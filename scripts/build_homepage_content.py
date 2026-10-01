@@ -1,449 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CalcHub — High-Precision Free Online Engineering, Finance & Health Calculators</title>
-  <meta name="description" content="Free precision calculators built on published mathematical, medical (WHO), financial, and industrial standards (IEC 60364, NEC & ACI). Explore 30+ specialized calculators across 12 core disciplines.">
-  <meta name="keywords" content="calculator, online calculator, engineering calculator, financial calculator, health calculator, math calculator, bmi calculator, loan emi calculator, ohms law calculator, solar calculator">
-  <meta name="author" content="CalcHub Global Editorial Board">
-  <meta name="robots" content="index, follow, max-image-preview:large">
-  <link rel="canonical" href="https://calchub.org/">
-  <link rel="stylesheet" href="styles.css">
+"""
+Script to build top-notch, SEO-rich, keyword-interlinked content for index.html.
+"""
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="CalcHub — Precision Engineering, Finance & Health Calculators">
-  <meta property="og:description" content="Free, standards-compliant online calculators. Zero registration, instant client-side computation, and exportable reports.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://calchub.org/">
+import re
+import sys
 
-  <!-- Google Search Sitelinks & Knowledge Graph Schema -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebSite",
-        "@id": "https://calchub.org/#website",
-        "name": "CalcHub",
-        "url": "https://calchub.org/",
-        "description": "High-precision free online calculation platform verified against published standards.",
-        "potentialAction": {
-          "@type": "SearchAction",
-          "target": "https://calchub.org/?q={search_term_string}",
-          "query-input": "required name=search_term_string"
-        }
-      },
-      {
-        "@type": "Organization",
-        "@id": "https://calchub.org/#org",
-        "name": "CalcHub",
-        "url": "https://calchub.org/",
-        "logo": "https://calchub.org/assets/logo.png",
-        "knowsAbout": [
-          "Mathematical Analysis",
-          "Electrical & Solar Engineering (IEC 60364 & NEC)",
-          "Civil Structural Design (ACI 318 & Eurocode)",
-          "Mechanical HVAC Thermodynamics (ASHRAE)",
-          "Cardiovascular & Anthropometric Health (WHO)",
-          "Financial Amortization & Investment Mathematics"
-        ]
-      },
-            {
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "How does CalcHub ensure calculations match engineering standards?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Every calculator on CalcHub is programmed using published formulas from recognized standard bodies including IEC 60364, NFPA 70 & 72, ACI 318, ASHRAE Standard 183, and WHO. Each tool displays its underlying mathematical formulas, parameter ranges, and reference citations."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Does CalcHub store my engineering inputs or sensitive financial information?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "No. CalcHub operates on a 100% client-side privacy architecture. All mathematical evaluations execute purely inside your device's web browser using vanilla JavaScript. No dimensions or financial inputs are transmitted to external servers."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "How do I export my calculation results to a formal PDF report?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Every calculator includes a dedicated Print Report button that triggers an optimized CSS print stylesheet to output a formal document with clean title headers, detailed inputs, calculated figures with engineering units, and a timestamp."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Are all calculators on CalcHub completely free to use?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Yes. All 33 calculators across all 12 disciplines are 100% free with unlimited usage, with zero paywalls, locked features, or mandatory registration barriers."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Can CalcHub calculators be used offline on field jobsites?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Yes. Because CalcHub tools require zero server round-trips for calculation execution, once loaded in your browser, the calculation logic remains fully functional without an active internet connection."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "How are units handled across metric and imperial systems?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Tools that involve physical dimensions feature built-in unit switchers allowing seamless toggling between Metric units (meters, millimeters, kilograms, kW, °C) and US Customary / Imperial units (feet, inches, pounds, BTU, °F)."
-            }
-          }
-        ]
-      }
-    ]
-  }
-    ]
-  }
-  </script>
-</head>
-<body>
+sys.stdout.reconfigure(encoding='utf-8')
 
-        <!-- Sticky Header -->
-  <header class="site-header">
-    <div class="header-inner">
-      <a href="index.html" class="brand-logo">
-        <span class="logo-badge">∑</span>
-        <span>Calc<span class="accent">Hub</span></span>
-      </a>
-      <nav class="header-nav" aria-label="Main Navigation">
-        <div class="nav-row">
-          <a href="index.html" class="nav-link active">🏠 Home</a>
-          <a href="health.html" class="nav-link">⚖️ Health</a>
-          <a href="finance.html" class="nav-link">🏦 Finance</a>
-          <a href="math.html" class="nav-link">🔢 Math</a>
-          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
-          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
-          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
-        </div>
-        <div class="nav-row">
-          <a href="civil.html" class="nav-link">🏗️ Civil</a>
-          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
-          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
-          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
-          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
-          <a href="converter.html" class="nav-link">🔄 Converter</a>
-        </div>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Hero Section -->
-  <div style="background:linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);border-bottom:1px solid #E2E8F0;padding:3.5rem 1.25rem 2.75rem;">
-    <div style="max-width:1120px;margin:0 auto;text-align:center;">
-      <span class="category-tag" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE;margin-bottom:1rem;">
-        ⚡ 100% Free · Clinical, Financial & Industrial Standards Verified · Zero Signup
-      </span>
-      <h1 style="font-size:clamp(2.2rem, 4vw, 3.25rem);letter-spacing:-0.03em;margin-bottom:1rem;color:#0F172A;">
-        High-Precision <span style="color:#2563EB;">Online Calculators</span>
-      </h1>
-      <p style="font-size:1.15rem;color:#475569;line-height:1.65;max-width:820px;margin:0 auto 1.5rem;">
-        Engineered according to international medical (WHO), financial, mathematical, civil (ACI), mechanical (ASHRAE), and electrical standards (IEC 60364 & NEC). Instant client-side computation with exportable reports.
-      </p>
-
-      <!-- Quick Category Jump Chips -->
-      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:1.5rem;">
-        <a href="health.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">⚖️ Health (5)</a>
-        <a href="finance.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">🏦 Finance (5)</a>
-        <a href="math.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">🔢 Math (5)</a>
-        <a href="engineering.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">⚡ Electrical (5)</a>
-        <a href="solar-energy.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">☀️ Solar (4)</a>
-        <a href="mechanical.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">⚙️ Mechanical (3)</a>
-        <a href="civil.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">🏗️ Civil (2)</a>
-        <a href="chemical.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">🧪 Chemical (1)</a>
-        <a href="fire-safety.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">🚨 Fire (1)</a>
-        <a href="programmer.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">👨‍💻 Tech (1)</a>
-        <a href="datetime.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">📅 Date (1)</a>
-        <a href="converter.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">🔄 Unit Converter</a>
-      </div>
-
-      <!-- Quick Calculator & Popular Tools Row -->
-      <div class="hero-calc-row">
-        
-        <!-- Left: Quick Calculator Widget -->
-        <div class="hero-card-panel">
-          <div class="hero-panel-title">
-            <span>🔢</span> Quick Arithmetic Calculator
-          </div>
-          <div class="quick-calc-screen">
-            <div class="quick-calc-expr" id="quick-calc-expr">&nbsp;</div>
-            <div class="quick-calc-val" id="quick-calc-val">0</div>
-          </div>
-          <div class="quick-calc-keys" id="quick-calc-keys">
-            <!-- Rendered by app.js -->
-          </div>
-        </div>
-
-        <!-- Right: Trending / Most-Used Tools -->
-        <div class="hero-card-panel">
-          <div class="hero-panel-title">
-            <span>⭐</span> Popular & Trending Calculators
-          </div>
-          <div class="hero-popular-grid">
-            <a href="bmi-calculator.html" class="hero-tool-chip">
-              <span class="t-icon">⚖️</span>
-              <span class="t-name">BMI Calculator</span>
-              <span class="t-cat">Health & Fitness</span>
-            </a>
-            <a href="loan-emi-calculator.html" class="hero-tool-chip">
-              <span class="t-icon">🏦</span>
-              <span class="t-name">Loan EMI</span>
-              <span class="t-cat">Finance</span>
-            </a>
-            <a href="solar-battery-bank-calculator.html" class="hero-tool-chip">
-              <span class="t-icon">🔋</span>
-              <span class="t-name">Solar Battery</span>
-              <span class="t-cat">Solar Energy</span>
-            </a>
-            <a href="cooling-load-calculator.html" class="hero-tool-chip">
-              <span class="t-icon">❄️</span>
-              <span class="t-name">HVAC Cooling</span>
-              <span class="t-cat">Mechanical</span>
-            </a>
-            <a href="concrete-calculator.html" class="hero-tool-chip">
-              <span class="t-icon">🏗️</span>
-              <span class="t-name">Concrete Slab</span>
-              <span class="t-cat">Civil Engineering</span>
-            </a>
-            <a href="subnet-calculator.html" class="hero-tool-chip">
-              <span class="t-icon">🌐</span>
-              <span class="t-name">IPv4 Subnet</span>
-              <span class="t-cat">Programmer</span>
-            </a>
-            <a href="percentage-calculator.html" class="hero-tool-chip">
-              <span class="t-icon">🔢</span>
-              <span class="t-name">Percentage</span>
-              <span class="t-cat">Mathematics</span>
-            </a>
-            <a href="ohms-law-calculator.html" class="hero-tool-chip">
-              <span class="t-icon">⚡</span>
-              <span class="t-name">Ohm's Law</span>
-              <span class="t-cat">Engineering</span>
-            </a>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Main Content -->
-  <main class="main-wrapper" style="margin-top:2.5rem;">
-
-    <!-- Section: Browse by Category (Hub Cards) -->
-    <div style="text-align:center;margin-bottom:1.5rem;">
-      <h2 style="margin:0 0 0.5rem;font-size:1.85rem;color:#0F172A;">Explore All 12 Specialized Disciplines</h2>
-      <p style="color:#64748B;font-size:1rem;max-width:680px;margin:0 auto;">
-        Select any discipline below to access certified formulas, calculation manuals, and interactive engineering tools.
-      </p>
-    </div>
-
-    <!-- 12 Category Hub Cards Grid -->
-    <div class="category-overview-grid">
-      
-      <!-- 1. Health & Fitness -->
-      <div class="category-overview-card cat-health">
-        <div class="cat-card-header">
-          <div class="cat-icon-box" style="background:#ECFDF5;border-color:#A7F3D0;">🩺</div>
-          <span class="cat-count-badge" style="background:#ECFDF5;color:#059669;border-color:#A7F3D0;">5 Tools</span>
-        </div>
-        <div class="cat-card-title">Health & Fitness</div>
-        <div class="cat-card-desc">Clinical anthropometric screening and metabolic energy balance tools verified against WHO and NASEM standards.</div>
-        <div class="cat-tool-preview-list">
-          <a href="bmi-calculator.html" class="cat-tool-item"><span>⚖️ BMI Calculator</span><span class="arr">&rarr;</span></a>
-          <a href="calorie-calculator.html" class="cat-tool-item"><span>🔥 Calorie TDEE</span><span class="arr">&rarr;</span></a>
-          <a href="body-fat-calculator.html" class="cat-tool-item"><span>📏 Body Fat (US Navy)</span><span class="arr">&rarr;</span></a>
-          <a href="ideal-weight-calculator.html" class="cat-tool-item"><span>❤️ Ideal Body Weight</span><span class="arr">&rarr;</span></a>
-          <a href="water-intake-calculator.html" class="cat-tool-item"><span>💧 Water Intake</span><span class="arr">&rarr;</span></a>
-        </div>
-        <a href="health.html" class="cat-explore-btn">Explore Health Hub &rarr;</a>
-      </div>
-
-      <!-- 2. Finance & Investment -->
-      <div class="category-overview-card cat-finance">
-        <div class="cat-card-header">
-          <div class="cat-icon-box" style="background:#EFF6FF;border-color:#BFDBFE;">🏦</div>
-          <span class="cat-count-badge" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE;">5 Tools</span>
-        </div>
-        <div class="cat-card-title">Finance & Investment</div>
-        <div class="cat-card-desc">Transparent financial mathematics for reducing-balance mortgages, compound interest wealth, and sales taxes.</div>
-        <div class="cat-tool-preview-list">
-          <a href="loan-emi-calculator.html" class="cat-tool-item"><span>🏦 Loan EMI Calculator</span><span class="arr">&rarr;</span></a>
-          <a href="compound-interest-calculator.html" class="cat-tool-item"><span>📈 Compound Interest</span><span class="arr">&rarr;</span></a>
-          <a href="simple-interest-calculator.html" class="cat-tool-item"><span>💰 Simple Interest</span><span class="arr">&rarr;</span></a>
-          <a href="discount-calculator.html" class="cat-tool-item"><span>🏷️ Discount & Sale</span><span class="arr">&rarr;</span></a>
-          <a href="salary-calculator.html" class="cat-tool-item"><span>💼 Salary / Paycheck</span><span class="arr">&rarr;</span></a>
-        </div>
-        <a href="finance.html" class="cat-explore-btn">Explore Finance Hub &rarr;</a>
-      </div>
-
-      <!-- 3. Mathematics & Utilities -->
-      <div class="category-overview-card cat-math">
-        <div class="cat-card-header">
-          <div class="cat-icon-box" style="background:#F5F3FF;border-color:#DDD6FE;">🔢</div>
-          <span class="cat-count-badge" style="background:#F5F3FF;color:#7C3AED;border-color:#DDD6FE;">5 Tools</span>
-        </div>
-        <div class="cat-card-title">Mathematics & Utilities</div>
-        <div class="cat-card-desc">Exact arithmetic, proportional reasoning, grade point averages, and Gregorian calendar mechanics.</div>
-        <div class="cat-tool-preview-list">
-          <a href="percentage-calculator.html" class="cat-tool-item"><span>🔢 Percentage Calculator</span><span class="arr">&rarr;</span></a>
-          <a href="age-calculator.html" class="cat-tool-item"><span>🎂 Exact Age Calculator</span><span class="arr">&rarr;</span></a>
-          <a href="gpa-calculator.html" class="cat-tool-item"><span>🎓 College GPA (4.0)</span><span class="arr">&rarr;</span></a>
-          <a href="fraction-calculator.html" class="cat-tool-item"><span>½ Fraction Calculator</span><span class="arr">&rarr;</span></a>
-          <a href="ratio-calculator.html" class="cat-tool-item"><span>➗ Ratio Simplifier</span><span class="arr">&rarr;</span></a>
-        </div>
-        <a href="math.html" class="cat-explore-btn">Explore Mathematics Hub &rarr;</a>
-      </div>
-
-      <!-- 4. Electrical & Engineering -->
-      <div class="category-overview-card cat-engineering">
-        <div class="cat-card-header">
-          <div class="cat-icon-box" style="background:#FFFBEB;border-color:#FDE68A;">⚡</div>
-          <span class="cat-count-badge" style="background:#FFFBEB;color:#D97706;border-color:#FDE68A;">5 Tools</span>
-        </div>
-        <div class="cat-card-title">Electrical Engineering</div>
-        <div class="cat-card-desc">Verified electrical engineering calculators compliant with IEC 60364-5-52, NEC NFPA 70, and EIA resistor standards.</div>
-        <div class="cat-tool-preview-list">
-          <a href="ohms-law-calculator.html" class="cat-tool-item"><span>⚡ Ohm's Law Wheel</span><span class="arr">&rarr;</span></a>
-          <a href="voltage-drop-calculator.html" class="cat-tool-item"><span>📉 Voltage Drop (NEC)</span><span class="arr">&rarr;</span></a>
-          <a href="cable-sizing-calculator.html" class="cat-tool-item"><span>🔌 Cable Sizing (IEC)</span><span class="arr">&rarr;</span></a>
-          <a href="resistor-color-code-calculator.html" class="cat-tool-item"><span>🎨 Resistor Color Code</span><span class="arr">&rarr;</span></a>
-          <a href="solar-panel-sizing-calculator.html" class="cat-tool-item"><span>☀️ Solar PV Array Sizing</span><span class="arr">&rarr;</span></a>
-        </div>
-        <a href="engineering.html" class="cat-explore-btn">Explore Electrical Hub &rarr;</a>
-      </div>
-
-      <!-- 5. Solar & Renewable Energy -->
-      <div class="category-overview-card cat-solar">
-        <div class="cat-card-header">
-          <div class="cat-icon-box" style="background:#FFF7ED;border-color:#FFEDD5;">☀️</div>
-          <span class="cat-count-badge" style="background:#FFF7ED;color:#EA580C;border-color:#FFEDD5;">4 Tools</span>
-        </div>
-        <div class="cat-card-title">Solar & Renewable Energy</div>
-        <div class="cat-card-desc">Photovoltaic array sizing, battery bank Ah/kWh, inverter capacity, and EV charging speeds.</div>
-        <div class="cat-tool-preview-list">
-          <a href="solar-panel-sizing-calculator.html" class="cat-tool-item"><span>☀️ Solar Panel Sizing</span><span class="arr">&rarr;</span></a>
-          <a href="solar-battery-bank-calculator.html" class="cat-tool-item"><span>🔋 Solar Battery Bank</span><span class="arr">&rarr;</span></a>
-          <a href="solar-inverter-sizing-calculator.html" class="cat-tool-item"><span>⚡ Solar Inverter Sizing</span><span class="arr">&rarr;</span></a>
-          <a href="ev-charging-time-calculator.html" class="cat-tool-item"><span>🔌 EV Charging Time</span><span class="arr">&rarr;</span></a>
-        </div>
-        <a href="solar-energy.html" class="cat-explore-btn">Explore Solar Hub &rarr;</a>
-      </div>
-
-      <!-- 6. Mechanical & HVAC -->
-      <div class="category-overview-card cat-mechanical">
-        <div class="cat-card-header">
-          <div class="cat-icon-box" style="background:#ECFEFF;border-color:#A5F3FC;">⚙️</div>
-          <span class="cat-count-badge" style="background:#ECFEFF;color:#0891B2;border-color:#A5F3FC;">3 Tools</span>
-        </div>
-        <div class="cat-card-title">Mechanical & HVAC</div>
-        <div class="cat-card-desc">ASHRAE cooling load tonnage, Darcy-Weisbach pipe sizing, and rotating shaft torque mechanics.</div>
-        <div class="cat-tool-preview-list">
-          <a href="cooling-load-calculator.html" class="cat-tool-item"><span>❄️ Cooling Load (HVAC)</span><span class="arr">&rarr;</span></a>
-          <a href="pipe-sizing-calculator.html" class="cat-tool-item"><span>🚰 Pipe Sizing & Flow</span><span class="arr">&rarr;</span></a>
-          <a href="torque-calculator.html" class="cat-tool-item"><span>⚙️ Torque & Shaft Power</span><span class="arr">&rarr;</span></a>
-        </div>
-        <a href="mechanical.html" class="cat-explore-btn">Explore Mechanical Hub &rarr;</a>
-      </div>
-
-      <!-- 7. Civil & Construction -->
-      <div class="category-overview-card cat-civil">
-        <div class="cat-card-header">
-          <div class="cat-icon-box" style="background:#FEFCE8;border-color:#FEF08A;">🏗️</div>
-          <span class="cat-count-badge" style="background:#FEFCE8;color:#B45309;border-color:#FEF08A;">2 Tools</span>
-        </div>
-        <div class="cat-card-title">Civil & Construction</div>
-        <div class="cat-card-desc">Concrete slab volume in m³/yd³, cement batching bags, and reinforcing steel rebar weight estimations.</div>
-        <div class="cat-tool-preview-list">
-          <a href="concrete-calculator.html" class="cat-tool-item"><span>🏗️ Concrete Volume Sizing</span><span class="arr">&rarr;</span></a>
-          <a href="rebar-calculator.html" class="cat-tool-item"><span>🔩 Rebar Weight & Spacing</span><span class="arr">&rarr;</span></a>
-        </div>
-        <a href="civil.html" class="cat-explore-btn">Explore Civil Hub &rarr;</a>
-      </div>
-
-      <!-- 8. Chemical & Water Treatment -->
-      <div class="category-overview-card cat-chemical">
-        <div class="cat-card-header">
-          <div class="cat-icon-box" style="background:#F0FDFA;border-color:#99F6E4;">🧪</div>
-          <span class="cat-count-badge" style="background:#F0FDFA;color:#0D9488;border-color:#99F6E4;">1 Tool</span>
-        </div>
-        <div class="cat-card-title">Chemical & Water</div>
-        <div class="cat-card-desc">Industrial water treatment chemical dosing pump delivery rates in L/hr and solution mass balance.</div>
-        <div class="cat-tool-preview-list">
-          <a href="chemical-dosing-calculator.html" class="cat-tool-item"><span>🧪 Chemical Dosing Rate</span><span class="arr">&rarr;</span></a>
-        </div>
-        <a href="chemical.html" class="cat-explore-btn">Explore Chemical Hub &rarr;</a>
-      </div>
-
-      <!-- 9. Fire & Safety -->
-      <div class="category-overview-card cat-fire">
-        <div class="cat-card-header">
-          <div class="cat-icon-box" style="background:#FEF2F2;border-color:#FECACA;">🚨</div>
-          <span class="cat-count-badge" style="background:#FEF2F2;color:#DC2626;border-color:#FECACA;">1 Tool</span>
-        </div>
-        <div class="cat-card-title">Fire & Life Safety</div>
-        <div class="cat-card-desc">NFPA 72 smoke detector spacing with ceiling height derating factors and layout coverage analysis.</div>
-        <div class="cat-tool-preview-list">
-          <a href="smoke-detector-spacing-calculator.html" class="cat-tool-item"><span>🚨 Smoke Detector Spacing</span><span class="arr">&rarr;</span></a>
-        </div>
-        <a href="fire-safety.html" class="cat-explore-btn">Explore Fire Hub &rarr;</a>
-      </div>
-
-      <!-- 10. Programmer & Networking -->
-      <div class="category-overview-card cat-programmer">
-        <div class="cat-card-header">
-          <div class="cat-icon-box" style="background:#EEF2FF;border-color:#C7D2FE;">👨‍💻</div>
-          <span class="cat-count-badge" style="background:#EEF2FF;color:#4F46E5;border-color:#C7D2FE;">1 Tool</span>
-        </div>
-        <div class="cat-card-title">Programmer & Networking</div>
-        <div class="cat-card-desc">IPv4 CIDR subnetting, wildcard masks, usable host address boundaries, and network IDs.</div>
-        <div class="cat-tool-preview-list">
-          <a href="subnet-calculator.html" class="cat-tool-item"><span>🌐 IPv4 Subnet Calculator</span><span class="arr">&rarr;</span></a>
-        </div>
-        <a href="programmer.html" class="cat-explore-btn">Explore Tech Hub &rarr;</a>
-      </div>
-
-      <!-- 11. Date & Time -->
-      <div class="category-overview-card cat-datetime">
-        <div class="cat-card-header">
-          <div class="cat-icon-box" style="background:#F0F9FF;border-color:#BAE6FD;">📅</div>
-          <span class="cat-count-badge" style="background:#F0F9FF;color:#0284C7;border-color:#BAE6FD;">1 Tool</span>
-        </div>
-        <div class="cat-card-title">Date & Time Utilities</div>
-        <div class="cat-card-desc">Calendar duration math: working business days (excluding weekends), elapsed days, and year fractions.</div>
-        <div class="cat-tool-preview-list">
-          <a href="date-difference-calculator.html" class="cat-tool-item"><span>📅 Date Difference & Workdays</span><span class="arr">&rarr;</span></a>
-        </div>
-        <a href="datetime.html" class="cat-explore-btn">Explore Date Hub &rarr;</a>
-      </div>
-
-      <!-- 12. Universal Converters -->
-      <div class="category-overview-card cat-converter">
-        <div class="cat-card-header">
-          <div class="cat-icon-box" style="background:#FAF5FF;border-color:#E9D5FF;">🔄</div>
-          <span class="cat-count-badge" style="background:#FAF5FF;color:#9333EA;border-color:#E9D5FF;">Multi-Unit</span>
-        </div>
-        <div class="cat-card-title">Unit Converters</div>
-        <div class="cat-card-desc">Universal conversion engine across length, weight/mass, temperature, pressure, area, and volume.</div>
-        <div class="cat-tool-preview-list">
-          <a href="unit-converter.html" class="cat-tool-item"><span>🔄 Universal Multi-Converter</span><span class="arr">&rarr;</span></a>
-        </div>
-        <a href="converter.html" class="cat-explore-btn">Explore Converter Hub &rarr;</a>
-      </div>
-    </div>
-
+# The rich SEO and Engineering section to insert into index.html
+RICH_CONTENT_HTML = r"""
     <!-- ================================================================= -->
     <!-- SECTION 1: WHAT IS CALCHUB? (AUTHORITATIVE PLATFORM OVERVIEW)    -->
     <!-- ================================================================= -->
@@ -1052,61 +617,87 @@
 
       </div>
     </section>
+"""
 
-  </main>
+def update_homepage():
+    with open("index.html", "r", encoding="utf-8") as f:
+        html = f.read()
 
-  <!-- Site Footer -->
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a href="index.html" class="brand-logo">
-            <span class="logo-badge">∑</span>
-            <span>Calc<span class="accent">Hub</span></span>
-          </a>
-          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
-        </div>
-        <div class="footer-col">
-          <h4>Health & Fitness</h4>
-          <ul class="footer-links">
-            <li><a href="bmi-calculator.html">BMI Calculator</a></li>
-            <li><a href="calorie-calculator.html">Calorie Calculator (TDEE)</a></li>
-            <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
-            <li><a href="ideal-weight-calculator.html">Ideal Body Weight</a></li>
-            <li><a href="water-intake-calculator.html">Daily Water Intake</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Finance & Money</h4>
-          <ul class="footer-links">
-            <li><a href="loan-emi-calculator.html">Loan EMI Calculator</a></li>
-            <li><a href="compound-interest-calculator.html">Compound Interest</a></li>
-            <li><a href="simple-interest-calculator.html">Simple Interest</a></li>
-            <li><a href="discount-calculator.html">Discount & Sale</a></li>
-            <li><a href="salary-calculator.html">Salary / Paycheck</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Engineering & Tech</h4>
-          <ul class="footer-links">
-            <li><a href="solar-energy.html">Solar & Renewable Hub</a></li>
-            <li><a href="mechanical.html">Mechanical & HVAC Hub</a></li>
-            <li><a href="civil.html">Civil & Construction Hub</a></li>
-            <li><a href="chemical.html">Chemical & Water Hub</a></li>
-            <li><a href="programmer.html">Programmer & CIDR Hub</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2026 CalcHub. All rights reserved. Mathematical tools are for educational and guidance purposes.</p>
-        <div>
-          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
-          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy & Terms</a>
-        </div>
-      </div>
-    </div>
-  </footer>
+    # Expand the FAQPage schema in index.html to include all 6 questions
+    faq_schema = '''      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How does CalcHub ensure calculations match engineering standards?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Every calculator on CalcHub is programmed using published formulas from recognized standard bodies including IEC 60364, NFPA 70 & 72, ACI 318, ASHRAE Standard 183, and WHO. Each tool displays its underlying mathematical formulas, parameter ranges, and reference citations."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does CalcHub store my engineering inputs or sensitive financial information?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. CalcHub operates on a 100% client-side privacy architecture. All mathematical evaluations execute purely inside your device's web browser using vanilla JavaScript. No dimensions or financial inputs are transmitted to external servers."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I export my calculation results to a formal PDF report?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Every calculator includes a dedicated Print Report button that triggers an optimized CSS print stylesheet to output a formal document with clean title headers, detailed inputs, calculated figures with engineering units, and a timestamp."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Are all calculators on CalcHub completely free to use?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. All 33 calculators across all 12 disciplines are 100% free with unlimited usage, with zero paywalls, locked features, or mandatory registration barriers."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can CalcHub calculators be used offline on field jobsites?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Because CalcHub tools require zero server round-trips for calculation execution, once loaded in your browser, the calculation logic remains fully functional without an active internet connection."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How are units handled across metric and imperial systems?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Tools that involve physical dimensions feature built-in unit switchers allowing seamless toggling between Metric units (meters, millimeters, kilograms, kW, °C) and US Customary / Imperial units (feet, inches, pounds, BTU, °F)."
+            }
+          }
+        ]
+      }'''
 
-  <script src="app.js"></script>
-</body>
-</html>
+    schema_pattern = re.compile(r'\{\s*"@type":\s*"FAQPage".*?\}\s*\]\s*\}', re.DOTALL)
+    if schema_pattern.search(html):
+        html = schema_pattern.sub(lambda m: faq_schema + '\n    ]\n  }', html)
+        print("Updated JSON-LD FAQPage schema successfully.")
+
+    # In index.html, replace the incomplete filter & block sections and small geo box with the new master content
+    replace_pattern = re.compile(r'<!--\s*Category Filter Bar\s*-->.*?</main>', re.DOTALL)
+    
+    if replace_pattern.search(html):
+        new_main_content = RICH_CONTENT_HTML.strip() + "\n\n  </main>"
+        html = replace_pattern.sub(lambda m: new_main_content, html)
+        print("Replaced main content with new SEO & Engineering architecture.")
+    else:
+        print("Warning: replace pattern for main content not found!")
+        return
+
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(html)
+
+    print("index.html updated successfully!")
+
+if __name__ == "__main__":
+    update_homepage()
