@@ -4,21 +4,34 @@
  */
 
 const CALC_DIRECTORY = [
+  // Category Hubs
+  { name: "Health & Fitness Category Hub", url: "health.html", category: "Category Hub", icon: "⚖️" },
+  { name: "Finance & Investment Category Hub", url: "finance.html", category: "Category Hub", icon: "🏦" },
+  { name: "Mathematics & Utilities Category Hub", url: "math.html", category: "Category Hub", icon: "🔢" },
+  { name: "Electrical & Engineering Category Hub", url: "engineering.html", category: "Category Hub", icon: "⚡" },
+
+  // Health Calculators
   { name: "BMI Calculator", url: "bmi-calculator.html", category: "Health & Fitness", icon: "⚖️" },
   { name: "Calorie Calculator (TDEE)", url: "calorie-calculator.html", category: "Health & Fitness", icon: "🔥" },
   { name: "Body Fat Calculator", url: "body-fat-calculator.html", category: "Health & Fitness", icon: "📏" },
   { name: "Ideal Body Weight Calculator", url: "ideal-weight-calculator.html", category: "Health & Fitness", icon: "❤️" },
   { name: "Daily Water Intake Calculator", url: "water-intake-calculator.html", category: "Health & Fitness", icon: "💧" },
+
+  // Finance Calculators
   { name: "Loan EMI Calculator", url: "loan-emi-calculator.html", category: "Finance", icon: "🏦" },
   { name: "Compound Interest Calculator", url: "compound-interest-calculator.html", category: "Finance", icon: "📈" },
   { name: "Simple Interest Calculator", url: "simple-interest-calculator.html", category: "Finance", icon: "💰" },
   { name: "Discount & Sale Calculator", url: "discount-calculator.html", category: "Finance", icon: "🏷️" },
   { name: "Salary / Paycheck Calculator", url: "salary-calculator.html", category: "Finance", icon: "💼" },
+
+  // Math Calculators
   { name: "Percentage Calculator", url: "percentage-calculator.html", category: "Math & Utility", icon: "🔢" },
   { name: "Exact Age Calculator", url: "age-calculator.html", category: "Math & Utility", icon: "🎂" },
   { name: "College & High School GPA Calculator", url: "gpa-calculator.html", category: "Math & Utility", icon: "🎓" },
   { name: "Fraction Calculator", url: "fraction-calculator.html", category: "Math & Utility", icon: "½" },
   { name: "Ratio Calculator & Simplifier", url: "ratio-calculator.html", category: "Math & Utility", icon: "➗" },
+
+  // Engineering Calculators
   { name: "Ohm's Law Calculator", url: "ohms-law-calculator.html", category: "Engineering", icon: "⚡" },
   { name: "Voltage Drop Calculator", url: "voltage-drop-calculator.html", category: "Engineering", icon: "📉" },
   { name: "Cable Sizing Calculator (IEC/NEC)", url: "cable-sizing-calculator.html", category: "Engineering", icon: "🔌" },
@@ -30,6 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initSearch();
   initToast();
   initTOC();
+  initQuickCalc();
+  initCategoryFilter();
 });
 
 // Search Autocomplete
@@ -129,6 +144,102 @@ function initTOC() {
           el.scrollIntoView({ behavior: "smooth", block: "start" });
         }
       }
+    });
+  });
+}
+
+// Interactive Hero Quick Calculator
+function initQuickCalc() {
+  const keysContainer = document.getElementById("quick-calc-keys");
+  const valEl = document.getElementById("quick-calc-val");
+  const exprEl = document.getElementById("quick-calc-expr");
+  if (!keysContainer || !valEl) return;
+
+  const KEYS = ["AC", "⌫", "%", "÷", "7", "8", "9", "×", "4", "5", "6", "−", "1", "2", "3", "+", "0", ".", "="];
+  let expr = "";
+  let justEvaluated = false;
+
+  keysContainer.innerHTML = "";
+  KEYS.forEach(k => {
+    const btn = document.createElement("div");
+    btn.textContent = k;
+    let cls = "q-key";
+    if (["÷", "×", "−", "+"].includes(k)) cls += " op";
+    else if (k === "=") cls += " eq";
+    else if (["AC", "⌫", "%"].includes(k)) cls += " fn";
+    btn.className = cls;
+
+    btn.addEventListener("click", () => handlePress(k));
+    keysContainer.appendChild(btn);
+  });
+
+  function handlePress(k) {
+    if (k === "AC") {
+      expr = "";
+      valEl.textContent = "0";
+      if (exprEl) exprEl.innerHTML = "&nbsp;";
+      return;
+    }
+    if (k === "⌫") {
+      expr = expr.slice(0, -1);
+      valEl.textContent = expr || "0";
+      return;
+    }
+    if (k === "=") {
+      if (!expr) return;
+      try {
+        let clean = expr.replace(/%/g, "/100").replace(/×/g, "*").replace(/÷/g, "/").replace(/−/g, "-");
+        if (!/^[0-9+\-*/.() ]+$/.test(clean)) throw new Error("Invalid");
+        let result = Function('"use strict";return (' + clean + ')')();
+        if (!isFinite(result)) throw new Error("Math error");
+        if (exprEl) exprEl.textContent = expr + " =";
+        let displayVal = Math.round(result * 100000000) / 100000000;
+        valEl.textContent = String(displayVal);
+        expr = String(displayVal);
+        justEvaluated = true;
+      } catch (err) {
+        valEl.textContent = "Error";
+        expr = "";
+      }
+      return;
+    }
+
+    if (justEvaluated && /[0-9.]/.test(k)) {
+      expr = "";
+    }
+    justEvaluated = false;
+
+    // Prevent double operators
+    const lastChar = expr.slice(-1);
+    const ops = ["+", "−", "×", "÷"];
+    if (ops.includes(k) && ops.includes(lastChar)) {
+      expr = expr.slice(0, -1) + k;
+    } else {
+      expr += k;
+    }
+    valEl.textContent = expr;
+  }
+}
+
+// Interactive Category Filter Bar
+function initCategoryFilter() {
+  const filterPills = document.querySelectorAll(".category-filter-nav .filter-pill");
+  const sections = document.querySelectorAll(".category-block-section");
+  if (!filterPills.length) return;
+
+  filterPills.forEach(pill => {
+    pill.addEventListener("click", () => {
+      filterPills.forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
+
+      const cat = pill.getAttribute("data-cat");
+      sections.forEach(sec => {
+        if (cat === "all" || sec.getAttribute("data-cat") === cat) {
+          sec.style.display = "block";
+        } else {
+          sec.style.display = "none";
+        }
+      });
     });
   });
 }
