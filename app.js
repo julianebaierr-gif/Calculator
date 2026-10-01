@@ -4,39 +4,76 @@
  */
 
 const CALC_DIRECTORY = [
-  // Category Hubs
+  // Category Hubs (12)
   { name: "Health & Fitness Category Hub", url: "health.html", category: "Category Hub", icon: "⚖️" },
   { name: "Finance & Investment Category Hub", url: "finance.html", category: "Category Hub", icon: "🏦" },
   { name: "Mathematics & Utilities Category Hub", url: "math.html", category: "Category Hub", icon: "🔢" },
   { name: "Electrical & Engineering Category Hub", url: "engineering.html", category: "Category Hub", icon: "⚡" },
+  { name: "Solar & Renewable Energy Category Hub", url: "solar-energy.html", category: "Category Hub", icon: "☀️" },
+  { name: "Mechanical & HVAC Category Hub", url: "mechanical.html", category: "Category Hub", icon: "⚙️" },
+  { name: "Civil & Construction Category Hub", url: "civil.html", category: "Category Hub", icon: "🏗️" },
+  { name: "Chemical & Water Treatment Category Hub", url: "chemical.html", category: "Category Hub", icon: "🧪" },
+  { name: "Fire & Life Safety Category Hub", url: "fire-safety.html", category: "Category Hub", icon: "🚨" },
+  { name: "Programmer & Networking Category Hub", url: "programmer.html", category: "Category Hub", icon: "👨‍💻" },
+  { name: "Date & Time Utilities Category Hub", url: "datetime.html", category: "Category Hub", icon: "📅" },
+  { name: "Universal Unit Converters Category Hub", url: "converter.html", category: "Category Hub", icon: "🔄" },
 
-  // Health Calculators
+  // Health & Fitness Calculators
   { name: "BMI Calculator", url: "bmi-calculator.html", category: "Health & Fitness", icon: "⚖️" },
   { name: "Calorie Calculator (TDEE)", url: "calorie-calculator.html", category: "Health & Fitness", icon: "🔥" },
   { name: "Body Fat Calculator", url: "body-fat-calculator.html", category: "Health & Fitness", icon: "📏" },
   { name: "Ideal Body Weight Calculator", url: "ideal-weight-calculator.html", category: "Health & Fitness", icon: "❤️" },
   { name: "Daily Water Intake Calculator", url: "water-intake-calculator.html", category: "Health & Fitness", icon: "💧" },
 
-  // Finance Calculators
+  // Finance & Investment Calculators
   { name: "Loan EMI Calculator", url: "loan-emi-calculator.html", category: "Finance", icon: "🏦" },
   { name: "Compound Interest Calculator", url: "compound-interest-calculator.html", category: "Finance", icon: "📈" },
   { name: "Simple Interest Calculator", url: "simple-interest-calculator.html", category: "Finance", icon: "💰" },
   { name: "Discount & Sale Calculator", url: "discount-calculator.html", category: "Finance", icon: "🏷️" },
   { name: "Salary / Paycheck Calculator", url: "salary-calculator.html", category: "Finance", icon: "💼" },
 
-  // Math Calculators
+  // Mathematics & Utilities Calculators
   { name: "Percentage Calculator", url: "percentage-calculator.html", category: "Math & Utility", icon: "🔢" },
   { name: "Exact Age Calculator", url: "age-calculator.html", category: "Math & Utility", icon: "🎂" },
   { name: "College & High School GPA Calculator", url: "gpa-calculator.html", category: "Math & Utility", icon: "🎓" },
   { name: "Fraction Calculator", url: "fraction-calculator.html", category: "Math & Utility", icon: "½" },
   { name: "Ratio Calculator & Simplifier", url: "ratio-calculator.html", category: "Math & Utility", icon: "➗" },
 
-  // Engineering Calculators
+  // Electrical & Engineering Calculators
   { name: "Ohm's Law Calculator", url: "ohms-law-calculator.html", category: "Engineering", icon: "⚡" },
   { name: "Voltage Drop Calculator", url: "voltage-drop-calculator.html", category: "Engineering", icon: "📉" },
   { name: "Cable Sizing Calculator (IEC/NEC)", url: "cable-sizing-calculator.html", category: "Engineering", icon: "🔌" },
   { name: "Resistor Color Code Calculator", url: "resistor-color-code-calculator.html", category: "Engineering", icon: "🎨" },
-  { name: "Solar Panel & Battery Sizing", url: "solar-panel-sizing-calculator.html", category: "Engineering", icon: "☀️" }
+  { name: "Solar Panel & Battery Sizing", url: "solar-panel-sizing-calculator.html", category: "Engineering", icon: "☀️" },
+
+  // Solar & Renewable Energy Calculators
+  { name: "Solar Battery Bank Sizing", url: "solar-battery-bank-calculator.html", category: "Solar & Renewable", icon: "🔋" },
+  { name: "Solar Inverter Sizing", url: "solar-inverter-sizing-calculator.html", category: "Solar & Renewable", icon: "⚡" },
+  { name: "EV Charging Time & Power", url: "ev-charging-time-calculator.html", category: "Solar & Renewable", icon: "🔌" },
+
+  // Mechanical & HVAC Calculators
+  { name: "Cooling Load (HVAC) Sizing", url: "cooling-load-calculator.html", category: "Mechanical & HVAC", icon: "❄️" },
+  { name: "Pipe Sizing & Water Flow", url: "pipe-sizing-calculator.html", category: "Mechanical & HVAC", icon: "🚰" },
+  { name: "Torque & Shaft Power", url: "torque-calculator.html", category: "Mechanical & HVAC", icon: "⚙️" },
+
+  // Civil & Construction Calculators
+  { name: "Concrete Slab, Footing & Column", url: "concrete-calculator.html", category: "Civil & Construction", icon: "🏗️" },
+  { name: "Rebar Weight & Grid Spacing", url: "rebar-calculator.html", category: "Civil & Construction", icon: "🔩" },
+
+  // Chemical & Water Treatment
+  { name: "Chemical Dosing Rate Calculator", url: "chemical-dosing-calculator.html", category: "Chemical & Water", icon: "🧪" },
+
+  // Fire & Life Safety
+  { name: "Smoke Detector Spacing & Layout", url: "smoke-detector-spacing-calculator.html", category: "Fire & Safety", icon: "🚨" },
+
+  // Programmer & Networking
+  { name: "IPv4 Subnet & CIDR IP Calculator", url: "subnet-calculator.html", category: "Programmer & Networking", icon: "🌐" },
+
+  // Date & Time Utilities
+  { name: "Date Difference & Business Days", url: "date-difference-calculator.html", category: "Date & Time", icon: "📅" },
+
+  // Universal Converters
+  { name: "Universal Multi-Unit Converter", url: "unit-converter.html", category: "Universal Converters", icon: "🔄" }
 ];
 
 document.addEventListener("DOMContentLoaded", () => {

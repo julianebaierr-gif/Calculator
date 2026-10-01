@@ -1,4 +1,9 @@
-<!DOCTYPE html>
+"""
+Script to generate the comprehensive, updated index.html featuring all categories and live calculators.
+"""
+
+def generate_homepage():
+    content = """<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -709,4 +714,10 @@
 
   <script src="app.js"></script>
 </body>
-</html>
+</html>"""
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(content)
+    print("Updated index.html successfully with all categories!")
+
+if __name__ == "__main__":
+    generate_homepage()
