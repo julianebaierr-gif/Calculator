@@ -1,230 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Health & Fitness Calculators — Free Medical & Body Metric Tools | CalcHub</title>
-  <meta name="description" content="Free precision health and anthropometric calculators verified against WHO, NASEM, and clinical standards. Calculate BMI, Calorie TDEE, Body Fat %, Ideal Body Weight, and Water Intake.">
-  <meta name="keywords" content="health calculator, bmi calculator, calorie calculator, tdee calculator, body fat calculator, ideal body weight calculator, water intake calculator">
-  <meta name="author" content="CalcHub Clinical & Anthropometric Editorial Board">
-  <meta name="robots" content="index, follow, max-image-preview:large">
-  <link rel="canonical" href="https://calchub.org/health.html">
-  <link rel="stylesheet" href="styles.css">
+import os
+import re
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Health & Fitness Calculators — Clinical Precision Tools | CalcHub">
-  <meta property="og:description" content="Standards-compliant body composition, metabolic, and hydration screening tools based on published medical criteria.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://calchub.org/health.html">
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-  <!-- Structured Data: CollectionPage & FAQ -->
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "CollectionPage",
-      "@id": "https://calchub.org/health.html#webpage",
-      "url": "https://calchub.org/health.html",
-      "name": "Health & Fitness Calculators",
-      "description": "Comprehensive suite of clinical anthropometric and metabolic health calculators.",
-      "breadcrumb": {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": "https://calchub.org/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Health & Fitness",
-            "item": "https://calchub.org/health.html"
-          }
-        ]
-      }
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "Why is BMI alone insufficient for assessing body composition?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Body Mass Index (BMI) only evaluates total weight relative to height squared; it cannot differentiate between skeletal muscle mass, bone density, and adipose fat tissue. An athletic bodybuilder with low body fat may register a BMI of 30+ ('Obese'), while an elderly person with muscle wasting may register 'Normal' despite excessive visceral fat."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Why is the Mifflin-St Jeor equation preferred over the Harris-Benedict equation?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "The original Harris-Benedict equation was formulated in 1919 using a small sample of young, lean individuals and systematically overestimates BMR by 5% to 15% in modern sedentary populations. Multiple clinical trials confirm the Mifflin-St Jeor formula (published in 1990) provides the highest accuracy (within \u00b110% of indirect calorimetry)."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How does a 500-calorie daily deficit relate to one pound of fat loss?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "One pound of human adipose fat tissue stores approximately 3,500 kilocalories of chemical energy. A daily energy deficit of 500 kcal accumulates to 3,500 kcal over seven days (500 \u00d7 7 = 3,500), producing approximately one pound (0.45 kg) of sustainable fat mass reduction per week."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How does water intake impact metabolic rate and weight loss?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Water is essential for intracellular lipolysis (the biochemical breakdown of fat triglycerides). Mild dehydration (1%\u20132% body weight loss) impairs cellular metabolism, reduces exercise performance, and is frequently misidentified by the hypothalamus as hunger. Keep your hydration balanced with our Water Intake Calculator."
-          }
-        }
-      ]
-    }
-  ]
-}
-</script>
-</head>
-<body class="cat-theme-health">
-
-        <!-- Sticky Header -->
-  <header class="site-header">
-    <div class="header-inner">
-      <a href="index.html" class="brand-logo">
-        <span class="logo-badge">∑</span>
-        <span>Calc<span class="accent">Hub</span></span>
-      </a>
-      <nav class="header-nav" aria-label="Main Navigation">
-        <div class="nav-row">
-          <a href="index.html" class="nav-link">🏠 Home</a>
-          <a href="health.html" class="nav-link active">⚖️ Health</a>
-          <a href="finance.html" class="nav-link">🏦 Finance</a>
-          <a href="math.html" class="nav-link">🔢 Math</a>
-          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
-          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
-          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
-        </div>
-        <div class="nav-row">
-          <a href="civil.html" class="nav-link">🏗️ Civil</a>
-          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
-          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
-          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
-          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
-          <a href="converter.html" class="nav-link">🔄 Converter</a>
-        </div>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Category Hub Hero -->
-  <div class="cat-hub-hero">
-    <div class="cat-hub-hero-inner">
-      <div class="category-breadcrumbs">
-        <a href="index.html">Home</a> &rsaquo; <span>Health & Fitness</span>
-      </div>
-      <span class="category-tag" style="background:#ECFDF5;color:#059669;border-color:#A7F3D0;margin-bottom:1rem;">
-        🩺 WHO, NASEM & Clinical Standards Verified
-      </span>
-      <h1 style="font-size:clamp(2.2rem, 4vw, 3rem);letter-spacing:-0.03em;margin-bottom:0.75rem;color:#0F172A;">
-        Health & Fitness <span style="color:#059669;">Calculators</span>
-      </h1>
-      <p style="font-size:1.1rem;color:#475569;line-height:1.65;margin-bottom:1.5rem;">
-        Screen anthropometric body metrics, energy balance, and daily physiological targets using certified clinical formulas. Free, instantaneous, with 100% client-side privacy.
-      </p>
-      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
-        <span style="font-size:0.88rem;color:#64748B;"><strong>5</strong> Precision Tools</span>
-        <span style="font-size:0.88rem;color:#64748B;">• <strong>Zero</strong> Tracking Cookies</span>
-        <span style="font-size:0.88rem;color:#64748B;">• <strong>Metric & Imperial</strong> Support</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Tools Grid -->
-  <main class="main-wrapper" style="margin-top:2.5rem;">
-
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-      <h2 style="margin:0;font-size:1.5rem;color:#0F172A;">Available Health Calculators (5)</h2>
-      <a href="index.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">&larr; All Categories</a>
-    </div>
-
-    <div class="silo-card-grid" style="margin-top:0;margin-bottom:3.5rem;">
-      
-      <!-- 1. BMI -->
-      <a href="bmi-calculator.html" class="silo-card" style="border-top:3px solid #059669;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">⚖️</div>
-          <span class="silo-card-badge">WHO Standard</span>
-        </div>
-        <div class="silo-card-title">BMI Calculator</div>
-        <div class="silo-card-desc">Calculate Body Mass Index, WHO classification, healthy weight boundaries, and BMI Prime ratio in Metric (kg/cm) and Imperial (lbs/ft-in).</div>
-        <div class="formula-badge-pill">BMI = kg / (m)²</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#059669;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-      <!-- 2. Calorie TDEE -->
-      <a href="calorie-calculator.html" class="silo-card" style="border-top:3px solid #059669;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">🔥</div>
-          <span class="silo-card-badge">Mifflin-St Jeor</span>
-        </div>
-        <div class="silo-card-title">Calorie Calculator (TDEE)</div>
-        <div class="silo-card-desc">Determine your Basal Metabolic Rate (BMR) and Total Daily Energy Expenditure (TDEE) with target calories for fat loss or muscle gain.</div>
-        <div class="formula-badge-pill">TDEE = BMR × Activity Factor</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#059669;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-      <!-- 3. Body Fat -->
-      <a href="body-fat-calculator.html" class="silo-card" style="border-top:3px solid #059669;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">📏</div>
-          <span class="silo-card-badge">US Navy Method</span>
-        </div>
-        <div class="silo-card-title">Body Fat Calculator</div>
-        <div class="silo-card-desc">Estimate body fat percentage, lean body mass, and fat weight using the validated US Navy circumference formula for men and women.</div>
-        <div class="formula-badge-pill">Logarithmic Circumference Model</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#059669;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-      <!-- 4. Ideal Body Weight -->
-      <a href="ideal-weight-calculator.html" class="silo-card" style="border-top:3px solid #059669;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">❤️</div>
-          <span class="silo-card-badge">4-Formula Matrix</span>
-        </div>
-        <div class="silo-card-title">Ideal Body Weight Calculator</div>
-        <div class="silo-card-desc">Compare medical weight targets across Devine, Robinson, Miller, and Hamwi equations alongside healthy BMI boundaries.</div>
-        <div class="formula-badge-pill">Devine: 50kg + 2.3kg/inch &gt; 5ft</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#059669;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-      <!-- 5. Water Intake -->
-      <a href="water-intake-calculator.html" class="silo-card" style="border-top:3px solid #059669;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">💧</div>
-          <span class="silo-card-badge">NASEM Fluid Norms</span>
-        </div>
-        <div class="silo-card-title">Daily Water Intake Calculator</div>
-        <div class="silo-card-desc">Calculate baseline daily water requirements adjusted for physical exercise exertion duration and high ambient temperatures.</div>
-        <div class="formula-badge-pill">Base (35ml/kg) + Exercise + Heat</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#059669;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-    </div>
-
-    <!-- Educational & Clinical Guide -->
-    <!-- Educational & Engineering Guide -->
+HEALTH_CONTENT = r'''
     <!-- Educational & Engineering Guide -->
     <article class="article-section">
       <div class="article-header">
@@ -441,61 +220,21 @@
       </div>
 
     </article>
+'''
 
-  </main>
+def update_health():
+    filepath = os.path.join(BASE_DIR, "health.html")
+    with open(filepath, "r", encoding="utf-8") as f:
+        content = f.read()
 
-  <!-- Site Footer -->
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a href="index.html" class="brand-logo">
-            <span class="logo-badge">∑</span>
-            <span>Calc<span class="accent">Hub</span></span>
-          </a>
-          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
-        </div>
-        <div class="footer-col">
-          <h4>Health & Fitness</h4>
-          <ul class="footer-links">
-            <li><a href="bmi-calculator.html">BMI Calculator</a></li>
-            <li><a href="calorie-calculator.html">Calorie Calculator (TDEE)</a></li>
-            <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
-            <li><a href="ideal-weight-calculator.html">Ideal Body Weight</a></li>
-            <li><a href="water-intake-calculator.html">Daily Water Intake</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Finance & Money</h4>
-          <ul class="footer-links">
-            <li><a href="loan-emi-calculator.html">Loan EMI Calculator</a></li>
-            <li><a href="compound-interest-calculator.html">Compound Interest</a></li>
-            <li><a href="simple-interest-calculator.html">Simple Interest</a></li>
-            <li><a href="discount-calculator.html">Discount & Sale</a></li>
-            <li><a href="salary-calculator.html">Salary / Paycheck</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Math & Engineering</h4>
-          <ul class="footer-links">
-            <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
-            <li><a href="age-calculator.html">Exact Age Calculator</a></li>
-            <li><a href="ohms-law-calculator.html">Ohm's Law Calculator</a></li>
-            <li><a href="voltage-drop-calculator.html">Voltage Drop (NEC/IEC)</a></li>
-            <li><a href="cable-sizing-calculator.html">Cable Sizing Calculator</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2026 CalcHub. All rights reserved. Mathematical tools are for educational and guidance purposes.</p>
-        <div>
-          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
-          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy & Terms</a>
-        </div>
-      </div>
-    </div>
-  </footer>
+    article_pattern = re.compile(r'<article class="article-section">.*?</article>', re.DOTALL)
+    if article_pattern.search(content):
+        updated = article_pattern.sub(lambda m: HEALTH_CONTENT.strip(), content, count=1)
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(updated)
+        print("Updated health.html successfully!")
+        words = len(re.sub(r'<[^>]+>', ' ', HEALTH_CONTENT).split())
+        print(f"Health hub article word count: {words} words")
 
-  <script src="app.js"></script>
-</body>
-</html>
+if __name__ == "__main__":
+    update_health()

@@ -1,230 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Finance, Loan & Investment Calculators — Amortization & Wealth Tools | CalcHub</title>
-  <meta name="description" content="Free financial calculators built on standard banking and investment mathematics. Calculate loan EMI, compound interest wealth, simple interest promissory returns, retail discounts, and net salary.">
-  <meta name="keywords" content="finance calculator, loan emi calculator, compound interest calculator, simple interest calculator, discount calculator, salary calculator">
-  <meta name="author" content="CalcHub Quantitative Financial Editorial Board">
-  <meta name="robots" content="index, follow, max-image-preview:large">
-  <link rel="canonical" href="https://calchub.org/finance.html">
-  <link rel="stylesheet" href="styles.css">
+import os
+import re
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Finance, Loan & Investment Calculators — Quantitative Precision | CalcHub">
-  <meta property="og:description" content="Transparent financial mathematics for reducing-balance mortgages, compound interest wealth, and sales taxes.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://calchub.org/finance.html">
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-  <!-- Structured Data: CollectionPage & FAQ -->
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "CollectionPage",
-      "@id": "https://calchub.org/finance.html#webpage",
-      "url": "https://calchub.org/finance.html",
-      "name": "Finance, Loan & Investment Calculators",
-      "description": "Comprehensive suite of precision financial, loan amortization, and investment calculators.",
-      "breadcrumb": {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": "https://calchub.org/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Finance & Investment",
-            "item": "https://calchub.org/finance.html"
-          }
-        ]
-      }
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "What is the difference between reducing-balance interest and flat-rate interest?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "In reducing-balance amortization, interest for each billing cycle is calculated strictly on the remaining principal balance, meaning interest decreases as you repay the loan. In flat-rate loans, interest is calculated on the full initial loan amount across the entire term, doubling or tripling the effective interest rate compared to reducing loans."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is the difference between APR and APY / EAR?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Annual Percentage Rate (APR) represents the nominal annualized interest rate without taking into account intra-year compounding. Annual Percentage Yield (APY) or Effective Annual Rate (EAR) includes the effect of compounding frequency (monthly, daily). For example, 12% APR compounded monthly equals 12.68% APY."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is loan amortization tilting?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "In the early years of a long-term loan (e.g., years 1 through 7 of a 30-year mortgage), monthly EMI payments consist almost entirely of interest charges (often 70%\u201380%), with very little principal paydown. Only after the amortization crossover point does the principal portion exceed the interest portion."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How do marginal tax brackets affect gross-to-net salary take-home pay?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Income tax brackets are progressive, not flat. Moving into a higher bracket (e.g., from 22% to 24%) means only the dollars earned above that threshold are taxed at 24%, not your entire income. Check your take-home pay accurately with our Salary Calculator."
-          }
-        }
-      ]
-    }
-  ]
-}
-</script>
-</head>
-<body class="cat-theme-finance">
-
-        <!-- Sticky Header -->
-  <header class="site-header">
-    <div class="header-inner">
-      <a href="index.html" class="brand-logo">
-        <span class="logo-badge">∑</span>
-        <span>Calc<span class="accent">Hub</span></span>
-      </a>
-      <nav class="header-nav" aria-label="Main Navigation">
-        <div class="nav-row">
-          <a href="index.html" class="nav-link">🏠 Home</a>
-          <a href="health.html" class="nav-link">⚖️ Health</a>
-          <a href="finance.html" class="nav-link active">🏦 Finance</a>
-          <a href="math.html" class="nav-link">🔢 Math</a>
-          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
-          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
-          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
-        </div>
-        <div class="nav-row">
-          <a href="civil.html" class="nav-link">🏗️ Civil</a>
-          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
-          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
-          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
-          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
-          <a href="converter.html" class="nav-link">🔄 Converter</a>
-        </div>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Category Hub Hero -->
-  <div class="cat-hub-hero">
-    <div class="cat-hub-hero-inner">
-      <div class="category-breadcrumbs">
-        <a href="index.html">Home</a> &rsaquo; <span>Finance & Investment</span>
-      </div>
-      <span class="category-tag" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE;margin-bottom:1rem;">
-        📊 Transparent Banking & Amortization Mathematics
-      </span>
-      <h1 style="font-size:clamp(2.2rem, 4vw, 3rem);letter-spacing:-0.03em;margin-bottom:0.75rem;color:#0F172A;">
-        Finance & Investment <span style="color:#2563EB;">Calculators</span>
-      </h1>
-      <p style="font-size:1.1rem;color:#475569;line-height:1.65;margin-bottom:1.5rem;">
-        Model loan amortization, multi-year compounding portfolios, wage conversions, and retail discounts with institutional mathematical accuracy.
-      </p>
-      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
-        <span style="font-size:0.88rem;color:#64748B;"><strong>5</strong> Financial Tools</span>
-        <span style="font-size:0.88rem;color:#64748B;">• <strong>Complete</strong> Amortization Schedules</span>
-        <span style="font-size:0.88rem;color:#64748B;">• <strong>100%</strong> Browser-Executed</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Tools Grid -->
-  <main class="main-wrapper" style="margin-top:2.5rem;">
-
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-      <h2 style="margin:0;font-size:1.5rem;color:#0F172A;">Available Financial Calculators (5)</h2>
-      <a href="index.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">&larr; All Categories</a>
-    </div>
-
-    <div class="silo-card-grid" style="margin-top:0;margin-bottom:3.5rem;">
-      
-      <!-- 1. Loan EMI -->
-      <a href="loan-emi-calculator.html" class="silo-card" style="border-top:3px solid #2563EB;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">🏦</div>
-          <span class="silo-card-badge">Reducing Balance</span>
-        </div>
-        <div class="silo-card-title">Loan EMI Calculator</div>
-        <div class="silo-card-desc">Compute monthly installment payments, total interest liability, and full month-by-month visual amortization schedules for mortgages and auto loans.</div>
-        <div class="formula-badge-pill">EMI = [P·r·(1+r)ⁿ] / [(1+r)ⁿ - 1]</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#2563EB;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-      <!-- 2. Compound Interest -->
-      <a href="compound-interest-calculator.html" class="silo-card" style="border-top:3px solid #2563EB;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">📈</div>
-          <span class="silo-card-badge">Periodic Contributions</span>
-        </div>
-        <div class="silo-card-title">Compound Interest Calculator</div>
-        <div class="silo-card-desc">Forecast investment wealth growth with periodic monthly deposits, flexible compounding frequencies, and doubling time analysis via Rule of 72.</div>
-        <div class="formula-badge-pill">A = P(1 + r/n)ⁿᵗ + PMT···</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#2563EB;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-      <!-- 3. Simple Interest -->
-      <a href="simple-interest-calculator.html" class="silo-card" style="border-top:3px solid #2563EB;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">💰</div>
-          <span class="silo-card-badge">Linear Returns</span>
-        </div>
-        <div class="silo-card-title">Simple Interest Calculator</div>
-        <div class="silo-card-desc">Quickly calculate fixed linear returns, total interest earned, and final maturity amount for short-term promissory notes and bonds.</div>
-        <div class="formula-badge-pill">I = P × R × T / 100</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#2563EB;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-      <!-- 4. Discount & Sale -->
-      <a href="discount-calculator.html" class="silo-card" style="border-top:3px solid #2563EB;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">🏷️</div>
-          <span class="silo-card-badge">Stacked Coupons</span>
-        </div>
-        <div class="silo-card-title">Discount & Sale Calculator</div>
-        <div class="silo-card-desc">Calculate net savings with sequential coupon stacking, markdown percentages, and local retail sales tax adjustments.</div>
-        <div class="formula-badge-pill">Price × (1 - d₁) × (1 - d₂) × (1 + tax)</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#2563EB;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-      <!-- 5. Salary Paycheck -->
-      <a href="salary-calculator.html" class="silo-card" style="border-top:3px solid #2563EB;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">💼</div>
-          <span class="silo-card-badge">Wage Conversion</span>
-        </div>
-        <div class="silo-card-title">Salary / Paycheck Calculator</div>
-        <div class="silo-card-desc">Seamlessly convert hourly pay rates to weekly, bi-weekly, monthly, and annual gross compensation with overtime hours multiplier.</div>
-        <div class="formula-badge-pill">Annual = Hourly × (Weekly Hours × 52)</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#2563EB;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-    </div>
-
-    <!-- Educational & Financial Guide -->
-    <!-- Educational & Engineering Guide -->
+FINANCE_CONTENT = r'''
     <!-- Educational & Engineering Guide -->
     <article class="article-section">
       <div class="article-header">
@@ -435,61 +214,21 @@
       </div>
 
     </article>
+'''
 
-  </main>
+def update_finance():
+    filepath = os.path.join(BASE_DIR, "finance.html")
+    with open(filepath, "r", encoding="utf-8") as f:
+        content = f.read()
 
-  <!-- Site Footer -->
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a href="index.html" class="brand-logo">
-            <span class="logo-badge">∑</span>
-            <span>Calc<span class="accent">Hub</span></span>
-          </a>
-          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
-        </div>
-        <div class="footer-col">
-          <h4>Health & Fitness</h4>
-          <ul class="footer-links">
-            <li><a href="bmi-calculator.html">BMI Calculator</a></li>
-            <li><a href="calorie-calculator.html">Calorie Calculator (TDEE)</a></li>
-            <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
-            <li><a href="ideal-weight-calculator.html">Ideal Body Weight</a></li>
-            <li><a href="water-intake-calculator.html">Daily Water Intake</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Finance & Money</h4>
-          <ul class="footer-links">
-            <li><a href="loan-emi-calculator.html">Loan EMI Calculator</a></li>
-            <li><a href="compound-interest-calculator.html">Compound Interest</a></li>
-            <li><a href="simple-interest-calculator.html">Simple Interest</a></li>
-            <li><a href="discount-calculator.html">Discount & Sale</a></li>
-            <li><a href="salary-calculator.html">Salary / Paycheck</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Math & Engineering</h4>
-          <ul class="footer-links">
-            <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
-            <li><a href="age-calculator.html">Exact Age Calculator</a></li>
-            <li><a href="ohms-law-calculator.html">Ohm's Law Calculator</a></li>
-            <li><a href="voltage-drop-calculator.html">Voltage Drop (NEC/IEC)</a></li>
-            <li><a href="cable-sizing-calculator.html">Cable Sizing Calculator</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2026 CalcHub. All rights reserved. Mathematical tools are for educational and guidance purposes.</p>
-        <div>
-          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
-          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy & Terms</a>
-        </div>
-      </div>
-    </div>
-  </footer>
+    article_pattern = re.compile(r'<article class="article-section">.*?</article>', re.DOTALL)
+    if article_pattern.search(content):
+        updated = article_pattern.sub(lambda m: FINANCE_CONTENT.strip(), content, count=1)
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(updated)
+        print("Updated finance.html successfully!")
+        words = len(re.sub(r'<[^>]+>', ' ', FINANCE_CONTENT).split())
+        print(f"Finance hub article word count: {words} words")
 
-  <script src="app.js"></script>
-</body>
-</html>
+if __name__ == "__main__":
+    update_finance()

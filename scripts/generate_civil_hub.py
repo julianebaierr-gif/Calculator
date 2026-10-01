@@ -1,184 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Civil & Construction Calculators — High-Precision Free Online Tools | CalcHub</title>
-  <meta name="description" content="Free civil engineering and structural construction calculators. Estimate concrete slab volume (m³ & yd³), cement bags, rebar grid weight, and structural loads.">
-  <meta name="author" content="CalcHub Civil & Construction Calculators Editorial Board">
-  <meta name="robots" content="index, follow, max-image-preview:large">
-  <link rel="canonical" href="https://calchub.org/civil.html">
-  <link rel="stylesheet" href="styles.css">
+import os
+import re
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Civil & Construction Calculators | CalcHub">
-  <meta property="og:description" content="Free civil engineering and structural construction calculators. Estimate concrete slab volume (m³ & yd³), cement bags, rebar grid weight, and structural loads.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://calchub.org/civil.html">
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-  <!-- Structured Data: CollectionPage -->
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "CollectionPage",
-      "@id": "https://calchub.org/civil.html#webpage",
-      "url": "https://calchub.org/civil.html",
-      "name": "Civil & Construction Calculators",
-      "description": "Free civil engineering and structural construction calculators. Estimate concrete slab volume (m\u00b3 & yd\u00b3), cement bags, rebar grid weight, and structural loads.",
-      "breadcrumb": {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": "https://calchub.org/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Civil & Construction Calculators",
-            "item": "https://calchub.org/civil.html"
-          }
-        ]
-      }
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "Why is the dry concrete bulking factor 1.54 used in volume estimation?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Dry aggregate particles (sand and crushed stone) have approximately 30% to 35% void ratios between angular grains. When water and fine cement paste are mixed in, the paste lubricates and fills these inter-granular voids. Consequently, it takes approximately 1.54 cubic meters of dry loose materials to yield 1.0 cubic meter of compacted wet in-situ concrete."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How does water-cement ratio (w/c) dictate structural compressive strength?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "According to Abrams' Law, the compressive strength of fully compacted concrete is inversely proportional to its water-cement ratio. A lower w/c ratio (e.g., 0.40 to 0.45) leaves fewer capillary pores as excess water evaporates, producing dense, watertight concrete with high 28-day strength (35\u201345 MPa). High w/c ratios (>0.60) cause severe bleeding, honeycombing, and cracking."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is the standard rebar lap splice length in structural slabs and beams?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Under ACI 318-19 and Eurocode 2, tensile lap splice lengths depend on concrete compressive strength, bar diameter, and coating. A standard rule of thumb for Grade 60 (420 MPa) deformed bars in normal-weight concrete is 40 to 50 times the bar diameter (40d to 50d). For a 12mm rebar, the minimum tension lap length is 480 mm to 600 mm."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is the difference between concrete compressive strength classes (e.g., C20/25 vs 3000 PSI)?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "European Eurocode standard EN 206 designates concrete as C20/25, where 20 MPa is characteristic compressive strength measured on a 150mm cylinder, and 25 MPa is strength measured on a 150mm cube. American concrete standards (ASTM/ACI) express cylinder compressive strength (f'c) in pounds per square inch, such as 3,000 PSI (approx. 20.7 MPa) or 4,000 PSI (approx. 27.6 MPa)."
-          }
-        }
-      ]
-    }
-  ]
-}
-</script>
-</head>
-<body class="cat-theme-civil">
-
-        <!-- Sticky Header -->
-  <header class="site-header">
-    <div class="header-inner">
-      <a href="index.html" class="brand-logo">
-        <span class="logo-badge">∑</span>
-        <span>Calc<span class="accent">Hub</span></span>
-      </a>
-      <nav class="header-nav" aria-label="Main Navigation">
-        <div class="nav-row">
-          <a href="index.html" class="nav-link">🏠 Home</a>
-          <a href="health.html" class="nav-link">⚖️ Health</a>
-          <a href="finance.html" class="nav-link">🏦 Finance</a>
-          <a href="math.html" class="nav-link">🔢 Math</a>
-          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
-          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
-          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
-        </div>
-        <div class="nav-row">
-          <a href="civil.html" class="nav-link active">🏗️ Civil</a>
-          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
-          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
-          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
-          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
-          <a href="converter.html" class="nav-link">🔄 Converter</a>
-        </div>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Category Hub Hero -->
-  <div class="cat-hub-hero">
-    <div class="cat-hub-hero-inner">
-      <div class="category-breadcrumbs">
-        <a href="index.html">Home</a> &rsaquo; <span>Civil & Construction Calculators</span>
-      </div>
-      <span class="category-tag" style="background:#FEFCE8;color:#B45309;border-color:#FEF08A;margin-bottom:1rem;">
-        🏗️ Verified ACI 318 & Eurocode Standards Compliant
-      </span>
-      <h1 style="font-size:clamp(2.2rem, 4vw, 3rem);letter-spacing:-0.03em;margin-bottom:0.75rem;color:#0F172A;">
-        Civil & Construction Calculators
-      </h1>
-      <p style="font-size:1.1rem;color:#475569;line-height:1.65;margin-bottom:1.5rem;">
-        Free civil engineering and structural construction calculators. Estimate concrete slab volume (m³ & yd³), cement bags, rebar grid weight, and structural loads.
-      </p>
-      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
-        <span style="font-size:0.88rem;color:#64748B;"><strong>2</strong> Certified Calculators</span>
-        <span style="font-size:0.88rem;color:#64748B;">• <strong>100%</strong> Free & Client-Side</span>
-        <span style="font-size:0.88rem;color:#64748B;">• <strong>Print-Ready</strong> Reports</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Tools Grid -->
-  <main class="main-wrapper" style="margin-top:2.5rem;">
-
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-      <h2 style="margin:0;font-size:1.5rem;color:#0F172A;">Available Tools (2)</h2>
-      <a href="index.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">&larr; All Categories</a>
-    </div>
-
-    <div class="silo-card-grid" style="margin-top:0;margin-bottom:3.5rem;">
-      
-        <a href="concrete-calculator.html" class="silo-card" style="border-top:3px solid #B45309;">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-            <div class="silo-card-icon">🏗️</div>
-            <span class="silo-card-badge">ACI 318 & BS EN 206</span>
-          </div>
-          <div class="silo-card-title">Concrete Slab, Footing & Column</div>
-          <div class="silo-card-desc">Calculate wet concrete volume in m³ and yards³, plus 50kg cement bags, sand, and gravel quantities.</div>
-          <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#B45309;margin-top:1rem;">
-            Launch Calculator &rarr;
-          </span>
-        </a>
-        
-
-        <a href="rebar-calculator.html" class="silo-card" style="border-top:3px solid #B45309;">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-            <div class="silo-card-icon">🔩</div>
-            <span class="silo-card-badge">ASTM A615 & Eurocode 2</span>
-          </div>
-          <div class="silo-card-title">Rebar Weight & Grid Spacing</div>
-          <div class="silo-card-desc">Calculate reinforcing steel linear length, cut bar counts, and total mass in kg and lbs.</div>
-          <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#B45309;margin-top:1rem;">
-            Launch Calculator &rarr;
-          </span>
-        </a>
-        
-    </div>
-
-    <!-- Educational Guide -->
-    <!-- Educational & Engineering Guide -->
+CIVIL_CONTENT = r'''
     <!-- Educational & Engineering Guide -->
     <article class="article-section">
       <div class="article-header">
@@ -412,61 +237,21 @@
       </div>
 
     </article>
+'''
 
-  </main>
+def update_civil():
+    filepath = os.path.join(BASE_DIR, "civil.html")
+    with open(filepath, "r", encoding="utf-8") as f:
+        content = f.read()
 
-  <!-- Site Footer -->
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a href="index.html" class="brand-logo">
-            <span class="logo-badge">∑</span>
-            <span>Calc<span class="accent">Hub</span></span>
-          </a>
-          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
-        </div>
-        <div class="footer-col">
-          <h4>Health & Fitness</h4>
-          <ul class="footer-links">
-            <li><a href="bmi-calculator.html">BMI Calculator</a></li>
-            <li><a href="calorie-calculator.html">Calorie Calculator (TDEE)</a></li>
-            <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
-            <li><a href="ideal-weight-calculator.html">Ideal Body Weight</a></li>
-            <li><a href="water-intake-calculator.html">Daily Water Intake</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Finance & Money</h4>
-          <ul class="footer-links">
-            <li><a href="loan-emi-calculator.html">Loan EMI Calculator</a></li>
-            <li><a href="compound-interest-calculator.html">Compound Interest</a></li>
-            <li><a href="simple-interest-calculator.html">Simple Interest</a></li>
-            <li><a href="discount-calculator.html">Discount & Sale</a></li>
-            <li><a href="salary-calculator.html">Salary / Paycheck</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>All Categories</h4>
-          <ul class="footer-links">
-            <li><a href="solar-energy.html">Solar & Renewable</a></li>
-            <li><a href="mechanical.html">Mechanical & HVAC</a></li>
-            <li><a href="civil.html">Civil & Construction</a></li>
-            <li><a href="chemical.html">Chemical & Water</a></li>
-            <li><a href="fire-safety.html">Fire & Life Safety</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2026 CalcHub. All rights reserved. Mathematical tools are for educational and guidance purposes.</p>
-        <div>
-          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
-          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy & Terms</a>
-        </div>
-      </div>
-    </div>
-  </footer>
+    article_pattern = re.compile(r'<article class="article-section">.*?</article>', re.DOTALL)
+    if article_pattern.search(content):
+        updated = article_pattern.sub(lambda m: CIVIL_CONTENT.strip(), content, count=1)
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(updated)
+        print("Updated civil.html successfully!")
+        words = len(re.sub(r'<[^>]+>', ' ', CIVIL_CONTENT).split())
+        print(f"Civil hub article word count: {words} words")
 
-  <script src="app.js"></script>
-</body>
-</html>
+if __name__ == "__main__":
+    update_civil()

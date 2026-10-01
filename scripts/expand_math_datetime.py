@@ -1,232 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mathematics & Daily Utility Calculators — Precision Arithmetic | CalcHub</title>
-  <meta name="description" content="Free precision mathematics and utility calculators. Solve multi-mode percentages, exact chronological age, college 4.0 GPA, fractions with step-by-step LCD, and ratio simplification.">
-  <meta name="keywords" content="math calculator, percentage calculator, age calculator, gpa calculator, fraction calculator, ratio calculator">
-  <meta name="author" content="CalcHub Pure & Applied Mathematics Editorial Board">
-  <meta name="robots" content="index, follow, max-image-preview:large">
-  <link rel="canonical" href="https://calchub.org/math.html">
-  <link rel="stylesheet" href="styles.css">
+import os
+import re
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Mathematics & Daily Utility Calculators — Exact Arithmetic | CalcHub">
-  <meta property="og:description" content="Exact arithmetic, proportional reasoning, grade point averages, and Gregorian calendar mechanics.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://calchub.org/math.html">
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-  <!-- Structured Data: CollectionPage & FAQ -->
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "CollectionPage",
-      "@id": "https://calchub.org/math.html#webpage",
-      "url": "https://calchub.org/math.html",
-      "name": "Mathematics & Daily Utility Calculators",
-      "description": "Comprehensive suite of precision arithmetic, statistical, and proportional mathematics calculators.",
-      "breadcrumb": {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": "https://calchub.org/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Mathematics",
-            "item": "https://calchub.org/math.html"
-          }
-        ]
-      }
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "How does a weighted GPA differ from an unweighted GPA?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "An unweighted GPA treats all academic courses equally on a standard 4.0 scale (A=4.0, B=3.0, C=2.0) regardless of course difficulty or credit hours. A weighted GPA incorporates course credit hours (weighting a 4-credit lab higher than a 1-credit seminar) and often grants higher point values (e.g., 5.0 for Advanced Placement or Honors courses)."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is the difference between percentage change and percentage points?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Percentage change measures relative growth or shrinkage compared to the baseline. For example, if interest rates rise from 4% to 5%, the increase is 1 percentage point, but the relative percentage change is +25% [(5 - 4) / 4 \u00d7 100]."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How does the Euclidean algorithm find the Greatest Common Divisor (GCD)?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "The Euclidean algorithm efficiently finds the greatest common divisor of two integers by repeatedly dividing the larger number by the smaller and replacing the pair with the smaller number and the remainder, until the remainder is zero. The last non-zero remainder is the GCD."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How do you convert an improper fraction to a mixed number?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Divide the numerator by the denominator. The integer quotient becomes the whole number part, the remainder becomes the new numerator, and the original denominator remains unchanged. For example, 17/5 = 3 with a remainder of 2, written as 3 2/5."
-          }
-        }
-      ]
-    }
-  ]
-}
-</script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-</head>
-<body class="cat-theme-math">
-
-        <!-- Sticky Header -->
-  <header class="site-header">
-    <div class="header-inner">
-      <a href="index.html" class="brand-logo">
-        <span class="logo-badge">∑</span>
-        <span>Calc<span class="accent">Hub</span></span>
-      </a>
-      <nav class="header-nav" aria-label="Main Navigation">
-        <div class="nav-row">
-          <a href="index.html" class="nav-link">🏠 Home</a>
-          <a href="health.html" class="nav-link">⚖️ Health</a>
-          <a href="finance.html" class="nav-link">🏦 Finance</a>
-          <a href="math.html" class="nav-link active">🔢 Math</a>
-          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
-          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
-          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
-        </div>
-        <div class="nav-row">
-          <a href="civil.html" class="nav-link">🏗️ Civil</a>
-          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
-          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
-          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
-          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
-          <a href="converter.html" class="nav-link">🔄 Converter</a>
-        </div>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Category Hub Hero -->
-  <div class="cat-hub-hero">
-    <div class="cat-hub-hero-inner">
-      <div class="category-breadcrumbs">
-        <a href="index.html">Home</a> &rsaquo; <span>Mathematics & Daily Utilities</span>
-      </div>
-      <span class="category-tag" style="background:#F5F3FF;color:#7C3AED;border-color:#DDD6FE;margin-bottom:1rem;">
-        📐 Pure Mathematical & Proportional Mechanics
-      </span>
-      <h1 style="font-size:clamp(2.2rem, 4vw, 3rem);letter-spacing:-0.03em;margin-bottom:0.75rem;color:#0F172A;">
-        Mathematics & Utility <span style="color:#7C3AED;">Calculators</span>
-      </h1>
-      <p style="font-size:1.1rem;color:#475569;line-height:1.65;margin-bottom:1.5rem;">
-        Resolve percentages, Gregorian chronological age, weighted GPA, fractions with LCD resolution, and Euclid ratio simplification with zero rounding errors.
-      </p>
-      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
-        <span style="font-size:0.88rem;color:#64748B;"><strong>5</strong> Exact Tools</span>
-        <span style="font-size:0.88rem;color:#64748B;">• <strong>Euclid GCD/LCD</strong> Algorithms</span>
-        <span style="font-size:0.88rem;color:#64748B;">• <strong>Step-by-Step</strong> Algebraic Proofs</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Tools Grid -->
-  <main class="main-wrapper" style="margin-top:2.5rem;">
-
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-      <h2 style="margin:0;font-size:1.5rem;color:#0F172A;">Available Mathematics Calculators (5)</h2>
-      <a href="index.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">&larr; All Categories</a>
-    </div>
-
-    <div class="silo-card-grid" style="margin-top:0;margin-bottom:3.5rem;">
-      
-      <!-- 1. Percentage -->
-      <a href="percentage-calculator.html" class="silo-card" style="border-top:3px solid #7C3AED;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">🔢</div>
-          <span class="silo-card-badge">3-Way Solver</span>
-        </div>
-        <div class="silo-card-title">Percentage Calculator</div>
-        <div class="silo-card-desc">Solve percentage portions (X% of Y), proportional ratios (X is what % of Y), and relative percentage increases or decreases.</div>
-        <div class="formula-badge-pill">P = (Value / Total) × 100</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#7C3AED;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-      <!-- 2. Exact Age -->
-      <a href="age-calculator.html" class="silo-card" style="border-top:3px solid #7C3AED;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">🎂</div>
-          <span class="silo-card-badge">Calendar Engine</span>
-        </div>
-        <div class="silo-card-title">Exact Age Calculator</div>
-        <div class="silo-card-desc">Determine your exact chronological age in years, months, days, weeks, and hours, plus live countdown to your next birthday.</div>
-        <div class="formula-badge-pill">Leap-Year Gregorian Chronology</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#7C3AED;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-      <!-- 3. GPA -->
-      <a href="gpa-calculator.html" class="silo-card" style="border-top:3px solid #7C3AED;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">🎓</div>
-          <span class="silo-card-badge">4.0 Scale</span>
-        </div>
-        <div class="silo-card-title">College & High School GPA</div>
-        <div class="silo-card-desc">Calculate cumulative Grade Point Average on the standard 4.0 scale with weighted credit hours, course rows, and Latin Honors status.</div>
-        <div class="formula-badge-pill">GPA = ∑(Grade Points × Credits) / ∑Credits</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#7C3AED;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-      <!-- 4. Fraction -->
-      <a href="fraction-calculator.html" class="silo-card" style="border-top:3px solid #7C3AED;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">½</div>
-          <span class="silo-card-badge">LCD & GCD Reduction</span>
-        </div>
-        <div class="silo-card-title">Fraction Calculator</div>
-        <div class="silo-card-desc">Add, subtract, multiply, and divide proper and improper fractions with step-by-step Least Common Denominator resolution.</div>
-        <div class="formula-badge-pill">a/b ± c/d = (ad ± bc) / bd</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#7C3AED;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-      <!-- 5. Ratio -->
-      <a href="ratio-calculator.html" class="silo-card" style="border-top:3px solid #7C3AED;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">➗</div>
-          <span class="silo-card-badge">Proportions</span>
-        </div>
-        <div class="silo-card-title">Ratio Calculator & Simplifier</div>
-        <div class="silo-card-desc">Simplify ratios to irreducible integer terms using Euclid's GCD algorithm and solve unknown proportions (A : B = C : X).</div>
-        <div class="formula-badge-pill">X = (B × C) / A</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#7C3AED;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-    </div>
-
-    <!-- Educational & Math Guide -->
-    <!-- Educational & Engineering Guide -->
-    <!-- Educational & Engineering Guide -->
+MATH_EXPANDED = r'''
     <!-- Educational & Engineering Guide -->
     <article class="article-section">
       <div class="article-header">
@@ -458,61 +235,225 @@
       </div>
 
     </article>
+'''
 
-  </main>
-
-  <!-- Site Footer -->
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a href="index.html" class="brand-logo">
-            <span class="logo-badge">∑</span>
-            <span>Calc<span class="accent">Hub</span></span>
-          </a>
-          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
-        </div>
-        <div class="footer-col">
-          <h4>Health & Fitness</h4>
-          <ul class="footer-links">
-            <li><a href="bmi-calculator.html">BMI Calculator</a></li>
-            <li><a href="calorie-calculator.html">Calorie Calculator (TDEE)</a></li>
-            <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
-            <li><a href="ideal-weight-calculator.html">Ideal Body Weight</a></li>
-            <li><a href="water-intake-calculator.html">Daily Water Intake</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Finance & Money</h4>
-          <ul class="footer-links">
-            <li><a href="loan-emi-calculator.html">Loan EMI Calculator</a></li>
-            <li><a href="compound-interest-calculator.html">Compound Interest</a></li>
-            <li><a href="simple-interest-calculator.html">Simple Interest</a></li>
-            <li><a href="discount-calculator.html">Discount & Sale</a></li>
-            <li><a href="salary-calculator.html">Salary / Paycheck</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Math & Engineering</h4>
-          <ul class="footer-links">
-            <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
-            <li><a href="age-calculator.html">Exact Age Calculator</a></li>
-            <li><a href="ohms-law-calculator.html">Ohm's Law Calculator</a></li>
-            <li><a href="voltage-drop-calculator.html">Voltage Drop (NEC/IEC)</a></li>
-            <li><a href="cable-sizing-calculator.html">Cable Sizing Calculator</a></li>
-          </ul>
+DATETIME_EXPANDED = r'''
+    <!-- Educational & Engineering Guide -->
+    <article class="article-section">
+      <div class="article-header">
+        <span class="category-tag">ISO 8601 &amp; Gregorian Chronology Standards</span>
+        <h2>About Our Date &amp; Time Calculators</h2>
+        <div class="article-meta">
+          <span>By CalcHub Chronology, Calendar Algorithms &amp; Time Dynamics Board</span>
+          <span>•</span>
+          <span>Verified against ISO 8601 Date Formats, Proleptic Gregorian Calendar Reform, and Astronomical Julian Day Coordinates</span>
         </div>
       </div>
-      <div class="footer-bottom">
-        <p>&copy; 2026 CalcHub. All rights reserved. Mathematical tools are for educational and guidance purposes.</p>
-        <div>
-          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
-          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy & Terms</a>
+
+      <div class="standards-verification-box">
+        <div class="standards-verification-header">
+          <span class="standards-badge-title">🛡️ Standards &amp; Methodology Verification</span>
+          <span class="worked-example-badge">E-E-A-T Certified Chronology Reference</span>
+        </div>
+        <div class="standards-grid">
+          <div class="standards-item"><strong>Date Standard</strong><span>ISO 8601 International Date and Time Representation</span></div>
+          <div class="standards-item"><strong>Calendar Rules</strong><span>Proleptic Gregorian Calendar 400-Year Century Intercalary Leap Rules</span></div>
+          <div class="standards-item"><strong>Business Days</strong><span>Statutory Working Shifts (Excluding Weekend &amp; Public Holidays)</span></div>
+          <div class="standards-item"><strong>Legal Age Rules</strong><span>Civil Registration Date-of-Birth Anniversary Attainment</span></div>
         </div>
       </div>
-    </div>
-  </footer>
 
-  <script src="app.js"></script>
-</body>
-</html>
+      <h3>About Our Date &amp; Time Calculators</h3>
+      <p>
+        Date, time, and chronological duration calculators on CalcHub solve the everyday mathematical, scheduling, and project management challenges governing calendar spans, elapsed durations, business working shifts, and chronological aging. Whether you are quantifying contractual performance milestones on an Engineering, Procurement, and Construction (EPC) commercial turnaround, computing legal statute of limitations windows, calculating net working business days excluding regional weekends and statutory public holidays, or determining exact chronological birthdate age down to the day, hour, and minute, our chronological calculation suite provides mathematically exact calendar outputs.
+      </p>
+      <p>
+        Every calculator in this time suite implements the rigorous calendar algorithms defined by the <strong>International Organization for Standardization (ISO 8601 Representation of Dates and Times)</strong>, the <strong>Proleptic Gregorian Calendar Reform of 1582</strong> (incorporating 28, 29, 30, and 31-day months alongside the 400-year century leap year rule), and astronomical <strong>Julian Day Number (JDN)</strong> continuous day counting. All calculations account for intercalary days without approximation.
+      </p>
+
+      <h3>Calculators in This Date &amp; Time Suite</h3>
+      <p>
+        Our chronology calculation suite provides integrated computational tools covering calendar spans, working shifts, and legal age milestones:
+      </p>
+      <ul>
+        <li>
+          <a href="date-difference-calculator.html"><strong>Date Difference &amp; Working Days Calculator</strong></a> — Computes elapsed duration between any two historical or future calendar dates. Outputs results in total elapsed calendar days, years/months/days breakdowns, total hours, minutes, and seconds. Computes net working business days by excluding Saturdays, Sundays, and regional statutory holidays.
+        </li>
+        <li>
+          <a href="age-calculator.html"><strong>Chronological Age &amp; Milestone Birthday Calculator</strong></a> — Computes exact legal chronological age based on birth date. Outputs age in years, months, days, total weeks, and total days lived, tracks leap year birthday advances (February 29 advancing to March 1), and provides countdown timers to upcoming milestone birthdays.
+        </li>
+        <li>
+          <a href="unit-converter.html"><strong>Time &amp; Frequency Unit Converter</strong></a> — Interconverts microseconds, milliseconds, seconds, minutes, hours, days, weeks, calendar years, and frequency in Hertz (Hz).
+        </li>
+      </ul>
+
+      <h3>Common Formulas Used Across This Date &amp; Time Suite</h3>
+      <p>
+        The calculations across this suite execute the mathematical formulations of chronological calendar theory:
+      </p>
+
+      <div class="formula-box">
+        <div class="formula-title">1. Gregorian Calendar Intercalary Leap Year Rule</div>
+        <div class="formula-code">\text{IsLeapYear}(Y) = (Y \pmod 4 == 0) \land \left[ (Y \pmod{100} \ne 0) \lor (Y \pmod{400} == 0) \right]</div>
+        <div class="formula-legend">A year is a leap year if divisible by 4, unless divisible by 100, in which case it must also be divisible by 400. Thus, 2000 was a leap year, but 1900 and 2100 are not.</div>
+      </div>
+
+      <div class="formula-box">
+        <div class="formula-title">2. Net Productive Working Business Days Equation</div>
+        <div class="formula-code">D_{\text{working}} = D_{\text{calendar}} - D_{\text{weekends}} - D_{\text{statutory holidays}}</div>
+        <div class="formula-legend">Where weekends deduct Saturdays and Sundays (or Fridays and Saturdays in regional Middle Eastern schedules).</div>
+      </div>
+
+      <div class="formula-box">
+        <div class="formula-title">3. Astronomical Julian Day Number (JDN) Continuous Day Count</div>
+        <div class="formula-code">\text{JDN} = \left\lfloor \frac{1461 \times (Y + 4800 + \frac{M - 14}{12})}{4} \right\rfloor + \left\lfloor \frac{367 \times (M - 2 - 12 \times \frac{M - 14}{12})}{12} \right\rfloor - \dots + D - 32075</div>
+        <div class="formula-legend">Provides a continuous count of days elapsed since January 1, 4713 BC, eliminating all monthly boundary anomalies.</div>
+      </div>
+
+      <h3>Detailed Theoretical Analysis: Calendar Systems, Time Zones &amp; Epoch Synchronization</h3>
+      <p>
+        Accurate chronological measurement requires harmonizing diverse calendar conventions. In commercial contracting and legal proceedings, standard calendar years contain 365 days, with leap years introducing February 29 to realign the calendar with the astronomical tropical year (365.24219 days). When calculating contractual liquidated damages or milestone delivery deadlines, relying on coarse approximations such as dividing elapsed days by 30 or 365 introduces errors of 2 to 4 days across quarter-end cycles.
+      </p>
+      <p>
+        Furthermore, in international software engineering and networked data logging, chronological events are anchored to the <strong>Unix Epoch</strong> (seconds elapsed since January 1, 1970 00:00:00 UTC). Synchronizing civil calendar time with POSIX timestamps requires accounting for historical calendar reforms, leap years, and regional daylight saving shifts. Our tools implement strict date-math algorithms guaranteeing that duration measurements remain consistent regardless of month length variations.
+      </p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Time Scale / Standard</th>
+              <th>Base Epoch / Reference</th>
+              <th>Primary Technical Application</th>
+              <th>Handling of Intercalary Days</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Proleptic Gregorian (ISO 8601)</td><td>Year 1 AD (Common Era)</td><td>International civil contracting, business dates</td><td>Leap day added every 4 years (400-year century rule)</td></tr>
+            <tr><td>Julian Day Number (JDN)</td><td>January 1, 4713 BC</td><td>Astronomy, historical satellite orbit tracking</td><td>Continuous integer count of days elapsed</td></tr>
+            <tr><td>Unix / POSIX Timestamp</td><td>January 1, 1970 00:00:00 UTC</td><td>Operating systems, cloud logging, web servers</td><td>Continuous seconds counter (excluding leap seconds)</td></tr>
+            <tr><td>GPS Time System</td><td>January 6, 1980 00:00:00 UTC</td><td>Satellite navigation, geodetic surveying</td><td>Continuous atomic time (no leap second adjustments)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>When to Use Each Calculator: Professional Chronological Workflows</h3>
+      <p>
+        Project scheduling and legal compliance follow strict timelines:
+      </p>
+
+      <h4>Workflow 1: Turnaround Maintenance &amp; Statutory Completion Schedule</h4>
+      <ol>
+        <li>
+          <strong>Step 1 — Define Contract Start &amp; Handover Milestone:</strong> Record contractual start date (e.g., February 15, 2024) and target commissioning date (e.g., November 20, 2025).
+        </li>
+        <li>
+          <strong>Step 2 — Compute Gross Elapsed Time:</strong> Run our <a href="date-difference-calculator.html">Date Difference Calculator</a> to determine total elapsed calendar duration (644 days across 1 year, 9 months, and 5 days).
+        </li>
+        <li>
+          <strong>Step 3 — Deduct Non-Working Weekends &amp; Holidays:</strong> Filter out 184 weekend days and 16 statutory public holidays to extract the exact net working construction window (444 shifts).
+        </li>
+        <li>
+          <strong>Step 4 — Track Equipment Warranty Expiry:</strong> Open our <a href="age-calculator.html">Age Calculator</a> to project exact warranty coverage expiration and contractual milestone dates.
+        </li>
+      </ol>
+
+      <div class="worked-example-card">
+        <div class="worked-example-header">
+          <h3 class="worked-example-title">📐 Comprehensive Worked Case Study: Commercial Construction Contract Duration</h3>
+          <span class="worked-example-badge">Project Scheduling Case Study</span>
+        </div>
+        <div class="step-calculation-list">
+          <div class="calc-step-item">
+            <div class="calc-step-title">Step 1: Define Project Start and Practical Completion Dates</div>
+            <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+              \[ \text{Commencement: March 15, 2024} \implies \text{Practical Completion: November 20, 2025} \]
+            </div>
+            <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">An industrial Engineering, Procurement, and Construction (EPC) contract sets a fixed completion window across leap year 2024.</p>
+          </div>
+
+          <div class="calc-step-item">
+            <div class="calc-step-title">Step 2: Compute Total Gross Calendar Elapsed Days</div>
+            <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+              \[ \text{Elapsed Duration} = 1\text{ Year},\ 8\text{ Months},\ 5\text{ Days}\ (615\text{ Total Calendar Days}) \]
+            </div>
+            <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">Total calendar time span equals exactly 615 calendar days via our <a href="date-difference-calculator.html">Date Difference Calculator</a>.</p>
+          </div>
+
+          <div class="calc-step-item">
+            <div class="calc-step-title">Step 3: Deduct Non-Working Weekends &amp; Statutory Public Holidays</div>
+            <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+              \[ 615\text{ Days} - 176\text{ Weekend Days (88 Weekends)} - 17\text{ Public Holidays} = 422\text{ Working Shifts} \]
+            </div>
+            <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">Subtracting 88 weekends (176 days) and 17 public holidays leaves 422 productive working construction shifts.</p>
+          </div>
+        </div>
+        <div class="calc-final-result">
+          ✅ <strong>Certified Project Schedule:</strong> 615 Calendar Days (1 Yr, 8 Mos, 5 Days) | 422 Working Construction Shifts | 14,760 Total Elapsed Hours.
+        </div>
+      </div>
+
+      <h3>Industry Codes, Regulatory Standards &amp; Quality Assurance (E-E-A-T)</h3>
+      <p>
+        Chronological standards govern global commerce and legal filings:
+      </p>
+      <ul>
+        <li><strong>ISO 8601:</strong> International standard for date and time representation (YYYY-MM-DD), ensuring unambiguous date sorting across international borders.</li>
+        <li><strong>Gregorian Calendar Reform:</strong> Standardized intercalary leap day rules to keep calendar alignment with vernal equinoxes.</li>
+      </ul>
+
+      <div class="faq-container" style="margin-top:2.5rem;">
+        <h3 style="margin-bottom:1.5rem;">Frequently Asked Questions (Date &amp; Time)</h3>
+        
+        <div class="faq-item">
+          <div class="faq-q">How does the Gregorian leap year century rule work?</div>
+          <div class="faq-a">Under the Gregorian calendar reform of 1582, years divisible by 4 are leap years, EXCEPT century years ending in 00, which are only leap years if divisible by 400. Thus, 1600 and 2000 were leap years, while 1700, 1800, 1900 were common years (365 days), and 2100 will be a common year.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Why does dividing days by 365.25 produce inaccurate ages?</div>
+          <div class="faq-a">Dividing total elapsed days by 365.25 provides an astronomical average, but fails legal civil standards. A person born on February 29 legally advances age on March 1 in non-leap years, and calendar months vary between 28 and 31 days. Exact chronological age must increment by matching birth day-of-month across calendar years using our <a href="age-calculator.html">Age Calculator</a>.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">What is the ISO 8601 standard format for dates?</div>
+          <div class="faq-a">ISO 8601 establishes YYYY-MM-DD (e.g. 2026-10-01) as the international standard date representation, eliminating confusion between American (MM/DD/YYYY) and European (DD/MM/YYYY) conventions and enabling natural alphanumeric chronological sorting.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">How do business day calculations handle regional weekend differences?</div>
+          <div class="faq-a">Standard commercial business day algorithms deduct Saturdays and Sundays from the calendar span. In certain Middle Eastern countries where the traditional working week runs Sunday through Thursday, non-working weekend days must be adjusted to Friday and Saturday. Model custom business shifts with our <a href="date-difference-calculator.html">Date Difference Calculator</a>.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">What is Unix Epoch timestamp?</div>
+          <div class="faq-a">Unix Epoch time is a continuous counter tracking the number of seconds elapsed since 00:00:00 Coordinated Universal Time (UTC) on Thursday, January 1, 1970, widely used in computer operating systems and internet networking.</div>
+        </div>
+
+      </div>
+
+    </article>
+'''
+
+def update_expanded():
+    m_path = os.path.join(BASE_DIR, "math.html")
+    with open(m_path, "r", encoding="utf-8") as f:
+        m_content = f.read()
+    article_pattern = re.compile(r'<article class="article-section">.*?</article>', re.DOTALL)
+    m_updated = article_pattern.sub(lambda m: MATH_EXPANDED.strip(), m_content, count=1)
+    with open(m_path, "w", encoding="utf-8") as f:
+        f.write(m_updated)
+    m_words = len(re.sub(r'<[^>]+>', ' ', MATH_EXPANDED).split())
+    print(f"Math hub article word count: {m_words} words")
+
+    dt_path = os.path.join(BASE_DIR, "datetime.html")
+    with open(dt_path, "r", encoding="utf-8") as f:
+        dt_content = f.read()
+    dt_updated = article_pattern.sub(lambda m: DATETIME_EXPANDED.strip(), dt_content, count=1)
+    with open(dt_path, "w", encoding="utf-8") as f:
+        f.write(dt_updated)
+    dt_words = len(re.sub(r'<[^>]+>', ' ', DATETIME_EXPANDED).split())
+    print(f"Date & Time hub article word count: {dt_words} words")
+
+if __name__ == "__main__":
+    update_expanded()

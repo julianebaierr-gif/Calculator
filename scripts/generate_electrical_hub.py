@@ -1,239 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Electrical & Energy Engineering Calculators — IEC 60364 & NEC | CalcHub</title>
-  <meta name="description" content="Free industrial electrical engineering calculators compliant with IEC 60364, NEC NFPA 70, and EIA standards. Compute Ohm's law wheel, cable ampacity, voltage drop, resistor color codes, and solar PV sizing.">
-  <meta name="keywords" content="engineering calculator, electrical calculator, ohms law calculator, voltage drop calculator, cable sizing calculator, resistor color code calculator, solar panel sizing calculator">
-  <meta name="author" content="CalcHub Electrical & Power Systems Editorial Board">
-  <meta name="robots" content="index, follow, max-image-preview:large">
-  <link rel="canonical" href="https://calchub.org/engineering.html">
-  <link rel="stylesheet" href="styles.css">
+import os
+import re
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Electrical & Energy Engineering Calculators — IEC 60364 & NEC | CalcHub">
-  <meta property="og:description" content="Verified electrical engineering calculators compliant with IEC 60364-5-52, NEC NFPA 70, and EIA standards.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://calchub.org/engineering.html">
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-  <!-- Structured Data: CollectionPage & FAQ -->
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "CollectionPage",
-      "@id": "https://calchub.org/engineering.html#webpage",
-      "url": "https://calchub.org/engineering.html",
-      "name": "Electrical & Energy Engineering Calculators",
-      "description": "Comprehensive suite of industrial electrical engineering and photovoltaic sizing calculators.",
-      "breadcrumb": {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": "https://calchub.org/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Engineering",
-            "item": "https://calchub.org/engineering.html"
-          }
-        ]
-      }
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "Why does the 3-phase voltage drop formula use \u221a3 while single-phase uses 2?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Single-phase circuits employ two conductors (line and neutral), meaning current must traverse the entire circuit distance twice (2 \u00d7 L). In a balanced 3-phase 3-wire or 4-wire system, line-to-line voltage is vectorially displaced by 120 electrical degrees, which introduces the square-root-of-three factor (\u221a3 \u2248 1.732) rather than doubling."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "When does the NEC 125% continuous load factor apply?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "According to National Electrical Code (NEC) Article 100, any electrical load where the maximum current is expected to continue for 3 hours or more (such as commercial lighting, data center server racks, HVAC compressors, and EV charging stations) is classified as a continuous load and must be multiplied by 1.25 when sizing conductors and overcurrent protective devices."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Why is XLPE 90\u00b0C preferred over PVC 70\u00b0C in industrial cable trays?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Cross-Linked Polyethylene (XLPE) possesses thermosetting dielectric molecular cross-linking, allowing continuous conductor operation at 90\u00b0C (with short-circuit withstand up to 250\u00b0C), compared to thermoplastic PVC's 70\u00b0C limit. This 20\u00b0C differential gives XLPE cables approximately 18% to 22% higher current carrying capacity for the identical copper cross-sectional area."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How do I choose between 4-band and 5-band precision resistors?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Standard 4-band axial resistors provide two significant digits, a decimal multiplier, and a tolerance band (typically \u00b15% gold or \u00b110% silver). Precision electronic circuits requiring tight tolerances (\u00b11% brown, \u00b10.5% green, or \u00b10.1% violet) require 5-band resistors, which provide three significant digits before the multiplier for high-accuracy circuit tuning. Decode any band instantly using our Resistor Color Code Calculator."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How do solar PV array voltages affect DC string cable sizing?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Solar strings operate at fluctuating DC voltages up to 1,000V or 1,500V. High DC voltages reduce operational current for a given kilowatt rating, substantially lowering I\u00b2R power losses. However, cold ambient temperatures increase open-circuit voltage (Voc), requiring temperature-compensated calculations using our Solar Panel Sizing Calculator."
-          }
-        }
-      ]
-    }
-  ]
-}
-</script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-</head>
-<body class="cat-theme-engineering">
-
-        <!-- Sticky Header -->
-  <header class="site-header">
-    <div class="header-inner">
-      <a href="index.html" class="brand-logo">
-        <span class="logo-badge">∑</span>
-        <span>Calc<span class="accent">Hub</span></span>
-      </a>
-      <nav class="header-nav" aria-label="Main Navigation">
-        <div class="nav-row">
-          <a href="index.html" class="nav-link">🏠 Home</a>
-          <a href="health.html" class="nav-link">⚖️ Health</a>
-          <a href="finance.html" class="nav-link">🏦 Finance</a>
-          <a href="math.html" class="nav-link">🔢 Math</a>
-          <a href="engineering.html" class="nav-link active">⚡ Electrical</a>
-          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
-          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
-        </div>
-        <div class="nav-row">
-          <a href="civil.html" class="nav-link">🏗️ Civil</a>
-          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
-          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
-          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
-          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
-          <a href="converter.html" class="nav-link">🔄 Converter</a>
-        </div>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Category Hub Hero -->
-  <div class="cat-hub-hero">
-    <div class="cat-hub-hero-inner">
-      <div class="category-breadcrumbs">
-        <a href="index.html">Home</a> &rsaquo; <span>Electrical & Energy Engineering</span>
-      </div>
-      <span class="category-tag" style="background:#FFFBEB;color:#D97706;border-color:#FDE68A;margin-bottom:1rem;">
-        ⚡ IEC 60364-5-52, NEC NFPA 70 & EIA Standards
-      </span>
-      <h1 style="font-size:clamp(2.2rem, 4vw, 3rem);letter-spacing:-0.03em;margin-bottom:0.75rem;color:#0F172A;">
-        Electrical & Engineering <span style="color:#D97706;">Calculators</span>
-      </h1>
-      <p style="font-size:1.1rem;color:#475569;line-height:1.65;margin-bottom:1.5rem;">
-        Size conductors with thermal derating, calculate feeder voltage drop, solve circular Ohm's law, decode resistor bands, and engineer off-grid solar PV arrays.
-      </p>
-      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
-        <span style="font-size:0.88rem;color:#64748B;"><strong>5</strong> Engineering Tools</span>
-        <span style="font-size:0.88rem;color:#64748B;">• <strong>NEC 3% / 5%</strong> Compliance</span>
-        <span style="font-size:0.88rem;color:#64748B;">• <strong>Copper & Aluminum</strong> Resistivity</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Tools Grid -->
-  <main class="main-wrapper" style="margin-top:2.5rem;">
-
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-      <h2 style="margin:0;font-size:1.5rem;color:#0F172A;">Available Engineering Calculators (5)</h2>
-      <a href="index.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">&larr; All Categories</a>
-    </div>
-
-    <div class="silo-card-grid" style="margin-top:0;margin-bottom:3.5rem;">
-      
-      <!-- 1. Ohm's Law -->
-      <a href="ohms-law-calculator.html" class="silo-card" style="border-top:3px solid #D97706;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">⚡</div>
-          <span class="silo-card-badge">12-Formula Wheel</span>
-        </div>
-        <div class="silo-card-title">Ohm's Law Calculator</div>
-        <div class="silo-card-desc">Solve voltage (V), current (I), resistance (R), and electrical power (P) simultaneously across all 12 circular Ohm's law derivations.</div>
-        <div class="formula-badge-pill">V = I·R | P = V·I = I²R = V²/R</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#D97706;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-      <!-- 2. Voltage Drop -->
-      <a href="voltage-drop-calculator.html" class="silo-card" style="border-top:3px solid #D97706;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">📉</div>
-          <span class="silo-card-badge">NEC 3% & 5%</span>
-        </div>
-        <div class="silo-card-title">Voltage Drop Calculator</div>
-        <div class="silo-card-desc">Check NEC compliance across single-phase and three-phase copper/aluminum cable runs with conductor cross-section and distance modeling.</div>
-        <div class="formula-badge-pill">ΔV = (2 or √3) · I · L · ρ / A</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#D97706;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-      <!-- 3. Cable Sizing -->
-      <a href="cable-sizing-calculator.html" class="silo-card" style="border-top:3px solid #D97706;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">🔌</div>
-          <span class="silo-card-badge">IEC 60364-5-52</span>
-        </div>
-        <div class="silo-card-title">Cable Sizing (IEC/NEC)</div>
-        <div class="silo-card-desc">Size low-voltage conductors with ambient temperature derating (Ca), grouping factors (Cg), and XLPE/PVC insulation ampacity tables.</div>
-        <div class="formula-badge-pill">I_tabulated ≥ I_load / (Ca × Cg)</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#D97706;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-      <!-- 4. Resistor Color Code -->
-      <a href="resistor-color-code-calculator.html" class="silo-card" style="border-top:3px solid #D97706;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">🎨</div>
-          <span class="silo-card-badge">EIA 4 & 5-Band</span>
-        </div>
-        <div class="silo-card-title">Resistor Color Code</div>
-        <div class="silo-card-desc">Decode 4-band and 5-band axial resistors with an interactive graphical SVG resistor, multiplier values, and guaranteed tolerance boundaries.</div>
-        <div class="formula-badge-pill">R = (Sig Digits) × 10ⁿ ± Tol%</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#D97706;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-      <!-- 5. Solar Panel Sizing -->
-      <a href="solar-panel-sizing-calculator.html" class="silo-card" style="border-top:3px solid #D97706;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="silo-card-icon">☀️</div>
-          <span class="silo-card-badge">PV & Battery Bank</span>
-        </div>
-        <div class="silo-card-title">Solar Panel & Battery Sizing</div>
-        <div class="silo-card-desc">Calculate photovoltaic array wattage, module counts, and battery bank storage (Ah/kWh) based on daily kWh consumption and peak sun hours.</div>
-        <div class="formula-badge-pill">PV (W) = Daily Wh / (PSH × η)</div>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#D97706;margin-top:1rem;">
-          Launch Calculator &rarr;
-        </span>
-      </a>
-
-    </div>
-
-    <!-- Educational & Engineering Guide -->
-    <!-- Educational & Engineering Guide -->
+ELECTRICAL_CONTENT = r'''
     <!-- Educational & Engineering Guide -->
     <article class="article-section">
       <div class="article-header">
@@ -493,61 +263,23 @@
       </div>
 
     </article>
+'''
 
-  </main>
+def update_electrical():
+    filepath = os.path.join(BASE_DIR, "engineering.html")
+    with open(filepath, "r", encoding="utf-8") as f:
+        content = f.read()
 
-  <!-- Site Footer -->
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a href="index.html" class="brand-logo">
-            <span class="logo-badge">∑</span>
-            <span>Calc<span class="accent">Hub</span></span>
-          </a>
-          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
-        </div>
-        <div class="footer-col">
-          <h4>Health & Fitness</h4>
-          <ul class="footer-links">
-            <li><a href="bmi-calculator.html">BMI Calculator</a></li>
-            <li><a href="calorie-calculator.html">Calorie Calculator (TDEE)</a></li>
-            <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
-            <li><a href="ideal-weight-calculator.html">Ideal Body Weight</a></li>
-            <li><a href="water-intake-calculator.html">Daily Water Intake</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Finance & Money</h4>
-          <ul class="footer-links">
-            <li><a href="loan-emi-calculator.html">Loan EMI Calculator</a></li>
-            <li><a href="compound-interest-calculator.html">Compound Interest</a></li>
-            <li><a href="simple-interest-calculator.html">Simple Interest</a></li>
-            <li><a href="discount-calculator.html">Discount & Sale</a></li>
-            <li><a href="salary-calculator.html">Salary / Paycheck</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Math & Engineering</h4>
-          <ul class="footer-links">
-            <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
-            <li><a href="age-calculator.html">Exact Age Calculator</a></li>
-            <li><a href="ohms-law-calculator.html">Ohm's Law Calculator</a></li>
-            <li><a href="voltage-drop-calculator.html">Voltage Drop (NEC/IEC)</a></li>
-            <li><a href="cable-sizing-calculator.html">Cable Sizing Calculator</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2026 CalcHub. All rights reserved. Mathematical tools are for educational and guidance purposes.</p>
-        <div>
-          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
-          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy & Terms</a>
-        </div>
-      </div>
-    </div>
-  </footer>
+    article_pattern = re.compile(r'<article class="article-section">.*?</article>', re.DOTALL)
+    if article_pattern.search(content):
+        updated = article_pattern.sub(lambda m: ELECTRICAL_CONTENT.strip(), content, count=1)
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(updated)
+        print("Updated engineering.html successfully!")
+        words = len(re.sub(r'<[^>]+>', ' ', ELECTRICAL_CONTENT).split())
+        print(f"Electrical hub article word count: {words} words")
+    else:
+        print("Error: article tag not found in engineering.html")
 
-  <script src="app.js"></script>
-</body>
-</html>
+if __name__ == "__main__":
+    update_electrical()

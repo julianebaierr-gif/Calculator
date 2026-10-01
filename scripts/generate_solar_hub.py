@@ -1,210 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Solar & Renewable Energy Calculators — High-Precision Free Online Tools | CalcHub</title>
-  <meta name="description" content="Free industrial solar and renewable energy calculators. Size solar photovoltaic arrays, calculate battery storage Ah/kWh, size inverters, and estimate EV charging duration.">
-  <meta name="author" content="CalcHub Solar & Renewable Energy Calculators Editorial Board">
-  <meta name="robots" content="index, follow, max-image-preview:large">
-  <link rel="canonical" href="https://calchub.org/solar-energy.html">
-  <link rel="stylesheet" href="styles.css">
+import os
+import re
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Solar & Renewable Energy Calculators | CalcHub">
-  <meta property="og:description" content="Free industrial solar and renewable energy calculators. Size solar photovoltaic arrays, calculate battery storage Ah/kWh, size inverters, and estimate EV charging duration.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://calchub.org/solar-energy.html">
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-  <!-- Structured Data: CollectionPage -->
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "CollectionPage",
-      "@id": "https://calchub.org/solar-energy.html#webpage",
-      "url": "https://calchub.org/solar-energy.html",
-      "name": "Solar & Renewable Energy Calculators",
-      "description": "Free industrial solar and renewable energy calculators. Size solar photovoltaic arrays, calculate battery storage Ah/kWh, size inverters, and estimate EV charging duration.",
-      "breadcrumb": {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": "https://calchub.org/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Solar & Renewable Energy Calculators",
-            "item": "https://calchub.org/solar-energy.html"
-          }
-        ]
-      }
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "What are Peak Sun Hours (PSH) and how do they differ from daylight hours?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Peak Sun Hours (PSH) represent the equivalent number of hours in a day during which solar irradiance averages standard test condition (STC) intensity of 1,000 Watts per square meter (1 kW/m\u00b2). A location may receive 12 hours of total daylight, but low morning and evening sun angles mean it may only generate 4.5 to 5.5 PSH of usable peak energy."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Why is Depth of Discharge (DoD) critical for solar battery lifespan?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Depth of Discharge measures the percentage of battery capacity drawn during each cycle. Lead-acid/AGM batteries experience rapid plate sulfation and cell failure if discharged past 50% DoD (yielding roughly 500\u2013800 cycles). Lithium Iron Phosphate (LiFePO4) chemistries maintain stable crystal structure up to 80%\u201390% DoD, reliably exceeding 4,000\u20136,000 cycles."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How does ambient cold temperature affect solar panel open-circuit voltage (Voc)?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Photovoltaic silicon cells exhibit a negative temperature coefficient of voltage (typically -0.28% to -0.35% per \u00b0C). On cold winter mornings (-10\u00b0C), open-circuit voltage rises substantially above factory STC ratings (25\u00b0C). Solar charge controllers and inverters will suffer permanent overvoltage destruction if strings are sized without calculating cold Voc."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How does Level 2 EV charging integrate with a residential solar system?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "A Level 2 EV charging station operating at 240V / 32A draws 7.68 kW of continuous power. To charge an EV exclusively from solar, the PV array must generate surplus energy above base household consumption, or draw from an intelligent battery storage buffer. Model charge speeds and energy draw with our EV Charging Time Calculator."
-          }
-        }
-      ]
-    }
-  ]
-}
-</script>
-</head>
-<body class="cat-theme-solar">
-
-        <!-- Sticky Header -->
-  <header class="site-header">
-    <div class="header-inner">
-      <a href="index.html" class="brand-logo">
-        <span class="logo-badge">∑</span>
-        <span>Calc<span class="accent">Hub</span></span>
-      </a>
-      <nav class="header-nav" aria-label="Main Navigation">
-        <div class="nav-row">
-          <a href="index.html" class="nav-link">🏠 Home</a>
-          <a href="health.html" class="nav-link">⚖️ Health</a>
-          <a href="finance.html" class="nav-link">🏦 Finance</a>
-          <a href="math.html" class="nav-link">🔢 Math</a>
-          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
-          <a href="solar-energy.html" class="nav-link active">☀️ Solar</a>
-          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
-        </div>
-        <div class="nav-row">
-          <a href="civil.html" class="nav-link">🏗️ Civil</a>
-          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
-          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
-          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
-          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
-          <a href="converter.html" class="nav-link">🔄 Converter</a>
-        </div>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Category Hub Hero -->
-  <div class="cat-hub-hero">
-    <div class="cat-hub-hero-inner">
-      <div class="category-breadcrumbs">
-        <a href="index.html">Home</a> &rsaquo; <span>Solar & Renewable Energy Calculators</span>
-      </div>
-      <span class="category-tag" style="background:#FFF7ED;color:#EA580C;border-color:#FFEDD5;margin-bottom:1rem;">
-        ☀️ Verified IEC 61215 & NEC 690 Compliant
-      </span>
-      <h1 style="font-size:clamp(2.2rem, 4vw, 3rem);letter-spacing:-0.03em;margin-bottom:0.75rem;color:#0F172A;">
-        Solar & Renewable Energy Calculators
-      </h1>
-      <p style="font-size:1.1rem;color:#475569;line-height:1.65;margin-bottom:1.5rem;">
-        Free industrial solar and renewable energy calculators. Size solar photovoltaic arrays, calculate battery storage Ah/kWh, size inverters, and estimate EV charging duration.
-      </p>
-      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
-        <span style="font-size:0.88rem;color:#64748B;"><strong>4</strong> Certified Calculators</span>
-        <span style="font-size:0.88rem;color:#64748B;">• <strong>100%</strong> Free & Client-Side</span>
-        <span style="font-size:0.88rem;color:#64748B;">• <strong>Print-Ready</strong> Reports</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Tools Grid -->
-  <main class="main-wrapper" style="margin-top:2.5rem;">
-
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-      <h2 style="margin:0;font-size:1.5rem;color:#0F172A;">Available Tools (4)</h2>
-      <a href="index.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">&larr; All Categories</a>
-    </div>
-
-    <div class="silo-card-grid" style="margin-top:0;margin-bottom:3.5rem;">
-      
-        <a href="solar-panel-sizing-calculator.html" class="silo-card" style="border-top:3px solid #EA580C;">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-            <div class="silo-card-icon">☀️</div>
-            <span class="silo-card-badge">PV & Battery Bank</span>
-          </div>
-          <div class="silo-card-title">Solar Panel & Battery Sizing</div>
-          <div class="silo-card-desc">Calculate array wattage, panel counts, and battery bank storage based on peak sun hours.</div>
-          <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#EA580C;margin-top:1rem;">
-            Launch Calculator &rarr;
-          </span>
-        </a>
-        
-
-        <a href="solar-battery-bank-calculator.html" class="silo-card" style="border-top:3px solid #EA580C;">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-            <div class="silo-card-icon">🔋</div>
-            <span class="silo-card-badge">IEC 61427 & IEEE 1013</span>
-          </div>
-          <div class="silo-card-title">Solar Battery Bank Sizing</div>
-          <div class="silo-card-desc">Size battery storage in Ah and kWh for off-grid autonomy and cycle life protection.</div>
-          <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#EA580C;margin-top:1rem;">
-            Launch Calculator &rarr;
-          </span>
-        </a>
-        
-
-        <a href="solar-inverter-sizing-calculator.html" class="silo-card" style="border-top:3px solid #EA580C;">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-            <div class="silo-card-icon">⚡</div>
-            <span class="silo-card-badge">NEC 690 & IEC 62109</span>
-          </div>
-          <div class="silo-card-title">Solar Inverter Sizing</div>
-          <div class="silo-card-desc">Calculate continuous inverter kVA and inductive motor starting surge capacity.</div>
-          <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#EA580C;margin-top:1rem;">
-            Launch Calculator &rarr;
-          </span>
-        </a>
-        
-
-        <a href="ev-charging-time-calculator.html" class="silo-card" style="border-top:3px solid #EA580C;">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-            <div class="silo-card-icon">🔌</div>
-            <span class="silo-card-badge">SAE J1772 & IEC 61851</span>
-          </div>
-          <div class="silo-card-title">EV Charging Time & Power</div>
-          <div class="silo-card-desc">Estimate exact hours and minutes to charge electric vehicles across Levels 1, 2, and DC Fast.</div>
-          <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:0.85rem;color:#EA580C;margin-top:1rem;">
-            Launch Calculator &rarr;
-          </span>
-        </a>
-        
-    </div>
-
-    <!-- Educational Guide -->
-    <!-- Educational & Engineering Guide -->
+SOLAR_CONTENT = r'''
     <!-- Educational & Engineering Guide -->
     <article class="article-section">
       <div class="article-header">
@@ -448,61 +247,21 @@
       </div>
 
     </article>
+'''
 
-  </main>
+def update_solar():
+    filepath = os.path.join(BASE_DIR, "solar-energy.html")
+    with open(filepath, "r", encoding="utf-8") as f:
+        content = f.read()
 
-  <!-- Site Footer -->
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a href="index.html" class="brand-logo">
-            <span class="logo-badge">∑</span>
-            <span>Calc<span class="accent">Hub</span></span>
-          </a>
-          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
-        </div>
-        <div class="footer-col">
-          <h4>Health & Fitness</h4>
-          <ul class="footer-links">
-            <li><a href="bmi-calculator.html">BMI Calculator</a></li>
-            <li><a href="calorie-calculator.html">Calorie Calculator (TDEE)</a></li>
-            <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
-            <li><a href="ideal-weight-calculator.html">Ideal Body Weight</a></li>
-            <li><a href="water-intake-calculator.html">Daily Water Intake</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Finance & Money</h4>
-          <ul class="footer-links">
-            <li><a href="loan-emi-calculator.html">Loan EMI Calculator</a></li>
-            <li><a href="compound-interest-calculator.html">Compound Interest</a></li>
-            <li><a href="simple-interest-calculator.html">Simple Interest</a></li>
-            <li><a href="discount-calculator.html">Discount & Sale</a></li>
-            <li><a href="salary-calculator.html">Salary / Paycheck</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>All Categories</h4>
-          <ul class="footer-links">
-            <li><a href="solar-energy.html">Solar & Renewable</a></li>
-            <li><a href="mechanical.html">Mechanical & HVAC</a></li>
-            <li><a href="civil.html">Civil & Construction</a></li>
-            <li><a href="chemical.html">Chemical & Water</a></li>
-            <li><a href="fire-safety.html">Fire & Life Safety</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2026 CalcHub. All rights reserved. Mathematical tools are for educational and guidance purposes.</p>
-        <div>
-          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
-          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy & Terms</a>
-        </div>
-      </div>
-    </div>
-  </footer>
+    article_pattern = re.compile(r'<article class="article-section">.*?</article>', re.DOTALL)
+    if article_pattern.search(content):
+        updated = article_pattern.sub(lambda m: SOLAR_CONTENT.strip(), content, count=1)
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(updated)
+        print("Updated solar-energy.html successfully!")
+        words = len(re.sub(r'<[^>]+>', ' ', SOLAR_CONTENT).split())
+        print(f"Solar hub article word count: {words} words")
 
-  <script src="app.js"></script>
-</body>
-</html>
+if __name__ == "__main__":
+    update_solar()
