@@ -6,6 +6,7 @@ import glob
 import re
 
 CATEGORIES_ROW_1 = [
+    ("index.html", "🏠 Home", "home"),
     ("health.html", "⚖️ Health", "health"),
     ("finance.html", "🏦 Finance", "finance"),
     ("math.html", "🔢 Math", "math"),
@@ -56,6 +57,10 @@ def get_header_html(active_cat=None):
 
 def determine_active_cat(filename):
     f = filename.lower()
+    if f == "index.html":
+        return "home"
+    if f == "404.html":
+        return None
     if "health" in f or "bmi" in f or "calorie" in f or "body-fat" in f or "ideal-weight" in f or "water-intake" in f:
         return "health"
     if "finance" in f or "loan" in f or "compound" in f or "interest" in f or "discount" in f or "salary" in f:
