@@ -5,13 +5,16 @@ Update the sticky header in all HTML files to remove search and show all 12 cate
 import glob
 import re
 
-CATEGORIES = [
+CATEGORIES_ROW_1 = [
     ("health.html", "⚖️ Health", "health"),
     ("finance.html", "🏦 Finance", "finance"),
     ("math.html", "🔢 Math", "math"),
     ("engineering.html", "⚡ Electrical", "engineering"),
     ("solar-energy.html", "☀️ Solar", "solar"),
-    ("mechanical.html", "⚙️ Mechanical", "mechanical"),
+    ("mechanical.html", "⚙️ Mechanical", "mechanical")
+]
+
+CATEGORIES_ROW_2 = [
     ("civil.html", "🏗️ Civil", "civil"),
     ("chemical.html", "🧪 Chemical", "chemical"),
     ("fire-safety.html", "🚨 Fire &amp; Safety", "fire"),
@@ -21,11 +24,17 @@ CATEGORIES = [
 ]
 
 def get_header_html(active_cat=None):
-    nav_links = []
-    for href, label, cat_key in CATEGORIES:
+    r1_links = []
+    for href, label, cat_key in CATEGORIES_ROW_1:
         is_active = ' active' if active_cat == cat_key else ''
-        nav_links.append(f'        <a href="{href}" class="nav-link{is_active}">{label}</a>')
-    nav_str = "\n".join(nav_links)
+        r1_links.append(f'          <a href="{href}" class="nav-link{is_active}">{label}</a>')
+    r1_str = "\n".join(r1_links)
+
+    r2_links = []
+    for href, label, cat_key in CATEGORIES_ROW_2:
+        is_active = ' active' if active_cat == cat_key else ''
+        r2_links.append(f'          <a href="{href}" class="nav-link{is_active}">{label}</a>')
+    r2_str = "\n".join(r2_links)
 
     return f"""  <!-- Sticky Header -->
   <header class="site-header">
@@ -35,7 +44,12 @@ def get_header_html(active_cat=None):
         <span>Calc<span class="accent">Hub</span></span>
       </a>
       <nav class="header-nav" aria-label="Main Navigation">
-{nav_str}
+        <div class="nav-row">
+{r1_str}
+        </div>
+        <div class="nav-row">
+{r2_str}
+        </div>
       </nav>
     </div>
   </header>"""
@@ -46,8 +60,6 @@ def determine_active_cat(filename):
         return "health"
     if "finance" in f or "loan" in f or "compound" in f or "interest" in f or "discount" in f or "salary" in f:
         return "finance"
-    if "math" in f or "percentage" in f or "age" in f or "gpa" in f or "fraction" in f or "ratio" in f:
-        return "math"
     if "engineering" in f or "ohms" in f or "voltage" in f or "cable" in f or "resistor" in f:
         return "engineering"
     if "solar" in f or "charging" in f:
@@ -66,6 +78,8 @@ def determine_active_cat(filename):
         return "datetime"
     if "converter" in f or "unit" in f:
         return "converter"
+    if "math" in f or "percentage" in f or "age" in f or "gpa" in f or "fraction" in f or "ratio" in f:
+        return "math"
     return None
 
 def main():
