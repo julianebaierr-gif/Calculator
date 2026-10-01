@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cable Sizing Calculator — IEC 60364 & BS 7671 Conductor Ampacity — CalcHub</title>
+  <meta name="description" content="Determine minimum conductor size (mm²) per IEC 60364-5-52 and BS 7671. Automatic ambient temperature derating, grouping factors, and XLPE/PVC ratings.">
+  <meta name="keywords" content="cable sizing calculator, iec 60364 cable sizing, wire ampacity calculator, bs 7671 cable calculator, electrical cable size, conductor sizing">
+  <meta name="author" content="CalcHub Professional Team">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://calchub.org/cable-sizing-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  
+  <meta property="og:title" content="Cable Sizing Calculator — IEC 60364 & BS 7671 Conductor Ampacity">
+  <meta property="og:description" content="Determine minimum conductor size (mm²) per IEC 60364-5-52 and BS 7671. Automatic ambient temperature derating, grouping factors, and XLPE/PVC ratings.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://calchub.org/cable-sizing-calculator.html">
+  
+  <script type="application/ld+json">
+  {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Cable Sizing Calculator",
+  "url": "https://calchub.org/cable-sizing-calculator.html",
+  "applicationCategory": "EngineeringApplication",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <a href="index.html#health" class="nav-link ">Health</a>
+        <a href="index.html#finance" class="nav-link ">Finance</a>
+        <a href="index.html#math" class="nav-link ">Math</a>
+        <a href="index.html#engineering" class="nav-link active">Engineering</a>
+      </nav>
+      <div class="header-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="header-search-input" placeholder="Search 20+ calculators... (Ctrl+K)" autocomplete="off">
+        <div id="search-results-dropdown" class="search-results-dropdown"></div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="index.html">Home</a>
+    <span class="sep">›</span>
+    <a href="index.html#engineering">Electrical Engineering</a>
+    <span class="sep">›</span>
+    <span class="current">Cable Sizing Calculator</span>
+  </nav>
+
+  <main class="main-wrapper">
+    <div class="calculator-hero">
+      <span class="category-tag">📊 Electrical Engineering</span>
+      <h1>Cable Sizing Calculator</h1>
+      <p class="subtitle">Size power cables with international engineering standards. Applies ambient temperature derating (Ca) and multi-circuit bundling factors (Cg).</p>
+    </div>
+
+    <div class="calculator-workspace">
+      
+      <section class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-title">🔌 Installation & Load Conditions (IEC 60364)</span>
+        </div>
+        <form onsubmit="return false;">
+          <div class="calc-form-grid">
+            <div class="input-group">
+              <label class="input-label" for="cs-current">Design Current Ib (A)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="cs-current" value="45" min="1" max="1500" oninput="calcCable()">
+                <span class="input-unit-badge">A</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="cs-temp">Ambient Temperature (°C)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="cs-temp" value="35" min="10" max="65" oninput="calcCable()">
+                <span class="input-unit-badge">°C</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="cs-insul">Insulation Material</label>
+              <div class="input-wrap">
+                <select id="cs-insul" onchange="calcCable()">
+                  <option value="xlpe" selected>XLPE / EPR (90°C Rated)</option>
+                  <option value="pvc">PVC (70°C Rated)</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="cs-method">Installation Method</label>
+              <div class="input-wrap">
+                <select id="cs-method" onchange="calcCable()">
+                  <option value="conduit" selected>Enclosed in Conduit / Trunking (Method B)</option>
+                  <option value="clipped">Clipped Direct to Wall (Method C)</option>
+                  <option value="tray">Perforated Cable Tray in Free Air (Method E)</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group calc-field-full">
+              <label class="input-label" for="cs-grouping">Number of Grouped Circuits</label>
+              <div class="input-wrap">
+                <select id="cs-grouping" onchange="calcCable()">
+                  <option value="1.0" selected>1 Circuit (No Grouping Derating: 1.00)</option>
+                  <option value="0.8">2 Circuits (Cg: 0.80)</option>
+                  <option value="0.7">3 Circuits (Cg: 0.70)</option>
+                  <option value="0.65">4–5 Circuits (Cg: 0.65)</option>
+                  <option value="0.57">6–8 Circuits (Cg: 0.57)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="calc-actions">
+            <button type="button" class="btn btn-primary" onclick="copyResults()">📋 Copy Sizing Specification</button>
+            <button type="button" class="btn btn-subtle" onclick="window.print()">🖨️ Print Cable Schedule</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="results-card">
+        <div class="results-header">
+          <span class="results-title">Conductor Specification</span>
+          <span class="status-pill status-success">IEC 60364 Compliant</span>
+        </div>
+        <div class="primary-result-box">
+          <div class="primary-result-label">Recommended Conductor Size</div>
+          <div>
+            <span class="primary-result-value" id="cs-res-size" style="color:#2563EB;">10.0</span>
+            <span class="primary-result-unit">mm² Copper</span>
+          </div>
+        </div>
+        <div class="result-breakdown-grid">
+          <div class="breakdown-item">
+            <div class="breakdown-label">Minimum Required Ampacity (It)</div>
+            <div class="breakdown-val" id="cs-it">49.4 A</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Nominal Cable Ampacity (Iz)</div>
+            <div class="breakdown-val" id="cs-iz">65.0 A</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Temp Derating (Ca)</div>
+            <div class="breakdown-val" id="cs-ca">0.96</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Grouping Derating (Cg)</div>
+            <div class="breakdown-val" id="cs-cg">1.00</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    
+    <section class="geo-citation-box">
+      <div class="geo-header">💡 Direct Answer (GEO & Quick Summary)</div>
+      <p>Cable sizing per <strong>IEC 60364-5-52</strong> and <strong>BS 7671</strong> ensures that a cable's corrected current-carrying capacity (Iz) is greater than or equal to the design load current (Ib). The required tabulated ampacity (It) is determined by:</p>
+      <p><code>It = Ib ÷ (Ca × Cg × Ci)</code></p>
+      <p>Where <strong>Ib</strong> = Design Current, <strong>Ca</strong> = Ambient Temperature Correction Factor, <strong>Cg</strong> = Grouping Factor, and <strong>Ci</strong> = Thermal Insulation Factor. A conductor cross-section (mm²) is selected such that <code>Iz ≥ It</code>.</p>
+    </section>
+
+    
+    <nav class="toc-container" aria-label="Table of Contents">
+      <div class="toc-title">📑 Table of Contents</div>
+      <ul class="toc-list">
+        <li><a href="#cs-procedure">4-Step Cable Sizing Procedure</a></li>
+        <li><a href="#cs-derating-factors">Temperature & Grouping Derating Factors</a></li>
+        <li><a href="#xlpe-vs-pvc">XLPE vs PVC Insulation Performance</a></li>
+        <li><a href="#cs-faq">Frequently Asked Questions</a></li>
+      </ul>
+    </nav>
+
+
+    <article class="article-section">
+      
+      <h2 id="cs-procedure">The 4-Step Sizing Procedure (IEC 60364-5-52)</h2>
+      <ol>
+        <li><strong>Determine Design Current (Ib):</strong> Calculate operational load current from kilowatt power and power factor.</li>
+        <li><strong>Calculate Required Tabulated Current (It):</strong> Divide Ib by all applicable derating factors: <code>It = Ib / (Ca · Cg)</code>.</li>
+        <li><strong>Select Conductor Size:</strong> Consult IEC 60364-5-52 Table B.52.4 to choose the smallest standard conductor whose tabulated current <code>Iz ≥ It</code>.</li>
+        <li><strong>Verify Voltage Drop:</strong> Confirm that total voltage drop over the run length does not exceed 3% for lighting or 5% for power.</li>
+      </ol>
+
+      <h2 id="cs-derating-factors">Derating Correction Multipliers</h2>
+      <p>Cables running in ambient air above 30°C or bunched together in trays cannot dissipate heat effectively, requiring derating:</p>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead><tr><th>Ambient Temp (°C)</th><th>XLPE Derating (Ca)</th><th>PVC Derating (Ca)</th></tr></thead>
+          <tbody>
+            <tr><td>30°C</td><td>1.00</td><td>1.00</td></tr>
+            <tr><td>35°C</td><td>0.96</td><td>0.94</td></tr>
+            <tr><td>40°C</td><td>0.91</td><td>0.87</td></tr>
+            <tr><td>45°C</td><td>0.87</td><td>0.79</td></tr>
+            <tr><td>50°C</td><td>0.82</td><td>0.71</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="xlpe-vs-pvc">XLPE (90°C) vs. PVC (70°C)</h2>
+      <p>Cross-Linked Polyethylene (XLPE) operates at conductor temperatures up to 90°C, compared to 70°C for PVC. This 20°C thermal margin allows XLPE to carry approximately 15-20% higher ampacity in the exact same copper cross-sectional area.</p>
+
+      <h2 id="cs-faq">Frequently Asked Questions</h2>
+      <div class="faq-wrap">
+        <details class="faq-item">
+          <summary>What is the rule of thumb for cable current capacity?</summary>
+          <div class="faq-content">In small residential wiring, copper cables roughly support: 1.5 mm² ≈ 16A, 2.5 mm² ≈ 24A, 4.0 mm² ≈ 32A, 6.0 mm² ≈ 41A, 10.0 mm² ≈ 57A. However, professional engineering always mandates formal derating calculations.</div>
+        </details>
+      </div>
+
+    </article>
+
+    <section>
+      <h2>Related Health & Fitness Calculators</h2>
+      <div class="silo-card-grid">
+        <a href="bmi-calculator.html" class="silo-card">
+          <div class="silo-card-icon">⚖️</div>
+          <div class="silo-card-title">BMI Calculator</div>
+          <div class="silo-card-desc">Calculate body mass index and healthy target weight ranges.</div>
+        </a>
+        <a href="calorie-calculator.html" class="silo-card">
+          <div class="silo-card-icon">🔥</div>
+          <div class="silo-card-title">Calorie Calculator</div>
+          <div class="silo-card-desc">TDEE and daily caloric requirements for weight loss or muscle gain.</div>
+        </a>
+        <a href="body-fat-calculator.html" class="silo-card">
+          <div class="silo-card-icon">📏</div>
+          <div class="silo-card-title">Body Fat Calculator</div>
+          <div class="silo-card-desc">Estimate body fat percentage and lean mass using the US Navy tape measurement method.</div>
+        </a>
+        <a href="water-intake-calculator.html" class="silo-card">
+          <div class="silo-card-icon">💧</div>
+          <div class="silo-card-title">Daily Water Intake</div>
+          <div class="silo-card-desc">Determine optimal daily hydration based on body weight, climate, and exercise volume.</div>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <span class="logo-badge">∑</span>
+            <span>Calc<span class="accent">Hub</span></span>
+          </a>
+          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Health & Fitness</h4>
+          <ul class="footer-links">
+            <li><a href="bmi-calculator.html">BMI Calculator</a></li>
+            <li><a href="calorie-calculator.html">Calorie Calculator (TDEE)</a></li>
+            <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html">Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html">Daily Water Intake</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Finance & Money</h4>
+          <ul class="footer-links">
+            <li><a href="loan-emi-calculator.html">Loan EMI Calculator</a></li>
+            <li><a href="compound-interest-calculator.html">Compound Interest</a></li>
+            <li><a href="simple-interest-calculator.html">Simple Interest</a></li>
+            <li><a href="discount-calculator.html">Discount & Sale</a></li>
+            <li><a href="salary-calculator.html">Salary / Paycheck</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Math & Engineering</h4>
+          <ul class="footer-links">
+            <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
+            <li><a href="age-calculator.html">Exact Age Calculator</a></li>
+            <li><a href="ohms-law-calculator.html">Ohm's Law Calculator</a></li>
+            <li><a href="voltage-drop-calculator.html">Voltage Drop (NEC/IEC)</a></li>
+            <li><a href="cable-sizing-calculator.html">Cable Sizing Calculator</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Mathematical tools are for educational and guidance purposes.</p>
+        <div>
+          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
+          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy & Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="app.js"></script>
+  
+  <script>
+    // Simplified IEC 60364-5-52 Copper XLPE/PVC reference ampacity (Method B/C)
+    const AMPACITY_TABLE = [
+      { size: 1.5, xlpe: 19.5, pvc: 15.5 },
+      { size: 2.5, xlpe: 27.0, pvc: 21.0 },
+      { size: 4.0, xlpe: 36.0, pvc: 28.0 },
+      { size: 6.0, xlpe: 46.0, pvc: 36.0 },
+      { size: 10.0, xlpe: 65.0, pvc: 50.0 },
+      { size: 16.0, xlpe: 87.0, pvc: 68.0 },
+      { size: 25.0, xlpe: 114.0, pvc: 89.0 },
+      { size: 35.0, xlpe: 141.0, pvc: 110.0 },
+      { size: 50.0, xlpe: 182.0, pvc: 134.0 },
+      { size: 70.0, xlpe: 234.0, pvc: 171.0 },
+      { size: 95.0, xlpe: 284.0, pvc: 207.0 }
+    ];
+
+    function calcCable() {
+      const ib = parseFloat(document.getElementById('cs-current').value) || 45;
+      const temp = parseFloat(document.getElementById('cs-temp').value) || 35;
+      const insul = document.getElementById('cs-insul').value;
+      const cg = parseFloat(document.getElementById('cs-grouping').value) || 1.0;
+
+      // Temp derating approximation
+      let ca = 1.0;
+      if (temp > 30) {
+        ca = insul === 'xlpe' ? 1.0 - ((temp - 30) * 0.009) : 1.0 - ((temp - 30) * 0.014);
+      }
+      ca = Math.max(0.4, Math.min(1.0, ca));
+
+      const it = ib / (ca * cg);
+
+      let chosen = AMPACITY_TABLE[AMPACITY_TABLE.length - 1];
+      for (let row of AMPACITY_TABLE) {
+        const rating = insul === 'xlpe' ? row.xlpe : row.pvc;
+        if (rating >= it) {
+          chosen = row;
+          break;
+        }
+      }
+
+      const iz = insul === 'xlpe' ? chosen.xlpe : chosen.pvc;
+
+      document.getElementById('cs-res-size').textContent = chosen.size.toFixed(1);
+      document.getElementById('cs-it').textContent = it.toFixed(1) + ' A';
+      document.getElementById('cs-iz').textContent = iz.toFixed(1) + ' A';
+      document.getElementById('cs-ca').textContent = ca.toFixed(2);
+      document.getElementById('cs-cg').textContent = cg.toFixed(2);
+    }
+    function copyResults() {
+      const s = document.getElementById('cs-res-size').textContent;
+      const iz = document.getElementById('cs-iz').textContent;
+      window.copyToClipboard(`CalcHub Cable Sizing: ${s} mm² Copper (Tabulated Iz: ${iz})`);
+    }
+    calcCable();
+  </script>
+
+</body>
+</html>

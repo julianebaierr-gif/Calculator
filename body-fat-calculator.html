@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Body Fat Calculator — US Navy Circumference Method — CalcHub</title>
+  <meta name="description" content="Accurate body fat percentage calculator using the clinical US Navy tape measurement method. Computes fat mass, lean body mass, and fitness benchmarks.">
+  <meta name="keywords" content="body fat calculator, navy body fat formula, lean body mass, body fat percentage, fat mass calculator">
+  <meta name="author" content="CalcHub Professional Team">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://calchub.org/body-fat-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  
+  <meta property="og:title" content="Body Fat Calculator — US Navy Circumference Method">
+  <meta property="og:description" content="Accurate body fat percentage calculator using the clinical US Navy tape measurement method. Computes fat mass, lean body mass, and fitness benchmarks.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://calchub.org/body-fat-calculator.html">
+  
+  <script type="application/ld+json">
+  {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Body Fat Calculator",
+  "url": "https://calchub.org/body-fat-calculator.html",
+  "applicationCategory": "HealthApplication",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <a href="index.html#health" class="nav-link active">Health</a>
+        <a href="index.html#finance" class="nav-link ">Finance</a>
+        <a href="index.html#math" class="nav-link ">Math</a>
+        <a href="index.html#engineering" class="nav-link ">Engineering</a>
+      </nav>
+      <div class="header-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="header-search-input" placeholder="Search 20+ calculators... (Ctrl+K)" autocomplete="off">
+        <div id="search-results-dropdown" class="search-results-dropdown"></div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="index.html">Home</a>
+    <span class="sep">›</span>
+    <a href="index.html#health">Health & Fitness</a>
+    <span class="sep">›</span>
+    <span class="current">Body Fat Calculator</span>
+  </nav>
+
+  <main class="main-wrapper">
+    <div class="calculator-hero">
+      <span class="category-tag">📊 Health & Fitness</span>
+      <h1>Body Fat Calculator</h1>
+      <p class="subtitle">Measure your body composition without expensive DEXA scans. Calculate your precise body fat percentage, lean tissue mass, and athletic classification.</p>
+    </div>
+
+    <div class="calculator-workspace">
+      
+      <section class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-title">📏 Body Circumferences (US Navy Method)</span>
+        </div>
+        <form onsubmit="return false;">
+          <div class="calc-form-grid">
+            <div class="input-group">
+              <label class="input-label" for="bf-gender">Gender</label>
+              <div class="input-wrap">
+                <select id="bf-gender" onchange="toggleHipField(); calcBF();">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="bf-weight">Weight (kg)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="bf-weight" value="75" min="30" max="250" oninput="calcBF()">
+                <span class="input-unit-badge">kg</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="bf-height">Height (cm)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="bf-height" value="178" min="100" max="250" oninput="calcBF()">
+                <span class="input-unit-badge">cm</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="bf-neck">Neck Circumference (cm)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="bf-neck" value="38" min="20" max="70" oninput="calcBF()">
+                <span class="input-unit-badge">cm</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="bf-waist">Waist Circumference (cm)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="bf-waist" value="84" min="40" max="180" oninput="calcBF()">
+                <span class="input-unit-badge">cm</span>
+              </div>
+            </div>
+            <div class="input-group" id="fld-hip" style="display:none;">
+              <label class="input-label" for="bf-hip">Hip Circumference (cm)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="bf-hip" value="96" min="50" max="180" oninput="calcBF()">
+                <span class="input-unit-badge">cm</span>
+              </div>
+            </div>
+          </div>
+          <div class="calc-actions">
+            <button type="button" class="btn btn-primary" onclick="copyResults()">📋 Copy Result</button>
+            <button type="button" class="btn btn-subtle" onclick="window.print()">🖨️ Print Report</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="results-card">
+        <div class="results-header">
+          <span class="results-title">Body Composition</span>
+          <span class="status-pill status-success" id="bf-pill">Fitness Level</span>
+        </div>
+        <div class="primary-result-box">
+          <div class="primary-result-label">Estimated Body Fat Percentage</div>
+          <div>
+            <span class="primary-result-value" id="bf-val">15.8</span>
+            <span class="primary-result-unit">%</span>
+          </div>
+        </div>
+        <div class="result-breakdown-grid">
+          <div class="breakdown-item">
+            <div class="breakdown-label">Fat Mass</div>
+            <div class="breakdown-val" id="bf-fat-mass">11.9 kg</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Lean Body Mass</div>
+            <div class="breakdown-val" id="bf-lean-mass">63.1 kg</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Category</div>
+            <div class="breakdown-val" id="bf-cat">Fitness</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">ACE Benchmark</div>
+            <div class="breakdown-val">14–17% (Male)</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    
+    <section class="geo-citation-box">
+      <div class="geo-header">💡 Direct Answer (GEO & Quick Summary)</div>
+      <p>The <strong>US Navy Body Fat Formula</strong> calculates body fat percentage based on circumferences of the neck, waist, height (and hip for females). The American Council on Exercise (ACE) benchmarks body fat as follows:</p>
+      <ul>
+        <li><strong>Men:</strong> Essential Fat: 2-5% | Athletes: 6-13% | Fitness: 14-17% | Average: 18-24% | Obese: 25%+</li>
+        <li><strong>Women:</strong> Essential Fat: 10-13% | Athletes: 14-20% | Fitness: 21-24% | Average: 25-31% | Obese: 32%+</li>
+      </ul>
+    </section>
+
+    
+    <nav class="toc-container" aria-label="Table of Contents">
+      <div class="toc-title">📑 Table of Contents</div>
+      <ul class="toc-list">
+        <li><a href="#navy-method">US Navy Circumference Formula</a></li>
+        <li><a href="#ace-categories">ACE Classification Standards</a></li>
+        <li><a href="#measuring-technique">Accurate Measuring Protocols</a></li>
+        <li><a href="#bf-faq">Frequently Asked Questions</a></li>
+      </ul>
+    </nav>
+
+
+    <article class="article-section">
+      
+      <h2 id="navy-method">The US Navy Circumference Method</h2>
+      <p>Developed by Hodgdon and Beckett at the Naval Health Research Center in 1984, the US Navy Body Fat equation is the most validated anthropometric technique in clinical medicine. It circumvents the athlete bias of BMI by factoring in abdominal adiposity relative to skeletal frame.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">US Navy Equations (Metric)</div>
+        <div class="formula-code">Men: %Fat = 495 / (1.0324 - 0.19077·log₁₀(waist - neck) + 0.15456·log₁₀(height)) - 450<br>Women: %Fat = 495 / (1.29579 - 0.35004·log₁₀(waist + hip - neck) + 0.22100·log₁₀(height)) - 450</div>
+        <div class="formula-legend">All circumferences entered in centimeters (cm)</div>
+      </div>
+
+      <h2 id="ace-categories">ACE Body Fat Classification Standards</h2>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead><tr><th>Classification</th><th>Women (% Fat)</th><th>Men (% Fat)</th></tr></thead>
+          <tbody>
+            <tr><td>Essential Fat</td><td>10–13%</td><td>2–5%</td></tr>
+            <tr><td>Athletes</td><td>14–20%</td><td>6–13%</td></tr>
+            <tr><td>Fitness</td><td>21–24%</td><td>14–17%</td></tr>
+            <tr><td>Acceptable (Average)</td><td>25–31%</td><td>18–24%</td></tr>
+            <tr><td>Obese</td><td>32%+</td><td>25%+</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="measuring-technique">Accurate Measuring Protocols</h2>
+      <p>Measure circumferences using an inelastic tape measure snug against skin without compressing soft tissue:</p>
+      <ul>
+        <li><strong>Neck:</strong> Measure just below the larynx (Adam's apple), perpendicular to the neck axis.</li>
+        <li><strong>Waist:</strong> Measure horizontally at the level of the navel for men, or at the narrowest point of the torso for women.</li>
+        <li><strong>Hips (Women only):</strong> Measure around the widest circumference of the buttocks.</li>
+      </ul>
+
+      <h2 id="bf-faq">Frequently Asked Questions</h2>
+      <div class="faq-wrap">
+        <details class="faq-item">
+          <summary>How accurate is the US Navy method compared to a DEXA scan?</summary>
+          <div class="faq-content">When measurements are taken properly, the US Navy method correlates with Dual-Energy X-ray Absorptiometry (DEXA) within an error margin of 3-4%. It is significantly more reliable than standard home bioelectrical impedance (BIA) bathroom scales, which vary wildly with hydration levels.</div>
+        </details>
+      </div>
+
+    </article>
+
+    <section>
+      <h2>Related Health & Fitness Calculators</h2>
+      <div class="silo-card-grid">
+        <a href="bmi-calculator.html" class="silo-card">
+          <div class="silo-card-icon">⚖️</div>
+          <div class="silo-card-title">BMI Calculator</div>
+          <div class="silo-card-desc">Calculate body mass index and healthy target weight ranges.</div>
+        </a>
+        <a href="calorie-calculator.html" class="silo-card">
+          <div class="silo-card-icon">🔥</div>
+          <div class="silo-card-title">Calorie Calculator</div>
+          <div class="silo-card-desc">TDEE and daily caloric requirements for weight loss or muscle gain.</div>
+        </a>
+        <a href="body-fat-calculator.html" class="silo-card">
+          <div class="silo-card-icon">📏</div>
+          <div class="silo-card-title">Body Fat Calculator</div>
+          <div class="silo-card-desc">Estimate body fat percentage and lean mass using the US Navy tape measurement method.</div>
+        </a>
+        <a href="water-intake-calculator.html" class="silo-card">
+          <div class="silo-card-icon">💧</div>
+          <div class="silo-card-title">Daily Water Intake</div>
+          <div class="silo-card-desc">Determine optimal daily hydration based on body weight, climate, and exercise volume.</div>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <span class="logo-badge">∑</span>
+            <span>Calc<span class="accent">Hub</span></span>
+          </a>
+          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Health & Fitness</h4>
+          <ul class="footer-links">
+            <li><a href="bmi-calculator.html">BMI Calculator</a></li>
+            <li><a href="calorie-calculator.html">Calorie Calculator (TDEE)</a></li>
+            <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html">Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html">Daily Water Intake</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Finance & Money</h4>
+          <ul class="footer-links">
+            <li><a href="loan-emi-calculator.html">Loan EMI Calculator</a></li>
+            <li><a href="compound-interest-calculator.html">Compound Interest</a></li>
+            <li><a href="simple-interest-calculator.html">Simple Interest</a></li>
+            <li><a href="discount-calculator.html">Discount & Sale</a></li>
+            <li><a href="salary-calculator.html">Salary / Paycheck</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Math & Engineering</h4>
+          <ul class="footer-links">
+            <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
+            <li><a href="age-calculator.html">Exact Age Calculator</a></li>
+            <li><a href="ohms-law-calculator.html">Ohm's Law Calculator</a></li>
+            <li><a href="voltage-drop-calculator.html">Voltage Drop (NEC/IEC)</a></li>
+            <li><a href="cable-sizing-calculator.html">Cable Sizing Calculator</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Mathematical tools are for educational and guidance purposes.</p>
+        <div>
+          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
+          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy & Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="app.js"></script>
+  
+  <script>
+    function toggleHipField() {
+      const g = document.getElementById('bf-gender').value;
+      document.getElementById('fld-hip').style.display = (g === 'female') ? 'block' : 'none';
+    }
+    function calcBF() {
+      const g = document.getElementById('bf-gender').value;
+      const w = parseFloat(document.getElementById('bf-weight').value) || 75;
+      const h = parseFloat(document.getElementById('bf-height').value) || 178;
+      const neck = parseFloat(document.getElementById('bf-neck').value) || 38;
+      const waist = parseFloat(document.getElementById('bf-waist').value) || 84;
+      const hip = parseFloat(document.getElementById('bf-hip').value) || 96;
+
+      let bf = 0;
+      if (g === 'male') {
+        const diff = waist - neck;
+        if (diff <= 0) return;
+        bf = 495 / (1.0324 - 0.19077 * Math.log10(diff) + 0.15456 * Math.log10(h)) - 450;
+      } else {
+        const sum = waist + hip - neck;
+        if (sum <= 0) return;
+        bf = 495 / (1.29579 - 0.35004 * Math.log10(sum) + 0.22100 * Math.log10(h)) - 450;
+      }
+
+      bf = Math.max(3, Math.min(60, bf));
+      const fatMass = w * (bf / 100);
+      const leanMass = w - fatMass;
+
+      let cat = "Fitness";
+      let pillClass = "status-success";
+      if (g === 'male') {
+        if (bf < 6) cat = "Essential Fat";
+        else if (bf < 14) cat = "Athletes";
+        else if (bf < 18) cat = "Fitness";
+        else if (bf < 25) { cat = "Average"; pillClass = "status-warning"; }
+        else { cat = "Obese"; pillClass = "status-danger"; }
+      } else {
+        if (bf < 14) cat = "Essential Fat";
+        else if (bf < 21) cat = "Athletes";
+        else if (bf < 25) cat = "Fitness";
+        else if (bf < 32) { cat = "Average"; pillClass = "status-warning"; }
+        else { cat = "Obese"; pillClass = "status-danger"; }
+      }
+
+      document.getElementById('bf-val').textContent = bf.toFixed(1);
+      document.getElementById('bf-fat-mass').textContent = fatMass.toFixed(1) + ' kg';
+      document.getElementById('bf-lean-mass').textContent = leanMass.toFixed(1) + ' kg';
+      document.getElementById('bf-cat').textContent = cat;
+      const pill = document.getElementById('bf-pill');
+      pill.className = 'status-pill ' + pillClass;
+      pill.textContent = cat;
+    }
+    function copyResults() {
+      const bf = document.getElementById('bf-val').textContent;
+      const cat = document.getElementById('bf-cat').textContent;
+      window.copyToClipboard(`CalcHub Body Fat Report: ${bf}% (${cat})`);
+    }
+    calcBF();
+  </script>
+
+</body>
+</html>

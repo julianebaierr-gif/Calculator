@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BMI Calculator — Accurate Body Mass Index (Metric & Imperial)</title>
+  <meta name="description" content="Calculate your Body Mass Index (BMI) using WHO standards. Supports Metric (kg/cm) and Imperial (lbs/ft). Get instant category, healthy weight range, and prime index.">
+  <meta name="keywords" content="bmi calculator, body mass index, bmi formula, who bmi chart, healthy weight calculator, imperial bmi, metric bmi, calculate bmi">
+  <meta name="author" content="CalcHub Health Team">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://calchub.org/bmi-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="BMI Calculator — Accurate Body Mass Index (Metric & Imperial)">
+  <meta property="og:description" content="Calculate your Body Mass Index (BMI) using WHO standards. Real-time visual gauge and comprehensive health guide.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://calchub.org/bmi-calculator.html">
+  
+  <!-- GEO / LLMO Meta -->
+  <meta name="ai-content-description" content="Body Mass Index (BMI) is an anthropometric screening tool that assesses weight relative to height squared (kg/m²). Calculated based on World Health Organization (WHO) international classification standards for adults.">
+
+  <!-- JSON-LD Schemas -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://calchub.org/bmi-calculator.html#app",
+        "name": "BMI Calculator",
+        "url": "https://calchub.org/bmi-calculator.html",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "All",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": [
+          "Metric and Imperial unit support",
+          "WHO international BMI classification",
+          "Healthy weight range calculation",
+          "Ponderal Index & BMI Prime metrics"
+        ]
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://calchub.org/" },
+          { "@type": "ListItem", "position": 2, "name": "Health Calculators", "item": "https://calchub.org/#health" },
+          { "@type": "ListItem", "position": 3, "name": "BMI Calculator" }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is considered a normal BMI?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "According to the World Health Organization (WHO), a normal BMI for adults falls between 18.5 and 24.9 kg/m². Values below 18.5 are classified as underweight, while 25.0 to 29.9 indicates overweight, and 30.0 or above indicates obesity."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is BMI calculated?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In the metric system, BMI is weight in kilograms divided by height in meters squared: BMI = weight (kg) / (height (m))². In imperial units, multiply weight in pounds by 703 and divide by height in inches squared: BMI = (weight (lbs) × 703) / (height (in))²."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why does BMI sometimes misclassify muscular athletes?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "BMI does not distinguish between lean muscle mass and adipose fat tissue. Because muscle tissue is approximately 18% denser than fat, muscular athletes and bodybuilders often register in the 'overweight' or 'obese' category despite having extremely low body fat percentages."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <a href="index.html#health" class="nav-link active">Health</a>
+        <a href="index.html#finance" class="nav-link">Finance</a>
+        <a href="index.html#math" class="nav-link">Math</a>
+        <a href="index.html#engineering" class="nav-link">Engineering</a>
+      </nav>
+      <div class="header-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="header-search-input" placeholder="Search 20+ calculators... (Ctrl+K)" autocomplete="off">
+        <div id="search-results-dropdown" class="search-results-dropdown"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="index.html">Home</a>
+    <span class="sep">›</span>
+    <a href="index.html#health">Health</a>
+    <span class="sep">›</span>
+    <span class="current">BMI Calculator</span>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="main-wrapper">
+    
+    <div class="calculator-hero">
+      <span class="category-tag">⚖️ Health & Fitness</span>
+      <h1>BMI Calculator</h1>
+      <p class="subtitle">Calculate your Body Mass Index (BMI) using World Health Organization (WHO) standards. Switch between Metric and Imperial units for real-time body composition insights and healthy weight projections.</p>
+    </div>
+
+    <!-- Workspace Grid -->
+    <div class="calculator-workspace">
+      
+      <!-- Calculator Input Card -->
+      <section class="calc-card" aria-label="BMI Calculator Form">
+        <div class="calc-card-header">
+          <span class="calc-title">⚖️ Your Measurements</span>
+          <div class="unit-switcher">
+            <button type="button" class="unit-btn active" id="btn-metric" onclick="setUnitSystem('metric')">Metric (kg, cm)</button>
+            <button type="button" class="unit-btn" id="btn-imperial" onclick="setUnitSystem('imperial')">Imperial (lbs, ft/in)</button>
+          </div>
+        </div>
+
+        <form id="bmi-form" onsubmit="return false;">
+          <div class="calc-form-grid">
+            
+            <!-- Gender -->
+            <div class="input-group">
+              <label class="input-label" for="bmi-gender">Gender</label>
+              <div class="input-wrap">
+                <select id="bmi-gender" onchange="calculateBMI()">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Age -->
+            <div class="input-group">
+              <label class="input-label" for="bmi-age">Age <span class="label-hint">(18–120 yrs)</span></label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="bmi-age" value="28" min="18" max="120" oninput="calculateBMI()">
+                <span class="input-unit-badge">yrs</span>
+              </div>
+            </div>
+
+            <!-- Height Metric -->
+            <div class="input-group" id="fld-height-metric">
+              <label class="input-label" for="bmi-height-cm">Height</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="bmi-height-cm" value="175" min="80" max="260" step="0.5" oninput="calculateBMI()">
+                <span class="input-unit-badge">cm</span>
+              </div>
+            </div>
+
+            <!-- Height Imperial -->
+            <div class="input-group" id="fld-height-imperial" style="display:none;">
+              <label class="input-label">Height</label>
+              <div style="display:flex;gap:8px;">
+                <div class="input-wrap has-unit" style="flex:1;">
+                  <input type="number" id="bmi-height-ft" value="5" min="3" max="8" oninput="calculateBMI()">
+                  <span class="input-unit-badge">ft</span>
+                </div>
+                <div class="input-wrap has-unit" style="flex:1;">
+                  <input type="number" id="bmi-height-in" value="9" min="0" max="11" oninput="calculateBMI()">
+                  <span class="input-unit-badge">in</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Weight -->
+            <div class="input-group">
+              <label class="input-label" for="bmi-weight">Weight</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="bmi-weight" value="70" min="20" max="300" step="0.1" oninput="calculateBMI()">
+                <span class="input-unit-badge" id="lbl-weight-unit">kg</span>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="calc-actions">
+            <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+            <button type="button" class="btn btn-primary" onclick="copyResults()">📋 Copy Result</button>
+            <button type="button" class="btn btn-subtle" onclick="window.print()">🖨️ Print Report</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Results Card -->
+      <section class="results-card" aria-live="polite">
+        <div class="results-header">
+          <span class="results-title">Calculated Results</span>
+          <span class="status-pill status-success" id="bmi-status-pill">Normal Weight</span>
+        </div>
+
+        <div class="primary-result-box">
+          <div class="primary-result-label">Body Mass Index (BMI)</div>
+          <div>
+            <span class="primary-result-value" id="bmi-value">22.9</span>
+            <span class="primary-result-unit">kg/m²</span>
+          </div>
+        </div>
+
+        <!-- Gauge Bar -->
+        <div class="visual-bar-wrap">
+          <div class="visual-bar-track">
+            <div class="visual-bar-fill" id="bmi-gauge-fill" style="width: 45%; background: #059669;"></div>
+          </div>
+          <div class="visual-bar-labels">
+            <span>Under (&lt;18.5)</span>
+            <span>Normal (18.5–24.9)</span>
+            <span>Over (25–29.9)</span>
+            <span>Obese (30+)</span>
+          </div>
+        </div>
+
+        <div class="result-breakdown-grid">
+          <div class="breakdown-item">
+            <div class="breakdown-label">WHO Category</div>
+            <div class="breakdown-val" id="bmi-cat">Normal weight</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Healthy Weight</div>
+            <div class="breakdown-val" id="bmi-healthy-range">56.7 – 76.3 kg</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">BMI Prime</div>
+            <div class="breakdown-val" id="bmi-prime">0.91</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Ponderal Index</div>
+            <div class="breakdown-val" id="bmi-ponderal">13.1 kg/m³</div>
+          </div>
+        </div>
+
+        <p style="font-size:0.8rem;color:#64748B;margin-top:0.5rem;text-align:center;">
+          Standard BMI calculation based on the WHO international guidelines.
+        </p>
+      </section>
+
+    </div>
+
+    <!-- GEO / LLMO Citation Answer Box -->
+    <section class="geo-citation-box" id="quick-answer">
+      <div class="geo-header">💡 Direct Answer (GEO & Quick Summary)</div>
+      <p><strong>Body Mass Index (BMI)</strong> is an epidemiological and clinical screening metric calculating the ratio of a person's mass to the square of their height. Per the <strong>World Health Organization (WHO)</strong>:</p>
+      <ul>
+        <li><strong>Underweight:</strong> BMI less than 18.5 kg/m²</li>
+        <li><strong>Normal weight:</strong> BMI between 18.5 and 24.9 kg/m²</li>
+        <li><strong>Overweight:</strong> BMI between 25.0 and 29.9 kg/m²</li>
+        <li><strong>Obesity:</strong> BMI of 30.0 kg/m² or greater (Class I: 30–34.9, Class II: 35–39.9, Class III: ≥ 40)</li>
+      </ul>
+      <p>While an exceptional screening tool for population-level health trends, BMI does not account for muscularity, bone density, or adipose distribution.</p>
+    </section>
+
+    <!-- Table of Contents -->
+    <nav class="toc-container" aria-label="Table of Contents">
+      <div class="toc-title">📑 Table of Contents</div>
+      <ul class="toc-list">
+        <li><a href="#how-bmi-works">How BMI Works & Formulas</a></li>
+        <li><a href="#who-classification-table">WHO Classification Benchmarks</a></li>
+        <li><a href="#bmi-prime-ponderal">BMI Prime & Ponderal Index</a></li>
+        <li><a href="#clinical-limitations">Clinical Limitations & Muscle Mass</a></li>
+        <li><a href="#frequently-asked-questions">Frequently Asked Questions (FAQ)</a></li>
+      </ul>
+    </nav>
+
+    <!-- In-Depth Article -->
+    <article class="article-section">
+      <h2 id="how-bmi-works">How Body Mass Index (BMI) Works</h2>
+      <p>Body Mass Index, originally known as the <em>Quetelet Index</em>, was developed in 1832 by Belgian polymath Adolphe Quetelet. It was specifically formulated to measure the degree of obesity across large populations and remains the international standard endorsed by the World Health Organization (WHO), the Centers for Disease Control and Prevention (CDC), and the National Institutes of Health (NIH).</p>
+      
+      <div class="formula-box">
+        <div class="formula-title">Mathematical Formula for BMI</div>
+        <div class="formula-code">BMI = Weight (kg) ÷ [Height (m)]²</div>
+        <div class="formula-legend">Metric: kg / m² &nbsp;|&nbsp; Imperial: [Weight (lbs) × 703] ÷ [Height (in)]²</div>
+      </div>
+
+      <p>For example, an adult who weighs <strong>70 kg</strong> with a height of <strong>1.75 m (175 cm)</strong>:</p>
+      <p><code>Height² = 1.75 × 1.75 = 3.0625 m²</code></p>
+      <p><code>BMI = 70 ÷ 3.0625 = 22.86 kg/m² (Normal Weight)</code></p>
+
+      <h2 id="who-classification-table">World Health Organization (WHO) BMI Classification</h2>
+      <p>The standard adult BMI categories established by the WHO apply equally to adult men and women across all age groups from 18 to 65+:</p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>BMI Range (kg/m²)</th>
+              <th>Classification</th>
+              <th>Health Risk Category</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>&lt; 16.0</td>
+              <td>Severe Thinness</td>
+              <td>Elevated (Nutritional deficiency, osteoporosis)</td>
+            </tr>
+            <tr>
+              <td>16.0 – 16.9</td>
+              <td>Moderate Thinness</td>
+              <td>Moderate risk</td>
+            </tr>
+            <tr>
+              <td>17.0 – 18.4</td>
+              <td>Mild Thinness</td>
+              <td>Low risk</td>
+            </tr>
+            <tr>
+              <td><strong>18.5 – 24.9</strong></td>
+              <td><strong>Normal Weight</strong></td>
+              <td><strong>Optimal / Lowest Risk</strong></td>
+            </tr>
+            <tr>
+              <td>25.0 – 29.9</td>
+              <td>Overweight (Pre-obese)</td>
+              <td>Increased cardiovascular & metabolic risk</td>
+            </tr>
+            <tr>
+              <td>30.0 – 34.9</td>
+              <td>Obese Class I (Moderate)</td>
+              <td>High risk of Type 2 diabetes & hypertension</td>
+            </tr>
+            <tr>
+              <td>35.0 – 39.9</td>
+              <td>Obese Class II (Severe)</td>
+              <td>Very high cardiovascular morbidity</td>
+            </tr>
+            <tr>
+              <td>≥ 40.0</td>
+              <td>Obese Class III (Morbid)</td>
+              <td>Extremely high health hazard</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="bmi-prime-ponderal">Beyond Standard BMI: BMI Prime and Ponderal Index</h2>
+      <p>Standard BMI provides a single numerical figure, but modern clinical practice frequently leverages two additional metrics provided in this calculator:</p>
+      
+      <h3>1. BMI Prime</h3>
+      <p>BMI Prime is the ratio of an individual's actual BMI to the upper limit of normal BMI (fixed at 25 kg/m² by default). A BMI Prime of <code>1.00</code> signifies exactly the upper threshold of healthy weight. A person with a BMI Prime under 0.74 is underweight, between 0.74 and 1.00 is normal, and above 1.00 is overweight.</p>
+
+      <h3>2. Ponderal Index (Corpulence Index)</h3>
+      <p>Calculated as <code>Weight (kg) ÷ [Height (m)]³</code>, the Ponderal Index normalizes mass against volume rather than area. This makes it substantially more reliable for unusually tall or short individuals, as 2D squaring tends to overestimate fatness in tall people and underestimate it in shorter people.</p>
+
+      <h2 id="clinical-limitations">Clinical Limitations & The "Athlete Paradox"</h2>
+      <p>While BMI is universally valued in preventative health, users must understand its boundaries:</p>
+      <ul>
+        <li><strong>Muscle vs. Fat Density:</strong> Skeletal muscle tissue is roughly 18% denser than adipose tissue. Professional athletes, powerlifters, and bodybuilders frequently exceed a 25 or 30 BMI while possessing under 10% total body fat.</li>
+        <li><strong>Fat Distribution:</strong> Visceral fat (stored inside the abdominal cavity around internal organs) creates substantially higher cardiovascular risk than subcutaneous fat. BMI cannot measure waist circumference or visceral storage.</li>
+        <li><strong>Age & Sarcopenia:</strong> Elderly individuals may experience muscle loss (sarcopenia) with reciprocal fat gain, maintaining a "normal" BMI despite unhealthy body composition.</li>
+      </ul>
+
+      <h2 id="frequently-asked-questions">Frequently Asked Questions (FAQ)</h2>
+      <div class="faq-wrap">
+        <details class="faq-item">
+          <summary>Does BMI apply identically to men and women?</summary>
+          <div class="faq-content">
+            Yes, the standard WHO cutoff numbers (18.5, 25.0, 30.0) apply identically to adult men and women. However, for any given BMI, women on average carry approximately 10% more biological body fat than men due to essential endocrine, breast, and reproductive tissue needs.
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>What is my ideal body weight range?</summary>
+          <div class="faq-content">
+            Your ideal weight range is the weight bracket that keeps your BMI between 18.5 and 24.9 kg/m² for your exact height. You can compute this via: <code>Min Weight = 18.5 × Height(m)²</code> and <code>Max Weight = 24.9 × Height(m)²</code>.
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>Are Asian populations evaluated under different BMI thresholds?</summary>
+          <div class="faq-content">
+            Yes. Due to higher body fat percentages and elevated cardiovascular risk at lower weights, the WHO and many Asian ministries of health define Overweight at ≥ 23.0 kg/m² and Obesity at ≥ 27.5 kg/m² for individuals of South Asian and East Asian ancestry.
+          </div>
+        </details>
+      </div>
+    </article>
+
+    <!-- Related Topic Silos -->
+    <section>
+      <h2>Related Health & Fitness Calculators</h2>
+      <div class="silo-card-grid">
+        <a href="calorie-calculator.html" class="silo-card">
+          <div class="silo-card-icon">🔥</div>
+          <div class="silo-card-title">Calorie Calculator</div>
+          <div class="silo-card-desc">Calculate your Total Daily Energy Expenditure (TDEE) and target deficit calories for weight loss.</div>
+        </a>
+        <a href="body-fat-calculator.html" class="silo-card">
+          <div class="silo-card-icon">📏</div>
+          <div class="silo-card-title">Body Fat Calculator</div>
+          <div class="silo-card-desc">Estimate body fat percentage and lean mass using the US Navy tape measurement method.</div>
+        </a>
+        <a href="ideal-weight-calculator.html" class="silo-card">
+          <div class="silo-card-icon">❤️</div>
+          <div class="silo-card-title">Ideal Body Weight</div>
+          <div class="silo-card-desc">Compare medical benchmarks across Devine, Robinson, Miller, and Hamwi equations.</div>
+        </a>
+        <a href="water-intake-calculator.html" class="silo-card">
+          <div class="silo-card-icon">💧</div>
+          <div class="silo-card-title">Daily Water Intake</div>
+          <div class="silo-card-desc">Determine optimal daily hydration based on body weight, climate, and exercise volume.</div>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <span class="logo-badge">∑</span>
+            <span>Calc<span class="accent">Hub</span></span>
+          </a>
+          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Health & Fitness</h4>
+          <ul class="footer-links">
+            <li><a href="bmi-calculator.html">BMI Calculator</a></li>
+            <li><a href="calorie-calculator.html">Calorie Calculator (TDEE)</a></li>
+            <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html">Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html">Daily Water Intake</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Finance & Money</h4>
+          <ul class="footer-links">
+            <li><a href="loan-emi-calculator.html">Loan EMI Calculator</a></li>
+            <li><a href="compound-interest-calculator.html">Compound Interest</a></li>
+            <li><a href="simple-interest-calculator.html">Simple Interest</a></li>
+            <li><a href="discount-calculator.html">Discount & Sale</a></li>
+            <li><a href="salary-calculator.html">Salary / Paycheck</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Math & Engineering</h4>
+          <ul class="footer-links">
+            <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
+            <li><a href="age-calculator.html">Exact Age Calculator</a></li>
+            <li><a href="ohms-law-calculator.html">Ohm's Law Calculator</a></li>
+            <li><a href="voltage-drop-calculator.html">Voltage Drop (NEC/IEC)</a></li>
+            <li><a href="cable-sizing-calculator.html">Cable Sizing Calculator</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Mathematical tools are for educational and guidance purposes.</p>
+        <div>
+          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
+          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy & Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    let currentUnit = 'metric';
+
+    function setUnitSystem(sys) {
+      currentUnit = sys;
+      document.getElementById('btn-metric').classList.toggle('active', sys === 'metric');
+      document.getElementById('btn-imperial').classList.toggle('active', sys === 'imperial');
+
+      if (sys === 'metric') {
+        document.getElementById('fld-height-metric').style.display = 'block';
+        document.getElementById('fld-height-imperial').style.display = 'none';
+        document.getElementById('lbl-weight-unit').textContent = 'kg';
+        // Convert imperial values to metric if needed
+        const w = parseFloat(document.getElementById('bmi-weight').value);
+        if (w > 120) {
+          document.getElementById('bmi-weight').value = (w * 0.453592).toFixed(1);
+        }
+      } else {
+        document.getElementById('fld-height-metric').style.display = 'none';
+        document.getElementById('fld-height-imperial').style.display = 'block';
+        document.getElementById('lbl-weight-unit').textContent = 'lbs';
+        const w = parseFloat(document.getElementById('bmi-weight').value);
+        if (w < 120) {
+          document.getElementById('bmi-weight').value = (w * 2.20462).toFixed(1);
+        }
+      }
+      calculateBMI();
+    }
+
+    function calculateBMI() {
+      let weightKg = 0;
+      let heightM = 0;
+
+      if (currentUnit === 'metric') {
+        const hCm = parseFloat(document.getElementById('bmi-height-cm').value) || 175;
+        const wKg = parseFloat(document.getElementById('bmi-weight').value) || 70;
+        heightM = hCm / 100;
+        weightKg = wKg;
+      } else {
+        const ft = parseFloat(document.getElementById('bmi-height-ft').value) || 5;
+        const inch = parseFloat(document.getElementById('bmi-height-in').value) || 9;
+        const totalInches = (ft * 12) + inch;
+        const wLbs = parseFloat(document.getElementById('bmi-weight').value) || 154;
+        heightM = (totalInches * 2.54) / 100;
+        weightKg = wLbs * 0.453592;
+      }
+
+      if (heightM <= 0 || weightKg <= 0) return;
+
+      const bmi = weightKg / (heightM * heightM);
+      const bmiPrime = bmi / 25.0;
+      const ponderal = weightKg / Math.pow(heightM, 3);
+
+      // Healthy weight range (18.5 - 24.9)
+      const minHealthyKg = 18.5 * (heightM * heightM);
+      const maxHealthyKg = 24.9 * (heightM * heightM);
+
+      // Category detection
+      let category = "Normal weight";
+      let pillClass = "status-success";
+      let gaugeWidth = 50;
+      let gaugeColor = "#059669";
+
+      if (bmi < 18.5) {
+        category = "Underweight";
+        pillClass = "status-warning";
+        gaugeWidth = Math.min(Math.max((bmi / 18.5) * 25, 10), 25);
+        gaugeColor = "#D97706";
+      } else if (bmi <= 24.9) {
+        category = "Normal weight";
+        pillClass = "status-success";
+        gaugeWidth = 25 + ((bmi - 18.5) / (24.9 - 18.5)) * 25;
+        gaugeColor = "#059669";
+      } else if (bmi <= 29.9) {
+        category = "Overweight";
+        pillClass = "status-warning";
+        gaugeWidth = 50 + ((bmi - 25.0) / (29.9 - 25.0)) * 25;
+        gaugeColor = "#D97706";
+      } else {
+        category = bmi >= 35 ? "Obese (Class II/III)" : "Obese (Class I)";
+        pillClass = "status-danger";
+        gaugeWidth = Math.min(75 + ((bmi - 30.0) / 15) * 25, 100);
+        gaugeColor = "#E11D48";
+      }
+
+      // Update DOM
+      document.getElementById('bmi-value').textContent = bmi.toFixed(1);
+      document.getElementById('bmi-cat').textContent = category;
+      
+      const pill = document.getElementById('bmi-status-pill');
+      pill.className = `status-pill ${pillClass}`;
+      pill.textContent = category;
+
+      const fill = document.getElementById('bmi-gauge-fill');
+      fill.style.width = `${gaugeWidth}%`;
+      fill.style.background = gaugeColor;
+
+      if (currentUnit === 'metric') {
+        document.getElementById('bmi-healthy-range').textContent = `${minHealthyKg.toFixed(1)} – ${maxHealthyKg.toFixed(1)} kg`;
+      } else {
+        const minLbs = minHealthyKg * 2.20462;
+        const maxLbs = maxHealthyKg * 2.20462;
+        document.getElementById('bmi-healthy-range').textContent = `${minLbs.toFixed(1)} – ${maxLbs.toFixed(1)} lbs`;
+      }
+
+      document.getElementById('bmi-prime').textContent = bmiPrime.toFixed(2);
+      document.getElementById('bmi-ponderal').textContent = `${ponderal.toFixed(1)} kg/m³`;
+    }
+
+    function resetForm() {
+      if (currentUnit === 'metric') {
+        document.getElementById('bmi-height-cm').value = 175;
+        document.getElementById('bmi-weight').value = 70;
+      } else {
+        document.getElementById('bmi-height-ft').value = 5;
+        document.getElementById('bmi-height-in').value = 9;
+        document.getElementById('bmi-weight').value = 154;
+      }
+      document.getElementById('bmi-age').value = 28;
+      calculateBMI();
+    }
+
+    function copyResults() {
+      const bmi = document.getElementById('bmi-value').textContent;
+      const cat = document.getElementById('bmi-cat').textContent;
+      const range = document.getElementById('bmi-healthy-range').textContent;
+      const text = `CalcHub BMI Report:\nBMI: ${bmi} kg/m² (${cat})\nHealthy Weight Range: ${range}`;
+      window.copyToClipboard(text, "BMI result copied to clipboard!");
+    }
+
+    // Run on load
+    calculateBMI();
+  </script>
+</body>
+</html>

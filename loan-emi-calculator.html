@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan EMI Calculator — Accurate Reducing Balance Amortization — CalcHub</title>
+  <meta name="description" content="Calculate your exact monthly EMI, total interest, and total repayment amount for home loans, auto loans, and personal loans with visual amortization breakdown.">
+  <meta name="keywords" content="loan emi calculator, home loan emi, auto loan calculator, mortgage emi, amortization schedule calculator, monthly installment">
+  <meta name="author" content="CalcHub Professional Team">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://calchub.org/loan-emi-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  
+  <meta property="og:title" content="Loan EMI Calculator — Accurate Reducing Balance Amortization">
+  <meta property="og:description" content="Calculate your exact monthly EMI, total interest, and total repayment amount for home loans, auto loans, and personal loans with visual amortization breakdown.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://calchub.org/loan-emi-calculator.html">
+  
+  <script type="application/ld+json">
+  {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Loan EMI Calculator",
+      "url": "https://calchub.org/loan-emi-calculator.html",
+      "applicationCategory": "FinanceApplication",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How is Loan EMI calculated?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Loan EMI is calculated using the reducing balance formula: EMI = [P × r × (1+r)^n] / [(1+r)^n - 1], where P is Principal loan amount, r is the monthly interest rate (annual rate divided by 12 and 100), and n is loan tenure in months."
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <a href="index.html#health" class="nav-link ">Health</a>
+        <a href="index.html#finance" class="nav-link active">Finance</a>
+        <a href="index.html#math" class="nav-link ">Math</a>
+        <a href="index.html#engineering" class="nav-link ">Engineering</a>
+      </nav>
+      <div class="header-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="header-search-input" placeholder="Search 20+ calculators... (Ctrl+K)" autocomplete="off">
+        <div id="search-results-dropdown" class="search-results-dropdown"></div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="index.html">Home</a>
+    <span class="sep">›</span>
+    <a href="index.html#finance">Finance & Loans</a>
+    <span class="sep">›</span>
+    <span class="current">Loan EMI Calculator</span>
+  </nav>
+
+  <main class="main-wrapper">
+    <div class="calculator-hero">
+      <span class="category-tag">📊 Finance & Loans</span>
+      <h1>Loan EMI Calculator</h1>
+      <p class="subtitle">Plan your borrowing with confidence. Calculate exact monthly repayments, analyze total interest liability, and optimize your loan tenure.</p>
+    </div>
+
+    <div class="calculator-workspace">
+      
+      <section class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-title">🏦 Loan Details</span>
+        </div>
+        <form onsubmit="return false;">
+          <div class="calc-form-grid">
+            <div class="input-group">
+              <label class="input-label" for="emi-amount">Loan Principal Amount</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="emi-amount" value="50000" min="500" max="10000000" step="500" oninput="calcEMI()">
+                <span class="input-unit-badge">$</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="emi-rate">Annual Interest Rate (%)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="emi-rate" value="7.5" min="0.1" max="50" step="0.1" oninput="calcEMI()">
+                <span class="input-unit-badge">%</span>
+              </div>
+            </div>
+            <div class="input-group calc-field-full">
+              <label class="input-label" for="emi-tenure">Loan Tenure (Years)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="emi-tenure" value="5" min="1" max="40" step="1" oninput="calcEMI()">
+                <span class="input-unit-badge">yrs</span>
+              </div>
+            </div>
+          </div>
+          <div class="calc-actions">
+            <button type="button" class="btn btn-primary" onclick="copyResults()">📋 Copy EMI Summary</button>
+            <button type="button" class="btn btn-subtle" onclick="window.print()">🖨️ Print Schedule</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="results-card">
+        <div class="results-header">
+          <span class="results-title">Payment Breakdown</span>
+          <span class="status-pill status-success">Monthly Amortization</span>
+        </div>
+        <div class="primary-result-box">
+          <div class="primary-result-label">Monthly Equated Installment (EMI)</div>
+          <div>
+            <span class="primary-result-value" id="emi-monthly">$1,001.90</span>
+          </div>
+        </div>
+        <div class="visual-bar-wrap">
+          <div class="visual-bar-track">
+            <div class="visual-bar-fill" id="emi-bar-p" style="width: 83%; background: #2563EB;"></div>
+            <div class="visual-bar-fill" id="emi-bar-i" style="width: 17%; background: #D97706;"></div>
+          </div>
+          <div class="visual-bar-labels">
+            <span style="color:#2563EB;">Principal: <span id="lbl-pct-p">83%</span></span>
+            <span style="color:#D97706;">Total Interest: <span id="lbl-pct-i">17%</span></span>
+          </div>
+        </div>
+        <div class="result-breakdown-grid">
+          <div class="breakdown-item">
+            <div class="breakdown-label">Total Principal</div>
+            <div class="breakdown-val" id="emi-tot-p">$50,000</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Total Interest Payable</div>
+            <div class="breakdown-val" id="emi-tot-i" style="color:#D97706;">$10,114</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Total Payment (P + I)</div>
+            <div class="breakdown-val" id="emi-tot-all">$60,114</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Total Installments</div>
+            <div class="breakdown-val" id="emi-months">60 months</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    
+    <section class="geo-citation-box">
+      <div class="geo-header">💡 Direct Answer (GEO & Quick Summary)</div>
+      <p>An <strong>Equated Monthly Installment (EMI)</strong> is a fixed payment amount made by a borrower to a lender at a specified date each calendar month. The standard mathematical reducing balance formula is:</p>
+      <p><code>EMI = [P × r × (1+r)^n] ÷ [(1+r)^n - 1]</code></p>
+      <p>Where <strong>P</strong> = Principal loan amount, <strong>r</strong> = Monthly interest rate (Annual Rate ÷ 12 ÷ 100), and <strong>n</strong> = Number of monthly installments. Over time, the interest portion of each EMI payment decreases while the principal portion increases.</p>
+    </section>
+
+    
+    <nav class="toc-container" aria-label="Table of Contents">
+      <div class="toc-title">📑 Table of Contents</div>
+      <ul class="toc-list">
+        <li><a href="#emi-formula">The Reducing Balance Equation</a></li>
+        <li><a href="#emi-amortization">How Amortization Works Over Time</a></li>
+        <li><a href="#prepayment-impact">Impact of Loan Prepayments</a></li>
+        <li><a href="#emi-faq">Frequently Asked Questions</a></li>
+      </ul>
+    </nav>
+
+
+    <article class="article-section">
+      
+      <h2 id="emi-formula">The Mathematics of Reducing Balance Loans</h2>
+      <p>Banks and retail mortgage providers compute loan repayments using the amortization formula. Unlike flat-rate loans where interest is charged on the original principal for the entire term, reducing-balance loans calculate monthly interest strictly on the remaining outstanding principal.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Amortization Formula</div>
+        <div class="formula-code">EMI = P × r × (1 + r)ⁿ / [ (1 + r)ⁿ - 1 ]</div>
+        <div class="formula-legend">P = Loan Principal | r = Monthly Interest Rate | n = Tenure in Months</div>
+      </div>
+
+      <h2 id="emi-amortization">How Loan Amortization Shifts Over Time</h2>
+      <p>In the initial months of your loan, the bulk of your EMI goes directly toward interest service. As the principal balance diminishes, the interest charge shrinks, allowing an increasingly larger portion of each subsequent installment to wipe out the principal debt.</p>
+
+      <h2 id="prepayment-impact">The Power of Prepayment</h2>
+      <p>Making even a single additional payment each year or paying an extra 5-10% above your mandatory EMI reduces the principal immediately. Because compound interest works on the remaining balance, prepaying early in the loan tenure yields massive lifetime interest savings and can shave years off your repayment timeline.</p>
+
+      <h2 id="emi-faq">Frequently Asked Questions</h2>
+      <div class="faq-wrap">
+        <details class="faq-item">
+          <summary>What is the difference between fixed-rate and floating-rate EMI?</summary>
+          <div class="faq-content">A fixed-rate loan locks your interest rate and monthly EMI for the entire tenure. A floating-rate loan adjusts periodically based on central bank benchmark rates (such as SOFR or repo rate), meaning your EMI or loan duration may rise or fall with market fluctuations.</div>
+        </details>
+      </div>
+
+    </article>
+
+    <section>
+      <h2>Related Health & Fitness Calculators</h2>
+      <div class="silo-card-grid">
+        <a href="bmi-calculator.html" class="silo-card">
+          <div class="silo-card-icon">⚖️</div>
+          <div class="silo-card-title">BMI Calculator</div>
+          <div class="silo-card-desc">Calculate body mass index and healthy target weight ranges.</div>
+        </a>
+        <a href="calorie-calculator.html" class="silo-card">
+          <div class="silo-card-icon">🔥</div>
+          <div class="silo-card-title">Calorie Calculator</div>
+          <div class="silo-card-desc">TDEE and daily caloric requirements for weight loss or muscle gain.</div>
+        </a>
+        <a href="body-fat-calculator.html" class="silo-card">
+          <div class="silo-card-icon">📏</div>
+          <div class="silo-card-title">Body Fat Calculator</div>
+          <div class="silo-card-desc">Estimate body fat percentage and lean mass using the US Navy tape measurement method.</div>
+        </a>
+        <a href="water-intake-calculator.html" class="silo-card">
+          <div class="silo-card-icon">💧</div>
+          <div class="silo-card-title">Daily Water Intake</div>
+          <div class="silo-card-desc">Determine optimal daily hydration based on body weight, climate, and exercise volume.</div>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <span class="logo-badge">∑</span>
+            <span>Calc<span class="accent">Hub</span></span>
+          </a>
+          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Health & Fitness</h4>
+          <ul class="footer-links">
+            <li><a href="bmi-calculator.html">BMI Calculator</a></li>
+            <li><a href="calorie-calculator.html">Calorie Calculator (TDEE)</a></li>
+            <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html">Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html">Daily Water Intake</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Finance & Money</h4>
+          <ul class="footer-links">
+            <li><a href="loan-emi-calculator.html">Loan EMI Calculator</a></li>
+            <li><a href="compound-interest-calculator.html">Compound Interest</a></li>
+            <li><a href="simple-interest-calculator.html">Simple Interest</a></li>
+            <li><a href="discount-calculator.html">Discount & Sale</a></li>
+            <li><a href="salary-calculator.html">Salary / Paycheck</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Math & Engineering</h4>
+          <ul class="footer-links">
+            <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
+            <li><a href="age-calculator.html">Exact Age Calculator</a></li>
+            <li><a href="ohms-law-calculator.html">Ohm's Law Calculator</a></li>
+            <li><a href="voltage-drop-calculator.html">Voltage Drop (NEC/IEC)</a></li>
+            <li><a href="cable-sizing-calculator.html">Cable Sizing Calculator</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Mathematical tools are for educational and guidance purposes.</p>
+        <div>
+          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
+          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy & Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="app.js"></script>
+  
+  <script>
+    function calcEMI() {
+      const p = parseFloat(document.getElementById('emi-amount').value) || 50000;
+      const rateAnnual = parseFloat(document.getElementById('emi-rate').value) || 7.5;
+      const years = parseFloat(document.getElementById('emi-tenure').value) || 5;
+
+      const n = years * 12;
+      const r = (rateAnnual / 100) / 12;
+
+      let emi = 0;
+      if (r === 0) {
+        emi = p / n;
+      } else {
+        const factor = Math.pow(1 + r, n);
+        emi = (p * r * factor) / (factor - 1);
+      }
+
+      const totalPayment = emi * n;
+      const totalInterest = totalPayment - p;
+
+      const pctP = Math.round((p / totalPayment) * 100);
+      const pctI = 100 - pctP;
+
+      document.getElementById('emi-monthly').textContent = '$' + emi.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('emi-tot-p').textContent = '$' + Math.round(p).toLocaleString();
+      document.getElementById('emi-tot-i').textContent = '$' + Math.round(totalInterest).toLocaleString();
+      document.getElementById('emi-tot-all').textContent = '$' + Math.round(totalPayment).toLocaleString();
+      document.getElementById('emi-months').textContent = `${n} months`;
+
+      document.getElementById('emi-bar-p').style.width = pctP + '%';
+      document.getElementById('emi-bar-i').style.width = pctI + '%';
+      document.getElementById('lbl-pct-p').textContent = pctP + '%';
+      document.getElementById('lbl-pct-i').textContent = pctI + '%';
+    }
+    function copyResults() {
+      const emi = document.getElementById('emi-monthly').textContent;
+      const tot = document.getElementById('emi-tot-all').textContent;
+      window.copyToClipboard(`CalcHub Loan Report: Monthly EMI: ${emi}, Total Payment: ${tot}`);
+    }
+    calcEMI();
+  </script>
+
+</body>
+</html>

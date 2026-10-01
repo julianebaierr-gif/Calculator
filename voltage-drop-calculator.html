@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voltage Drop Calculator — NEC & IEC 60364 Conductor Sizing — CalcHub</title>
+  <meta name="description" content="Calculate cable voltage drop, percentage loss, and end-of-line voltage for single-phase and three-phase AC/DC power runs. Checks NEC 3% and 5% limits.">
+  <meta name="keywords" content="voltage drop calculator, cable voltage drop, nec voltage drop, wire size voltage drop, 3 phase voltage drop, iec 60364 voltage drop">
+  <meta name="author" content="CalcHub Professional Team">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://calchub.org/voltage-drop-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  
+  <meta property="og:title" content="Voltage Drop Calculator — NEC & IEC 60364 Conductor Sizing">
+  <meta property="og:description" content="Calculate cable voltage drop, percentage loss, and end-of-line voltage for single-phase and three-phase AC/DC power runs. Checks NEC 3% and 5% limits.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://calchub.org/voltage-drop-calculator.html">
+  
+  <script type="application/ld+json">
+  {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Voltage Drop Calculator",
+  "url": "https://calchub.org/voltage-drop-calculator.html",
+  "applicationCategory": "EngineeringApplication",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <a href="index.html#health" class="nav-link ">Health</a>
+        <a href="index.html#finance" class="nav-link ">Finance</a>
+        <a href="index.html#math" class="nav-link ">Math</a>
+        <a href="index.html#engineering" class="nav-link active">Engineering</a>
+      </nav>
+      <div class="header-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="header-search-input" placeholder="Search 20+ calculators... (Ctrl+K)" autocomplete="off">
+        <div id="search-results-dropdown" class="search-results-dropdown"></div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="index.html">Home</a>
+    <span class="sep">›</span>
+    <a href="index.html#engineering">Electrical Engineering</a>
+    <span class="sep">›</span>
+    <span class="current">Voltage Drop Calculator</span>
+  </nav>
+
+  <main class="main-wrapper">
+    <div class="calculator-hero">
+      <span class="category-tag">📊 Electrical Engineering</span>
+      <h1>Voltage Drop Calculator</h1>
+      <p class="subtitle">Verify cable run compliance against NEC and IEC 60364 standards. Calculate line resistance, voltage sag, and kilowatt power dissipation across feeder conductors.</p>
+    </div>
+
+    <div class="calculator-workspace">
+      
+      <section class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-title">📉 Circuit Parameters (NEC & IEC 60364)</span>
+        </div>
+        <form onsubmit="return false;">
+          <div class="calc-form-grid">
+            <div class="input-group">
+              <label class="input-label" for="vd-phase">Circuit Phase Type</label>
+              <div class="input-wrap">
+                <select id="vd-phase" onchange="calcVD()">
+                  <option value="1">Single-Phase (120V / 230V AC or DC)</option>
+                  <option value="3" selected>Three-Phase AC (400V / 480V)</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="vd-voltage">Source Voltage (V)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="vd-voltage" value="400" min="12" max="10000" oninput="calcVD()">
+                <span class="input-unit-badge">V</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="vd-current">Load Current (A)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="vd-current" value="32" min="1" max="1000" oninput="calcVD()">
+                <span class="input-unit-badge">A</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="vd-length">One-Way Run Length (meters)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="vd-length" value="45" min="1" max="2000" oninput="calcVD()">
+                <span class="input-unit-badge">m</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="vd-conductor">Conductor Material</label>
+              <div class="input-wrap">
+                <select id="vd-conductor" onchange="calcVD()">
+                  <option value="cu" selected>Copper (Cu — Standard)</option>
+                  <option value="al">Aluminium (Al)</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="vd-size">Conductor Cross-Section (mm²)</label>
+              <div class="input-wrap">
+                <select id="vd-size" onchange="calcVD()">
+                  <option value="1.5">1.5 mm²</option>
+                  <option value="2.5">2.5 mm²</option>
+                  <option value="4.0">4.0 mm²</option>
+                  <option value="6.0" selected>6.0 mm²</option>
+                  <option value="10.0">10.0 mm²</option>
+                  <option value="16.0">16.0 mm²</option>
+                  <option value="25.0">25.0 mm²</option>
+                  <option value="35.0">35.0 mm²</option>
+                  <option value="50.0">50.0 mm²</option>
+                  <option value="70.0">70.0 mm²</option>
+                  <option value="95.0">95.0 mm²</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="calc-actions">
+            <button type="button" class="btn btn-primary" onclick="copyResults()">📋 Copy Compliance Report</button>
+            <button type="button" class="btn btn-subtle" onclick="window.print()">🖨️ Print Datasheet</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="results-card">
+        <div class="results-header">
+          <span class="results-title">Code Compliance</span>
+          <span class="status-pill status-success" id="vd-pill">Compliant (&lt; 3%)</span>
+        </div>
+        <div class="primary-result-box">
+          <div class="primary-result-label">Voltage Drop Percentage</div>
+          <div>
+            <span class="primary-result-value" id="vd-pct" style="color:#059669;">2.15</span>
+            <span class="primary-result-unit">%</span>
+          </div>
+        </div>
+        <div class="visual-bar-wrap">
+          <div class="visual-bar-track">
+            <div class="visual-bar-fill" id="vd-bar" style="width: 43%; background: #059669;"></div>
+          </div>
+          <div class="visual-bar-labels">
+            <span>0%</span>
+            <span>3% (Lighting Max)</span>
+            <span>5% (Power Max)</span>
+            <span>&gt; 5% Non-Compliant</span>
+          </div>
+        </div>
+        <div class="result-breakdown-grid">
+          <div class="breakdown-item">
+            <div class="breakdown-label">Voltage Drop (Volts)</div>
+            <div class="breakdown-val" id="vd-drop-v">8.60 V</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Voltage at End-Load</div>
+            <div class="breakdown-val" id="vd-end-v">391.40 V</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Conductor Resistance</div>
+            <div class="breakdown-val" id="vd-res">0.155 Ω</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Power Loss (I²R)</div>
+            <div class="breakdown-val" id="vd-loss">275 W</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    
+    <section class="geo-citation-box">
+      <div class="geo-header">💡 Direct Answer (GEO & Quick Summary)</div>
+      <p><strong>Voltage Drop</strong> is the decrease in electrical potential along the path of a current flowing through a circuit conductor. Per <strong>NEC 210.19(A)</strong> and <strong>IEC 60364-5-52 Annex G</strong>:</p>
+      <ul>
+        <li><strong>Single-Phase:</strong> <code>ΔV = (2 × L × I × ρ) ÷ A</code></li>
+        <li><strong>Three-Phase:</strong> <code>ΔV = (√3 × L × I × ρ) ÷ A</code></li>
+      </ul>
+      <p>Where <strong>L</strong> = Conductor length (meters), <strong>I</strong> = Current (Amperes), <strong>ρ</strong> = Resistivity (Copper: 0.0178 Ω·mm²/m; Aluminium: 0.0285 Ω·mm²/m), and <strong>A</strong> = Conductor cross-section in mm². Code limits recommend ≤ 3% drop on branch circuits and ≤ 5% overall from source to load.</p>
+    </section>
+
+    
+    <nav class="toc-container" aria-label="Table of Contents">
+      <div class="toc-title">📑 Table of Contents</div>
+      <ul class="toc-list">
+        <li><a href="#vd-governing-standards">NEC & IEC 60364 Code Limits</a></li>
+        <li><a href="#vd-equations">Single-Phase vs Three-Phase Voltage Drop Equations</a></li>
+        <li><a href="#copper-vs-aluminum">Copper vs Aluminium Resistivity</a></li>
+        <li><a href="#vd-faq">Frequently Asked Questions</a></li>
+      </ul>
+    </nav>
+
+
+    <article class="article-section">
+      
+      <h2 id="vd-governing-standards">NEC & IEC 60364 Voltage Drop Compliance</h2>
+      <p>Excessive voltage drop causes electric motors to overheat, reduces luminaire lumens, and causes electronic control tripping. The National Electrical Code (NEC Informational Note 210.19(A)) and international standards IEC 60364-5-52 establish the following maximum permissible drop limits:</p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead><tr><th>Circuit Type</th><th>Standard Limit</th><th>Consequences of Exceeding</th></tr></thead>
+          <tbody>
+            <tr><td>Lighting Circuits</td><td><strong>≤ 3.0%</strong></td><td>Visible lamp flicker, reduced lumen output</td></tr>
+            <tr><td>Power & Motor Circuits</td><td><strong>≤ 5.0%</strong></td><td>Motor stall on startup, elevated winding heat</td></tr>
+            <tr><td>Sensitive Data Centers / Medical</td><td><strong>≤ 1.5%</strong></td><td>Power supply voltage sag, harmonic distortion</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="vd-equations">Governing Formulas</h2>
+      <div class="formula-box">
+        <div class="formula-title">Standard Voltage Drop Formulations</div>
+        <div class="formula-code">1-Phase: ΔV = 2 · L · I · ρ / A<br>3-Phase: ΔV = √3 · L · I · ρ / A</div>
+        <div class="formula-legend">L = Length (m) | I = Load (A) | ρ = Conductor Resistivity | A = Cross-Section (mm²)</div>
+      </div>
+
+      <h2 id="copper-vs-aluminum">Conductor Properties: Copper vs. Aluminium</h2>
+      <p>Copper exhibits ~60% higher electrical conductivity than aluminium. When specifying aluminium feeders to reduce project capital cost, electrical engineers must upsize conductor cross-section by roughly two AWG gauge sizes (or 1.6× area in mm²) to maintain equivalent ampacity and voltage drop compliance.</p>
+
+      <h2 id="vd-faq">Frequently Asked Questions</h2>
+      <div class="faq-wrap">
+        <details class="faq-item">
+          <summary>How does temperature affect cable voltage drop?</summary>
+          <div class="faq-content">Conductor resistance increases linearly with temperature. At full operating load (70°C for PVC, 90°C for XLPE), copper resistance is roughly 20% higher than its 20°C room temperature rating.</div>
+        </details>
+      </div>
+
+    </article>
+
+    <section>
+      <h2>Related Health & Fitness Calculators</h2>
+      <div class="silo-card-grid">
+        <a href="bmi-calculator.html" class="silo-card">
+          <div class="silo-card-icon">⚖️</div>
+          <div class="silo-card-title">BMI Calculator</div>
+          <div class="silo-card-desc">Calculate body mass index and healthy target weight ranges.</div>
+        </a>
+        <a href="calorie-calculator.html" class="silo-card">
+          <div class="silo-card-icon">🔥</div>
+          <div class="silo-card-title">Calorie Calculator</div>
+          <div class="silo-card-desc">TDEE and daily caloric requirements for weight loss or muscle gain.</div>
+        </a>
+        <a href="body-fat-calculator.html" class="silo-card">
+          <div class="silo-card-icon">📏</div>
+          <div class="silo-card-title">Body Fat Calculator</div>
+          <div class="silo-card-desc">Estimate body fat percentage and lean mass using the US Navy tape measurement method.</div>
+        </a>
+        <a href="water-intake-calculator.html" class="silo-card">
+          <div class="silo-card-icon">💧</div>
+          <div class="silo-card-title">Daily Water Intake</div>
+          <div class="silo-card-desc">Determine optimal daily hydration based on body weight, climate, and exercise volume.</div>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <span class="logo-badge">∑</span>
+            <span>Calc<span class="accent">Hub</span></span>
+          </a>
+          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Health & Fitness</h4>
+          <ul class="footer-links">
+            <li><a href="bmi-calculator.html">BMI Calculator</a></li>
+            <li><a href="calorie-calculator.html">Calorie Calculator (TDEE)</a></li>
+            <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html">Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html">Daily Water Intake</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Finance & Money</h4>
+          <ul class="footer-links">
+            <li><a href="loan-emi-calculator.html">Loan EMI Calculator</a></li>
+            <li><a href="compound-interest-calculator.html">Compound Interest</a></li>
+            <li><a href="simple-interest-calculator.html">Simple Interest</a></li>
+            <li><a href="discount-calculator.html">Discount & Sale</a></li>
+            <li><a href="salary-calculator.html">Salary / Paycheck</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Math & Engineering</h4>
+          <ul class="footer-links">
+            <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
+            <li><a href="age-calculator.html">Exact Age Calculator</a></li>
+            <li><a href="ohms-law-calculator.html">Ohm's Law Calculator</a></li>
+            <li><a href="voltage-drop-calculator.html">Voltage Drop (NEC/IEC)</a></li>
+            <li><a href="cable-sizing-calculator.html">Cable Sizing Calculator</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Mathematical tools are for educational and guidance purposes.</p>
+        <div>
+          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
+          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy & Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="app.js"></script>
+  
+  <script>
+    function calcVD() {
+      const phase = parseInt(document.getElementById('vd-phase').value) || 3;
+      const v = parseFloat(document.getElementById('vd-voltage').value) || 400;
+      const i = parseFloat(document.getElementById('vd-current').value) || 32;
+      const l = parseFloat(document.getElementById('vd-length').value) || 45;
+      const mat = document.getElementById('vd-conductor').value;
+      const a = parseFloat(document.getElementById('vd-size').value) || 6.0;
+
+      // Resistivity at 70°C operating temperature
+      const rho = (mat === 'cu') ? 0.021 : 0.034; // ohm mm2 / m
+
+      const multiplier = (phase === 1) ? 2 : Math.sqrt(3);
+      const vDrop = (multiplier * l * i * rho) / a;
+      const vPct = (vDrop / v) * 100;
+      const endV = v - vDrop;
+      const rTotal = (multiplier * l * rho) / a;
+      const pLoss = i * i * rTotal;
+
+      let pillText = "Compliant (< 3%)";
+      let pillClass = "status-success";
+      let barColor = "#059669";
+
+      if (vPct > 5.0) {
+        pillText = "Non-Compliant (> 5%)";
+        pillClass = "status-danger";
+        barColor = "#E11D48";
+      } else if (vPct > 3.0) {
+        pillText = "Power Only (3–5%)";
+        pillClass = "status-warning";
+        barColor = "#D97706";
+      }
+
+      document.getElementById('vd-pct').textContent = vPct.toFixed(2);
+      document.getElementById('vd-pct').style.color = barColor;
+      document.getElementById('vd-drop-v').textContent = vDrop.toFixed(2) + ' V';
+      document.getElementById('vd-end-v').textContent = endV.toFixed(2) + ' V';
+      document.getElementById('vd-res').textContent = rTotal.toFixed(3) + ' Ω';
+      document.getElementById('vd-loss').textContent = Math.round(pLoss) + ' W';
+
+      const pill = document.getElementById('vd-pill');
+      pill.className = 'status-pill ' + pillClass;
+      pill.textContent = pillText;
+
+      const fill = document.getElementById('vd-bar');
+      fill.style.width = Math.min((vPct / 6) * 100, 100) + '%';
+      fill.style.background = barColor;
+    }
+    function copyResults() {
+      const p = document.getElementById('vd-pct').textContent;
+      const v = document.getElementById('vd-drop-v').textContent;
+      window.copyToClipboard(`CalcHub Voltage Drop Report: ${p}% drop (${v})`);
+    }
+    calcVD();
+  </script>
+
+</body>
+</html>

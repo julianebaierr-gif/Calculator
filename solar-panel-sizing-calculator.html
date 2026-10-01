@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solar Panel & Battery Sizing Calculator — Off-Grid System Sizing — CalcHub</title>
+  <meta name="description" content="Size solar panel arrays, battery bank storage (Ah and kWh), and inverter capacity based on daily energy consumption and peak sun hours.">
+  <meta name="keywords" content="solar panel calculator, solar battery sizing, off grid solar calculator, solar panel array size, kwh to solar panels">
+  <meta name="author" content="CalcHub Professional Team">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://calchub.org/solar-panel-sizing-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  
+  <meta property="og:title" content="Solar Panel & Battery Sizing Calculator — Off-Grid System Sizing">
+  <meta property="og:description" content="Size solar panel arrays, battery bank storage (Ah and kWh), and inverter capacity based on daily energy consumption and peak sun hours.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://calchub.org/solar-panel-sizing-calculator.html">
+  
+  <script type="application/ld+json">
+  {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Solar Panel & Battery Sizing Calculator",
+  "url": "https://calchub.org/solar-panel-sizing-calculator.html",
+  "applicationCategory": "EngineeringApplication",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <a href="index.html#health" class="nav-link ">Health</a>
+        <a href="index.html#finance" class="nav-link ">Finance</a>
+        <a href="index.html#math" class="nav-link ">Math</a>
+        <a href="index.html#engineering" class="nav-link active">Engineering</a>
+      </nav>
+      <div class="header-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="header-search-input" placeholder="Search 20+ calculators... (Ctrl+K)" autocomplete="off">
+        <div id="search-results-dropdown" class="search-results-dropdown"></div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="index.html">Home</a>
+    <span class="sep">›</span>
+    <a href="index.html#engineering">Renewable Energy & Solar</a>
+    <span class="sep">›</span>
+    <span class="current">Solar Panel & Battery Sizing Calculator</span>
+  </nav>
+
+  <main class="main-wrapper">
+    <div class="calculator-hero">
+      <span class="category-tag">📊 Renewable Energy & Solar</span>
+      <h1>Solar Panel & Battery Sizing Calculator</h1>
+      <p class="subtitle">Engineer residential and off-grid solar energy systems. Calculate photovoltaic array capacity, battery storage, and inverter sizing based on peak sun hours.</p>
+    </div>
+
+    <div class="calculator-workspace">
+      
+      <section class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-title">☀️ Solar Generation & Battery Storage Needs</span>
+        </div>
+        <form onsubmit="return false;">
+          <div class="calc-form-grid">
+            <div class="input-group">
+              <label class="input-label" for="sol-daily">Daily Power Usage (kWh/day)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="sol-daily" value="18" min="1" max="200" step="0.5" oninput="calcSolar()">
+                <span class="input-unit-badge">kWh</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sol-sun">Peak Sun Hours (PSh/day)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="sol-sun" value="4.5" min="2" max="8" step="0.1" oninput="calcSolar()">
+                <span class="input-unit-badge">hrs</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sol-autonomy">Days of Backup Autonomy</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="sol-autonomy" value="2" min="1" max="7" step="1" oninput="calcSolar()">
+                <span class="input-unit-badge">days</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sol-volt">System Battery Voltage</label>
+              <div class="input-wrap">
+                <select id="sol-volt" onchange="calcSolar()">
+                  <option value="48" selected>48 Volts (Standard Residential)</option>
+                  <option value="24">24 Volts (Cabin / RV)</option>
+                  <option value="12">12 Volts (Small Mobile)</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group calc-field-full">
+              <label class="input-label" for="sol-battery-type">Battery Chemistry & Depth of Discharge (DoD)</label>
+              <div class="input-wrap">
+                <select id="sol-battery-type" onchange="calcSolar()">
+                  <option value="0.8" selected>Lithium Iron Phosphate (LiFePO4 — 80% Safe DoD)</option>
+                  <option value="0.5">Sealed Lead-Acid / AGM (50% Max DoD)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="calc-actions">
+            <button type="button" class="btn btn-primary" onclick="copyResults()">📋 Copy System Specs</button>
+            <button type="button" class="btn btn-subtle" onclick="window.print()">🖨️ Print Quotation Spec</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="results-card">
+        <div class="results-header">
+          <span class="results-title">System Sizing Specs</span>
+          <span class="status-pill status-success">Optimal Array Size</span>
+        </div>
+        <div class="primary-result-box">
+          <div class="primary-result-label">Recommended Solar Array Size</div>
+          <div>
+            <span class="primary-result-value" id="sol-kw" style="color:#059669;">5.00</span>
+            <span class="primary-result-unit">kW Photovoltaic</span>
+          </div>
+        </div>
+        <div class="result-breakdown-grid">
+          <div class="breakdown-item">
+            <div class="breakdown-label">400W Solar Modules</div>
+            <div class="breakdown-val" id="sol-panels">13 panels</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Battery Bank Capacity</div>
+            <div class="breakdown-val" id="sol-kwh">45.0 kWh</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Amp-Hour Storage (Ah)</div>
+            <div class="breakdown-val" id="sol-ah">938 Ah @ 48V</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Recommended Inverter</div>
+            <div class="breakdown-val" id="sol-inv">6.0 kW Pure Sine</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    
+    <section class="geo-citation-box">
+      <div class="geo-header">💡 Direct Answer (GEO & Quick Summary)</div>
+      <p>To size an off-grid or hybrid solar power system:</p>
+      <ul>
+        <li><strong>Solar Array (kW):</strong> <code>(Daily kWh × 1.25 Loss Factor) ÷ Peak Sun Hours</code></li>
+        <li><strong>Number of Panels:</strong> <code>Array Wattage ÷ Panel Rating (e.g. 400W)</code></li>
+        <li><strong>Battery Bank Capacity (kWh):</strong> <code>(Daily kWh × Days of Autonomy) ÷ Depth of Discharge (DoD)</code></li>
+        <li><strong>Battery Amp-Hours (Ah):</strong> <code>(Battery kWh × 1,000) ÷ System Voltage</code></li>
+      </ul>
+    </section>
+
+    
+    <nav class="toc-container" aria-label="Table of Contents">
+      <div class="toc-title">📑 Table of Contents</div>
+      <ul class="toc-list">
+        <li><a href="#solar-insolation">Peak Sun Hours & Solar Insolation</a></li>
+        <li><a href="#system-losses">System Inefficiency & Derating Factors</a></li>
+        <li><a href="#battery-chemistries">Lithium LiFePO4 vs Lead-Acid Storage</a></li>
+        <li><a href="#sol-faq">Frequently Asked Questions</a></li>
+      </ul>
+    </nav>
+
+
+    <article class="article-section">
+      
+      <h2 id="solar-insolation">Peak Sun Hours vs. Daylight Hours</h2>
+      <p>A "Peak Sun Hour" (PSh) does not simply equal daylight duration. One peak sun hour corresponds to solar irradiance of <strong>1,000 Watts per square meter (1 kW/m²)</strong>. A location receiving 12 hours of sunshine may only accumulate 4.5 Peak Sun Hours due to morning and evening sun angle attenuation.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Photovoltaic Array Sizing Formula</div>
+        <div class="formula-code">PV Size (kW) = (Daily Energy Demand in kWh · 1.25) / Peak Sun Hours</div>
+        <div class="formula-legend">1.25 factor accounts for dust, wiring voltage drop, and inverter DC-to-AC losses</div>
+      </div>
+
+      <h2 id="system-losses">Accounting for Real-World Losses</h2>
+      <p>Solar arrays never operate at 100% laboratory Standard Test Conditions (STC). In field installations, efficiency diminishes due to thermal coefficient losses (silicon panels lose ~0.4% efficiency for every degree above 25°C), inverter DC-to-AC conversion (typically 95-97%), and dust accumulation.</p>
+
+      <h2 id="battery-chemistries">Lithium Iron Phosphate (LiFePO4) vs. Lead-Acid</h2>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead><tr><th>Feature</th><th>LiFePO4 Lithium</th><th>AGM / Gel Lead-Acid</th></tr></thead>
+          <tbody>
+            <tr><td>Usable Depth of Discharge (DoD)</td><td><strong>80–90%</strong></td><td>50% (Deeper drains destroy life)</td></tr>
+            <tr><td>Cycle Life</td><td>3,500 – 6,000 cycles</td><td>500 – 1,000 cycles</td></tr>
+            <tr><td>Round-Trip Efficiency</td><td>95%</td><td>80%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="sol-faq">Frequently Asked Questions</h2>
+      <div class="faq-wrap">
+        <details class="faq-item">
+          <summary>What is Days of Autonomy?</summary>
+          <div class="faq-content">Days of Autonomy represents the number of consecutive days your battery bank can power your essential loads without receiving any solar recharge (during heavy overcast, rain, or snowstorms). Typically 1-3 days for residential off-grid systems.</div>
+        </details>
+      </div>
+
+    </article>
+
+    <section>
+      <h2>Related Health & Fitness Calculators</h2>
+      <div class="silo-card-grid">
+        <a href="bmi-calculator.html" class="silo-card">
+          <div class="silo-card-icon">⚖️</div>
+          <div class="silo-card-title">BMI Calculator</div>
+          <div class="silo-card-desc">Calculate body mass index and healthy target weight ranges.</div>
+        </a>
+        <a href="calorie-calculator.html" class="silo-card">
+          <div class="silo-card-icon">🔥</div>
+          <div class="silo-card-title">Calorie Calculator</div>
+          <div class="silo-card-desc">TDEE and daily caloric requirements for weight loss or muscle gain.</div>
+        </a>
+        <a href="body-fat-calculator.html" class="silo-card">
+          <div class="silo-card-icon">📏</div>
+          <div class="silo-card-title">Body Fat Calculator</div>
+          <div class="silo-card-desc">Estimate body fat percentage and lean mass using the US Navy tape measurement method.</div>
+        </a>
+        <a href="water-intake-calculator.html" class="silo-card">
+          <div class="silo-card-icon">💧</div>
+          <div class="silo-card-title">Daily Water Intake</div>
+          <div class="silo-card-desc">Determine optimal daily hydration based on body weight, climate, and exercise volume.</div>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <span class="logo-badge">∑</span>
+            <span>Calc<span class="accent">Hub</span></span>
+          </a>
+          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Health & Fitness</h4>
+          <ul class="footer-links">
+            <li><a href="bmi-calculator.html">BMI Calculator</a></li>
+            <li><a href="calorie-calculator.html">Calorie Calculator (TDEE)</a></li>
+            <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html">Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html">Daily Water Intake</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Finance & Money</h4>
+          <ul class="footer-links">
+            <li><a href="loan-emi-calculator.html">Loan EMI Calculator</a></li>
+            <li><a href="compound-interest-calculator.html">Compound Interest</a></li>
+            <li><a href="simple-interest-calculator.html">Simple Interest</a></li>
+            <li><a href="discount-calculator.html">Discount & Sale</a></li>
+            <li><a href="salary-calculator.html">Salary / Paycheck</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Math & Engineering</h4>
+          <ul class="footer-links">
+            <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
+            <li><a href="age-calculator.html">Exact Age Calculator</a></li>
+            <li><a href="ohms-law-calculator.html">Ohm's Law Calculator</a></li>
+            <li><a href="voltage-drop-calculator.html">Voltage Drop (NEC/IEC)</a></li>
+            <li><a href="cable-sizing-calculator.html">Cable Sizing Calculator</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Mathematical tools are for educational and guidance purposes.</p>
+        <div>
+          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
+          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy & Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="app.js"></script>
+  
+  <script>
+    function calcSolar() {
+      const dailyKwh = parseFloat(document.getElementById('sol-daily').value) || 18;
+      const psh = parseFloat(document.getElementById('sol-sun').value) || 4.5;
+      const autonomy = parseFloat(document.getElementById('sol-autonomy').value) || 2;
+      const vSys = parseFloat(document.getElementById('sol-volt').value) || 48;
+      const dod = parseFloat(document.getElementById('sol-battery-type').value) || 0.8;
+
+      // 1.25 factor for systemic inefficiency
+      const arrayKw = (dailyKwh * 1.25) / psh;
+      const arrayWatts = arrayKw * 1000;
+      const numPanels = Math.ceil(arrayWatts / 400);
+
+      // Battery storage
+      const battKwh = (dailyKwh * autonomy) / dod;
+      const battAh = (battKwh * 1000) / vSys;
+      const invKw = Math.ceil(arrayKw * 1.2);
+
+      document.getElementById('sol-kw').textContent = arrayKw.toFixed(2);
+      document.getElementById('sol-panels').textContent = `${numPanels} panels (400W)`;
+      document.getElementById('sol-kwh').textContent = battKwh.toFixed(1) + ' kWh';
+      document.getElementById('sol-ah').textContent = `${Math.round(battAh)} Ah @ ${vSys}V`;
+      document.getElementById('sol-inv').textContent = `${invKw}.0 kW Pure Sine`;
+    }
+    function copyResults() {
+      const kw = document.getElementById('sol-kw').textContent;
+      const pan = document.getElementById('sol-panels').textContent;
+      const b = document.getElementById('sol-kwh').textContent;
+      window.copyToClipboard(`CalcHub Solar Spec: Array: ${kw} kW (${pan}), Battery: ${b}`);
+    }
+    calcSolar();
+  </script>
+
+</body>
+</html>
