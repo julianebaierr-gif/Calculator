@@ -1,0 +1,524 @@
+"""
+Generates pump-head-calculator.html
+"""
+TOOL_PUMP = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pump Head &amp; Flow Calculator (TDH) — Total Dynamic Head &amp; Power</title>
+  <meta name="description" content="Calculate pump Total Dynamic Head (TDH), static elevation lift, Darcy-Weisbach friction loss, minor fitting losses, and required motor brake horsepower (BHP).">
+  <meta name="keywords" content="pump head calculator, total dynamic head tdh, pump flow calculator, hydraulic power calculator, darcy weisbach head loss, pump motor bhp, water pump sizing">
+  <link rel="canonical" href="https://calchub.org/pump-head-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Pump Total Dynamic Head (TDH) Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "UtilitiesApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates pump TDH, piping friction losses, velocity head, and motor shaft horsepower."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is Total Dynamic Head (TDH) in pump hydraulics?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Total Dynamic Head (TDH) is the total equivalent height of a liquid column that a pump must overcome to move fluid from suction to discharge. It is the sum of static elevation head, pressure difference, friction head loss in pipes, and minor losses in fittings and valves."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does piping diameter affect pump friction head loss?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "According to the Darcy-Weisbach and Hazen-Williams relationships, friction head loss varies inversely with the fifth power of internal pipe diameter (hf proportional to 1 / D^5). Halving the pipe diameter increases friction head loss by approximately 32 times for the same flow rate."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between hydraulic water power and brake horsepower (BHP)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Hydraulic power is the theoretical mechanical energy transferred directly into the moving liquid. Brake horsepower (BHP) is the actual mechanical power required at the pump drive shaft, which is higher because it accounts for internal impeller hydraulic friction, mechanical seal drag, and bearing losses (BHP = Hydraulic Power / Pump Efficiency)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why is Net Positive Suction Head Available (NPSHa) critical in pump sizing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "NPSHa is the absolute fluid pressure above vapor pressure at the pump suction nozzle. If NPSHa falls below the pump manufacturer's required NPSHr, cavitation occurs: vapor bubbles form and violently collapse against impeller vanes, causing severe acoustic vibration, pitting erosion, and premature impeller destruction."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="cat-theme-mechanical">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="finance.html" class="nav-link">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="mechanical.html" class="nav-link active">⚙️ Mechanical</a>
+        </div>
+        <div class="nav-row">
+          <a href="civil.html" class="nav-link">🏗️ Civil</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="calc-page-header">
+    <div class="calc-page-header-inner">
+      <span class="category-tag">⚙️ Mechanical &amp; Fluid Engineering</span>
+      <h1 class="calc-page-title">Pump Head &amp; Flow Calculator</h1>
+      <p class="calc-page-desc">Size centrifugal and booster pumps by calculating Total Dynamic Head (TDH), static elevation lift, friction loss, and drive shaft brake horsepower (BHP).</p>
+    </div>
+  </div>
+
+  <div class="layout-container" style="display:flex;gap:2rem;max-width:1200px;margin:2rem auto;padding:0 1.25rem;align-items:start;">
+    
+    <main style="flex:1;min-width:0;">
+      <div class="calculator-workspace">
+        <section class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title"><span>🌊</span> Hydraulic System Parameters</h2>
+            <span class="status-info">Darcy-Weisbach &amp; HI</span>
+          </div>
+          <form id="pump-form" onsubmit="return false;">
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="unit-sys">Measurement System</label>
+                <select id="unit-sys" class="form-control" onchange="togglePumpUnits()">
+                  <option value="us" selected>US Customary (GPM, Feet, HP)</option>
+                  <option value="metric">Metric SI (m³/hr, Meters, kW)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" id="lbl-flow" for="flow-rate">Flow Rate (GPM)</label>
+                <input type="number" id="flow-rate" class="form-control" value="250" min="1" max="100000" step="5" oninput="runPumpCalc()">
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" id="lbl-static" for="static-head">Static Elevation Lift (ft)</label>
+                <input type="number" id="static-head" class="form-control" value="45" min="0" max="2000" step="1" oninput="runPumpCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" id="lbl-pipe-len" for="pipe-length">Total Pipe Run Length (ft)</label>
+                <input type="number" id="pipe-length" class="form-control" value="200" min="1" max="10000" step="10" oninput="runPumpCalc()">
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" id="lbl-pipe-dia" for="pipe-diameter">Internal Pipe Diameter (in)</label>
+                <select id="pipe-diameter" class="form-control" onchange="runPumpCalc()">
+                  <option value="2.067">2" Schedule 40 (2.067" ID)</option>
+                  <option value="3.068">3" Schedule 40 (3.068" ID)</option>
+                  <option value="4.026" selected>4" Schedule 40 (4.026" ID)</option>
+                  <option value="6.065">6" Schedule 40 (6.065" ID)</option>
+                  <option value="7.981">8" Schedule 40 (7.981" ID)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="pipe-mat">Pipe Material (Hazen-Williams C)</label>
+                <select id="pipe-mat" class="form-control" onchange="runPumpCalc()">
+                  <option value="150" selected>PVC / HDPE Plastic (C = 150)</option>
+                  <option value="130">Copper / Brass (C = 130)</option>
+                  <option value="120">Commercial Carbon Steel (C = 120)</option>
+                  <option value="100">Cast Iron / Aged Steel (C = 100)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="fittings-pct">Fittings &amp; Valves Allowance (% of pipe loss)</label>
+                <select id="fittings-pct" class="form-control" onchange="runPumpCalc()">
+                  <option value="0.15" selected>15% (Few elbows &amp; gate valve)</option>
+                  <option value="0.25">25% (Standard manifold &amp; check valve)</option>
+                  <option value="0.40">40% (Complex piping with many bends)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="pump-eff">Pump Hydraulic Efficiency (%)</label>
+                <input type="number" id="pump-eff" class="form-control" value="75" min="20" max="95" step="1" oninput="runPumpCalc()">
+              </div>
+            </div>
+
+            <div class="calc-actions" style="margin-top:1.5rem;display:flex;gap:1rem;">
+              <button type="button" class="btn btn-primary" onclick="runPumpCalc()">Calculate Pump TDH</button>
+              <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Print Report</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="results-card">
+          <h2 class="results-title">Pump Sizing Results</h2>
+          <div class="primary-result-box" style="margin-bottom:1.5rem;text-align:center;padding:1.5rem;border-radius:12px;background:#F8FAFC;border:2px solid #E2E8F0;">
+            <div class="primary-result-label" style="font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em;color:#64748B;">Total Dynamic Head (TDH)</div>
+            <div id="res-tdh-val" class="primary-result-value" style="font-size:2.5rem;font-weight:800;color:#0284C7;margin:0.25rem 0;">51.8 ft</div>
+            <div id="res-tdh-metric" style="font-size:0.9rem;color:#64748B;font-weight:600;">15.8 meters / 22.4 psi</div>
+          </div>
+
+          <div class="result-details-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Brake Horsepower (BHP)</span>
+              <span id="res-bhp-val" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">4.36 HP</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Shaft Motor kW</span>
+              <span id="res-kw-val" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">3.25 kW</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Friction Head Loss</span>
+              <span id="res-frict-val" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">5.93 ft</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Fluid Flow Velocity</span>
+              <span id="res-vel-val" class="result-val" style="font-size:1.1rem;font-weight:700;color:#059669;">6.31 ft/s</span>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem;padding:0.85rem;border-radius:8px;background:#F0F9FF;border:1px solid #BAE6FD;font-size:0.85rem;color:#0369A1;">
+            <strong>💡 Recommended Motor Frame:</strong> A standard <strong>5.0 HP (3.7 kW)</strong> industrial electric motor is recommended, providing a 15% service factor margin above operating BHP.
+          </div>
+        </section>
+      </div>
+
+      <!-- In-Depth Technical Article (1,200+ words) -->
+      <article class="article-section" style="margin-top:2.5rem;line-height:1.7;color:#334155;">
+        <h2>Engineering Principles of Pump Total Dynamic Head &amp; Hydraulic Sizing</h2>
+        <p>
+          Selecting a centrifugal pump for a municipal water distribution main, industrial process plant, or commercial HVAC chilled-water loop is one of the most critical responsibilities in mechanical and civil fluid engineering. A common pitfall is sizing a pump purely on static elevation—the physical height difference between the suction reservoir and the discharge tank. In real-world hydraulic systems, fluids experience intense shear friction against internal pipe walls, turbulent momentum redirection through elbows and valves, and dynamic pressure drops across flow meters and heat exchangers. The actual energy that the pump impeller must impart to the fluid to sustain design discharge is known as <strong>Total Dynamic Head (TDH)</strong>.
+        </p>
+
+        <h3>Governing Equations of Total Dynamic Head (TDH)</h3>
+        <p>
+          Derived from the fundamental <strong>Bernoulli Energy Equation</strong> with friction terms added, Total Dynamic Head represents the difference between the total energy head at the pump discharge nozzle ($H_d$) and the suction nozzle ($H_s$):
+        </p>
+        <p>$$TDH = H_{discharge} - H_{suction}$$</p>
+        <p>
+          In practical field calculations, TDH is expanded into four distinct physical components:
+        </p>
+        <p>$$TDH = h_{static} + h_{pressure} + h_{friction} + h_{minor} + \frac{v_d^2 - v_s^2}{2g}$$</p>
+        <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+          <li><strong>Static Elevation Head ($h_{static}$):</strong> The net vertical elevation change between the liquid level at suction and the highest point of liquid discharge ($z_d - z_s$).</li>
+          <li><strong>Surface Pressure Head ($h_{pressure}$):</strong> The pressure difference between the discharge tank and the suction vessel converted to fluid column height ($\frac{P_d - P_s}{\rho \cdot g}$). For open atmospheric tanks, this term is zero.</li>
+          <li><strong>Friction Head Loss ($h_{friction}$):</strong> The resistive viscous head lost as fluid moves along straight pipe lengths, governed by the <strong>Hazen-Williams</strong> or <strong>Darcy-Weisbach</strong> formulations.</li>
+          <li><strong>Minor Fitting Losses ($h_{minor}$):</strong> Dynamic turbulence losses across elbows, tees, check valves, strainers, and contractions, expressed via loss coefficients ($\sum K \frac{v^2}{2g}$).</li>
+          <li><strong>Velocity Head ($\frac{v_d^2 - v_s^2}{2g}$):</strong> The difference in kinetic energy between suction and discharge piping, usually negligible when pipe diameters match.</li>
+        </ul>
+
+        <h3>Piping Friction Head Loss Mechanics</h3>
+        <p>
+          For water distribution systems operating under turbulent flow conditions ($Re > 4000$), the widely accepted empirical standard published by the <strong>American Water Works Association (AWWA)</strong> is the <strong>Hazen-Williams formula</strong>:
+        </p>
+        <p>$$h_f = 10.44 \times \frac{L \cdot Q^{1.852}}{C^{1.852} \cdot D^{4.8655}} \quad \text{(US Units: } h_f \text{ in ft, } L \text{ in ft, } Q \text{ in GPM, } D \text{ in inches)}$$</p>
+        <p>
+          In metric SI units, the formula converts to:
+        </p>
+        <p>$$h_f = 10.67 \times \frac{L \cdot Q^{1.852}}{C^{1.852} \cdot D^{4.87}} \quad \text{(Metric Units: } h_f \text{ in m, } L \text{ in m, } Q \text{ in m}^3/\text{s}, D \text{ in m)}$$</p>
+        <p>
+          Notice the extreme sensitivity to pipe diameter ($D^{4.87}$). If a design specifies 2-inch pipe instead of 3-inch pipe, the friction loss increases by a staggering factor of $(3 / 2)^{4.87} \approx 7.15\times$! Sizing pipes appropriately using our <a href="pipe-sizing-calculator.html">Pipe Sizing Calculator</a> and verifying motor power with our <a href="motor-starting-current-calculator.html">Motor Starting Current Calculator</a> ensures low operating lifecycle costs.
+        </p>
+
+        <h3>Piping Roughness Coefficients &amp; Equivalent Loss Values</h3>
+        <table class="reference-table" style="width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.9rem;">
+          <thead>
+            <tr style="background:#F1F5F9;text-align:left;">
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Pipe Material</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Hazen-Williams C Factor</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Internal Surface Condition</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Corrosion Resistance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>PVC / CPVC / HDPE Plastic</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">150</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Extremely smooth, non-porous</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Zero scale buildup, lifelong performance</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Copper / Drawn Brass</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">130 – 140</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Smooth metallic extrusion</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Minimal erosion at velocities under 8 ft/s</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>New Welded Commercial Steel</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">120</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Standard mill finish</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Requires chemical treatment against rust</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Aged Cast Iron / Ductile Iron</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">100</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Rough, tuberculated interior</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">High friction; accumulates mineral scale</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Hydraulic Water Power vs Brake Horsepower (BHP)</h3>
+        <p>
+          Once Total Dynamic Head and design flow rate are established, the power transferred into the water column is calculated as:
+        </p>
+        <p>$$\text{Water Horsepower (WHP)} = \frac{Q \text{ (GPM)} \times TDH \text{ (ft)} \times SG}{3960}$$</p>
+        <p>
+          Where $SG$ is specific gravity (1.00 for cold clean water) and 3960 is the dimensional conversion constant ($33,000 \text{ ft-lb/min} / 8.34 \text{ lb/gal}$). In metric SI units:
+        </p>
+        <p>$$P_{hydraulic} \text{ (kW)} = \frac{\rho \cdot g \cdot Q \text{ (m}^3/\text{s)} \cdot TDH \text{ (m)}}{1000} = \frac{9.81 \times Q \text{ (m}^3/\text{hr)} \times TDH \text{ (m)}}{3600}$$</p>
+        <p>
+          Because mechanical seals, impeller disc friction, and hydraulic turbulence introduce losses inside the pump casing, the pump operates at an efficiency $\eta_{pump}$ (typically 65% to 85% at best efficiency point, BEP). The actual shaft power demanded from the electric motor is <strong>Brake Horsepower (BHP)</strong>:
+        </p>
+        <p>$$\text{Brake Horsepower (BHP)} = \frac{\text{WHP}}{\eta_{pump}} = \frac{Q \times TDH \times SG}{3960 \times \eta_{pump}}$$</p>
+
+        <h3>Cavitation &amp; Net Positive Suction Head (NPSH)</h3>
+        <p>
+          Even with perfect TDH and horsepower calculations, pumps can suffer catastrophic failure due to <strong>cavitation</strong>. At the eye of an impeller, fluid velocity surges, causing local static pressure to plunge. If local pressure drops to or below the vapor pressure of the liquid ($P_v$), microscopic steam/vapor bubbles spontaneously nucleate. As these bubbles travel into higher-pressure impeller regions, they implode violently with shock pressures exceeding 100,000 psi (690 MPa). To prevent cavitation, engineers must ensure that <strong>Net Positive Suction Head Available (NPSHa)</strong> exceeds manufacturer <strong>NPSH Required (NPSHr)</strong> by a safety margin of at least 2 to 3 feet (0.6 to 1.0 m):
+        </p>
+        <p>$$NPSHa = h_{atm} \pm h_s - h_{fs} - h_{vp} \ge NPSHr + \text{Margin}$$</p>
+
+        <h3>Worked Practical Example: Industrial Cooling Tower Recirculation Pump</h3>
+        <div class="worked-example-card" style="background:#F0FDF4;border-left:4px solid #16A34A;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#14532D;">Commercial HVAC Design Case Study:</h4>
+          <p><strong>Design Scenario:</strong> An HVAC engineer is sizing a condenser water pump to circulate warm water from an outdoor cooling tower basin to an indoor centrifugal chiller located in the basement. Specifications:</p>
+          <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+            <li>Flow Rate ($Q$): 400 GPM clean water ($SG = 1.0$)</li>
+            <li>Static Elevation Difference ($h_{static}$): 25 feet lift</li>
+            <li>Piping: 300 feet of 4-inch Schedule 40 Steel pipe ($ID = 4.026 \text{ in}$, $C = 120$)</li>
+            <li>Fittings: 4 &times; 90° elbows, 2 gate valves, 1 check valve (equivalent to 20% pipe length allowance)</li>
+            <li>Pump Efficiency ($\eta$): 78% at Best Efficiency Point</li>
+          </ul>
+          <p><strong>Step 1: Calculate Friction Head Loss in Straight Pipe:</strong></p>
+          <p>$$h_f = 10.44 \times \frac{300 \times (400)^{1.852}}{(120)^{1.852} \times (4.026)^{4.8655}} = 10.44 \times \frac{300 \times 65,492}{7,112 \times 887.3} = \frac{205,125,936}{6,310,477} = 32.5 \text{ ft}$$</p>
+          <p><strong>Step 2: Account for Minor Fitting Losses (20%):</strong></p>
+          <p>$$h_{minor} = 32.5 \times 0.20 = 6.5 \text{ ft}$$</p>
+          <p>$$\text{Total Friction Loss } = 32.5 + 6.5 = 39.0 \text{ ft}$$</p>
+          <p><strong>Step 3: Compute Total Dynamic Head (TDH):</strong></p>
+          <p>$$TDH = h_{static} + h_{friction, total} = 25.0 + 39.0 = 64.0 \text{ feet}$$</p>
+          <p><strong>Step 4: Calculate Motor Brake Horsepower (BHP):</strong></p>
+          <p>$$\text{BHP} = \frac{400 \text{ GPM} \times 64.0 \text{ ft} \times 1.0}{3960 \times 0.78} = \frac{25,600}{3,088.8} = 8.29 \text{ HP (6.18 kW)}$$</p>
+          <p><strong>Conclusion:</strong> Sizing requires a standard <strong>10 HP (7.5 kW)</strong> electric drive motor, providing a reliable 20.6% safety margin preventing motor overload across the full pump curve.</p>
+        </div>
+
+        <p>
+          For complete plant calculations, verify HVAC heat rejection with our <a href="cooling-load-calculator.html">HVAC Cooling Load Calculator</a>, evaluate fire suppression systems with our <a href="fire-sprinkler-calculator.html">Fire Sprinkler Flow Calculator</a>, and size electrical power cables using the <a href="cable-sizing-calculator.html">Cable Sizing Calculator</a>.
+        </p>
+
+        <!-- Technical FAQs -->
+        <div class="faq-container" style="margin-top:2.5rem;">
+          <h3 style="margin-bottom:1rem;color:#0F172A;">Frequently Asked Questions About Pump Head</h3>
+          
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What is Total Dynamic Head (TDH) in pump hydraulics?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Total Dynamic Head (TDH) is the total equivalent height of a liquid column that a pump must overcome to move fluid from suction to discharge. It is the sum of static elevation head, pressure difference, friction head loss in pipes, and minor losses in fittings and valves.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">How does piping diameter affect pump friction head loss?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              According to the Darcy-Weisbach and Hazen-Williams relationships, friction head loss varies inversely with the fifth power of internal pipe diameter (hf proportional to 1 / D^5). Halving the pipe diameter increases friction head loss by approximately 32 times for the same flow rate.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What is the difference between hydraulic water power and brake horsepower (BHP)?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Hydraulic power is the theoretical mechanical energy transferred directly into the moving liquid. Brake horsepower (BHP) is the actual mechanical power required at the pump drive shaft, which is higher because it accounts for internal impeller hydraulic friction, mechanical seal drag, and bearing losses (BHP = Hydraulic Power / Pump Efficiency).
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">Why is Net Positive Suction Head Available (NPSHa) critical in pump sizing?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              NPSHa is the absolute fluid pressure above vapor pressure at the pump suction nozzle. If NPSHa falls below the pump manufacturer's required NPSHr, cavitation occurs: vapor bubbles form and violently collapse against impeller vanes, causing severe acoustic vibration, pitting erosion, and premature impeller destruction.
+            </div>
+          </details>
+        </div>
+      </article>
+    </main>
+
+    <!-- Post Sidebar -->
+    <aside class="post-sidebar" style="width:300px;flex-shrink:0;">
+      <div class="sidebar-widget" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;">
+        <div class="sidebar-widget-header" style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+          <span class="widget-icon" style="font-size:1.25rem;">⚙️</span>
+          <h3 class="widget-title" style="margin:0;font-size:1.05rem;color:#0F172A;">Mechanical &amp; HVAC Suite</h3>
+        </div>
+        <div class="sidebar-widget-subtitle" style="font-size:0.8rem;color:#64748B;margin-bottom:1rem;">Verified fluid and mechanical calculation tools:</div>
+        <ul class="sidebar-tools-list" style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+          <li><a href="pump-head-calculator.html" class="sidebar-tool-item active" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;background:#EFF6FF;color:#2563EB;text-decoration:none;font-size:0.85rem;font-weight:600;">🌊 Pump Head (TDH &amp; BHP)</a></li>
+          <li><a href="pipe-sizing-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🚰 Pipe Sizing &amp; Flow</a></li>
+          <li><a href="cooling-load-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">❄️ Cooling Load (ASHRAE)</a></li>
+          <li><a href="torque-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">⚙️ Torque &amp; Shaft Power</a></li>
+          <li><a href="fire-sprinkler-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">💦 Sprinkler Flow (NFPA 13)</a></li>
+        </ul>
+        <div class="sidebar-widget-footer" style="margin-top:1.25rem;padding-top:0.75rem;border-top:1px solid #E2E8F0;text-align:center;">
+          <a href="mechanical.html" class="sidebar-cat-link" style="color:#2563EB;font-weight:600;font-size:0.85rem;text-decoration:none;">Explore Mechanical Hub &rarr;</a>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <span class="logo-badge">∑</span>
+            <span>Calc<span class="accent">Hub</span></span>
+          </a>
+          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Mechanical &amp; Fluids</h4>
+          <ul class="footer-links">
+            <li><a href="pump-head-calculator.html">Pump Head &amp; TDH</a></li>
+            <li><a href="pipe-sizing-calculator.html">Pipe Sizing &amp; Flow</a></li>
+            <li><a href="cooling-load-calculator.html">Cooling Load (ASHRAE)</a></li>
+            <li><a href="torque-calculator.html">Torque &amp; Power</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Engineering Suites</h4>
+          <ul class="footer-links">
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+            <li><a href="engineering.html">Electrical Engineering</a></li>
+            <li><a href="civil.html">Civil &amp; Structural</a></li>
+            <li><a href="chemical.html">Chemical &amp; Water</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Engineering calculations are for guidance purposes.</p>
+        <div>
+          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
+          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy &amp; Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function togglePumpUnits() {
+      const u = document.getElementById('unit-sys').value;
+      if (u === 'metric') {
+        document.getElementById('lbl-flow').textContent = 'Flow Rate (m³/hr)';
+        document.getElementById('lbl-static').textContent = 'Static Elevation Lift (m)';
+        document.getElementById('lbl-pipe-len').textContent = 'Total Pipe Run Length (m)';
+        document.getElementById('flow-rate').value = '55';
+        document.getElementById('static-head').value = '14';
+        document.getElementById('pipe-length').value = '60';
+      } else {
+        document.getElementById('lbl-flow').textContent = 'Flow Rate (GPM)';
+        document.getElementById('lbl-static').textContent = 'Static Elevation Lift (ft)';
+        document.getElementById('lbl-pipe-len').textContent = 'Total Pipe Run Length (ft)';
+        document.getElementById('flow-rate').value = '250';
+        document.getElementById('static-head').value = '45';
+        document.getElementById('pipe-length').value = '200';
+      }
+      runPumpCalc();
+    }
+
+    function runPumpCalc() {
+      const isMetric = document.getElementById('unit-sys').value === 'metric';
+      let flow = parseFloat(document.getElementById('flow-rate').value) || 0;
+      let staticH = parseFloat(document.getElementById('static-head').value) || 0;
+      let length = parseFloat(document.getElementById('pipe-length').value) || 0;
+      const diaInches = parseFloat(document.getElementById('pipe-diameter').value) || 4.026;
+      const cFactor = parseFloat(document.getElementById('pipe-mat').value) || 150;
+      const fitPct = parseFloat(document.getElementById('fittings-pct').value) || 0.15;
+      const eff = (parseFloat(document.getElementById('pump-eff').value) || 75) / 100;
+
+      // Convert to US customary internally
+      let gpm = isMetric ? (flow * 4.40287) : flow;
+      let staticFt = isMetric ? (staticH * 3.28084) : staticH;
+      let lengthFt = isMetric ? (length * 3.28084) : length;
+
+      // Hazen-Williams friction loss (ft):
+      // h_f = 10.44 * L * Q^1.852 / (C^1.852 * D^4.8655)
+      const num = 10.44 * lengthFt * Math.pow(gpm, 1.852);
+      const den = Math.pow(cFactor, 1.852) * Math.pow(diaInches, 4.8655);
+      const pipeFrictFt = num / den;
+      const totalFrictFt = pipeFrictFt * (1 + fitPct);
+
+      const tdhFt = staticFt + totalFrictFt;
+
+      // Flow velocity (ft/s): V = Q (cfs) / Area (sq ft)
+      const pipeAreaSqFt = (Math.PI * Math.pow(diaInches / 12, 2)) / 4;
+      const flowCfs = gpm / 448.831;
+      const velFps = flowCfs / pipeAreaSqFt;
+
+      // Power: Water Horsepower WHP = (GPM * TDH * SG) / 3960
+      const whp = (gpm * tdhFt * 1.0) / 3960;
+      const bhp = whp / eff;
+      const kw = bhp * 0.7457;
+
+      if (isMetric) {
+        const tdhMeters = tdhFt * 0.3048;
+        const frictMeters = totalFrictFt * 0.3048;
+        const velMps = velFps * 0.3048;
+        document.getElementById('res-tdh-val').textContent = tdhMeters.toFixed(1) + ' m';
+        document.getElementById('res-tdh-metric').textContent = (tdhMeters * 0.0980665).toFixed(2) + ' bar / ' + tdhFt.toFixed(1) + ' ft';
+        document.getElementById('res-bhp-val').textContent = bhp.toFixed(2) + ' HP';
+        document.getElementById('res-kw-val').textContent = kw.toFixed(2) + ' kW';
+        document.getElementById('res-frict-val').textContent = frictMeters.toFixed(2) + ' m';
+        document.getElementById('res-vel-val').textContent = velMps.toFixed(2) + ' m/s';
+      } else {
+        const psi = tdhFt * 0.4335;
+        const meters = tdhFt * 0.3048;
+        document.getElementById('res-tdh-val').textContent = tdhFt.toFixed(1) + ' ft';
+        document.getElementById('res-tdh-metric').textContent = meters.toFixed(1) + ' meters / ' + psi.toFixed(1) + ' psi';
+        document.getElementById('res-bhp-val').textContent = bhp.toFixed(2) + ' HP';
+        document.getElementById('res-kw-val').textContent = kw.toFixed(2) + ' kW';
+        document.getElementById('res-frict-val').textContent = totalFrictFt.toFixed(2) + ' ft';
+        document.getElementById('res-vel-val').textContent = velFps.toFixed(2) + ' ft/s';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', runPumpCalc);
+  </script>
+</body>
+</html>
+"""
+
+with open("pump-head-calculator.html", "w", encoding="utf-8") as f:
+    f.write(TOOL_PUMP)
+
+print("pump-head-calculator.html generated successfully!")

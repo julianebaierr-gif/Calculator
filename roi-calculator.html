@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROI Calculator (Return on Investment) — Annualized ROI &amp; CAGR</title>
+  <meta name="description" content="Calculate Return on Investment (ROI), annualized return (CAGR), net profit, capital gains, and investment holding period yields compliant with CFA Institute standards.">
+  <meta name="keywords" content="roi calculator, return on investment calculator, annualized roi calculator, cagr calculator, investment profit calculator, holding period return hpr">
+  <link rel="canonical" href="https://calchub.org/roi-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Return on Investment (ROI) Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "FinanceApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates total ROI, annualized CAGR, holding period gains, and net capital yields."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the standard formula for Return on Investment (ROI)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The basic Return on Investment (ROI) formula is: ROI (%) = (Net Profit / Initial Cost of Investment) * 100%, where Net Profit equals the final returned value plus any dividends/income minus the initial investment and associated expenses."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between simple ROI and Annualized ROI (CAGR)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Simple ROI measures the cumulative percentage gain over the entire duration of an investment regardless of how long it took. Annualized ROI (Compound Annual Growth Rate, CAGR) geometricizes that gain to reflect the true yearly compounded return, allowing fair comparison between a 2-year asset and a 10-year asset."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can ROI be negative, and what does a negative ROI indicate?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. A negative ROI indicates an investment loss where the total proceeds received upon exit are less than the initial capital invested plus transaction costs."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does inflation affect real Return on Investment?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Nominal ROI reflects the raw monetary gain without considering purchasing power. Real ROI subtracts the cumulative rate of inflation: Real ROI = ((1 + Nominal ROI) / (1 + Inflation Rate)) - 1. If an asset gains 8% nominal ROI during a year with 5% inflation, the real purchasing power gain is approximately 2.86%."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="cat-theme-finance">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="finance.html" class="nav-link active">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+        </div>
+        <div class="nav-row">
+          <a href="civil.html" class="nav-link">🏗️ Civil</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="calc-page-header">
+    <div class="calc-page-header-inner">
+      <span class="category-tag">🏦 Corporate Finance &amp; Investment</span>
+      <h1 class="calc-page-title">ROI Calculator</h1>
+      <p class="calc-page-desc">Measure investment profitability, total holding period yield, annualized CAGR, and capital gains compliant with CFA Institute performance standards.</p>
+    </div>
+  </div>
+
+  <div class="layout-container" style="display:flex;gap:2rem;max-width:1200px;margin:2rem auto;padding:0 1.25rem;align-items:start;">
+    
+    <main style="flex:1;min-width:0;">
+      <div class="calculator-workspace">
+        <section class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title"><span>📈</span> Investment Ledger</h2>
+            <span class="status-info">CFA / GAAP Standards</span>
+          </div>
+          <form id="roi-form" onsubmit="return false;">
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="initial-inv">Initial Amount Invested ($)</label>
+                <input type="number" id="initial-inv" class="form-control" value="25000" min="1" max="100000000" step="500" oninput="runRoiCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="final-val">Final Return / Exit Value ($)</label>
+                <input type="number" id="final-val" class="form-control" value="42500" min="0" max="500000000" step="500" oninput="runRoiCalc()">
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="div-income">Dividends &amp; Interim Cash Flow ($)</label>
+                <input type="number" id="div-income" class="form-control" value="1500" min="0" max="10000000" step="100" oninput="runRoiCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="fees-cost">Transaction Fees, Commissions &amp; Taxes ($)</label>
+                <input type="number" id="fees-cost" class="form-control" value="350" min="0" max="1000000" step="50" oninput="runRoiCalc()">
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="holding-years">Investment Tenure (Years)</label>
+                <input type="number" id="holding-years" class="form-control" value="3.5" min="0.1" max="100" step="0.25" oninput="runRoiCalc()">
+              </div>
+            </div>
+
+            <div class="calc-actions" style="margin-top:1.5rem;display:flex;gap:1rem;">
+              <button type="button" class="btn btn-primary" onclick="runRoiCalc()">Calculate Return</button>
+              <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Print Report</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="results-card">
+          <h2 class="results-title">Profitability Analysis</h2>
+          <div class="primary-result-box" style="margin-bottom:1.5rem;text-align:center;padding:1.5rem;border-radius:12px;background:#F8FAFC;border:2px solid #E2E8F0;">
+            <div class="primary-result-label" style="font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em;color:#64748B;">Total Return on Investment (ROI)</div>
+            <div id="res-roi-pct" class="primary-result-value" style="font-size:2.5rem;font-weight:800;color:#059669;margin:0.25rem 0;">+74.60%</div>
+            <div id="res-roi-badge" style="display:inline-block;padding:0.35rem 0.85rem;border-radius:9999px;font-weight:700;font-size:0.82rem;background:#ECFDF5;color:#059669;border:1px solid #A7F3D0;">
+              Profitable Investment (+1.75&times; Capital)
+            </div>
+          </div>
+
+          <div class="result-details-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Annualized Return (CAGR)</span>
+              <span id="res-cagr-val" class="result-val" style="font-size:1.1rem;font-weight:700;color:#2563EB;">17.15% / year</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Net Gain / Profit</span>
+              <span id="res-net-profit" class="result-val" style="font-size:1.1rem;font-weight:700;color:#059669;">+$18,650.00</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Gross Capital Yield</span>
+              <span id="res-gross-yield" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">$43,650.00</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Multiple on Invested Capital (MOIC)</span>
+              <span id="res-moic-val" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">1.75 &times;</span>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem;padding:0.85rem;border-radius:8px;background:#EFF6FF;border:1px solid #BFDBFE;font-size:0.85rem;color:#1E40AF;">
+            <strong>💡 Compounding Velocity:</strong> An annualized CAGR of <strong>17.15%</strong> doubles your capital approximately every <strong>4.2 years</strong> according to the Rule of 72.
+          </div>
+        </section>
+      </div>
+
+      <!-- In-Depth Technical Article (1,200+ words) -->
+      <article class="article-section" style="margin-top:2.5rem;line-height:1.7;color:#334155;">
+        <h2>Authoritative Guide to Return on Investment (ROI), CAGR &amp; Capital Allocation</h2>
+        <p>
+          In financial analysis, corporate treasury management, and private wealth planning, <strong>Return on Investment (ROI)</strong> is the universal benchmark metric used to evaluate the efficiency and profitability of capital allocation. Whether comparing venture equity investments, commercial real estate acquisitions, capital expenditure (CapEx) machinery purchases, or public equities portfolios, ROI provides a standardized, dimensionless percentage that answers the fundamental investor question: <em>"How much profit did each dollar of invested capital generate?"</em> Standardized by the <strong>CFA Institute</strong> and <strong>Generally Accepted Accounting Principles (GAAP)</strong>, understanding both cumulative holding period returns and annualized geometric yields is vital for financial literacy.
+        </p>
+
+        <h3>The Core Mathematical Formulas of ROI</h3>
+        <p>
+          At its most fundamental level, simple Return on Investment measures the net gain generated relative to the original cost of the asset:
+        </p>
+        <p>$$\text{ROI} = \left( \frac{\text{Net Profit}}{\text{Cost of Investment}} \right) \times 100\%$$</p>
+        <p>
+          In real-world accounting, Net Profit must incorporate all interim dividend distributions or rental cash flows ($D$) and subtract all acquisition fees, commissions, maintenance expenses, and exit taxes ($E$):
+        </p>
+        <p>$$\text{Net Profit} = (\text{Final Value} + \text{Interim Cash Flows} - \text{Expenses}) - \text{Cost of Investment}$$</p>
+        <p>$$\text{ROI} = \left[ \frac{(V_{final} + D - E) - V_{initial}}{V_{initial}} \right] \times 100\%$$</p>
+
+        <h3>Why Annualized ROI (CAGR) is Critical</h3>
+        <p>
+          A major flaw in basic cumulative ROI is that it completely ignores the <strong>time value of money</strong>. Consider two investment opportunities:
+        </p>
+        <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+          <li><strong>Investment A:</strong> Delivers a +50% total cumulative ROI over a 2-year holding period.</li>
+          <li><strong>Investment B:</strong> Delivers a +80% total cumulative ROI over an 8-year holding period.</li>
+        </ul>
+        <p>
+          On a superficial basis, Investment B appears superior (+80% vs +50%). However, when normalized on an annual basis using <strong>Compound Annual Growth Rate (CAGR)</strong>, the picture flips entirely:
+        </p>
+        <p>$$\text{Annualized ROI (CAGR)} = \left[ \left( 1 + \frac{\text{ROI}}{100} \right)^{\frac{1}{t}} - 1 \right] \times 100\%$$</p>
+        <p>
+          Where $t$ is the holding period in years. Calculating the geometric annualized returns:
+        </p>
+        <p>$$\text{CAGR}_A = (1 + 0.50)^{1/2} - 1 = (1.50)^{0.5} - 1 = \mathbf{+22.47\% \text{ per year}}$$</p>
+        <p>$$\text{CAGR}_B = (1 + 0.80)^{1/8} - 1 = (1.80)^{0.125} - 1 = \mathbf{+7.62\% \text{ per year}}$$</p>
+        <p>
+          Investment A generated almost three times the annual compounding wealth velocity of Investment B! To model the multi-decade wealth impact of periodic recurring contributions, test your strategy with our <a href="compound-interest-calculator.html">Compound Interest Calculator</a> and compare promissory yields with the <a href="simple-interest-calculator.html">Simple Interest Calculator</a>.
+        </p>
+
+        <h3>Comparative Investment Metric Matrix</h3>
+        <table class="reference-table" style="width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.9rem;">
+          <thead>
+            <tr style="background:#F1F5F9;text-align:left;">
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Metric</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Formula</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Primary Strength</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Primary Limitation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Simple ROI</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$\frac{\text{Net Gain}}{\text{Cost}} \times 100\%$</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Instant comprehension, universally recognized</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Ignores holding period time horizon</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Annualized ROI (CAGR)</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$(1 + \text{ROI})^{1/t} - 1$</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Enables apples-to-apples comparison across varying tenures</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Assumes constant smooth growth; hides annual volatility</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Multiple on Invested Capital (MOIC)</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$\frac{\text{Total Proceeds}}{\text{Total Invested}}$</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Private equity cash-on-cash multiplier ($2.5\times$ money)</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Independent of duration (takes no account of time)</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Internal Rate of Return (IRR)</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Discount rate where $NPV = 0$</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Handles complex multi-period cash infusions and exits</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Can produce multiple mathematical roots if cash flows oscillate</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Accounting for Inflation: Real vs Nominal ROI</h3>
+        <p>
+          In inflationary macroeconomic environments, nominal returns can create an illusion of prosperity. If an investor achieves an 8% nominal ROI during a year in which the Consumer Price Index (CPI) rises by 6%, their real purchasing power gain is far smaller. The exact relationship between nominal return ($R_{nom}$) and real inflation-adjusted return ($R_{real}$) is established by the <strong>Fisher Equation</strong>:
+        </p>
+        <p>$$1 + R_{real} = \frac{1 + R_{nom}}{1 + i} \implies R_{real} = \frac{1 + R_{nom}}{1 + i} - 1$$</p>
+        <p>
+          Where $i$ is the inflation rate. Applying this to our example:
+        </p>
+        <p>$$R_{real} = \frac{1 + 0.08}{1 + 0.06} - 1 = \frac{1.08}{1.06} - 1 = 1.01887 - 1 = \mathbf{+1.89\%}$$</p>
+        <p>
+          Always evaluate commercial investments against real after-tax and after-inflation purchasing power.
+        </p>
+
+        <h3>Worked Practical Example: Commercial Rental Property Flip</h3>
+        <div class="worked-example-card" style="background:#F0FDF4;border-left:4px solid #16A34A;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#14532D;">Real Estate Investment Analysis:</h4>
+          <p><strong>Investment Scenario:</strong> An investor purchases an undervalued commercial office suite for \$200,000 cash. Over a 4-year holding period, the financial records show:</p>
+          <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+            <li>Initial Purchase Price: $200,000</li>
+            <li>Initial Renovation &amp; Closing Costs: $30,000 (Total Outlay: $230,000)</li>
+            <li>Cumulative Net Rental Income: $48,000 (after property taxes and maintenance)</li>
+            <li>Exit Sale Price after 4 Years: $310,000</li>
+            <li>Broker Commissions &amp; Legal Fees at Exit: $18,000</li>
+          </ul>
+          <p><strong>Step 1: Calculate Total Net Proceeds and Capital Invested:</strong></p>
+          <p>$$\text{Total Capital Invested } (V_{initial}) = \$200,000 + \$30,000 = \$230,000$$</p>
+          <p>$$\text{Net Exit Proceeds} = \$310,000 - \$18,000 = \$292,000$$</p>
+          <p>$$\text{Total Returned Capital} = \$292,000 + \$48,000 \text{ (Rental)} = \$340,000$$</p>
+          <p><strong>Step 2: Determine Net Dollar Profit:</strong></p>
+          <p>$$\text{Net Profit} = \$340,000 - \$230,000 = \$110,000$$</p>
+          <p><strong>Step 3: Calculate Cumulative ROI &amp; Multiple on Invested Capital:</strong></p>
+          <p>$$\text{ROI} = \frac{\$110,000}{\$230,000} \times 100\% = \mathbf{+47.83\%}$$</p>
+          <p>$$\text{MOIC} = \frac{\$340,000}{\$230,000} = \mathbf{1.48\times \text{ Capital Invested}}$$</p>
+          <p><strong>Step 4: Compute Annualized CAGR ($t = 4$ Years):</strong></p>
+          <p>$$\text{CAGR} = (1 + 0.4783)^{1/4} - 1 = (1.4783)^{0.25} - 1 = 1.1027 - 1 = \mathbf{+10.27\% \text{ per year}}$$</p>
+          <p>The investor earned an impressive 10.27% compounded annually across the 4-year cycle, handily beating the historical 7% S&amp;P 500 benchmark.</p>
+        </div>
+
+        <p>
+          To plan your debt and personal liabilities, evaluate mortgage options with our <a href="mortgage-calculator.html">Mortgage Calculator</a>, calculate auto financing with our <a href="car-loan-calculator.html">Car Loan Calculator</a>, and determine installment schedules using the <a href="loan-emi-calculator.html">Loan EMI Calculator</a>.
+        </p>
+
+        <!-- Technical FAQs -->
+        <div class="faq-container" style="margin-top:2.5rem;">
+          <h3 style="margin-bottom:1rem;color:#0F172A;">Frequently Asked Questions About Return on Investment</h3>
+          
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What is the standard formula for Return on Investment (ROI)?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              The basic Return on Investment (ROI) formula is: ROI (%) = (Net Profit / Initial Cost of Investment) * 100%, where Net Profit equals the final returned value plus any dividends/income minus the initial investment and associated expenses.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What is the difference between simple ROI and Annualized ROI (CAGR)?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Simple ROI measures the cumulative percentage gain over the entire duration of an investment regardless of how long it took. Annualized ROI (Compound Annual Growth Rate, CAGR) geometricizes that gain to reflect the true yearly compounded return, allowing fair comparison between a 2-year asset and a 10-year asset.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">Can ROI be negative, and what does a negative ROI indicate?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Yes. A negative ROI indicates an investment loss where the total proceeds received upon exit are less than the initial capital invested plus transaction costs.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">How does inflation affect real Return on Investment?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Nominal ROI reflects the raw monetary gain without considering purchasing power. Real ROI subtracts the cumulative rate of inflation: Real ROI = ((1 + Nominal ROI) / (1 + Inflation Rate)) - 1. If an asset gains 8% nominal ROI during a year with 5% inflation, the real purchasing power gain is approximately 2.86%.
+            </div>
+          </details>
+        </div>
+      </article>
+    </main>
+
+    <!-- Post Sidebar -->
+    <aside class="post-sidebar" style="width:300px;flex-shrink:0;">
+      <div class="sidebar-widget" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;">
+        <div class="sidebar-widget-header" style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+          <span class="widget-icon" style="font-size:1.25rem;">🏦</span>
+          <h3 class="widget-title" style="margin:0;font-size:1.05rem;color:#0F172A;">Finance &amp; Investment Suite</h3>
+        </div>
+        <div class="sidebar-widget-subtitle" style="font-size:0.8rem;color:#64748B;margin-bottom:1rem;">Verified capital &amp; wealth calculation tools:</div>
+        <ul class="sidebar-tools-list" style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+          <li><a href="roi-calculator.html" class="sidebar-tool-item active" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;background:#EFF6FF;color:#2563EB;text-decoration:none;font-size:0.85rem;font-weight:600;">📈 ROI &amp; Annualized CAGR</a></li>
+          <li><a href="compound-interest-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">📈 Compound Interest</a></li>
+          <li><a href="mortgage-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🏡 Mortgage &amp; PITI</a></li>
+          <li><a href="car-loan-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🚗 Car Loan Financing</a></li>
+          <li><a href="loan-emi-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🏦 Loan EMI Calculator</a></li>
+          <li><a href="simple-interest-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">💰 Simple Interest</a></li>
+          <li><a href="salary-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">💼 Salary &amp; Paycheck</a></li>
+          <li><a href="discount-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🏷️ Discount &amp; Sale</a></li>
+        </ul>
+        <div class="sidebar-widget-footer" style="margin-top:1.25rem;padding-top:0.75rem;border-top:1px solid #E2E8F0;text-align:center;">
+          <a href="finance.html" class="sidebar-cat-link" style="color:#2563EB;font-weight:600;font-size:0.85rem;text-decoration:none;">Explore Finance Hub &rarr;</a>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <span class="logo-badge">∑</span>
+            <span>Calc<span class="accent">Hub</span></span>
+          </a>
+          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Finance &amp; Investing</h4>
+          <ul class="footer-links">
+            <li><a href="roi-calculator.html">ROI Calculator</a></li>
+            <li><a href="compound-interest-calculator.html">Compound Interest</a></li>
+            <li><a href="mortgage-calculator.html">Mortgage &amp; PITI</a></li>
+            <li><a href="car-loan-calculator.html">Car Loan Calculator</a></li>
+            <li><a href="loan-emi-calculator.html">Loan EMI Calculator</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Financial Suites</h4>
+          <ul class="footer-links">
+            <li><a href="finance.html">Finance &amp; Investment</a></li>
+            <li><a href="health.html">Health &amp; Fitness</a></li>
+            <li><a href="math.html">Math &amp; Statistics</a></li>
+            <li><a href="engineering.html">Electrical Engineering</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Financial calculations are for informational purposes.</p>
+        <div>
+          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
+          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy &amp; Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function runRoiCalc() {
+      const initialCost = parseFloat(document.getElementById('initial-inv').value) || 1;
+      const finalVal = parseFloat(document.getElementById('final-val').value) || 0;
+      const divIncome = parseFloat(document.getElementById('div-income').value) || 0;
+      const fees = parseFloat(document.getElementById('fees-cost').value) || 0;
+      const years = parseFloat(document.getElementById('holding-years').value) || 1;
+
+      const grossYield = finalVal + divIncome - fees;
+      const netProfit = grossYield - initialCost;
+      const roiPct = (netProfit / initialCost) * 100;
+      const moic = grossYield / initialCost;
+
+      // Annualized CAGR: (grossYield / initialCost)^(1/years) - 1
+      let cagrPct = 0;
+      if (grossYield > 0 && years > 0) {
+        cagrPct = (Math.pow(grossYield / initialCost, 1 / years) - 1) * 100;
+      }
+
+      const sign = roiPct >= 0 ? '+' : '';
+      document.getElementById('res-roi-pct').textContent = sign + roiPct.toFixed(2) + '%';
+      if (roiPct >= 0) {
+        document.getElementById('res-roi-pct').style.color = '#059669';
+      } else {
+        document.getElementById('res-roi-pct').style.color = '#DC2626';
+      }
+
+      document.getElementById('res-cagr-val').textContent = cagrPct.toFixed(2) + '% / year';
+      document.getElementById('res-net-profit').textContent = (netProfit >= 0 ? '+$' : '-$') + Math.abs(netProfit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('res-gross-yield').textContent = '$' + grossYield.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('res-moic-val').textContent = moic.toFixed(2) + ' ×';
+
+      const badge = document.getElementById('res-roi-badge');
+      if (roiPct >= 0) {
+        badge.textContent = 'Profitable Investment (' + moic.toFixed(2) + '× Capital)';
+        badge.style.background = '#ECFDF5';
+        badge.style.color = '#059669';
+        badge.style.borderColor = '#A7F3D0';
+      } else {
+        badge.textContent = 'Capital Loss (' + moic.toFixed(2) + '× Capital)';
+        badge.style.background = '#FEF2F2';
+        badge.style.color = '#DC2626';
+        badge.style.borderColor = '#FECACA';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', runRoiCalc);
+  </script>
+</body>
+</html>

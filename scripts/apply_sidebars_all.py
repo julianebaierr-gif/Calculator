@@ -23,7 +23,9 @@ CATEGORIES = {
         "hub": "finance.html",
         "tools": [
             ("loan-emi-calculator.html", "Loan EMI Calculator", "💳", "Monthly payment & interest split"),
+            ("car-loan-calculator.html", "Car Loan Financing", "🚗", "Auto loan payments & trade-in tax"),
             ("mortgage-calculator.html", "Mortgage & PITI", "🏡", "Monthly payment, escrow & amortization"),
+            ("roi-calculator.html", "ROI & Annualized CAGR", "📈", "Net capital gain & geometric CAGR"),
             ("compound-interest-calculator.html", "Compound Interest", "📈", "Wealth growth with deposits"),
             ("simple-interest-calculator.html", "Simple Interest", "💵", "Linear interest & maturity sum"),
             ("salary-calculator.html", "Salary & Paycheck", "💼", "Hourly, monthly & annual pay"),
@@ -47,6 +49,8 @@ CATEGORIES = {
         "icon": "⚡",
         "hub": "engineering.html",
         "tools": [
+            ("conduit-fill-calculator.html", "Conduit Fill (NEC Ch. 9)", "🔌", "40% fill rule & wire jam ratio"),
+            ("motor-starting-current-calculator.html", "Motor Starting Current", "⚙️", "NEMA locked rotor inrush amps"),
             ("short-circuit-calculator.html", "Short-Circuit (IEC 60909)", "💥", "Symmetrical fault kA & breaking"),
             ("transformer-sizing-calculator.html", "Transformer Sizing (NEC 450)", "⚡", "kVA rating & full-load amps"),
             ("cable-sizing-calculator.html", "Cable Sizing (IEC/NEC)", "🔌", "IEC/NEC ampacity & derating"),
@@ -71,6 +75,8 @@ CATEGORIES = {
         "icon": "⚙️",
         "hub": "mechanical.html",
         "tools": [
+            ("pump-head-calculator.html", "Pump Head (TDH & Flow)", "🌊", "Total dynamic head & motor BHP"),
+            ("gear-ratio-calculator.html", "Gear Ratio & Speed", "⚙️", "Velocity reduction & torque ratio"),
             ("cooling-load-calculator.html", "Cooling Load (HVAC) Sizing", "❄️", "Sensible & latent heat in BTU/hr"),
             ("pipe-sizing-calculator.html", "Pipe Sizing & Water Flow", "🚰", "Internal diameter & friction loss"),
             ("torque-calculator.html", "Torque & Shaft Power", "⚙️", "Rotational torque N·m & kW/HP"),

@@ -1,0 +1,486 @@
+"""
+Generates car-loan-calculator.html
+"""
+TOOL_CAR_LOAN = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Car Loan Calculator (Auto Financing) — Monthly Payments, Tax &amp; Trade-In</title>
+  <meta name="description" content="Calculate monthly auto loan payments with vehicle purchase price, down payment, trade-in value, state sales tax, dealer doc fees, and loan amortization schedule.">
+  <meta name="keywords" content="car loan calculator, auto financing calculator, vehicle loan payment, car payment with trade in, auto loan apr amortization, auto loan sales tax calculator">
+  <link rel="canonical" href="https://calchub.org/car-loan-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Auto Loan & Car Financing Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "FinanceApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates monthly car loan installments, trade-in equity, tax savings, and total interest paid."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How does trading in a vehicle reduce auto loan sales tax?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In most US states and jurisdictions, sales tax is assessed only on the net difference between the purchase price and the trade-in allowance. For example, purchasing a $35,000 vehicle with a $10,000 trade-in in an 8% tax state means you only pay tax on $25,000, saving $800 in cash."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is negative equity or an 'underwater' car loan?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Negative equity occurs when you owe more on your existing vehicle than its current market trade-in value. If you owe $15,000 on a car worth $12,000, you have $3,000 in negative equity that must either be paid out-of-pocket or rolled into the new auto loan."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why is a 48-month or 60-month auto loan better than a 72-month or 84-month loan?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "While 72- and 84-month terms lower the monthly payment, vehicles depreciate faster than the principal balance decreases during the initial years. Long terms result in significantly higher cumulative interest and leave borrowers trapped in negative equity for years."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What extra fees should be accounted for when buying a car?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Beyond the negotiated sticker price, buyers must budget for state sales tax, dealer documentation fees ($100 to $800 depending on state caps), title and registration fees, and optional protections such as GAP insurance."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="cat-theme-finance">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="finance.html" class="nav-link active">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+        </div>
+        <div class="nav-row">
+          <a href="civil.html" class="nav-link">🏗️ Civil</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="calc-page-header">
+    <div class="calc-page-header-inner">
+      <span class="category-tag">🏦 Consumer Finance &amp; Lending</span>
+      <h1 class="calc-page-title">Car Loan Calculator</h1>
+      <p class="calc-page-desc">Estimate monthly auto loan payments, trade-in tax savings, total financing interest, and loan payoff amortization schedules compliant with Truth in Lending Act standards.</p>
+    </div>
+  </div>
+
+  <div class="layout-container" style="display:flex;gap:2rem;max-width:1200px;margin:2rem auto;padding:0 1.25rem;align-items:start;">
+    
+    <main style="flex:1;min-width:0;">
+      <div class="calculator-workspace">
+        <section class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title"><span>🚗</span> Vehicle Financing Details</h2>
+            <span class="status-info">TILA Reg Z</span>
+          </div>
+          <form id="car-form" onsubmit="return false;">
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="vehicle-price">Vehicle Purchase Price ($)</label>
+                <input type="number" id="vehicle-price" class="form-control" value="35000" min="500" max="500000" step="500" oninput="runCarCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="down-payment">Cash Down Payment ($)</label>
+                <input type="number" id="down-payment" class="form-control" value="5000" min="0" max="500000" step="250" oninput="runCarCalc()">
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="trade-value">Trade-In Allowance Value ($)</label>
+                <input type="number" id="trade-value" class="form-control" value="8000" min="0" max="200000" step="500" oninput="runCarCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="trade-owed">Amount Owed on Trade-In ($)</label>
+                <input type="number" id="trade-owed" class="form-control" value="0" min="0" max="200000" step="250" oninput="runCarCalc()">
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="interest-rate">Annual Interest Rate - APR (%)</label>
+                <input type="number" id="interest-rate" class="form-control" value="6.49" min="0" max="35" step="0.05" oninput="runCarCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="loan-term">Loan Term (Months)</label>
+                <select id="loan-term" class="form-control" onchange="runCarCalc()">
+                  <option value="36">36 Months (3 Years)</option>
+                  <option value="48">48 Months (4 Years)</option>
+                  <option value="60" selected>60 Months (5 Years)</option>
+                  <option value="72">72 Months (6 Years)</option>
+                  <option value="84">84 Months (7 Years)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="sales-tax">State &amp; Local Sales Tax (%)</label>
+                <input type="number" id="sales-tax" class="form-control" value="7.0" min="0" max="15" step="0.1" oninput="runCarCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="dealer-fees">Dealer Doc, Title &amp; Reg Fees ($)</label>
+                <input type="number" id="dealer-fees" class="form-control" value="650" min="0" max="5000" step="50" oninput="runCarCalc()">
+              </div>
+            </div>
+
+            <div class="calc-actions" style="margin-top:1.5rem;display:flex;gap:1rem;">
+              <button type="button" class="btn btn-primary" onclick="runCarCalc()">Calculate Monthly Payment</button>
+              <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Print Report</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="results-card">
+          <h2 class="results-title">Payment &amp; Cost Breakdown</h2>
+          <div class="primary-result-box" style="margin-bottom:1.5rem;text-align:center;padding:1.5rem;border-radius:12px;background:#F8FAFC;border:2px solid #E2E8F0;">
+            <div class="primary-result-label" style="font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em;color:#64748B;">Monthly Payment</div>
+            <div id="res-monthly-pmt" class="primary-result-value" style="font-size:2.5rem;font-weight:800;color:#2563EB;margin:0.25rem 0;">$480.14 / mo</div>
+            <div id="res-term-badge" style="font-size:0.85rem;color:#64748B;font-weight:600;">60 Payments at 6.49% APR</div>
+          </div>
+
+          <div class="result-details-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Net Financed Amount</span>
+              <span id="res-net-financed" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">$24,540.00</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Total Finance Interest</span>
+              <span id="res-total-interest" class="result-val" style="font-size:1.1rem;font-weight:700;color:#DC2626;">$4,268.40</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Sales Tax Charged</span>
+              <span id="res-tax-paid" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">$1,890.00</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Total Purchase Cost</span>
+              <span id="res-total-cost" class="result-val" style="font-size:1.1rem;font-weight:700;color:#059669;">$33,808.40</span>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem;padding:0.85rem;border-radius:8px;background:#ECFDF5;border:1px solid #A7F3D0;font-size:0.85rem;color:#065F46;">
+            <strong>💵 Trade-In Tax Benefit:</strong> Trading in your vehicle saved approximately <strong><span id="res-tax-saved">$560.00</span></strong> in sales tax compared to buying without a trade-in!
+          </div>
+        </section>
+      </div>
+
+      <!-- In-Depth Technical Article (1,200+ words) -->
+      <article class="article-section" style="margin-top:2.5rem;line-height:1.7;color:#334155;">
+        <h2>Authoritative Guide to Auto Loan Amortization, Taxes &amp; Vehicle Financing</h2>
+        <p>
+          Purchasing an automobile is frequently the second-largest household expenditure after residential homeownership. Yet, dealership financing offices remain one of the most opaque environments for consumers. Dealership F&amp;I (Finance and Insurance) managers routinely manipulate loan variables—extending loan terms from 48 months to 72 or 84 months, packing doc fees, rolling over negative equity, or altering trade-in allowances—to arrive at an enticing "monthly payment" that conceals thousands of dollars in hidden finance charges. To protect yourself and make sound financial decisions, you must understand the actuarial mathematics governing vehicle loan amortization under the <strong>Federal Truth in Lending Act (TILA / Regulation Z)</strong>.
+        </p>
+
+        <h3>The Auto Loan Amortization Formula</h3>
+        <p>
+          Automobile installment loans are structured on a monthly reducing-balance amortization schedule. The fixed monthly payment ($M$) is calculated mathematically using the standard annuity formula:
+        </p>
+        <p>$$M = P \left[ \frac{r(1+r)^n}{(1+r)^n - 1} \right]$$</p>
+        <p>Where the parameters represent:</p>
+        <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+          <li>$P$ = Net Principal Amount Financed (the exact balance borrowed from the lender)</li>
+          <li>$r$ = Monthly periodic interest rate, calculated as $\frac{\text{APR}}{12 \times 100}$</li>
+          <li>$n$ = Total loan tenure in months (e.g., 36, 48, 60, 72, or 84 months)</li>
+        </ul>
+
+        <h3>Determining the Net Financed Amount ($P$)</h3>
+        <p>
+          The principal balance $P$ is not simply the vehicle sticker price. It incorporates down payments, trade-in equity, sales taxes, and registration fees:
+        </p>
+        <p>$$\text{Net Trade Equity} = \text{Trade-In Allowance} - \text{Amount Owed on Trade}$$</p>
+        <p>$$\text{Taxable Vehicle Base} = \text{Purchase Price} - \text{Trade-In Allowance} \quad \text{(in tax-credit states)}$$</p>
+        <p>$$\text{Sales Tax} = \text{Taxable Vehicle Base} \times \left( \frac{\text{Tax Rate \%}}{100} \right)$$</p>
+        <p>$$P = (\text{Purchase Price} - \text{Down Payment} - \text{Net Trade Equity}) + \text{Sales Tax} + \text{Dealer Fees}$$</p>
+        <p>
+          For general personal loans and mortgages, cross-reference your figures with our <a href="loan-emi-calculator.html">Loan EMI Calculator</a> and explore home financing with the <a href="mortgage-calculator.html">Mortgage Calculator</a>.
+        </p>
+
+        <h3>The State Trade-In Sales Tax Advantage</h3>
+        <p>
+          In 42 out of 50 US states, state tax codes grant a major incentive known as the <strong>Trade-In Sales Tax Credit</strong>. When you trade in an existing vehicle at a licensed automobile dealership, sales tax is assessed only on the net difference between the purchase price and the trade-in allowance, rather than the full transaction price:
+        </p>
+        <table class="reference-table" style="width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.9rem;">
+          <thead>
+            <tr style="background:#F1F5F9;text-align:left;">
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Scenario</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Purchase Price</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Trade-In Value</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Taxable Basis</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Sales Tax (at 7.5%)</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Direct Tax Savings</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Private Sale (No Trade)</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$40,000</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$0 (Sold privately)</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$40,000</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$3,000.00</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$0.00 (Base)</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Dealer Trade-In ($12,000)</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$40,000</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$12,000</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$28,000</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$2,100.00</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>+$900.00 saved</strong></td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Dealer Trade-In ($20,000)</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$40,000</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$20,000</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$20,000</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$1,500.00</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>+$1,500.00 saved</strong></td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          This tax credit means that selling a car privately for \$13,000 might actually net you less than accepting a \$12,200 dealer trade offer once the \$900 sales tax credit and private selling transaction costs are factored in!
+        </p>
+
+        <h3>The Danger of Long-Term Loans (72 &amp; 84 Months)</h3>
+        <p>
+          Over the past decade, the average auto loan duration in the United States has expanded from 48-60 months to nearly 70 months, with 84-month (7-year) loans becoming widespread. While extended terms reduce the monthly payment, they introduce severe economic risks:
+        </p>
+        <div class="worked-example-card" style="background:#F8FAFC;border-left:4px solid #2563EB;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#1E293B;">Loan Term Comparison ($30,000 Loan at 7.0% APR):</h4>
+          <ul style="margin:0;padding-left:1.25rem;">
+            <li><strong>48 Months (4 Years):</strong> Monthly Payment: <strong>$718.39</strong> | Total Interest: <strong>$4,482.72</strong></li>
+            <li><strong>60 Months (5 Years):</strong> Monthly Payment: <strong>$594.04</strong> | Total Interest: <strong>$5,642.40</strong> (+$1,160 interest)</li>
+            <li><strong>72 Months (6 Years):</strong> Monthly Payment: <strong>$511.45</strong> | Total Interest: <strong>$6,824.40</strong> (+$2,342 interest)</li>
+            <li><strong>84 Months (7 Years):</strong> Monthly Payment: <strong>$452.73</strong> | Total Interest: <strong>$8,029.32</strong> (+$3,547 interest)</li>
+          </ul>
+        </div>
+        <p>
+          On an 84-month loan, the vehicle's market value depreciates by 20% in year one and roughly 15% each subsequent year. By year three or four, the vehicle is worth significantly less than the remaining loan balance—a condition known as <strong>negative equity (being "underwater")</strong>. If the vehicle is totaled in an accident or stolen, the auto insurance payout only covers fair market value, leaving the borrower personally responsible for the remaining thousands of dollars unless expensive Guaranteed Asset Protection (GAP) insurance was purchased. To model compounding wealth rather than debt interest, visit our <a href="compound-interest-calculator.html">Compound Interest Calculator</a>.
+        </p>
+
+        <h3>Worked Practical Example: Purchasing a New Family SUV</h3>
+        <div class="worked-example-card" style="background:#F0FDF4;border-left:4px solid #16A34A;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#14532D;">Real-World Dealership Financial Breakdown:</h4>
+          <p><strong>Transaction Scenario:</strong> A buyer negotiates a new SUV with the following terms:</p>
+          <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+            <li>Negotiated Vehicle Price: $42,000</li>
+            <li>Cash Down Payment: $6,000</li>
+            <li>Trade-In Allowance: $10,000 (Trade loan balance owed: $2,000)</li>
+            <li>State Sales Tax Rate: 6.5%</li>
+            <li>Dealer Documentation &amp; Title Fees: $650</li>
+            <li>Financing: 60-Month Auto Loan at 5.9% APR</li>
+          </ul>
+          <p><strong>Step 1: Calculate Net Trade Equity &amp; Taxable Basis:</strong></p>
+          <p>$$\text{Net Trade Equity} = \$10,000 - \$2,000 = \$8,000$$</p>
+          <p>$$\text{Taxable Base} = \$42,000 - \$10,000 = \$32,000$$</p>
+          <p>$$\text{Sales Tax} = \$32,000 \times 0.065 = \$2,080$$</p>
+          <p><strong>Step 2: Determine Total Financed Principal ($P$):</strong></p>
+          <p>$$P = (\$42,000 - \$6,000 - \$8,000) + \$2,080 + \$650 = \$28,000 + \$2,730 = \$30,730$$</p>
+          <p><strong>Step 3: Calculate Monthly Amortized Payment ($M$):</strong></p>
+          <p>Monthly rate $r = \frac{0.059}{12} = 0.0049167$, $n = 60$</p>
+          <p>$$M = 30,730 \times \left[ \frac{0.0049167 \times (1.0049167)^{60}}{(1.0049167)^{60} - 1} \right] = 30,730 \times 0.019286 = \$592.66 / \text{month}$$</p>
+          <p><strong>Step 4: Financial Summary:</strong></p>
+          <p>Total payments over 5 years: $60 \times \$592.66 = \$35,559.60$.</p>
+          <p>Total finance interest paid: $\$35,559.60 - \$30,730 = \$4,829.60$.</p>
+        </div>
+
+        <p>
+          For wage budgeting and take-home pay analysis, check your paycheck with our <a href="salary-calculator.html">Salary Calculator</a>, evaluate retail promotions with our <a href="discount-calculator.html">Discount Calculator</a>, and calculate dining gratuities with our <a href="tip-calculator.html">Tip Calculator</a>.
+        </p>
+
+        <!-- Technical FAQs -->
+        <div class="faq-container" style="margin-top:2.5rem;">
+          <h3 style="margin-bottom:1rem;color:#0F172A;">Frequently Asked Questions About Car Loans</h3>
+          
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">How does trading in a vehicle reduce auto loan sales tax?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              In most US states and jurisdictions, sales tax is assessed only on the net difference between the purchase price and the trade-in allowance. For example, purchasing a $35,000 vehicle with a $10,000 trade-in in an 8% tax state means you only pay tax on $25,000, saving $800 in cash.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What is negative equity or an 'underwater' car loan?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Negative equity occurs when you owe more on your existing vehicle than its current market trade-in value. If you owe $15,000 on a car worth $12,000, you have $3,000 in negative equity that must either be paid out-of-pocket or rolled into the new auto loan.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">Why is a 48-month or 60-month auto loan better than a 72-month or 84-month loan?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              While 72- and 84-month terms lower the monthly payment, vehicles depreciate faster than the principal balance decreases during the initial years. Long terms result in significantly higher cumulative interest and leave borrowers trapped in negative equity for years.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What extra fees should be accounted for when buying a car?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Beyond the negotiated sticker price, buyers must budget for state sales tax, dealer documentation fees ($100 to $800 depending on state caps), title and registration fees, and optional protections such as GAP insurance.
+            </div>
+          </details>
+        </div>
+      </article>
+    </main>
+
+    <!-- Post Sidebar -->
+    <aside class="post-sidebar" style="width:300px;flex-shrink:0;">
+      <div class="sidebar-widget" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;">
+        <div class="sidebar-widget-header" style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+          <span class="widget-icon" style="font-size:1.25rem;">🏦</span>
+          <h3 class="widget-title" style="margin:0;font-size:1.05rem;color:#0F172A;">Finance &amp; Lending Suite</h3>
+        </div>
+        <div class="sidebar-widget-subtitle" style="font-size:0.8rem;color:#64748B;margin-bottom:1rem;">Verified consumer finance &amp; lending tools:</div>
+        <ul class="sidebar-tools-list" style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+          <li><a href="car-loan-calculator.html" class="sidebar-tool-item active" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;background:#EFF6FF;color:#2563EB;text-decoration:none;font-size:0.85rem;font-weight:600;">🚗 Car Loan &amp; Auto Financing</a></li>
+          <li><a href="mortgage-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🏡 Mortgage &amp; PITI</a></li>
+          <li><a href="loan-emi-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🏦 Loan EMI Calculator</a></li>
+          <li><a href="compound-interest-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">📈 Compound Interest</a></li>
+          <li><a href="salary-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">💼 Salary &amp; Paycheck</a></li>
+          <li><a href="tip-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🍽️ Tip &amp; Bill Split</a></li>
+          <li><a href="simple-interest-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">💰 Simple Interest</a></li>
+          <li><a href="discount-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🏷️ Discount &amp; Sale</a></li>
+        </ul>
+        <div class="sidebar-widget-footer" style="margin-top:1.25rem;padding-top:0.75rem;border-top:1px solid #E2E8F0;text-align:center;">
+          <a href="finance.html" class="sidebar-cat-link" style="color:#2563EB;font-weight:600;font-size:0.85rem;text-decoration:none;">Explore Finance Hub &rarr;</a>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <span class="logo-badge">∑</span>
+            <span>Calc<span class="accent">Hub</span></span>
+          </a>
+          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Finance &amp; Loans</h4>
+          <ul class="footer-links">
+            <li><a href="car-loan-calculator.html">Car Loan Calculator</a></li>
+            <li><a href="mortgage-calculator.html">Mortgage &amp; PITI</a></li>
+            <li><a href="loan-emi-calculator.html">Loan EMI Calculator</a></li>
+            <li><a href="compound-interest-calculator.html">Compound Interest</a></li>
+            <li><a href="salary-calculator.html">Salary Paycheck</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Financial Suites</h4>
+          <ul class="footer-links">
+            <li><a href="finance.html">Finance &amp; Investment</a></li>
+            <li><a href="health.html">Health &amp; Fitness</a></li>
+            <li><a href="math.html">Math &amp; Statistics</a></li>
+            <li><a href="engineering.html">Electrical Engineering</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Financial calculations are for informational purposes.</p>
+        <div>
+          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
+          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy &amp; Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function runCarCalc() {
+      const price = parseFloat(document.getElementById('vehicle-price').value) || 0;
+      const downPmt = parseFloat(document.getElementById('down-payment').value) || 0;
+      const tradeVal = parseFloat(document.getElementById('trade-value').value) || 0;
+      const tradeOwed = parseFloat(document.getElementById('trade-owed').value) || 0;
+      const apr = parseFloat(document.getElementById('interest-rate').value) || 0;
+      const term = parseInt(document.getElementById('loan-term').value) || 60;
+      const taxRate = (parseFloat(document.getElementById('sales-tax').value) || 0) / 100;
+      const fees = parseFloat(document.getElementById('dealer-fees').value) || 0;
+
+      // Net trade equity
+      const netTradeEquity = tradeVal - tradeOwed;
+
+      // Sales tax on price minus trade value (standard trade-in tax credit)
+      const taxableBase = Math.max(0, price - tradeVal);
+      const salesTaxAmt = taxableBase * taxRate;
+      const taxSaved = tradeVal * taxRate;
+
+      // Total Net Financed Principal:
+      // (Price - DownPayment - NetTradeEquity) + SalesTax + Fees
+      const netFinanced = Math.max(0, (price - downPmt - netTradeEquity) + salesTaxAmt + fees);
+
+      // Monthly payment:
+      let monthlyPmt = 0;
+      if (apr > 0) {
+        const r = (apr / 100) / 12;
+        monthlyPmt = netFinanced * (r * Math.pow(1 + r, term)) / (Math.pow(1 + r, term) - 1);
+      } else {
+        monthlyPmt = netFinanced / term;
+      }
+
+      const totalPayments = monthlyPmt * term;
+      const totalInterest = Math.max(0, totalPayments - netFinanced);
+      const totalCost = totalPayments + downPmt;
+
+      document.getElementById('res-monthly-pmt').textContent = '$' + monthlyPmt.toFixed(2) + ' / mo';
+      document.getElementById('res-term-badge').textContent = term + ' Payments at ' + apr.toFixed(2) + '% APR';
+      document.getElementById('res-net-financed').textContent = '$' + netFinanced.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('res-total-interest').textContent = '$' + totalInterest.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('res-tax-paid').textContent = '$' + salesTaxAmt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('res-total-cost').textContent = '$' + totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('res-tax-saved').textContent = '$' + taxSaved.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    window.addEventListener('DOMContentLoaded', runCarCalc);
+  </script>
+</body>
+</html>
+"""
+
+with open("car-loan-calculator.html", "w", encoding="utf-8") as f:
+    f.write(TOOL_CAR_LOAN)
+
+print("car-loan-calculator.html generated successfully!")
