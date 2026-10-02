@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BMR Calculator (Basal Metabolic Rate) — Mifflin-St Jeor &amp; Katch-McArdle</title>
+  <meta name="description" content="Calculate your true Basal Metabolic Rate (BMR) using clinical Mifflin-St Jeor, Revised Harris-Benedict, and Katch-McArdle formulas. Determine baseline calories burned at rest.">
+  <meta name="keywords" content="bmr calculator, basal metabolic rate calculator, mifflin st jeor bmr, katch mcardle calculator, resting metabolic rate rmr, calories burned at rest">
+  <link rel="canonical" href="https://calchub.org/bmr-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Clinical Basal Metabolic Rate (BMR) Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "HealthApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates baseline resting caloric expenditure using Mifflin-St Jeor and Katch-McArdle metabolic equations."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the difference between BMR and TDEE?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Basal Metabolic Rate (BMR) is the minimal number of calories your body burns at complete physical and digestive rest just to keep vital organs functioning (brain, heart, lungs, kidneys). Total Daily Energy Expenditure (TDEE) adds the energy cost of daily movement, physical exercise, and the thermic effect of digesting food to your BMR."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which BMR formula is considered the most clinically accurate?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The American Dietetic Association (ADA) and clinical research identify the Mifflin-St Jeor formula as the most reliable predictor of resting metabolic rate in healthy adults, estimating within 10% of measured indirect calorimetry. For athletic individuals with low body fat, the Katch-McArdle formula based on lean body mass is superior."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can you eat fewer calories than your BMR to lose weight faster?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Consistently eating below your BMR is medically discouraged. Severe caloric restriction triggers adaptive thermogenesis ('starvation response'), slowing down thyroid output, causing hormonal disruption, menstrual irregularities, muscle tissue catabolism, and severe metabolic slowdown."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does lean muscle mass increase your basal metabolic rate?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Skeletal muscle is metabolically active tissue, burning approximately 6 calories per pound (13 kcal/kg) per day at complete rest, compared to adipose fat tissue which burns only about 2 calories per pound (4.5 kcal/kg). Gaining lean muscle mass permanently elevates your baseline resting BMR."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="cat-theme-health">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="health.html" class="nav-link active">⚖️ Health</a>
+          <a href="finance.html" class="nav-link">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+        </div>
+        <div class="nav-row">
+          <a href="civil.html" class="nav-link">🏗️ Civil</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="calc-page-header">
+    <div class="calc-page-header-inner">
+      <span class="category-tag">🩺 Clinical Anthropometrics &amp; Metabolism</span>
+      <h1 class="calc-page-title">BMR Calculator</h1>
+      <p class="calc-page-desc">Determine your baseline resting energy expenditure using clinical Mifflin-St Jeor, Harris-Benedict, and lean-mass Katch-McArdle metabolic equations.</p>
+    </div>
+  </div>
+
+  <div class="layout-container" style="display:flex;gap:2rem;max-width:1200px;margin:2rem auto;padding:0 1.25rem;align-items:start;">
+    
+    <main style="flex:1;min-width:0;">
+      <div class="calculator-workspace">
+        <section class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title"><span>🧬</span> Physiological Inputs</h2>
+            <span class="status-info">Mifflin-St Jeor</span>
+          </div>
+          <form id="bmr-form" onsubmit="return false;">
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="unit-sys">Unit System</label>
+                <select id="unit-sys" class="form-control" onchange="toggleBmrUnits()">
+                  <option value="metric" selected>Metric (kg, cm)</option>
+                  <option value="imperial">Imperial (lbs, ft &amp; inches)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="user-gender">Biological Sex</label>
+                <select id="user-gender" class="form-control" onchange="runBmrCalc()">
+                  <option value="male" selected>Male (XY Chromosome)</option>
+                  <option value="female">Female (XX Chromosome)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="user-age">Age (Years)</label>
+                <input type="number" id="user-age" class="form-control" value="30" min="15" max="105" step="1" oninput="runBmrCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" id="lbl-weight" for="user-weight">Weight (kg)</label>
+                <input type="number" id="user-weight" class="form-control" value="75" min="25" max="300" step="0.5" oninput="runBmrCalc()">
+              </div>
+            </div>
+
+            <div class="calc-fields-grid" id="height-metric-box">
+              <div class="form-group">
+                <label class="form-label" for="user-height-cm">Height (cm)</label>
+                <input type="number" id="user-height-cm" class="form-control" value="178" min="80" max="250" step="1" oninput="runBmrCalc()">
+              </div>
+            </div>
+
+            <div class="calc-fields-grid" id="height-imperial-box" style="display:none;">
+              <div class="form-group">
+                <label class="form-label" for="user-height-ft">Height (Feet)</label>
+                <input type="number" id="user-height-ft" class="form-control" value="5" min="3" max="7" step="1" oninput="runBmrCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="user-height-in">Height (Inches)</label>
+                <input type="number" id="user-height-in" class="form-control" value="10" min="0" max="11" step="1" oninput="runBmrCalc()">
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="user-bodyfat">Body Fat % (Optional for Katch-McArdle)</label>
+                <input type="number" id="user-bodyfat" class="form-control" value="18" min="3" max="65" step="0.5" oninput="runBmrCalc()">
+              </div>
+            </div>
+
+            <div class="calc-actions" style="margin-top:1.5rem;display:flex;gap:1rem;">
+              <button type="button" class="btn btn-primary" onclick="runBmrCalc()">Calculate BMR</button>
+              <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Print Report</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="results-card">
+          <h2 class="results-title">Resting Metabolism Summary</h2>
+          <div class="primary-result-box" style="margin-bottom:1.5rem;text-align:center;padding:1.5rem;border-radius:12px;background:#F8FAFC;border:2px solid #E2E8F0;">
+            <div class="primary-result-label" style="font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em;color:#64748B;">Basal Metabolic Rate (Mifflin-St Jeor)</div>
+            <div id="res-bmr-main" class="primary-result-value" style="font-size:2.5rem;font-weight:800;color:#059669;margin:0.25rem 0;">1,723 kcal / day</div>
+            <div style="font-size:0.85rem;color:#64748B;font-weight:600;">Energy required to sustain organ life in coma state</div>
+          </div>
+
+          <div class="result-details-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Katch-McArdle (Lean Mass)</span>
+              <span id="res-bmr-katch" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">1,725 kcal</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Harris-Benedict (Revised)</span>
+              <span id="res-bmr-harris" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">1,756 kcal</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Hourly Resting Burn Rate</span>
+              <span id="res-bmr-hourly" class="result-val" style="font-size:1.1rem;font-weight:700;color:#2563EB;">71.8 kcal / hr</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Sedentary Maintenance (1.2&times;)</span>
+              <span id="res-bmr-sedentary" class="result-val" style="font-size:1.1rem;font-weight:700;color:#059669;">2,068 kcal</span>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem;padding:0.85rem;border-radius:8px;background:#ECFDF5;border:1px solid #A7F3D0;font-size:0.85rem;color:#065F46;">
+            <strong>🍎 Daily Energy Balance:</strong> To add workout expenditures and diet deficit/surplus goals, explore our <a href="calorie-calculator.html" style="color:#065F46;font-weight:700;">Calorie Calculator (TDEE)</a> and split macros using the <a href="macro-calculator.html" style="color:#065F46;font-weight:700;">Macro Calculator</a>.
+          </div>
+        </section>
+      </div>
+
+      <!-- In-Depth Technical Article (1,200+ words) -->
+      <article class="article-section" style="margin-top:2.5rem;line-height:1.7;color:#334155;">
+        <h2>Clinical Understanding of Basal Metabolic Rate (BMR) &amp; Human Energetics</h2>
+        <p>
+          The human body is an exquisite, continuous biochemical furnace. Even when you are asleep in a dark room at neutral thermal temperature, your physiological systems are tirelessly expending chemical energy. The brain consumes massive amounts of glucose to maintain neuronal membrane potentials; the myocardium pumps blood continuously through thousands of miles of vascular capillaries; the liver filters toxins and synthesizes glycogen; the kidneys perform glomerular filtration; and cells across every organ actively synthesize adenosine triphosphate (ATP) to drive active ion transport. The minimal baseline energy required to sustain these vegetative cellular processes under complete physical, digestive, and psychological rest is defined clinically as the <strong>Basal Metabolic Rate (BMR)</strong> or <strong>Resting Metabolic Rate (RMR)</strong>.
+        </p>
+
+        <h3>BMR Mathematical Formulations Compared</h3>
+        <p>
+          While the gold standard for measuring BMR in clinical metabolic wards is <strong>indirect calorimetry</strong> (measuring volume of oxygen consumed, $VO_2$, and carbon dioxide exhaled, $VCO_2$, via a Douglas bag or ventilated hood), sports scientists and endocrinologists rely on validated predictive regression equations:
+        </p>
+
+        <div class="worked-example-card" style="background:#F8FAFC;border-left:4px solid #2563EB;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#1E293B;">1. The Mifflin-St Jeor Formula (Clinical Gold Standard, 1990)</h4>
+          <p>Adopted by the Academy of Nutrition and Dietetics as the most accurate predictor for general populations:</p>
+          <p>$$\text{BMR}_{\text{Male}} = (10 \times \text{weight in kg}) + (6.25 \times \text{height in cm}) - (5 \times \text{age in years}) + 5$$</p>
+          <p>$$\text{BMR}_{\text{Female}} = (10 \times \text{weight in kg}) + (6.25 \times \text{height in cm}) - (5 \times \text{age in years}) - 161$$</p>
+        </div>
+
+        <div class="worked-example-card" style="background:#F8FAFC;border-left:4px solid #059669;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#065F46;">2. The Katch-McArdle Formula (Lean Mass Specific)</h4>
+          <p>Unlike formulas that rely on total scale weight, Katch-McArdle isolates <strong>Fat-Free Mass (FFM / Lean Body Mass)</strong> in kilograms. Because adipose fat tissue has very low metabolic activity while skeletal muscle and organs burn the vast majority of calories, this formula is identical for both men and women:</p>
+          <p>$$\text{BMR} = 370 + (21.6 \times \text{Lean Body Mass in kg})$$</p>
+          <p>Where $\text{LBM} = \text{Weight in kg} \times \left(1 - \frac{\text{Body Fat \%}}{100}\right)$. Calculate your exact tape body fat with our <a href="body-fat-calculator.html">Body Fat Calculator</a>.</p>
+        </div>
+
+        <div class="worked-example-card" style="background:#F8FAFC;border-left:4px solid #D97706;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#78350F;">3. The Revised Harris-Benedict Equation (Roza &amp; Shizgal, 1984)</h4>
+          <p>A statistical recalibration of the classic 1919 Carnegie Institute dataset:</p>
+          <p>$$\text{BMR}_{\text{Male}} = 88.362 + (13.397 \times \text{kg}) + (4.799 \times \text{cm}) - (5.677 \times \text{age})$$</p>
+          <p>$$\text{BMR}_{\text{Female}} = 447.593 + (9.247 \times \text{kg}) + (3.098 \times \text{cm}) - (4.330 \times \text{age})$$</p>
+        </div>
+
+        <h3>Organ-by-Organ Breakdown of Resting Caloric Expenditure</h3>
+        <p>
+          Where do your basal calories actually go? It is a common misconception that skeletal muscles consume the majority of resting energy. In reality, internal visceral organs account for over 70% of your daily basal energy burn despite making up less than 6% of your total body mass:
+        </p>
+        <table class="reference-table" style="width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.9rem;">
+          <thead>
+            <tr style="background:#F1F5F9;text-align:left;">
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Internal Organ</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">% of Body Weight</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">% of Basal Metabolic Rate</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Metabolic Rate (kcal/kg/day)</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Primary Physiological Function</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Liver</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">~2.6%</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>27%</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">200 kcal/kg</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Gluconeogenesis, protein synthesis, detoxification</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Brain</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">~2.0%</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>19%</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">240 kcal/kg</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Sodium-potassium ion pumping, neurotransmission</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Skeletal Muscle</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">~40.0%</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>18%</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">13 kcal/kg</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Resting tone, glycogen stores, protein turnover</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Kidneys</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">~0.5%</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>10%</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">440 kcal/kg</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Active electrolyte transport &amp; blood filtration</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Heart</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">~0.5%</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>7%</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">440 kcal/kg</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Continuous rhythmic mechanical contraction</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Adipose Fat Tissue</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">15 – 35%</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>4 – 5%</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">4.5 kcal/kg</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Lipid triglyceride storage &amp; endocrine signaling</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Why Eating Below Your BMR Causes Metabolic Adaptation</h3>
+        <p>
+          In desperate attempts to accelerate weight loss, dieters frequently cut their caloric intake dramatically below their calculated BMR (e.g., eating 800 or 1,000 calories per day when their BMR is 1,600 kcal). Endocrinologists refer to the consequences as <strong>adaptive thermogenesis</strong>:
+        </p>
+        <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+          <li><strong>Thyroid Suppression:</strong> Circulating active triiodothyronine (T3) levels collapse, reducing the metabolic rate of cells across the entire body.</li>
+          <li><strong>Leptin Collapse &amp; Ghrelin Surge:</strong> Hunger hormones spike to emergency evolutionary levels, causing intense food cravings and uncontrollable binge eating episodes.</li>
+          <li><strong>Lean Muscle Catabolism:</strong> Because the body cannot extract fatty acids quickly enough to meet urgent energy needs, cortisol rises and breaks down skeletal muscle tissue through gluconeogenesis, permanently lowering your post-diet BMR.</li>
+          <li><strong>Spontaneous NEAT Suppression:</strong> Non-Exercise Activity Thermogenesis (fidgeting, pacing, upright posture) drops sub-consciously to conserve calories, leaving the individual fatigued and sluggish.</li>
+        </ul>
+        <p>
+          To lose body fat safely without wrecking your metabolic engine, aim for a moderate deficit of 300 to 500 kcal below your <em>Total Daily Energy Expenditure (TDEE)</em>, while keeping daily intake at or slightly above your baseline BMR. Verify your healthy clinical weight band using our <a href="bmi-calculator.html">BMI Calculator</a> and check target weights with our <a href="ideal-weight-calculator.html">Ideal Body Weight Calculator</a>.
+        </p>
+
+        <h3>Worked Practical Example: Male Office Worker vs Bodybuilder</h3>
+        <div class="worked-example-card" style="background:#F0FDF4;border-left:4px solid #16A34A;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#14532D;">Comparative Metabolic Case Study:</h4>
+          <p><strong>Case Profile:</strong> Consider two 30-year-old males who both weigh 90 kg (198.4 lbs) and stand 180 cm tall (5 ft 11 in):</p>
+          <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+            <li><strong>Subject 1 (Sedentary Office Worker):</strong> Body Fat = 28% (Lean Mass = $90 \times (1 - 0.28) = 64.8 \text{ kg}$)</li>
+            <li><strong>Subject 2 (Trained Natural Bodybuilder):</strong> Body Fat = 10% (Lean Mass = $90 \times (1 - 0.10) = 81.0 \text{ kg}$)</li>
+          </ul>
+          <p><strong>Mifflin-St Jeor Prediction (ignores body composition):</strong></p>
+          <p>$$\text{BMR} = (10 \times 90) + (6.25 \times 180) - (5 \times 30) + 5 = 900 + 1125 - 150 + 5 = \mathbf{1,880 \text{ kcal/day}}$$</p>
+          <p>Mifflin predicts both men burn the exact same 1,880 kcal at rest.</p>
+          <p><strong>Katch-McArdle Prediction (accounts for muscle mass):</strong></p>
+          <p>$$\text{BMR}_{\text{Subject 1}} = 370 + (21.6 \times 64.8) = 370 + 1399.7 = \mathbf{1,770 \text{ kcal/day}}$$</p>
+          <p>$$\text{BMR}_{\text{Subject 2}} = 370 + (21.6 \times 81.0) = 370 + 1749.6 = \mathbf{2,120 \text{ kcal/day}}$$</p>
+          <p>Because the bodybuilder carries 16.2 kg more metabolically active lean tissue, his body burns an extra <strong>350 kcal every single day at complete rest</strong>—equivalent to running 3.5 miles without taking a single step!</p>
+        </div>
+
+        <p>
+          For optimal athletic performance and body recomposition, structure your daily macronutrients with our <a href="macro-calculator.html">Macro Calculator</a> and optimize daily hydration with our <a href="water-intake-calculator.html">Water Intake Calculator</a>.
+        </p>
+
+        <!-- Technical FAQs -->
+        <div class="faq-container" style="margin-top:2.5rem;">
+          <h3 style="margin-bottom:1rem;color:#0F172A;">Frequently Asked Questions About BMR</h3>
+          
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What is the difference between BMR and TDEE?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Basal Metabolic Rate (BMR) is the minimal number of calories your body burns at complete physical and digestive rest just to keep vital organs functioning (brain, heart, lungs, kidneys). Total Daily Energy Expenditure (TDEE) adds the energy cost of daily movement, physical exercise, and the thermic effect of digesting food to your BMR.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">Which BMR formula is considered the most clinically accurate?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              The American Dietetic Association (ADA) and clinical research identify the Mifflin-St Jeor formula as the most reliable predictor of resting metabolic rate in healthy adults, estimating within 10% of measured indirect calorimetry. For athletic individuals with low body fat, the Katch-McArdle formula based on lean body mass is superior.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">Can you eat fewer calories than your BMR to lose weight faster?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Consistently eating below your BMR is medically discouraged. Severe caloric restriction triggers adaptive thermogenesis ('starvation response'), slowing down thyroid output, causing hormonal disruption, menstrual irregularities, muscle tissue catabolism, and severe metabolic slowdown.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">How does lean muscle mass increase your basal metabolic rate?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Skeletal muscle is metabolically active tissue, burning approximately 6 calories per pound (13 kcal/kg) per day at complete rest, compared to adipose fat tissue which burns only about 2 calories per pound (4.5 kcal/kg). Gaining lean muscle mass permanently elevates your baseline resting BMR.
+            </div>
+          </details>
+        </div>
+      </article>
+    </main>
+
+          <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚖️</span>
+            <h3 class="widget-title">Related Health & Fitness</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bmr-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> BMR Calculator</a></li>
+            <li><a href="macro-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Macro Split Calculator</a></li>
+            <li><a href="calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Calculator (TDEE)</a></li>
+            <li><a href="bmi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Daily Water Intake</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="health.html" class="sidebar-category-link">View All Health & Fitness Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <span class="logo-badge">∑</span>
+            <span>Calc<span class="accent">Hub</span></span>
+          </a>
+          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Metabolism &amp; Fitness</h4>
+          <ul class="footer-links">
+            <li><a href="bmr-calculator.html">BMR Calculator</a></li>
+            <li><a href="macro-calculator.html">Macro Split Calculator</a></li>
+            <li><a href="calorie-calculator.html">Calorie TDEE</a></li>
+            <li><a href="bmi-calculator.html">BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Clinical Suites</h4>
+          <ul class="footer-links">
+            <li><a href="health.html">Health &amp; Nutrition</a></li>
+            <li><a href="finance.html">Finance &amp; Wealth</a></li>
+            <li><a href="engineering.html">Electrical Engineering</a></li>
+            <li><a href="math.html">Math &amp; Statistics</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Medical calculations are for educational and guidance purposes.</p>
+        <div>
+          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
+          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy &amp; Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleBmrUnits() {
+      const isMetric = document.getElementById('unit-sys').value === 'metric';
+      if (isMetric) {
+        document.getElementById('lbl-weight').textContent = 'Weight (kg)';
+        document.getElementById('height-metric-box').style.display = 'grid';
+        document.getElementById('height-imperial-box').style.display = 'none';
+        document.getElementById('user-weight').value = '75';
+      } else {
+        document.getElementById('lbl-weight').textContent = 'Weight (lbs)';
+        document.getElementById('height-metric-box').style.display = 'none';
+        document.getElementById('height-imperial-box').style.display = 'grid';
+        document.getElementById('user-weight').value = '165';
+      }
+      runBmrCalc();
+    }
+
+    function runBmrCalc() {
+      const isMetric = document.getElementById('unit-sys').value === 'metric';
+      const gender = document.getElementById('user-gender').value;
+      const age = parseFloat(document.getElementById('user-age').value) || 30;
+      let weight = parseFloat(document.getElementById('user-weight').value) || 75;
+      const bfPct = parseFloat(document.getElementById('user-bodyfat').value) || 18;
+
+      let weightKg = isMetric ? weight : (weight * 0.453592);
+      let heightCm = 178;
+
+      if (isMetric) {
+        heightCm = parseFloat(document.getElementById('user-height-cm').value) || 178;
+      } else {
+        const ft = parseFloat(document.getElementById('user-height-ft').value) || 5;
+        const inch = parseFloat(document.getElementById('user-height-in').value) || 10;
+        heightCm = (ft * 12 + inch) * 2.54;
+      }
+
+      // 1. Mifflin-St Jeor
+      let bmrMifflin = (10 * weightKg) + (6.25 * heightCm) - (5 * age);
+      if (gender === 'male') {
+        bmrMifflin += 5;
+      } else {
+        bmrMifflin -= 161;
+      }
+
+      // 2. Katch-McArdle (BMR = 370 + 21.6 * LBM_kg)
+      const lbmKg = weightKg * (1 - (bfPct / 100));
+      const bmrKatch = 370 + (21.6 * lbmKg);
+
+      // 3. Revised Harris-Benedict
+      let bmrHarris = 0;
+      if (gender === 'male') {
+        bmrHarris = 88.362 + (13.397 * weightKg) + (4.799 * heightCm) - (5.677 * age);
+      } else {
+        bmrHarris = 447.593 + (9.247 * weightKg) + (3.098 * heightCm) - (4.330 * age);
+      }
+
+      const hourly = bmrMifflin / 24;
+      const sedentary = bmrMifflin * 1.2;
+
+      document.getElementById('res-bmr-main').textContent = Math.round(bmrMifflin).toLocaleString() + ' kcal / day';
+      document.getElementById('res-bmr-katch').textContent = Math.round(bmrKatch).toLocaleString() + ' kcal';
+      document.getElementById('res-bmr-harris').textContent = Math.round(bmrHarris).toLocaleString() + ' kcal';
+      document.getElementById('res-bmr-hourly').textContent = hourly.toFixed(1) + ' kcal / hr';
+      document.getElementById('res-bmr-sedentary').textContent = Math.round(sedentary).toLocaleString() + ' kcal';
+    }
+
+    window.addEventListener('DOMContentLoaded', runBmrCalc);
+  </script>
+</body>
+</html>

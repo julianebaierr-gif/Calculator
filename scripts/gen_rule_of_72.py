@@ -1,0 +1,478 @@
+"""
+Generates rule-of-72-calculator.html with 1,200+ words of financial mathematics content and working interactive calculator.
+"""
+
+TOOL_RULE72 = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rule of 72 Calculator — Investment Doubling Time &amp; Compound Growth</title>
+  <meta name="description" content="Calculate investment doubling time with the Rule of 72 vs exact logarithmic compounding. Calculate tripling (Rule of 114) and inflation purchasing power halving.">
+  <meta name="keywords" content="rule of 72 calculator, investment doubling time, compound interest doubling, rule of 72 vs exact formula, rule of 114 tripling, purchasing power halving">
+  <link rel="canonical" href="https://calchub.org/rule-of-72-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Financial Rule of 72 Compound Growth Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "FinanceApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates exact logarithmic and approximate Rule of 72 investment doubling time, Rule of 115 tripling, and inflation decay."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Why does the Rule of 72 use the number 72 instead of 69.3?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Mathematically, continuous compounding requires the natural logarithm of 2, which is approximately 0.6931 (the Rule of 69.3). However, most financial accounts compound annually or quarterly rather than continuously. For discrete annual compounding at typical market return rates (6% to 9%), the effective denominator shifts upward toward 72. Furthermore, 72 is an abundant composite number divisible by 1, 2, 3, 4, 6, 8, 9, and 12, making mental calculation effortless."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the exact mathematical formula for investment doubling time?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The exact formula derived from the future value equation FV = PV × (1 + r)^t is: t = ln(2) ÷ ln(1 + r), where r is the annual interest rate expressed as a decimal. For example, at an 8% return (r = 0.08), t = 0.693147 ÷ 0.076961 = 9.006 years, compared to 72 ÷ 8 = 9.000 years."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can the Rule of 72 be applied in reverse to estimate inflation decay?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. If inflation averages 3.0% annually, dividing 72 by 3.0 indicates that the real purchasing power of cash will be cut in half in exactly 24 years. Conversely, dividing 72 by the number of years until retirement reveals the annual rate of return needed to double your wealth."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the Rules of 115 and 144?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The Rule of 115 (based on ln(3) ≈ 1.0986) calculates the time required for an investment to triple: Years to Triple ≈ 115 ÷ Annual Rate. The Rule of 144 (based on ln(4) = 2 × ln(2) ≈ 1.386) calculates the time required for an investment to quadruple: Years to Quadruple ≈ 144 ÷ Annual Rate."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="cat-theme-finance">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="finance.html" class="nav-link active">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+          <a href="civil.html" class="nav-link">🏗️ Civil</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+        </div>
+        <div class="nav-row">
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="calc-page-header">
+    <div class="calc-page-header-inner">
+      <span class="category-tag">🏦 Wealth Building &amp; Compounding</span>
+      <h1 class="calc-page-title">Rule of 72 Calculator</h1>
+      <p class="calc-page-desc">Calculate the exact number of years required to double, triple, or quadruple your investment portfolio alongside mental math approximations.</p>
+    </div>
+  </div>
+
+  <div class="layout-container" style="display:flex;gap:2rem;max-width:1200px;margin:2rem auto;padding:0 1.25rem;align-items:start;">
+    
+    <main style="flex:1;min-width:0;">
+      <div class="calculator-workspace">
+        <section class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title"><span>📈</span> Investment Assumptions</h2>
+            <span class="status-info">Compound Doubling</span>
+          </div>
+          <form id="rule72-form" onsubmit="return false;">
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="init-principal">Initial Investment Principal ($)</label>
+                <input type="number" id="init-principal" class="form-control" value="10000" min="100" max="100000000" step="500" oninput="runRule72Calc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="growth-rate">Annual Interest / Expected Return (R%)</label>
+                <input type="number" id="growth-rate" class="form-control" value="8.0" min="0.1" max="100" step="0.1" oninput="runRule72Calc()">
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="infl-rate">Estimated Annual Inflation Rate (%)</label>
+                <input type="number" id="infl-rate" class="form-control" value="2.5" min="0" max="25" step="0.1" oninput="runRule72Calc()">
+              </div>
+            </div>
+
+            <div class="calc-actions" style="margin-top:1.5rem;display:flex;gap:1rem;">
+              <button type="button" class="btn btn-primary" onclick="runRule72Calc()">Calculate Doubling Time</button>
+              <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Print Financial Plan</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="results-card">
+          <h2 class="results-title">Compound Growth Horizon</h2>
+          
+          <div class="primary-result-box" style="margin-bottom:1.5rem;text-align:center;padding:1.5rem;border-radius:12px;background:#F8FAFC;border:2px solid #E2E8F0;">
+            <div class="primary-result-label" style="font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em;color:#64748B;">Rule of 72 Doubling Time</div>
+            <div id="res-rule72-yrs" class="primary-result-value" style="font-size:2.5rem;font-weight:800;color:#0F172A;margin:0.25rem 0;">9.00 Years</div>
+            <div id="res-doubled-val" style="font-size:0.9rem;color:#059669;font-weight:700;">Portfolio grows to $20,000.00</div>
+          </div>
+
+          <div class="result-details-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Exact Logarithmic Doubling</span>
+              <span id="res-exact-yrs" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">9.01 Years</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Rule of 115 (Tripling Time)</span>
+              <span id="res-triple-yrs" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">14.38 Years ($30,000)</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Rule of 144 (Quadrupling Time)</span>
+              <span id="res-quad-yrs" class="result-val" style="font-size:1.1rem;font-weight:700;color:#2563EB;">18.00 Years ($40,000)</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Inflation Halving Time</span>
+              <span id="res-infl-half" class="result-val" style="font-size:1.1rem;font-weight:700;color:#DC2626;">28.80 Years (at 2.5%)</span>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem;padding:0.85rem;border-radius:8px;background:#F0FDF4;border:1px solid #BBF7D0;font-size:0.85rem;color:#166534;">
+            <strong>🏦 Complete Wealth Management:</strong> Model ongoing monthly contributions with our <a href="compound-interest-calculator.html" style="color:#166534;font-weight:700;">Compound Interest Calculator</a> and calculate net annualized yield with the <a href="roi-calculator.html" style="color:#166534;font-weight:700;">ROI Calculator</a>.
+          </div>
+        </section>
+      </div>
+
+      <!-- In-Depth Technical Article (1,200+ words) -->
+      <article class="article-section" style="margin-top:2.5rem;line-height:1.7;color:#334155;">
+        <h2>The Mathematics of Geometric Growth: Rigorous Derivation and Limits of the Rule of 72</h2>
+        <p>
+          In quantitative finance and capital asset pricing, compound interest has famously been characterized as the most potent force in the economic universe. The <strong>Rule of 72</strong> is one of humanity's most enduring financial heuristics—a lightning-fast mental shortcut allowing investors, bankers, and economists to approximate how many years it will take for a given sum of invested capital to double in value at a fixed annual compound rate of return.
+        </p>
+        <p>
+          First referenced in print by Franciscan friar and mathematical pioneer <strong>Luca Pacioli</strong> in his 1494 masterwork <em>Summa de arithmetica, geometria, proportioni et proportionalita</em>, the rule predates modern electronic financial calculators by nearly five centuries. Yet beneath its deceptively simple appearance lies an elegant Taylor series expansion of the natural logarithmic function.
+        </p>
+
+        <h3>1. Mathematical Proof &amp; Logarithmic Derivation</h3>
+        <p>
+          Consider an initial capital principal $P$ invested at an annual interest rate $r$ (expressed as a decimal fraction, e.g., $0.08$ for $8\%$). Compounded once annually over $t$ years, the future value $FV$ is defined by:
+        </p>
+        <p>
+          $$FV = P \times (1 + r)^t$$
+        </p>
+        <p>
+          To determine the exact time $t$ required for the portfolio to double, we set the future value equal to twice the principal ($FV = 2P$):
+        </p>
+        <p>
+          $$2P = P \times (1 + r)^t \implies 2 = (1 + r)^t$$
+        </p>
+        <p>
+          Taking the natural logarithm ($\ln$) of both sides of the equation:
+        </p>
+        <p>
+          $$\ln(2) = \ln\left((1 + r)^t\right) = t \times \ln(1 + r)$$
+        </p>
+        <p>
+          Solving algebraically for time $t$:
+        </p>
+        <p>
+          $$t = \frac{\ln(2)}{\ln(1 + r)}$$
+        </p>
+        <p>
+          The numerator $\ln(2)$ is an irrational mathematical constant approximately equal to:
+        </p>
+        <p>
+          $$\ln(2) \approx 0.69314718$$
+        </p>
+        <p>
+          If compounding were instantaneous and continuous, the denominator would simplify directly to $r$, giving the theoretical <strong>Rule of 69.3</strong>:
+        </p>
+        <p>
+          $$t_{\text{continuous}} = \frac{0.69315}{r} = \frac{69.3}{R\%}$$
+        </p>
+
+        <h3>2. Why 72 Replaces 69.3 in Real-World Finance</h3>
+        <p>
+          If the exact natural logarithm is $69.3$, why do financial institutions universally teach the Rule of 72? The answer stems from two harmonious factors—one mathematical and one practical:
+        </p>
+        <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+          <li><strong>1. The Taylor Series Correction:</strong> In discrete annual compounding, the denominator is not $r$, but $\ln(1 + r)$. Applying the Maclaurin/Taylor series expansion for $\ln(1 + r)$:
+            $$\ln(1 + r) = r - \frac{r^2}{2} + \frac{r^3}{3} - \dots \approx r \left(1 - \frac{r}{2}\right)$$
+            Substituting this back into the doubling equation:
+            $$t = \frac{\ln(2)}{r \left(1 - \frac{r}{2}\right)} \approx \frac{0.69315}{r} \times \left(1 + \frac{r}{2}\right)$$
+            For typical market interest rates between $6\%$ and $10\%$ ($r \approx 0.08$), the factor $(1 + r/2)$ equals approximately $1.04$. Multiplying $0.69315 \times 1.04 = \mathbf{0.7208}$! Thus, for ordinary retail investing, $72$ is mathematically <em>more accurate</em> than $69.3$.
+          </li>
+          <li><strong>2. Extreme Arithmetical Divisibility:</strong> The number 72 is an abundant composite integer with twelve divisors: $1, 2, 3, 4, 6, 8, 9, 12, 18, 24, 36,$ and $72$. This allows anyone to calculate doubling horizons in their head within two seconds without a smartphone:
+            <br>&bull; At $6\%$: $72 \div 6 = \mathbf{12\text{ years}}$
+            <br>&bull; At $8\%$: $72 \div 8 = \mathbf{9\text{ years}}$
+            <br>&bull; At $9\%$: $72 \div 9 = \mathbf{8\text{ years}}$
+            <br>&bull; At $12\%$: $72 \div 12 = \mathbf{6\text{ years}}$
+          </li>
+        </ul>
+
+        <h3>3. Accuracy and Error Analysis: Rule of 72 vs. Exact Logarithm</h3>
+        <p>
+          The table below demonstrates the extraordinary precision of the Rule of 72 across standard macroeconomic interest rates:
+        </p>
+
+        <table class="reference-table" style="width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.9rem;">
+          <thead>
+            <tr style="background:#F1F5F9;text-align:left;">
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Annual Return ($R\%$)</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Exact Log Time (Years)</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Rule of 72 (Years)</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Absolute Error</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Accuracy Assessment</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>2%</strong> (High-Yield Savings)</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">35.00</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">36.00</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">+1.00 yrs</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Acceptable (Rule of 70 is closer)</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>4%</strong> (Bonds / Safe Withdrawal)</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">17.67</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">18.00</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">+0.33 yrs</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Very High Precision</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>6%</strong> (Balanced Portfolio)</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">11.90</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">12.00</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">+0.10 yrs</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Near Perfect (0.8% error)</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>8%</strong> (S&amp;P 500 Historical Avg)</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">9.01</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">9.00</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">-0.01 yrs</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Virtually Exact (&lt; 0.1% error)</strong></td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>10%</strong> (Equities Long Run)</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">7.27</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">7.20</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">-0.07 yrs</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Near Perfect (1.0% error)</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>15%</strong> (High-Growth VC / Real Estate)</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">4.96</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">4.80</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">-0.16 yrs</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Slight Underestimation</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>4. The Extended Family: Rules of 115, 144, and Inflation Decay</h3>
+        <p>
+          The logarithmic logic can be extended across all integer wealth multiples:
+        </p>
+        <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+          <li><strong>Rule of 115 (Tripling Wealth):</strong> Because $\ln(3) \approx 1.0986$, incorporating discrete compounding yields $115$. To triple your money at $8\%$, expect $115 \div 8 \approx \mathbf{14.4\text{ years}}$.</li>
+          <li><strong>Rule of 144 (Quadrupling Wealth):</strong> Since $4 = 2^2$, quadrupling simply requires two consecutive doublings: $72 \times 2 = \mathbf{144}$. At $8\%$, your money will 4x in $144 \div 8 = \mathbf{18\text{ years}}$.</li>
+          <li><strong>Inflation Purchasing Power Halving:</strong> The exact same rule applies inversely to monetary depreciation. If central bank monetary inflation runs at $3.6\%$ annually, the purchasing power of uninvested paper cash is sliced in half in exactly $72 \div 3.6 = \mathbf{20\text{ years}}$!</li>
+        </ul>
+
+        <h3>Worked Practical Example: 30-Year-Old Roth IRA Allocation</h3>
+        <div class="worked-example-card" style="background:#F0FDF4;border-left:4px solid #16A34A;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#14532D;">Retirement Doubling Horizon Case Study</h4>
+          <p><strong>Investor Scenario:</strong> A 30-year-old saver deposits $\$25,000$ into a low-cost total stock market index fund within a Roth IRA. They plan to retire at age 66 (a 36-year investment horizon) and expect an $8.0\%$ nominal annualized return.</p>
+          <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+            <li><strong>Step 1: Calculate Single Doubling Period:</strong>
+              $$t_{\text{double}} = \frac{72}{8} = \mathbf{9.0\text{ years}}$$
+            </li>
+            <li><strong>Step 2: Calculate Number of Doubling Cycles Over Horizon:</strong>
+              $$\text{Cycles} = \frac{36\text{ years}}{9.0\text{ years/cycle}} = \mathbf{4\text{ full doubling cycles}}$$
+            </li>
+            <li><strong>Step 3: Track Exponential Balance Progression:</strong>
+              <br>&bull; Age 30: $\$25,000$ (Initial Investment)
+              <br>&bull; Age 39 (Cycle 1): $\$25,000 \times 2 = \mathbf{\$50,000}$
+              <br>&bull; Age 48 (Cycle 2): $\$50,000 \times 2 = \mathbf{\$100,000}$
+              <br>&bull; Age 57 (Cycle 3): $\$100,000 \times 2 = \mathbf{\$200,000}$
+              <br>&bull; Age 66 (Cycle 4): $\$200,000 \times 2 = \mathbf{\$400,000}$
+            </li>
+            <li><strong>Key Insight:</strong> Without adding another single penny to the account, compounding transforms a modest $\$25,000$ nest egg into $\$400,000$—a <strong>16-fold ($1,600\%$) total return</strong>!</li>
+          </ul>
+        </div>
+
+        <p>
+          To model more intricate financial trajectories with ongoing monthly contributions, use our <a href="compound-interest-calculator.html">Compound Interest Calculator</a>, evaluate net yield performance with the <a href="roi-calculator.html">ROI Calculator</a>, and calculate auto vehicle financing terms with the <a href="car-loan-calculator.html">Car Loan Calculator</a>.
+        </p>
+
+        <!-- Technical FAQs -->
+        <div class="faq-container" style="margin-top:2.5rem;">
+          <h3 style="margin-bottom:1rem;color:#0F172A;">Frequently Asked Questions About the Rule of 72</h3>
+          
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">Why does the Rule of 72 use the number 72 instead of 69.3?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Mathematically, continuous compounding requires the natural logarithm of 2, which is approximately 0.6931 (the Rule of 69.3). However, most financial accounts compound annually or quarterly rather than continuously. For discrete annual compounding at typical market return rates (6% to 9%), the effective denominator shifts upward toward 72. Furthermore, 72 is an abundant composite number divisible by 1, 2, 3, 4, 6, 8, 9, and 12, making mental calculation effortless.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What is the exact mathematical formula for investment doubling time?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              The exact formula derived from the future value equation FV = PV × (1 + r)^t is: t = ln(2) ÷ ln(1 + r), where r is the annual interest rate expressed as a decimal. For example, at an 8% return (r = 0.08), t = 0.693147 ÷ 0.076961 = 9.006 years, compared to 72 ÷ 8 = 9.000 years.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">Can the Rule of 72 be applied in reverse to estimate inflation decay?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Yes. If inflation averages 3.0% annually, dividing 72 by 3.0 indicates that the real purchasing power of cash will be cut in half in exactly 24 years. Conversely, dividing 72 by the number of years until retirement reveals the annual rate of return needed to double your wealth.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What are the Rules of 115 and 144?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              The Rule of 115 (based on ln(3) ≈ 1.0986) calculates the time required for an investment to triple: Years to Triple ≈ 115 ÷ Annual Rate. The Rule of 144 (based on ln(4) = 2 × ln(2) ≈ 1.386) calculates the time required for an investment to quadruple: Years to Quadruple ≈ 144 ÷ Annual Rate.
+            </div>
+          </details>
+        </div>
+      </article>
+    </main>
+
+    <!-- Post Sidebar -->
+    <aside class="post-sidebar" style="width:300px;flex-shrink:0;">
+      <div class="sidebar-widget" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;">
+        <div class="sidebar-widget-header" style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+          <span class="widget-icon" style="font-size:1.25rem;">🏦</span>
+          <h3 class="widget-title" style="margin:0;font-size:1.05rem;color:#0F172A;">Finance &amp; Wealth Suite</h3>
+        </div>
+        <div class="sidebar-widget-subtitle" style="font-size:0.8rem;color:#64748B;margin-bottom:1rem;">Compounding, debt &amp; returns:</div>
+        <ul class="sidebar-tools-list" style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+          <li><a href="rule-of-72-calculator.html" class="sidebar-tool-item active" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;background:#EFF6FF;color:#2563EB;text-decoration:none;font-size:0.85rem;font-weight:600;">📈 Rule of 72 Doubling</a></li>
+          <li><a href="compound-interest-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">💰 Compound Interest</a></li>
+          <li><a href="roi-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">📊 Return on Investment (ROI)</a></li>
+          <li><a href="car-loan-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🚗 Auto Loan &amp; Amortization</a></li>
+          <li><a href="mortgage-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🏠 Fixed-Rate Mortgage</a></li>
+          <li><a href="tip-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🍽️ Bill &amp; Tip Splitter</a></li>
+        </ul>
+        <div class="sidebar-widget-footer" style="margin-top:1.25rem;padding-top:0.75rem;border-top:1px solid #E2E8F0;text-align:center;">
+          <a href="finance.html" class="sidebar-cat-link" style="color:#2563EB;font-weight:600;font-size:0.85rem;text-decoration:none;">Explore Finance Hub &rarr;</a>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <span class="logo-badge">∑</span>
+            <span>Calc<span class="accent">Hub</span></span>
+          </a>
+          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Finance &amp; Investment</h4>
+          <ul class="footer-links">
+            <li><a href="rule-of-72-calculator.html">Rule of 72 Calculator</a></li>
+            <li><a href="compound-interest-calculator.html">Compound Interest Calculator</a></li>
+            <li><a href="roi-calculator.html">ROI Calculator</a></li>
+            <li><a href="car-loan-calculator.html">Car Loan Calculator</a></li>
+            <li><a href="mortgage-calculator.html">Mortgage Calculator</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Financial Suites</h4>
+          <ul class="footer-links">
+            <li><a href="finance.html">Finance &amp; Wealth</a></li>
+            <li><a href="math.html">Math &amp; Statistics</a></li>
+            <li><a href="engineering.html">Electrical Engineering</a></li>
+            <li><a href="health.html">Health &amp; Nutrition</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Mathematical calculations verified per standard financial algorithms.</p>
+        <div>
+          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
+          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy &amp; Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function runRule72Calc() {
+      const p = parseFloat(document.getElementById('init-principal').value) || 10000;
+      const r = parseFloat(document.getElementById('growth-rate').value) || 8.0;
+      const infl = parseFloat(document.getElementById('infl-rate').value) || 2.5;
+
+      const rule72Yrs = 72.0 / r;
+      const rDecimal = r / 100.0;
+      const exactYrs = Math.log(2) / Math.log(1 + rDecimal);
+
+      const rule115Yrs = 115.0 / r;
+      const rule144Yrs = 144.0 / r;
+
+      const inflHalfYrs = infl > 0 ? (72.0 / infl) : 0;
+      const doubledVal = p * 2;
+
+      document.getElementById('res-rule72-yrs').textContent = rule72Yrs.toFixed(2) + ' Years';
+      document.getElementById('res-doubled-val').textContent = 'Portfolio grows to $' + doubledVal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+      document.getElementById('res-exact-yrs').textContent = exactYrs.toFixed(2) + ' Years';
+      document.getElementById('res-triple-yrs').textContent = rule115Yrs.toFixed(2) + ' Years ($' + (p*3).toLocaleString() + ')';
+      document.getElementById('res-quad-yrs').textContent = rule144Yrs.toFixed(2) + ' Years ($' + (p*4).toLocaleString() + ')';
+      
+      if (inflHalfYrs > 0) {
+        document.getElementById('res-infl-half').textContent = inflHalfYrs.toFixed(2) + ' Years (at ' + infl.toFixed(1) + '%)';
+      } else {
+        document.getElementById('res-infl-half').textContent = 'Infinite (0% Inflation)';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', runRule72Calc);
+  </script>
+</body>
+</html>
+"""
+
+with open("rule-of-72-calculator.html", "w", encoding="utf-8") as f:
+    f.write(TOOL_RULE72)
+
+print("rule-of-72-calculator.html generated successfully!")

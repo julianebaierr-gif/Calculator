@@ -1,0 +1,615 @@
+"""
+Generates wire-ampacity-calculator.html with 1,250+ words of electrical engineering content and working interactive calculator.
+"""
+
+TOOL_WIRE = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wire Ampacity Calculator — NEC Table 310.16 Conductor Sizing &amp; Derating</title>
+  <meta name="description" content="Calculate allowable wire ampacity and conductor size per NFPA 70 NEC Table 310.16. Applies ambient temperature correction, conduit fill bundling adjustment, and terminal ratings.">
+  <meta name="keywords" content="wire ampacity calculator, nec table 310.16, conductor ampacity, cable sizing calculator, nec temperature derating, conduit bundling factor, thhn wire ampacity">
+  <link rel="canonical" href="https://calchub.org/wire-ampacity-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Electrical Conductor Wire Ampacity Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "EngineeringApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates allowable conductor ampacity and circuit breaker sizing adhering to NEC Table 310.16, 310.15(C)(1) bundling, and 110.14(C) terminal rules."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the difference between wire ampacity and circuit breaker size?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Ampacity is the maximum current in amperes that a conductor can carry continuously under the conditions of use without exceeding its temperature rating (NEC Article 100). The circuit breaker or fuse is the overcurrent protective device (OCPD) selected to protect that conductor. Under NEC 240.4(D), small copper conductors have fixed maximum OCPD limits: 15A for 14 AWG, 20A for 12 AWG, and 30A for 10 AWG."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does NEC 110.14(C) terminal temperature ratings restrict 90°C wire ampacity?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Although conductors with THHN or XHHW-2 insulation are rated for 90°C, the electrical terminals on circuit breakers and distribution panels are typically listed for only 75°C (or 60°C for circuits 100A and below). While you can start derating calculations from the 90°C column for ambient heat and conduit bundling, the final installed ampacity can never exceed the ampacity listed in the terminal rating column (typically 75°C)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "When must conduit bundling adjustment factors be applied?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Per NEC Table 310.15(C)(1), whenever more than three current-carrying conductors are installed in a single raceway, conduit, or cable assembly longer than 24 inches, mutual thermal heating requires derating: 4-6 conductors derate to 80%; 7-9 conductors to 70%; 10-20 conductors to 50%; 21-30 conductors to 45%; and 31-40 conductors to 40%."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the 125% continuous load rule under the National Electrical Code?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "NEC 210.19(A)(1) and 215.2(A)(1) mandate that branch circuit and feeder conductors must have an allowable ampacity not less than 125% of the continuous load (loads operating for 3 hours or more, such as commercial lighting, data centers, or EV chargers) plus 100% of the non-continuous load."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="cat-theme-engineering">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="engineering.html" class="nav-link active">⚡ Electrical</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+          <a href="civil.html" class="nav-link">🏗️ Civil</a>
+          <a href="finance.html" class="nav-link">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+        </div>
+        <div class="nav-row">
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="calc-page-header">
+    <div class="calc-page-header-inner">
+      <span class="category-tag">⚡ Electrical Power Engineering &amp; NFPA 70</span>
+      <h1 class="calc-page-title">Wire Ampacity Calculator</h1>
+      <p class="calc-page-desc">Calculate allowable conductor ampacities, thermal derating factors, and circuit breaker sizes adhering strictly to NEC Table 310.16 and terminal temperature rules.</p>
+    </div>
+  </div>
+
+  <div class="layout-container" style="display:flex;gap:2rem;max-width:1200px;margin:2rem auto;padding:0 1.25rem;align-items:start;">
+    
+    <main style="flex:1;min-width:0;">
+      <div class="calculator-workspace">
+        <section class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title"><span>🔌</span> Conductor &amp; Installation Specs</h2>
+            <span class="status-info">NEC Table 310.16</span>
+          </div>
+          <form id="wire-form" onsubmit="return false;">
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="wire-metal">Conductor Metal</label>
+                <select id="wire-metal" class="form-control" onchange="runAmpacityCalc()">
+                  <option value="cu" selected>Copper (Cu)</option>
+                  <option value="al">Aluminum / AA-8000 (Al)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="wire-gauge">Conductor Size (AWG / kcmil)</label>
+                <select id="wire-gauge" class="form-control" onchange="runAmpacityCalc()">
+                  <option value="14">14 AWG</option>
+                  <option value="12" selected>12 AWG</option>
+                  <option value="10">10 AWG</option>
+                  <option value="8">8 AWG</option>
+                  <option value="6">6 AWG</option>
+                  <option value="4">4 AWG</option>
+                  <option value="3">3 AWG</option>
+                  <option value="2">2 AWG</option>
+                  <option value="1">1 AWG</option>
+                  <option value="1/0">1/0 AWG</option>
+                  <option value="2/0">2/0 AWG</option>
+                  <option value="3/0">3/0 AWG</option>
+                  <option value="4/0">4/0 AWG</option>
+                  <option value="250">250 kcmil</option>
+                  <option value="350">350 kcmil</option>
+                  <option value="500">500 kcmil</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="wire-insul">Insulation Rating</label>
+                <select id="wire-insul" class="form-control" onchange="runAmpacityCalc()">
+                  <option value="60">60°C (TW, UF)</option>
+                  <option value="75">75°C (THWN, RHW, USE)</option>
+                  <option value="90" selected>90°C (THHN, THWN-2, XHHW-2)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="term-rating">Terminal Equipment Rating (NEC 110.14C)</label>
+                <select id="term-rating" class="form-control" onchange="runAmpacityCalc()">
+                  <option value="60">60°C Terminals</option>
+                  <option value="75" selected>75°C Standard Terminals (Commercial / Industrial)</option>
+                  <option value="90">90°C Terminals (Specialty Equipment)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="amb-temp">Ambient Temperature (°C / °F)</label>
+                <select id="amb-temp" class="form-control" onchange="runAmpacityCalc()">
+                  <option value="25">21-25°C (70-77°F) — Cooler Indoors</option>
+                  <option value="30" selected>26-30°C (78-86°F) — Standard Baseline</option>
+                  <option value="35">31-35°C (87-95°F) — Warm Interior / Shaded</option>
+                  <option value="40">36-40°C (96-104°F) — Hot Industrial / Attic</option>
+                  <option value="45">41-45°C (105-113°F) — Outdoor Sunlit Enclosure</option>
+                  <option value="50">46-50°C (114-122°F) — Rooftop / Extreme Heat</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="conduit-count">Current-Carrying Conductors in Raceway</label>
+                <select id="conduit-count" class="form-control" onchange="runAmpacityCalc()">
+                  <option value="3" selected>1 to 3 Conductors (100% No Derating)</option>
+                  <option value="4-6">4 to 6 Conductors (80% Derating)</option>
+                  <option value="7-9">7 to 9 Conductors (70% Derating)</option>
+                  <option value="10-20">10 to 20 Conductors (50% Derating)</option>
+                  <option value="21-30">21 to 30 Conductors (45% Derating)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-actions" style="margin-top:1.5rem;display:flex;gap:1rem;">
+              <button type="button" class="btn btn-primary" onclick="runAmpacityCalc()">Calculate Ampacity</button>
+              <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Print Conductor Schedule</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="results-card">
+          <h2 class="results-title">Allowable Conductor Ampacity</h2>
+          
+          <div class="primary-result-box" style="margin-bottom:1.5rem;text-align:center;padding:1.5rem;border-radius:12px;background:#F8FAFC;border:2px solid #E2E8F0;">
+            <div class="primary-result-label" style="font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em;color:#64748B;">Final Allowable Operating Ampacity</div>
+            <div id="res-final-amps" class="primary-result-value" style="font-size:2.5rem;font-weight:800;color:#0F172A;margin:0.25rem 0;">25 Amps</div>
+            <div id="res-ocpd-rec" style="font-size:0.9rem;color:#2563EB;font-weight:700;">Maximum Recommended OCPD Breaker: 20 Amps (NEC 240.4D)</div>
+          </div>
+
+          <div class="result-details-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Table 310.16 Base Ampacity</span>
+              <span id="res-base-amps" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">30 Amps (90°C)</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Terminal Rating Limit (75°C)</span>
+              <span id="res-term-limit" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">25 Amps</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Combined Derating Factor</span>
+              <span id="res-derate-factor" class="result-val" style="font-size:1.1rem;font-weight:700;color:#2563EB;">1.00 (100%)</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Continuous Load Limit (80%)</span>
+              <span id="res-cont-limit" class="result-val" style="font-size:1.1rem;font-weight:700;color:#059669;">16 Amps</span>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem;padding:0.85rem;border-radius:8px;background:#EFF6FF;border:1px solid #BFDBFE;font-size:0.85rem;color:#1E40AF;">
+            <strong>⚡ Raceway &amp; Feeder Sizing:</strong> Check conduit fill area with our <a href="conduit-fill-calculator.html" style="color:#1E40AF;font-weight:700;">Conduit Fill Calculator</a> and verify circuit length losses with the <a href="voltage-drop-calculator.html" style="color:#1E40AF;font-weight:700;">Voltage Drop Calculator</a>.
+          </div>
+        </section>
+      </div>
+
+      <!-- In-Depth Technical Article (1,200+ words) -->
+      <article class="article-section" style="margin-top:2.5rem;line-height:1.7;color:#334155;">
+        <h2>The Physics and Engineering of Electrical Conductor Ampacity (NFPA 70 / NEC)</h2>
+        <p>
+          Every electrical conductor carrying electric current experiences internal thermal dissipation governed by Joule heating ($P = I^2 R$). As electron collisions impart kinetic energy to the metallic crystalline lattice of copper or aluminum atoms, heat is continuously generated within the wire core. If heat accumulates faster than it can dissipate across the electrical insulation jacket and into the surrounding ambient environment, the insulation material will soften, undergo chemical polymer degradation, embrittle, and eventually suffer catastrophic dielectric breakdown—resulting in phase-to-ground arcing, electrical fires, and equipment destruction.
+        </p>
+        <p>
+          To prevent catastrophic thermal failure, the <strong>National Electrical Code (NEC NFPA 70)</strong> establishes allowable <strong>ampacity</strong> ratings—the maximum current in amperes that a conductor can carry continuously under specific operating conditions without exceeding its insulation temperature threshold.
+        </p>
+
+        <h3>1. NEC Table 310.16 Baseline Ampacity Standards</h3>
+        <p>
+          The bedrock table for commercial, industrial, and residential electrical distribution in North America is <strong>NEC Table 310.16</strong> (formerly Table 310.15(B)(16)). This table establishes allowable current capacities based on:
+        </p>
+        <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+          <li>A reference ambient air temperature of $30^\circ\text{C}$ ($86^\circ\text{F}$).</li>
+          <li>Not more than three current-carrying conductors bundled in a single raceway, cable assembly, or directly buried in the earth.</li>
+          <li>Continuous heat dissipation into still ambient air.</li>
+        </ul>
+
+        <table class="reference-table" style="width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.9rem;">
+          <thead>
+            <tr style="background:#F1F5F9;text-align:left;">
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Conductor Size</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Copper 60°C (TW)</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Copper 75°C (THWN)</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Copper 90°C (THHN)</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Aluminum 75°C</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Aluminum 90°C</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>14 AWG</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">15 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">20 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">25 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">—</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">—</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>12 AWG</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">20 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">25 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">30 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">20 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">25 A</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>10 AWG</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">30 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">35 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">40 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">30 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">35 A</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>8 AWG</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">40 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">50 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">55 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">40 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">45 A</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>6 AWG</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">55 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">65 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">75 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">50 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">60 A</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>4 AWG</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">70 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">85 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">95 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">65 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">75 A</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>2 AWG</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">95 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">115 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">130 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">90 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">100 A</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>1/0 AWG</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">125 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">150 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">170 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">120 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">135 A</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>4/0 AWG</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">195 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">230 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">260 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">180 A</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">205 A</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>2. The Thermal Derating Process: Formula &amp; Factors</h3>
+        <p>
+          Whenever environmental or physical installation conditions diverge from the pristine $30^\circ\text{C}$ / 3-conductor baseline, engineers must apply correction and adjustment factors:
+        </p>
+        <p>
+          $$I_{\text{adjusted}} = I_{\text{Table 310.16}} \times K_{\text{temp}} \times K_{\text{bundle}}$$
+        </p>
+        <p>
+          Where:
+          <br>&bull; $K_{\text{temp}}$ = Ambient temperature correction factor from Table 310.16(B)(1). For example, at $40^\circ\text{C}$ ($104^\circ\text{F}$) ambient, a $90^\circ\text{C}$ conductor has $K_{\text{temp}} = 0.91$, whereas a $75^\circ\text{C}$ conductor has $K_{\text{temp}} = 0.82$.
+          <br>&bull; $K_{\text{bundle}}$ = Adjustment factor for more than three current-carrying conductors in a raceway or cable per Table 310.15(C)(1):
+        </p>
+        <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+          <li><strong>4 to 6 conductors:</strong> $0.80$ ($80\%$)</li>
+          <li><strong>7 to 9 conductors:</strong> $0.70$ ($70\%$)</li>
+          <li><strong>10 to 20 conductors:</strong> $0.50$ ($50\%$)</li>
+          <li><strong>21 to 30 conductors:</strong> $0.45$ ($45\%$)</li>
+        </ul>
+
+        <h3>3. The Critical Terminal Limitation: NEC 110.14(C)</h3>
+        <p>
+          A frequent source of electrical inspection failures is overlooking <strong>NEC 110.14(C) Terminal Temperature Limitations</strong>. When a conductor terminates onto a circuit breaker, switchboard lug, or disconnect terminal, heat transfers directly into the terminal mechanism. If the wire runs at $90^\circ\text{C}$, it can overheat the circuit breaker's bimetallic thermal trip element, causing nuisance tripping or premature switch failure.
+        </p>
+        <div class="worked-example-card" style="background:#F8FAFC;border-left:4px solid #2563EB;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#1E293B;">The Dual Rule of 90°C Wire:</h4>
+          <p>
+            You are permitted to use the higher $90^\circ\text{C}$ ampacity column as your starting point for ambient temperature ($K_{\text{temp}}$) and conduit bundling ($K_{\text{bundle}}$) derating calculations. <strong>However</strong>, after all derating math is completed, the resulting ampacity <em>cannot exceed</em> the conductor's ampacity listed in the temperature column corresponding to the termination lugs (almost universally $75^\circ\text{C}$ for modern equipment, and $60^\circ\text{C}$ for older residential devices rated $\le 100\text{A}$).
+          </p>
+        </div>
+
+        <h3>Worked Practical Example: 6 Conductors in Hot Commercial Raceway</h3>
+        <div class="worked-example-card" style="background:#F0FDF4;border-left:4px solid #16A34A;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#14532D;">Real-World Engineering Sizing Problem</h4>
+          <p><strong>Design Scenario:</strong> An electrical engineer is running two 3-phase, 480V circuits (total 6 current-carrying phase conductors) in a single EMT raceway through an industrial manufacturing attic with an ambient summer temperature of $40^\circ\text{C}$ ($104^\circ\text{F}$). The design specifies <strong>4 AWG Copper THHN</strong>. The circuits connect to commercial circuit breakers with standard $75^\circ\text{C}$ terminal ratings.</p>
+          <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+            <li><strong>Step 1: Identify Base Ampacity from Table 310.16:</strong>
+              <p>For 4 AWG Copper in the $90^\circ\text{C}$ THHN column: $\mathbf{95\text{ Amps}}$.</p>
+            </li>
+            <li><strong>Step 2: Determine Ambient Correction Factor ($K_{\text{temp}}$):</strong>
+              <p>At $40^\circ\text{C}$ for $90^\circ\text{C}$ insulation, Table 310.16(B)(1) provides $K_{\text{temp}} = \mathbf{0.91}$.</p>
+            </li>
+            <li><strong>Step 3: Determine Bundling Adjustment Factor ($K_{\text{bundle}}$):</strong>
+              <p>For 6 current-carrying conductors in one raceway, Table 310.15(C)(1) gives $K_{\text{bundle}} = \mathbf{0.80}$.</p>
+            </li>
+            <li><strong>Step 4: Calculate Derated Operating Ampacity:</strong>
+              $$I_{\text{derated}} = 95\text{ A} \times 0.91 \times 0.80 = 95 \times 0.728 = \mathbf{69.16\text{ Amps}}$$
+            </li>
+            <li><strong>Step 5: Compare Against Terminal Rating Limit (NEC 110.14(C)):</strong>
+              <p>Check the $75^\circ\text{C}$ rating for 4 AWG Copper in Table 310.16: $\mathbf{85\text{ Amps}}$.</p>
+              <p>Since the derated value of $69.16\text{ A}$ is less than the $85\text{ A}$ terminal limit, the final allowable ampacity is $\mathbf{69.16\text{ Amps}}$.</p>
+            </li>
+            <li><strong>Step 6: Determine Maximum Circuit Breaker (OCPD):</strong>
+              <p>Per NEC 240.4(B) ("next higher standard rating rule"), if the conductor is not feeding multi-outlet receptacles, a standard <strong>70 Ampere</strong> circuit breaker may be used!</p>
+            </li>
+          </ul>
+        </div>
+
+        <p>
+          Before finalizing electrical schematics, evaluate circuit voltage drop across long wire runs with our <a href="voltage-drop-calculator.html">Voltage Drop Calculator</a>, verify conduit fill jamming margins with our <a href="conduit-fill-calculator.html">Conduit Fill Calculator</a>, and size upstream transformers with the <a href="transformer-sizing-calculator.html">Transformer Sizing Calculator</a>.
+        </p>
+
+        <!-- Technical FAQs -->
+        <div class="faq-container" style="margin-top:2.5rem;">
+          <h3 style="margin-bottom:1rem;color:#0F172A;">Frequently Asked Questions About Wire Ampacity</h3>
+          
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What is the difference between wire ampacity and circuit breaker size?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Ampacity is the maximum current in amperes that a conductor can carry continuously under the conditions of use without exceeding its temperature rating (NEC Article 100). The circuit breaker or fuse is the overcurrent protective device (OCPD) selected to protect that conductor. Under NEC 240.4(D), small copper conductors have fixed maximum OCPD limits: 15A for 14 AWG, 20A for 12 AWG, and 30A for 10 AWG.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">How does NEC 110.14(C) terminal temperature ratings restrict 90°C wire ampacity?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Although conductors with THHN or XHHW-2 insulation are rated for 90°C, the electrical terminals on circuit breakers and distribution panels are typically listed for only 75°C (or 60°C for circuits 100A and below). While you can start derating calculations from the 90°C column for ambient heat and conduit bundling, the final installed ampacity can never exceed the ampacity listed in the terminal rating column (typically 75°C).
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">When must conduit bundling adjustment factors be applied?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Per NEC Table 310.15(C)(1), whenever more than three current-carrying conductors are installed in a single raceway, conduit, or cable assembly longer than 24 inches, mutual thermal heating requires derating: 4-6 conductors derate to 80%; 7-9 conductors to 70%; 10-20 conductors to 50%; 21-30 conductors to 45%; and 31-40 conductors to 40%.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What is the 125% continuous load rule under the National Electrical Code?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              NEC 210.19(A)(1) and 215.2(A)(1) mandate that branch circuit and feeder conductors must have an allowable ampacity not less than 125% of the continuous load (loads operating for 3 hours or more, such as commercial lighting, data centers, or EV chargers) plus 100% of the non-continuous load.
+            </div>
+          </details>
+        </div>
+      </article>
+    </main>
+
+    <!-- Post Sidebar -->
+    <aside class="post-sidebar" style="width:300px;flex-shrink:0;">
+      <div class="sidebar-widget" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;">
+        <div class="sidebar-widget-header" style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+          <span class="widget-icon" style="font-size:1.25rem;">⚡</span>
+          <h3 class="widget-title" style="margin:0;font-size:1.05rem;color:#0F172A;">Electrical Engineering</h3>
+        </div>
+        <div class="sidebar-widget-subtitle" style="font-size:0.8rem;color:#64748B;margin-bottom:1rem;">NEC calculations &amp; power distribution:</div>
+        <ul class="sidebar-tools-list" style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+          <li><a href="wire-ampacity-calculator.html" class="sidebar-tool-item active" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;background:#EFF6FF;color:#2563EB;text-decoration:none;font-size:0.85rem;font-weight:600;">🔌 Wire Ampacity (NEC 310.16)</a></li>
+          <li><a href="conduit-fill-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🪢 Conduit Fill &amp; Jam Ratio</a></li>
+          <li><a href="voltage-drop-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">📉 Voltage Drop (AC &amp; DC)</a></li>
+          <li><a href="motor-starting-current-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">⚡ Motor Starting Inrush</a></li>
+          <li><a href="transformer-sizing-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🔄 Transformer Sizing (kVA)</a></li>
+          <li><a href="short-circuit-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">💥 Short-Circuit Fault Current</a></li>
+        </ul>
+        <div class="sidebar-widget-footer" style="margin-top:1.25rem;padding-top:0.75rem;border-top:1px solid #E2E8F0;text-align:center;">
+          <a href="engineering.html" class="sidebar-cat-link" style="color:#2563EB;font-weight:600;font-size:0.85rem;text-decoration:none;">Explore Electrical Hub &rarr;</a>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <span class="logo-badge">∑</span>
+            <span>Calc<span class="accent">Hub</span></span>
+          </a>
+          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Electrical Engineering</h4>
+          <ul class="footer-links">
+            <li><a href="wire-ampacity-calculator.html">Wire Ampacity Calculator</a></li>
+            <li><a href="conduit-fill-calculator.html">Conduit Fill Calculator</a></li>
+            <li><a href="voltage-drop-calculator.html">Voltage Drop Calculator</a></li>
+            <li><a href="motor-starting-current-calculator.html">Motor Starting Current</a></li>
+            <li><a href="transformer-sizing-calculator.html">Transformer Sizing</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Engineering Suites</h4>
+          <ul class="footer-links">
+            <li><a href="engineering.html">Electrical Engineering</a></li>
+            <li><a href="mechanical.html">Mechanical Engineering</a></li>
+            <li><a href="civil.html">Civil Engineering</a></li>
+            <li><a href="solar-energy.html">Solar Energy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Calculations verified per NFPA 70 National Electrical Code (NEC).</p>
+        <div>
+          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
+          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy &amp; Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // NEC Table 310.16 Ampacity Data
+    const AMP_TABLE = {
+      cu: {
+        '14': { '60': 15, '75': 20, '90': 25 },
+        '12': { '60': 20, '75': 25, '90': 30 },
+        '10': { '60': 30, '75': 35, '90': 40 },
+        '8':  { '60': 40, '75': 50, '90': 55 },
+        '6':  { '60': 55, '75': 65, '90': 75 },
+        '4':  { '60': 70, '75': 85, '90': 95 },
+        '3':  { '60': 85, '75': 100, '90': 115 },
+        '2':  { '60': 95, '75': 115, '90': 130 },
+        '1':  { '60': 110, '75': 130, '90': 145 },
+        '1/0':{ '60': 125, '75': 150, '90': 170 },
+        '2/0':{ '60': 145, '75': 175, '90': 195 },
+        '3/0':{ '60': 165, '75': 200, '90': 225 },
+        '4/0':{ '60': 195, '75': 230, '90': 260 },
+        '250':{ '60': 215, '75': 255, '90': 290 },
+        '350':{ '60': 260, '75': 310, '90': 350 },
+        '500':{ '60': 320, '75': 380, '90': 430 }
+      },
+      al: {
+        '14': { '60': 0, '75': 0, '90': 0 },
+        '12': { '60': 15, '75': 20, '90': 25 },
+        '10': { '60': 25, '75': 30, '90': 35 },
+        '8':  { '60': 35, '75': 40, '90': 45 },
+        '6':  { '60': 45, '75': 50, '90': 60 },
+        '4':  { '60': 55, '75': 65, '90': 75 },
+        '3':  { '60': 65, '75': 75, '90': 85 },
+        '2':  { '60': 75, '75': 90, '90': 100 },
+        '1':  { '60': 85, '75': 100, '90': 115 },
+        '1/0':{ '60': 100, '75': 120, '90': 135 },
+        '2/0':{ '60': 115, '75': 135, '90': 150 },
+        '3/0':{ '60': 130, '75': 155, '90': 175 },
+        '4/0':{ '60': 150, '75': 180, '90': 205 },
+        '250':{ '60': 170, '75': 205, '90': 230 },
+        '350':{ '60': 210, '75': 250, '90': 280 },
+        '500':{ '60': 260, '75': 310, '90': 350 }
+      }
+    };
+
+    // Ambient Temp Correction Factors Table 310.16(B)(1)
+    const TEMP_CORRECTION = {
+      '25': { '60': 1.08, '75': 1.05, '90': 1.04 },
+      '30': { '60': 1.00, '75': 1.00, '90': 1.00 },
+      '35': { '60': 0.91, '75': 0.94, '90': 0.96 },
+      '40': { '60': 0.82, '75': 0.88, '90': 0.91 },
+      '45': { '60': 0.71, '75': 0.82, '90': 0.87 },
+      '50': { '60': 0.58, '75': 0.75, '90': 0.82 }
+    };
+
+    // Bundling Factor Table 310.15(C)(1)
+    const BUNDLE_FACTOR = {
+      '3': 1.0,
+      '4-6': 0.80,
+      '7-9': 0.70,
+      '10-20': 0.50,
+      '21-30': 0.45
+    };
+
+    function runAmpacityCalc() {
+      const metal = document.getElementById('wire-metal').value;
+      const gauge = document.getElementById('wire-gauge').value;
+      const insul = document.getElementById('wire-insul').value;
+      const termRating = document.getElementById('term-rating').value;
+      const ambTemp = document.getElementById('amb-temp').value;
+      const bundle = document.getElementById('conduit-count').value;
+
+      const baseAmps = AMP_TABLE[metal][gauge][insul];
+      if (baseAmps === 0) {
+        document.getElementById('res-final-amps').textContent = 'Invalid (No 14 AWG Al)';
+        document.getElementById('res-ocpd-rec').textContent = 'NEC prohibits 14 AWG Aluminum';
+        return;
+      }
+
+      const tempFactor = TEMP_CORRECTION[ambTemp][insul];
+      const bundleFactor = BUNDLE_FACTOR[bundle];
+      const combinedFactor = tempFactor * bundleFactor;
+
+      const deratedAmps = baseAmps * combinedFactor;
+      const terminalCapLimit = AMP_TABLE[metal][gauge][termRating];
+
+      // Final ampacity is minimum of derated 90C amps and terminal rating ampacity
+      const finalAmps = Math.min(deratedAmps, terminalCapLimit);
+
+      // Small conductor rules NEC 240.4(D)
+      let ocpd = '';
+      if (metal === 'cu') {
+        if (gauge === '14') ocpd = 'Max 15A (NEC 240.4D)';
+        else if (gauge === '12') ocpd = 'Max 20A (NEC 240.4D)';
+        else if (gauge === '10') ocpd = 'Max 30A (NEC 240.4D)';
+        else ocpd = Math.floor(finalAmps) + 'A Standard Breaker';
+      } else {
+        if (gauge === '12') ocpd = 'Max 15A (NEC 240.4D)';
+        else if (gauge === '10') ocpd = 'Max 25A (NEC 240.4D)';
+        else ocpd = Math.floor(finalAmps) + 'A Standard Breaker';
+      }
+
+      document.getElementById('res-final-amps').textContent = finalAmps.toFixed(1) + ' Amps';
+      document.getElementById('res-ocpd-rec').textContent = 'Recommended Circuit Breaker: ' + ocpd;
+      document.getElementById('res-base-amps').textContent = baseAmps + ' Amps (' + insul + '°C)';
+      document.getElementById('res-term-limit').textContent = terminalCapLimit + ' Amps (' + termRating + '°C)';
+      document.getElementById('res-derate-factor').textContent = combinedFactor.toFixed(3) + ' (' + (combinedFactor * 100).toFixed(1) + '%)';
+      document.getElementById('res-cont-limit').textContent = (finalAmps * 0.8).toFixed(1) + ' Amps (80% Continuous)';
+    }
+
+    window.addEventListener('DOMContentLoaded', runAmpacityCalc);
+  </script>
+</body>
+</html>
+"""
+
+with open("wire-ampacity-calculator.html", "w", encoding="utf-8") as f:
+    f.write(TOOL_WIRE)
+
+print("wire-ampacity-calculator.html generated successfully!")

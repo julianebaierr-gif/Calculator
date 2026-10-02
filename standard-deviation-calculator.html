@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Standard Deviation Calculator — Sample (n-1) &amp; Population (N) Statistics</title>
+  <meta name="description" content="Calculate sample standard deviation with Bessel's correction, population variance, mean, sum of squares, and standard error of the mean (SEM) with step-by-step steps.">
+  <meta name="keywords" content="standard deviation calculator, sample standard deviation calculator, population standard deviation, bessel correction n-1, variance calculator, standard error of the mean sem">
+  <link rel="canonical" href="https://calchub.org/standard-deviation-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Statistical Standard Deviation and Variance Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "EducationalApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates sample and population standard deviation, variance, SEM, and sum of squares with step-by-step arithmetic breakdown."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the difference between sample standard deviation (s) and population standard deviation (σ)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Population standard deviation (σ) divides by N and is used when you have measured every single individual in the entire population. Sample standard deviation (s) divides by (n - 1) using Bessel's correction, and is used when you are inferring population characteristics from a smaller subset. Dividing by (n - 1) corrects for the mathematical certainty that sample deviations around the sample mean underestimate true population dispersion."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is Bessel's correction and why is it necessary?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Because the true population mean (μ) is unknown in sampling, we substitute the sample mean (x̄). By definition, the sum of squared deviations from the sample mean is mathematically smaller than the sum of squared deviations from any other value, including μ. Dividing by n produces an uncorrected sample variance that is systematically biased downward. Dividing by (n - 1) provides an unbiased estimator of the true population variance."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between Standard Deviation (SD) and Standard Error of the Mean (SEM)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Standard Deviation (s) measures the variability and physical dispersion of individual data points around their mean within a single dataset. Standard Error of the Mean (SEM = s ÷ √n) measures how accurately the sample mean represents the true population mean, quantifying the sampling variability across repeated experiments."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What does the Empirical Rule (68-95-99.7) state for normal distributions?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For data following a Gaussian normal distribution: approximately 68.27% of observations fall within ±1 standard deviation of the mean (μ ± 1σ); approximately 95.45% fall within ±2 standard deviations (μ ± 2σ); and 99.73% fall within ±3 standard deviations (μ ± 3σ)."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="cat-theme-math">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="math.html" class="nav-link active">🔢 Math</a>
+          <a href="finance.html" class="nav-link">🏦 Finance</a>
+          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+          <a href="civil.html" class="nav-link">🏗️ Civil</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+        </div>
+        <div class="nav-row">
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="calc-page-header">
+    <div class="calc-page-header-inner">
+      <span class="category-tag">📊 Inferential &amp; Descriptive Statistics</span>
+      <h1 class="calc-page-title">Standard Deviation Calculator</h1>
+      <p class="calc-page-desc">Calculate sample standard deviation ($s$) with Bessel's correction, population standard deviation ($\sigma$), variance, SEM, and sum of squared deviations.</p>
+    </div>
+  </div>
+
+  <div class="layout-container" style="display:flex;gap:2rem;max-width:1200px;margin:2rem auto;padding:0 1.25rem;align-items:start;">
+    
+    <main style="flex:1;min-width:0;">
+      <div class="calculator-workspace">
+        <section class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title"><span>🔢</span> Dataset Input</h2>
+            <span class="status-info">Bessel's Correction (n-1)</span>
+          </div>
+          <form id="stddev-form" onsubmit="return false;">
+            <div class="form-group" style="margin-bottom:1.25rem;">
+              <label class="form-label" for="raw-data">Enter Numbers (separated by commas, spaces, or lines):</label>
+              <textarea id="raw-data" class="form-control" rows="4" style="font-family:monospace;font-size:0.95rem;line-height:1.5;" oninput="runStdDevCalc()">12, 15, 18, 20, 25, 29, 32, 36, 40, 48</textarea>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="calc-type">Analysis Paradigm</label>
+                <select id="calc-type" class="form-control" onchange="runStdDevCalc()">
+                  <option value="sample" selected>Sample Standard Deviation (s, n-1) — Most Common</option>
+                  <option value="pop">Population Standard Deviation (σ, N)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-actions" style="margin-top:1.5rem;display:flex;gap:1rem;">
+              <button type="button" class="btn btn-primary" onclick="runStdDevCalc()">Compute Statistics</button>
+              <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Print Statistical Report</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="results-card">
+          <h2 class="results-title">Statistical Dispersion Metrics</h2>
+          
+          <div class="primary-result-box" style="margin-bottom:1.5rem;text-align:center;padding:1.5rem;border-radius:12px;background:#F8FAFC;border:2px solid #E2E8F0;">
+            <div id="lbl-primary-sd" class="primary-result-label" style="font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em;color:#64748B;">Sample Standard Deviation (s)</div>
+            <div id="res-sd-val" class="primary-result-value" style="font-size:2.5rem;font-weight:800;color:#0F172A;margin:0.25rem 0;">11.391</div>
+            <div id="res-var-sub" style="font-size:0.9rem;color:#2563EB;font-weight:700;">Sample Variance (s²): 129.767</div>
+          </div>
+
+          <div class="result-details-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Arithmetic Mean (x̄)</span>
+              <span id="res-mean-val" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">27.500</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Sample Count (n) &amp; Sum (∑x)</span>
+              <span id="res-count-sum" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">n = 10, ∑ = 275</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Sum of Squared Deviations (SS)</span>
+              <span id="res-ss-val" class="result-val" style="font-size:1.1rem;font-weight:700;color:#2563EB;">1,167.900</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Standard Error of Mean (SEM)</span>
+              <span id="res-sem-val" class="result-val" style="font-size:1.1rem;font-weight:700;color:#059669;">3.602 (s / √n)</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Coefficient of Variation (CV)</span>
+              <span id="res-cv-val" class="result-val" style="font-size:1.1rem;font-weight:700;color:#7C3AED;">41.42%</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">95% Normal CI Band (x̄ ± 1.96·SEM)</span>
+              <span id="res-ci-band" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">[20.44, 34.56]</span>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem;padding:0.85rem;border-radius:8px;background:#F0FDF4;border:1px solid #BBF7D0;font-size:0.85rem;color:#166534;">
+            <strong>📐 Mathematical Precision:</strong> Explore our complete suite of quantitative tools in the <a href="math.html" style="color:#166534;font-weight:700;">Math &amp; Statistics Suite</a> and analyze investment volatility with the <a href="roi-calculator.html" style="color:#166534;font-weight:700;">ROI Calculator</a>.
+          </div>
+        </section>
+      </div>
+
+      <!-- In-Depth Technical Article (1,200+ words) -->
+      <article class="article-section" style="margin-top:2.5rem;line-height:1.7;color:#334155;">
+        <h2>The Foundation of Statistical Dispersion: Theory, Bessel's Correction, and Inferential Statistics</h2>
+        <p>
+          In descriptive and inferential statistics, summarizing a dataset using only measures of central tendency—such as the mean, median, or mode—presents an incomplete and often dangerous picture of reality. Two manufacturing factories might produce steel bolts with the identical average diameter of $10.0\text{ mm}$, yet one facility maintains tolerances within $0.05\text{ mm}$ while the other produces erratic bolts varying from $6.0\text{ mm}$ to $14.0\text{ mm}$. To quantify the spread, dispersion, reliability, and risk of numerical distributions, mathematicians developed the concepts of <strong>variance</strong> and <strong>standard deviation</strong>.
+        </p>
+        <p>
+          First coined by Karl Pearson in 1893, the standard deviation represents the root-mean-square deviation of observations from their arithmetic mean. Unlike variance (which expresses spread in awkward squared units such as $\text{dollars}^2$ or $\text{meters}^2$), standard deviation possesses the immense practical advantage of returning dispersion to the <em>original linear units</em> of the underlying physical measurement.
+        </p>
+
+        <h3>1. Sample vs. Population Formulations: The Mathematics of Bessel's Correction</h3>
+        <p>
+          The fundamental fork in statistical calculations lies between whether you are analyzing a complete <strong>Population</strong> ($N$) or inferring truths from a finite <strong>Sample</strong> ($n$).
+        </p>
+
+        <div class="worked-example-card" style="background:#F8FAFC;border-left:4px solid #2563EB;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#1E293B;">Population Standard Deviation ($\sigma$)</h4>
+          <p>When you have recorded every single measurement across the universe of interest:</p>
+          <p>$$\sigma = \sqrt{\frac{1}{N} \sum_{i=1}^N (x_i - \mu)^2}$$</p>
+          <p>Where $\mu = \frac{1}{N} \sum x_i$ is the true population mean, and $N$ is the total population size.</p>
+        </div>
+
+        <div class="worked-example-card" style="background:#F8FAFC;border-left:4px solid #059669;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#065F46;">Sample Standard Deviation ($s$) with Bessel's Correction</h4>
+          <p>When you take a representative sample of $n$ observations from a larger unmeasured population:</p>
+          <p>$$s = \sqrt{\frac{1}{n - 1} \sum_{i=1}^n (x_i - \bar{x})^2}$$</p>
+          <p>Where $\bar{x} = \frac{1}{n} \sum x_i$ is the sample mean, and $(n - 1)$ represents the remaining <strong>degrees of freedom</strong>.</p>
+        </div>
+
+        <h3>2. Why Must We Divide by $(n - 1)$? (Mathematical Proof of Bias)</h3>
+        <p>
+          Students of statistics frequently wonder why sample variance divides by $(n - 1)$ rather than $n$. The reason was proved by German astronomer Friedrich Bessel in 1815.
+        </p>
+        <p>
+          In sample experiments, the true population mean $\mu$ is unknown. We are forced to compute deviations around the sample mean $\bar{x}$. However, by mathematical definition of the least squares principle, the sum of squared deviations $\sum (x_i - c)^2$ achieves its absolute minimum when $c = \bar{x}$. Therefore:
+        </p>
+        <p>
+          $$\sum_{i=1}^n (x_i - \bar{x})^2 \le \sum_{i=1}^n (x_i - \mu)^2$$
+        </p>
+        <p>
+          Because the sample points naturally gravitate closer to their own internal centroid ($\bar{x}$) than they do to the true external population mean ($\mu$), computing $\frac{1}{n}\sum (x_i - \bar{x})^2$ will <em>systematically underestimate</em> the true population dispersion on average. Taking the expected value:
+        </p>
+        <p>
+          $$\mathbb{E}\left[\frac{1}{n} \sum_{i=1}^n (x_i - \bar{x})^2\right] = \frac{n - 1}{n} \sigma^2$$
+        </p>
+        <p>
+          To eliminate this negative downward bias and produce an <strong>unbiased estimator</strong> of $\sigma^2$, we must multiply the biased equation by $\frac{n}{n - 1}$, which yields the famous denominator $(n - 1)$!
+        </p>
+
+        <h3>3. Standard Deviation vs. Standard Error of the Mean (SEM)</h3>
+        <p>
+          Confusing $s$ and $SEM$ is one of the most widespread errors in medical research papers and clinical trial reporting:
+        </p>
+
+        <table class="reference-table" style="width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.9rem;">
+          <thead>
+            <tr style="background:#F1F5F9;text-align:left;">
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Statistical Metric</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Mathematical Formula</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">What It Quantifies</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Behavior as Sample Size $n \to \infty$</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Standard Deviation ($s$)</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$s = \sqrt{\frac{SS}{n - 1}}$</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">The physical dispersion of individual data observations around the mean</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Remains constant (converges to true $\sigma$)</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Standard Error ($SEM$)</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$SEM = \frac{s}{\sqrt{n}}$</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">The precision and uncertainty of the sample mean estimate</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Approaches zero</strong> ($SEM \to 0$)</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Variance ($s^2$)</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$s^2 = \frac{SS}{n - 1}$</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Squared deviations, used in ANOVA &amp; regression modeling</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Remains constant (converges to $\sigma^2$)</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Coefficient of Variation ($CV$)</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$CV = \frac{s}{\bar{x}} \times 100\%$</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Relative dispersion normalized against magnitude of the mean</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Scale-invariant unitless percentage</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>4. The Empirical Rule (68-95-99.7) &amp; Normal Distributions</h3>
+        <p>
+          When continuous physical or biological data conforms to a Gaussian normal bell curve:
+        </p>
+        <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+          <li><strong>$68.27\%$</strong> of all data points fall within $1$ standard deviation of the mean ($\mu \pm 1\sigma$).</li>
+          <li><strong>$95.45\%$</strong> of all data points fall within $2$ standard deviations of the mean ($\mu \pm 2\sigma$).</li>
+          <li><strong>$99.73\%$</strong> of all data points fall within $3$ standard deviations of the mean ($\mu \pm 3\sigma$).</li>
+        </ul>
+        <p>
+          In six-sigma industrial manufacturing quality control, processes are designed such that the upper and lower engineering tolerance specifications sit at least $\pm 6\sigma$ away from the mean, permitting no more than $3.4$ defective parts per million opportunities!
+        </p>
+
+        <h3>Worked Practical Example: 5-Point Quality Control Sampling</h3>
+        <div class="worked-example-card" style="background:#F0FDF4;border-left:4px solid #16A34A;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#14532D;">Step-by-Step Manual Calculation</h4>
+          <p><strong>Sample Dataset:</strong> An engineer measures 5 battery voltage outputs ($n = 5$): $12, 15, 18, 20, 25$.</p>
+          <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+            <li><strong>Step 1: Calculate the Sample Mean ($\bar{x}$):</strong>
+              $$\bar{x} = \frac{12 + 15 + 18 + 20 + 25}{5} = \frac{90}{5} = \mathbf{18.0}$$
+            </li>
+            <li><strong>Step 2: Calculate Deviations and Squared Deviations ($SS$):</strong>
+              <br>&bull; $(12 - 18)^2 = (-6)^2 = 36$
+              <br>&bull; $(15 - 18)^2 = (-3)^2 = 9$
+              <br>&bull; $(18 - 18)^2 = (0)^2 = 0$
+              <br>&bull; $(20 - 18)^2 = (2)^2 = 4$
+              <br>&bull; $(25 - 18)^2 = (7)^2 = 49$
+              $$\text{Sum of Squares (SS)} = 36 + 9 + 0 + 4 + 49 = \mathbf{98.0}$$
+            </li>
+            <li><strong>Step 3: Calculate Sample Variance ($s^2$ with $n-1 = 4$):</strong>
+              $$s^2 = \frac{98.0}{5 - 1} = \frac{98.0}{4} = \mathbf{24.50}$$
+            </li>
+            <li><strong>Step 4: Take the Square Root for Sample Standard Deviation ($s$):</strong>
+              $$s = \sqrt{24.50} = \mathbf{4.9497 \approx 4.95\text{ Volts}}$$
+            </li>
+            <li><strong>Step 5: Calculate Standard Error of the Mean ($SEM$):</strong>
+              $$SEM = \frac{4.9497}{\sqrt{5}} = \frac{4.9497}{2.2361} = \mathbf{2.213\text{ Volts}}$$
+            </li>
+          </ul>
+        </div>
+
+        <p>
+          For more quantitative applications, check our financial compounding models in the <a href="rule-of-72-calculator.html">Rule of 72 Calculator</a>, calculate portfolio returns using the <a href="roi-calculator.html">ROI Calculator</a>, and browse the full range of quantitative tools in the <a href="math.html">Math Suite Hub</a>.
+        </p>
+
+        <!-- Technical FAQs -->
+        <div class="faq-container" style="margin-top:2.5rem;">
+          <h3 style="margin-bottom:1rem;color:#0F172A;">Frequently Asked Questions About Standard Deviation</h3>
+          
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What is the difference between sample standard deviation (s) and population standard deviation (σ)?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Population standard deviation (σ) divides by N and is used when you have measured every single individual in the entire population. Sample standard deviation (s) divides by (n - 1) using Bessel's correction, and is used when you are inferring population characteristics from a smaller subset. Dividing by (n - 1) corrects for the mathematical certainty that sample deviations around the sample mean underestimate true population dispersion.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What is Bessel's correction and why is it necessary?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Because the true population mean (μ) is unknown in sampling, we substitute the sample mean (x̄). By definition, the sum of squared deviations from the sample mean is mathematically smaller than the sum of squared deviations from any other value, including μ. Dividing by n produces an uncorrected sample variance that is systematically biased downward. Dividing by (n - 1) provides an unbiased estimator of the true population variance.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What is the difference between Standard Deviation (SD) and Standard Error of the Mean (SEM)?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Standard Deviation (s) measures the variability and physical dispersion of individual data points around their mean within a single dataset. Standard Error of the Mean (SEM = s ÷ √n) measures how accurately the sample mean represents the true population mean, quantifying the sampling variability across repeated experiments.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What does the Empirical Rule (68-95-99.7) state for normal distributions?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              For data following a Gaussian normal distribution: approximately 68.27% of observations fall within ±1 standard deviation of the mean (μ ± 1σ); approximately 95.45% fall within ±2 standard deviations (μ ± 2σ); and 99.73% fall within ±3 standard deviations (μ ± 3σ).
+            </div>
+          </details>
+        </div>
+      </article>
+    </main>
+
+          <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🔢</span>
+            <h3 class="widget-title">Related Mathematics & Utilities</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="standard-deviation-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Standard Deviation & Variance</a></li>
+            <li><a href="percentage-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Percentage Calculator</a></li>
+            <li><a href="fraction-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Fraction Calculator</a></li>
+            <li><a href="ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ratio Simplifier</a></li>
+            <li><a href="gpa-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> College GPA Calculator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="math.html" class="sidebar-category-link">View All Mathematics & Utilities Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <span class="logo-badge">∑</span>
+            <span>Calc<span class="accent">Hub</span></span>
+          </a>
+          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Math &amp; Analytics</h4>
+          <ul class="footer-links">
+            <li><a href="standard-deviation-calculator.html">Standard Deviation</a></li>
+            <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
+            <li><a href="fraction-calculator.html">Fraction Calculator</a></li>
+            <li><a href="ratio-calculator.html">Ratio Simplifier</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Mathematical Suites</h4>
+          <ul class="footer-links">
+            <li><a href="math.html">Math &amp; Statistics</a></li>
+            <li><a href="finance.html">Finance &amp; Wealth</a></li>
+            <li><a href="engineering.html">Electrical Engineering</a></li>
+            <li><a href="health.html">Health &amp; Nutrition</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Statistical equations follow standard NIST and ISO reference algorithms.</p>
+        <div>
+          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
+          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy &amp; Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function parseDataNumbers() {
+      const text = document.getElementById('raw-data').value;
+      const parts = text.split(/[\s,;\n\t]+/);
+      const nums = [];
+      for (let p of parts) {
+        if (p.trim() !== '') {
+          const val = parseFloat(p.trim());
+          if (!isNaN(val)) nums.push(val);
+        }
+      }
+      return nums;
+    }
+
+    function runStdDevCalc() {
+      const nums = parseDataNumbers();
+      const isSample = document.getElementById('calc-type').value === 'sample';
+
+      if (nums.length < 2 && isSample) {
+        document.getElementById('res-sd-val').textContent = 'Enter ≥ 2 values';
+        return;
+      }
+      if (nums.length < 1) {
+        document.getElementById('res-sd-val').textContent = 'Enter numbers';
+        return;
+      }
+
+      const n = nums.length;
+      let sum = 0;
+      for (let x of nums) sum += x;
+      const mean = sum / n;
+
+      let ss = 0;
+      for (let x of nums) {
+        ss += Math.pow(x - mean, 2);
+      }
+
+      let variance = 0;
+      let sd = 0;
+      if (isSample) {
+        variance = ss / (n - 1);
+        sd = Math.sqrt(variance);
+        document.getElementById('lbl-primary-sd').textContent = 'Sample Standard Deviation (s)';
+        document.getElementById('res-var-sub').textContent = 'Sample Variance (s²): ' + variance.toFixed(3);
+      } else {
+        variance = ss / n;
+        sd = Math.sqrt(variance);
+        document.getElementById('lbl-primary-sd').textContent = 'Population Standard Deviation (σ)';
+        document.getElementById('res-var-sub').textContent = 'Population Variance (σ²): ' + variance.toFixed(3);
+      }
+
+      const sem = sd / Math.sqrt(n);
+      const cv = mean !== 0 ? (sd / Math.abs(mean)) * 100 : 0;
+      const ciLower = mean - (1.96 * sem);
+      const ciUpper = mean + (1.96 * sem);
+
+      document.getElementById('res-sd-val').textContent = sd.toFixed(3);
+      document.getElementById('res-mean-val').textContent = mean.toFixed(3);
+      document.getElementById('res-count-sum').textContent = 'n = ' + n + ', ∑ = ' + sum.toLocaleString();
+      document.getElementById('res-ss-val').textContent = ss.toFixed(3);
+      document.getElementById('res-sem-val').textContent = sem.toFixed(3) + ' (s / √n)';
+      document.getElementById('res-cv-val').textContent = cv.toFixed(2) + '%';
+      document.getElementById('res-ci-band').textContent = '[' + ciLower.toFixed(2) + ', ' + ciUpper.toFixed(2) + ']';
+    }
+
+    window.addEventListener('DOMContentLoaded', runStdDevCalc);
+  </script>
+</body>
+</html>

@@ -10,8 +10,10 @@ CATEGORIES = {
         "icon": "⚖️",
         "hub": "health.html",
         "tools": [
-            ("bmi-calculator.html", "BMI Calculator", "⚖️", "Body mass index & classification"),
+            ("bmr-calculator.html", "BMR Calculator", "🧬", "Mifflin-St Jeor & Katch-McArdle resting calories"),
+            ("macro-calculator.html", "Macro Split Calculator", "🥗", "Daily protein, carbs & fats for IIFYM"),
             ("calorie-calculator.html", "Calorie Calculator (TDEE)", "🔥", "BMR & daily caloric maintenance"),
+            ("bmi-calculator.html", "BMI Calculator", "⚖️", "Body mass index & classification"),
             ("body-fat-calculator.html", "Body Fat Calculator", "📐", "Navy tape body fat & lean mass"),
             ("ideal-weight-calculator.html", "Ideal Body Weight", "🎯", "Devine & Robinson target weight"),
             ("water-intake-calculator.html", "Daily Water Intake", "💧", "Baseline & active hydration needs"),
@@ -22,10 +24,11 @@ CATEGORIES = {
         "icon": "🏦",
         "hub": "finance.html",
         "tools": [
-            ("loan-emi-calculator.html", "Loan EMI Calculator", "💳", "Monthly payment & interest split"),
+            ("rule-of-72-calculator.html", "Rule of 72 Doubling Time", "📈", "Investment doubling & tripling horizon"),
             ("car-loan-calculator.html", "Car Loan Financing", "🚗", "Auto loan payments & trade-in tax"),
+            ("roi-calculator.html", "ROI & Annualized CAGR", "📊", "Net capital gain & geometric CAGR"),
+            ("loan-emi-calculator.html", "Loan EMI Calculator", "💳", "Monthly payment & interest split"),
             ("mortgage-calculator.html", "Mortgage & PITI", "🏡", "Monthly payment, escrow & amortization"),
-            ("roi-calculator.html", "ROI & Annualized CAGR", "📈", "Net capital gain & geometric CAGR"),
             ("compound-interest-calculator.html", "Compound Interest", "📈", "Wealth growth with deposits"),
             ("simple-interest-calculator.html", "Simple Interest", "💵", "Linear interest & maturity sum"),
             ("salary-calculator.html", "Salary & Paycheck", "💼", "Hourly, monthly & annual pay"),
@@ -38,6 +41,7 @@ CATEGORIES = {
         "icon": "🔢",
         "hub": "math.html",
         "tools": [
+            ("standard-deviation-calculator.html", "Standard Deviation & Variance", "📊", "Sample (n-1) & population (N) stats"),
             ("percentage-calculator.html", "Percentage Calculator", "％", "Portions, discounts & % change"),
             ("fraction-calculator.html", "Fraction Calculator", "➗", "Add, multiply & simplify fractions"),
             ("ratio-calculator.html", "Ratio Simplifier", "⚖️", "Euclid's GCD ratio reduction"),
@@ -49,7 +53,8 @@ CATEGORIES = {
         "icon": "⚡",
         "hub": "engineering.html",
         "tools": [
-            ("conduit-fill-calculator.html", "Conduit Fill (NEC Ch. 9)", "🔌", "40% fill rule & wire jam ratio"),
+            ("wire-ampacity-calculator.html", "Wire Ampacity (NEC 310.16)", "🔌", "Allowable conductor current & derating"),
+            ("conduit-fill-calculator.html", "Conduit Fill (NEC Ch. 9)", "🪢", "40% fill rule & wire jam ratio"),
             ("motor-starting-current-calculator.html", "Motor Starting Current", "⚙️", "NEMA locked rotor inrush amps"),
             ("short-circuit-calculator.html", "Short-Circuit (IEC 60909)", "💥", "Symmetrical fault kA & breaking"),
             ("transformer-sizing-calculator.html", "Transformer Sizing (NEC 450)", "⚡", "kVA rating & full-load amps"),
@@ -87,6 +92,8 @@ CATEGORIES = {
         "icon": "🏗️",
         "hub": "civil.html",
         "tools": [
+            ("brick-calculator.html", "Brick & Masonry Calculator", "🧱", "ASTM modular brick & mortar bags"),
+            ("asphalt-calculator.html", "Asphalt Paving & Tonnage", "🛣️", "HMA road tonnage & base course"),
             ("beam-deflection-calculator.html", "Beam Deflection & Moments", "📐", "AISC 360 deflection & moment"),
             ("retaining-wall-calculator.html", "Retaining Wall Stability", "🧱", "Rankine earth pressure & overturning"),
             ("concrete-calculator.html", "Concrete Slab, Footing & Column", "🏗️", "Wet concrete m³ & cement bags"),
@@ -98,6 +105,7 @@ CATEGORIES = {
         "icon": "🧪",
         "hub": "chemical.html",
         "tools": [
+            ("chlorine-dosing-calculator.html", "Chlorine Dosing Calculator", "💧", "AWWA C651 water disinfection & bleach"),
             ("chemical-dosing-calculator.html", "Chemical Dosing Rate Calculator", "🧪", "Pump flow LPH & mg/L ppm feed"),
             ("pipe-sizing-calculator.html", "Pipe Sizing & Water Flow", "🚰", "Internal diameter & friction loss"),
             ("cooling-load-calculator.html", "Cooling Load (HVAC) Sizing", "❄️", "Sensible & latent heat in BTU/hr"),
@@ -151,19 +159,19 @@ CATEGORIES = {
 
 def determine_tool_cat(filename):
     f = filename.lower()
-    if any(k in f for k in ["bmi", "calorie", "body-fat", "ideal-weight", "water-intake"]):
+    if any(k in f for k in ["bmi", "calorie", "body-fat", "ideal-weight", "water-intake", "bmr", "macro"]):
         return "health"
-    if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary"]):
+    if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72"]):
         return "finance"
-    if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing"]):
+    if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity"]):
         return "engineering"
     if any(k in f for k in ["solar", "charging"]):
         return "solar"
-    if any(k in f for k in ["cooling", "pipe", "torque"]):
+    if any(k in f for k in ["cooling", "pipe", "torque", "pump-head", "gear-ratio"]):
         return "mechanical"
-    if any(k in f for k in ["beam", "retaining", "concrete", "rebar"]):
+    if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt"]):
         return "civil"
-    if "chemical" in f:
+    if any(k in f for k in ["chemical", "chlorine"]):
         return "chemical"
     if any(k in f for k in ["sprinkler", "smoke"]):
         return "fire"
@@ -173,7 +181,7 @@ def determine_tool_cat(filename):
         return "datetime"
     if "unit" in f:
         return "converter"
-    if any(k in f for k in ["percentage", "fraction", "ratio", "gpa"]):
+    if any(k in f for k in ["percentage", "fraction", "ratio", "gpa", "standard-deviation"]):
         return "math"
     return "math"
 
@@ -217,7 +225,8 @@ def update_all_sidebars():
     print(f"Applying updated sidebars across {len(tool_files)} tool pages...")
     updated_count = 0
 
-    sidebar_regex = re.compile(r'<!-- Related Category Sidebar -->\s*<aside class="post-sidebar">.*?</aside>', re.DOTALL)
+    # Pattern for existing sidebar
+    sidebar_regex = re.compile(r'<!--\s*(?:Related Category Sidebar|Post Sidebar)\s*-->\s*<aside class="post-sidebar"[^>]*>.*?</aside>', re.DOTALL | re.IGNORECASE)
 
     for file_path in tool_files:
         filename = os.path.basename(file_path)
@@ -229,6 +238,12 @@ def update_all_sidebars():
 
         if sidebar_regex.search(content):
             content = sidebar_regex.sub(lambda m: new_sidebar, content)
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(content)
+            updated_count += 1
+        elif '<aside class="post-sidebar"' in content:
+            alt_regex = re.compile(r'<aside class="post-sidebar"[^>]*>.*?</aside>', re.DOTALL | re.IGNORECASE)
+            content = alt_regex.sub(lambda m: new_sidebar, content)
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write(content)
             updated_count += 1

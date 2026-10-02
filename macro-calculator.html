@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Macro Calculator — Flexible Dieting, IIFYM &amp; AMDR Target Splits</title>
+  <meta name="description" content="Calculate your daily macronutrient targets (protein, carbohydrates, fats) based on the Institute of Medicine AMDR, body composition, and fitness goals (cut, bulk, recomp).">
+  <meta name="keywords" content="macro calculator, macronutrient calculator, iifym calculator, protein carb fat calculator, flexible dieting calculator, macro split for fat loss, bodybuilding macros">
+  <link rel="canonical" href="https://calchub.org/macro-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Clinical Macronutrient Split Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "HealthApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates individualized daily protein, carb, and fat gram targets according to AMDR, lean mass, and athletic goals."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What are the recommended Acceptable Macronutrient Distribution Ranges (AMDR)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The National Academies Food and Nutrition Board defines the AMDR for healthy adults as: Carbohydrates: 45% to 65% of daily energy; Fats: 20% to 35% of daily energy; and Protein: 10% to 35% of daily energy. Athletic performance diets typically bias protein toward the upper boundary."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How much protein do strength athletes and bodybuilders really need per day?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The International Society of Sports Nutrition (ISSN) and extensive meta-analyses recommend 1.6 to 2.2 grams of protein per kilogram of body weight (0.73 to 1.0 g/lb) for muscle hypertrophy. During calorie-restricted cutting phases, protein can be elevated to 2.3 to 3.1 g/kg of fat-free mass (FFM) to preserve lean muscle tissue."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why can dietary fats never be dropped to zero during a fat loss diet?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Dietary lipids provide essential fatty acids (linoleic and alpha-linolenic acids) that the human body cannot synthesize. Fats are crucial for steroid hormone production (including testosterone and estrogen), cell membrane integrity, and the absorption of fat-soluble vitamins (A, D, E, and K). Dropping fat below 15-20% of total calories can trigger hormonal crash and amenorrhea."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do Atwater general factors calculate energy from macros?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The standard Atwater system assigns: 4 kcal per gram of digestible carbohydrate, 4 kcal per gram of protein, 9 kcal per gram of dietary fat, and 7 kcal per gram of ethanol (alcohol). Fiber is typically discounted to approximately 1.5 to 2.0 kcal/g depending on fermentability."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="cat-theme-health">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="health.html" class="nav-link active">⚖️ Health</a>
+          <a href="finance.html" class="nav-link">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+        </div>
+        <div class="nav-row">
+          <a href="civil.html" class="nav-link">🏗️ Civil</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="calc-page-header">
+    <div class="calc-page-header-inner">
+      <span class="category-tag">🥗 Nutritional Science &amp; Energetics</span>
+      <h1 class="calc-page-title">Macronutrient Calculator</h1>
+      <p class="calc-page-desc">Precision macro split targets based on clinical AMDR guidelines, body composition, and training goals (IIFYM, Hypertrophy, Cutting, or Keto).</p>
+    </div>
+  </div>
+
+  <div class="layout-container" style="display:flex;gap:2rem;max-width:1200px;margin:2rem auto;padding:0 1.25rem;align-items:start;">
+    
+    <main style="flex:1;min-width:0;">
+      <div class="calculator-workspace">
+        <section class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title"><span>🥗</span> Nutritional Profile</h2>
+            <span class="status-info">ISSN &amp; AMDR</span>
+          </div>
+          <form id="macro-form" onsubmit="return false;">
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="daily-cals">Daily Calorie Target (kcal)</label>
+                <input type="number" id="daily-cals" class="form-control" value="2200" min="800" max="8000" step="50" oninput="runMacroCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="diet-goal">Nutritional Objective</label>
+                <select id="diet-goal" class="form-control" onchange="runMacroCalc()">
+                  <option value="balanced" selected>Balanced AMDR (45% Carb / 25% Pro / 30% Fat)</option>
+                  <option value="athletic">High Protein Athlete (40% Carb / 35% Pro / 25% Fat)</option>
+                  <option value="cutting">Cutting &amp; Fat Loss (30% Carb / 40% Pro / 30% Fat)</option>
+                  <option value="lowcarb">Low Carb / Endurance (20% Carb / 35% Pro / 45% Fat)</option>
+                  <option value="keto">Ketogenic (5% Carb / 25% Pro / 70% Fat)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="user-mass">Body Weight (kg)</label>
+                <input type="number" id="user-mass" class="form-control" value="75" min="30" max="250" step="1" oninput="runMacroCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="meals-count">Daily Meal Frequency</label>
+                <select id="meals-count" class="form-control" onchange="runMacroCalc()">
+                  <option value="3">3 Meals / day</option>
+                  <option value="4" selected>4 Meals / day</option>
+                  <option value="5">5 Meals / day</option>
+                  <option value="6">6 Meals / day</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-actions" style="margin-top:1.5rem;display:flex;gap:1rem;">
+              <button type="button" class="btn btn-primary" onclick="runMacroCalc()">Calculate Macros</button>
+              <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Print Nutrition Plan</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="results-card">
+          <h2 class="results-title">Macronutrient Target Distribution</h2>
+          
+          <div class="result-details-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:1.5rem;">
+            <!-- Protein Card -->
+            <div class="result-item" style="background:#FEF2F2;border:1px solid #FECACA;padding:1rem;border-radius:10px;text-align:center;">
+              <span class="result-label" style="display:block;font-size:0.8rem;font-weight:700;color:#991B1B;text-transform:uppercase;">🥩 Protein (4 kcal/g)</span>
+              <span id="res-pro-g" class="result-val" style="font-size:1.6rem;font-weight:800;color:#DC2626;display:block;margin:0.25rem 0;">138 g</span>
+              <span id="res-pro-cal" style="font-size:0.8rem;color:#7F1D1D;">550 kcal (25%)</span>
+            </div>
+            <!-- Carbs Card -->
+            <div class="result-item" style="background:#EFF6FF;border:1px solid #BFDBFE;padding:1rem;border-radius:10px;text-align:center;">
+              <span class="result-label" style="display:block;font-size:0.8rem;font-weight:700;color:#1E40AF;text-transform:uppercase;">🍚 Carbs (4 kcal/g)</span>
+              <span id="res-carb-g" class="result-val" style="font-size:1.6rem;font-weight:800;color:#2563EB;display:block;margin:0.25rem 0;">248 g</span>
+              <span id="res-carb-cal" style="font-size:0.8rem;color:#1E3A8A;">990 kcal (45%)</span>
+            </div>
+            <!-- Fat Card -->
+            <div class="result-item" style="background:#FEFCE8;border:1px solid #FEF08A;padding:1rem;border-radius:10px;text-align:center;">
+              <span class="result-label" style="display:block;font-size:0.8rem;font-weight:700;color:#854D0E;text-transform:uppercase;">🥑 Fats (9 kcal/g)</span>
+              <span id="res-fat-g" class="result-val" style="font-size:1.6rem;font-weight:800;color:#CA8A04;display:block;margin:0.25rem 0;">73 g</span>
+              <span id="res-fat-cal" style="font-size:0.8rem;color:#713F12;">660 kcal (30%)</span>
+            </div>
+          </div>
+
+          <div class="result-details-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Per-Meal Protein Target</span>
+              <span id="res-meal-pro" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">34.5 g / meal</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Daily Fiber Intake Goal</span>
+              <span id="res-fiber-g" class="result-val" style="font-size:1.1rem;font-weight:700;color:#059669;">30.8 g (14g/1000kcal)</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Relative Protein per Bodyweight</span>
+              <span id="res-rel-pro" class="result-val" style="font-size:1.1rem;font-weight:700;color:#2563EB;">1.84 g / kg (0.83 g/lb)</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Thermic Effect of Food (TEF)</span>
+              <span id="res-tef-cals" class="result-val" style="font-size:1.1rem;font-weight:700;color:#7C3AED;">~220 kcal burned</span>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem;padding:0.85rem;border-radius:8px;background:#F0FDF4;border:1px solid #BBF7D0;font-size:0.85rem;color:#166534;">
+            <strong>⚖️ Baseline Metabolism:</strong> Need to establish your daily caloric maintenance first? Run our clinical <a href="bmr-calculator.html" style="color:#166534;font-weight:700;">BMR Calculator</a> and our <a href="calorie-calculator.html" style="color:#166534;font-weight:700;">TDEE Calorie Calculator</a>.
+          </div>
+        </section>
+      </div>
+
+      <!-- In-Depth Technical Article (1,200+ words) -->
+      <article class="article-section" style="margin-top:2.5rem;line-height:1.7;color:#334155;">
+        <h2>Macronutrient Partitioning: The Science of Fueling, Muscle Sparing, and Lipid Metabolism</h2>
+        <p>
+          While the First Law of Thermodynamics dictates that absolute energy balance (calories in versus calories out) governs total body mass changes over time, <strong>macronutrient partitioning</strong> determines the quality and tissue composition of that change. Whether weight lost is purely visceral and subcutaneous adipose tissue or valuable skeletal muscle mass—and whether weight gained is dense contractile tissue or stubborn fat—is fundamentally modulated by how you partition your daily caloric intake across the three primary dietary macronutrients: proteins, carbohydrates, and lipids.
+        </p>
+
+        <h3>1. The Atwater System and Energetic Substrates</h3>
+        <p>
+          In human nutritional physiology, chemical potential energy stored in food is calculated via the classic Atwater specific factor system:
+        </p>
+        <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+          <li><strong>Protein:</strong> $4.0\text{ kcal per gram}$ ($16.7\text{ kJ/g}$). Composed of 20 amino acids, 9 of which are essential (EAAs) that must be obtained exogenously.</li>
+          <li><strong>Carbohydrates:</strong> $4.0\text{ kcal per gram}$ ($16.7\text{ kJ/g}$). The premier fuel substrate for central nervous system glycolysis and high-intensity anaerobic athletic performance ($VO_2 \ge 70\%$).</li>
+          <li><strong>Dietary Lipids (Fats):</strong> $9.0\text{ kcal per gram}$ ($37.7\text{ kJ/g}$). Dense energetic stores, lipid bilayer membrane precursors, and essential carriers for fat-soluble vitamins (A, D, E, K).</li>
+          <li><strong>Ethanol (Alcohol):</strong> $7.0\text{ kcal per gram}$ ($29.3\text{ kJ/g}$). Oxidized preferentially by the liver, suppressing hepatic lipid oxidation.</li>
+        </ul>
+
+        <h3>2. Clinical Acceptable Macronutrient Distribution Ranges (AMDR)</h3>
+        <p>
+          The Food and Nutrition Board of the National Academies of Sciences, Engineering, and Medicine publishes evidence-based AMDR ranges designed to minimize risk of chronic cardiometabolic diseases while ensuring adequate intake of micronutrients:
+        </p>
+
+        <table class="reference-table" style="width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.9rem;">
+          <thead>
+            <tr style="background:#F1F5F9;text-align:left;">
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Macronutrient</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">IOM / AMDR Range</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">ISSN Athlete Range</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Thermic Effect (TEF)</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Physiological Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Protein</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">10% – 35% of total kcal</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$1.6 - 2.4\text{ g/kg}$ (up to 3.1 in cuts)</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>20% – 30%</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Muscle protein synthesis (MPS), enzymes, tissue remodeling</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Carbohydrates</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">45% – 65% of total kcal</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$3.0 - 8.0\text{ g/kg}$ (sport specific)</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>5% – 10%</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Skeletal muscle &amp; liver glycogen replenishment, glycolytic power</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Dietary Fats</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">20% – 35% of total kcal</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">$0.7 - 1.2\text{ g/kg}$ (minimum 20% kcal)</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>0% – 3%</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Steroid hormone synthesis (testosterone), lipid signaling, cell membranes</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>3. The Thermic Effect of Food (TEF) &amp; Metabolic Advantage</h3>
+        <p>
+          Not all calories ingested are metabolically accessible to the body. The <strong>Thermic Effect of Food (TEF)</strong>, also termed diet-induced thermogenesis (DIT), represents the energetic cost of chewing, swallowing, secreting gastric acid, enzymatically cleaving peptide bonds, absorbing across the enterocytes, and biochemically processing nutrients:
+        </p>
+        <p>
+          $$\text{Net Energy} = \text{Gross Ingested Calories} - \text{TEF}$$
+        </p>
+        <p>
+          Because protein possesses an extraordinary thermic cost of $20 - 30\%$, for every 100 calories of lean chicken breast or whey isolate consumed, approximately $20\text{ to }30\text{ kcal}$ are immediately dissipated as obligatory body heat just to break the peptide linkages and undergo hepatic deamination. In contrast, dietary fats incur an energetic cost of only $0 - 3\%$, meaning fat molecules are stored with near-100% thermodynamic efficiency. Shifting your macronutrient ratios toward higher protein thus naturally increases your 24-hour total energy expenditure without extra treadmill cardio!
+        </p>
+
+        <h3>4. Muscle Protein Synthesis (MPS) and Per-Meal Distribution</h3>
+        <p>
+          Skeletal muscle is in a dynamic, continuous state of turnover between <em>Muscle Protein Synthesis (MPS)</em> and <em>Muscle Protein Breakdown (MPB)</em>. To achieve a net positive nitrogen balance and drive muscular hypertrophy or preserve lean mass during a cutting calorie deficit, the intracellular <strong>mTORC1</strong> (mechanistic target of rapamycin complex 1) pathway must be periodically stimulated.
+        </p>
+        <div class="worked-example-card" style="background:#F8FAFC;border-left:4px solid #2563EB;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#1E293B;">The Leucine Trigger Threshold</h4>
+          <p>
+            Research demonstrates that MPS is maximally stimulated when a single meal delivers approximately <strong>$2.5\text{ to }3.5\text{ grams of L-leucine}$</strong>—the branched-chain amino acid that acts as the primary biochemical trigger for mTOR activation. In whole foods, this equates to roughly <strong>$30\text{ to }40\text{ grams}$</strong> of high-quality animal protein (beef, eggs, dairy, poultry) or $40\text{ to }50\text{ grams}$ of plant-based protein blends (pea/rice). Eating 150 grams of protein in one gigantic evening meal triggers MPS only once, whereas partitioning that 150g across four distinct 37.5g meals every 3-4 hours stimulates MPS multiple times throughout the day.
+          </p>
+        </div>
+
+        <h3>Worked Practical Example: 80 kg Athlete Designing a Fat-Loss Cut</h3>
+        <div class="worked-example-card" style="background:#F0FDF4;border-left:4px solid #16A34A;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#14532D;">Step-by-Step Macro Calculations</h4>
+          <p><strong>Subject Profile:</strong> 80 kg male, 15% body fat, maintenance calories = $2,600\text{ kcal}$. Goal: 500 kcal deficit to lose fat while retaining maximum lean contractile mass.</p>
+          <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+            <li><strong>Step 1: Daily Target Calories:</strong> $2,600 - 500 = \mathbf{2,100\text{ kcal/day}}$</li>
+            <li><strong>Step 2: Establish High-Protein Ceiling:</strong> ISSN recommended cutting intake is $2.2\text{ g/kg}$ of body mass:
+              $$\text{Protein} = 80\text{ kg} \times 2.2\text{ g/kg} = \mathbf{176\text{ grams}}\quad(176 \times 4 = 704\text{ kcal},\; 33.5\%)$$
+            </li>
+            <li><strong>Step 3: Establish Essential Lipid Floor:</strong> Never drop below 20-25% of calories to protect testosterone and lipid health:
+              $$\text{Fat (25\% of kcal)} = \frac{2,100 \times 0.25}{9\text{ kcal/g}} = \frac{525}{9} = \mathbf{58.3\text{ grams}}\quad(525\text{ kcal})$$
+            </li>
+            <li><strong>Step 4: Allocate Remaining Calories to Carbohydrates:</strong>
+              $$\text{Carb Calories} = 2,100 - (704 + 525) = 871\text{ kcal}$$
+              $$\text{Carbohydrate Grams} = \frac{871}{4\text{ kcal/g}} = \mathbf{217.8\text{ grams}}\quad(41.5\%)$$
+            </li>
+            <li><strong>Step 5: Dietary Fiber Target:</strong> Based on 14g per 1,000 kcal:
+              $$\text{Fiber Target} = \frac{2,100}{1,000} \times 14 = \mathbf{29.4\text{ grams}}$$
+            </li>
+          </ul>
+          <p><strong>Per-Meal Execution (4 Meals/Day):</strong> $44\text{g protein}$, $54.5\text{g carbs}$, $14.6\text{g fat}$ per sitting ensures the leucine trigger is surpassed 4 times daily while effortlessly shedding 1 lb of pure body fat weekly!</p>
+        </div>
+
+        <p>
+          To monitor your body composition trajectory, cross-reference your progress with our <a href="body-fat-calculator.html">Body Fat Calculator</a>, track your hydration with the <a href="water-intake-calculator.html">Water Intake Calculator</a>, and calibrate energy expenditure using the <a href="calorie-calculator.html">Calorie Calculator</a>.
+        </p>
+
+        <!-- Technical FAQs -->
+        <div class="faq-container" style="margin-top:2.5rem;">
+          <h3 style="margin-bottom:1rem;color:#0F172A;">Frequently Asked Questions About Macronutrient Partitioning</h3>
+          
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What are the recommended Acceptable Macronutrient Distribution Ranges (AMDR)?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              The National Academies Food and Nutrition Board defines the AMDR for healthy adults as: Carbohydrates: 45% to 65% of daily energy; Fats: 20% to 35% of daily energy; and Protein: 10% to 35% of daily energy. Athletic performance diets typically bias protein toward the upper boundary.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">How much protein do strength athletes and bodybuilders really need per day?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              The International Society of Sports Nutrition (ISSN) and extensive meta-analyses recommend 1.6 to 2.2 grams of protein per kilogram of body weight (0.73 to 1.0 g/lb) for muscle hypertrophy. During calorie-restricted cutting phases, protein can be elevated to 2.3 to 3.1 g/kg of fat-free mass (FFM) to preserve lean muscle tissue.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">Why can dietary fats never be dropped to zero during a fat loss diet?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Dietary lipids provide essential fatty acids (linoleic and alpha-linolenic acids) that the human body cannot synthesize. Fats are crucial for steroid hormone production (including testosterone and estrogen), cell membrane integrity, and the absorption of fat-soluble vitamins (A, D, E, and K). Dropping fat below 15-20% of total calories can trigger hormonal crash and amenorrhea.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">How do Atwater general factors calculate energy from macros?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              The standard Atwater system assigns: 4 kcal per gram of digestible carbohydrate, 4 kcal per gram of protein, 9 kcal per gram of dietary fat, and 7 kcal per gram of ethanol (alcohol). Fiber is typically discounted to approximately 1.5 to 2.0 kcal/g depending on fermentability.
+            </div>
+          </details>
+        </div>
+      </article>
+    </main>
+
+          <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚖️</span>
+            <h3 class="widget-title">Related Health & Fitness</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bmr-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMR Calculator</a></li>
+            <li><a href="macro-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Macro Split Calculator</a></li>
+            <li><a href="calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Calculator (TDEE)</a></li>
+            <li><a href="bmi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Daily Water Intake</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="health.html" class="sidebar-category-link">View All Health & Fitness Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <span class="logo-badge">∑</span>
+            <span>Calc<span class="accent">Hub</span></span>
+          </a>
+          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Metabolism &amp; Fitness</h4>
+          <ul class="footer-links">
+            <li><a href="macro-calculator.html">Macro Split Calculator</a></li>
+            <li><a href="bmr-calculator.html">BMR Calculator</a></li>
+            <li><a href="calorie-calculator.html">Calorie TDEE</a></li>
+            <li><a href="bmi-calculator.html">BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Clinical Suites</h4>
+          <ul class="footer-links">
+            <li><a href="health.html">Health &amp; Nutrition</a></li>
+            <li><a href="finance.html">Finance &amp; Wealth</a></li>
+            <li><a href="engineering.html">Electrical Engineering</a></li>
+            <li><a href="math.html">Math &amp; Statistics</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Medical calculations are for educational and guidance purposes.</p>
+        <div>
+          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
+          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy &amp; Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function runMacroCalc() {
+      const cals = parseFloat(document.getElementById('daily-cals').value) || 2000;
+      const goal = document.getElementById('diet-goal').value;
+      const weightKg = parseFloat(document.getElementById('user-mass').value) || 75;
+      const meals = parseInt(document.getElementById('meals-count').value) || 4;
+
+      let carbPct = 0.45, proPct = 0.25, fatPct = 0.30;
+
+      if (goal === 'athletic') {
+        carbPct = 0.40; proPct = 0.35; fatPct = 0.25;
+      } else if (goal === 'cutting') {
+        carbPct = 0.30; proPct = 0.40; fatPct = 0.30;
+      } else if (goal === 'lowcarb') {
+        carbPct = 0.20; proPct = 0.35; fatPct = 0.45;
+      } else if (goal === 'keto') {
+        carbPct = 0.05; proPct = 0.25; fatPct = 0.70;
+      }
+
+      const proCals = cals * proPct;
+      const carbCals = cals * carbPct;
+      const fatCals = cals * fatPct;
+
+      const proGrams = proCals / 4;
+      const carbGrams = carbCals / 4;
+      const fatGrams = fatCals / 9;
+
+      const fiberGrams = (cals / 1000) * 14;
+      const perMealPro = proGrams / meals;
+      const relPro = proGrams / weightKg;
+      const relProLb = relPro / 2.20462;
+      const tef = (proCals * 0.25) + (carbCals * 0.08) + (fatCals * 0.02);
+
+      document.getElementById('res-pro-g').textContent = Math.round(proGrams) + ' g';
+      document.getElementById('res-pro-cal').textContent = Math.round(proCals) + ' kcal (' + Math.round(proPct * 100) + '%)';
+
+      document.getElementById('res-carb-g').textContent = Math.round(carbGrams) + ' g';
+      document.getElementById('res-carb-cal').textContent = Math.round(carbCals) + ' kcal (' + Math.round(carbPct * 100) + '%)';
+
+      document.getElementById('res-fat-g').textContent = Math.round(fatGrams) + ' g';
+      document.getElementById('res-fat-cal').textContent = Math.round(fatCals) + ' kcal (' + Math.round(fatPct * 100) + '%)';
+
+      document.getElementById('res-meal-pro').textContent = perMealPro.toFixed(1) + ' g / meal';
+      document.getElementById('res-fiber-g').textContent = fiberGrams.toFixed(1) + ' g (14g/1000kcal)';
+      document.getElementById('res-rel-pro').textContent = relPro.toFixed(2) + ' g/kg (' + relProLb.toFixed(2) + ' g/lb)';
+      document.getElementById('res-tef-cals').textContent = '~' + Math.round(tef) + ' kcal burned';
+    }
+
+    window.addEventListener('DOMContentLoaded', runMacroCalc);
+  </script>
+</body>
+</html>

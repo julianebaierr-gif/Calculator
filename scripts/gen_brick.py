@@ -1,0 +1,517 @@
+"""
+Generates brick-calculator.html and asphalt-calculator.html
+"""
+import os
+
+TOOL_BRICK = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brick &amp; Block Wall Calculator — Masonry Units, Mortar &amp; Waste</title>
+  <meta name="description" content="Calculate the exact number of bricks or concrete blocks (CMU) and mortar bags required for any wall area. Deduct door and window openings with standard 10% wastage factors.">
+  <meta name="keywords" content="brick calculator, block wall calculator, cmu block calculator, masonry mortar calculator, brick takeoff calculator, mortar bags per brick, brick wall estimator">
+  <link rel="canonical" href="https://calchub.org/brick-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Brick & Masonry Wall Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "UtilitiesApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates brick and CMU block quantities, net surface area, and bags of masonry mortar required for building walls."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How many standard modular bricks are required per square foot of wall?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For standard US modular facing bricks (3-5/8 x 2-1/4 x 7-5/8 inches) laid with a standard 3/8-inch mortar joint, exactly 6.75 bricks are required per square foot of single-wythe wall surface (or approximately 7.4 bricks per sq ft when factoring in a standard 10% cutting and breakage allowance)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How many concrete blocks (CMU) are required per 100 square feet of wall?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A standard 8x8x16 concrete masonry unit (nominal dimensions including 3/8-inch mortar joint) has a nominal face area of 8 x 16 inches = 128 sq in (0.888 sq ft). Exactly 112.5 blocks are required per 100 square feet of wall surface (approx 124 blocks with 10% waste)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How many bags of masonry mortar do I need per 100 bricks?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "On average, one 80 lb (36 kg) bag of Type N or Type S pre-blended masonry cement mortar will lay approximately 30 to 35 standard modular bricks or 12 to 14 standard 8-inch CMU blocks. Therefore, 100 bricks require roughly 3 bags of mortar."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between single-wythe and double-wythe brick walls?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A single-wythe wall consists of a single layer of bricks in thickness (typically used as an exterior veneer over wood or steel framing). A double-wythe wall has two parallel layers of bricks bonded together with mortar headers or metal ties, requiring exactly double the quantity of bricks."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="cat-theme-civil">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="finance.html" class="nav-link">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+        </div>
+        <div class="nav-row">
+          <a href="civil.html" class="nav-link active">🏗️ Civil</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="calc-page-header">
+    <div class="calc-page-header-inner">
+      <span class="category-tag">🏗️ Civil &amp; Structural Engineering</span>
+      <h1 class="calc-page-title">Brick &amp; Block Wall Calculator</h1>
+      <p class="calc-page-desc">Estimate required masonry units, mortar bags, sand volume, and material takeoff costs for single or double wythe brick and concrete block (CMU) walls.</p>
+    </div>
+  </div>
+
+  <div class="layout-container" style="display:flex;gap:2rem;max-width:1200px;margin:2rem auto;padding:0 1.25rem;align-items:start;">
+    
+    <main style="flex:1;min-width:0;">
+      <div class="calculator-workspace">
+        <section class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title"><span>🧱</span> Wall &amp; Masonry Dimensions</h2>
+            <span class="status-info">ASTM C216 &amp; C90</span>
+          </div>
+          <form id="brick-form" onsubmit="return false;">
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="unit-sys">Measurement System</label>
+                <select id="unit-sys" class="form-control" onchange="toggleBrickUnits()">
+                  <option value="imperial" selected>Imperial (Feet &amp; Inches)</option>
+                  <option value="metric">Metric (Meters &amp; Millimeters)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="masonry-type">Masonry Unit Type</label>
+                <select id="masonry-type" class="form-control" onchange="runBrickCalc()">
+                  <option value="modular" selected>US Standard Modular Brick (3⅝" &times; 2¼" &times; 7⅝")</option>
+                  <option value="standard">US Standard Common Brick (3½" &times; 2¼" &times; 8")</option>
+                  <option value="queen">Queen Size Brick (3" &times; 2¾" &times; 7⅝")</option>
+                  <option value="cmu8">CMU Concrete Block (8" &times; 8" &times; 16")</option>
+                  <option value="cmu6">CMU Concrete Block (6" &times; 8" &times; 16")</option>
+                  <option value="ukmetric">UK Standard Metric Brick (215 &times; 102.5 &times; 65 mm)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" id="lbl-wall-len" for="wall-len">Wall Length (ft)</label>
+                <input type="number" id="wall-len" class="form-control" value="25" min="1" max="1000" step="0.5" oninput="runBrickCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" id="lbl-wall-ht" for="wall-ht">Wall Height (ft)</label>
+                <input type="number" id="wall-ht" class="form-control" value="8" min="1" max="100" step="0.5" oninput="runBrickCalc()">
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="wall-wythe">Wall Construction Layers</label>
+                <select id="wall-wythe" class="form-control" onchange="runBrickCalc()">
+                  <option value="1" selected>Single Wythe (1 Layer / Facing Veneer)</option>
+                  <option value="2">Double Wythe (2 Layers / Solid Cavity Wall)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="waste-pct">Cutting &amp; Breakage Waste Factor (%)</label>
+                <select id="waste-pct" class="form-control" onchange="runBrickCalc()">
+                  <option value="0.05">5% (Simple rectangular wall)</option>
+                  <option value="0.10" selected>10% (Standard architectural allowance)</option>
+                  <option value="0.15">15% (Complex corners &amp; many cuts)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" id="lbl-open-area" for="open-area">Openings Deductions - Doors/Windows (sq ft)</label>
+                <input type="number" id="open-area" class="form-control" value="21" min="0" max="10000" step="1" oninput="runBrickCalc()">
+              </div>
+            </div>
+
+            <div class="calc-actions" style="margin-top:1.5rem;display:flex;gap:1rem;">
+              <button type="button" class="btn btn-primary" onclick="runBrickCalc()">Calculate Masonry Takeoff</button>
+              <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Print Report</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="results-card">
+          <h2 class="results-title">Material Takeoff Results</h2>
+          <div class="primary-result-box" style="margin-bottom:1.5rem;text-align:center;padding:1.5rem;border-radius:12px;background:#F8FAFC;border:2px solid #E2E8F0;">
+            <div class="primary-result-label" style="font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em;color:#64748B;">Total Bricks / Blocks Needed</div>
+            <div id="res-total-bricks" class="primary-result-value" style="font-size:2.5rem;font-weight:800;color:#B45309;margin:0.25rem 0;">1,329 Units</div>
+            <div id="res-waste-note" style="font-size:0.85rem;color:#64748B;font-weight:600;">Includes 10% Cutting &amp; Breakage Waste</div>
+          </div>
+
+          <div class="result-details-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Net Wall Surface Area</span>
+              <span id="res-net-area" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">179.0 sq ft</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Exact Base Units (0% waste)</span>
+              <span id="res-base-bricks" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">1,208 Units</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Mortar Bags (80 lb / Type N)</span>
+              <span id="res-mortar-bags" class="result-val" style="font-size:1.1rem;font-weight:700;color:#2563EB;">38 Bags</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Estimated Masonry Sand</span>
+              <span id="res-sand-vol" class="result-val" style="font-size:1.1rem;font-weight:700;color:#059669;">1.4 Tons / 1.1 yd³</span>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem;padding:0.85rem;border-radius:8px;background:#FEFCE8;border:1px solid #FEF08A;font-size:0.85rem;color:#854D0E;">
+            <strong>💡 Structural Tip:</strong> For foundation footings and slab tie-ins supporting this wall, calculate concrete batching with our <a href="concrete-calculator.html" style="color:#854D0E;font-weight:700;">Concrete Calculator</a> and size rebar with the <a href="rebar-calculator.html" style="color:#854D0E;font-weight:700;">Rebar Calculator</a>.
+          </div>
+        </section>
+      </div>
+
+      <!-- In-Depth Technical Article (1,200+ words) -->
+      <article class="article-section" style="margin-top:2.5rem;line-height:1.7;color:#334155;">
+        <h2>Authoritative Guide to Brick &amp; Block Masonry Quantity Takeoffs</h2>
+        <p>
+          Accurate material estimation is the bedrock of cost management in masonry construction, whether building a residential perimeter garden wall, a multi-story commercial veneer cavity system, or an industrial retaining wall using reinforced Concrete Masonry Units (CMU). Under-ordering bricks delays project timelines and risks noticeable batch color mismatches from separate kiln firings. Conversely, over-ordering ties up working capital in non-returnable pallets. Governed by standards from the <strong>Masonry Institute of America (MIA)</strong>, <strong>ASTM C216 (Facing Brick)</strong>, and <strong>ASTM C90 (Loadbearing CMU)</strong>, professional estimating involves precise geometric calculations factoring in mortar bed joint thicknesses, wall wythe layers, and cutting allowances.
+        </p>
+
+        <h3>Nominal vs Specified Masonry Dimensions</h3>
+        <p>
+          In architectural drawings and specifications, a critical distinction exists between <em>specified (manufactured) dimensions</em> and <em>nominal dimensions</em>. The nominal dimension always includes the thickness of one standard mortar joint—typically 3/8 inch (9.5 mm) in US practice, or 10 mm in European and British standards. For example:
+        </p>
+        <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+          <li><strong>Standard US Modular Brick:</strong> Actual manufactured dimensions are $3\frac{5}{8} \times 2\frac{1}{4} \times 7\frac{5}{8}$ inches. When laid with a $3/8$-inch mortar joint, its nominal modular size becomes $4 \times 2\frac{2}{3} \times 8$ inches ($102 \times 68 \times 203$ mm). Three courses of modular brick equal exactly 8 inches in vertical height, perfectly matching standard concrete block modular grid coordination!</li>
+          <li><strong>Standard 8-Inch CMU Block:</strong> Actual manufactured dimensions are $7\frac{5}{8} \times 7\frac{5}{8} \times 15\frac{5}{8}$ inches. With the 3/8-inch bed joint and head joint, nominal dimensions are exactly $8 \times 8 \times 16$ inches ($200 \times 200 \times 400$ mm).</li>
+        </ul>
+
+        <h3>Mathematical Governing Equations</h3>
+        <p>
+          The net surface area ($A_{net}$) of the wall to be laid is the gross wall area minus the area of all window, door, and architectural openings:
+        </p>
+        <p>$$A_{net} = (L_{wall} \times H_{wall}) - \sum A_{openings}$$</p>
+        <p>
+          The face area occupied by a single masonry unit ($A_{unit}$) including its mortar joints is:
+        </p>
+        <p>$$A_{unit} = (L_{unit} + t_{joint}) \times (H_{unit} + t_{joint})$$</p>
+        <p>
+          For standard US Modular brick in imperial units:
+        </p>
+        <p>$$A_{unit} = \left( 7.625 + 0.375 \right) \text{ in} \times \left( 2.25 + 0.375 \right) \text{ in} = 8.0 \text{ in} \times 2.625 \text{ in} = 21.0 \text{ sq inches} = 0.14583 \text{ sq ft}$$</p>
+        <p>
+          The number of bricks per square foot of wall surface is:
+        </p>
+        <p>$$\text{Bricks per sq ft} = \frac{1}{0.14583} \approx 6.857 \text{ bricks/sq ft (approx. 6.75 to 7.0)}$$</p>
+        <p>
+          Multiplying by the wall layer multiplier ($W = 1$ for single wythe, $W = 2$ for double wythe) and adding the cutting and breakage waste factor ($f_{waste} \approx 0.10$ for 10%):
+        </p>
+        <p>$$\text{Total Bricks} = A_{net} \times (\text{Bricks per sq ft}) \times W \times (1 + f_{waste})$$</p>
+
+        <h3>Masonry Unit Dimensions &amp; Coverage Reference Table</h3>
+        <table class="reference-table" style="width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.9rem;">
+          <thead>
+            <tr style="background:#F1F5F9;text-align:left;">
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Masonry Type</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Actual Dimensions (in / mm)</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Nominal Face Area</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Units per Sq Ft (0% waste)</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Units per Sq Meter</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>US Modular Brick</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">3⅝" &times; 2¼" &times; 7⅝"</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">21.0 sq in (0.146 sq ft)</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">6.75 – 6.86</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">74.0</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>US Standard Brick</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">3½" &times; 2¼" &times; 8"</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">21.9 sq in (0.152 sq ft)</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">6.55 – 6.60</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">70.5</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>US Queen Size Brick</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">3" &times; 2¾" &times; 7⅝"</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">25.0 sq in (0.174 sq ft)</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">5.75 – 5.80</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">62.0</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>Standard 8" CMU Block</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">7⅝" &times; 7⅝" &times; 15⅝"</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">128.0 sq in (0.889 sq ft)</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">1.125</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">12.5</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>UK Metric Standard Brick</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">215 &times; 102.5 &times; 65 mm</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">16,875 mm² (0.182 sq ft)</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">5.50</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">60.0</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Mortar Estimation &amp; Mix Ratios (ASTM C270)</h3>
+        <p>
+          Mortar accounts for approximately 15% to 20% of the total volume of a completed brick wall. Under <strong>ASTM C270</strong>, masonry mortars are categorized by compressive strength:
+        </p>
+        <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+          <li><strong>Type M (2,500 psi / 17.2 MPa):</strong> High compressive strength; recommended for below-grade foundation retaining walls, heavy loadbearing piers, and severe frost exposure.</li>
+          <li><strong>Type S (1,800 psi / 12.4 MPa):</strong> High flexural bond strength; ideal for seismic zones, exterior walls subject to high lateral wind loads, and reinforced CMU masonry.</li>
+          <li><strong>Type N (750 psi / 5.2 MPa):</strong> General-purpose medium strength; the industry standard for above-grade exterior residential brick veneer and interior partitions.</li>
+        </ul>
+        <p>
+          On average, an 80 lb (36.3 kg) bag of pre-mixed Type N masonry cement combined with clean masonry sand yields approximately 0.75 cubic feet of wet mortar. In field practice, contractors estimate:
+        </p>
+        <p>$$\text{Mortar Bags} = \frac{\text{Total Bricks}}{30 \text{ to } 35 \text{ bricks per bag}} \quad \text{or for CMU: } \frac{\text{Total Blocks}}{12 \text{ to } 14 \text{ blocks per bag}}$$</p>
+        <p>
+          For concrete foundations beneath the wall, use our <a href="concrete-calculator.html">Concrete Volume Calculator</a>, and verify lateral soil stability for basement stems with our <a href="retaining-wall-calculator.html">Retaining Wall Calculator</a>.
+        </p>
+
+        <h3>Worked Practical Example: Residential Garage Brick Veneer</h3>
+        <div class="worked-example-card" style="background:#F0FDF4;border-left:4px solid #16A34A;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#14532D;">Real-World Contractor Quantity Takeoff:</h4>
+          <p><strong>Design Scenario:</strong> A masonry contractor is installing a single-wythe exterior facing brick veneer on a residential garage wall. The design parameters are:</p>
+          <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+            <li>Wall Dimensions: 30 feet long &times; 9 feet high</li>
+            <li>Openings: 1 garage door (8 ft &times; 7 ft = 56 sq ft) and 1 pedestrian door (3 ft &times; 7 ft = 21 sq ft)</li>
+            <li>Brick Specification: Standard US Modular brick (6.75 bricks/sq ft)</li>
+            <li>Wastage Allowance: 10% cutting and chipping margin</li>
+          </ul>
+          <p><strong>Step 1: Calculate Gross and Net Wall Areas:</strong></p>
+          <p>$$A_{gross} = 30 \text{ ft} \times 9 \text{ ft} = 270.0 \text{ sq ft}$$</p>
+          <p>$$A_{openings} = 56 + 21 = 77.0 \text{ sq ft}$$</p>
+          <p>$$A_{net} = 270.0 - 77.0 = 193.0 \text{ sq ft}$$</p>
+          <p><strong>Step 2: Calculate Base Brick Count:</strong></p>
+          <p>$$\text{Base Bricks} = 193.0 \text{ sq ft} \times 6.75 \text{ bricks/sq ft} = 1,302.75 \approx 1,303 \text{ bricks}$$</p>
+          <p><strong>Step 3: Factor 10% Waste Margin:</strong></p>
+          <p>$$\text{Total Order} = 1,303 \times 1.10 = 1,433.3 \rightarrow \mathbf{1,434 \text{ Modular Bricks (3 pallets of 500)}}$$</p>
+          <p><strong>Step 4: Calculate Mortar &amp; Sand Requirements:</strong></p>
+          <p>$$\text{Mortar Bags (80 lb)} = \frac{1,434}{33} \approx \mathbf{44 \text{ Bags of Type N Mortar}}$$</p>
+          <p>$$\text{Masonry Sand} = 44 \text{ bags} \times 0.035 \text{ tons/bag} \approx \mathbf{1.54 \text{ Tons of Sand}}$$</p>
+        </div>
+
+        <p>
+          For structural roof girders bearing onto masonry pilasters, calculate beam deflection with our <a href="beam-deflection-calculator.html">Beam Deflection Calculator</a>, and evaluate driveway paving with our <a href="asphalt-calculator.html">Asphalt Calculator</a>.
+        </p>
+
+        <!-- Technical FAQs -->
+        <div class="faq-container" style="margin-top:2.5rem;">
+          <h3 style="margin-bottom:1rem;color:#0F172A;">Frequently Asked Questions About Brick Takeoffs</h3>
+          
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">How many standard modular bricks are required per square foot of wall?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              For standard US modular facing bricks (3-5/8 x 2-1/4 x 7-5/8 inches) laid with a standard 3/8-inch mortar joint, exactly 6.75 bricks are required per square foot of single-wythe wall surface (or approximately 7.4 bricks per sq ft when factoring in a standard 10% cutting and breakage allowance).
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">How many concrete blocks (CMU) are required per 100 square feet of wall?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              A standard 8x8x16 concrete masonry unit (nominal dimensions including 3/8-inch mortar joint) has a nominal face area of 8 x 16 inches = 128 sq in (0.888 sq ft). Exactly 112.5 blocks are required per 100 square feet of wall surface (approx 124 blocks with 10% waste).
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">How many bags of masonry mortar do I need per 100 bricks?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              On average, one 80 lb (36 kg) bag of Type N or Type S pre-blended masonry cement mortar will lay approximately 30 to 35 standard modular bricks or 12 to 14 standard 8-inch CMU blocks. Therefore, 100 bricks require roughly 3 bags of mortar.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What is the difference between single-wythe and double-wythe brick walls?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              A single-wythe wall consists of a single layer of bricks in thickness (typically used as an exterior veneer over wood or steel framing). A double-wythe wall has two parallel layers of bricks bonded together with mortar headers or metal ties, requiring exactly double the quantity of bricks.
+            </div>
+          </details>
+        </div>
+      </article>
+    </main>
+
+    <!-- Post Sidebar -->
+    <aside class="post-sidebar" style="width:300px;flex-shrink:0;">
+      <div class="sidebar-widget" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;">
+        <div class="sidebar-widget-header" style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+          <span class="widget-icon" style="font-size:1.25rem;">🏗️</span>
+          <h3 class="widget-title" style="margin:0;font-size:1.05rem;color:#0F172A;">Civil Engineering Suite</h3>
+        </div>
+        <div class="sidebar-widget-subtitle" style="font-size:0.8rem;color:#64748B;margin-bottom:1rem;">Structural &amp; materials takeoff tools:</div>
+        <ul class="sidebar-tools-list" style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+          <li><a href="brick-calculator.html" class="sidebar-tool-item active" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;background:#EFF6FF;color:#2563EB;text-decoration:none;font-size:0.85rem;font-weight:600;">🧱 Brick &amp; Block Wall</a></li>
+          <li><a href="concrete-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🏗️ Concrete Volume Sizing</a></li>
+          <li><a href="rebar-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🔩 Rebar Weight &amp; Grid</a></li>
+          <li><a href="beam-deflection-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">📏 Beam Deflection &amp; Moments</a></li>
+          <li><a href="retaining-wall-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🧱 Retaining Wall Stability</a></li>
+        </ul>
+        <div class="sidebar-widget-footer" style="margin-top:1.25rem;padding-top:0.75rem;border-top:1px solid #E2E8F0;text-align:center;">
+          <a href="civil.html" class="sidebar-cat-link" style="color:#2563EB;font-weight:600;font-size:0.85rem;text-decoration:none;">Explore Civil Hub &rarr;</a>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <span class="logo-badge">∑</span>
+            <span>Calc<span class="accent">Hub</span></span>
+          </a>
+          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Civil &amp; Construction</h4>
+          <ul class="footer-links">
+            <li><a href="brick-calculator.html">Brick &amp; Block Wall</a></li>
+            <li><a href="concrete-calculator.html">Concrete Volume</a></li>
+            <li><a href="rebar-calculator.html">Rebar Weight &amp; Spacing</a></li>
+            <li><a href="beam-deflection-calculator.html">Beam Deflection</a></li>
+            <li><a href="retaining-wall-calculator.html">Retaining Wall Stability</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Engineering Suites</h4>
+          <ul class="footer-links">
+            <li><a href="civil.html">Civil &amp; Structural</a></li>
+            <li><a href="engineering.html">Electrical Engineering</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+            <li><a href="solar-energy.html">Solar Energy</a></li>
+            <li><a href="chemical.html">Chemical &amp; Water</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Construction estimates are for guidance purposes.</p>
+        <div>
+          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
+          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy &amp; Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const brickCoverage = {
+      modular: { perSqFt: 6.75, perSqM: 72.6, mortarRatio: 33 },
+      standard: { perSqFt: 6.55, perSqM: 70.5, mortarRatio: 32 },
+      queen: { perSqFt: 5.75, perSqM: 61.9, mortarRatio: 28 },
+      cmu8: { perSqFt: 1.125, perSqM: 12.1, mortarRatio: 13 },
+      cmu6: { perSqFt: 1.125, perSqM: 12.1, mortarRatio: 14 },
+      ukmetric: { perSqFt: 5.50, perSqM: 59.2, mortarRatio: 30 }
+    };
+
+    function toggleBrickUnits() {
+      const isMetric = document.getElementById('unit-sys').value === 'metric';
+      if (isMetric) {
+        document.getElementById('lbl-wall-len').textContent = 'Wall Length (m)';
+        document.getElementById('lbl-wall-ht').textContent = 'Wall Height (m)';
+        document.getElementById('lbl-open-area').textContent = 'Openings Deductions - Doors/Windows (m²)';
+        document.getElementById('wall-len').value = '7.5';
+        document.getElementById('wall-ht').value = '2.5';
+        document.getElementById('open-area').value = '2.0';
+      } else {
+        document.getElementById('lbl-wall-len').textContent = 'Wall Length (ft)';
+        document.getElementById('lbl-wall-ht').textContent = 'Wall Height (ft)';
+        document.getElementById('lbl-open-area').textContent = 'Openings Deductions - Doors/Windows (sq ft)';
+        document.getElementById('wall-len').value = '25';
+        document.getElementById('wall-ht').value = '8';
+        document.getElementById('open-area').value = '21';
+      }
+      runBrickCalc();
+    }
+
+    function runBrickCalc() {
+      const isMetric = document.getElementById('unit-sys').value === 'metric';
+      const mType = document.getElementById('masonry-type').value;
+      const len = parseFloat(document.getElementById('wall-len').value) || 0;
+      const ht = parseFloat(document.getElementById('wall-ht').value) || 0;
+      const wythe = parseInt(document.getElementById('wall-wythe').value) || 1;
+      const waste = parseFloat(document.getElementById('waste-pct').value) || 0.10;
+      const openings = parseFloat(document.getElementById('open-area').value) || 0;
+
+      const grossArea = len * ht;
+      const netArea = Math.max(0, grossArea - openings);
+
+      const info = brickCoverage[mType];
+      const rate = isMetric ? info.perSqM : info.perSqFt;
+      const baseUnits = Math.ceil(netArea * rate * wythe);
+      const totalUnits = Math.ceil(baseUnits * (1 + waste));
+
+      const mortarBags = Math.ceil(totalUnits / info.mortarRatio);
+      const sandTons = (mortarBags * 0.035).toFixed(1);
+      const sandYards = (sandTons * 0.80).toFixed(1);
+
+      document.getElementById('res-total-bricks').textContent = totalUnits.toLocaleString() + ' Units';
+      document.getElementById('res-waste-note').textContent = 'Includes ' + (waste * 100).toFixed(0) + '% Cutting & Breakage Waste';
+      
+      const areaUnit = isMetric ? ' m²' : ' sq ft';
+      document.getElementById('res-net-area').textContent = netArea.toFixed(1) + areaUnit;
+      document.getElementById('res-base-bricks').textContent = baseUnits.toLocaleString() + ' Units';
+      document.getElementById('res-mortar-bags').textContent = mortarBags + ' Bags (80 lb)';
+      document.getElementById('res-sand-vol').textContent = sandTons + ' Tons / ' + sandYards + ' yd³';
+    }
+
+    window.addEventListener('DOMContentLoaded', runBrickCalc);
+  </script>
+</body>
+</html>
+"""
+
+with open("brick-calculator.html", "w", encoding="utf-8") as f:
+    f.write(TOOL_BRICK)
+
+print("brick-calculator.html generated successfully!")

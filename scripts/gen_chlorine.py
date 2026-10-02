@@ -1,0 +1,528 @@
+"""
+Generates chlorine-dosing-calculator.html with 1,250+ words of chemical engineering content and working interactive calculator.
+"""
+
+TOOL_CHLORINE = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chlorine Dosing Calculator — AWWA C651 Water Disinfection &amp; Bleach Feed</title>
+  <meta name="description" content="Calculate required chlorine mass, sodium hypochlorite bleach volume, or continuous chemical feed rate for water disinfection using AWWA C651 and EPA CT standards.">
+  <meta name="keywords" content="chlorine dosing calculator, sodium hypochlorite calculator, awwa c651 chlorine dose, bleach feed rate calculator, water disinfection ppm, chlorine demand residual">
+  <link rel="canonical" href="https://calchub.org/chlorine-dosing-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Industrial Water Chlorine Dosing Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "UtilitiesApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates chemical dosage for gas chlorine, sodium hypochlorite bleach (12.5% and 5.25%), and calcium hypochlorite (65%) per AWWA and EPA standards."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the standard formula for chlorine feed rate in continuous water treatment?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In US customary units, the chemical dosing formula is: Chemical Feed (lbs/day) = Flow (MGD) × Desired Dose (mg/L or ppm) × 8.34 lbs/gal ÷ Available Chlorine Decimal Fraction. In metric units: Feed (kg/day) = Flow (m³/day) × Dose (g/m³) ÷ (1,000 × Fraction)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between chlorine demand, dose, and free residual?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Chlorine Dose is the total amount of disinfectant added to the water. Chlorine Demand is the amount consumed reacting with inorganic minerals (iron, manganese, hydrogen sulfide) and organic matter/pathogens. Free Chlorine Residual is the remaining active hypochlorous acid available to sanitize the distribution network. The governing relationship is: Dose = Demand + Free Residual."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does water pH affect the biocidal efficacy of free chlorine?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "When dissolved in water, chlorine forms hypochlorous acid (HOCl) and hypochlorite ions (OCl⁻). HOCl is 80 to 100 times more potent at killing bacteria and viruses than OCl⁻. At pH 6.5, approximately 90% exists as HOCl; at pH 7.5, the split is 50/50; and at pH 8.5, only 10% remains as HOCl, requiring drastically longer contact times."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the AWWA C651 dosing requirements for new water main commissioning?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "AWWA C651 specifies three primary disinfection methods: 1) Continuous feed method: 25 mg/L initial dose maintained for 24 hours with minimum 10 mg/L residual remaining; 2) Slug method: 100 mg/L dose flowing through the pipe with minimum 3-hour contact time; 3) Tablet/granule method: calcium hypochlorite affixed to pipe tops during dry installation for smaller diameters."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="cat-theme-chemical">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="chemical.html" class="nav-link active">🧪 Chemical</a>
+          <a href="civil.html" class="nav-link">🏗️ Civil</a>
+          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+          <a href="finance.html" class="nav-link">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+        </div>
+        <div class="nav-row">
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="calc-page-header">
+    <div class="calc-page-header-inner">
+      <span class="category-tag">🧪 Water Treatment &amp; Environmental Engineering</span>
+      <h1 class="calc-page-title">Chlorine Dosing Calculator</h1>
+      <p class="calc-page-desc">Calculate pure disinfectant mass, commercial sodium hypochlorite bleach volume, or continuous metering pump feed rates adhering to AWWA C651 and EPA standards.</p>
+    </div>
+  </div>
+
+  <div class="layout-container" style="display:flex;gap:2rem;max-width:1200px;margin:2rem auto;padding:0 1.25rem;align-items:start;">
+    
+    <main style="flex:1;min-width:0;">
+      <div class="calculator-workspace">
+        <section class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title"><span>💧</span> Dosing Specifications</h2>
+            <span class="status-info">AWWA C651 / EPA</span>
+          </div>
+          <form id="chlorine-form" onsubmit="return false;">
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="calc-mode">Calculation Application</label>
+                <select id="calc-mode" class="form-control" onchange="toggleChlorineMode()">
+                  <option value="batch" selected>Static Batch Tank / Pipe Volume</option>
+                  <option value="flow">Continuous Pipeline Flow Rate</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="chem-source">Disinfectant Chemical Source</label>
+                <select id="chem-source" class="form-control" onchange="runChlorineCalc()">
+                  <option value="naocl_125" selected>Sodium Hypochlorite 12.5% (Industrial Bleach)</option>
+                  <option value="naocl_60">Sodium Hypochlorite 6.0% (Commercial Household)</option>
+                  <option value="caocl_65">Calcium Hypochlorite 65% (HTH Granules / Tablets)</option>
+                  <option value="gas_100">Gas Chlorine 100% (Cl₂ Liquefied Gas Cylinders)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Batch inputs -->
+            <div class="calc-fields-grid" id="batch-input-row">
+              <div class="form-group">
+                <label class="form-label" for="tank-vol">Water Volume (Gallons)</label>
+                <input type="number" id="tank-vol" class="form-control" value="50000" min="10" max="100000000" step="500" oninput="runChlorineCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="dose-target">Target Chlorine Dose (mg/L or ppm)</label>
+                <input type="number" id="dose-target" class="form-control" value="2.5" min="0.1" max="500" step="0.1" oninput="runChlorineCalc()">
+              </div>
+            </div>
+
+            <!-- Flow inputs -->
+            <div class="calc-fields-grid" id="flow-input-row" style="display:none;">
+              <div class="form-group">
+                <label class="form-label" for="flow-rate">Flow Rate (Gallons Per Minute - GPM)</label>
+                <input type="number" id="flow-rate" class="form-control" value="350" min="1" max="100000" step="10" oninput="runChlorineCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="flow-dose-target">Target Chlorine Dose (mg/L or ppm)</label>
+                <input type="number" id="flow-dose-target" class="form-control" value="2.0" min="0.1" max="50" step="0.1" oninput="runChlorineCalc()">
+              </div>
+            </div>
+
+            <div class="calc-actions" style="margin-top:1.5rem;display:flex;gap:1rem;">
+              <button type="button" class="btn btn-primary" onclick="runChlorineCalc()">Calculate Chemical Dose</button>
+              <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Print Batch Sheet</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="results-card">
+          <h2 class="results-title">Chemical Dosage Requirements</h2>
+          
+          <div class="primary-result-box" style="margin-bottom:1.5rem;text-align:center;padding:1.5rem;border-radius:12px;background:#F0FDF4;border:2px solid #86EFAC;">
+            <div id="lbl-primary-res" class="primary-result-label" style="font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em;color:#166534;">Commercial Bleach Volume Required</div>
+            <div id="res-chem-vol" class="primary-result-value" style="font-size:2.5rem;font-weight:800;color:#15803D;margin:0.25rem 0;">1.04 Gallons</div>
+            <div id="res-chem-metric" style="font-size:0.85rem;color:#166534;font-weight:600;">Equivalent to 3.94 Liters (12.5% NaOCl)</div>
+          </div>
+
+          <div class="result-details-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Pure Available Chlorine (100% Cl₂)</span>
+              <span id="res-pure-cl" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">1.04 lbs (0.47 kg)</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Commercial Product Weight</span>
+              <span id="res-prod-wt" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">8.34 lbs (3.78 kg)</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Continuous Metering Pump Rate</span>
+              <span id="res-meter-rate" class="result-val" style="font-size:1.1rem;font-weight:700;color:#2563EB;">N/A (Batch Mode)</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">EPA Disinfection CT Metric (at 30m)</span>
+              <span id="res-ct-val" class="result-val" style="font-size:1.1rem;font-weight:700;color:#059669;">75.0 mg·min/L</span>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem;padding:0.85rem;border-radius:8px;background:#F8FAFC;border:1px solid #E2E8F0;font-size:0.85rem;color:#475569;">
+            <strong>🧪 Hydration &amp; Hydraulics:</strong> Sizing water distribution pipes or booster pumps? Check our <a href="pump-head-calculator.html" style="color:#2563EB;font-weight:700;">Pump Head Calculator</a> and explore all tools in the <a href="chemical.html" style="color:#2563EB;font-weight:700;">Chemical Engineering Hub</a>.
+          </div>
+        </section>
+      </div>
+
+      <!-- In-Depth Technical Article (1,200+ words) -->
+      <article class="article-section" style="margin-top:2.5rem;line-height:1.7;color:#334155;">
+        <h2>Water Disinfection Engineering: Principles of Chlorination, CT Kinetics, and Breakpoint Chemistry</h2>
+        <p>
+          Chlorine remains the most universally utilized chemical disinfectant in municipal water treatment, industrial cooling loops, food processing facilities, and swimming pool sanitation. First introduced for public health in Louisville, Kentucky and Jersey City in the early 1900s, water chlorination virtually eradicated waterborne epidemics of typhoid fever, cholera, and dysentery across the industrialized world. However, delivering reliable microbiological disinfection without generating excessive carcinogenic disinfection byproducts (DBPs, such as trihalomethanes and haloacetic acids) requires rigorous chemical dosing calculations grounded in fluid mechanics, stoichiometry, and reaction kinetics.
+        </p>
+
+        <h3>1. Disinfection Chemistry: Gas vs. Hypochlorite Formulations</h3>
+        <p>
+          When elemental chlorine gas or hypochlorite salts are introduced into water, they undergo rapid hydrolysis and ionization reactions:
+        </p>
+        <p>
+          <strong>Gas Chlorine Dissolution:</strong>
+          $$\text{Cl}_2 + \text{H}_2\text{O} \rightleftharpoons \text{HOCl} + \text{H}^+ + \text{Cl}^-$$
+        </p>
+        <p>
+          <strong>Sodium Hypochlorite Bleach Dissolution:</strong>
+          $$\text{NaOCl} + \text{H}_2\text{O} \rightleftharpoons \text{HOCl} + \text{Na}^+ + \text{OH}^-$$
+        </p>
+        <p>
+          <strong>Calcium Hypochlorite Dissolution:</strong>
+          $$\text{Ca(OCl)}_2 + 2\text{H}_2\text{O} \rightleftharpoons 2\text{HOCl} + \text{Ca}^{2+} + 2\text{OH}^-$$
+        </p>
+        <p>
+          Notice that while chlorine gas consumes alkalinity and lowers water pH (producing hydrochloric acid), hypochlorite solutions are alkaline and slightly elevate water pH. In both cases, the primary germicidal agent generated is <strong>hypochlorous acid ($\text{HOCl}$)</strong>.
+        </p>
+
+        <h3>2. The Crucial Role of Water pH on Germicidal Potency</h3>
+        <p>
+          Once formed, hypochlorous acid ($\text{HOCl}$) dissociates reversibly into hydrogen ions ($\text{H}^+$) and hypochlorite ions ($\text{OCl}^-$) according to an equilibrium constant ($pK_a \approx 7.53$ at $20^\circ\text{C}$):
+        </p>
+        <p>
+          $$\text{HOCl} \rightleftharpoons \text{H}^+ + \text{OCl}^-$$
+        </p>
+        <p>
+          The electrical charge of these two chemical species dictates their biocidal effectiveness. Hypochlorous acid ($\text{HOCl}$) is an electrically neutral molecule with a low molecular weight, allowing it to penetrate the negatively charged phospholipid cellular membranes of bacterial pathogens and cryptosporidium oocysts with minimal resistance. Conversely, the hypochlorite ion ($\text{OCl}^-$) bears a negative electrical charge, causing electrostatic repulsion against bacterial cell walls that renders it <strong>80 to 100 times less effective</strong> as a bactericide.
+        </p>
+
+        <table class="reference-table" style="width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.9rem;">
+          <thead>
+            <tr style="background:#F1F5F9;text-align:left;">
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Solution pH</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">% Hypochlorous Acid (HOCl)</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">% Hypochlorite Ion (OCl⁻)</th>
+              <th style="padding:0.75rem;border:1px solid #CBD5E1;">Relative Biocidal Speed</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>pH 6.0</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">96.5%</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">3.5%</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Extremely Fast (High Corrosion Potential)</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>pH 7.0</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">77.5%</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">22.5%</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Optimal Disinfection Efficacy</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>pH 7.5</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">50.0%</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">50.0%</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Equilibrium Crossover Point</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>pH 8.0</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">21.5%</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">78.5%</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Substantially Reduced Disinfection Rate</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;"><strong>pH 8.5</strong></td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">9.0%</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">91.0%</td>
+              <td style="padding:0.75rem;border:1px solid #CBD5E1;">Very Slow (Requires high CT multiples)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>3. The Breakpoint Chlorination Phenomenon</h3>
+        <p>
+          When chlorine is added to raw natural water containing ammonia, nitrogenous organic compounds, and reducing minerals (iron $Fe^{2+}$, manganese $Mn^{2+}$, and sulfides $S^{2-}$), chlorine is consumed sequentially through several distinct biochemical phases:
+        </p>
+        <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+          <li><strong>Phase 1: Immediate Inorganic Demand:</strong> Chlorine instantly oxidizes dissolved iron, manganese, and hydrogen sulfide. Zero chlorine residual is detectable.</li>
+          <li><strong>Phase 2: Combined Chlorine (Chloramines):</strong> Chlorine reacts with ammonia to form monochloramine ($\text{NH}_2\text{Cl}$) and dichloramine ($\text{NHCl}_2$). While these provide moderate disinfectant properties, they cause strong chlorinous odors and eye irritation.</li>
+          <li><strong>Phase 3: The Breakpoint Dip:</strong> As the chlorine-to-ammonia ratio approaches approximately $7.6:1$ to $8.0:1$ by weight, chloramines are destroyed and oxidized into inert nitrogen gas ($\text{N}_2$) and nitrous oxide. The total chlorine residual drops to a distinct local minimum known as the <em>Breakpoint</em>.</li>
+          <li><strong>Phase 4: Free Available Residual:</strong> Once all ammonia has been completely oxidized past the breakpoint, any additional chlorine added remains 100% as powerful <strong>Free Available Chlorine (FAC)</strong>.</li>
+        </ul>
+
+        <h3>4. Disinfection Kinetics: The EPA CT Concept</h3>
+        <p>
+          The United States Environmental Protection Agency (EPA) Surface Water Treatment Rule establishes compliance using the <strong>$CT$ product</strong>:
+        </p>
+        <p>
+          $$CT = C \times T_{10}$$
+        </p>
+        <p>
+          Where:
+          <br>&bull; $C$ = Free chlorine residual concentration at the exit of the contact basin ($\text{mg/L}$).
+          <br>&bull; $T_{10}$ = Time in minutes that $90\%$ of the water remains in the basin (incorporating baffling factors: unbaffled circular tank $= 0.1$, well-baffled serpentine serpentine basin $= 0.7$, ideal plug flow $= 1.0$).
+          <br>For example, to achieve a 3-log ($99.9\%$) inactivation of <em>Giardia lamblia</em> cysts at $10^\circ\text{C}$ and pH 7.5, a $CT$ value of approximately $120\text{ to }150\text{ mg}\cdot\text{min/L}$ is legally mandated.
+        </p>
+
+        <h3>Worked Practical Example: Disinfecting a 100,000 Gallon Water Storage Tank (AWWA C652)</h3>
+        <div class="worked-example-card" style="background:#F0FDF4;border-left:4px solid #16A34A;padding:1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;">
+          <h4 style="margin:0 0 0.5rem;color:#14532D;">Engineering Dosing Calculation</h4>
+          <p><strong>Design Scenario:</strong> A municipal water authority is commissioning a newly recoated 100,000-gallon steel potable water reservoir. AWWA C652 Method 1 requires filling the tank with water chlorinated to an initial concentration of $10.0\text{ mg/L}$ ($10\text{ ppm}$), using commercial 12.5% trade percent sodium hypochlorite (density $\approx 10.0\text{ lbs/gal}$, specific gravity $= 1.20$).</p>
+          <ul style="margin:0.5rem 0;padding-left:1.25rem;">
+            <li><strong>Step 1: Calculate Mass of Pure Available Chlorine (100% Cl₂ Equivalent):</strong>
+              $$\text{Mass } Cl_2 = \text{Volume in MGal} \times \text{Dose in mg/L} \times 8.34\text{ lbs/gal}$$
+              $$\text{Mass } Cl_2 = 0.100\text{ MGal} \times 10.0\text{ mg/L} \times 8.34 = \mathbf{8.34\text{ lbs of pure } Cl_2}$$
+            </li>
+            <li><strong>Step 2: Determine Gallons of 12.5% Trade Sodium Hypochlorite Needed:</strong>
+              <p>One gallon of 12.5% trade bleach contains $1.043\text{ lbs}$ of available chlorine:</p>
+              $$\text{Bleach Volume} = \frac{8.34\text{ lbs } Cl_2}{1.043\text{ lbs/gal}} = \mathbf{7.996 \approx 8.0\text{ Gallons of Bleach}}$$
+            </li>
+            <li><strong>Step 3: Verification &amp; Retention:</strong>
+              <p>Add 8.0 gallons of 12.5% NaOCl while filling the 100,000-gallon reservoir. Let stand for 24 hours. Under AWWA C652, the residual at the end of 24 hours must be at least $2.0\text{ mg/L}$ free chlorine before de-chlorinating and filling for potable consumption.</p>
+            </li>
+          </ul>
+        </div>
+
+        <p>
+          For additional process fluid calculations, evaluate fluid friction losses with our <a href="pump-head-calculator.html">Pump Head Calculator</a>, and browse the complete catalog of industrial tools in the <a href="chemical.html">Chemical Engineering Suite</a>.
+        </p>
+
+        <!-- Technical FAQs -->
+        <div class="faq-container" style="margin-top:2.5rem;">
+          <h3 style="margin-bottom:1rem;color:#0F172A;">Frequently Asked Questions About Chlorine Disinfection</h3>
+          
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What is the standard formula for chlorine feed rate in continuous water treatment?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              In US customary units, the chemical dosing formula is: Chemical Feed (lbs/day) = Flow (MGD) × Desired Dose (mg/L or ppm) × 8.34 lbs/gal ÷ Available Chlorine Decimal Fraction. In metric units: Feed (kg/day) = Flow (m³/day) × Dose (g/m³) ÷ (1,000 × Fraction).
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What is the difference between chlorine demand, dose, and free residual?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              Chlorine Dose is the total amount of disinfectant added to the water. Chlorine Demand is the amount consumed reacting with inorganic minerals (iron, manganese, hydrogen sulfide) and organic matter/pathogens. Free Chlorine Residual is the remaining active hypochlorous acid available to sanitize the distribution network. The governing relationship is: Dose = Demand + Free Residual.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">How does water pH affect the biocidal efficacy of free chlorine?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              When dissolved in water, chlorine forms hypochlorous acid (HOCl) and hypochlorite ions (OCl⁻). HOCl is 80 to 100 times more potent at killing bacteria and viruses than OCl⁻. At pH 6.5, approximately 90% exists as HOCl; at pH 7.5, the split is 50/50; and at pH 8.5, only 10% remains as HOCl, requiring drastically longer contact times.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #E2E8F0;border-radius:8px;padding:1rem;margin-bottom:0.75rem;">
+            <summary style="font-weight:700;cursor:pointer;color:#1E293B;">What are the AWWA C651 dosing requirements for new water main commissioning?</summary>
+            <div class="faq-content" style="margin-top:0.75rem;color:#475569;">
+              AWWA C651 specifies three primary disinfection methods: 1) Continuous feed method: 25 mg/L initial dose maintained for 24 hours with minimum 10 mg/L residual remaining; 2) Slug method: 100 mg/L dose flowing through the pipe with minimum 3-hour contact time; 3) Tablet/granule method: calcium hypochlorite affixed to pipe tops during dry installation for smaller diameters.
+            </div>
+          </details>
+        </div>
+      </article>
+    </main>
+
+    <!-- Post Sidebar -->
+    <aside class="post-sidebar" style="width:300px;flex-shrink:0;">
+      <div class="sidebar-widget" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;">
+        <div class="sidebar-widget-header" style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+          <span class="widget-icon" style="font-size:1.25rem;">🧪</span>
+          <h3 class="widget-title" style="margin:0;font-size:1.05rem;color:#0F172A;">Chemical Engineering</h3>
+        </div>
+        <div class="sidebar-widget-subtitle" style="font-size:0.8rem;color:#64748B;margin-bottom:1rem;">Process, kinetics &amp; solutions:</div>
+        <ul class="sidebar-tools-list" style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+          <li><a href="chlorine-dosing-calculator.html" class="sidebar-tool-item active" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;background:#EFF6FF;color:#2563EB;text-decoration:none;font-size:0.85rem;font-weight:600;">💧 Chlorine Dosing (AWWA)</a></li>
+          <li><a href="pump-head-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">⚙️ Pump Head &amp; TDH</a></li>
+          <li><a href="water-intake-calculator.html" class="sidebar-tool-item" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;color:#475569;text-decoration:none;font-size:0.85rem;">🚰 Water Balance</a></li>
+        </ul>
+        <div class="sidebar-widget-footer" style="margin-top:1.25rem;padding-top:0.75rem;border-top:1px solid #E2E8F0;text-align:center;">
+          <a href="chemical.html" class="sidebar-cat-link" style="color:#2563EB;font-weight:600;font-size:0.85rem;text-decoration:none;">Explore Chemical Hub &rarr;</a>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <span class="logo-badge">∑</span>
+            <span>Calc<span class="accent">Hub</span></span>
+          </a>
+          <p>High-precision, free online calculators designed according to published mathematical, clinical, and industrial engineering standards. 100% free, browser-based, with zero tracking.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Chemical &amp; Process</h4>
+          <ul class="footer-links">
+            <li><a href="chlorine-dosing-calculator.html">Chlorine Dosing Calculator</a></li>
+            <li><a href="pump-head-calculator.html">Pump Head Calculator</a></li>
+            <li><a href="chemical.html">Chemical Suite Hub</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Industrial Suites</h4>
+          <ul class="footer-links">
+            <li><a href="engineering.html">Electrical Engineering</a></li>
+            <li><a href="civil.html">Civil Engineering</a></li>
+            <li><a href="mechanical.html">Mechanical Engineering</a></li>
+            <li><a href="math.html">Math &amp; Statistics</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Engineering equations are verified against AWWA and EPA standards.</p>
+        <div>
+          <a href="sitemap.xml" style="color:#64748B;margin-left:1rem;">Sitemap</a>
+          <a href="index.html" style="color:#64748B;margin-left:1rem;">Privacy &amp; Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleChlorineMode() {
+      const mode = document.getElementById('calc-mode').value;
+      if (mode === 'batch') {
+        document.getElementById('batch-input-row').style.display = 'grid';
+        document.getElementById('flow-input-row').style.display = 'none';
+        document.getElementById('lbl-primary-res').textContent = 'Commercial Chemical Product Required';
+      } else {
+        document.getElementById('batch-input-row').style.display = 'none';
+        document.getElementById('flow-input-row').style.display = 'grid';
+        document.getElementById('lbl-primary-res').textContent = 'Continuous Daily Chemical Feed Rate';
+      }
+      runChlorineCalc();
+    }
+
+    function runChlorineCalc() {
+      const mode = document.getElementById('calc-mode').value;
+      const source = document.getElementById('chem-source').value;
+
+      // Concentration fraction & density lbs/gal
+      let clFraction = 0.125;
+      let densityLbsPerGal = 10.0; // 12.5% NaOCl is ~10 lbs/gal
+      let isLiquid = true;
+
+      if (source === 'naocl_125') {
+        clFraction = 0.125;
+        densityLbsPerGal = 10.0;
+        isLiquid = true;
+      } else if (source === 'naocl_60') {
+        clFraction = 0.06;
+        densityLbsPerGal = 8.9;
+        isLiquid = true;
+      } else if (source === 'caocl_65') {
+        clFraction = 0.65;
+        isLiquid = false;
+      } else if (source === 'gas_100') {
+        clFraction = 1.0;
+        isLiquid = false;
+      }
+
+      if (mode === 'batch') {
+        const volGallons = parseFloat(document.getElementById('tank-vol').value) || 50000;
+        const doseMgL = parseFloat(document.getElementById('dose-target').value) || 2.5;
+
+        const volMGal = volGallons / 1000000.0;
+        const pureClLbs = volMGal * doseMgL * 8.34;
+        const pureClKg = pureClLbs * 0.453592;
+
+        const productLbs = pureClLbs / clFraction;
+        const productKg = productLbs * 0.453592;
+
+        if (isLiquid) {
+          const productGallons = productLbs / densityLbsPerGal;
+          const productLiters = productGallons * 3.78541;
+          document.getElementById('res-chem-vol').textContent = productGallons.toFixed(2) + ' Gallons';
+          document.getElementById('res-chem-metric').textContent = 'Equivalent to ' + productLiters.toFixed(2) + ' Liters (' + (clFraction*100).toFixed(1) + '% Bleach)';
+        } else {
+          document.getElementById('res-chem-vol').textContent = productLbs.toFixed(2) + ' lbs Granules/Gas';
+          document.getElementById('res-chem-metric').textContent = 'Equivalent to ' + productKg.toFixed(2) + ' kg Dry Product';
+        }
+
+        document.getElementById('res-pure-cl').textContent = pureClLbs.toFixed(2) + ' lbs (' + pureClKg.toFixed(2) + ' kg)';
+        document.getElementById('res-prod-wt').textContent = productLbs.toFixed(2) + ' lbs (' + productKg.toFixed(2) + ' kg)';
+        document.getElementById('res-meter-rate').textContent = 'N/A (Batch Mode)';
+        document.getElementById('res-ct-val').textContent = (doseMgL * 30).toFixed(1) + ' mg·min/L (at 30 min)';
+      } else {
+        const gpm = parseFloat(document.getElementById('flow-rate').value) || 350;
+        const doseMgL = parseFloat(document.getElementById('flow-dose-target').value) || 2.0;
+
+        const mgd = (gpm * 1440) / 1000000.0;
+        const pureClLbsDay = mgd * doseMgL * 8.34;
+        const pureClKgDay = pureClLbsDay * 0.453592;
+
+        const productLbsDay = pureClLbsDay / clFraction;
+
+        if (isLiquid) {
+          const galDay = productLbsDay / densityLbsPerGal;
+          const galHr = galDay / 24.0;
+          const mlMin = (galDay * 3785.41) / 1440.0;
+          document.getElementById('res-chem-vol').textContent = galDay.toFixed(2) + ' Gal / Day';
+          document.getElementById('res-chem-metric').textContent = 'Pump Feed: ' + galHr.toFixed(3) + ' GPH (' + mlMin.toFixed(1) + ' mL/min)';
+          document.getElementById('res-meter-rate').textContent = galHr.toFixed(3) + ' GPH (' + mlMin.toFixed(1) + ' mL/min)';
+        } else {
+          document.getElementById('res-chem-vol').textContent = productLbsDay.toFixed(2) + ' lbs / Day';
+          document.getElementById('res-chem-metric').textContent = (productLbsDay * 0.453592).toFixed(2) + ' kg / Day';
+          document.getElementById('res-meter-rate').textContent = (productLbsDay / 24).toFixed(2) + ' lbs / hr';
+        }
+
+        document.getElementById('res-pure-cl').textContent = pureClLbsDay.toFixed(2) + ' lbs/day Cl₂';
+        document.getElementById('res-prod-wt').textContent = productLbsDay.toFixed(2) + ' lbs/day gross';
+        document.getElementById('res-ct-val').textContent = (doseMgL * 15).toFixed(1) + ' mg·min/L (at 15 min contact)';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', runChlorineCalc);
+  </script>
+</body>
+</html>
+"""
+
+with open("chlorine-dosing-calculator.html", "w", encoding="utf-8") as f:
+    f.write(TOOL_CHLORINE)
+
+print("chlorine-dosing-calculator.html generated successfully!")
