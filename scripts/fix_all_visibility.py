@@ -195,6 +195,14 @@ CAT_MAP = {
             ("henderson-hasselbalch-calculator.html", "Henderson-Hasselbalch (pH Buffer)", "🧪", "Acid-base conjugate ratio, pKa & Van Slyke buffer beta", "pH = pK_a + log([A⁻]/[HA]) | β = 2.303·C·α·(1-α)"),
             ("hydrazine-dosing-calculator.html", "Hydrazine Dosing (Boiler Deoxygenation)", "💧", "ASME / EPRI AVT(R) dissolved O₂ scavenger & pump sizing", "N₂H₄ + O₂ ➔ N₂ + 2H₂O | 1:1 mass ratio | 35% hydrate"),
             ("ideal-gas-law-calculator.html", "Ideal Gas Law (PV = nRT)", "🎈", "Universal gas state equation, density & compressibility Z", "PV = nRT = (m/M)RT | ρ = PM / RT | v_rms speed"),
+            ("lime-dosing-calculator.html", "Lime Softening (Ca(OH)₂ & CaO)", "🧱", "AWWA B202 softening, CO₂ removal & sludge yield", "CaO + H₂O ➔ Ca(OH)₂ | Sludge = 2.5·CaO (kg/day)"),
+            ("molar-mass-calculator.html", "Molar Mass (IUPAC Formula Sizer)", "🔬", "Molecular weight, formula mass & mass % composition", "M = Σ(n_i · A_r(i)) | %w_i = (n_i·A_r/M)·100"),
+            ("molarity-calculator.html", "Molarity & Solution Preparation", "🧪", "Molar concentration, mass grams, volume & normality N", "M = n/V = m/(MW·V) | N = M·z (eq/L)"),
+            ("ph-calculator.html", "pH & [H⁺]/[OH⁻] Equilibrium", "🌡️", "Strong/weak acids & bases, exact quadratic Ka & pOH", "pH = -log₁₀[H⁺] | [H⁺] = (-Ka + √(Ka² + 4KaC))/2"),
+            ("ph-poh-calculator.html", "pH to pOH & Ion Converter", "🌡️", "Mutual conversion, hydronium [H⁺], hydroxide & Kw", "pH + pOH = pKw | Kw shifts 14.94 (0°C) to 12.29 (100°C)"),
+            ("phosphate-dosing-calculator.html", "Phosphate Dosing (Boiler & Lead CCT)", "💧", "ASME / EPRI TSP/DSP congruent treatment & EPA LCR", "10 Ca²⁺ + 6 PO₄³⁻ + 2 OH⁻ ➔ Hydroxyapatite sludge"),
+            ("polymer-dosing-calculator.html", "Polymer Dosing (Sludge Dewatering)", "🧪", "Centrifuge & belt press kg/DT, aging tank & pump LPH", "Dose = kg active / DT sludge | 45-min hydration"),
+            ("ro-antiscalant-dosing-calculator.html", "RO Antiscalant (Membrane Scaling)", "🌊", "Concentration factor CF=1/(1-Y), LSI & neat pump LPH", "CF = 1/(1-Y) | Prevents CaCO₃, CaSO₄, BaSO₄ & SiO₂"),
         ]
     },
     "fire-safety.html": {

@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Molar Mass Calculator | Molecular Weight &amp; Formula Mass Sizer</title>
+  <meta name="description" content="Calculate molar mass, molecular weight, elemental mass percent composition, and mole-to-gram conversions using standard IUPAC atomic weights.">
+  <link rel="canonical" href="https://calchub.cloud/molar-mass-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Molar Mass Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates molecular weight, molar mass, elemental percentage composition, and empirical formula mass for chemical compounds using standard IUPAC atomic weights.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the difference between molecular weight, molar mass, and formula weight?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Molecular weight (relative molecular mass, Mr) is a dimensionless ratio comparing the mass of a molecule to 1/12th the mass of a carbon-12 atom. Molar mass (M) is the mass of one mole of substance expressed in units of grams per mole (g/mol) or kg/kmol. Formula weight applies specifically to ionic compounds (such as NaCl or CaCO3) that do not exist as discrete discrete molecules."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does the formula parser handle hydrates and parentheses?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The chemical formula parser processes nested parentheses and dot-separated hydrates algebraically. For example, in aluminum sulfate octadecahydrate Al2(SO4)3·18H2O, the subscript 3 multiplies both sulfur (1*3=3) and oxygen (4*3=12), while the hydrate coefficient 18 adds 36 hydrogens and 18 oxygens, yielding a total molar mass of 666.42 g/mol."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What standard atomic weights are utilized in modern molar mass calculations?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "This calculator adheres strictly to the Commission on Isotopic Abundances and Atomic Weights (CIAAW) under IUPAC. Because terrestrial isotopic abundances vary slightly by geographical origin, IUPAC publishes standard atomic weights reflecting natural terrestrial occurrence (e.g., Carbon = 12.011 g/mol, Oxygen = 15.999 g/mol, Hydrogen = 1.008 g/mol)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do you calculate mass percent of an element in a chemical compound?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The mass percentage (w/w%) of an element i is calculated as: % Mass = (n_i * A_r(i) / M_total) * 100%, where n_i is the number of atoms of element i in the chemical formula, A_r(i) is its standard atomic weight, and M_total is the total molar mass of the compound."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="chemical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="chemical.html">Chemical &amp; Water Treatment</a> &rsaquo; 
+      <span>Molar Mass Calculator</span>
+    </nav>
+
+    <h1 class="tool-title">Molar Mass &amp; Molecular Weight Calculator</h1>
+    <p class="tool-subtitle">IUPAC Atomic Weights, Elemental Mass Composition &amp; Gram-Mole Interconversion</p>
+
+    <div class="calculator-layout">
+      <!-- Calculator Core Interface -->
+      <div class="calculator-card">
+        <div class="calc-form">
+          <div class="form-group">
+            <label for="compoundPreset">Common Compound Presets</label>
+            <select id="compoundPreset" class="form-control" onchange="updateCompoundPreset()">
+              <option value="H2O">Water (H₂O)</option>
+              <option value="C6H12O6" selected>D-Glucose (C₆H₁₂O₆)</option>
+              <option value="H2SO4">Sulfuric Acid (H₂SO₄)</option>
+              <option value="CaCO3">Calcium Carbonate (CaCO₃)</option>
+              <option value="Al2(SO4)3.18H2O">Alum Hydrate [Al₂(SO₄)₃·18H₂O]</option>
+              <option value="C8H10N4O2">Caffeine (C₈H₁₀N₄O₂)</option>
+              <option value="C9H8O4">Aspirin (Acetylsalicylic Acid, C₉H₈O₄)</option>
+              <option value="Fe2O3">Iron(III) Oxide / Rust (Fe₂O₃)</option>
+              <option value="NaCl">Sodium Chloride (Table Salt, NaCl)</option>
+              <option value="custom">Custom Chemical Formula Entry</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="chemFormulaInput">Chemical Formula Entry</label>
+            <input type="text" id="chemFormulaInput" class="form-control" value="C6H12O6" placeholder="e.g. Ca(OH)2, Al2(SO4)3.18H2O, CuSO4.5H2O" style="font-size: 1.2rem; font-weight: bold; font-family: monospace;">
+            <span class="field-hint">Supports element symbols, subscripts, parentheses, and dot hydrates (e.g. .5H2O)</span>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="convertMode">Conversion Sizing Mode</label>
+              <select id="convertMode" class="form-control" onchange="updateConvertMode()">
+                <option value="mass_to_mol" selected>Given Mass &rarr; Find Moles &amp; Molecules</option>
+                <option value="mol_to_mass">Given Moles &rarr; Find Total Mass</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="convertValueInput">Quantity to Convert</label>
+              <input type="number" id="convertValueInput" class="form-control" value="100.0" step="1.0" min="0.000001">
+              <span id="convertUnitLabel" class="field-hint">Grams (g)</span>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary" onclick="calcMolarMass()" style="width: 100%; margin-top: 15px;">Parse Formula &amp; Calculate Molar Mass</button>
+        </div>
+      </div>
+
+      <!-- Output Results Panel -->
+      <div class="results-card">
+        <div class="result-box primary-result">
+          <div class="result-label">Total Molar Mass (M)</div>
+          <div id="resMolarMassVal" class="result-value">180.156 g/mol</div>
+          <div id="resMolarMassAlt" class="result-subtext">0.18016 kg/mol (180.156 amu / Da)</div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-item">
+            <span class="result-label">Substance Quantity (n)</span>
+            <span id="resMolesVal" class="result-value highlight">0.5551 mol</span>
+            <span id="resMolesAlt" class="result-subtext">555.07 mmol</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Particle Count (N)</span>
+            <span id="resMoleculesVal" class="result-value">3.343 &times; 10²³</span>
+            <span class="result-subtext">Molecules via Avogadro Nₐ</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Total Sample Mass</span>
+            <span id="resSampleMassVal" class="result-value">100.00 g</span>
+            <span id="resSampleMassAlt" class="result-subtext">0.1000 kg (0.2205 lbs)</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Atom Count per Formula</span>
+            <span id="resTotalAtomsVal" class="result-value">24 Atoms</span>
+            <span class="result-subtext">Sum of atomic subscripts</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Element Breakdown Table -->
+        <div style="margin-top: 20px;">
+          <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 8px;">Elemental Mass Percent Breakdown</h4>
+          <div class="table-responsive">
+            <table class="data-table" style="font-size: 0.88rem;">
+              <thead>
+                <tr>
+                  <th>Element</th>
+                  <th>Symbol</th>
+                  <th>Atomic Wt</th>
+                  <th>Atoms</th>
+                  <th>Mass (g/mol)</th>
+                  <th>Mass %</th>
+                </tr>
+              </thead>
+              <tbody id="elementBreakdownBody">
+                <!-- Populated via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1000+ Words Engineering Body -->
+    <article class="article-body">
+      <h2>Foundational Principles of Chemical Metrology and Molar Mass</h2>
+      <p>In quantitative chemistry, process engineering, and industrial stoichiometry, chemical reactions occur between individual atoms, ions, and molecules in discrete integer ratios governed by quantum mechanics. However, macroscopic laboratory balances and chemical feed equipment measure physical mass in grams, kilograms, or tons. The <strong>mole</strong> ($\text{mol}$) serves as the fundamental SI base unit bridging the submicroscopic molecular scale and the macroscopic engineering world.</p>
+
+      <p>Following the 2019 redefinition of SI base units, the mole is defined by fixing the numerical value of <strong>Avogadro's constant</strong> ($N_A$) to exactly:</p>
+
+      <div class="formula-box">
+        $$N_A = 6.02214076 \times 10^{23}\text{ entities per mole}$$
+      </div>
+
+      <p>The <strong>molar mass</strong> ($M$) of a chemical entity is defined as the physical mass of one mole of that substance, conventionally reported in grams per mole ($\text{g/mol}$) or kilograms per kilomole ($\text{kg/kmol}$). For discrete molecular covalent substances (such as water $\text{H}_2\text{O}$ or glucose $\text{C}_6\text{H}_{12}\text{O}_6$), molar mass is numerically equivalent to the relative molecular mass ($M_r$). For ionic networks and crystalline minerals (such as sodium chloride $\text{NaCl}$ or calcite $\text{CaCO}_3$) that exist as continuous electrostatic crystal lattices rather than isolated molecules, the quantity is properly termed the <strong>formula mass</strong> or <strong>formula weight</strong>.</p>
+
+      <h2>Mathematical Derivation of Compound Molar Mass</h2>
+      <p>The total molar mass of any chemical compound represented by the general empirical formula $\text{A}_a\text{B}_b\text{C}_c\dots$ is calculated as the sum of the standard atomic weights of its constituent chemical elements weighted by their stoichiometric coefficients:</p>
+
+      <div class="formula-box">
+        $$M = \sum_{i=1}^{k} n_i \cdot A_r(i)$$
+      </div>
+
+      <p>Where $n_i$ represents the number of atoms of element $i$ in the chemical formula unit, and $A_r(i)$ denotes the standard atomic weight (relative atomic mass) of element $i$ established by the IUPAC Commission on Isotopic Abundances and Atomic Weights (CIAAW).</p>
+
+      <h2>Elemental Mass Percentage Composition Formula</h2>
+      <p>Gravimetric analytical chemistry and materials characterization frequently require determining the theoretical mass fraction ($w_i$) or mass percentage ($\%_{\text{mass}, i}$) contributed by each individual element within a compound:</p>
+
+      <div class="formula-box">
+        $$w_i = \frac{n_i \cdot A_r(i)}{M_{\text{total}}} \quad \implies \quad \%_{\text{mass}, i} = \left(\frac{n_i \cdot A_r(i)}{M_{\text{total}}}\right) \times 100\%$$
+      </div>
+
+      <p>By the law of conservation of mass, the sum of all elemental mass percentages across the chemical formula must equal exactly $100.00\%$, establishing a crucial verification audit in chemical assays and combustion elemental analysis ($\text{CHNS-O}$).</p>
+
+      <h2>Mole-to-Mass and Particle Count Conversions</h2>
+      <p>Interconverting between physical mass ($m$), molar quantity ($n$), and absolute particle count ($N$) forms the core of stoichiometric pipeline calculations:</p>
+      <ul>
+        <li><strong>Calculating Substance Quantity (Moles) from Mass:</strong>
+        $$n\text{ (mol)} = \frac{m\text{ (g)}}{M\text{ (g/mol)}}$$</li>
+        <li><strong>Calculating Total Mass from Moles:</strong>
+        $$m\text{ (g)} = n\text{ (mol)} \times M\text{ (g/mol)}$$</li>
+        <li><strong>Calculating Absolute Molecular Count:</strong>
+        $$N = n\text{ (mol)} \times N_A = \left(\frac{m}{M}\right) \times 6.02214076 \times 10^{23}$$</li>
+      </ul>
+
+      <h2>IUPAC Standard Atomic Weights Reference Table</h2>
+      <p>The table below summarizes standard atomic weights ($A_r$), atomic numbers ($Z$), standard terrestrial isotopic abundances, and valence states across 15 essential engineering and biological elements per the latest <strong>IUPAC CIAAW 2021 Table of Atomic Weights</strong>:</p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Atomic No. (Z)</th>
+              <th>Element Name</th>
+              <th>Symbol</th>
+              <th>Standard Atomic Wt (g/mol)</th>
+              <th>Major Terrestrial Isotopes</th>
+              <th>Key Industrial Function</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Hydrogen</td>
+              <td>H</td>
+              <td>1.0080</td>
+              <td>¹H (99.988%), ²H (0.012%)</td>
+              <td>Acids, hydration, hydrocarbons</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Carbon</td>
+              <td>C</td>
+              <td>12.011</td>
+              <td>¹²C (98.93%), ¹³C (1.07%)</td>
+              <td>Organic backbone, carbonates, polymers</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>Nitrogen</td>
+              <td>N</td>
+              <td>14.007</td>
+              <td>¹⁴N (99.63%), ¹⁵N (0.37%)</td>
+              <td>Ammonia, nitric acid, amines, fertilizers</td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td>Oxygen</td>
+              <td>O</td>
+              <td>15.999</td>
+              <td>¹⁶O (99.76%), ¹⁸O (0.20%)</td>
+              <td>Oxides, water, combustion oxidant</td>
+            </tr>
+            <tr>
+              <td>11</td>
+              <td>Sodium</td>
+              <td>Na</td>
+              <td>22.990</td>
+              <td>²³Na (100% monoisotopic)</td>
+              <td>Caustic soda, salts, brine regeneration</td>
+            </tr>
+            <tr>
+              <td>12</td>
+              <td>Magnesium</td>
+              <td>Mg</td>
+              <td>24.305</td>
+              <td>²⁴Mg (78.99%), ²⁵Mg (10.00%)</td>
+              <td>Water hardness, structural light alloys</td>
+            </tr>
+            <tr>
+              <td>13</td>
+              <td>Aluminum</td>
+              <td>Al</td>
+              <td>26.982</td>
+              <td>²⁷Al (100% monoisotopic)</td>
+              <td>Alum coagulation, structural metals</td>
+            </tr>
+            <tr>
+              <td>14</td>
+              <td>Silicon</td>
+              <td>Si</td>
+              <td>28.085</td>
+              <td>²⁸Si (92.22%), ²⁹Si (4.69%)</td>
+              <td>Silicates, zeolites, semiconductors</td>
+            </tr>
+            <tr>
+              <td>15</td>
+              <td>Phosphorus</td>
+              <td>P</td>
+              <td>30.974</td>
+              <td>³¹P (100% monoisotopic)</td>
+              <td>Phosphates, scale inhibitors, fertilizers</td>
+            </tr>
+            <tr>
+              <td>16</td>
+              <td>Sulfur</td>
+              <td>S</td>
+              <td>32.06</td>
+              <td>³²S (94.99%), ³⁴S (4.25%)</td>
+              <td>Sulfuric acid, sulfates, vulcanization</td>
+            </tr>
+            <tr>
+              <td>17</td>
+              <td>Chlorine</td>
+              <td>Cl</td>
+              <td>35.45</td>
+              <td>³⁵Cl (75.76%), ³⁷Cl (24.24%)</td>
+              <td>Bleach, water disinfection, PVC polymer</td>
+            </tr>
+            <tr>
+              <td>19</td>
+              <td>Potassium</td>
+              <td>K</td>
+              <td>39.098</td>
+              <td>³⁹K (93.26%), ⁴¹K (6.73%)</td>
+              <td>Potash fertilizers, biochemical electrolytes</td>
+            </tr>
+            <tr>
+              <td>20</td>
+              <td>Calcium</td>
+              <td>Ca</td>
+              <td>40.078</td>
+              <td>⁴⁰Ca (96.94%), ⁴⁴Ca (2.09%)</td>
+              <td>Lime softening, cement, scale formation</td>
+            </tr>
+            <tr>
+              <td>26</td>
+              <td>Iron</td>
+              <td>Fe</td>
+              <td>55.845</td>
+              <td>⁵⁶Fe (91.75%), ⁵⁴Fe (5.85%)</td>
+              <td>Ferric chloride coagulant, structural steel</td>
+            </tr>
+            <tr>
+              <td>29</td>
+              <td>Copper</td>
+              <td>Cu</td>
+              <td>63.546</td>
+              <td>⁶³Cu (69.15%), ⁶⁵Cu (30.85%)</td>
+              <td>Piping, heat exchanger tubes, algaecides</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Practical Worked Case Study: Complex Hydrate Stoichiometry</h2>
+      <div class="worked-example-card">
+        <h3>Chemical Engineering Case Study: Water Treatment Alum Hydrate</h3>
+        <p><strong>Scenario:</strong> A municipal water treatment plant purchases solid aluminum sulfate octadecahydrate (commercial filter alum, chemical formula $\text{Al}_2(\text{SO}_4)_3 \cdot 18\text{H}_2\text{O}$) to coagulate suspended clay colloids. To optimize chemical feed inventory, determine: (1) the precise molecular weight of the hydrated salt, (2) the elemental mass percent of active trivalent aluminum ($\text{Al}^{3+}$), (3) the mass percent of water of crystallization, and (4) how many moles of active aluminum are delivered by a $1,000\text{ kg}$ bulk tote bag.</p>
+
+        <p><strong>Step 1: Inventory the Elemental Formula Unit:</strong></p>
+        <p>Expanding the formula $\text{Al}_2(\text{SO}_4)_3 \cdot 18\text{H}_2\text{O}$ yields:</p>
+        <ul>
+          <li>Aluminum: $2\text{ atoms} \times 26.9815386\text{ g/mol} = 53.9631\text{ g/mol}$</li>
+          <li>Sulfur: $3\text{ atoms} \times 32.06\text{ g/mol} = 96.1800\text{ g/mol}$</li>
+          <li>Oxygen (in sulfate): $3 \times 4 = 12\text{ atoms} \times 15.9994\text{ g/mol} = 191.9928\text{ g/mol}$</li>
+          <li>Hydrogen (in water): $18 \times 2 = 36\text{ atoms} \times 1.0080\text{ g/mol} = 36.2880\text{ g/mol}$</li>
+          <li>Oxygen (in water): $18 \times 1 = 18\text{ atoms} \times 15.9994\text{ g/mol} = 287.9892\text{ g/mol}$</li>
+        </ul>
+
+        <p><strong>Step 2: Sum Total Molar Mass:</strong></p>
+        $$M = 53.9631 + 96.1800 + 191.9928 + 36.2880 + 287.9892 = 666.4131\text{ g/mol}$$
+        <p>Anhydrous aluminum sulfate $\text{Al}_2(\text{SO}_4)_3$ contributes $342.15\text{ g/mol}$ ($51.34\%$), while the 18 hydration waters contribute $18 \times 18.0153 = 324.28\text{ g/mol}$ ($48.66\%$).</p>
+
+        <p><strong>Step 3: Compute Elemental Mass Percent of Aluminum:</strong></p>
+        $$\%_{\text{Al}} = \left(\frac{53.9631\text{ g/mol}}{666.4131\text{ g/mol}}\right) \times 100\% = 8.0975\% \approx 8.10\%\text{ w/w Al}$$
+
+        <p><strong>Step 4: Moles and Aluminum Delivery per 1,000 kg Bulk Tote:</strong></p>
+        $$n_{\text{alum}} = \frac{1,000,000\text{ g}}{666.4131\text{ g/mol}} = 1,500.57\text{ moles of alum}$$
+        $$\text{Moles of Al}^{3+} = 1,500.57\text{ mol} \times 2 = 3,001.14\text{ moles of Al}^{3+}$$
+        $$\text{Mass of pure Al metal} = 1,000\text{ kg} \times 0.080975 = 80.98\text{ kg of active aluminum}$$
+      </div>
+
+      <h2>Isotopic Variations and Mass Spectrometry Considerations</h2>
+      <p>While standard atomic weights represent the geographic average across the Earth's crust, precise isotopic ratios can deviate slightly depending on geological origin, biological fractionation, or artificial enrichment (such as depleted uranium $^{238}\text{U}$ or heavy water $\text{D}_2\text{O}$). In high-resolution electrospray ionization mass spectrometry (ESI-MS) and matrix-assisted laser desorption (MALDI), analytical chemists differentiate between:</p>
+      <ul>
+        <li><strong>Average Molar Mass:</strong> Calculated using natural isotopic abundance weighted averages ($180.156\text{ g/mol}$ for glucose), representing bulk wet-chemical titrations.</li>
+        <li><strong>Monoisotopic Mass:</strong> Calculated using the exact mass of the single most abundant naturally occurring stable isotope for each element ($^{12}\text{C} = 12.000000$, $^{1}\text{H} = 1.007825$, $^{16}\text{O} = 15.994915$), producing a monoisotopic mass of $180.06339\text{ Da}$ for glucose, corresponding to the dominant base peak observed in mass spectra.</li>
+      </ul>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">
+            <span class="logo-icon">&pi;</span>
+            <span class="logo-text">Calc<strong>Hub</strong></span>
+          </div>
+          <p class="footer-about">High-precision chemical metrology, molecular weight calculation, and elemental stoichiometry tools conforming to IUPAC and CIAAW standards.</p>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Engineering Disciplines</h4>
+          <ul class="footer-links">
+            <li><a href="chemical.html">Chemical &amp; Water Treatment</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+            <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+            <li><a href="civil.html">Civil &amp; Construction</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Standard References</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.ciaaw.org" target="_blank" rel="noopener">IUPAC Commission on Isotopic Abundances</a></li>
+            <li><a href="https://webbook.nist.gov" target="_blank" rel="noopener">NIST Chemistry WebBook</a></li>
+            <li><a href="https://www.bipm.org" target="_blank" rel="noopener">BIPM 2019 SI Base Units</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Free, open, client-side engineering tools.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // IUPAC Standard Atomic Weights (CIAAW 2021)
+    const ATOMIC_WEIGHTS = {
+      H: { name: "Hydrogen", mass: 1.0080 },
+      He: { name: "Helium", mass: 4.0026 },
+      Li: { name: "Lithium", mass: 6.94 },
+      Be: { name: "Beryllium", mass: 9.0122 },
+      B: { name: "Boron", mass: 10.81 },
+      C: { name: "Carbon", mass: 12.011 },
+      N: { name: "Nitrogen", mass: 14.007 },
+      O: { name: "Oxygen", mass: 15.999 },
+      F: { name: "Fluorine", mass: 18.9984 },
+      Ne: { name: "Neon", mass: 20.1797 },
+      Na: { name: "Sodium", mass: 22.9898 },
+      Mg: { name: "Magnesium", mass: 24.305 },
+      Al: { name: "Aluminum", mass: 26.9815 },
+      Si: { name: "Silicon", mass: 28.085 },
+      P: { name: "Phosphorus", mass: 30.9738 },
+      S: { name: "Sulfur", mass: 32.06 },
+      Cl: { name: "Chlorine", mass: 35.45 },
+      Ar: { name: "Argon", mass: 39.948 },
+      K: { name: "Potassium", mass: 39.0983 },
+      Ca: { name: "Calcium", mass: 40.078 },
+      Sc: { name: "Scandium", mass: 44.9559 },
+      Ti: { name: "Titanium", mass: 47.867 },
+      V: { name: "Vanadium", mass: 50.9415 },
+      Cr: { name: "Chromium", mass: 51.9961 },
+      Mn: { name: "Manganese", mass: 54.9380 },
+      Fe: { name: "Iron", mass: 55.845 },
+      Co: { name: "Cobalt", mass: 58.9332 },
+      Ni: { name: "Nickel", mass: 58.6934 },
+      Cu: { name: "Copper", mass: 63.546 },
+      Zn: { name: "Zinc", mass: 65.38 },
+      Ga: { name: "Gallium", mass: 69.723 },
+      Ge: { name: "Germanium", mass: 72.630 },
+      As: { name: "Arsenic", mass: 74.9216 },
+      Se: { name: "Selenium", mass: 78.971 },
+      Br: { name: "Bromine", mass: 79.904 },
+      Kr: { name: "Krypton", mass: 83.798 },
+      Rb: { name: "Rubidium", mass: 85.4678 },
+      Sr: { name: "Strontium", mass: 87.62 },
+      Y: { name: "Yttrium", mass: 88.9058 },
+      Zr: { name: "Zirconium", mass: 91.224 },
+      Mo: { name: "Molybdenum", mass: 95.95 },
+      Ag: { name: "Silver", mass: 107.8682 },
+      Cd: { name: "Cadmium", mass: 112.414 },
+      In: { name: "Indium", mass: 114.818 },
+      Sn: { name: "Tin", mass: 118.710 },
+      Sb: { name: "Antimony", mass: 121.760 },
+      Te: { name: "Tellurium", mass: 127.60 },
+      I: { name: "Iodine", mass: 126.9045 },
+      Xe: { name: "Xenon", mass: 131.293 },
+      Cs: { name: "Cesium", mass: 132.9055 },
+      Ba: { name: "Barium", mass: 137.327 },
+      La: { name: "Lanthanum", mass: 138.9055 },
+      Ce: { name: "Cerium", mass: 140.116 },
+      W: { name: "Tungsten", mass: 183.84 },
+      Pt: { name: "Platinum", mass: 195.084 },
+      Au: { name: "Gold", mass: 196.9666 },
+      Hg: { name: "Mercury", mass: 200.592 },
+      Pb: { name: "Lead", mass: 207.2 },
+      Bi: { name: "Bismuth", mass: 208.9804 },
+      U: { name: "Uranium", mass: 238.0289 }
+    };
+
+    function updateCompoundPreset() {
+      const p = document.getElementById("compoundPreset").value;
+      if (p !== "custom") {
+        document.getElementById("chemFormulaInput").value = p;
+        calcMolarMass();
+      }
+    }
+
+    function updateConvertMode() {
+      const mode = document.getElementById("convertMode").value;
+      document.getElementById("convertUnitLabel").textContent = mode === "mass_to_mol" ? "Sample Mass in Grams (g)" : "Substance in Moles (mol)";
+    }
+
+    // Formula parser with parentheses & hydrates
+    function parseFormula(formulaStr) {
+      let f = formulaStr.trim().replace(/\s+/g, "");
+      // Handle hydrate dots e.g. CuSO4.5H2O or Al2(SO4)3·18H2O
+      const parts = f.split(/[\.·]/);
+      let totalCounts = {};
+
+      for (let pIdx = 0; pIdx < parts.length; pIdx++) {
+        let part = parts[pIdx];
+        if (!part) continue;
+
+        let multiplier = 1;
+        // Check leading coefficient for hydrate e.g. 18H2O or 5H2O
+        let matchCoeff = part.match(/^(\d+)(.*)$/);
+        if (pIdx > 0 && matchCoeff) {
+          multiplier = parseInt(matchCoeff[1], 10);
+          part = matchCoeff[2];
+        }
+
+        let counts = parseSingleFormula(part);
+        for (let elem in counts) {
+          totalCounts[elem] = (totalCounts[elem] || 0) + counts[elem] * multiplier;
+        }
+      }
+      return totalCounts;
+    }
+
+    function parseSingleFormula(s) {
+      // Handles brackets and parentheses
+      let stack = [{}];
+      let i = 0;
+      let n = s.length;
+
+      while (i < n) {
+        let char = s[i];
+
+        if (char === "(" || char === "[" || char === "{") {
+          stack.push({});
+          i++;
+        } else if (char === ")" || char === "]" || char === "}") {
+          i++;
+          // Parse following number
+          let numStart = i;
+          while (i < n && /\d/.test(s[i])) i++;
+          let repeat = numStart === i ? 1 : parseInt(s.substring(numStart, i), 10);
+          let popped = stack.pop();
+          let top = stack[stack.length - 1];
+          for (let el in popped) {
+            top[el] = (top[el] || 0) + popped[el] * repeat;
+          }
+        } else if (/[A-Z]/.test(char)) {
+          // Element name (1 uppercase + optional lowercase)
+          let elem = char;
+          i++;
+          if (i < n && /[a-z]/.test(s[i])) {
+            elem += s[i];
+            i++;
+          }
+          // Parse following number
+          let numStart = i;
+          while (i < n && /\d/.test(s[i])) i++;
+          let count = numStart === i ? 1 : parseInt(s.substring(numStart, i), 10);
+          let top = stack[stack.length - 1];
+          top[elem] = (top[elem] || 0) + count;
+        } else {
+          i++;
+        }
+      }
+
+      return stack[0];
+    }
+
+    function calcMolarMass() {
+      const formulaInput = document.getElementById("chemFormulaInput").value.trim();
+      if (!formulaInput) return;
+
+      let counts;
+      try {
+        counts = parseFormula(formulaInput);
+      } catch (err) {
+        alert("Invalid chemical formula syntax: " + err.message);
+        return;
+      }
+
+      let totalMolarMass = 0;
+      let totalAtoms = 0;
+      let breakdown = [];
+      let unknownElements = [];
+
+      for (let el in counts) {
+        let atomCount = counts[el];
+        totalAtoms += atomCount;
+        if (ATOMIC_WEIGHTS[el]) {
+          let atMass = ATOMIC_WEIGHTS[el].mass;
+          let elTotalMass = atomCount * atMass;
+          totalMolarMass += elTotalMass;
+          breakdown.push({
+            symbol: el,
+            name: ATOMIC_WEIGHTS[el].name,
+            atWeight: atMass,
+            count: atomCount,
+            totalMass: elTotalMass
+          });
+        } else {
+          unknownElements.push(el);
+        }
+      }
+
+      if (unknownElements.length > 0) {
+        alert("Unknown element symbol(s): " + unknownElements.join(", "));
+        return;
+      }
+
+      if (totalMolarMass === 0) {
+        alert("No valid chemical elements detected.");
+        return;
+      }
+
+      // Sort breakdown descending by total mass
+      breakdown.sort((a, b) => b.totalMass - a.totalMass);
+
+      // Conversion calculation
+      const mode = document.getElementById("convertMode").value;
+      const inputVal = parseFloat(document.getElementById("convertValueInput").value) || 100.0;
+      const N_A = 6.02214076e23;
+
+      let calcMassGrams = 0;
+      let calcMoles = 0;
+
+      if (mode === "mass_to_mol") {
+        calcMassGrams = inputVal;
+        calcMoles = calcMassGrams / totalMolarMass;
+      } else {
+        calcMoles = inputVal;
+        calcMassGrams = calcMoles * totalMolarMass;
+      }
+
+      const totalParticles = calcMoles * N_A;
+
+      // Update primary UI
+      document.getElementById("resMolarMassVal").textContent = totalMolarMass.toFixed(3) + " g/mol";
+      document.getElementById("resMolarMassAlt").textContent = (totalMolarMass / 1000.0).toFixed(5) + " kg/mol (" + totalMolarMass.toFixed(3) + " amu / Da)";
+
+      document.getElementById("resMolesVal").textContent = calcMoles < 0.001 ? calcMoles.toExponential(4) + " mol" : calcMoles.toFixed(4) + " mol";
+      document.getElementById("resMolesAlt").textContent = (calcMoles * 1000).toFixed(2) + " mmol";
+
+      document.getElementById("resMoleculesVal").textContent = totalParticles.toExponential(3);
+      document.getElementById("resSampleMassVal").textContent = calcMassGrams >= 1000 ? (calcMassGrams / 1000).toFixed(3) + " kg" : calcMassGrams.toFixed(2) + " g";
+      document.getElementById("resSampleMassAlt").textContent = (calcMassGrams / 1000).toFixed(4) + " kg (" + (calcMassGrams * 0.00220462).toFixed(4) + " lbs)";
+
+      document.getElementById("resTotalAtomsVal").textContent = totalAtoms + " Atoms";
+
+      // Populate Table
+      const tbody = document.getElementById("elementBreakdownBody");
+      tbody.innerHTML = "";
+
+      breakdown.forEach(item => {
+        const pct = (item.totalMass / totalMolarMass) * 100.0;
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><strong>${item.name}</strong></td>
+          <td><code>${item.symbol}</code></td>
+          <td>${item.atWeight.toFixed(4)}</td>
+          <td>${item.count}</td>
+          <td>${item.totalMass.toFixed(3)}</td>
+          <td><span style="font-weight:700;color:var(--primary);">${pct.toFixed(2)}%</span></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      calcMolarMass();
+    });
+  </script>
+</body>
+</html>

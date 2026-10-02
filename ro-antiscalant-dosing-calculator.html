@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RO Antiscalant Dosing Calculator | Membrane Scale Inhibitor Sizer</title>
+  <meta name="description" content="Calculate reverse osmosis (RO) membrane antiscalant chemical dosing, feed pump rates, brine concentration factor, and Langelier Saturation Index (LSI) control.">
+  <link rel="canonical" href="https://calchub.cloud/ro-antiscalant-dosing-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "RO Antiscalant Dosing Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates reverse osmosis membrane chemical antiscalant feed rates, brine reject concentration factors, recovery limits, and chemical metering pump stroke sizing.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the primary function of antiscalant in Reverse Osmosis (RO) systems?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "As raw feedwater passes across semi-permeable RO membranes, pure permeate water is extracted, concentrating sparingly soluble mineral salts in the reject brine stream. Antiscalants are synthetic organic phosphonates or polycarboxylates that delay crystal nucleation and distort crystalline lattice growth, allowing minerals like CaCO3, CaSO4, BaSO4, and SiO2 to remain supersaturated without precipitating onto membrane surfaces."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is the concentration factor (CF) calculated in RO systems?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The brine concentration factor represents how concentrated rejected minerals become relative to raw feedwater. It is calculated from system recovery ratio Y (permeate flow divided by feed flow): CF = 1 / (1 - Y). For instance, an RO system operating at 75% recovery (Y = 0.75) has a concentration factor of CF = 1 / (1 - 0.75) = 4.0, meaning rejected minerals are 400% more concentrated in the brine."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the typical dosage range for RO membrane antiscalant?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Standard industrial antiscalant dosages typically range from 1.5 to 5.0 mg/L (ppm) based on total raw feedwater flow. Under-dosing leads to irreversible mineral scaling on final-stage membrane elements, while excessive over-dosing can cause biofouling or polymer-antiscalant cross-precipitation with cationic coagulants."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why is antiscalant dosed based on raw feed flow rather than permeate flow?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Antiscalant must be uniformly dispersed throughout the entire liquid volume entering the first-stage membrane feed manifold. If dosed into brine or permeate, mineral crystals would nucleate in earlier stages before inhibitor contact, causing premature tail-element scale blinding."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="chemical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="chemical.html">Chemical &amp; Water Treatment</a> &rsaquo; 
+      <span>RO Antiscalant Dosing Calculator</span>
+    </nav>
+
+    <h1 class="tool-title">Reverse Osmosis Antiscalant Dosing Calculator</h1>
+    <p class="tool-subtitle">Membrane Scale Inhibition Sizing, Concentration Factor (CF) &amp; Metering Pump Calibration</p>
+
+    <div class="calculator-layout">
+      <!-- Calculator Core Interface -->
+      <div class="calculator-card">
+        <div class="calc-form">
+          <div class="form-group">
+            <label for="roFeedwaterPreset">RO System Application &amp; Water Source</label>
+            <select id="roFeedwaterPreset" class="form-control" onchange="updateROPreset()">
+              <option value="brackish_ground" selected>Brackish Groundwater (75% Recovery, LSI &gt; 1.5, Moderate Silica)</option>
+              <option value="seawater_ro">Seawater Reverse Osmosis (SWRO, 45% Recovery, S&amp;DSI Scaling)</option>
+              <option value="effluent_reuse">Tertiary Wastewater Reuse (80% Recovery, Calcium Phosphate/Sulfate)</option>
+              <option value="industrial_pure">Industrial Ultrapure Boiler Feed (85% Recovery, High Silica Stress)</option>
+              <option value="custom">Custom Feed &amp; Recovery Parameters</option>
+            </select>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="roFeedFlowVal">RO Raw Feedwater Flow Rate</label>
+              <input type="number" id="roFeedFlowVal" class="form-control" value="100" step="10" min="0.1">
+            </div>
+            <div class="form-group">
+              <label for="roFeedFlowUnit">Feed Flow Units</label>
+              <select id="roFeedFlowUnit" class="form-control">
+                <option value="m3h" selected>Cubic Meters / Hour (m³/h)</option>
+                <option value="gpm">Gallons / Minute (GPM)</option>
+                <option value="mgd">Million Gallons / Day (MGD)</option>
+                <option value="mld">Million Liters / Day (MLD)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="roRecoveryPct">System Permeate Recovery (Y %)</label>
+              <input type="number" id="roRecoveryPct" class="form-control" value="75.0" step="1.0" min="30.0" max="95.0">
+              <span class="field-hint">Typically 75% for brackish, 40-50% for seawater</span>
+            </div>
+            <div class="form-group">
+              <label for="antiscalantDosePpm">Antiscalant Dosage (mg/L neat ppm)</label>
+              <input type="number" id="antiscalantDosePpm" class="form-control" value="3.0" step="0.2" min="0.5" max="15.0">
+              <span class="field-hint">Based on raw feedwater flow</span>
+            </div>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="antiscalantSG">Neat Antiscalant Specific Gravity (SG)</label>
+              <input type="number" id="antiscalantSG" class="form-control" value="1.20" step="0.02" min="1.05" max="1.45">
+              <span class="field-hint">Typically 1.15 to 1.30 kg/L</span>
+            </div>
+            <div class="form-group">
+              <label for="tankDilutionRatio">Day Tank Dilution Factor</label>
+              <select id="tankDilutionRatio" class="form-control">
+                <option value="1" selected>Neat 100% (No Dilution / Direct Drum Pumping)</option>
+                <option value="5">1 : 4 Dilution (20% v/v in RO Permeate)</option>
+                <option value="10">1 : 9 Dilution (10% v/v in RO Permeate)</option>
+                <option value="20">1 : 19 Dilution (5% v/v in RO Permeate)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="roPumpMaxCapacityLph">Metering Pump Max Rating (L/h)</label>
+              <input type="number" id="roPumpMaxCapacityLph" class="form-control" value="2.0" step="0.5" min="0.1">
+            </div>
+            <div class="form-group">
+              <label for="operatingHoursDay">Daily Operating Hours</label>
+              <input type="number" id="operatingHoursDay" class="form-control" value="24" step="1" min="1" max="24">
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary" onclick="calcROAntiscalant()" style="width: 100%; margin-top: 15px;">Calculate Antiscalant Dosing</button>
+        </div>
+      </div>
+
+      <!-- Output Results Panel -->
+      <div class="results-card">
+        <div class="result-box primary-result">
+          <div class="result-label">Feed Pump Volumetric Delivery Rate</div>
+          <div id="resPumpLphVal" class="result-value">0.250 L / hour</div>
+          <div id="resPumpAlternateUnits" class="result-subtext">4.17 mL/min (0.066 GPH neat antiscalant feed)</div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-item">
+            <span class="result-label">Daily Neat Consumption</span>
+            <span id="resDailyNeatKg" class="result-value highlight">7.20 kg / day</span>
+            <span id="resDailyNeatLiters" class="result-subtext">6.00 Liters / day (15.88 lbs/day)</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Concentration Factor (CF)</span>
+            <span id="resConcentrationFactor" class="result-value">4.00 &times;</span>
+            <span class="result-subtext">Brine reject mineral concentration</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Permeate Production Flow</span>
+            <span id="resPermeateFlow" class="result-value">75.0 m³/h</span>
+            <span id="resPermeateFlowSub" class="result-subtext">330.2 GPM pure permeate</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Concentrate Brine Discharge</span>
+            <span id="resBrineFlow" class="result-value">25.0 m³/h</span>
+            <span id="resBrineFlowSub" class="result-subtext">110.1 GPM reject brine</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Pump Stroke Setting</span>
+            <span id="resPumpStrokeSetting" class="result-value">12.5%</span>
+            <span id="resPumpStrokeWarning" class="result-subtext">Of 2.0 L/h maximum pump rating</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Standard Drum Autonomy</span>
+            <span id="resDrumAutonomyDays" class="result-value">33.3 Days</span>
+            <span class="result-subtext">Standard 200 L / 55-Gal shipping drum</span>
+          </div>
+        </div>
+
+        <div class="result-details" style="margin-top: 15px;">
+          <p><strong>Brine Scaling Stress Analysis:</strong> <span id="resScaleRiskNote">At 4.00x concentration factor, LSI in concentrate increases by approx +0.60 units. Antiscalant prevents calcite and gypsum precipitation.</span></p>
+          <p><strong>Dilution Water Standard:</strong> <span id="resDilutionWaterNote">Always use chlorine-free RO permeate for antiscalant tank dilution to prevent biological fouling inside day tanks.</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1000+ Words Engineering Body -->
+    <article class="article-body">
+      <h2>Engineering Fundamentals of Reverse Osmosis Membrane Scaling</h2>
+      <p>In modern industrial desalination, semiconductor ultrapure water production, and municipal wastewater reclamation, <strong>Reverse Osmosis (RO)</strong> systems utilize high-pressure semi-permeable spiral-wound polyamide composite membranes to separate dissolved ionic salts from water. While RO membranes reject upwards of $99.5\%$ of monovalent and multivalent dissolved minerals, this separation inevitably partitions the raw feedwater stream into two distinct hydraulic components: a purified <strong>permeate</strong> stream and an ultra-concentrated <strong>reject (concentrate or brine)</strong> stream.</p>
+
+      <p>As water is progressively extracted through the membrane leaves, the concentrations of sparingly soluble inorganic salts—principally calcium carbonate ($\text{CaCO}_3$), calcium sulfate ($\text{CaSO}_4$, gypsum), barium sulfate ($\text{BaSO}_4$, barite), strontium sulfate ($\text{SrSO}_4$), and reactive silica ($\text{SiO}_2$)—increase exponentially inside the membrane feed-concentrate spacer channels. When the thermodynamic ion activity product ($IAP$) of any mineral exceeds its corresponding equilibrium solubility product ($K_{sp}$), the brine becomes supersaturated ($IAP / K_{sp} &gt; 1.0$), triggering heterogeneous crystal nucleation and irreversible scale deposition across the membrane feed spacer and active surface.</p>
+
+      <h2>The Concentration Factor (CF) and Recovery Equation</h2>
+      <p>The volumetric recovery ratio ($Y$) of an RO membrane array represents the ratio of permeate flow rate ($Q_p$) to total raw feedwater flow rate ($Q_f$):</p>
+
+      <div class="formula-box">
+        $$Y = \frac{Q_p}{Q_f} \quad \implies \quad Q_f = Q_p + Q_c$$
+      </div>
+
+      <p>Where $Q_c$ denotes the concentrate brine flow rate. Assuming near-complete rejection of multivalent scaling ions ($R_{\text{salt}} \approx 100\%$), the mass balance across the membrane train defines the <strong>Concentration Factor ($CF$)</strong> of the reject brine:</p>
+
+      <div class="formula-box">
+        $$CF = \frac{C_{\text{brine}}}{C_{\text{feed}}} = \frac{1}{1 - Y}$$
+      </div>
+
+      <p>The non-linear nature of this relationship governs membrane scaling risk:</p>
+      <ul>
+        <li>At $50\%$ Recovery ($Y = 0.50$): $CF = \frac{1}{1 - 0.50} = 2.00\times$ (reject minerals are doubled).</li>
+        <li>At $75\%$ Recovery ($Y = 0.75$): $CF = \frac{1}{1 - 0.75} = 4.00\times$ (reject minerals are quadrupled).</li>
+        <li>At $85\%$ Recovery ($Y = 0.85$): $CF = \frac{1}{1 - 0.85} = 6.67\times$ (reject minerals increase nearly 7-fold).</li>
+        <li>At $90\%$ Recovery ($Y = 0.90$): $CF = \frac{1}{1 - 0.90} = 10.00\times$ (reject minerals increase 10-fold).</li>
+      </ul>
+      <p>Because solubility products scale by the square or cube of concentration (e.g., $[\text{Ca}^{2+}][\text{SO}_4^{2-}]$ increases by $CF^2 = 16\times$ at $75\%$ recovery), scaling potential surges drastically in the tail elements of the final membrane stage.</p>
+
+      <h2>Mechanisms of Chemical Scale Inhibition</h2>
+      <p>Rather than dissolving mineral scale after it has formed, modern synthetic RO antiscalants act as <strong>threshold scale inhibitors</strong> operating at substoichiometric concentrations (merely $1\text{ to } 5\text{ mg/L}$ chemical dosed against hundreds of $\text{mg/L}$ of scaling salts). They safeguard membranes via three distinct physicochemical mechanisms:</p>
+      <ol>
+        <li><strong>Threshold Inhibition (Nucleation Delay):</strong> Antiscalant molecules (such as amino tris(methylene phosphonic acid) ATMP or phosphonobutane-tricarboxylic acid PBTC) electrostatically adsorb onto embryonic sub-nanometer crystal nuclei as they spontaneously form. This dramatically increases the activation energy required for crystal growth, keeping minerals in a metastable supersaturated state throughout the $10\text{ to } 30\text{ second}$ hydraulic residence time of water passing through the pressure vessels.</li>
+        <li><strong>Crystal Lattice Distortion:</strong> When micro-crystals do nucleate, antiscalant anions incorporate into the regular crystalline lattice boundaries, disrupting periodic symmetry. Instead of forming sharp, hard, adherent rhombohedral calcite or needle-like gypsum crystals that mechanically pierce the polyamide polymer layer, the crystals deform into soft, rounded, non-adherent spherulites that cannot adhere to the membrane surface.</li>
+        <li><strong>Colloidal Dispersion:</strong> Negatively charged polycarboxylate and polymaleic acid polymer chains coat suspended particles, increasing their negative zeta potential. The resulting mutual electrostatic repulsion keeps colloidal silica, iron hydroxide, and organic colloids dispersed in the high-velocity cross-flow stream for discharge into the reject drain.</li>
+      </ol>
+
+      <h2>Mathematical Dosing and Feeder Sizing Formulas</h2>
+      <p>Because antiscalant must protect the entire membrane envelope starting from the lead element, dosage ($D_{\text{neat}}$ in $\text{mg/L}$ or $\text{ppm}$) is universally calculated against the <strong>total raw feedwater flow rate ($Q_f$)</strong>, regardless of system recovery:</p>
+
+      <div class="formula-box">
+        $$\dot{m}_{\text{neat}}\text{ (kg/day)} = \frac{Q_f\text{ (m}^3/\text{day)} \times D_{\text{neat}}\text{ (mg/L)}}{1,000}$$
+        $$\dot{m}_{\text{neat}}\text{ (lb/day)} = Q_f\text{ (MGD)} \times D_{\text{neat}}\text{ (ppm)} \times 8.3454\text{ lb/(MGD}\cdot\text{ppm)}$$
+      </div>
+
+      <p>Given the specific gravity ($\text{SG}$, typically $1.15\text{ to } 1.30\text{ kg/L}$) and dilution factor in the chemical day tank ($F_{\text{dilution}} = V_{\text{total}} / V_{\text{neat}}$), the volumetric dosing rate ($q_{\text{pump}}$ in Liters per hour or Gallons per hour) delivered by the positive displacement metering pump is:</p>
+
+      <div class="formula-box">
+        $$q_{\text{pump}}\text{ (L/h)} = \frac{\dot{m}_{\text{neat}}\text{ (kg/day)} \times F_{\text{dilution}}}{24\text{ h/day} \times \text{SG}\text{ (kg/L)}}$$
+      </div>
+
+      <h2>Scaling Saturation Indices and Thresholds Benchmark Table</h2>
+      <p>The table below summarizes critical scaling indices, geochemical thresholds, and maximum permissible saturation limits achievable with specialized modern threshold inhibitors:</p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Scaling Mineral Species</th>
+              <th>Governing Thermodynamic Index</th>
+              <th>Thermodynamic Saturation Limit (Without Inhibitor)</th>
+              <th>Maximum Practical Limit (With High-Performance Antiscalant)</th>
+              <th>Preferred Antiscalant Chemistry</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Calcium Carbonate (CaCO₃)</td>
+              <td>Langelier Saturation Index (LSI, TDS &lt; 10,000 ppm)</td>
+              <td>LSI &gt; 0.0 (Precipitates)</td>
+              <td>LSI up to +2.5 to +2.8 (Safe)</td>
+              <td>Phosphonates (PBTC, HEDP), Polyacrylates</td>
+            </tr>
+            <tr>
+              <td>Calcium Carbonate (High Salinity)</td>
+              <td>Stiff-Davis Stability Index (S&amp;DSI, SWRO)</td>
+              <td>S&amp;DSI &gt; 0.0</td>
+              <td>S&amp;DSI up to +1.0 to +1.2</td>
+              <td>Polymaleic acid (PMA), Phosphonocarboxylic acids</td>
+            </tr>
+            <tr>
+              <td>Calcium Sulfate (Gypsum, CaSO₄·2H₂O)</td>
+              <td>Percent Saturation Ratio (% Sat)</td>
+              <td>&gt; 100% Saturation</td>
+              <td>Up to 230% &ndash; 300% Saturation</td>
+              <td>Specialized high-sulfate phosphonate blends</td>
+            </tr>
+            <tr>
+              <td>Barium Sulfate (Barite, BaSO₄)</td>
+              <td>Percent Saturation Ratio (% Sat)</td>
+              <td>&gt; 100% Saturation</td>
+              <td>Up to 6,000% &ndash; 8,000% Saturation</td>
+              <td>Polyphosphonates (extremely insoluble salt)</td>
+            </tr>
+            <tr>
+              <td>Strontium Sulfate (Celestite, SrSO₄)</td>
+              <td>Percent Saturation Ratio (% Sat)</td>
+              <td>&gt; 100% Saturation</td>
+              <td>Up to 800% &ndash; 1,200% Saturation</td>
+              <td>Carboxylic-sulfonic terpolymers</td>
+            </tr>
+            <tr>
+              <td>Reactive Colloidal Silica (SiO₂)</td>
+              <td>Total Dissolved Silica (mg/L as SiO₂)</td>
+              <td>120 &ndash; 140 mg/L at 25°C</td>
+              <td>Up to 240 &ndash; 300 mg/L at 25°C</td>
+              <td>Silica-specific dispersants (neutral charge polyethers)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Practical Worked Case Study: Sizing Antiscalant for a 1,200 GPM Brackish RO System</h2>
+      <div class="worked-example-card">
+        <h3>Membrane Plant Engineering Case Study: Municipal Brackish Groundwater RO</h3>
+        <p><strong>Scenario:</strong> A municipal brackish water reverse osmosis (BWRO) facility treats deep well water to produce drinking water. The system operates at a total raw feedwater flow rate of $Q_f = 1,200\text{ GPM}$ ($272.5\text{ m}^3/\text{h}$, equivalent to $1.728\text{ MGD}$). The membrane array is configured in a two-stage $2:1$ vessel ratio operating at a global recovery ratio of $Y = 75.0\%$. Feedwater analysis reveals: Calcium $= 110\text{ mg/L}$, Bicarbonate $= 280\text{ mg/L}$, Sulfate $= 220\text{ mg/L}$, and Silica $= 22\text{ mg/L}$ at $T = 22.0^\circ\text{C}$ and $\text{pH } 7.60$. Projection modeling indicates the brine LSI will reach $+1.85$ and silica will reach $88\text{ mg/L}$ in the concentrate. A broad-spectrum neat liquid phosphonate antiscalant is prescribed at a continuous dosage of $D_{\text{neat}} = 3.50\text{ mg/L (ppm)}$ on raw feed. Chemical properties: neat specific gravity $\text{SG} = 1.22\text{ kg/L}$, delivered in standard $200\text{ Liter (55 gallon)}$ polyethylene drums. The chemical metering skid is equipped with a digital diaphragm pump rated at maximum capacity $q_{\text{pump, max}} = 3.00\text{ L/h}$.</p>
+
+        <p><strong>Step 1: Compute Hydraulic Flow Balance:</strong></p>
+        $$Q_{\text{permeate}} = 1,200\text{ GPM} \times 0.75 = 900\text{ GPM}\ (204.4\text{ m}^3/\text{h} = 1.296\text{ MGD})$$
+        $$Q_{\text{brine}} = 1,200\text{ GPM} \times (1 - 0.75) = 300\text{ GPM}\ (68.1\text{ m}^3/\text{h} = 0.432\text{ MGD})$$
+        $$CF = \frac{1}{1 - 0.75} = 4.00\times\text{ Reject Concentration Factor}$$
+
+        <p><strong>Step 2: Determine Daily Mass Delivery Rate of Neat Antiscalant:</strong></p>
+        $$\dot{m}_{\text{neat}} = 1.728\text{ MGD} \times 3.50\text{ ppm} \times 8.3454\text{ lb/(MGD}\cdot\text{ppm)} = 50.47\text{ lbs / day}\ (22.89\text{ kg / day})$$
+
+        <p><strong>Step 3: Calculate Neat Volumetric Pumping Rate:</strong></p>
+        $$q_{\text{neat}} = \frac{22.89\text{ kg/day}}{1.22\text{ kg/L}} = 18.76\text{ Liters / day}$$
+        $$q_{\text{pump, hourly}} = \frac{18.76\text{ L/day}}{24\text{ hours}} = 0.7818\text{ Liters / hour}\ (13.03\text{ mL / minute} = 0.2065\text{ GPH})$$
+
+        <p><strong>Step 4: Metering Pump Stroke Calibration:</strong></p>
+        $$\text{Stroke}\% = \left( \frac{0.7818\text{ L/h}}{3.00\text{ L/h}} \right) \times 100\% = 26.06\%$$
+        <p>Operating at $26.1\%$ stroke length and stroke frequency falls squarely within the optimum linear accuracy envelope ($15\%\text{ to } 85\%$) of electronic solenoid metering pumps.</p>
+
+        <p><strong>Step 5: Shipping Drum Autonomy:</strong></p>
+        $$\text{Autonomy} = \frac{200\text{ Liters in Drum}}{18.76\text{ Liters / day}} = 10.66\text{ Days per Drum}$$
+        <p>The facility requires approximately 3 drums per month.</p>
+      </div>
+
+      <h2>Operational Pitfalls: Coagulant Compatibility and Biofouling</h2>
+      <p>While antiscalants prevent mineral crystallization, improper operation can trigger alternative membrane failure modes:</p>
+      <ul>
+        <li><strong>Incompatibility with Cationic Coagulants:</strong> If upstream pretreatment utilizes cationic polymeric coagulants (e.g., polyDADMAC) to clarify turbid surface water, carryover of unreacted cationic polymer into the RO feed will react electrostatically with anionic polycarboxylate antiscalants. This produces an extremely sticky, insoluble coagulant-antiscalant co-precipitate that blindfolds lead elements, destroying membrane permeability.</li>
+        <li><strong>Over-dosing and Biological Growth:</strong> Dosing antiscalant in excess of manufacturer recommendations does not provide additional scale protection. Instead, phosphonate antiscalants contain orthophosphate precursors ($\text{PO}_4$) that act as limiting biological nutrients, accelerating bacterial proliferation and severe biological slime fouling on feed spacer grids.</li>
+      </ul>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">
+            <span class="logo-icon">&pi;</span>
+            <span class="logo-text">Calc<strong>Hub</strong></span>
+          </div>
+          <p class="footer-about">High-precision reverse osmosis membrane modeling, threshold scale inhibition stoichiometry, and desalination chemical engineering tools conforming to AWWA and IDA standards.</p>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Engineering Disciplines</h4>
+          <ul class="footer-links">
+            <li><a href="chemical.html">Chemical &amp; Water Treatment</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+            <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+            <li><a href="civil.html">Civil &amp; Construction</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Standard References</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.idadesal.org" target="_blank" rel="noopener">International Desalination Association (IDA)</a></li>
+            <li><a href="https://www.awwa.org" target="_blank" rel="noopener">AWWA Manual M46 Reverse Osmosis</a></li>
+            <li><a href="https://www.dupont.com/water" target="_blank" rel="noopener">FilmTec Membrane Technical Manual</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Free, open, client-side engineering tools.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function updateROPreset() {
+      const p = document.getElementById("roFeedwaterPreset").value;
+      if (p === "brackish_ground") {
+        document.getElementById("roRecoveryPct").value = 75.0;
+        document.getElementById("antiscalantDosePpm").value = 3.0;
+        document.getElementById("antiscalantSG").value = 1.20;
+      } else if (p === "seawater_ro") {
+        document.getElementById("roRecoveryPct").value = 45.0;
+        document.getElementById("antiscalantDosePpm").value = 2.0;
+        document.getElementById("antiscalantSG").value = 1.25;
+      } else if (p === "effluent_reuse") {
+        document.getElementById("roRecoveryPct").value = 80.0;
+        document.getElementById("antiscalantDosePpm").value = 4.5;
+        document.getElementById("antiscalantSG").value = 1.22;
+      } else if (p === "industrial_pure") {
+        document.getElementById("roRecoveryPct").value = 85.0;
+        document.getElementById("antiscalantDosePpm").value = 5.0;
+        document.getElementById("antiscalantSG").value = 1.25;
+      }
+      calcROAntiscalant();
+    }
+
+    function calcROAntiscalant() {
+      const feedVal = parseFloat(document.getElementById("roFeedFlowVal").value) || 0;
+      const feedUnit = document.getElementById("roFeedFlowUnit").value;
+      const recPct = parseFloat(document.getElementById("roRecoveryPct").value) || 75.0;
+      const dosePpm = parseFloat(document.getElementById("antiscalantDosePpm").value) || 3.0;
+      const sg = parseFloat(document.getElementById("antiscalantSG").value) || 1.20;
+      const dilution = parseFloat(document.getElementById("tankDilutionRatio").value) || 1;
+      const maxPumpLph = parseFloat(document.getElementById("roPumpMaxCapacityLph").value) || 2.0;
+      const opHours = parseFloat(document.getElementById("operatingHoursDay").value) || 24;
+
+      // Feed Flow converted to m3/day and m3/h
+      let m3_per_day = 0;
+      let m3_per_hour = 0;
+      if (feedUnit === "m3h") {
+        m3_per_hour = feedVal;
+        m3_per_day = feedVal * 24.0;
+      } else if (feedUnit === "gpm") {
+        m3_per_hour = feedVal * 0.227125;
+        m3_per_day = m3_per_hour * 24.0;
+      } else if (feedUnit === "mgd") {
+        m3_per_day = feedVal * 3785.41;
+        m3_per_hour = m3_per_day / 24.0;
+      } else if (feedUnit === "mld") {
+        m3_per_day = feedVal * 1000.0;
+        m3_per_hour = m3_per_day / 24.0;
+      }
+
+      // Permeate and brine flows
+      const recoveryFraction = recPct / 100.0;
+      const permeateM3h = m3_per_hour * recoveryFraction;
+      const brineM3h = m3_per_hour * (1.0 - recoveryFraction);
+      const permeateGpm = permeateM3h * 4.40287;
+      const brineGpm = brineM3h * 4.40287;
+
+      // Concentration factor CF = 1 / (1 - Y)
+      const cf = 1.0 / (1.0 - recoveryFraction);
+
+      // Neat mass and volume
+      const neatKgPerDay = (m3_per_day * dosePpm) / 1000.0;
+      const neatKgPerHour = neatKgPerDay / 24.0;
+      const neatLbsPerDay = neatKgPerDay * 2.20462;
+
+      const neatLitersPerDay = neatKgPerDay / sg;
+      const neatLitersPerHour = neatLitersPerDay / 24.0;
+      const neatMlPerMin = (neatLitersPerHour * 1000.0) / 60.0;
+      const neatGph = neatLitersPerHour * 0.264172;
+
+      // Dosing pump actual flow (accounting for tank dilution)
+      const pumpedLph = neatLitersPerHour * dilution;
+      const pumpStrokePct = (pumpedLph / maxPumpLph) * 100.0;
+
+      // Drum autonomy (200 L standard drum)
+      const drumDays = neatLitersPerDay > 0 ? (200.0 / neatLitersPerDay).toFixed(1) : "N/A";
+
+      // Render Outputs
+      document.getElementById("resPumpLphVal").textContent = pumpedLph.toFixed(3) + " L / hour";
+      document.getElementById("resPumpAlternateUnits").textContent = (pumpedLph * 1000.0 / 60.0).toFixed(2) + " mL/min (" + (pumpedLph * 0.264172).toFixed(4) + " GPH feed)";
+
+      document.getElementById("resDailyNeatKg").textContent = neatKgPerDay.toFixed(2) + " kg / day";
+      document.getElementById("resDailyNeatLiters").textContent = neatLitersPerDay.toFixed(2) + " L / day (" + neatLbsPerDay.toFixed(2) + " lbs/day neat)";
+
+      document.getElementById("resConcentrationFactor").textContent = cf.toFixed(2) + " ×";
+
+      document.getElementById("resPermeateFlow").textContent = permeateM3h.toFixed(1) + " m³/h";
+      document.getElementById("resPermeateFlowSub").textContent = permeateGpm.toFixed(1) + " GPM pure permeate";
+
+      document.getElementById("resBrineFlow").textContent = brineM3h.toFixed(1) + " m³/h";
+      document.getElementById("resBrineFlowSub").textContent = brineGpm.toFixed(1) + " GPM reject brine";
+
+      document.getElementById("resPumpStrokeSetting").textContent = pumpStrokePct.toFixed(1) + "%";
+
+      let strokeDesc = "Of " + maxPumpLph.toFixed(1) + " L/h maximum pump rating";
+      if (pumpStrokePct < 10) strokeDesc += " (Caution: Below 10% linearity, dilute product in day tank)";
+      else if (pumpStrokePct > 90) strokeDesc += " (Warning: Above 90% capacity, pump upgrade recommended)";
+      else strokeDesc += " (Optimal 10-90% linear operating range)";
+      document.getElementById("resPumpStrokeWarning").textContent = strokeDesc;
+
+      document.getElementById("resDrumAutonomyDays").textContent = drumDays + " Days";
+
+      // Scale risk analysis
+      let deltaLsi = (Math.log10(cf) * 1.0).toFixed(2);
+      document.getElementById("resScaleRiskNote").textContent = "At " + cf.toFixed(2) + "x concentration factor, LSI in concentrate increases by approx +" + deltaLsi + " units. Antiscalant prevents calcite and gypsum precipitation.";
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      calcROAntiscalant();
+    });
+  </script>
+</body>
+</html>

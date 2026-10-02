@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>pH Calculator | Aqueous [H+] Hydronium &amp; pOH Equilibrium Solver</title>
+  <meta name="description" content="Calculate pH, pOH, [H+] hydronium ion concentration, [OH-] hydroxide, and degree of ionization for strong/weak acids and bases across 0°C to 100°C.">
+  <link rel="canonical" href="https://calchub.cloud/ph-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "pH Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates aqueous pH, pOH, hydronium ion concentration, and weak acid-base chemical equilibria using exact quadratic and temperature-adjusted Kw formulations.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the mathematical definition of pH?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Originally formulated by Søren Sørensen in 1909, pH is the negative decimal logarithm of the thermodynamic hydronium (or hydrogen) ion activity: pH = -log10[H3O+]. In dilute aqueous solutions where activity coefficients approach unity, concentration in mol/L is used directly."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does water temperature change neutral pH?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The autoionization of water 2H2O <=> H3O+ + OH- is endothermic. As temperature rises from 0°C to 100°C, the ion product Kw increases from 0.114x10^-14 to 51.3x10^-14 (pKw drops from 14.94 to 12.29). Consequently, pure neutral water ([H+] = [OH-]) has a pH of 7.47 at 0°C, 7.00 at 25°C, and 6.14 at 100°C."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do you calculate pH for a weak acid using the quadratic equation?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For weak acid HA <=> H+ + A- with equilibrium constant Ka and initial concentration C, mass action gives Ka = [H+]^2 / (C - [H+]). Rearranging yields the quadratic equation [H+]^2 + Ka[H+] - Ka*C = 0. Solving via quadratic formula yields [H+] = (-Ka + sqrt(Ka^2 + 4*Ka*C)) / 2, avoiding inaccurate simplifications when Ka/C exceeds 0.05."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can pH ever be negative or greater than 14?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. The standard 0 to 14 scale reflects dilute aqueous solutions around 25°C. Highly concentrated strong acids (such as concentrated 12 M HCl with [H+] = 12 mol/L) have a theoretical pH of -log10(12) = -1.08. Conversely, concentrated 10 M NaOH has a theoretical pOH of -1.00 and pH of 15.00."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="chemical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="chemical.html">Chemical &amp; Water Treatment</a> &rsaquo; 
+      <span>pH Calculator</span>
+    </nav>
+
+    <h1 class="tool-title">Aqueous pH &amp; [H⁺] / [OH⁻] Equilibrium Calculator</h1>
+    <p class="tool-subtitle">Hydronium Concentration, Strong/Weak Acids &amp; Bases, pOH &amp; Temperature-Adjusted Kw</p>
+
+    <div class="calculator-layout">
+      <!-- Calculator Core Interface -->
+      <div class="calculator-card">
+        <div class="calc-form">
+          <div class="form-group">
+            <label for="electrolyteTypeSelect">Chemical Electrolyte Classification</label>
+            <select id="electrolyteTypeSelect" class="form-control" onchange="updateElectrolyteType()">
+              <option value="strong_acid" selected>Strong Monoprotic Acid (HCl, HNO₃, HClO₄)</option>
+              <option value="strong_acid_di">Strong Diprotic Acid (H₂SO₄)</option>
+              <option value="strong_base">Strong Monobasic Base (NaOH, KOH, LiOH)</option>
+              <option value="strong_base_di">Strong Dibasic Base [Ca(OH)₂, Ba(OH)₂]</option>
+              <option value="weak_acid">Weak Acid (Acetic, Formic, Citric) - Ka Solver</option>
+              <option value="weak_base">Weak Base (Ammonia, Methylamine) - Kb Solver</option>
+              <option value="direct_ph">Direct pH / [H⁺] / [OH⁻] Value Conversion</option>
+            </select>
+          </div>
+
+          <!-- Direct Input Value (when direct_ph selected) -->
+          <div id="directInputGroup" class="grid-2-col" style="display: none;">
+            <div class="form-group">
+              <label for="directVal">Enter Known Parameter</label>
+              <input type="number" id="directVal" class="form-control" value="7.0" step="0.1">
+            </div>
+            <div class="form-group">
+              <label for="directType">Parameter Type</label>
+              <select id="directType" class="form-control">
+                <option value="ph" selected>pH</option>
+                <option value="poh">pOH</option>
+                <option value="h">Hydronium [H⁺] (mol/L)</option>
+                <option value="oh">Hydroxide [OH⁻] (mol/L)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Concentration Input -->
+          <div id="concInputGroup" class="grid-2-col">
+            <div class="form-group">
+              <label for="soluteConcVal">Analytical Solute Concentration (C)</label>
+              <input type="number" id="soluteConcVal" class="form-control" value="0.05" step="0.01" min="0.000000001">
+            </div>
+            <div class="form-group">
+              <label for="soluteConcUnit">Concentration Unit</label>
+              <select id="soluteConcUnit" class="form-control">
+                <option value="m" selected>Molar (M, mol/L)</option>
+                <option value="mm">Millimolar (mM, mmol/L)</option>
+                <option value="um">Micromolar (&mu;M)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Ka / pKa Input for Weak Acid -->
+          <div id="weakAcidGroup" class="grid-2-col" style="display: none;">
+            <div class="form-group">
+              <label for="weakAcidPreset">Acid Preset</label>
+              <select id="weakAcidPreset" class="form-control" onchange="updateWeakAcidPreset()">
+                <option value="acetic" selected>Acetic Acid (CH₃COOH, pKa = 4.76)</option>
+                <option value="formic">Formic Acid (HCOOH, pKa = 3.75)</option>
+                <option value="benzoic">Benzoic Acid (C₆H₅COOH, pKa = 4.20)</option>
+                <option value="hf">Hydrofluoric Acid (HF, pKa = 3.17)</option>
+                <option value="custom">Custom pKa Entry</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="acidPkaVal">Acid Dissociation pKₐ</label>
+              <input type="number" id="acidPkaVal" class="form-control" value="4.76" step="0.01" min="0.0">
+            </div>
+          </div>
+
+          <!-- Kb / pKb Input for Weak Base -->
+          <div id="weakBaseGroup" class="grid-2-col" style="display: none;">
+            <div class="form-group">
+              <label for="weakBasePreset">Base Preset</label>
+              <select id="weakBasePreset" class="form-control" onchange="updateWeakBasePreset()">
+                <option value="ammonia" selected>Ammonia (NH₃, pKb = 4.75)</option>
+                <option value="methylamine">Methylamine (CH₃NH₂, pKb = 3.36)</option>
+                <option value="pyridine">Pyridine (C₅H₅N, pKb = 8.77)</option>
+                <option value="custom">Custom pKb Entry</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="basePkbVal">Base Dissociation pK_b</label>
+              <input type="number" id="basePkbVal" class="form-control" value="4.75" step="0.01" min="0.0">
+            </div>
+          </div>
+
+          <!-- Solution Temperature -->
+          <div class="form-group">
+            <label for="solnTempC">Solution Temperature (&deg;C) [Kw Shift]</label>
+            <input type="number" id="solnTempC" class="form-control" value="25.0" step="1.0" min="0.0" max="100.0">
+            <span class="field-hint">Autoionization Kw changes from 14.94 at 0&deg;C to 12.29 at 100&deg;C</span>
+          </div>
+
+          <button type="button" class="btn btn-primary" onclick="calcPH()" style="width: 100%; margin-top: 15px;">Compute Equilibrium pH &amp; Ions</button>
+        </div>
+      </div>
+
+      <!-- Output Results Panel -->
+      <div class="results-card">
+        <div class="result-box primary-result">
+          <div class="result-label">Resultant Solution pH</div>
+          <div id="resPHVal" class="result-value">1.30 pH</div>
+          <div id="resPHCategory" class="result-subtext">Strongly Acidic | pOH = 12.70</div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-item">
+            <span class="result-label">Hydronium Ion [H₃O⁺]</span>
+            <span id="resHydroniumVal" class="result-value highlight">5.00 &times; 10⁻² M</span>
+            <span id="resHydroniumSub" class="result-subtext">0.0500 mol/L</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Hydroxide Ion [OH⁻]</span>
+            <span id="resHydroxideVal" class="result-value">2.00 &times; 10⁻¹³ M</span>
+            <span id="resHydroxideSub" class="result-subtext">0.200 pmol/L</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Solution pOH</span>
+            <span id="resPOHVal" class="result-value">12.70</span>
+            <span class="result-subtext">pOH = -log₁₀[OH⁻]</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Degree of Ionization (&alpha;)</span>
+            <span id="resIonizationAlpha" class="result-value">100.0%</span>
+            <span class="result-subtext">Completely dissociated</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Autoionization pK_w</span>
+            <span id="resPKwVal" class="result-value">14.00</span>
+            <span id="resPKwSub" class="result-subtext">Neutrality pH = 7.00 at 25°C</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Acid/Base Dissociation K</span>
+            <span id="resEquilKVal" class="result-value">&infin; (Strong)</span>
+            <span class="result-subtext">Complete forward reaction</span>
+          </div>
+        </div>
+
+        <div class="result-details" style="margin-top: 15px;">
+          <p><strong>Equilibrium Chemistry Status:</strong> <span id="resChemStatus">Hydrochloric Acid complete dissociation into H⁺ and Cl⁻ ions.</span></p>
+          <p><strong>Colorimetric Indicator Anticipation:</strong> <span id="resIndicatorColor">Universal Indicator: Deep Red (pH &lt; 2) | Phenolphthalein: Colorless.</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1000+ Words Engineering Body -->
+    <article class="article-body">
+      <h2>Thermodynamic Foundation of the pH Scale</h2>
+      <p>The concept of <strong>pH</strong> (from the Latin <em>potentia hydrogenii</em>, power of hydrogen) was conceived in 1909 by Danish biochemist Søren Peder Lauritz Sørensen at the Carlsberg Laboratory as a logarithmic scale to compress vastly sprawling hydronium ion concentrations spanning over 14 orders of magnitude into an intuitive operational metric. In modern physical chemistry and IUPAC metrology, pH is rigorously defined as the negative base-10 logarithm of the thermodynamic activity of the aqueous hydronium ion ($a_{\text{H}_3\text{O}^+}$):</p>
+
+      <div class="formula-box">
+        $$\text{pH} = -\log_{10}(a_{\text{H}_3\text{O}^+}) = -\log_{10}\left(\gamma_{\text{H}^+} \cdot \frac{[\text{H}_3\text{O}^+]}{c^\circ}\right)$$
+      </div>
+
+      <p>Where $[\text{H}_3\text{O}^+]$ is the analytical molar concentration of hydronium in $\text{mol/L}$, $c^\circ = 1.0\text{ mol/L}$ is the thermodynamic standard state reference, and $\gamma_{\text{H}^+}$ is the single-ion activity coefficient. In dilute aqueous solutions ($c &lt; 0.1\text{ M}$), electrostatic interactions between ions are minimal, allowing the activity coefficient to approach unity ($\gamma_{\text{H}^+} \approx 1.0$), reducing the formal relationship to the familiar practical expression:</p>
+
+      <div class="formula-box">
+        $$\text{pH} \approx -\log_{10}[\text{H}_3\text{O}^+] \quad \iff \quad [\text{H}_3\text{O}^+] = 10^{-\text{pH}}$$
+      </div>
+
+      <p>Analogously, the <strong>pOH</strong> scale measures the negative base-10 logarithm of the free aqueous hydroxide ion concentration:</p>
+
+      <div class="formula-box">
+        $$\text{pOH} = -\log_{10}[\text{OH}^-] \quad \iff \quad [\text{OH}^-] = 10^{-\text{pOH}}$$
+      </div>
+
+      <h2>Autoionization of Water and the Ion Product (Kw)</h2>
+      <p>Pure liquid water is not an inert solvent; it spontaneously undergoes self-ionization (autoprotolysis), in which one amphiprotic water molecule donates a proton to another:</p>
+
+      <div class="formula-box">
+        $$2\text{H}_2\text{O (l)} \rightleftharpoons \text{H}_3\text{O}^+\text{ (aq)} + \text{OH}^-\text{ (aq)}$$
+      </div>
+
+      <p>The thermodynamic equilibrium constant for this autoprotolysis reaction is the <strong>ion product of water</strong> ($K_w$):</p>
+
+      <div class="formula-box">
+        $$K_w = [\text{H}_3\text{O}^+][\text{OH}^-]$$
+      </div>
+
+      <p>Taking the negative logarithm of both sides yields the fundamental reciprocal relationship connecting pH and pOH:</p>
+
+      <div class="formula-box">
+        $$-\log_{10}(K_w) = -\log_{10}[\text{H}_3\text{O}^+] - \log_{10}[\text{OH}^-] \quad \implies \quad pK_w = \text{pH} + \text{pOH}$$
+      </div>
+
+      <h2>Temperature Dependence of Kw and the Neutrality Threshold</h2>
+      <p>A critical engineering fallacy is the assumption that "neutral pH is always 7.00." Because the autodissociation of water breaks covalent bonds, it is an endothermic thermodynamic process ($\Delta H^\circ = +55.8\text{ kJ/mol}$). By Le Chatelier's principle, elevating temperature drives the forward equilibrium, generating higher concentrations of both $[\text{H}_3\text{O}^+]$ and $[\text{OH}^-]$ simultaneously. As temperature increases from freezing ($0^\circ\text{C}$) to boiling ($100^\circ\text{C}$), $K_w$ increases by more than 400-fold!</p>
+
+      <div class="formula-box">
+        $$\text{Neutrality Condition: } [\text{H}_3\text{O}^+] = [\text{OH}^-] = \sqrt{K_w} \quad \implies \quad \text{pH}_{\text{neutral}} = \frac{1}{2} pK_w$$
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Temperature (&deg;C)</th>
+              <th>Temperature (K)</th>
+              <th>Kw (&times; 10⁻¹⁴)</th>
+              <th>pK_w</th>
+              <th>Neutral pH (½ pKw)</th>
+              <th>[H⁺] at Neutrality (mol/L)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>0 &deg;C</td>
+              <td>273.15 K</td>
+              <td>0.114 &times; 10⁻¹⁴</td>
+              <td>14.94</td>
+              <td>7.47</td>
+              <td>3.38 &times; 10⁻⁸ M</td>
+            </tr>
+            <tr>
+              <td>10 &deg;C</td>
+              <td>283.15 K</td>
+              <td>0.292 &times; 10⁻¹⁴</td>
+              <td>14.53</td>
+              <td>7.27</td>
+              <td>5.40 &times; 10⁻⁸ M</td>
+            </tr>
+            <tr>
+              <td>20 &deg;C</td>
+              <td>293.15 K</td>
+              <td>0.681 &times; 10⁻¹⁴</td>
+              <td>14.17</td>
+              <td>7.08</td>
+              <td>8.25 &times; 10⁻⁸ M</td>
+            </tr>
+            <tr>
+              <td>25 &deg;C (Standard)</td>
+              <td>298.15 K</td>
+              <td>1.008 &times; 10⁻¹⁴</td>
+              <td>14.00</td>
+              <td>7.00</td>
+              <td>1.00 &times; 10⁻⁷ M</td>
+            </tr>
+            <tr>
+              <td>37 &deg;C (Human Body)</td>
+              <td>310.15 K</td>
+              <td>2.399 &times; 10⁻¹⁴</td>
+              <td>13.62</td>
+              <td>6.81</td>
+              <td>1.55 &times; 10⁻⁷ M</td>
+            </tr>
+            <tr>
+              <td>50 &deg;C</td>
+              <td>323.15 K</td>
+              <td>5.474 &times; 10⁻¹⁴</td>
+              <td>13.26</td>
+              <td>6.63</td>
+              <td>2.34 &times; 10⁻⁷ M</td>
+            </tr>
+            <tr>
+              <td>75 &deg;C</td>
+              <td>348.15 K</td>
+              <td>19.95 &times; 10⁻¹⁴</td>
+              <td>12.70</td>
+              <td>6.35</td>
+              <td>4.47 &times; 10⁻⁷ M</td>
+            </tr>
+            <tr>
+              <td>100 &deg;C (Boiling)</td>
+              <td>373.15 K</td>
+              <td>51.30 &times; 10⁻¹⁴</td>
+              <td>12.29</td>
+              <td>6.14</td>
+              <td>7.16 &times; 10⁻⁷ M</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Consequently, pure boiling water at $100^\circ\text{C}$ possesses a $\text{pH of } 6.14$. Despite having a pH below 7, it is 100% chemically neutral because $[\text{H}_3\text{O}^+]$ exactly equals $[\text{OH}^-]$.</p>
+
+      <h2>Mathematical Derivations for Strong vs. Weak Electrolytes</h2>
+
+      <h3>1. Strong Monoprotic Acids (HCl, HNO₃, HClO₄)</h3>
+      <p>Strong acids are assumed to undergo $100\%$ quantitative forward dissociation in aqueous solution:</p>
+      <div class="formula-box">
+        $$\text{HA} + \text{H}_2\text{O} \longrightarrow \text{H}_3\text{O}^+ + \text{A}^- \quad \implies \quad [\text{H}_3\text{O}^+] = C_{\text{acid}}$$
+        $$\text{pH} = -\log_{10}(C_{\text{acid}})$$
+      </div>
+      <p>For diprotic sulfuric acid ($\text{H}_2\text{SO}_4$), the first proton dissociates completely ($K_{a1} \gg 1$), while the second proton dissociates with $K_{a2} = 1.02 \times 10^{-2}$. At concentrations $C &gt; 0.05\text{ M}$, $[\text{H}^+] \approx 2 \cdot C_{\text{acid}}$.</p>
+
+      <h3>2. Strong Bases (NaOH, KOH, Ca(OH)₂)</h3>
+      <p>Strong metal hydroxides ionize completely:</p>
+      <div class="formula-box">
+        $$\text{M(OH)}_z \longrightarrow \text{M}^{z+} + z\text{OH}^- \quad \implies \quad [\text{OH}^-] = z \cdot C_{\text{base}}$$
+        $$\text{pOH} = -\log_{10}(z \cdot C_{\text{base}}), \quad \text{pH} = pK_w - \text{pOH}$$
+      </div>
+
+      <h3>3. Weak Acids: Exact Quadratic Derivation</h3>
+      <p>Weak acids establish a reversible thermodynamic dissociation equilibrium:</p>
+      <div class="formula-box">
+        $$\text{HA} + \text{H}_2\text{O} \rightleftharpoons \text{H}_3\text{O}^+ + \text{A}^-, \quad K_a = \frac{[\text{H}_3\text{O}^+][\text{A}^-]}{[\text{HA}]}$$
+      </div>
+      <p>From stoichiometric mass balance, let $x = [\text{H}_3\text{O}^+] = [\text{A}^-]$. The equilibrium concentration of unionized acid is $[\text{HA}] = C - x$. Substituting yields:</p>
+      <div class="formula-box">
+        $$K_a = \frac{x^2}{C - x} \quad \implies \quad x^2 + K_a x - K_a C = 0$$
+      </div>
+      <p>Applying the classical quadratic formula ($x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$):</p>
+      <div class="formula-box">
+        $$[\text{H}_3\text{O}^+] = \frac{-K_a + \sqrt{K_a^2 + 4 K_a C}}{2}$$
+      </div>
+      <p>While elementary textbooks often approximate $C - x \approx C$ (giving $[\text{H}^+] \approx \sqrt{K_a C}$), this approximation introduces severe errors ($&gt;5\%$) whenever $K_a / C &gt; 0.05$ (dilute weak acids). This engineering calculator executes the exact quadratic equation across all concentration regimes.</p>
+
+      <h2>Practical Worked Case Study: Exact pH Calculation of 0.020 M Acetic Acid</h2>
+      <div class="worked-example-card">
+        <h3>Biochemical Equilibrium Case Study: Vinegar Acidity Determination</h3>
+        <p><strong>Scenario:</strong> A laboratory technician prepares a dilute solution of acetic acid ($\text{CH}_3\text{COOH}$) at analytical concentration $C = 0.0200\text{ mol/L (M)}$ at standard laboratory temperature of $25.0^\circ\text{C}$. The thermodynamic acid dissociation constant is $K_a = 1.75 \times 10^{-5}$ ($pK_a = 4.757$). Calculate: (1) exact hydronium concentration $[\text{H}_3\text{O}^+]$ via the quadratic formula, (2) solution $\text{pH}$ and $\text{pOH}$, (3) hydroxide ion concentration $[\text{OH}^-]$, and (4) the fractional degree of ionization ($\alpha$).</p>
+
+        <p><strong>Step 1: Set Up the Quadratic Mass Action Equation:</strong></p>
+        $$x^2 + (1.75 \times 10^{-5})x - (1.75 \times 10^{-5} \times 0.0200) = 0$$
+        $$x^2 + (1.75 \times 10^{-5})x - (3.50 \times 10^{-7}) = 0$$
+
+        <p><strong>Step 2: Solve the Quadratic Formula:</strong></p>
+        $$x = \frac{-(1.75 \times 10^{-5}) + \sqrt{(1.75 \times 10^{-5})^2 - 4(1)(-3.50 \times 10^{-7})}}{2}$$
+        $$\sqrt{3.0625 \times 10^{-10} + 1.40 \times 10^{-6}} = \sqrt{1.4003 \times 10^{-6}} = 1.1833 \times 10^{-3}$$
+        $$x = \frac{-0.0000175 + 0.0011833}{2} = \frac{0.0011658}{2} = 5.829 \times 10^{-4}\text{ mol/L}$$
+        $$[\text{H}_3\text{O}^+] = 5.829 \times 10^{-4}\text{ M}$$
+
+        <p><strong>Step 3: Determine Solution pH and pOH:</strong></p>
+        $$\text{pH} = -\log_{10}(5.829 \times 10^{-4}) = -(-3.234) = 3.234 \approx 3.23$$
+        $$\text{pOH} = 14.00 - 3.234 = 10.766 \approx 10.77$$
+
+        <p><strong>Step 4: Compute Hydroxide Concentration:</strong></p>
+        $$[\text{OH}^-] = 10^{-10.766} = 1.714 \times 10^{-11}\text{ mol/L}$$
+
+        <p><strong>Step 5: Degree of Acid Ionization (Ostwald's α):</strong></p>
+        $$\alpha = \frac{[\text{H}_3\text{O}^+]}{C} \times 100\% = \frac{5.829 \times 10^{-4}\text{ M}}{0.0200\text{ M}} \times 100\% = 2.915\%$$
+        <p>Only $2.91\%$ of acetic acid molecules ionize into hydronium and acetate ions; $97.09\%$ remain as intact neutral molecules.</p>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">
+            <span class="logo-icon">&pi;</span>
+            <span class="logo-text">Calc<strong>Hub</strong></span>
+          </div>
+          <p class="footer-about">High-precision chemical equilibrium, hydronium ion activity, and acid-base thermodynamics tools conforming to IUPAC and NIST standards.</p>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Engineering Disciplines</h4>
+          <ul class="footer-links">
+            <li><a href="chemical.html">Chemical &amp; Water Treatment</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+            <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+            <li><a href="civil.html">Civil &amp; Construction</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Standard References</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.iupac.org" target="_blank" rel="noopener">IUPAC Measurement of pH Definition</a></li>
+            <li><a href="https://webbook.nist.gov" target="_blank" rel="noopener">NIST Ionization Constants of Water</a></li>
+            <li><a href="https://www.bipm.org" target="_blank" rel="noopener">BIPM International Metrology in Chemistry</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Free, open, client-side engineering tools.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const WEAK_ACIDS = {
+      acetic: 4.76,
+      formic: 3.75,
+      benzoic: 4.20,
+      hf: 3.17,
+      custom: 4.76
+    };
+
+    const WEAK_BASES = {
+      ammonia: 4.75,
+      methylamine: 3.36,
+      pyridine: 8.77,
+      custom: 4.75
+    };
+
+    function updateElectrolyteType() {
+      const t = document.getElementById("electrolyteTypeSelect").value;
+      document.getElementById("directInputGroup").style.display = t === "direct_ph" ? "grid" : "none";
+      document.getElementById("concInputGroup").style.display = t === "direct_ph" ? "none" : "grid";
+      document.getElementById("weakAcidGroup").style.display = t === "weak_acid" ? "grid" : "none";
+      document.getElementById("weakBaseGroup").style.display = t === "weak_base" ? "grid" : "none";
+      calcPH();
+    }
+
+    function updateWeakAcidPreset() {
+      const p = document.getElementById("weakAcidPreset").value;
+      if (p !== "custom") {
+        document.getElementById("acidPkaVal").value = WEAK_ACIDS[p];
+        calcPH();
+      }
+    }
+
+    function updateWeakBasePreset() {
+      const p = document.getElementById("weakBasePreset").value;
+      if (p !== "custom") {
+        document.getElementById("basePkbVal").value = WEAK_BASES[p];
+        calcPH();
+      }
+    }
+
+    // Temperature dependent Kw calculation (Bandura and Lvov formula approximation)
+    function getKw(tempC) {
+      const T = tempC + 273.15;
+      // Empirical pKw fit from 0 to 100 °C (NIST / Harned data)
+      // pKw ≈ 4471.33/T - 6.0875 + 0.01706 * T
+      const pkw = (4471.33 / T) - 6.0875 + (0.01706 * T);
+      const kw = Math.pow(10, -pkw);
+      return { pkw: pkw, kw: kw };
+    }
+
+    function calcPH() {
+      const eType = document.getElementById("electrolyteTypeSelect").value;
+      const tempC = parseFloat(document.getElementById("solnTempC").value) || 25.0;
+      const kwObj = getKw(tempC);
+      const pKw = kwObj.pkw;
+      const Kw = kwObj.kw;
+      const neutralPH = pKw / 2.0;
+
+      let h_conc = 1e-7;
+      let oh_conc = 1e-7;
+      let alphaPct = 100.0;
+      let kValStr = "∞ (Strong)";
+      let chemDesc = "";
+
+      if (eType === "direct_ph") {
+        const dVal = parseFloat(document.getElementById("directVal").value) || 7.0;
+        const dType = document.getElementById("directType").value;
+        if (dType === "ph") {
+          h_conc = Math.pow(10, -dVal);
+          oh_conc = Kw / h_conc;
+        } else if (dType === "poh") {
+          oh_conc = Math.pow(10, -dVal);
+          h_conc = Kw / oh_conc;
+        } else if (dType === "h") {
+          h_conc = dVal;
+          oh_conc = Kw / h_conc;
+        } else if (dType === "oh") {
+          oh_conc = dVal;
+          h_conc = Kw / oh_conc;
+        }
+        alphaPct = 100.0;
+        kValStr = "Direct Entry";
+        chemDesc = "Direct concentration / activity measurement input.";
+      } else {
+        let cVal = parseFloat(document.getElementById("soluteConcVal").value) || 0.05;
+        const cUnit = document.getElementById("soluteConcUnit").value;
+        let C = cVal;
+        if (cUnit === "mm") C = cVal / 1000.0;
+        else if (cUnit === "um") C = cVal / 1000000.0;
+
+        if (eType === "strong_acid") {
+          h_conc = C;
+          oh_conc = Kw / h_conc;
+          alphaPct = 100.0;
+          kValStr = "∞ (Strong Acid)";
+          chemDesc = "Strong monoprotic acid complete 100% dissociation into H⁺ and A⁻.";
+        } else if (eType === "strong_acid_di") {
+          h_conc = C * 2.0;
+          oh_conc = Kw / h_conc;
+          alphaPct = 100.0;
+          kValStr = "∞ (Diprotic)";
+          chemDesc = "Strong diprotic acid complete dissociation (2 protons per molecule).";
+        } else if (eType === "strong_base") {
+          oh_conc = C;
+          h_conc = Kw / oh_conc;
+          alphaPct = 100.0;
+          kValStr = "∞ (Strong Base)";
+          chemDesc = "Strong monobasic base complete dissociation into OH⁻.";
+        } else if (eType === "strong_base_di") {
+          oh_conc = C * 2.0;
+          h_conc = Kw / oh_conc;
+          alphaPct = 100.0;
+          kValStr = "∞ (Dibasic)";
+          chemDesc = "Strong dibasic base complete dissociation (2 OH⁻ per formula unit).";
+        } else if (eType === "weak_acid") {
+          const pka = parseFloat(document.getElementById("acidPkaVal").value) || 4.76;
+          const Ka = Math.pow(10, -pka);
+          // Quadratic: x^2 + Ka*x - Ka*C = 0
+          const x = (-Ka + Math.sqrt(Ka * Ka + 4 * Ka * C)) / 2.0;
+          h_conc = x;
+          oh_conc = Kw / h_conc;
+          alphaPct = (h_conc / C) * 100.0;
+          kValStr = "Ka = " + Ka.toExponential(3) + " (pKa " + pka.toFixed(2) + ")";
+          chemDesc = "Weak acid reversible equilibrium solved via exact quadratic formula.";
+        } else if (eType === "weak_base") {
+          const pkb = parseFloat(document.getElementById("basePkbVal").value) || 4.75;
+          const Kb = Math.pow(10, -pkb);
+          // Quadratic: x^2 + Kb*x - Kb*C = 0 => x = [OH-]
+          const x = (-Kb + Math.sqrt(Kb * Kb + 4 * Kb * C)) / 2.0;
+          oh_conc = x;
+          h_conc = Kw / oh_conc;
+          alphaPct = (oh_conc / C) * 100.0;
+          kValStr = "Kb = " + Kb.toExponential(3) + " (pKb " + pkb.toFixed(2) + ")";
+          chemDesc = "Weak base reversible equilibrium solved via exact quadratic formula.";
+        }
+      }
+
+      const pH = -Math.log10(h_conc);
+      const pOH = -Math.log10(oh_conc);
+
+      // Categorization
+      let cat = "";
+      let indColor = "";
+      if (pH < 2.0) {
+        cat = "Strongly Acidic";
+        indColor = "Universal Indicator: Red | Thymol Blue: Red | Phenolphthalein: Colorless";
+      } else if (pH < 6.0) {
+        cat = "Moderately Acidic";
+        indColor = "Universal Indicator: Orange/Yellow | Methyl Red: Red | Phenolphthalein: Colorless";
+      } else if (Math.abs(pH - neutralPH) <= 0.3) {
+        cat = "Chemically Neutral (at " + tempC.toFixed(0) + "°C)";
+        indColor = "Universal Indicator: Green | Bromothymol Blue: Green";
+      } else if (pH < 11.5) {
+        cat = "Moderately Alkaline";
+        indColor = "Universal Indicator: Blue | Phenolphthalein: Light Pink";
+      } else {
+        cat = "Strongly Alkaline";
+        indColor = "Universal Indicator: Purple/Violet | Phenolphthalein: Deep Magenta";
+      }
+
+      document.getElementById("resPHVal").textContent = pH.toFixed(2) + " pH";
+      document.getElementById("resPHCategory").textContent = cat + " | pOH = " + pOH.toFixed(2);
+
+      document.getElementById("resHydroniumVal").textContent = h_conc.toExponential(3) + " M";
+      document.getElementById("resHydroniumSub").textContent = (h_conc >= 0.001 ? h_conc.toFixed(4) : h_conc.toExponential(2)) + " mol/L";
+
+      document.getElementById("resHydroxideVal").textContent = oh_conc.toExponential(3) + " M";
+      document.getElementById("resHydroxideSub").textContent = (oh_conc >= 0.001 ? oh_conc.toFixed(4) : oh_conc.toExponential(2)) + " mol/L";
+
+      document.getElementById("resPOHVal").textContent = pOH.toFixed(2);
+      document.getElementById("resIonizationAlpha").textContent = alphaPct > 99.9 ? "100.0% (Complete)" : alphaPct.toFixed(2) + "% Ionized";
+
+      document.getElementById("resPKwVal").textContent = pKw.toFixed(2) + " (Kw = " + Kw.toExponential(2) + ")";
+      document.getElementById("resPKwSub").textContent = "Neutral pH = " + neutralPH.toFixed(2) + " at " + tempC.toFixed(1) + "°C";
+
+      document.getElementById("resEquilKVal").textContent = kValStr;
+      document.getElementById("resChemStatus").textContent = chemDesc;
+      document.getElementById("resIndicatorColor").textContent = indColor;
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      calcPH();
+    });
+  </script>
+</body>
+</html>

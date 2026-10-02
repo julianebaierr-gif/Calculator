@@ -207,6 +207,14 @@ CATEGORIES = {
             ("henderson-hasselbalch-calculator.html", "Henderson-Hasselbalch (pH Buffer)", "🧪", "Acid-base conjugate ratio, pKa & Van Slyke buffer beta"),
             ("hydrazine-dosing-calculator.html", "Hydrazine Dosing (Boiler Deoxygenation)", "💧", "ASME / EPRI AVT(R) dissolved O₂ scavenger & pump sizing"),
             ("ideal-gas-law-calculator.html", "Ideal Gas Law (PV = nRT)", "🎈", "Universal gas state equation, density & compressibility Z"),
+            ("lime-dosing-calculator.html", "Lime Softening (Ca(OH)₂ & CaO)", "🧱", "AWWA B202 softening, CO₂ removal & sludge yield"),
+            ("molar-mass-calculator.html", "Molar Mass (IUPAC Formula Sizer)", "🔬", "Molecular weight, formula mass & mass % composition"),
+            ("molarity-calculator.html", "Molarity & Solution Preparation", "🧪", "Molar concentration, mass grams, volume & normality N"),
+            ("ph-calculator.html", "pH & [H⁺]/[OH⁻] Equilibrium", "🌡️", "Strong/weak acids & bases, exact quadratic Ka & pOH"),
+            ("ph-poh-calculator.html", "pH to pOH & Ion Converter", "🌡️", "Mutual conversion, hydronium [H⁺], hydroxide & Kw"),
+            ("phosphate-dosing-calculator.html", "Phosphate Dosing (Boiler & Lead CCT)", "💧", "ASME / EPRI TSP/DSP congruent treatment & EPA LCR"),
+            ("polymer-dosing-calculator.html", "Polymer Dosing (Sludge Dewatering)", "🧪", "Centrifuge & belt press kg/DT, aging tank & pump LPH"),
+            ("ro-antiscalant-dosing-calculator.html", "RO Antiscalant (Membrane Scaling)", "🌊", "Concentration factor CF=1/(1-Y), LSI & neat pump LPH"),
         ]
     },
     "fire": {
@@ -275,7 +283,7 @@ def determine_tool_cat(filename):
         return "mechanical"
     if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt", "rainwater-downpipe", "block", "drywall", "excavation", "flooring", "footing", "gravel", "paint", "roof-pitch", "slab", "slope", "soil", "tile"]):
         return "civil"
-    if any(k in f for k in ["chemical", "chlorine", "alum", "boyle", "calcium-hypochlorite", "caustic", "charles", "chlorine-dioxide", "coagulant", "combined-gas", "dilution", "gay-lussac", "half-life", "henderson", "hydrazine", "ideal-gas"]):
+    if any(k in f for k in ["chemical", "chlorine", "alum", "boyle", "calcium-hypochlorite", "caustic", "charles", "chlorine-dioxide", "coagulant", "combined-gas", "dilution", "gay-lussac", "half-life", "henderson", "hydrazine", "ideal-gas", "lime-dosing", "molar-mass", "molarity", "ph-calculator", "ph-poh", "phosphate", "polymer", "ro-antiscalant"]):
         return "chemical"
     if any(k in f for k in ["sprinkler", "smoke", "fire-alarm", "hydrant", "fire-pump", "nac", "strobe"]):
         return "fire"

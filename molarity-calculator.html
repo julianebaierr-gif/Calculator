@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Molarity Calculator | Solution Concentration &amp; Mass Sizer</title>
+  <meta name="description" content="Calculate molarity (M), mass of solute, solution volume, and molar concentration interconversions. Includes normality, molality, and dilution equivalents.">
+  <link rel="canonical" href="https://calchub.cloud/molarity-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Molarity Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates solution molarity, required solute mass, total volumetric dilution, and chemical reagent concentration for laboratory and industrial formulations.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the mathematical definition of molarity?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Molarity (M), or molar concentration, is defined as the number of moles of solute dissolved per liter of total solution volume: M = n / V = m / (MW * V), where n is moles, m is solute mass in grams, MW is the solute molar mass in g/mol, and V is total solution volume in liters."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the key difference between molarity (M) and molality (m)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Molarity is moles of solute per liter of total solution (mol/L), whereas molality is moles of solute per kilogram of pure solvent (mol/kg). Molarity changes with temperature because liquid volume expands and contracts thermally, while molality is completely temperature-independent."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is normality (N) related to molarity?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Normality represents equivalent concentration: N = M * z, where z is the equivalence factor (number of reactive protons H+ for acids, hydroxide ions OH- for bases, or transferred electrons in redox titrations). For instance, a 1.0 M solution of diprotic sulfuric acid (H2SO4) has a normality of 2.0 N."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does chemical hydration affect the solute mass required for molarity?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "When formulating a solution from a hydrated crystalline chemical (such as copper sulfate pentahydrate CuSO4·5H2O vs anhydrous CuSO4), the water of crystallization must be included in the molar mass. Failing to use the hydrated molecular weight results in under-dosing the active solute species."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="chemical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="chemical.html">Chemical &amp; Water Treatment</a> &rsaquo; 
+      <span>Molarity Calculator</span>
+    </nav>
+
+    <h1 class="tool-title">Molarity &amp; Solution Preparation Calculator</h1>
+    <p class="tool-subtitle">Molar Concentration (mol/L), Solute Mass Sizing, Volume &amp; Normality Equivalents</p>
+
+    <div class="calculator-layout">
+      <!-- Calculator Core Interface -->
+      <div class="calculator-card">
+        <div class="calc-form">
+          <div class="form-group">
+            <label for="solutePreset">Chemical Solute Preset</label>
+            <select id="solutePreset" class="form-control" onchange="updateSolutePreset()">
+              <option value="nacl" selected>Sodium Chloride (NaCl, M = 58.44 g/mol)</option>
+              <option value="naoh">Sodium Hydroxide (NaOH, M = 40.00 g/mol)</option>
+              <option value="hcl">Hydrochloric Acid (HCl, M = 36.46 g/mol)</option>
+              <option value="h2so4">Sulfuric Acid (H₂SO₄, M = 98.08 g/mol, z = 2)</option>
+              <option value="glucose">D-Glucose (C₆H₁₂O₆, M = 180.16 g/mol)</option>
+              <option value="tris">Tris Base (C₄H₁₁NO₃, M = 121.14 g/mol)</option>
+              <option value="kmno4">Potassium Permanganate (KMnO₄, M = 158.03 g/mol)</option>
+              <option value="cuso4_5h2o">Copper Sulfate Pentahydrate (CuSO₄·5H₂O, M = 249.68 g/mol)</option>
+              <option value="edta">EDTA Disodium Salt (C₁₀H₁₄N₂Na₂O₈·2H₂O, M = 372.24 g/mol)</option>
+              <option value="custom">Custom Solute / Unknown Compound</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="molaritySolveTarget">Variable to Calculate</label>
+            <select id="molaritySolveTarget" class="form-control" onchange="updateMolarityInputs()">
+              <option value="mass" selected>Mass of Solute (m) Required [Given M &amp; V]</option>
+              <option value="molarity">Molarity (M) [Given Mass &amp; V]</option>
+              <option value="volume">Solution Volume (V) [Given Mass &amp; M]</option>
+            </select>
+          </div>
+
+          <!-- Molar Mass Input -->
+          <div class="form-group">
+            <label for="soluteMolarMass">Solute Molar Mass (MW) (g/mol)</label>
+            <input type="number" id="soluteMolarMass" class="form-control" value="58.44" step="0.01" min="0.1">
+          </div>
+
+          <!-- Molarity Input -->
+          <div id="molarityInputGroup" class="grid-2-col">
+            <div class="form-group">
+              <label for="molarityVal">Target Concentration</label>
+              <input type="number" id="molarityVal" class="form-control" value="0.5" step="0.05" min="0.000001">
+            </div>
+            <div class="form-group">
+              <label for="molarityUnit">Concentration Unit</label>
+              <select id="molarityUnit" class="form-control">
+                <option value="m" selected>Molar (M, mol/L)</option>
+                <option value="mm">Millimolar (mM, mmol/L)</option>
+                <option value="um">Micromolar (&mu;M, &mu;mol/L)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Volume Input -->
+          <div id="volumeInputGroup" class="grid-2-col">
+            <div class="form-group">
+              <label for="volumeVal">Solution Volume</label>
+              <input type="number" id="volumeVal" class="form-control" value="1.0" step="0.1" min="0.000001">
+            </div>
+            <div class="form-group">
+              <label for="volumeUnit">Volume Unit</label>
+              <select id="volumeUnit" class="form-control">
+                <option value="l" selected>Liters (L)</option>
+                <option value="ml">Milliliters (mL)</option>
+                <option value="ul">Microliters (&mu;L)</option>
+                <option value="m3">Cubic Meters (m³)</option>
+                <option value="gal">US Gallons</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Mass Input -->
+          <div id="massInputGroup" class="grid-2-col" style="display: none;">
+            <div class="form-group">
+              <label for="massVal">Solute Mass</label>
+              <input type="number" id="massVal" class="form-control" value="29.22" step="0.1" min="0.000001">
+            </div>
+            <div class="form-group">
+              <label for="massUnit">Mass Unit</label>
+              <select id="massUnit" class="form-control">
+                <option value="g" selected>Grams (g)</option>
+                <option value="mg">Milligrams (mg)</option>
+                <option value="kg">Kilograms (kg)</option>
+                <option value="lb">Pounds (lbs)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="soluteEquivZ">Valence Factor (z) for Normality</label>
+            <input type="number" id="soluteEquivZ" class="form-control" value="1" step="1" min="1" max="6">
+            <span class="field-hint">1 for monoprotic (HCl, NaOH), 2 for diprotic (H₂SO₄), 3 for triprotic (H₃PO₄)</span>
+          </div>
+
+          <button type="button" class="btn btn-primary" onclick="calcMolarity()" style="width: 100%; margin-top: 15px;">Calculate Solution Concentration</button>
+        </div>
+      </div>
+
+      <!-- Output Results Panel -->
+      <div class="results-card">
+        <div class="result-box primary-result">
+          <div id="resPrimaryLabel" class="result-label">Required Solute Mass (m)</div>
+          <div id="resPrimaryVal" class="result-value">29.220 grams</div>
+          <div id="resPrimaryAlt" class="result-subtext">0.02922 kg (0.06442 lbs)</div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-item">
+            <span class="result-label">Molar Concentration (M)</span>
+            <span id="resMolarConc" class="result-value highlight">0.500 M</span>
+            <span id="resMolarConcSub" class="result-subtext">500.0 mM (0.500 mol/L)</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Total Substance Quantity</span>
+            <span id="resMolesTotal" class="result-value">0.500 mol</span>
+            <span class="result-subtext">Moles of active solute</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Normality Equivalent (N)</span>
+            <span id="resNormality" class="result-value">0.500 N</span>
+            <span class="result-subtext">N = M &times; z (eq/L)</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Mass Concentration (ppm)</span>
+            <span id="resMassPpm" class="result-value">29,220 mg/L</span>
+            <span class="result-subtext">29.22 g/L (ppm in water)</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Weight Percent (% w/v)</span>
+            <span id="resWeightVolPct" class="result-value">2.922%</span>
+            <span class="result-subtext">Grams solute per 100 mL</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Total Molecules Dissolved</span>
+            <span id="resMoleculesTotal" class="result-value">3.011 &times; 10²³</span>
+            <span class="result-subtext">Via Avogadro constant Nₐ</span>
+          </div>
+        </div>
+
+        <div class="result-details" style="margin-top: 15px;">
+          <p><strong>Bench Preparation Protocol:</strong> <span id="resPrepProtocol">Weigh 29.220 g of solute, dissolve in ~800 mL deionized water, then bring to exactly 1.000 L mark.</span></p>
+          <p><strong>Volumetric Tolerance:</strong> <span id="resToleranceNote">Standard Class A volumetric glassware provides &plusmn;0.2% measurement accuracy at 20&deg;C.</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1000+ Words Engineering Body -->
+    <article class="article-body">
+      <h2>Principles of Chemical Solution Concentrations</h2>
+      <p>In analytical chemistry, biochemical pharmacology, and industrial process engineering, accurate solution preparation constitutes the foundational prerequisite for all experimental reproducibility and manufacturing quality control. Whether preparing high-purity mobile phases for high-performance liquid chromatography (HPLC), formulating parenteral electrolyte infusions, or dosing coagulants in municipal water treatment, engineers must precisely regulate the number of dissolved solute particles per unit volume of solvent.</p>
+
+      <p>The primary quantitative metric for liquid solutions is <strong>molarity</strong> (also termed <em>molar concentration</em>, designated by symbol $M$ or $c$), defined by the International Union of Pure and Applied Chemistry (IUPAC) as the amount of substance in moles divided by the total final volume of the solution in liters:</p>
+
+      <div class="formula-box">
+        $$M = \frac{n}{V} = \frac{m}{M_w \cdot V}$$
+      </div>
+
+      <p>Where $n$ represents the substance quantity in moles ($\text{mol}$), $m$ is the physical mass of the solute in grams ($\text{g}$), $M_w$ is the molar mass (molecular weight) of the solute in grams per mole ($\text{g/mol}$), and $V$ is the total final solution volume in liters ($\text{L}$). Under standard SI convention, molarity is expressed in units of $\text{mol/dm}^3$, $\text{mol/L}$, or represented simply by the capitalized unit symbol $\text{M}$.</p>
+
+      <h2>Mathematical Rearrangements for Laboratory Bench Calculations</h2>
+      <p>Depending on the laboratory scenario, the governing equation is rearranged algebraically to solve for the target operational parameter:</p>
+
+      <h3>1. Calculating Solute Mass Required to Formulate a Specific Volume</h3>
+      <p>When a chemist needs to prepare a target volume $V$ at an exact molarity $M$:</p>
+      <div class="formula-box">
+        $$m\text{ (grams)} = M\text{ (mol/L)} \times V\text{ (L)} \times M_w\text{ (g/mol)}$$
+      </div>
+      <p>For micro-scale and biochemical solutions where concentrations are specified in millimolar ($\text{mM} = 10^{-3}\text{ M}$) or micromolar ($\mu\text{M} = 10^{-6}\text{ M}$) and volumes in milliliters ($\text{mL} = 10^{-3}\text{ L}$):</p>
+      <div class="formula-box">
+        $$m\text{ (mg)} = M\text{ (mM)} \times V\text{ (mL)} \times M_w\text{ (g/mol)} \times 10^{-3}$$
+      </div>
+
+      <h3>2. Calculating Molarity from Observed Solute Mass</h3>
+      <p>When an existing mass of solute $m$ is dissolved into a known volumetric flask $V$:</p>
+      <div class="formula-box">
+        $$M\text{ (mol/L)} = \frac{m\text{ (g)}}{M_w\text{ (g/mol)} \times V\text{ (L)}}$$
+      </div>
+
+      <h3>3. Calculating Maximum Deliverable Solution Volume</h3>
+      <p>When a limited inventory of chemical reagent $m$ is available and a fixed molarity $M$ is mandated:</p>
+      <div class="formula-box">
+        $$V\text{ (L)} = \frac{m\text{ (g)}}{M\text{ (mol/L)} \times M_w\text{ (g/mol)}}$$
+      </div>
+
+      <h2>Normality (N) and Equivalence Factors (z)</h2>
+      <p>In acid-base neutralization and oxidation-reduction titrations, stoichiometry frequently involves multivalent interactions. <strong>Normality</strong> ($N$) represents the equivalent concentration of a solution, defined as the number of gram-equivalents of solute per liter of solution:</p>
+
+      <div class="formula-box">
+        $$N = M \times z$$
+      </div>
+
+      <p>Where $z$ denotes the integer <strong>equivalence factor</strong>:</p>
+      <ul>
+        <li><strong>For Acids:</strong> $z$ is the number of reactive hydronium ions ($\text{H}^+$) yielded per molecule. For hydrochloric acid ($\text{HCl}$), $z = 1$, so $1.0\text{ M} = 1.0\text{ N}$. For diprotic sulfuric acid ($\text{H}_2\text{SO}_4$), $z = 2$, so $1.0\text{ M} = 2.0\text{ N}$. For triprotic phosphoric acid ($\text{H}_3\text{PO}_4$), $z = 3$, so $1.0\text{ M} = 3.0\text{ N}$.</li>
+        <li><strong>For Bases:</strong> $z$ is the number of hydroxide ions ($\text{OH}^-$) neutralized. For sodium hydroxide ($\text{NaOH}$), $z = 1$; for calcium hydroxide ($\text{Ca(OH)}_2$), $z = 2$.</li>
+        <li><strong>For Redox Reagents:</strong> $z$ is the number of electrons ($\text{e}^-$) transferred per formula unit. For potassium permanganate ($\text{KMnO}_4$) in acidic media ($\text{Mn}^{7+} + 5\text{e}^- \to \text{Mn}^{2+}$), $z = 5$, making a $0.10\text{ M KMnO}_4$ solution equivalent to $0.50\text{ N}$.</li>
+      </ul>
+
+      <h2>Molarity vs. Molality vs. Mass Percentage Comparison Table</h2>
+      <p>Different concentration scales serve distinct thermodynamic and physical functions. The table below delineates the mathematical definitions, temperature dependencies, and appropriate scientific use cases:</p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Concentration Unit</th>
+              <th>Symbol</th>
+              <th>Formal Definition</th>
+              <th>Dimensional Units</th>
+              <th>Temperature Sensitive?</th>
+              <th>Primary Industrial / Laboratory Use</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Molarity</td>
+              <td>M or c</td>
+              <td>Moles of solute / Liters of total solution</td>
+              <td>mol / L (mol / dm³)</td>
+              <td>Yes (liquids expand thermally)</td>
+              <td>Standard bench wet-chemistry, titrations, buffers</td>
+            </tr>
+            <tr>
+              <td>Molality</td>
+              <td>m or b</td>
+              <td>Moles of solute / Kilograms of pure solvent</td>
+              <td>mol / kg solvent</td>
+              <td>No (mass is conserved)</td>
+              <td>Colligative properties (boiling elevation, freezing depression)</td>
+            </tr>
+            <tr>
+              <td>Normality</td>
+              <td>N</td>
+              <td>Equivalents of solute / Liters of solution</td>
+              <td>eq / L</td>
+              <td>Yes</td>
+              <td>Acid-base and redox analytical titrimetry</td>
+            </tr>
+            <tr>
+              <td>Mass Percent</td>
+              <td>% w/w</td>
+              <td>(Mass solute / Total solution mass) &times; 100%</td>
+              <td>Dimensionless %</td>
+              <td>No</td>
+              <td>Commercial bulk reagents (e.g., 37% HCl, 50% NaOH)</td>
+            </tr>
+            <tr>
+              <td>Parts per Million</td>
+              <td>ppm</td>
+              <td>mg solute / Liters of solution (or kg total)</td>
+              <td>mg / L &asymp; ppm</td>
+              <td>Negligible in dilute water</td>
+              <td>Environmental trace contaminants, water quality limits</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Practical Worked Case Study: Formulating 2.50 L of 0.200 M Potassium Permanganate</h2>
+      <div class="worked-example-card">
+        <h3>Analytical Chemistry Case Study: Preparing a Primary Redox Titrant</h3>
+        <p><strong>Scenario:</strong> An environmental analytical laboratory requires $V = 2.50\text{ Liters}$ of a $M = 0.200\text{ mol/L (M)}$ potassium permanganate ($\text{KMnO}_4$) standard titrant for chemical oxygen demand (COD) assays under EPA Method 410. The molecular weight of pure crystalline $\text{KMnO}_4$ is $M_w = 158.034\text{ g/mol}$. In an acidic redox titration ($\text{MnO}_4^- + 8\text{H}^+ + 5\text{e}^- \to \text{Mn}^{2+} + 4\text{H}_2\text{O}$), the equivalence factor is $z = 5$. Determine: (1) the gravimetric mass of dry salt required, (2) the normality of the solution, (3) the mass concentration in parts per million ($\text{mg/L}$), and (4) the precise Class A volumetric laboratory preparation protocol.</p>
+
+        <p><strong>Step 1: Calculate Total Moles Required:</strong></p>
+        $$n = M \times V = 0.200\text{ mol/L} \times 2.50\text{ L} = 0.500\text{ moles of KMnO}_4$$
+
+        <p><strong>Step 2: Compute Gravimetric Solute Mass:</strong></p>
+        $$m = n \times M_w = 0.500\text{ mol} \times 158.034\text{ g/mol} = 79.017\text{ grams of pure KMnO}_4$$
+
+        <p><strong>Step 3: Determine Normality (N):</strong></p>
+        $$N = M \times z = 0.200\text{ M} \times 5\text{ eq/mol} = 1.000\text{ N (Normal)}$$
+
+        <p><strong>Step 4: Compute Mass Concentration and Weight Percent:</strong></p>
+        $$\text{Mass Concentration} = \frac{79.017\text{ g}}{2.50\text{ L}} = 31.607\text{ g/L} = 31,607\text{ mg/L (ppm)}$$
+        $$\% \text{w/v} = \frac{79.017\text{ g}}{2,500\text{ mL}} \times 100\% = 3.161\%\text{ w/v}$$
+
+        <p><strong>Step 5: Rigorous Standard Operating Procedure (SOP):</strong></p>
+        <ol>
+          <li>Tear an analytical balance ($\pm 0.0001\text{ g}$ precision) with an acid-washed glass weighing boat.</li>
+          <li>Weigh exactly $79.017\text{ g}$ of reagent-grade dry crystalline $\text{KMnO}_4$.</li>
+          <li>Transfer the dry crystals quantitatively into a clean $2\text{ Liter}$ borosilicate beaker containing approximately $1,500\text{ mL}$ of boiling deionized water (high heat accelerates dissolution of dark purple $\text{KMnO}_4$).</li>
+          <li>Cool the solution to $20.0^\circ\text{C}$ (calibrated glassware reference temperature).</li>
+          <li>Filter through a sintered glass crucible (to remove trace manganese dioxide $\text{MnO}_2$ precipitates) into a calibrated $2,500\text{ mL}$ Class A volumetric flask.</li>
+          <li>Dilute with deionized water until the bottom of the curved purple meniscus aligns tangentially with the calibration graduation mark. Stopper and invert 20 times to achieve complete concentration homogeneity.</li>
+        </ol>
+      </div>
+
+      <h2>Thermal Expansion and Volumetric Glassware Calibration</h2>
+      <p>Because liquids expand and contract thermally (for pure water, volumetric thermal expansion coefficient $\beta \approx 2.1 \times 10^{-4}\text{ K}^{-1}$ at $20^\circ\text{C}$), a solution prepared at $20^\circ\text{C}$ will expand by approximately $0.4\%\text{ to } 0.8\%$ when warmed to typical summer ambient temperatures of $30^\circ\text{C}\text{ to } 35^\circ\text{C}$. This thermal expansion increases solution volume $V$, causing the true molarity to drop:</p>
+
+      <div class="formula-box">
+        $$M_{T_2} = M_{T_1} \times \left( \frac{\rho_{T_2}}{\rho_{T_1}} \right)$$
+      </div>
+      <p>Where $\rho_T$ denotes solution density at temperature $T$. For precision titrations conforming to ISO 17025 standards, chemists must either utilize temperature-controlled water baths, apply volumetric temperature correction factors, or utilize molality ($m$), which remains strictly invariant with temperature.</p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">
+            <span class="logo-icon">&pi;</span>
+            <span class="logo-text">Calc<strong>Hub</strong></span>
+          </div>
+          <p class="footer-about">High-precision chemical concentration, solution stoichiometry, and laboratory molarity preparation tools conforming to IUPAC and NIST standards.</p>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Engineering Disciplines</h4>
+          <ul class="footer-links">
+            <li><a href="chemical.html">Chemical &amp; Water Treatment</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+            <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+            <li><a href="civil.html">Civil &amp; Construction</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Standard References</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.iupac.org" target="_blank" rel="noopener">IUPAC Compendium of Chemical Terminology</a></li>
+            <li><a href="https://webbook.nist.gov" target="_blank" rel="noopener">NIST Standard Reference Data</a></li>
+            <li><a href="https://www.iso.org" target="_blank" rel="noopener">ISO 17025 Laboratory Testing Standards</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Free, open, client-side engineering tools.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const SOLUTE_PRESETS = {
+      nacl: { mw: 58.44, z: 1 },
+      naoh: { mw: 40.00, z: 1 },
+      hcl: { mw: 36.46, z: 1 },
+      h2so4: { mw: 98.08, z: 2 },
+      glucose: { mw: 180.16, z: 1 },
+      tris: { mw: 121.14, z: 1 },
+      kmno4: { mw: 158.03, z: 5 },
+      cuso4_5h2o: { mw: 249.68, z: 2 },
+      edta: { mw: 372.24, z: 2 },
+      custom: { mw: 58.44, z: 1 }
+    };
+
+    function updateSolutePreset() {
+      const p = document.getElementById("solutePreset").value;
+      if (p !== "custom") {
+        const item = SOLUTE_PRESETS[p];
+        document.getElementById("soluteMolarMass").value = item.mw;
+        document.getElementById("soluteEquivZ").value = item.z;
+        calcMolarity();
+      }
+    }
+
+    function updateMolarityInputs() {
+      const target = document.getElementById("molaritySolveTarget").value;
+      document.getElementById("molarityInputGroup").style.display = target === "molarity" ? "none" : "grid";
+      document.getElementById("volumeInputGroup").style.display = target === "volume" ? "none" : "grid";
+      document.getElementById("massInputGroup").style.display = (target === "molarity" || target === "volume") ? "grid" : "none";
+    }
+
+    function calcMolarity() {
+      const target = document.getElementById("molaritySolveTarget").value;
+      const mw = parseFloat(document.getElementById("soluteMolarMass").value) || 58.44;
+      const z = parseFloat(document.getElementById("soluteEquivZ").value) || 1;
+
+      // Extract Molarity
+      let M = 0.5;
+      if (target !== "molarity") {
+        let mVal = parseFloat(document.getElementById("molarityVal").value) || 0.5;
+        let mUnit = document.getElementById("molarityUnit").value;
+        if (mUnit === "m") M = mVal;
+        else if (mUnit === "mm") M = mVal / 1000.0;
+        else if (mUnit === "um") M = mVal / 1000000.0;
+      }
+
+      // Extract Volume in Liters
+      let V_liters = 1.0;
+      if (target !== "volume") {
+        let vVal = parseFloat(document.getElementById("volumeVal").value) || 1.0;
+        let vUnit = document.getElementById("volumeUnit").value;
+        if (vUnit === "l") V_liters = vVal;
+        else if (vUnit === "ml") V_liters = vVal / 1000.0;
+        else if (vUnit === "ul") V_liters = vVal / 1000000.0;
+        else if (vUnit === "m3") V_liters = vVal * 1000.0;
+        else if (vUnit === "gal") V_liters = vVal * 3.78541;
+      }
+
+      // Extract Mass in Grams
+      let mass_grams = 0;
+      if (target === "molarity" || target === "volume") {
+        let massVal = parseFloat(document.getElementById("massVal").value) || 29.22;
+        let massUnit = document.getElementById("massUnit").value;
+        if (massUnit === "g") mass_grams = massVal;
+        else if (massUnit === "mg") mass_grams = massVal / 1000.0;
+        else if (massUnit === "kg") mass_grams = massVal * 1000.0;
+        else if (massUnit === "lb") mass_grams = massVal * 453.592;
+      }
+
+      let primaryLabel = "";
+      let primaryVal = "";
+      let primaryAlt = "";
+
+      if (target === "mass") {
+        mass_grams = M * V_liters * mw;
+        primaryLabel = "Required Solute Mass (m)";
+        if (mass_grams >= 1000) {
+          primaryVal = (mass_grams / 1000.0).toFixed(3) + " kg";
+          primaryAlt = mass_grams.toFixed(2) + " grams (" + (mass_grams * 0.00220462).toFixed(3) + " lbs)";
+        } else if (mass_grams < 0.01) {
+          primaryVal = (mass_grams * 1000.0).toFixed(2) + " mg";
+          primaryAlt = mass_grams.toExponential(3) + " grams";
+        } else {
+          primaryVal = mass_grams.toFixed(3) + " grams";
+          primaryAlt = (mass_grams / 1000.0).toFixed(5) + " kg (" + (mass_grams * 0.00220462).toFixed(4) + " lbs)";
+        }
+      } else if (target === "molarity") {
+        M = mass_grams / (mw * V_liters);
+        primaryLabel = "Resultant Molarity (M)";
+        primaryVal = M < 0.001 ? M.toExponential(4) + " M" : M.toFixed(4) + " M";
+        primaryAlt = (M * 1000.0).toFixed(2) + " mM (" + (M * 1e6).toFixed(1) + " μM)";
+      } else if (target === "volume") {
+        V_liters = mass_grams / (M * mw);
+        primaryLabel = "Resultant Solution Volume (V)";
+        if (V_liters >= 1.0) {
+          primaryVal = V_liters.toFixed(3) + " Liters";
+          primaryAlt = (V_liters * 1000.0).toFixed(1) + " mL (" + (V_liters * 0.264172).toFixed(3) + " US gal)";
+        } else {
+          primaryVal = (V_liters * 1000.0).toFixed(2) + " mL";
+          primaryAlt = V_liters.toFixed(5) + " Liters (" + (V_liters * 1e6).toFixed(0) + " μL)";
+        }
+      }
+
+      const totalMoles = M * V_liters;
+      const normality = M * z;
+      const massConcMgL = (mass_grams / V_liters) * 1000.0;
+      const weightVolPct = (mass_grams / (V_liters * 1000.0)) * 100.0;
+      const totalMolecules = totalMoles * 6.02214076e23;
+
+      document.getElementById("resPrimaryLabel").textContent = primaryLabel;
+      document.getElementById("resPrimaryVal").textContent = primaryVal;
+      document.getElementById("resPrimaryAlt").textContent = primaryAlt;
+
+      document.getElementById("resMolarConc").textContent = M < 0.001 ? M.toExponential(3) + " M" : M.toFixed(4) + " M";
+      document.getElementById("resMolarConcSub").textContent = (M * 1000.0).toFixed(2) + " mM (" + (M * 1e6).toFixed(1) + " μM)";
+
+      document.getElementById("resMolesTotal").textContent = totalMoles < 0.001 ? totalMoles.toExponential(3) + " mol" : totalMoles.toFixed(4) + " mol";
+      document.getElementById("resNormality").textContent = normality.toFixed(4) + " N (z = " + z + ")";
+      document.getElementById("resMassPpm").textContent = massConcMgL.toLocaleString(undefined, {maximumFractionDigits: 1}) + " mg/L";
+      document.getElementById("resWeightVolPct").textContent = weightVolPct.toFixed(3) + "% w/v";
+      document.getElementById("resMoleculesTotal").textContent = totalMolecules.toExponential(3);
+
+      let prepStr = "Weigh " + (mass_grams >= 1000 ? (mass_grams / 1000).toFixed(3) + " kg" : mass_grams.toFixed(3) + " g") + " of solute, dissolve in ~" + (V_liters * 0.75).toFixed(2) + " L solvent, then dilute to exactly " + V_liters.toFixed(3) + " L mark.";
+      document.getElementById("resPrepProtocol").textContent = prepStr;
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      calcMolarity();
+    });
+  </script>
+</body>
+</html>
