@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capacitive Reactance Calculator — AC Impedance (Xc) &amp; Frequency</title>
+  <meta name="description" content="Calculate capacitive reactance (Xc in Ohms), AC circuit impedance, and phase angle from alternating frequency and capacitance using exact Ohm formulas.">
+  <meta name="keywords" content="capacitive reactance calculator, calculate capacitive reactance, xc calculator, capacitance reactance formula, ac capacitor impedance, cut off frequency rc, 1 over 2 pi f c">
+  <link rel="canonical" href="https://calchub.org/capacitive-reactance-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Capacitive Reactance & AC Impedance Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "EngineeringApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates capacitive reactance Xc in Ohms, reactive power VARs, AC current, and cutoff frequency for electronic filter networks."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is capacitive reactance (Xc) in an AC electrical circuit?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Capacitive reactance (symbol Xc) is the opposition offered by a capacitor to the flow of sinusoidal alternating current (AC). Unlike pure resistance which dissipates electrical energy irrevocably as thermal heat, capacitive reactance stores energy temporarily in an electrostatic dielectric field and returns it back to the circuit during alternate quarter cycles, introducing a 90° leading phase shift between current and voltage."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the formula for calculating capacitive reactance?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Capacitive reactance is calculated using the reciprocal relationship: Xc = 1 / (2 × π × f × C) = 1 / (ω × C), where Xc is reactance in Ohms (Ω), f is AC frequency in Hertz (Hz), C is capacitance in Farads (F), and ω is angular frequency in radians per second (2πf). As frequency increases, capacitive reactance decreases toward zero (high frequencies pass easily); as frequency approaches zero (DC), capacitive reactance approaches infinity (capacitors block DC entirely)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the phase angle relationship between current and voltage across a capacitor?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In a purely capacitive AC circuit, electric current leads voltage by exactly 90 degrees (or π/2 radians), memorized in electrical engineering by the classic mnemonic 'ICE' (in a Capacitor C, current I leads electromotive force E). In complex impedance notation, capacitive impedance is written as: Zc = -j × Xc = 1 / (j × ω × C), where the negative imaginary operator -j denotes a -90° potential phase lag."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does capacitive reactance determine RC filter cutoff frequency?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In a simple passive RC low-pass or high-pass filter, the half-power cutoff frequency (fc or -3dB point) occurs at the exact frequency where capacitive reactance equals resistance: Xc = R. Substituting the reactance formula gives: 1 / (2π × fc × C) = R, which solves directly to: fc = 1 / (2 × π × R × C). At this critical frequency, output signal power drops by exactly 50% and output voltage drops to 70.7% (1/√2) of input."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="cat-theme-engineering">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="engineering.html" class="nav-link active">⚡ Electrical</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+          <a href="civil.html" class="nav-link">🏗️ Civil</a>
+          <a href="finance.html" class="nav-link">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+        </div>
+        <div class="nav-row">
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="calc-page-header">
+    <div class="calc-page-header-inner">
+      <span class="category-tag">⚡ AC Circuit Analysis &amp; Reactive Impedance</span>
+      <h1 class="calc-page-title">Capacitive Reactance Calculator</h1>
+      <p class="calc-page-desc">Calculate capacitive reactance (Xc in Ohms), complex AC impedance, RMS current, and reactive VAR power across frequency spectra from power grids to radio frequencies.</p>
+    </div>
+  </div>
+
+  <div class="layout-container" style="display:flex;gap:2rem;max-width:1200px;margin:2rem auto;padding:0 1.25rem;align-items:start;">
+    
+    <main style="flex:1;min-width:0;">
+      <div class="calculator-workspace">
+        <section class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title"><span>⚡</span> AC Frequency &amp; Capacitance Inputs</h2>
+            <span class="status-info">Xc = 1 / (2πfC)</span>
+          </div>
+          <form id="xc-form" onsubmit="return false;">
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="ac-frequency">AC Signal Frequency ($f$)</label>
+                <div style="display:flex;gap:0.5rem;">
+                  <input type="number" id="ac-frequency" class="form-control" value="60" min="0.0001" max="1000000000" step="1" oninput="runXcCalc()">
+                  <select id="unit-freq" class="form-control" style="width:110px;" onchange="runXcCalc()">
+                    <option value="1" selected>Hz</option>
+                    <option value="1000">kHz</option>
+                    <option value="1000000">MHz</option>
+                    <option value="1000000000">GHz</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="cap-val">Capacitance ($C$)</label>
+                <div style="display:flex;gap:0.5rem;">
+                  <input type="number" id="cap-val" class="form-control" value="10" min="0.0001" max="10000000" step="0.1" oninput="runXcCalc()">
+                  <select id="unit-cap" class="form-control" style="width:110px;" onchange="runXcCalc()">
+                    <option value="1e-6" selected>μF</option>
+                    <option value="1e-9">nF</option>
+                    <option value="1e-12">pF</option>
+                    <option value="1">Farads (F)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="ac-voltage">Applied AC RMS Voltage ($V_{rms}$)</label>
+                <input type="number" id="ac-voltage" class="form-control" value="120" min="0.1" max="1000000" step="1" oninput="runXcCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="preset-freq">Common Application Presets</label>
+                <select id="preset-freq" class="form-control" onchange="applyXcPreset()">
+                  <option value="custom" selected>-- Select Frequency Preset --</option>
+                  <option value="60">60 Hz (North American AC Mains)</option>
+                  <option value="50">50 Hz (European / Asian AC Mains)</option>
+                  <option value="1000">1 kHz (Audio Reference Frequency)</option>
+                  <option value="100000">100 kHz (SMPS Switch-Mode Power Supply)</option>
+                  <option value="10000000">10 MHz (High-Frequency RF Circuit)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-actions" style="margin-top:1.5rem;display:flex;gap:1rem;">
+              <button type="button" class="btn btn-primary" onclick="runXcCalc()">Calculate Capacitive Reactance</button>
+              <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Print AC Analysis Report</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="results-card">
+          <h2 class="results-title">Capacitive Reactance &amp; AC Response</h2>
+          
+          <div class="primary-result-box" style="margin-bottom:1.5rem;text-align:center;padding:1.5rem;border-radius:12px;background:#F8FAFC;border:2px solid #E2E8F0;">
+            <div class="primary-result-label" style="font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em;color:#64748B;">Capacitive Reactance ($X_c$)</div>
+            <div id="res-xc-primary" class="primary-result-value" style="font-size:2.5rem;font-weight:800;color:#0F172A;margin:0.25rem 0;">265.3 Ω</div>
+            <div id="res-impedance-complex" style="font-size:1.05rem;color:#2563EB;font-weight:700;">Complex Impedance: Z_c = 0 - j265.3 Ω (Phase: -90°)</div>
+          </div>
+
+          <div class="result-details-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">RMS Alternating Current ($I_{rms}$)</span>
+              <span id="res-rms-current" class="result-val" style="font-size:1.1rem;font-weight:700;color:#059669;">0.452 Amperes</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Reactive Power ($Q_c$)</span>
+              <span id="res-reactive-power" class="result-val" style="font-size:1.1rem;font-weight:700;color:#DC2626;">54.28 VAR</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Angular Frequency ($\omega = 2\pi f$)</span>
+              <span id="res-omega-val" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">377.0 rad/s</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Susceptance ($B_c = 1 / X_c$)</span>
+              <span id="res-susceptance" class="result-val" style="font-size:1.1rem;font-weight:700;color:#7C3AED;">3.77 mS (Siemens)</span>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem;padding:0.85rem;border-radius:8px;background:#F0FDF4;border:1px solid #BBF7D0;font-size:0.85rem;color:#166534;">
+            <strong>⚡ AC Engineering Tools:</strong> Calculate industrial capacitor bank sizing with our <a href="power-factor-calculator.html" style="color:#166534;font-weight:700;">Power Factor Calculator</a>, solve parallel branches with the <a href="parallel-resistor-calculator.html" style="color:#166534;font-weight:700;">Parallel Resistor Calculator</a>, or verify series drop with the <a href="ohms-law-calculator.html" style="color:#166534;font-weight:700;">Ohm's Law Calculator</a>.
+          </div>
+        </section>
+      </div>
+
+      <article class="educational-content" style="margin-top:3rem;line-height:1.7;color:#334155;">
+        <h2>The Physics of Capacitors in Alternating Current (AC) Circuits</h2>
+        <p>In direct current (DC) circuits, a capacitor acts as an absolute open-circuit insulator. Once its parallel conducting plates charge to the applied supply voltage ($Q = C \cdot V$), current ceases entirely. In alternating current (AC) circuits, however, the continuous sinusoidal reversal of polarity forces charge carriers to repeatedly flow back and forth between the opposing plates. Although no physical electrons cross the non-conductive dielectric barrier, the continuous displacement current through external leads allows AC current to flow unimpeded.</p>
+
+        <p>The opposition that a capacitor presents to this dynamic alternating current flow is termed <strong>capacitive reactance ($X_c$)</strong>. Unlike an ohmic resistor, which irreversibly converts electrical energy into heat dissipation via Joule heating ($P = I^2 R$), a reactive capacitor is an ideal energy storage component. During the voltage buildup quadrant, energy is absorbed from the power source and stored electrostatically inside the dielectric field ($E = \frac{1}{2} C V^2$). When the AC voltage wave collapses, this stored electric energy is discharged back into the power grid, resulting in a net real power dissipation of exactly zero Watts in an ideal capacitor.</p>
+
+        <h2>Mathematical Formulations of Capacitive Reactance</h2>
+
+        <h3>1. The Fundamental Reactance Equation</h3>
+        <p>The time-domain current flowing through a capacitor is proportional to the time rate of change of voltage across its terminals:</p>
+        <div class="formula-box" style="background:#F1F5F9;padding:1.25rem;border-radius:8px;margin:1.5rem 0;font-family:monospace;border-left:4px solid #2563EB;">
+          $$i(t) = C \cdot \frac{dv(t)}{dt}$$
+        </div>
+        <p>For a sinusoidal voltage $v(t) = V_m \sin(\omega t)$, differentiating with respect to time yields:</p>
+        <div class="formula-box" style="background:#F1F5F9;padding:1.25rem;border-radius:8px;margin:1.5rem 0;font-family:monospace;border-left:4px solid #059669;">
+          $$i(t) = C \cdot \frac{d}{dt}[V_m \sin(\omega t)] = \omega C V_m \cos(\omega t) = \omega C V_m \sin\left(\omega t + 90^\circ\right)$$
+        </div>
+        <p>Dividing peak voltage by peak current gives the magnitude of opposition, defining <strong>capacitive reactance ($X_c$)</strong>:</p>
+        <div class="formula-box" style="background:#F1F5F9;padding:1.25rem;border-radius:8px;margin:1.5rem 0;font-family:monospace;border-left:4px solid #7C3AED;">
+          $$X_c = \frac{V_m}{I_m} = \frac{1}{\omega C} = \frac{1}{2 \cdot \pi \cdot f \cdot C}$$
+        </div>
+        <p>Where:</p>
+        <ul>
+          <li><strong>$X_c$</strong> = Capacitive reactance measured in Ohms ($\Omega$).</li>
+          <li><strong>$f$</strong> = Cyclic AC frequency in Hertz ($\text{Hz}$).</li>
+          <li><strong>$\omega$</strong> = Angular frequency in radians per second ($\text{rad/s}$), where $\omega = 2\pi f$.</li>
+          <li><strong>$C$</strong> = Capacitance in Farads ($\text{F}$).</li>
+        </ul>
+
+        <h3>2. Frequency Dependency: High-Pass vs Low-Pass Behavior</h3>
+        <p>Because frequency ($f$) sits in the denominator, capacitive reactance is strictly <strong>inversely proportional</strong> to frequency:</p>
+        <ul>
+          <li><strong>At Zero Frequency ($f \to 0\text{ Hz}$, DC):</strong> $X_c \to \infty\text{ }\Omega$. A capacitor represents an infinite impedance, functioning as a DC blocking filter.</li>
+          <li><strong>At Infinite Frequency ($f \to \infty\text{ Hz}$):</strong> $X_c \to 0\text{ }\Omega$. A capacitor represents a dead electrical short circuit to high-frequency transients, acting as an RF bypass element.</li>
+        </ul>
+
+        <h3>3. Phasor Representation &amp; Complex Impedance ($Z_c$)</h3>
+        <p>Because the current wave leads voltage by $90^\circ$ ($\frac{\pi}{2}$ radians), capacitive impedance in the complex frequency domain ($s = j\omega$) is expressed with a negative imaginary operator:</p>
+        <div class="formula-box" style="background:#F1F5F9;padding:1.25rem;border-radius:8px;margin:1.5rem 0;font-family:monospace;border-left:4px solid #DC2626;">
+          $$Z_c = -j X_c = \frac{1}{j \omega C} = X_c \angle -90^\circ$$
+        </div>
+
+        <h2>Capacitive Reactance ($X_c$) Multi-Frequency Lookup Table</h2>
+        <p>The following table demonstrates how standard capacitor values scale in reactance across common engineering frequencies:</p>
+
+        <div class="table-responsive" style="overflow-x:auto;margin:1.5rem 0;">
+          <table class="table-custom" style="width:100%;border-collapse:collapse;border:1px solid #E2E8F0;">
+            <thead style="background:#F8FAFC;">
+              <tr style="border-bottom:2px solid #CBD5E1;text-align:left;">
+                <th style="padding:0.75rem;">Capacitance</th>
+                <th style="padding:0.75rem;">60 Hz (Mains Grid)</th>
+                <th style="padding:0.75rem;">1 kHz (Audio Mid)</th>
+                <th style="padding:0.75rem;">100 kHz (SMPS DC-DC)</th>
+                <th style="padding:0.75rem;">10 MHz (HF Radio)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:0.75rem;"><strong>100 pF (Ceramic Disc)</strong></td>
+                <td style="padding:0.75rem;">26.53 MΩ</td>
+                <td style="padding:0.75rem;">1.59 MΩ</td>
+                <td style="padding:0.75rem;">15.92 kΩ</td>
+                <td style="padding:0.75rem;">159.2 Ω</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;background:#F8FAFC;">
+                <td style="padding:0.75rem;"><strong>1 nF / 0.001 μF (Film)</strong></td>
+                <td style="padding:0.75rem;">2.65 MΩ</td>
+                <td style="padding:0.75rem;">159.2 kΩ</td>
+                <td style="padding:0.75rem;">1.59 kΩ</td>
+                <td style="padding:0.75rem;">15.92 Ω</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:0.75rem;"><strong>100 nF / 0.1 μF (Bypass)</strong></td>
+                <td style="padding:0.75rem;">26.53 kΩ</td>
+                <td style="padding:0.75rem;">1.59 kΩ</td>
+                <td style="padding:0.75rem;">15.92 Ω</td>
+                <td style="padding:0.75rem;">0.159 Ω</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;background:#F8FAFC;">
+                <td style="padding:0.75rem;"><strong>10 μF (Tantalum/SMD)</strong></td>
+                <td style="padding:0.75rem;">265.3 Ω</td>
+                <td style="padding:0.75rem;">15.92 Ω</td>
+                <td style="padding:0.75rem;">0.159 Ω</td>
+                <td style="padding:0.75rem;">0.0016 Ω</td>
+              </tr>
+              <tr>
+                <td style="padding:0.75rem;"><strong>100 μF (Electrolytic)</strong></td>
+                <td style="padding:0.75rem;">26.53 Ω</td>
+                <td style="padding:0.75rem;">1.59 Ω</td>
+                <td style="padding:0.75rem;">0.016 Ω</td>
+                <td style="padding:0.75rem;">Inductive parasitic</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="worked-example-card" style="background:#F8FAFC;border:2px solid #E2E8F0;border-radius:12px;padding:1.5rem;margin:2rem 0;">
+          <h3 style="margin-top:0;color:#0F172A;display:flex;align-items:center;gap:0.5rem;">
+            <span>📋</span> Real-World Engineering Worked Example: Audio Preamplifier DC Blocking
+          </h3>
+          <p><strong>Scenario:</strong> An analog audio engineer is designing a preamplifier input stage. The amplifier has an input impedance of $R_{\text{in}} = 47\text{ k}\Omega$ and requires a series DC blocking coupling capacitor to pass the human hearing lower limit of $f = 20\text{ Hz}$ with less than $1.0\text{ dB}$ attenuation ($X_c \le 0.1 \times R_{\text{in}} \approx 4,700\text{ }\Omega$). The engineer tests a standard $4.7\text{ }\mu\text{F}$ film capacitor.</p>
+
+          <ol style="padding-left:1.25rem;line-height:1.8;">
+            <li><strong>Calculate Angular Frequency ($\omega$):</strong>
+              $$\omega = 2 \cdot \pi \cdot f = 2 \times 3.14159 \times 20\text{ Hz} = 125.66\text{ rad/s}$$
+            </li>
+            <li><strong>Calculate Capacitive Reactance ($X_c$) at 20 Hz:</strong>
+              $$X_c = \frac{1}{2 \pi \cdot f \cdot C} = \frac{1}{125.66 \times (4.7 \times 10^{-6}\text{ F})} = \frac{1}{0.0005906} \approx 1,693.2\text{ }\Omega$$
+            </li>
+            <li><strong>Check Attenuation Ratio:</strong>
+              Because $X_c = 1,693\text{ }\Omega$ is significantly less than the $4,700\text{ }\Omega$ upper threshold ($X_c \approx 3.6\%$ of $R_{\text{in}}$), the voltage divider drop across the capacitor is negligible:
+              $$\frac{V_{\text{out}}}{V_{\text{in}}} = \frac{R_{\text{in}}}{\sqrt{R_{\text{in}}^2 + X_c^2}} = \frac{47,000}{\sqrt{(47,000)^2 + (1,693)^2}} = \frac{47,000}{47,030.5} \approx 0.9993\text{ } (-0.006\text{ dB})$$
+            </li>
+            <li><strong>Determine -3dB Cutoff Frequency ($f_c$):</strong>
+              $$f_c = \frac{1}{2 \pi \cdot R_{\text{in}} \cdot C} = \frac{1}{2 \times 3.14159 \times 47,000 \times 4.7 \times 10^{-6}} \approx 0.72\text{ Hz}$$
+              The low cutoff of $0.72\text{ Hz}$ guarantees ruler-flat audio bass response down to $20\text{ Hz}$.
+            </li>
+          </ol>
+        </div>
+
+        <h2>Frequently Asked Technical Questions</h2>
+        <div class="faq-accordion" style="margin-top:1.5rem;">
+          <div class="faq-item" style="border-bottom:1px solid #E2E8F0;padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">What is the difference between capacitive reactance (Xc) and resistance (R)?</h4>
+            <p style="margin:0;color:#64748B;">Resistance (R) dissipates real electrical energy as irreversible heat (Watts) and maintains an in-phase relationship between current and voltage (0° phase shift). Capacitive reactance (Xc) does not dissipate power; it temporarily stores energy in an electric field (VARs) and introduces a 90° leading phase shift where current peaks a quarter-cycle ahead of voltage.</p>
+          </div>
+          <div class="faq-item" style="border-bottom:1px solid #E2E8F0;padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">Why do real-world capacitors behave like inductors at very high frequencies?</h4>
+            <p style="margin:0;color:#64748B;">All physical capacitors have parasitic lead inductance and internal foil winding inductance (Equivalent Series Inductance, or ESL). While capacitive reactance drops with frequency, inductive reactance (XL = 2πfL) rises with frequency. At the Self-Resonant Frequency (SRF), Xc equals XL. Above the SRF, the inductive reactance dominates, and the capacitor ceases to function as a capacitor, behaving entirely as an inductor.</p>
+          </div>
+          <div class="faq-item" style="border-bottom:1px solid #E2E8F0;padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">How does capacitive reactance improve power factor in industrial facilities?</h4>
+            <p style="margin:0;color:#64748B;">Industrial induction motors and transformers operate with lagging power factors because their magnetic fields draw lagging inductive current (voltage leads current by +90°). Shunt capacitor banks introduce leading capacitive current (current leads voltage by +90°). The two opposite 180° out-of-phase reactive currents cancel each other out algebraically, eliminating reactive kVAR draw from the utility grid.</p>
+          </div>
+          <div class="faq-item" style="padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">What is Equivalent Series Resistance (ESR) in a capacitor?</h4>
+            <p style="margin:0;color:#64748B;">ESR represents real resistive losses inside the capacitor, including electrolyte resistance, lead wire resistance, and dielectric absorption losses. In switch-mode power supplies, high-frequency AC ripple currents flowing through the capacitor's ESR generate internal I²R heating, which can boil liquid electrolytes and cause capacitor bulging or explosion.</p>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <aside class="sidebar" style="width:300px;flex-shrink:0;">
+      <div class="sidebar-card" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;">
+        <h3 style="font-size:1rem;margin-top:0;color:#0F172A;">⚡ AC Circuit &amp; Impedance Tools</h3>
+        <ul style="list-style:none;padding:0;margin:0;font-size:0.88rem;line-height:2;">
+          <li><a href="capacitive-reactance-calculator.html" style="font-weight:700;color:#2563EB;">⚡ Capacitive Reactance (Xc)</a></li>
+          <li><a href="inductive-reactance-calculator.html" style="color:#475569;">🌀 Inductive Reactance (Xl)</a></li>
+          <li><a href="power-factor-calculator.html" style="color:#475569;">⚡ Power Factor Correction</a></li>
+          <li><a href="ohms-law-calculator.html" style="color:#475569;">⚡ Ohm's Law Calculator</a></li>
+          <li><a href="parallel-resistor-calculator.html" style="color:#475569;">⚡ Parallel Resistor (Req)</a></li>
+          <li><a href="555-timer-calculator.html" style="color:#475569;">⏱️ 555 Timer Calculator</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;">
+        <h3 style="font-size:1rem;margin-top:0;color:#0F172A;">⚡ Power Systems Suite</h3>
+        <ul style="list-style:none;padding:0;margin:0;font-size:0.88rem;line-height:2;">
+          <li><a href="short-circuit-calculator.html" style="color:#475569;">💥 Short-Circuit (IEC 60909)</a></li>
+          <li><a href="transformer-sizing-calculator.html" style="color:#475569;">⚡ Transformer Sizing</a></li>
+          <li><a href="wire-ampacity-calculator.html" style="color:#475569;">🔌 Wire Ampacity (NEC)</a></li>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer class="site-footer" style="background:#0F172A;color:#94A3B8;padding:3rem 1.25rem;margin-top:4rem;">
+    <div style="max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:2rem;">
+      <div>
+        <div style="font-size:1.25rem;font-weight:800;color:#FFFFFF;margin-bottom:0.5rem;">CalcHub</div>
+        <p style="font-size:0.88rem;max-width:320px;">Open-source engineering, financial, and scientific computational tools. 100% verified mathematics.</p>
+      </div>
+      <div>
+        <div style="font-weight:700;color:#FFFFFF;margin-bottom:0.75rem;">AC Network Standards</div>
+        <div style="font-size:0.85rem;line-height:2;">
+          IEEE 1459 Standard Definitions for Electric Power<br>
+          IEC 60384 Fixed Capacitors for Electronic Equipment<br>
+          EIA-198 Ceramic Dielectric Capacitors
+        </div>
+      </div>
+    </div>
+    <div style="max-width:1200px;margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid #1E293B;text-align:center;font-size:0.82rem;">
+      &copy; 2026 CalcHub. Professional AC Circuit &amp; Impedance Computational Suite.
+    </div>
+  </footer>
+
+  <script>
+    function applyXcPreset() {
+      const val = document.getElementById('preset-freq').value;
+      if (val !== 'custom') {
+        const num = parseFloat(val);
+        if (num >= 1e6) {
+          document.getElementById('ac-frequency').value = num / 1e6;
+          document.getElementById('unit-freq').value = '1000000';
+        } else if (num >= 1e3) {
+          document.getElementById('ac-frequency').value = num / 1e3;
+          document.getElementById('unit-freq').value = '1000';
+        } else {
+          document.getElementById('ac-frequency').value = num;
+          document.getElementById('unit-freq').value = '1';
+        }
+      }
+      runXcCalc();
+    }
+
+    function runXcCalc() {
+      const fVal = Math.max(1e-6, parseFloat(document.getElementById('ac-frequency').value) || 60);
+      const fMult = parseFloat(document.getElementById('unit-freq').value) || 1;
+      const freq = fVal * fMult; // in Hz
+
+      const cVal = Math.max(1e-18, parseFloat(document.getElementById('cap-val').value) || 10);
+      const cMult = parseFloat(document.getElementById('unit-cap').value) || 1e-6;
+      const cap = cVal * cMult; // in Farads
+
+      const vRms = Math.max(0.001, parseFloat(document.getElementById('ac-voltage').value) || 120);
+
+      // Xc = 1 / (2 * pi * f * C)
+      const omega = 2 * Math.PI * freq;
+      const xc = 1.0 / (omega * cap);
+
+      const iRms = vRms / xc;
+      const qVar = vRms * iRms;
+      const susceptance = 1.0 / xc; // in Siemens
+
+      let xcStr = '';
+      if (xc >= 1e6) xcStr = (xc / 1e6).toFixed(2) + ' M\u03A9';
+      else if (xc >= 1e3) xcStr = (xc / 1e3).toFixed(2) + ' k\u03A9 (' + Math.round(xc) + ' \u03A9)';
+      else if (xc >= 1) xcStr = xc.toFixed(2) + ' \u03A9';
+      else xcStr = (xc * 1000).toFixed(2) + ' m\u03A9';
+
+      let currStr = '';
+      if (iRms >= 1000) currStr = (iRms / 1000).toFixed(2) + ' kA';
+      else if (iRms >= 1) currStr = iRms.toFixed(3) + ' Amperes';
+      else if (iRms >= 1e-3) currStr = (iRms * 1e3).toFixed(2) + ' mA';
+      else currStr = (iRms * 1e6).toFixed(2) + ' \u03bcA';
+
+      let varStr = '';
+      if (qVar >= 1e6) varStr = (qVar / 1e6).toFixed(2) + ' MVAR';
+      else if (qVar >= 1e3) varStr = (qVar / 1e3).toFixed(2) + ' kVAR';
+      else varStr = qVar.toFixed(2) + ' VAR';
+
+      let suscStr = '';
+      if (susceptance >= 1) suscStr = susceptance.toFixed(3) + ' S';
+      else if (susceptance >= 1e-3) suscStr = (susceptance * 1e3).toFixed(2) + ' mS';
+      else suscStr = (susceptance * 1e6).toFixed(2) + ' \u03bcS';
+
+      document.getElementById('res-xc-primary').textContent = xcStr;
+      document.getElementById('res-impedance-complex').textContent = 'Complex Impedance: Z_c = 0 - j' + (xc >= 1000 ? (xc/1000).toFixed(2) + 'k' : xc.toFixed(1)) + ' \u03A9 (Phase: -90\u00B0)';
+      document.getElementById('res-rms-current').textContent = currStr;
+      document.getElementById('res-reactive-power').textContent = varStr;
+      document.getElementById('res-omega-val').textContent = omega >= 1e6 ? (omega / 1e6).toFixed(2) + ' Mrad/s' : omega.toFixed(1) + ' rad/s';
+      document.getElementById('res-susceptance').textContent = suscStr;
+    }
+
+    window.addEventListener('DOMContentLoaded', runXcCalc);
+  </script>
+</body>
+</html>

@@ -63,6 +63,12 @@ CAT_MAP = {
             ("parallel-resistor-calculator.html", "Parallel Resistor (Req)", "⚡", "Equivalent resistance & branch current divider", "1/Req = ∑(1/Ri) | Conductance G"),
             ("battery-life-calculator.html", "Battery Life & Runtime", "🔋", "Peukert's law discharge & C-rate runtime", "t = H × (C / IH)^k × DoD"),
             ("resistor-color-code-calculator.html", "Resistor Color Code", "🎨", "4 & 5-band axial resistance", "R = (Digits) × 10ⁿ ± Tol%"),
+            ("555-timer-calculator.html", "555 Timer Astable & Monostable", "⏱️", "Frequency, duty cycle & pulse width", "f = 1.44 / ((R1 + 2R2) × C)"),
+            ("led-resistor-calculator.html", "LED Series Resistor Calculator", "💡", "Current limiting & wattage rating", "R = (Vs - Vf) / If | P = I²R"),
+            ("capacitive-reactance-calculator.html", "Capacitive Reactance (Xc)", "⚡", "AC capacitor impedance & phase shift", "Xc = 1 / (2π · f · C)"),
+            ("inductive-reactance-calculator.html", "Inductive Reactance (Xl)", "⚡", "AC inductor reactance & back-EMF", "Xl = 2π · f · L"),
+            ("op-amp-gain-calculator.html", "Op-Amp Gain & Inverting/Non-Inv", "📈", "Closed loop gain, bandwidth & dB", "Av = -Rf/Rin | 1 + Rf/Rin"),
+            ("three-phase-power-calculator.html", "Three-Phase AC Power (kVA/kW)", "⚡", "Real, reactive & apparent 3-phase power", "P = √3 × V_LL × I_L × cos(θ)"),
         ]
     },
     "solar-energy.html": {
@@ -73,6 +79,7 @@ CAT_MAP = {
             ("solar-inverter-sizing-calculator.html", "Solar Inverter Sizing", "⚡", "Continuous kVA & surge capacity", "Inverter VA = Peak Continuous Load × 1.25"),
             ("pv-string-sizing-calculator.html", "PV String Sizing (NEC 690)", "☀️", "MPPT voltage limits & module temperature", "N_max = ⌊V_max / Voc_cold⌋"),
             ("ev-charging-time-calculator.html", "EV Charging Time & Power", "🔌", "Levels 1, 2 & DC Fast charge time", "Time (hrs) = Battery (kWh) ÷ Net kW"),
+            ("ev-charging-circuit-calculator.html", "EV Charging Circuit (NEC 625)", "🔌", "Continuous load 125%, breaker & AWG wire", "I_min = 1.25 × I_EVSE | NEC 625.42"),
         ]
     },
     "mechanical.html": {
@@ -112,6 +119,7 @@ CAT_MAP = {
             ("hydrant-fire-flow-calculator.html", "Hydrant Fire Flow (NFPA 291)", "🚒", "Pitot discharge flow & rated 20 psi capacity", "Q = 29.83·cd·d²√P | Q_R at 20 psi"),
             ("smoke-detector-spacing-calculator.html", "Smoke Detector Spacing & Layout", "🚨", "NFPA 72 ceiling height derating", "S = 30ft Baseline with Derating Factor"),
             ("fire-sprinkler-calculator.html", "Fire Sprinkler Hydraulics", "💦", "NFPA 13 head flow Q=K√P & demand", "Q = K × √P (K-Factor 5.6 & 8.0)"),
+            ("fire-pump-sizing-calculator.html", "Fire Pump Sizing (NFPA 20)", "🚒", "Rated flow, net head, churn & motor BHP", "BHP = (Q × H × SG) / (3960 × η)"),
         ]
     },
     "programmer.html": {

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EV Charging Circuit Calculator — NEC 625 Breaker &amp; Wire Sizing (125% Rule)</title>
+  <meta name="description" content="Calculate EV charging branch circuit breaker size, copper wire gauge (AWG), charging power in kW, and miles of range added per hour per NEC Article 625.">
+  <meta name="keywords" content="ev charging circuit calculator, nec 625 breaker sizing, ev wire size calculator, 125 percent continuous load ev, level 2 ev circuit, 48 amp ev charger breaker, ev charging range per hour">
+  <link rel="canonical" href="https://calchub.org/ev-charging-circuit-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "NEC 625 EV Charging Circuit Sizing Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "EngineeringApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates branch circuit breaker ratings, conductor gauge, charging power in kW, and hourly range addition for electric vehicle supply equipment per NEC 625."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Why does NEC Article 625 mandate the 125% continuous load rule for EV chargers?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Under National Electrical Code (NEC) Article 625.41 and Article 210.20(A), electric vehicle supply equipment (EVSE) is classified as a 'continuous load' because charging sessions routinely draw full maximum current for 3 hours or longer. Circuit breakers and conductors generate steady I²R thermal heating. To prevent thermal nuisance tripping and avoid degrading conductor insulation, the branch circuit overcurrent protection device (breaker) and conductors must be sized for at least 125% of the continuous charging load current."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What circuit breaker and wire size are required for a 48-Amp Level 2 EV charger?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A 48-Amp continuous EV charger requires a minimum breaker rating of: 48A × 1.25 = 60 Amperes. Under NEC 310.16 (75°C terminal rating for copper conductors), a 60A circuit requires minimum #6 AWG THHN copper wire or #4 AWG aluminum wire. If using nonmetallic sheathed cable (Romex / NM-B), it is restricted to the 60°C column (55A ampacity), requiring an upgrade to #4 AWG NM-B copper."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the charging speed difference between Level 1, Level 2, and DC Fast Charging?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Level 1 operates on standard 120V household outlets (12A continuous = 1.44 kW), providing approximately 3 to 5 miles of range per hour. Level 2 operates on 240V split-phase circuits (16A to 48A = 3.8 kW to 11.5 kW), providing 15 to 45 miles of range per hour, fully replenishing a depleted battery overnight in 6 to 9 hours. DC Fast Charging (Level 3) operates on 400V to 800V three-phase commercial feeds (50 kW to 350 kW), adding 150 to 250+ miles in 15 to 30 minutes."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why is hardwiring recommended over a NEMA 14-50 receptacle for high-power Level 2 charging?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Standard consumer-grade NEMA 14-50 outlets are limited to 40A continuous charging (on a 50A breaker) and are prone to thermal degradation and melting under sustained multi-hour 40A heating cycles. Hardwiring allows full 48A continuous charging on a 60A breaker (delivering 11.5 kW vs 9.6 kW), eliminates plug contact resistance, and exempts the installation from requiring a costly GFCI breaker (which often nuisance-trips against the EVSE's internal GFCI test circuit per NEC 625.54)."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="cat-theme-solar">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+          <a href="civil.html" class="nav-link">🏗️ Civil</a>
+          <a href="finance.html" class="nav-link">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+        </div>
+        <div class="nav-row">
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="solar-energy.html" class="nav-link active">☀️ Solar</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="calc-page-header">
+    <div class="calc-page-header-inner">
+      <span class="category-tag">☀️ Electric Vehicle Infrastructure &amp; NEC 625</span>
+      <h1 class="calc-page-title">EV Charging Circuit Calculator</h1>
+      <p class="calc-page-desc">Calculate required overcurrent breaker rating (125% rule), copper conductor gauge (AWG), charging power in kW, and range recovery rate per NEC Article 625.</p>
+    </div>
+  </div>
+
+  <div class="layout-container" style="display:flex;gap:2rem;max-width:1200px;margin:2rem auto;padding:0 1.25rem;align-items:start;">
+    
+    <main style="flex:1;min-width:0;">
+      <div class="calculator-workspace">
+        <section class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title"><span>🔌</span> EVSE Charger &amp; Electrical Supply</h2>
+            <span class="status-info">NEC 625.41 Continuous Rule</span>
+          </div>
+          <form id="evcircuit-form" onsubmit="return false;">
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="evse-rating-preset">Popular EV Charger Configurations</label>
+                <select id="evse-rating-preset" class="form-control" onchange="applyEvsePreset()">
+                  <option value="48-240" selected>48A @ 240V (Hardwired Wall Connector / 11.5 kW)</option>
+                  <option value="40-240">40A @ 240V (NEMA 14-50 Plug-In Station / 9.6 kW)</option>
+                  <option value="32-240">32A @ 240V (Standard Level 2 Mobile Cable / 7.7 kW)</option>
+                  <option value="16-240">16A @ 240V (Low-Power Level 2 / 3.8 kW)</option>
+                  <option value="12-120">12A @ 120V (Standard Level 1 Convenience / 1.4 kW)</option>
+                  <option value="80-240">80A @ 240V (High-Power Dual Inverter / 19.2 kW)</option>
+                  <option value="custom">Custom Load Specification</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="continuous-amps">EVSE Continuous Current ($I_{\text{load}}$ in Amps)</label>
+                <input type="number" id="continuous-amps" class="form-control" value="48" min="1" max="200" step="1" oninput="runEvCircuitCalc()">
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="circuit-voltage">Circuit Nominal AC Voltage</label>
+                <select id="circuit-voltage" class="form-control" onchange="runEvCircuitCalc()">
+                  <option value="240" selected>240 V (US Residential Split-Phase)</option>
+                  <option value="208">208 V (US Commercial 3-Phase 2-Leg)</option>
+                  <option value="120">120 V (Level 1 Household Standard)</option>
+                  <option value="230">230 V (European Single-Phase)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="wire-type">Conductor Insulation &amp; Wiring Method</label>
+                <select id="wire-type" class="form-control" onchange="runEvCircuitCalc()">
+                  <option value="thhn-conduit" selected>THHN Copper in Conduit (75°C / 90°C Terminal)</option>
+                  <option value="romex-nmb">Romex NM-B Cable (Limited to 60°C NEC 334.80)</option>
+                  <option value="aluminum-ser">Aluminum SER Cable (75°C Terminal)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="run-length-ft">One-Way Circuit Run Distance (Feet)</label>
+                <input type="number" id="run-length-ft" class="form-control" value="50" min="5" max="500" step="5" oninput="runEvCircuitCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="ev-efficiency">Vehicle Efficiency (miles / kWh)</label>
+                <input type="number" id="ev-efficiency" class="form-control" value="3.5" min="1.0" max="6.0" step="0.1" oninput="runEvCircuitCalc()">
+              </div>
+            </div>
+
+            <div class="calc-actions" style="margin-top:1.5rem;display:flex;gap:1rem;">
+              <button type="button" class="btn btn-primary" onclick="runEvCircuitCalc()">Size EV Branch Circuit</button>
+              <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Print Electrical Permit Plan</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="results-card">
+          <h2 class="results-title">Circuit Sizing &amp; Charging Performance</h2>
+          
+          <div class="primary-result-box" style="margin-bottom:1.5rem;text-align:center;padding:1.5rem;border-radius:12px;background:#F8FAFC;border:2px solid #E2E8F0;">
+            <div class="primary-result-label" style="font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em;color:#64748B;">Required Dedicated Circuit Breaker</div>
+            <div id="res-breaker-primary" class="primary-result-value" style="font-size:2.5rem;font-weight:800;color:#0F172A;margin:0.25rem 0;">60 Amp Breaker</div>
+            <div id="res-wire-gauge" style="font-size:1.05rem;color:#059669;font-weight:700;">Conductor: #6 AWG Copper THHN (75°C Rated)</div>
+          </div>
+
+          <div class="result-details-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Delivered Charging Power</span>
+              <span id="res-charging-power" class="result-val" style="font-size:1.1rem;font-weight:700;color:#2563EB;">11.52 kW</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Range Added Per Hour</span>
+              <span id="res-range-hourly" class="result-val" style="font-size:1.1rem;font-weight:700;color:#059669;">+ 40.3 Miles / Hour</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Continuous Current Sizing (125%)</span>
+              <span id="res-continuous-125" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">60.00 Amperes</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">One-Way Voltage Drop (50 ft)</span>
+              <span id="res-circuit-vdrop" class="result-val" style="font-size:1.1rem;font-weight:700;color:#7C3AED;">1.18% (2.83 V Drop — NEC &le; 3%)</span>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem;padding:0.85rem;border-radius:8px;background:#F0FDF4;border:1px solid #BBF7D0;font-size:0.85rem;color:#166534;">
+            <strong>🔌 Complete EV Infrastructure:</strong> Check feeder run capacity with our <a href="voltage-drop-calculator.html" style="color:#166534;font-weight:700;">Voltage Drop Calculator</a>, verify conduit fill with the <a href="conduit-fill-calculator.html" style="color:#166534;font-weight:700;">Conduit Fill Calculator</a>, and calculate full vehicle charge time with the <a href="ev-charging-time-calculator.html" style="color:#166534;font-weight:700;">EV Charging Time Calculator</a>.
+          </div>
+        </section>
+      </div>
+
+      <article class="educational-content" style="margin-top:3rem;line-height:1.7;color:#334155;">
+        <h2>The National Electrical Code (NEC Article 625) &amp; EV Charging Safety</h2>
+        <p>Electric Vehicle Supply Equipment (EVSE) represents one of the largest continuous electrical loads installed in modern residential homes and commercial parking facilities. Unlike intermittent household appliances (such as a microwave that runs for 3 minutes or a toaster that runs for 90 seconds), an electric vehicle will continuously draw maximum nameplate amperage from the circuit breaker panel for 6 to 10 consecutive hours every night.</p>
+
+        <p>Because electrical conductors and circuit breaker thermal bimetallic trip mechanisms generate continuous resistive heat ($P = I^2 R$), operating at $100\%$ capacity for multiple hours causes cumulative thermal expansion, terminal screw loosening, insulation degradation, and catastrophic panel fires. For this reason, <strong>NEC Article 625.41 (Overcurrent Protection)</strong> and <strong>NEC Article 210.20(A)</strong> explicitly mandate that EV charging circuits must be treated as <strong>continuous loads</strong>, requiring overcurrent protection and branch conductors to be sized at no less than <strong>$125\%$ of the continuous load current</strong>.</p>
+
+        <h2>Mathematical Sizing Formulations</h2>
+
+        <h3>1. The 125% Overcurrent Protection Rule</h3>
+        <p>The minimum required circuit breaker ampacity ($I_{\text{breaker}}$) is calculated using the standard continuous load multiplier:</p>
+        <div class="formula-box" style="background:#F1F5F9;padding:1.25rem;border-radius:8px;margin:1.5rem 0;font-family:monospace;border-left:4px solid #2563EB;">
+          $$I_{\text{breaker, min}} = I_{\text{continuous}} \times 1.25$$
+        </div>
+        <p>If the calculated value does not correspond to a standard commercial circuit breaker rating, the designer must select the next higher standard rating specified in <strong>NEC Article 240.6(A)</strong> (15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100 Amps).</p>
+
+        <h3>2. Delivered Electric Vehicle Charging Power ($P_{\text{charging}}$)</h3>
+        <p>Delivered electrical power transferred to the vehicle's onboard charger in kilowatts (kW) is:</p>
+        <div class="formula-box" style="background:#F1F5F9;padding:1.25rem;border-radius:8px;margin:1.5rem 0;font-family:monospace;border-left:4px solid #059669;">
+          $$P_{\text{charging}} = \frac{V_{\text{circuit}} \times I_{\text{continuous}}}{1,000} \quad [\text{kW}]$$
+        </div>
+
+        <h3>3. Estimated Range Recovery Rate (Miles per Hour)</h3>
+        <p>The vehicle range added per hour of continuous charging ($\text{RPH}$) is modeled using vehicle drivetrain efficiency ($\mu_{\text{efficiency}}$, typically $3.0$ to $4.0\text{ miles/kWh}$ for sedans and $2.0$ to $2.5\text{ miles/kWh}$ for electric trucks) and charging conversion efficiency ($\eta \approx 90\%$):</p>
+        <div class="formula-box" style="background:#F1F5F9;padding:1.25rem;border-radius:8px;margin:1.5rem 0;font-family:monospace;border-left:4px solid #7C3AED;">
+          $$\text{RPH} = P_{\text{charging}} \times \mu_{\text{efficiency}} \times \eta \quad [\text{Miles of Range / Hour}]$$
+        </div>
+
+        <h2>Standard EVSE Circuit Sizing, Breaker &amp; Conductor Gauge Table</h2>
+        <p>Sizing matrix for standard commercial and residential Level 2 EVSE installations:</p>
+
+        <div class="table-responsive" style="overflow-x:auto;margin:1.5rem 0;">
+          <table class="table-custom" style="width:100%;border-collapse:collapse;border:1px solid #E2E8F0;">
+            <thead style="background:#F8FAFC;">
+              <tr style="border-bottom:2px solid #CBD5E1;text-align:left;">
+                <th style="padding:0.75rem;">Continuous Charging Current</th>
+                <th style="padding:0.75rem;">Minimum Breaker Size (125%)</th>
+                <th style="padding:0.75rem;">Copper THHN in Conduit (75°C)</th>
+                <th style="padding:0.75rem;">Romex NM-B Cable (60°C Limit)</th>
+                <th style="padding:0.75rem;">Power at 240V</th>
+                <th style="padding:0.75rem;">Typical Range Added</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:0.75rem;"><strong>16 Amperes</strong></td>
+                <td style="padding:0.75rem;">20 Amp</td>
+                <td style="padding:0.75rem;">#12 AWG Cu</td>
+                <td style="padding:0.75rem;">#12 AWG Cu</td>
+                <td style="padding:0.75rem;">3.84 kW</td>
+                <td style="padding:0.75rem;">12 – 15 miles/hr</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;background:#F8FAFC;">
+                <td style="padding:0.75rem;"><strong>24 Amperes</strong></td>
+                <td style="padding:0.75rem;">30 Amp</td>
+                <td style="padding:0.75rem;">#10 AWG Cu</td>
+                <td style="padding:0.75rem;">#10 AWG Cu</td>
+                <td style="padding:0.75rem;">5.76 kW</td>
+                <td style="padding:0.75rem;">18 – 22 miles/hr</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:0.75rem;"><strong>32 Amperes</strong></td>
+                <td style="padding:0.75rem;">40 Amp</td>
+                <td style="padding:0.75rem;">#8 AWG Cu</td>
+                <td style="padding:0.75rem;">#8 AWG Cu</td>
+                <td style="padding:0.75rem;">7.68 kW</td>
+                <td style="padding:0.75rem;">25 – 30 miles/hr</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;background:#F8FAFC;">
+                <td style="padding:0.75rem;"><strong>40 Amperes</strong></td>
+                <td style="padding:0.75rem;">50 Amp</td>
+                <td style="padding:0.75rem;">#8 AWG Cu</td>
+                <td style="padding:0.75rem;">#6 AWG Cu</td>
+                <td style="padding:0.75rem;">9.60 kW</td>
+                <td style="padding:0.75rem;">30 – 35 miles/hr</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:0.75rem;"><strong>48 Amperes</strong></td>
+                <td style="padding:0.75rem;">60 Amp</td>
+                <td style="padding:0.75rem;">#6 AWG Cu</td>
+                <td style="padding:0.75rem;">#4 AWG Cu</td>
+                <td style="padding:0.75rem;">11.52 kW</td>
+                <td style="padding:0.75rem;">38 – 45 miles/hr</td>
+              </tr>
+              <tr>
+                <td style="padding:0.75rem;"><strong>80 Amperes</strong></td>
+                <td style="padding:0.75rem;">100 Amp</td>
+                <td style="padding:0.75rem;">#3 AWG Cu</td>
+                <td style="padding:0.75rem;">#1 AWG Cu</td>
+                <td style="padding:0.75rem;">19.20 kW</td>
+                <td style="padding:0.75rem;">60 – 75 miles/hr</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="worked-example-card" style="background:#F8FAFC;border:2px solid #E2E8F0;border-radius:12px;padding:1.5rem;margin:2rem 0;">
+          <h3 style="margin-top:0;color:#0F172A;display:flex;align-items:center;gap:0.5rem;">
+            <span>📋</span> Real-World Engineering Worked Example: Residential 48A Wall Connector
+          </h3>
+          <p><strong>Scenario:</strong> A homeowner purchases a Tesla Universal Wall Connector capable of charging at $48\text{A}$ on a $240\text{V}$ split-phase supply. The main electrical service panel is located $65\text{ feet}$ away in the basement. The installer runs conductors inside EMT conduit to the garage wall.</p>
+
+          <ol style="padding-left:1.25rem;line-height:1.8;">
+            <li><strong>Apply the NEC 125% Continuous Rule:</strong>
+              $$I_{\text{breaker}} = 48\text{ A} \times 1.25 = 60.0\text{ Amperes}$$
+              The electrician specifies a dedicated two-pole <strong>60 Amp circuit breaker</strong>.
+            </li>
+            <li><strong>Select Conductor Gauge per NEC 310.16:</strong>
+              Under the $75^\circ\text{C}$ terminal column, #6 AWG copper conductor has an allowable ampacity of $65\text{ Amperes}$, which exceeds the $60\text{A}$ breaker rating. The installer pulls two insulated #6 AWG THHN copper phase conductors (black and red) and one bare #10 AWG copper equipment grounding conductor (EGC) through $3/4\text{-inch}$ EMT conduit.
+            </li>
+            <li><strong>Check Voltage Drop at 65 Feet:</strong>
+              Using copper conductor resistance ($R \approx 0.491\text{ }\Omega / 1,000\text{ ft}$ for #6 AWG):
+              $$R_{\text{loop}} = 2 \times 65\text{ ft} \times \frac{0.491}{1,000} \approx 0.0638\text{ }\Omega$$
+              $$\Delta V = I \times R_{\text{loop}} = 48\text{ A} \times 0.0638\text{ }\Omega \approx 3.06\text{ Volts}$$
+              $$\% \Delta V = \frac{3.06\text{ V}}{240\text{ V}} \times 100\% \approx 1.28\%$$
+              This is well below the NEC recommended maximum feeder voltage drop limit of $3.0\%$.
+            </li>
+            <li><strong>Calculate Delivered Charging Power &amp; Hourly Range:</strong>
+              $$P = \frac{240\text{ V} \times 48\text{ A}}{1,000} = 11.52\text{ kW}$$
+              At $3.5\text{ miles/kWh}$ vehicle efficiency:
+              $$\text{Range Added} = 11.52\text{ kW} \times 3.5\text{ mi/kWh} \approx 40.3\text{ Miles per Hour of Charging}$$
+            </li>
+          </ol>
+        </div>
+
+        <h2>Frequently Asked Technical Questions</h2>
+        <div class="faq-accordion" style="margin-top:1.5rem;">
+          <div class="faq-item" style="border-bottom:1px solid #E2E8F0;padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">Why is Romex (NM-B) wire restricted to a lower ampacity than THHN in conduit?</h4>
+            <p style="margin:0;color:#64748B;">Per NEC Article 334.80, nonmetallic sheathed cable (Romex / NM-B) must be sized using the 60°C thermal column of Table 310.16 regardless of conductor insulation rating because Romex bundles conductors tightly inside a PVC jacket surrounded by building thermal insulation. For example, #6 AWG Romex is rated for only 55A at 60°C (insufficient for a 60A breaker!), whereas #6 AWG THHN in conduit is rated for 65A at 75°C.</p>
+          </div>
+          <div class="faq-item" style="border-bottom:1px solid #E2E8F0;padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">Does NEC 625 require GFCI protection for EV charger branch circuits?</h4>
+            <p style="margin:0;color:#64748B;">Under NEC 2020/2023 Article 625.54, all EVSE receptacles (such as NEMA 14-50 and 6-50 outlets) require Class A 5mA GFCI breaker protection in the panel. However, virtually all modern EV chargers incorporate internal CCID (Charge Circuit Interrupting Device) ground-fault protection. Dual GFCI devices in series often nuisance trip. Hardwiring the charger directly exempts the circuit from NEC 625.54 GFCI breaker requirements, saving $120+ and preventing nuisance shutdowns.</p>
+          </div>
+          <div class="faq-item" style="border-bottom:1px solid #E2E8F0;padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">Can a 200-Amp residential electrical service handle an EV charger installation?</h4>
+            <p style="margin:0;color:#64748B;">Most modern 200A panels can accommodate a 40A or 48A Level 2 charger unless the home has massive existing electrical loads (all-electric heat pump, electric tankless water heater, hot tub, and electric range). An electrician must perform an NEC Article 220 Service Load Calculation. If calculated demand exceeds 160A (80% of 200A), the installer can install an automatic EV Energy Management System (EMS / load-shedding device) to avoid a costly $3,000+ utility service upgrade.</p>
+          </div>
+          <div class="faq-item" style="padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">What is the difference between charging on 208V commercial vs 240V residential?</h4>
+            <p style="margin:0;color:#64748B;">Commercial buildings and apartment complexes supply three-phase 208Y/120V power, giving a line-to-line voltage of 208V instead of residential 240V split-phase. At 48 Amps, charging on 208V delivers 208V × 48A = 9.98 kW, which is approximately 13.4% slower than 240V (which delivers 11.52 kW). The car charges normally, but range addition per hour is slightly reduced.</p>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <aside class="sidebar" style="width:300px;flex-shrink:0;">
+      <div class="sidebar-card" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;">
+        <h3 style="font-size:1rem;margin-top:0;color:#0F172A;">☀️ Solar &amp; EV Infrastructure</h3>
+        <ul style="list-style:none;padding:0;margin:0;font-size:0.88rem;line-height:2;">
+          <li><a href="ev-charging-circuit-calculator.html" style="font-weight:700;color:#059669;">🔌 EV Charging Circuit (NEC 625)</a></li>
+          <li><a href="ev-charging-time-calculator.html" style="color:#475569;">🔌 EV Charging Time &amp; Power</a></li>
+          <li><a href="pv-string-sizing-calculator.html" style="color:#475569;">☀️ PV String Sizing</a></li>
+          <li><a href="solar-panel-sizing-calculator.html" style="color:#475569;">☀️ Solar Panel Sizing</a></li>
+          <li><a href="solar-battery-bank-calculator.html" style="color:#475569;">🔋 Solar Battery Bank Sizing</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;">
+        <h3 style="font-size:1rem;margin-top:0;color:#0F172A;">⚡ Electrical Wiring Suite</h3>
+        <ul style="list-style:none;padding:0;margin:0;font-size:0.88rem;line-height:2;">
+          <li><a href="wire-ampacity-calculator.html" style="color:#475569;">🔌 Wire Ampacity (NEC)</a></li>
+          <li><a href="conduit-fill-calculator.html" style="color:#475569;">🪢 Conduit Fill Calculator</a></li>
+          <li><a href="voltage-drop-calculator.html" style="color:#475569;">📉 Voltage Drop Calculator</a></li>
+          <li><a href="cable-sizing-calculator.html" style="color:#475569;">🔌 Cable Sizing Calculator</a></li>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer class="site-footer" style="background:#0F172A;color:#94A3B8;padding:3rem 1.25rem;margin-top:4rem;">
+    <div style="max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:2rem;">
+      <div>
+        <div style="font-size:1.25rem;font-weight:800;color:#FFFFFF;margin-bottom:0.5rem;">CalcHub</div>
+        <p style="font-size:0.88rem;max-width:320px;">Open-source engineering, financial, and scientific computational tools. 100% verified mathematics.</p>
+      </div>
+      <div>
+        <div style="font-weight:700;color:#FFFFFF;margin-bottom:0.75rem;">EV Electrical Codes</div>
+        <div style="font-size:0.85rem;line-height:2;">
+          NFPA 70 NEC Article 625 Electric Vehicle Power Transfer<br>
+          UL 2594 Standard for EVSE Safety<br>
+          SAE J1772 Electric Vehicle Conductive Charge Coupler
+        </div>
+      </div>
+    </div>
+    <div style="max-width:1200px;margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid #1E293B;text-align:center;font-size:0.82rem;">
+      &copy; 2026 CalcHub. Professional EV Infrastructure &amp; Electrical Sizing Suite.
+    </div>
+  </footer>
+
+  <script>
+    function applyEvsePreset() {
+      const val = document.getElementById('evse-rating-preset').value;
+      if (val !== 'custom') {
+        const parts = val.split('-');
+        document.getElementById('continuous-amps').value = parts[0];
+        document.getElementById('circuit-voltage').value = parts[1];
+      }
+      runEvCircuitCalc();
+    }
+
+    // Standard NEC 240.6 breaker sizes
+    const STANDARD_BREAKERS = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125];
+
+    function runEvCircuitCalc() {
+      const iLoad = Math.max(1, parseFloat(document.getElementById('continuous-amps').value) || 48);
+      const vCircuit = parseFloat(document.getElementById('circuit-voltage').value) || 240;
+      const wireMethod = document.getElementById('wire-type').value;
+      const distFt = Math.max(1, parseFloat(document.getElementById('run-length-ft').value) || 50);
+      const effMilesKwh = Math.max(0.5, parseFloat(document.getElementById('ev-efficiency').value) || 3.5);
+
+      // Continuous load 125% rule
+      const iMinBreaker = iLoad * 1.25;
+
+      let recBreaker = STANDARD_BREAKERS[STANDARD_BREAKERS.length - 1];
+      for (let i = 0; i < STANDARD_BREAKERS.length; i++) {
+        if (STANDARD_BREAKERS[i] >= iMinBreaker) {
+          recBreaker = STANDARD_BREAKERS[i];
+          break;
+        }
+      }
+
+      // Conductor sizing
+      let gaugeStr = '';
+      let rOhmsPer1000 = 0.491; // default #6 AWG Cu
+
+      if (wireMethod === 'thhn-conduit') {
+        // 75C column
+        if (recBreaker <= 15) { gaugeStr = '#14 AWG Copper THHN (15A max)'; rOhmsPer1000 = 3.07; }
+        else if (recBreaker <= 20) { gaugeStr = '#12 AWG Copper THHN (20A)'; rOhmsPer1000 = 1.93; }
+        else if (recBreaker <= 30) { gaugeStr = '#10 AWG Copper THHN (30A)'; rOhmsPer1000 = 1.21; }
+        else if (recBreaker <= 50) { gaugeStr = '#8 AWG Copper THHN (50A)'; rOhmsPer1000 = 0.764; }
+        else if (recBreaker <= 65) { gaugeStr = '#6 AWG Copper THHN (65A)'; rOhmsPer1000 = 0.491; }
+        else if (recBreaker <= 85) { gaugeStr = '#4 AWG Copper THHN (85A)'; rOhmsPer1000 = 0.308; }
+        else if (recBreaker <= 100) { gaugeStr = '#3 AWG Copper THHN (100A)'; rOhmsPer1000 = 0.245; }
+        else { gaugeStr = '#2 AWG Copper THHN (115A)'; rOhmsPer1000 = 0.194; }
+      } else if (wireMethod === 'romex-nmb') {
+        // 60C column limit per NEC 334.80
+        if (recBreaker <= 15) { gaugeStr = '#14 AWG Romex NM-B (15A max)'; rOhmsPer1000 = 3.07; }
+        else if (recBreaker <= 20) { gaugeStr = '#12 AWG Romex NM-B (20A)'; rOhmsPer1000 = 1.93; }
+        else if (recBreaker <= 30) { gaugeStr = '#10 AWG Romex NM-B (30A)'; rOhmsPer1000 = 1.21; }
+        else if (recBreaker <= 40) { gaugeStr = '#8 AWG Romex NM-B (40A)'; rOhmsPer1000 = 0.764; }
+        else if (recBreaker <= 55) { gaugeStr = '#6 AWG Romex NM-B (55A)'; rOhmsPer1000 = 0.491; }
+        else if (recBreaker <= 70) { gaugeStr = '#4 AWG Romex NM-B (70A)'; rOhmsPer1000 = 0.308; }
+        else { gaugeStr = '#2 AWG Romex NM-B (95A)'; rOhmsPer1000 = 0.194; }
+      } else {
+        // Aluminum SER 75C
+        if (recBreaker <= 40) { gaugeStr = '#6 AWG Aluminum SER (40A)'; rOhmsPer1000 = 0.808; }
+        else if (recBreaker <= 50) { gaugeStr = '#4 AWG Aluminum SER (50A)'; rOhmsPer1000 = 0.508; }
+        else if (recBreaker <= 65) { gaugeStr = '#3 AWG Aluminum SER (65A)'; rOhmsPer1000 = 0.403; }
+        else if (recBreaker <= 75) { gaugeStr = '#2 AWG Aluminum SER (75A)'; rOhmsPer1000 = 0.319; }
+        else if (recBreaker <= 90) { gaugeStr = '#1 AWG Aluminum SER (90A)'; rOhmsPer1000 = 0.253; }
+        else { gaugeStr = '#1/0 AWG Aluminum SER (100A)'; rOhmsPer1000 = 0.201; }
+      }
+
+      // Charging power kW
+      const kwPower = (vCircuit * iLoad) / 1000.0;
+      const hourlyMiles = kwPower * effMilesKwh * 0.90; // ~90% charger efficiency
+
+      // Voltage drop: 2 * L * R * I / 1000
+      const loopR = (2 * distFt * rOhmsPer1000) / 1000.0;
+      const vDrop = iLoad * loopR;
+      const vDropPct = (vDrop / vCircuit) * 100.0;
+
+      document.getElementById('res-breaker-primary').textContent = recBreaker + ' Amp Breaker';
+      document.getElementById('res-wire-gauge').textContent = 'Conductor: ' + gaugeStr;
+      document.getElementById('res-charging-power').textContent = kwPower.toFixed(2) + ' kW';
+      document.getElementById('res-range-hourly').textContent = '+ ' + hourlyMiles.toFixed(1) + ' Miles / Hour';
+      document.getElementById('res-continuous-125').textContent = iMinBreaker.toFixed(2) + ' Amperes';
+      document.getElementById('res-circuit-vdrop').textContent = vDropPct.toFixed(2) + '% (' + vDrop.toFixed(2) + ' V Drop \u2014 ' + (vDropPct <= 3.0 ? 'NEC Compliant \u2264 3%' : 'Exceeds 3% Rec') + ')';
+    }
+
+    window.addEventListener('DOMContentLoaded', runEvCircuitCalc);
+  </script>
+</body>
+</html>
