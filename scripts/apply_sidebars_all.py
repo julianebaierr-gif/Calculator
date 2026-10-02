@@ -87,6 +87,14 @@ CATEGORIES = {
             ("cable-sizing-calculator-bs-7671.html", "Cable Sizing (BS 7671 18th Ed)", "🔌", "UK wiring regulations & mV/A/m drop"),
             ("cable-sizing-calculator-iec-60364.html", "Cable Sizing (IEC 60364-5-52)", "🔌", "International LV dimensioning & adiabatic"),
             ("cable-sizing-installation-method-a.html", "Cable Sizing Method A (Insulated Wall)", "🔌", "A1 & A2 conduit in cavity derating"),
+            ("fault-current-calculator.html", "Fault Current (IEEE 141 / IEC)", "💥", "Transformer secondary & point-to-point kA"),
+            ("filter-calculator.html", "Analog Filter (RC, RL, LC)", "🎛️", "Cutoff frequency, dB gain & phase angle"),
+            ("generator-sizing-calculator.html", "Generator Sizing (ISO 8528)", "⚡", "Standby kVA, motor inrush & altitude derate"),
+            ("heatsink-calculator.html", "Heatsink Sizing & Thermal", "❄️", "Thermal resistance θ_sa & junction temp"),
+            ("cable-sizing-installation-method-c.html", "Cable Sizing Method C (Clipped Direct)", "🔌", "Surface clipped to masonry ampacity"),
+            ("cable-sizing-installation-method-e.html", "Cable Sizing Method E (Cable Tray)", "🔌", "Perforated tray & ladder rack in free air"),
+            ("cable-sizing-calculator-nec.html", "Cable Sizing (NEC Table 310.16)", "🔌", "125% continuous load & conduit fill derate"),
+            ("copper-cable-sizing-calculator.html", "Copper Cable Sizing (100% IACS)", "🔌", "Pure ETP Cu ampacity & I²R loss cost"),
         ]
     },
     "solar": {
@@ -195,7 +203,7 @@ def determine_tool_cat(filename):
         return "health"
     if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72"]):
         return "finance"
-    if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity", "power-factor", "parallel-resistor", "battery-life", "555-timer", "led-resistor", "capacitive-reactance", "inductive-reactance", "op-amp-gain", "three-phase-power", "adc-dac", "antenna-length", "battery-short-circuit", "bjt-transistor", "breaker-size", "decibel", "earth-pit", "electrical-power", "microstrip", "busbar"]):
+    if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity", "power-factor", "parallel-resistor", "battery-life", "555-timer", "led-resistor", "capacitive-reactance", "inductive-reactance", "op-amp-gain", "three-phase-power", "adc-dac", "antenna-length", "battery-short-circuit", "bjt-transistor", "breaker-size", "decibel", "earth-pit", "electrical-power", "microstrip", "busbar", "fault-current", "filter", "generator", "heatsink", "copper-cable"]):
         return "engineering"
     if any(k in f for k in ["solar", "charging", "pv-string", "ev-charging"]):
         return "solar"

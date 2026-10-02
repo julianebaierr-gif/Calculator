@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generator Sizing Calculator | Standby & Prime Power kVA Sizing</title>
+  <meta name="description" content="Calculate standby and prime diesel/gas generator kVA and kW capacity. Sizing accounts for continuous electrical loads, motor starting inrush kVA, non-linear harmonic loads, and ambient deratings per ISO 8528.">
+  <link rel="canonical" href="https://calchub.cloud/generator-sizing-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Generator Sizing Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Industrial electrical generator sizing tool computing steady-state kW, motor starting locked-rotor kVA surge, voltage dip tolerance, and ISO 8528 altitude/temperature derating.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the difference between Standby (ESP) and Prime (PRP) generator ratings?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Per ISO 8528-1: Emergency Standby Power (ESP) is the maximum power available during a utility outage for a maximum of 200 operational hours per year with an average load factor not exceeding 70%. Prime Running Power (PRP) is designed for continuous operation without utility grid support for unlimited annual hours with a 10% overload capability for 1 hour every 12 hours."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why must electric motor starting inrush be factored into generator sizing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "When an electric induction motor starts across-the-line (DOL), it draws a starting inrush current of 600% to 800% of its full-load running current (typically 6 kVA per rated horsepower). This sudden surge creates a severe reactive load that causes generator alternator voltage dip and engine frequency droop if the generator is sized strictly for running watts."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do non-linear loads and harmonics affect alternator sizing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Non-linear electronic loads such as uninterruptible power supplies (UPS), variable frequency drives (VFD), and LED drivers draw distorted non-sinusoidal currents rich in 3rd, 5th, and 7th harmonics. These currents cause heating in the alternator subtransient reactance (X''d) and distort the voltage waveform. An alternator must typically be oversized by 1.25x to 1.5x for systems with high total harmonic distortion (THD)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do ambient temperature and altitude derate diesel generators?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Generators are calibrated at standard reference conditions (sea level and 25°C to 40°C). At higher altitudes, thinner air reduces combustion oxygen density, causing diesel engines to lose roughly 3.5% power per 300 meters above 1000m. At ambient temperatures above 40°C, engine cooling capacity drops, requiring an additional 1% derating per 5°C."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="engineering">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="fire-safety.html">Fire Safety</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="engineering.html">Electrical &amp; Power Systems</a> &rsaquo;
+      <span>Generator Sizing Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">ISO 8528 &amp; NFPA 110 Compliance</div>
+          <h1 class="calc-title">Generator Sizing Calculator</h1>
+          <p class="calc-tagline">Calculate standby and prime generator kVA and kW sizing with motor starting surge, non-linear harmonics, and site altitude derating.</p>
+        </header>
+
+        <!-- Tool Card -->
+        <div class="tool-card">
+          <form id="genForm" onsubmit="return false;">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="dutyType" class="form-label">Generator Duty Application</label>
+                <select id="dutyType" class="form-control" onchange="calculateGenerator()">
+                  <option value="standby" selected>Emergency Standby Power (ESP - Grid Backup)</option>
+                  <option value="prime">Prime Power (PRP - Primary Island Source)</option>
+                  <option value="continuous">Continuous Base Load (COP - 100% Constant)</option>
+                </select>
+                <small class="form-hint">ISO 8528-1 duty rating class</small>
+              </div>
+
+              <div class="form-group">
+                <label for="steadyKw" class="form-label">Steady-State Running Load</label>
+                <div class="input-with-unit">
+                  <input type="number" id="steadyKw" class="form-control" value="85" min="1" step="5" oninput="calculateGenerator()">
+                  <span class="unit-badge">kW</span>
+                </div>
+                <small class="form-hint">Base continuous lighting, heating &amp; equipment</small>
+              </div>
+
+              <div class="form-group">
+                <label for="systemPf" class="form-label">System Power Factor ($\cos\theta$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="systemPf" class="form-control" value="0.80" min="0.5" max="1.0" step="0.05" oninput="calculateGenerator()">
+                  <span class="unit-badge">PF</span>
+                </div>
+                <small class="form-hint">Standard AC generator rating is 0.8 lagging</small>
+              </div>
+
+              <div class="form-group">
+                <label for="largestMotorHp" class="form-label">Largest Single Motor</label>
+                <div class="input-with-unit">
+                  <input type="number" id="largestMotorHp" class="form-control" value="30" min="0" step="5" oninput="calculateGenerator()">
+                  <span class="unit-badge">HP</span>
+                </div>
+                <small class="form-hint">Highest inrush load on the system</small>
+              </div>
+
+              <div class="form-group">
+                <label for="motorStartMethod" class="form-label">Motor Starter Topology</label>
+                <select id="motorStartMethod" class="form-control" onchange="calculateGenerator()">
+                  <option value="dol" selected>Direct-on-Line (DOL / Across-the-Line: ~6x Inrush)</option>
+                  <option value="stardelta">Star-Delta Starter (Wye-Delta: ~2.5x Inrush)</option>
+                  <option value="softstart">Solid-State Soft Starter (~3.0x Inrush)</option>
+                  <option value="vfd">Variable Frequency Drive (VFD: ~1.2x Inrush)</option>
+                </select>
+                <small class="form-hint">Starting method controls kVA surge</small>
+              </div>
+
+              <div class="form-group">
+                <label for="nonLinearKw" class="form-label">Non-Linear / UPS Harmonic Load</label>
+                <div class="input-with-unit">
+                  <input type="number" id="nonLinearKw" class="form-control" value="25" min="0" step="5" oninput="calculateGenerator()">
+                  <span class="unit-badge">kW</span>
+                </div>
+                <small class="form-hint">Computers, VFDs, servers, LED lighting</small>
+              </div>
+
+              <div class="form-group">
+                <label for="siteAltitude" class="form-label">Installation Altitude</label>
+                <div class="input-with-unit">
+                  <input type="number" id="siteAltitude" class="form-control" value="300" min="0" max="4500" step="100" oninput="calculateGenerator()">
+                  <span class="unit-badge">metres</span>
+                </div>
+                <small class="form-hint">Elevation above sea level</small>
+              </div>
+
+              <div class="form-group">
+                <label for="ambientTemp" class="form-label">Maximum Ambient Temperature</label>
+                <div class="input-with-unit">
+                  <input type="number" id="ambientTemp" class="form-control" value="35" min="10" max="60" step="1" oninput="calculateGenerator()">
+                  <span class="unit-badge">°C</span>
+                </div>
+                <small class="form-hint">Switchroom or outdoor enclosure temp</small>
+              </div>
+
+              <div class="form-group">
+                <label for="futureGrowthPct" class="form-label">Future Expansion Safety Margin</label>
+                <div class="input-with-unit">
+                  <input type="number" id="futureGrowthPct" class="form-control" value="20" min="0" max="50" step="5" oninput="calculateGenerator()">
+                  <span class="unit-badge">%</span>
+                </div>
+                <small class="form-hint">Recommended spare headroom (15%–25%)</small>
+              </div>
+            </div>
+
+            <button type="button" id="calcGenBtn" class="btn btn-primary btn-block" onclick="calculateGenerator()">Calculate Generator Sizing</button>
+          </form>
+
+          <div id="genResultBox" class="results-container" style="margin-top:20px;">
+            <h3>Generator Sizing Recommendation</h3>
+            <div class="results-grid">
+              <div class="result-tile">
+                <span class="result-label">Recommended Standby Generator</span>
+                <span id="genKvaOut" class="result-value">-- kVA</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Continuous Output Power</span>
+                <span id="genKwOut" class="result-value">-- kW</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Motor Starting Surge (Peak kVA)</span>
+                <span id="skvaOut" class="result-value">-- kVA</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Combined Environmental Derating Factor</span>
+                <span id="derateFactorOut" class="result-value">--</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Estimated Transient Voltage Dip</span>
+                <span id="vdipOut" class="result-value">-- %</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Nearest Commercial Generator Rating</span>
+                <span id="commercialSizeOut" class="result-value">-- kVA</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Engineering Guide to Standby &amp; Prime Generator Sizing</h2>
+          
+          <p>Properly sizing an on-site diesel or natural gas generator set (genset) requires an engineering balance between engine mechanical power (measured in brake horsepower or kWm) and alternator electromagnetic capacity (measured in kVA). A generator set that is undersized will suffer engine stalling under sudden load applications, unmanageable transient voltage dips that trip sensitive electronics, or continuous overheating. Conversely, a generator that is severely oversized ($> 60\%$ excess capacity) will suffer from <em>wet stacking</em>&mdash;a condition where unburned fuel and carbon accumulate in the diesel exhaust system due to low combustion cylinder temperatures, causing valve carbonization, oil contamination, and permanent engine glazing.</p>
+
+          <p>Professional genset dimensioning conforms to international standards codified in <strong>ISO 8528 (Reciprocating internal combustion engine driven alternating current generating sets)</strong>, <strong>NFPA 110 (Standard for Emergency and Standby Power Systems)</strong>, and <strong>IEEE 446 (Orange Book: Recommended Practice for Emergency and Standby Power Systems)</strong>.</p>
+
+          <div class="formula-box">
+            <h3>Steady-State Running Load &amp; Power Factor Conversion</h3>
+            <p>Electrical loads are specified in continuous running kilowatts ($kW$). Because commercial AC generators are wound for an industry-standard $0.80$ lagging power factor ($\text{PF} = \cos\theta = 0.8$), the required alternator apparent power in kilovolt-amperes ($kVA$) is derived from:</p>
+            <p>$$kVA_{steady} = \frac{kW_{running}}{\text{PF}} = \frac{kW_{running}}{0.80}$$</p>
+            <p>Where total running load combines linear static loads (lighting, heating elements, office equipment) and motor running power:</p>
+            <p>$$kW_{running} = kW_{static} + (HP_{motors} \times 0.746\text{ kW/HP}) + kW_{non-linear}$$</p>
+          </div>
+
+          <h3>Motor Starting Inrush: The SkVA Transient Shock</h3>
+          <p>Electric induction motors represent the most severe transient challenge for an isolated generator. At the instant of starting, a stationary motor acts essentially as a short-circuited transformer secondary, drawing an initial locked-rotor current ($I_{LRA}$) far exceeding its nameplate full-load running current.</p>
+
+          <p>Under NEMA MG-1 standards, motor starting kVA ($SkVA$) is categorized by NEMA Design Code Letters (ranging from Code A to Code V). Most modern industrial motors conform to Code G, which exhibits a locked-rotor kVA of approximately $5.6\text{ to }6.3\text{ kVA per rated horsepower}$:</p>
+
+          <p>$$SkVA_{base} = HP_{motor} \times 6.0 \quad [\text{kVA}]$$</p>
+
+          <p>The actual surge seen by the alternator depends directly upon the motor starting architecture:</p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Motor Starter Topology</th>
+                <th>Inrush Multiplier</th>
+                <th>Starting Torque (% FLT)</th>
+                <th>Generator Sizing Impact</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Direct-on-Line (DOL / Across-the-Line)</strong></td>
+                <td>$100\%$ ($6.0\times$ running HP)</td>
+                <td>$150\% - 200\%$</td>
+                <td>Requires massive alternator surge headroom; voltage dip typically $25\% - 35\%$</td>
+              </tr>
+              <tr>
+                <td><strong>Star-Delta Starter (Wye-Delta)</strong></td>
+                <td>$33\%$ ($2.0\times$ running HP)</td>
+                <td>$33\%$</td>
+                <td>Substantial reduction in inrush; suitable for low starting-torque loads (centrifugal pumps)</td>
+              </tr>
+              <tr>
+                <td><strong>Solid-State Soft Starter</strong></td>
+                <td>$45\% - 55\%$ ($2.8\times - 3.2\times$ running HP)</td>
+                <td>Adjustable ($30\% - 70\%$)</td>
+                <td>Smooth current ramp; limits transient alternator voltage dip to under $15\%$</td>
+              </tr>
+              <tr>
+                <td><strong>Variable Frequency Drive (VFD)</strong></td>
+                <td>$20\%$ ($1.0\times - 1.2\times$ running HP)</td>
+                <td>$100\% - 150\%$</td>
+                <td>Eliminates starting kVA surge entirely; however, introduces harmonic distortion</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="formula-box">
+            <h3>Transient Voltage Dip Evaluation (ISO 8528-5)</h3>
+            <p>When the starting kVA shock ($SkVA$) is applied across the generator alternator, the instantaneous terminal voltage dips due to the internal subtransient reactance ($X''_d$) of the alternator:</p>
+            <p>$$\text{Voltage Dip } (\Delta V\%) \approx \frac{SkVA}{kVA_{generator} + SkVA} \times 100\%$$</p>
+            <p>For critical facilities (data centers, hospitals, industrial automation), ISO 8528-5 Class G2 and G3 standards mandate that transient voltage dip must not exceed $15\%$ to $20\%$. An excessive voltage dip will cause magnetic contactors and relays to drop out (typically opening at $< 65\%$ nominal voltage), causing connected plant equipment to trip offline.</p>
+          </div>
+
+          <h3>Environmental Derating: Altitude &amp; Ambient Temperature</h3>
+          <p>Combustion engines require ambient air oxygen to combust diesel or natural gas fuel. As site altitude increases, atmospheric air pressure decreases, resulting in lower air density. Concurrently, high ambient switchroom temperatures reduce the volumetric cooling efficiency of both the radiator core and the alternator cooling fan.</p>
+
+          <p>Standard rating conditions per ISO 3046 / ISO 8528 are established at sea level ($0\text{ m}$) and $25^\circ\text{C}$ to $40^\circ\text{C}$ ambient. When operating beyond baseline conditions, deratings must be compounded:</p>
+          <ul>
+            <li><strong>Altitude Derating ($k_{alt}$):</strong> For elevations exceeding $1{,}000\text{ meters}$ ($3{,}280\text{ feet}$), engine power is derated by $3.5\%$ for each additional $300\text{ meters}$ ($1{,}000\text{ feet}$).</li>
+            <li><strong>Temperature Derating ($k_{temp}$):</strong> For ambient temperatures exceeding $40^\circ\text{C}$ ($104^\circ\text{F}$), output capacity is derated by $1.0\%$ for each $5^\circ\text{C}$ temperature rise.</li>
+            <li><strong>Combined Environmental Factor:</strong> $k_{env} = k_{alt} \times k_{temp}$. The required sea-level commercial generator rating is:
+              $$kVA_{nominal,req} = \frac{kVA_{calculated}}{k_{env}}$$
+            </li>
+          </ul>
+
+          <div class="worked-example-card">
+            <h3>Practical Worked Engineering Example: Hospital Emergency Generator Sizing</h3>
+            <p><strong>Scenario:</strong> Sizing an emergency standby generator (ESP) for a regional hospital healthcare pavilion located at an altitude of $1{,}300\text{ meters}$ where summer switchroom temperatures reach $45^\circ\text{C}$. The connected loads comprise:</p>
+            <ul>
+              <li>Continuous static emergency lighting, life-safety, and HVAC: $85\text{ kW}$</li>
+              <li>Largest individual motor: A $30\text{ HP}$ chilled-water pump started Direct-on-Line (DOL)</li>
+              <li>Critical non-linear UPS computing and MRI imaging load: $25\text{ kW}$</li>
+              <li>Design future expansion safety margin: $20\%$</li>
+            </ul>
+
+            <p><strong>Step 1: Compute Total Running Load in kW and kVA</strong></p>
+            <p>Total running active power $kW_{run}$:</p>
+            <p>$$kW_{motor,run} = 30\text{ HP} \times 0.746 = 22.38\text{ kW}$$</p>
+            <p>$$kW_{total,run} = 85\text{ kW} + 22.38\text{ kW} + 25\text{ kW} = 132.38\text{ kW}$$</p>
+            <p>At standard $0.80$ power factor:</p>
+            <p>$$kVA_{running} = \frac{132.38\text{ kW}}{0.80} = 165.48\text{ kVA}$$</p>
+
+            <p><strong>Step 2: Account for Non-Linear Harmonic Sizing</strong></p>
+            <p>Non-linear loads ($25\text{ kW}$) require an additional $25\%$ alternator thermal buffer:</p>
+            <p>$$kVA_{harmonic,adj} = \frac{25\text{ kW} \times 0.25}{0.80} = 7.81\text{ kVA}$$</p>
+            <p>Adjusted running demand = $165.48 + 7.81 = 173.29\text{ kVA}$.</p>
+
+            <p><strong>Step 3: Evaluate Motor Starting Surge (SkVA) &amp; Voltage Dip</strong></p>
+            <p>For a $30\text{ HP}$ motor started DOL ($6.0\text{ kVA/HP}$):</p>
+            <p>$$SkVA = 30 \times 6.0 = 180.0\text{ kVA}$$</p>
+            <p>To restrict transient voltage dip to $\le 20\%$, the generator must support $SkVA$ within acceptable limits:</p>
+            <p>$$kVA_{peak,req} \approx \frac{SkVA}{0.20} - SkVA \implies kVA_{min,surge} = \frac{180}{0.20 \times 4} \approx 225\text{ kVA}$$</p>
+
+            <p><strong>Step 4: Incorporate 20% Expansion Margin</strong></p>
+            <p>Base required rating = $\max(173.29\text{ kVA}, 225\text{ kVA}) \times 1.20 = 225 \times 1.20 = 270\text{ kVA}$.</p>
+
+            <p><strong>Step 5: Apply Site Altitude and Temperature Deratings</strong></p>
+            <p>Altitude is $1{,}300\text{ m}$ ($300\text{ m}$ above $1000\text{ m}$ threshold) $\implies k_{alt} = 1.0 - 0.035 = 0.965$.</p>
+            <p>Temperature is $45^\circ\text{C}$ ($5^\circ\text{C}$ above $40^\circ\text{C}$ threshold) $\implies k_{temp} = 1.0 - 0.010 = 0.990$.</p>
+            <p>$$k_{env} = 0.965 \times 0.990 = 0.955$$</p>
+            <p>$$kVA_{final} = \frac{270\text{ kVA}}{0.955} = 282.72\text{ kVA}$$</p>
+            <p><strong>Commercial Selection:</strong> Standard commercial diesel generator sizing increments are 250 kVA, 275 kVA, 300 kVA, 350 kVA. The engineer selects a standard <strong>300 kVA (240 kW) Standby Generator Set</strong>, ensuring complete compliance with ISO 8528 and NFPA 110.</p>
+          </div>
+
+          <h2>Frequently Asked Questions (Generator Sizing)</h2>
+          <div class="faq-item">
+            <h3>What happens if a diesel generator is operated at very light loads?</h3>
+            <p>Operating a diesel generator at less than $30\%$ of its rated capacity for extended periods leads to <em>wet stacking</em>. Low combustion cylinder pressures allow unburned fuel and lube oil to leak past piston rings into the exhaust manifold, creating a dark, thick residue. Over time, this leads to heavy carbon deposits on turbocharger vanes, sticking piston rings, and engine power loss. Commercial gensets must be tested annually under full load using resistive load banks.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Can I use a soft starter or VFD to reduce the generator size requirement?</h3>
+            <p>Yes. Installing a solid-state soft starter reduces motor starting inrush from $6.0\times$ running HP down to approximately $3.0\times$, cutting starting kVA in half. A Variable Frequency Drive (VFD) virtually eliminates inrush surge entirely, drawing only $1.0\times$ to $1.2\times$ rated full-load current. By eliminating starting current spikes, you can frequently downsize the generator set by one or two frame sizes.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What is the difference between a natural gas generator and a diesel generator?</h3>
+            <p>Diesel generators provide superior block load acceptance (often capable of absorbing $100\%$ full load in a single step per NFPA 110 10-second start requirements) and store on-site fuel securely. Natural gas generators rely on underground utility pipelines which may be shut off during seismic events or severe storms, and spark-ignited natural gas engines accept lower block load steps ($50\%$ to $70\%$). However, natural gas burns cleaner and has unlimited runtime without refueling logistics.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Why is standard generator power factor rated at 0.8 lagging?</h3>
+            <p>Industrial and commercial power networks consist of inductive components (electric motors, transformers, fluorescent ballasts) which cause alternating current to lag behind voltage. An alternator rated at 100 kVA at 0.8 PF delivers 80 kW of real usable mechanical work while providing 60 kVAR of magnetizing reactive current without exceeding alternator stator thermal limits.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar" id="toolSidebar">
+        <!-- Dynamically rendered sidebar -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Engineering and mathematical tools grounded in international standards.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="engineering.html">Engineering</a></li>
+        <li><a href="ohms-law-calculator.html">Ohm's Law</a></li>
+        <li><a href="sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    const commercialSizes = [
+      15, 20, 30, 45, 60, 80, 100, 125, 150, 175, 200, 225, 250, 275, 300, 350, 400, 450, 500, 600, 750, 800, 1000, 1250, 1500, 2000
+    ];
+
+    function calculateGenerator() {
+      const duty = document.getElementById("dutyType").value;
+      const steadyKw = parseFloat(document.getElementById("steadyKw").value) || 0;
+      const pf = parseFloat(document.getElementById("systemPf").value) || 0.8;
+      const motorHp = parseFloat(document.getElementById("largestMotorHp").value) || 0;
+      const startMethod = document.getElementById("motorStartMethod").value;
+      const nonLinearKw = parseFloat(document.getElementById("nonLinearKw").value) || 0;
+      const altitude = parseFloat(document.getElementById("siteAltitude").value) || 0;
+      const temp = parseFloat(document.getElementById("ambientTemp").value) || 25;
+      const growthPct = parseFloat(document.getElementById("futureGrowthPct").value) || 0;
+
+      // Motor running kW
+      const motorRunningKw = motorHp * 0.746;
+      const totalRunningKw = steadyKw + motorRunningKw + nonLinearKw;
+      const baseKva = totalRunningKw / pf;
+
+      // Motor starting inrush
+      let inrushMultiplier = 6.0;
+      if (startMethod === "stardelta") inrushMultiplier = 2.5;
+      else if (startMethod === "softstart") inrushMultiplier = 3.0;
+      else if (startMethod === "vfd") inrushMultiplier = 1.2;
+
+      const skva = motorHp * inrushMultiplier;
+
+      // Non linear harmonic buffer
+      const harmonicKva = (nonLinearKw * 0.25) / pf;
+
+      // Required kVA considering starting surge (assuming max 20% voltage dip)
+      const kvaForStarting = (skva / 0.20) * 0.25; // standard sizing rule of thumb
+      const rawRequiredKva = Math.max(baseKva + harmonicKva, kvaForStarting);
+
+      // Expansion margin
+      const withGrowthKva = rawRequiredKva * (1 + growthPct / 100);
+
+      // Environmental derating
+      let kAlt = 1.0;
+      if (altitude > 1000) {
+        kAlt -= ((altitude - 1000) / 300) * 0.035;
+      }
+      kAlt = Math.max(0.5, kAlt);
+
+      let kTemp = 1.0;
+      if (temp > 40) {
+        kTemp -= ((temp - 40) / 5) * 0.01;
+      }
+      kTemp = Math.max(0.7, kTemp);
+
+      const kEnv = kAlt * kTemp;
+
+      // Final un-derated commercial required kVA
+      let finalKva = withGrowthKva / kEnv;
+
+      // Duty adjustment: Prime power requires 10% headroom, Continuous 20%
+      if (duty === "prime") finalKva *= 1.10;
+      else if (duty === "continuous") finalKva *= 1.20;
+
+      const finalKw = finalKva * pf;
+
+      // Estimated voltage dip
+      const vDip = (skva / (finalKva + skva)) * 100;
+
+      // Find nearest standard commercial generator size
+      let nearestSize = commercialSizes[commercialSizes.length - 1];
+      for (let i = 0; i < commercialSizes.length; i++) {
+        if (commercialSizes[i] >= finalKva) {
+          nearestSize = commercialSizes[i];
+          break;
+        }
+      }
+
+      document.getElementById("genKvaOut").innerText = finalKva.toFixed(1) + " kVA";
+      document.getElementById("genKwOut").innerText = finalKw.toFixed(1) + " kW";
+      document.getElementById("skvaOut").innerText = skva.toFixed(1) + " kVA";
+      document.getElementById("derateFactorOut").innerText = kEnv.toFixed(3) + " (" + ((1 - kEnv) * 100).toFixed(1) + "% loss)";
+      document.getElementById("vdipOut").innerText = vDip.toFixed(1) + "%";
+      document.getElementById("commercialSizeOut").innerText = nearestSize + " kVA (" + (nearestSize * pf).toFixed(0) + " kW)";
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      calculateGenerator();
+    });
+  </script>
+</body>
+</html>

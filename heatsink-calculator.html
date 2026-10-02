@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heatsink Calculator | Thermal Resistance & Heat Dissipation Sizing</title>
+  <meta name="description" content="Calculate heatsink thermal resistance (theta_SA in °C/W), semiconductor maximum junction temperature Tj, power dissipation, and case-to-sink thermal interface requirements.">
+  <link rel="canonical" href="https://calchub.cloud/heatsink-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Heatsink Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Electronic and electrical thermal management calculator determining required heatsink thermal resistance, semiconductor junction temperature, and natural vs forced convection performance.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is thermal resistance (theta) in electronics cooling?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Thermal resistance theta (expressed in °C/W or K/W) measures a material's opposition to heat flow, directly analogous to electrical resistance in Ohm's Law. A thermal resistance of 2.0 °C/W means that for every 1 Watt of continuous heat dissipation, the temperature across the thermal barrier rises by exactly 2.0°C."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is maximum allowable heatsink thermal resistance calculated?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Using the series thermal circuit equation: theta_SA = ((T_j_max - T_ambient) / P_d) - theta_JC - theta_CS, where T_j_max is maximum junction temperature, T_ambient is ambient air temperature, P_d is power dissipation in watts, theta_JC is junction-to-case resistance, and theta_CS is case-to-heatsink interface resistance."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why is Thermal Interface Material (TIM) essential between transistor and heatsink?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Microscopic surface roughness between a metal transistor tab and a heatsink creates microscopic air gaps. Air is a terrible thermal conductor (0.026 W/m-K). Thermal grease or silicone gap pads displace trapped air with thermally conductive compounds (1.0 to 8.0 W/m-K), reducing interface resistance theta_CS by up to 80%."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does forced air cooling improve heatsink performance?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In natural convection, airflow depends solely on buoyant thermal drafts, resulting in thick thermal boundary layers. Forced airflow from a fan (e.g. 200 to 800 linear feet per minute, LFM) shears through the boundary layer, increasing the convective heat transfer coefficient h and reducing heatsink thermal resistance by 50% to 75% compared to still air."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="engineering">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="fire-safety.html">Fire Safety</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="engineering.html">Electrical &amp; Power Systems</a> &rsaquo;
+      <span>Heatsink Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">Thermal Management &amp; Heat Dissipation</div>
+          <h1 class="calc-title">Heatsink Calculator</h1>
+          <p class="calc-tagline">Calculate required heatsink thermal resistance ($\theta_{sa}$), semiconductor junction temperature, and natural vs. forced-air cooling performance.</p>
+        </header>
+
+        <!-- Tool Card -->
+        <div class="tool-card">
+          <form id="heatsinkForm" onsubmit="return false;">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="powerDissipation" class="form-label">Power Dissipation ($P_d$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="powerDissipation" class="form-control" value="25" min="0.1" step="1" oninput="calculateHeatsink()">
+                  <span class="unit-badge">Watts</span>
+                </div>
+                <small class="form-hint">Continuous thermal heat generation</small>
+              </div>
+
+              <div class="form-group">
+                <label for="maxJunctionTemp" class="form-label">Max Permissible Junction Temp ($T_{j,max}$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="maxJunctionTemp" class="form-control" value="125" min="50" max="200" step="5" oninput="calculateHeatsink()">
+                  <span class="unit-badge">°C</span>
+                </div>
+                <small class="form-hint">Typical silicon limit is 125°C–150°C</small>
+              </div>
+
+              <div class="form-group">
+                <label for="ambientAirTemp" class="form-label">Ambient Air Temperature ($T_a$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="ambientAirTemp" class="form-control" value="40" min="0" max="85" step="1" oninput="calculateHeatsink()">
+                  <span class="unit-badge">°C</span>
+                </div>
+                <small class="form-hint">Maximum temperature inside chassis enclosure</small>
+              </div>
+
+              <div class="form-group">
+                <label for="thetaJc" class="form-label">Junction-to-Case Resistance ($\theta_{jc}$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="thetaJc" class="form-control" value="1.2" min="0.05" max="20" step="0.1" oninput="calculateHeatsink()">
+                  <span class="unit-badge">°C/W</span>
+                </div>
+                <small class="form-hint">From transistor/MOSFET datasheet</small>
+              </div>
+
+              <div class="form-group">
+                <label for="timType" class="form-label">Thermal Interface Material (TIM $\theta_{cs}$)</label>
+                <select id="timType" class="form-control" onchange="calculateHeatsink()">
+                  <option value="0.2">Thermal Grease / Paste ($\theta_{cs} \approx 0.2\ ^\circ\text{C/W}$)</option>
+                  <option value="0.5" selected>Sil-Pad Elastomeric Insulator ($\theta_{cs} \approx 0.5\ ^\circ\text{C/W}$)</option>
+                  <option value="0.9">Mica Washer with Grease ($\theta_{cs} \approx 0.9\ ^\circ\text{C/W}$)</option>
+                  <option value="1.5">Dry Metal Contact (No TIM - Poor: $\theta_{cs} \approx 1.5\ ^\circ\text{C/W}$)</option>
+                </select>
+                <small class="form-hint">Case-to-heatsink mounting impedance</small>
+              </div>
+
+              <div class="form-group">
+                <label for="coolingAirflow" class="form-label">Convective Cooling Mode</label>
+                <select id="coolingAirflow" class="form-control" onchange="calculateHeatsink()">
+                  <option value="1.0" selected>Natural Convection (Still Ambient Air)</option>
+                  <option value="0.60">Forced Air - Low Speed (200 LFM / 1.0 m/s)</option>
+                  <option value="0.45">Forced Air - Medium Speed (400 LFM / 2.0 m/s)</option>
+                  <option value="0.30">Forced Air - High Velocity Fan (800 LFM / 4.0 m/s)</option>
+                </select>
+                <small class="form-hint">Air velocity across heatsink fins</small>
+              </div>
+            </div>
+
+            <button type="button" id="calcHeatsinkBtn" class="btn btn-primary btn-block" onclick="calculateHeatsink()">Compute Thermal Solution</button>
+          </form>
+
+          <div id="heatsinkResultBox" class="results-container" style="margin-top:20px;">
+            <h3>Thermal Resistance Sizing Results</h3>
+            <div class="results-grid">
+              <div class="result-tile">
+                <span class="result-label">Max Required Heatsink Rating ($\theta_{sa}$)</span>
+                <span id="thetaSaOut" class="result-value">-- °C/W</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Operating Junction Temp ($T_j$)</span>
+                <span id="tjOut" class="result-value">-- °C</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Transistor Case Temp ($T_c$)</span>
+                <span id="tcOut" class="result-value">-- °C</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Heatsink Surface Temp ($T_s$)</span>
+                <span id="tsOut" class="result-value">-- °C</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Thermal Headroom Safety Margin</span>
+                <span id="marginOut" class="result-value">-- °C</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Thermal Feasibility Status</span>
+                <span id="thermalStatusOut" class="result-value">--</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Fundamentals of Semiconductor Thermal Design &amp; Heatsink Selection</h2>
+          
+          <p>Every active power electronic semiconductor&mdash;whether a power MOSFET, Insulated Gate Bipolar Transistor (IGBT), silicon carbide (SiC) module, linear voltage regulator, or microprocessor&mdash;dissipates electrical energy as waste thermal power. This power dissipation ($P_d$) arises from conduction losses ($I_{rms}^2 R_{DS(on)}$), switching transitions ($E_{on} + E_{off}$), and reverse recovery charges. Because the active semiconductor die (the <em>junction</em>) is tiny (often measuring just a few square millimeters), concentrated heat flux generates extreme localized temperatures.</p>
+
+          <p>If the internal junction temperature ($T_j$) exceeds the manufacturer's silicon threshold (typically $150^\circ\text{C}$ to $175^\circ\text{C}$), catastrophic failure occurs via thermal runaway, junction punch-through, or bonding wire melting. Furthermore, according to the Arrhenius reliability equation, every $10^\circ\text{C}$ reduction in operating junction temperature doubles the operational lifespan (Mean Time Between Failures, MTBF) of the electronic assembly.</p>
+
+          <div class="formula-box">
+            <h3>The Electrical Analogy: Ohm's Law of Heat Transfer</h3>
+            <p>Thermal conduction through solid bodies is mathematically identical to electrical current conduction through resistive networks. By replacing electrical potential with temperature, current with heat power, and electrical resistance with thermal resistance, we construct the fundamental one-dimensional thermal circuit:</p>
+            <p>$$T_j = T_a + P_d \times \theta_{total}$$</p>
+            <p>Where the total thermal resistance from junction to ambient air ($\theta_{total}$) represents the sum of three serial thermal impedances:</p>
+            <p>$$\theta_{total} = \theta_{jc} + \theta_{cs} + \theta_{sa}$$</p>
+            <ul>
+              <li><strong>$\theta_{jc}$ (Junction-to-Case Resistance):</strong> The internal thermal resistance from the active silicon die to the external metal mounting tab or case of the package. Fixed by package design (TO-220, TO-247, D2PAK) and specified in the manufacturer's datasheet.</li>
+              <li><strong>$\theta_{cs}$ (Case-to-Sink Resistance):</strong> The interface thermal impedance between the semiconductor package and the heatsink surface, governed by surface flatness, mounting pressure, and Thermal Interface Material (TIM).</li>
+              <li><strong>$\theta_{sa}$ (Sink-to-Ambient Resistance):</strong> The thermal resistance of the heatsink itself, representing its ability to transfer heat into the surrounding air via conduction, convection, and radiation.</li>
+            </ul>
+          </div>
+
+          <h3>Derivation of Required Heatsink Thermal Resistance ($\theta_{sa}$)</h3>
+          <p>To ensure that the junction temperature remains safely below $T_{j,max}$ at the maximum expected ambient temperature $T_a$, the maximum permissible heatsink thermal resistance is derived algebraically:</p>
+
+          <p>$$\theta_{sa,required} \le \frac{T_{j,max} - T_a}{P_d} - (\theta_{jc} + \theta_{cs})$$</p>
+
+          <p>A smaller $\theta_{sa}$ value indicates a larger, more efficient heatsink with greater surface area. If the calculated $\theta_{sa,required}$ is negative, the semiconductor cannot be cooled even with an infinitely large heatsink at $0^\circ\text{C/W}$; the thermal bottleneck lies entirely within $\theta_{jc}$ or $\theta_{cs}$, requiring parallel transistors, lower ambient temperatures, or a package with lower internal resistance.</p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Semiconductor Package</th>
+                <th>Typical $\theta_{jc}$ (°C/W)</th>
+                <th>Typical $\theta_{ja}$ in Free Air (No Heatsink)</th>
+                <th>Max Practical Power Without Heatsink</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>TO-92 (Small Signal)</strong></td>
+                <td>$80 - 120$</td>
+                <td>$200^\circ\text{C/W}$</td>
+                <td>$< 0.5\text{ W}$</td>
+              </tr>
+              <tr>
+                <td><strong>TO-220 (Standard Power)</strong></td>
+                <td>$1.0 - 2.5$</td>
+                <td>$60 - 65^\circ\text{C/W}$</td>
+                <td>$\approx 1.5\text{ W}$ (Overheats above 2W without sink)</td>
+              </tr>
+              <tr>
+                <td><strong>TO-247 / TO-3P (High Power)</strong></td>
+                <td>$0.4 - 0.8$</td>
+                <td>$30 - 40^\circ\text{C/W}$</td>
+                <td>$\approx 3.0\text{ W}$</td>
+              </tr>
+              <tr>
+                <td><strong>D2PAK / TO-263 (SMD Power)</strong></td>
+                <td>$0.8 - 1.5$</td>
+                <td>$40 - 50^\circ\text{C/W}$ (on $1\text{ in}^2$ PCB copper)</td>
+                <td>$\approx 2.5\text{ W}$ (Limited by PCB thermal vias)</td>
+              </tr>
+              <tr>
+                <td><strong>SOT-227 (Isolated Power Module)</strong></td>
+                <td>$0.15 - 0.35$</td>
+                <td>N/A (Must be heatsink-mounted)</td>
+                <td>Requires dedicated aluminum cold-plate</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="formula-box">
+            <h3>Natural vs. Forced Convection Airflow Physics</h3>
+            <p>Heatsink catalogs publish thermal ratings calibrated for natural convection in open still air. In natural convection, air movement is driven entirely by thermal buoyancy&mdash;air adjacent to warm aluminum fins expands, decreases in density, and rises lazily at velocities rarely exceeding $0.2\text{ m/s}$ ($40\text{ LFM}$).</p>
+            <p>Introducing forced airflow from an axial fan increases the convective heat transfer coefficient $h_{conv}$ dramatically by thinning the stagnant laminar thermal boundary layer. The effective thermal resistance under forced air decreases according to the empirical velocity power law:</p>
+            <p>$$\theta_{sa,forced} \approx \theta_{sa,natural} \times \left(\frac{V_{ref}}{V_{air}}\right)^{0.6 \text{ to } 0.8}$$</p>
+            <p>At $400\text{ LFM}$ ($2.0\text{ m/s}$), a heatsink rated at $4.0^\circ\text{C/W}$ in still air operates at roughly $1.8^\circ\text{C/W}$&mdash;allowing more than double the power dissipation in the exact same physical envelope.</p>
+          </div>
+
+          <div class="worked-example-card">
+            <h3>Practical Worked Engineering Example: Sizing a Heatsink for a Linear Regulator</h3>
+            <p><strong>Design Scenario:</strong> A linear voltage regulator in a TO-220 package steps down a rectified DC rail from $24\text{ V}$ to $5\text{ V}$ supplying a continuous load current of $1.5\text{ Amperes}$. The assembly is housed inside an industrial enclosure where ambient air reaches $T_a = 45^\circ\text{C}$. To ensure high reliability, the design engineer limits the maximum junction temperature to $T_{j,max} = 110^\circ\text{C}$ (derated from the $150^\circ\text{C}$ silicon limit). The regulator datasheet specifies $\theta_{jc} = 2.0^\circ\text{C/W}$. An elastomeric Sil-Pad insulator is used with $\theta_{cs} = 0.5^\circ\text{C/W}$.</p>
+
+            <p><strong>Step 1: Calculate Power Dissipation ($P_d$)</strong></p>
+            <p>$$P_d = (V_{in} - V_{out}) \times I_L = (24\text{ V} - 5\text{ V}) \times 1.5\text{ A} = 19\text{ V} \times 1.5\text{ A} = 28.5\text{ Watts}$$</p>
+
+            <p><strong>Step 2: Calculate Total Allowable Thermal Resistance ($\theta_{total}$)</strong></p>
+            <p>$$\theta_{total} = \frac{T_{j,max} - T_a}{P_d} = \frac{110^\circ\text{C} - 45^\circ\text{C}}{28.5\text{ W}} = \frac{65^\circ\text{C}}{28.5\text{ W}} = 2.28^\circ\text{C/W}$$</p>
+
+            <p><strong>Step 3: Calculate Required Heatsink Thermal Resistance ($\theta_{sa}$)</strong></p>
+            <p>$$\theta_{sa,req} \le \theta_{total} - \theta_{jc} - \theta_{cs} = 2.28 - 2.0 - 0.5 = -0.22^\circ\text{C/W}$$</p>
+            <p><em>Critical Engineering Insight:</em> The result is <strong>negative</strong> ($\theta_{sa} < 0$). This proves mathematically that even with an infinite cryogenic heatsink ($\theta_{sa} = 0$), the junction temperature would reach:</p>
+            <p>$$T_j = 45^\circ\text{C} + 28.5\text{ W} \times (2.0 + 0.5) = 45 + 71.25 = 116.25^\circ\text{C} > 110^\circ\text{C}$$</p>
+
+            <p><strong>Step 4: Redesign Engineering Solution</strong></p>
+            <p>The design must be modified. The engineer replaces the standard TO-220 part with a TO-247 package having $\theta_{jc} = 0.6^\circ\text{C/W}$, uses high-performance thermal grease ($\theta_{cs} = 0.15^\circ\text{C/W}$), and increases the junction ceiling to $125^\circ\text{C}$:</p>
+            <p>$$\theta_{total} = \frac{125 - 45}{28.5} = \frac{80}{28.5} = 2.807^\circ\text{C/W}$$</p>
+            <p>$$\theta_{sa,req} = 2.807 - 0.6 - 0.15 = 2.057^\circ\text{C/W}$$</p>
+            <p>The engineer selects an extruded aluminum heatsink rated at $\le 2.0^\circ\text{C/W}$ in natural convection (or a compact $4.5^\circ\text{C/W}$ profile paired with a $200\text{ LFM}$ cooling fan), successfully solving the thermal challenge.</p>
+          </div>
+
+          <h2>Frequently Asked Questions (Heatsink &amp; Thermal Management)</h2>
+          <div class="faq-item">
+            <h3>Why is aluminum the dominant material for heatsinks rather than copper?</h3>
+            <p>Pure copper has a higher thermal conductivity ($k \approx 390\text{ W/m}\cdot\text{K}$) than aluminum ($k \approx 205\text{ W/m}\cdot\text{K}$ for 6063-T5 alloy). However, aluminum is one-third the weight of copper, significantly cheaper, and can be extruded into intricate high-aspect-ratio fin geometries with massive surface areas. Copper is typically reserved for heat pipes, vapor chambers, or small base-plate spreaders directly beneath concentrated dies.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Does anodizing an aluminum heatsink improve thermal performance?</h3>
+            <p>Yes, significantly in natural convection. Bare, shiny polished aluminum has an extremely low infrared surface emissivity ($\epsilon \approx 0.05$), meaning it emits virtually zero radiant heat. Black or clear anodizing creates an oxide layer that increases emissivity to $\epsilon \approx 0.85\text{ to }0.90$, increasing radiative heat dissipation and improving overall natural convection thermal resistance by $10\%$ to $15\%$. In high-velocity forced-air applications, however, convection dominates and anodizing has negligible effect.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What is the thermal penalty of an electrical insulating washer?</h3>
+            <p>In many power circuits, the metal tab of a transistor (e.g. TO-220 collector or drain) is electrically live. To prevent shorting the tab to a grounded chassis heatsink, an electrical insulator must be installed. Traditional mica washers with grease add $\approx 0.8^\circ\text{C/W}$, while modern ceramic washers (aluminum oxide $\text{Al}_2\text{O}_3$ or aluminum nitride $\text{AlN}$) provide high dielectric breakdown strength with low thermal impedance ($0.2\text{ to }0.4^\circ\text{C/W}$).</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How do heat pipes enhance heatsink efficiency?</h3>
+            <p>In massive heatsinks, heat conducts slowly from the center mounting point toward outer fin tips, causing outer fins to operate at lower temperatures and reducing convective efficiency. Embedded copper heat pipes utilize two-phase liquid-vapor phase change cycles to achieve an effective thermal conductivity exceeding $10{,}000\text{ W/m}\cdot\text{K}$, rapidly spreading heat isothermally across the entire fin matrix.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar" id="toolSidebar">
+        <!-- Dynamically rendered sidebar -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Engineering and mathematical tools grounded in international standards.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="engineering.html">Engineering</a></li>
+        <li><a href="ohms-law-calculator.html">Ohm's Law</a></li>
+        <li><a href="sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    function calculateHeatsink() {
+      const pd = parseFloat(document.getElementById("powerDissipation").value) || 0.1;
+      const tjMax = parseFloat(document.getElementById("maxJunctionTemp").value) || 125;
+      const ta = parseFloat(document.getElementById("ambientAirTemp").value) || 40;
+      const thetaJc = parseFloat(document.getElementById("thetaJc").value) || 1.2;
+      const thetaCs = parseFloat(document.getElementById("timType").value) || 0.5;
+      const airMultiplier = parseFloat(document.getElementById("coolingAirflow").value) || 1.0;
+
+      // Maximum allowable total resistance
+      const thetaTotalMax = (tjMax - ta) / pd;
+
+      // Required heatsink resistance under chosen cooling mode
+      const thetaSaReqEffective = thetaTotalMax - thetaJc - thetaCs;
+      // Convert to natural convection equivalent catalog rating
+      const thetaSaCatalogNatural = thetaSaReqEffective / airMultiplier;
+
+      const tjActual = ta + pd * (thetaJc + thetaCs + Math.max(0, thetaSaReqEffective));
+      const tcActual = ta + pd * (thetaCs + Math.max(0, thetaSaReqEffective));
+      const tsActual = ta + pd * Math.max(0, thetaSaReqEffective);
+      const margin = tjMax - tjActual;
+
+      const statusEl = document.getElementById("thermalStatusOut");
+
+      if (thetaSaReqEffective <= 0) {
+        document.getElementById("thetaSaOut").innerText = "Impossible (Bottleneck in Theta_JC)";
+        document.getElementById("tjOut").innerText = "> " + tjMax + " °C";
+        document.getElementById("tcOut").innerText = "--";
+        document.getElementById("tsOut").innerText = "--";
+        document.getElementById("marginOut").innerText = "Thermal Runaway!";
+        statusEl.innerText = "Fatal: Silicon exceeds Tj limit with infinite heatsink";
+        statusEl.style.color = "#ef4444";
+      } else {
+        document.getElementById("thetaSaOut").innerText = thetaSaCatalogNatural.toFixed(2) + " °C/W (Catalog)";
+        document.getElementById("tjOut").innerText = (ta + pd * (thetaJc + thetaCs + thetaSaReqEffective)).toFixed(1) + " °C";
+        document.getElementById("tcOut").innerText = (ta + pd * (thetaCs + thetaSaReqEffective)).toFixed(1) + " °C";
+        document.getElementById("tsOut").innerText = (ta + pd * thetaSaReqEffective).toFixed(1) + " °C";
+        document.getElementById("marginOut").innerText = (tjMax - (ta + pd * (thetaJc + thetaCs + thetaSaReqEffective))).toFixed(1) + " °C";
+        
+        if (thetaSaCatalogNatural < 0.8) {
+          statusEl.innerText = "Feasible: Large Extrusion or Forced Air Required";
+          statusEl.style.color = "#f59e0b";
+        } else {
+          statusEl.innerText = "Thermally Sound: Standard Commercial Profile Available";
+          statusEl.style.color = "#10b981";
+        }
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      calculateHeatsink();
+    });
+  </script>
+</body>
+</html>

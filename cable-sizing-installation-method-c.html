@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cable Sizing Installation Method C Calculator | Clipped Direct Wiring</title>
+  <meta name="description" content="Calculate low-voltage cable sizing for IEC 60364 and BS 7671 Installation Method C (single-core or multi-core cables clipped directly to a non-combustible surface).">
+  <link rel="canonical" href="https://calchub.cloud/cable-sizing-installation-method-c.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Cable Sizing Installation Method C Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "IEC 60364 and BS 7671 electrical cable sizing calculator for Reference Method C (surface clipped direct to masonry and non-combustible building surfaces).",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What defines Installation Method C under IEC 60364-5-52 and BS 7671?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Installation Method C is defined as single-core or multi-core sheathed cables clipped directly to a non-combustible surface (such as a masonry, concrete, or brick wall). The cable sheath is in direct physical contact with the wall, providing conductive heat sinking into the wall mass while convective air circulates freely around the remaining exposed perimeter."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why does Method C have a higher current-carrying capacity than Method A or B?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In Method A (cables in conduit in insulated walls) and Method B (cables in conduit on walls), heat is trapped inside an enclosed conduit air pocket. In Method C, there is no enclosing conduit; ambient room air circulates freely over the cable sheath and the masonry wall absorbs and conducts heat away, resulting in approximately 30% to 45% higher current-carrying capacity compared to Method A."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What grouping factors apply to multiple cables installed via Method C?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Under BS 7671 Table 4C1 and IEC 60364-5-52 Table B.52.17, when cables clipped direct touch each other, a grouping factor C_g is applied (e.g. 0.85 for 2 circuits, 0.79 for 3 circuits, 0.75 for 4 circuits). However, if cables are spaced with a clear gap equal to at least one cable overall diameter (d_e), no grouping derating is required (C_g = 1.0)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can twin-and-earth (flat) domestic cables be sized using Method C?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. BS 7671 Table 4D5 provides specific tabulated ratings for 70°C thermoplastic flat twin-and-earth cables installed via Method C (clipped direct to a surface). For example, 2.5 mm² copper carries 27A in Method C compared to only 18.5A in Method A2."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="engineering">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="fire-safety.html">Fire Safety</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="engineering.html">Electrical &amp; Power Systems</a> &rsaquo;
+      <span>Method C Cable Sizing Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">IEC 60364-5-52 &amp; BS 7671 Method C</div>
+          <h1 class="calc-title">Cable Sizing Installation Method C Calculator</h1>
+          <p class="calc-tagline">Calculate conductor sizing for cables clipped directly to masonry, concrete, and non-combustible walls.</p>
+        </header>
+
+        <!-- Tool Card -->
+        <div class="tool-card">
+          <form id="methCForm" onsubmit="return false;">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="methCConductor" class="form-label">Conductor Metallurgy</label>
+                <select id="methCConductor" class="form-control" onchange="calculateMethC()">
+                  <option value="copper" selected>Electrolytic Copper (Cu)</option>
+                  <option value="aluminium">Electrical Grade Aluminium (Al)</option>
+                </select>
+                <small class="form-hint">Conductor core material</small>
+              </div>
+
+              <div class="form-group">
+                <label for="methCInsulation" class="form-label">Insulation &amp; Max Temperature</label>
+                <select id="methCInsulation" class="form-control" onchange="calculateMethC()">
+                  <option value="xlpe" selected>XLPE / 90°C Thermosetting</option>
+                  <option value="pvc">PVC / 70°C Thermoplastic</option>
+                </select>
+                <small class="form-hint">Continuous thermal rating</small>
+              </div>
+
+              <div class="form-group">
+                <label for="methCPhasing" class="form-label">Supply Voltage &amp; Phase</label>
+                <select id="methCPhasing" class="form-control" onchange="calculateMethC()">
+                  <option value="230_1p" selected>Single-Phase 230V AC</option>
+                  <option value="400_3p">Three-Phase 400V AC</option>
+                </select>
+                <small class="form-hint">Nominal line supply</small>
+              </div>
+
+              <div class="form-group">
+                <label for="methCDesignCurrent" class="form-label">Design Load Current ($I_b$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="methCDesignCurrent" class="form-control" value="45" min="1" step="0.5" oninput="calculateMethC()">
+                  <span class="unit-badge">Amps</span>
+                </div>
+                <small class="form-hint">Operating continuous current</small>
+              </div>
+
+              <div class="form-group">
+                <label for="methCBreakerIn" class="form-label">Protective Device Rating ($I_n$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="methCBreakerIn" class="form-control" value="50" min="1" step="1" oninput="calculateMethC()">
+                  <span class="unit-badge">Amps</span>
+                </div>
+                <small class="form-hint">Upstream MCB / MCCB rating</small>
+              </div>
+
+              <div class="form-group">
+                <label for="methCAmbientTemp" class="form-label">Ambient Air Temperature</label>
+                <div class="input-with-unit">
+                  <input type="number" id="methCAmbientTemp" class="form-control" value="30" min="10" max="65" step="1" oninput="calculateMethC()">
+                  <span class="unit-badge">°C</span>
+                </div>
+                <small class="form-hint">Standard baseline is 30°C</small>
+              </div>
+
+              <div class="form-group">
+                <label for="methCGrouping" class="form-label">Grouping &amp; Spacing Layout ($C_g$)</label>
+                <select id="methCGrouping" class="form-control" onchange="calculateMethC()">
+                  <option value="1.0" selected>Single Circuit (No Grouping: Cg = 1.0)</option>
+                  <option value="0.85">2 Circuits Touching (Cg = 0.85)</option>
+                  <option value="0.79">3 Circuits Touching (Cg = 0.79)</option>
+                  <option value="0.75">4 Circuits Touching (Cg = 0.75)</option>
+                  <option value="0.73">5 Circuits Touching (Cg = 0.73)</option>
+                  <option value="0.72">6 Circuits Touching (Cg = 0.72)</option>
+                  <option value="spaced">Multiple Circuits Spaced >= 1x Diameter (Cg = 1.0)</option>
+                </select>
+                <small class="form-hint">Proximity derating factor</small>
+              </div>
+
+              <div class="form-group">
+                <label for="methCRouteLength" class="form-label">One-Way Route Length</label>
+                <div class="input-with-unit">
+                  <input type="number" id="methCRouteLength" class="form-control" value="45" min="1" step="1" oninput="calculateMethC()">
+                  <span class="unit-badge">metres</span>
+                </div>
+                <small class="form-hint">Total circuit cable length</small>
+              </div>
+
+              <div class="form-group">
+                <label for="methCMaxVd" class="form-label">Max Allowable Voltage Drop</label>
+                <div class="input-with-unit">
+                  <input type="number" id="methCMaxVd" class="form-control" value="4.0" min="1.0" max="10.0" step="0.1" oninput="calculateMethC()">
+                  <span class="unit-badge">%</span>
+                </div>
+                <small class="form-hint">Standard threshold (typically 3%–5%)</small>
+              </div>
+            </div>
+
+            <button type="button" id="calcMethCBtn" class="btn btn-primary btn-block" onclick="calculateMethC()">Dimension Cable (Method C)</button>
+          </form>
+
+          <div id="methCResultBox" class="results-container" style="margin-top:20px;">
+            <h3>Method C Dimensioning Results</h3>
+            <div class="results-grid">
+              <div class="result-tile">
+                <span class="result-label">Recommended Conductor Area</span>
+                <span id="methCSizeOut" class="result-value">-- mm²</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Base Method C Rating ($I_0$)</span>
+                <span id="methCBaseI0Out" class="result-value">-- A</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Derated Continuous Capacity ($I_z$)</span>
+                <span id="methCIzOut" class="result-value">-- A</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Total Derating Factor ($C_a \times C_g$)</span>
+                <span id="methCDeratingOut" class="result-value">--</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Calculated Voltage Drop ($\Delta V$)</span>
+                <span id="methCVdOut" class="result-value">-- V (-- %)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">IEC / BS Overcurrent Compliance</span>
+                <span id="methCStatusOut" class="result-value">--</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Engineering Principles: Sizing Cables Clipped Direct (Reference Method C)</h2>
+          
+          <p>In low-voltage electrical distribution across commercial, residential, and light industrial facilities, surface wiring provides an economical, accessible, and mechanically secure installation method. Under the international standards <strong>IEC 60364-5-52 (Table A.52.3)</strong> and the UK <strong>BS 7671 (Table 4A2)</strong>, cables mounted directly onto solid architectural structures without enclosing conduits or trunking are classified as <strong>Installation Reference Method C (Clipped Direct)</strong>.</p>
+
+          <p>Method C represents the standard baseline benchmark against which enclosed wiring methods (Method A and Method B) and free-air methods (Method E and Method F) are comparatively measured. Because the cable sheath is pinned in intimate physical contact with masonry, concrete, or stone walls, convective and conductive heat transfer occurs simultaneously, offering superior thermal performance compared to enclosed conduit runs.</p>
+
+          <div class="formula-box">
+            <h3>Heat Dissipation Dynamics in Method C Installations</h3>
+            <p>The continuous current-carrying capacity ($I_z$) of a conductor is reached when the rate of internal joule heat generation ($I^2 R_{ac}$) exactly matches the rate of heat dissipation across the cable boundary:</p>
+            <p>$$q_{dissipated} = q_{conduction,wall} + q_{convection,air} + q_{radiation}$$</p>
+            <p>In Method C:</p>
+            <ul>
+              <li><strong>Wall Conductive Sinking ($q_{conduction}$):</strong> The portion of the cable circumference resting against the masonry transfers heat via direct thermal conduction into the high-mass wall structure ($k_{concrete} \approx 1.4\text{ to } 1.8\text{ W}/(\text{m}\cdot\text{K})$).</li>
+              <li><strong>Natural Convective Draft ($q_{convection}$):</strong> The remaining exposed outer surface ($> 180^\circ$) dissipates heat into the open ambient air via buoyancy-driven natural convective boundary currents.</li>
+              <li><strong>Infrared Radiative Emission ($q_{radiation}$):</strong> Polyvinyl chloride (PVC) and cross-linked polyethylene (XLPE) outer jackets possess a high thermal emissivity ($\epsilon \approx 0.90\text{ to } 0.94$), emitting substantial radiative thermal flux into cooler room surroundings.</li>
+            </ul>
+          </div>
+
+          <h3>Quantitative Comparison: Method C vs. Method A &amp; Method B</h3>
+          <p>The thermodynamic benefit of eliminating the insulating air pocket of an enclosing conduit is substantial. Observe the comparative continuous ampacities for standard multi-core copper cables with $70^\circ\text{C}$ PVC insulation at $30^\circ\text{C}$ ambient (BS 7671 Table 4D2A):</p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Conductor Size (mm²)</th>
+                <th>Method A2 (In Conduit in Insulated Wall)</th>
+                <th>Method B2 (In Conduit on Masonry Wall)</th>
+                <th>Method C (Clipped Direct to Surface)</th>
+                <th>Method C Thermal Advantage vs. Method A</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1.5 mm²</strong></td>
+                <td>14.5 A</td>
+                <td>16.5 A</td>
+                <td><strong>19.5 A</strong></td>
+                <td><strong>+34.5%</strong> Higher Capacity</td>
+              </tr>
+              <tr>
+                <td><strong>2.5 mm²</strong></td>
+                <td>18.5 A</td>
+                <td>23.0 A</td>
+                <td><strong>27.0 A</strong></td>
+                <td><strong>+45.9%</strong> Higher Capacity</td>
+              </tr>
+              <tr>
+                <td><strong>4.0 mm²</strong></td>
+                <td>25.0 A</td>
+                <td>30.0 A</td>
+                <td><strong>36.0 A</strong></td>
+                <td><strong>+44.0%</strong> Higher Capacity</td>
+              </tr>
+              <tr>
+                <td><strong>6.0 mm²</strong></td>
+                <td>32.0 A</td>
+                <td>38.0 A</td>
+                <td><strong>46.0 A</strong></td>
+                <td><strong>+43.8%</strong> Higher Capacity</td>
+              </tr>
+              <tr>
+                <td><strong>10.0 mm²</strong></td>
+                <td>43.0 A</td>
+                <td>52.0 A</td>
+                <td><strong>63.0 A</strong></td>
+                <td><strong>+46.5%</strong> Higher Capacity</td>
+              </tr>
+              <tr>
+                <td><strong>16.0 mm²</strong></td>
+                <td>57.0 A</td>
+                <td>69.0 A</td>
+                <td><strong>85.0 A</strong></td>
+                <td><strong>+49.1%</strong> Higher Capacity</td>
+              </tr>
+              <tr>
+                <td><strong>25.0 mm²</strong></td>
+                <td>75.0 A</td>
+                <td>90.0 A</td>
+                <td><strong>112.0 A</strong></td>
+                <td><strong>+49.3%</strong> Higher Capacity</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="formula-box">
+            <h3>Grouping Derating: Touching vs. Spaced Runs (Table 4C1)</h3>
+            <p>When multiple cables are clipped to the same surface, mutual heating occurs. If cables touch, convective air circulation between adjacent sheaths is blocked, requiring a grouping correction factor $C_g$:</p>
+            <p>$$I_z = I_0 \times C_a \times C_g$$</p>
+            <p>Where $C_g$ for single-layer circuits clipped direct touching (BS 7671 Table 4C1) is:</p>
+            <ul>
+              <li>2 circuits touching: $C_g = 0.85$</li>
+              <li>3 circuits touching: $C_g = 0.79$</li>
+              <li>4 circuits touching: $C_g = 0.75$</li>
+              <li>6 circuits touching: $C_g = 0.72$</li>
+            </ul>
+            <p><strong>The "Spaced Installation" Engineering Exemption:</strong> If parallel cables are clipped with a clear spacing distance equal to or greater than one overall cable diameter ($s \ge d_e$), each cable establishes its own independent natural convective boundary layer. Under IEC 60364-5-52 Clause 523.5, <strong>no grouping derating is required ($C_g = 1.0$)</strong>, eliminating the need to upsize conductors.</p>
+          </div>
+
+          <div class="worked-example-card">
+            <h3>Practical Worked Engineering Example: Commercial Sub-Main Feeder</h3>
+            <p><strong>Design Scenario:</strong> Sizing a three-phase, 400V, 50 Hz sub-main feeder supplying a distribution board in a commercial warehouse. The continuous running load is $I_b = 45\text{ A}$ protected by a $50\text{ A}$ Type C MCB ($I_n = 50\text{ A}$). The cable route is $45\text{ meters}$ long, clipped directly to an interior concrete wall (Method C). The run runs alongside 2 other parallel loaded cables (total 3 circuits touching, $C_g = 0.79$). The warehouse ambient summer temperature reaches $35^\circ\text{C}$. Multi-core copper cable with XLPE ($90^\circ\text{C}$) insulation is specified. Max allowable voltage drop is $4.0\%$.</p>
+
+            <p><strong>Step 1: Compute Total Environmental Correction Factor ($C_{total}$)</strong></p>
+            <p>For XLPE at $35^\circ\text{C}$ ambient, $C_a = \sqrt{\frac{90 - 35}{90 - 30}} = \sqrt{\frac{55}{60}} = 0.957$.</p>
+            <p>With 3 circuits touching, $C_g = 0.79$.</p>
+            <p>$$C_{total} = C_a \times C_g = 0.957 \times 0.79 = 0.756$$</p>
+
+            <p><strong>Step 2: Calculate Minimum Required Tabulated Current Rating ($I_t$)</strong></p>
+            <p>To satisfy the fundamental overcurrent protection rule $I_n \le I_z$:</p>
+            <p>$$I_{t,req} \ge \frac{I_n}{C_{total}} = \frac{50\text{ A}}{0.756} = 66.14\text{ A}$$</p>
+
+            <p><strong>Step 3: Conductor Area Selection from Table 4E2A (Method C XLPE)</strong></p>
+            <ul>
+              <li>$10\text{ mm}^2 \implies I_0 = 73\text{ A}$ ($73 \ge 66.14\text{ A} \implies$ PASS)</li>
+            </ul>
+            <p>Effective derated continuous capacity:</p>
+            <p>$$I_z = 73\text{ A} \times 0.756 = 55.19\text{ A}$$</p>
+            <p>Since $I_b (45\text{ A}) \le I_n (50\text{ A}) \le I_z (55.19\text{ A})$, thermal coordination is fully satisfied.</p>
+
+            <p><strong>Step 4: Verification of Voltage Drop ($\Delta V$) on $10\text{ mm}^2$</strong></p>
+            <p>For $10\text{ mm}^2$ copper XLPE, the three-phase $(mV/A/m)$ factor is $3.8\text{ mV/A/m}$:</p>
+            <p>$$\Delta V = \frac{3.8 \times 45\text{ A} \times 45\text{ m}}{1000} = \frac{7695}{1000} = 7.70\text{ Volts}$$</p>
+            <p>$$\Delta V\% = \frac{7.70\text{ V}}{400\text{ V}} \times 100 = 1.92\%$$</p>
+            <p>Since $1.92\% \le 4.0\%$, the $10\text{ mm}^2$ XLPE copper cable satisfies all thermal, regulatory, and voltage drop requirements.</p>
+          </div>
+
+          <h2>Frequently Asked Questions (Installation Method C)</h2>
+          <div class="faq-item">
+            <h3>What types of cable cleats and clips are permissible for Method C?</h3>
+            <p>Under BS 7671 Regulation 521.10.202 and IEC 61914, all cable fixings must withstand operational electromagnetic fault forces and provide thermal retention during building fires. Plastic clips alone are forbidden on escape routes; metal cleats (stainless steel, copper, or aluminum with halogen-free polymer cushions) must be installed at intervals preventing cable sagging.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What happens if a Method C cable is subsequently covered by thermal insulation?</h3>
+            <p>If building renovations add thermal batts, spray foam, or dry lining over previously exposed surface-clipped cables, the installation automatically converts from Method C to <strong>Installation Method A</strong>. Because Method A capacity is nearly $30\%$ to $45\%$ lower, the cable will overheat unless the protective breaker is derated or the cable is upsized.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Does clipping direct to a wooden timber joist classify as Method C?</h3>
+            <p>Yes, provided the cable is exposed to the room atmosphere and not encased in insulation. However, timber has a lower thermal conductivity ($k \approx 0.13\text{ W}/(\text{m}\cdot\text{K})$) than masonry, slightly reducing conductive dissipation. In UK practice, BS 7671 groups cables clipped to wooden walls under Method C as long as natural convection remains unobstructed.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Can single-core armoured cables (AWA) be clipped direct using Method C?</h3>
+            <p>Yes, but single-core AC cables must be clipped in trefoil formation or spaced flat configuration, and their aluminum wire armour (AWA) must be solidly bonded at both ends (or single-point bonded for short lengths) to eliminate circulating sheath currents that cause excessive $I^2 R$ sheath losses.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar" id="toolSidebar">
+        <!-- Dynamically rendered sidebar -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Engineering and mathematical tools grounded in international standards.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="engineering.html">Engineering</a></li>
+        <li><a href="ohms-law-calculator.html">Ohm's Law</a></li>
+        <li><a href="sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // Standard IEC / BS 7671 Table 4D2A / 4E2A Method C ratings (Copper base values)
+    const methodCData = [
+      { size: 1.5,  pvc_1p: 19.5, pvc_3p: 17.5, xlpe_1p: 26,  xlpe_3p: 23,  mv_1p: 29.0, mv_3p: 25.0 },
+      { size: 2.5,  pvc_1p: 27.0, pvc_3p: 24.0, xlpe_1p: 36,  xlpe_3p: 31,  mv_1p: 18.0, mv_3p: 15.0 },
+      { size: 4.0,  pvc_1p: 36.0, pvc_3p: 32.0, xlpe_1p: 49,  xlpe_3p: 42,  mv_1p: 11.0, mv_3p: 9.5 },
+      { size: 6.0,  pvc_1p: 46.0, pvc_3p: 41.0, xlpe_1p: 62,  xlpe_3p: 54,  mv_1p: 7.3,  mv_3p: 6.4 },
+      { size: 10.0, pvc_1p: 63.0, pvc_3p: 57.0, xlpe_1p: 85,  xlpe_3p: 73,  mv_1p: 4.4,  mv_3p: 3.8 },
+      { size: 16.0, pvc_1p: 85.0, pvc_3p: 76.0, xlpe_1p: 110, xlpe_3p: 98,  mv_1p: 2.8,  mv_3p: 2.4 },
+      { size: 25.0, pvc_1p: 112,  pvc_3p: 96.0, xlpe_1p: 146, xlpe_3p: 127, mv_1p: 1.75, mv_3p: 1.50 },
+      { size: 35.0, pvc_1p: 138,  pvc_3p: 119,  xlpe_1p: 180, xlpe_3p: 158, mv_1p: 1.25, mv_3p: 1.10 },
+      { size: 50.0, pvc_1p: 168,  pvc_3p: 144,  xlpe_1p: 219, xlpe_3p: 192, mv_1p: 0.93, mv_3p: 0.80 },
+      { size: 70.0, pvc_1p: 213,  pvc_3p: 184,  xlpe_1p: 279, xlpe_3p: 246, mv_1p: 0.63, mv_3p: 0.55 },
+      { size: 95.0, pvc_1p: 258,  pvc_3p: 223,  xlpe_1p: 338, xlpe_3p: 298, mv_1p: 0.46, mv_3p: 0.40 },
+      { size: 120,  pvc_1p: 299,  pvc_3p: 259,  xlpe_1p: 392, xlpe_3p: 346, mv_1p: 0.36, mv_3p: 0.31 },
+      { size: 150,  pvc_1p: 344,  pvc_3p: 299,  xlpe_1p: 451, xlpe_3p: 399, mv_1p: 0.29, mv_3p: 0.25 },
+      { size: 185,  pvc_1p: 392,  pvc_3p: 341,  xlpe_1p: 515, xlpe_3p: 456, mv_1p: 0.23, mv_3p: 0.20 },
+      { size: 240,  pvc_1p: 461,  pvc_3p: 403,  xlpe_1p: 607, xlpe_3p: 538, mv_1p: 0.18, mv_3p: 0.155 }
+    ];
+
+    function calculateMethC() {
+      const conductor = document.getElementById("methCConductor").value;
+      const insulation = document.getElementById("methCInsulation").value;
+      const phasing = document.getElementById("methCPhasing").value;
+      const Ib = parseFloat(document.getElementById("methCDesignCurrent").value) || 0;
+      const In = parseFloat(document.getElementById("methCBreakerIn").value) || 0;
+      const ambTemp = parseFloat(document.getElementById("methCAmbientTemp").value) || 30;
+      const groupingVal = document.getElementById("methCGrouping").value;
+      const length = parseFloat(document.getElementById("methCRouteLength").value) || 1;
+      const maxVd = parseFloat(document.getElementById("methCMaxVd").value) || 4.0;
+
+      // Ca
+      let Ca = 1.0;
+      if (insulation === "xlpe") {
+        Ca = Math.sqrt(Math.max(0.1, (90 - ambTemp) / (90 - 30)));
+      } else {
+        Ca = Math.sqrt(Math.max(0.1, (70 - ambTemp) / (70 - 30)));
+      }
+
+      // Cg
+      const Cg = (groupingVal === "spaced") ? 1.0 : parseFloat(groupingVal);
+      const cTotal = Ca * Cg;
+
+      const condMult = (conductor === "aluminium") ? 0.78 : 1.0;
+      const vNom = (phasing === "230_1p") ? 230 : 400;
+
+      let selected = null;
+
+      for (let i = 0; i < methodCData.length; i++) {
+        const row = methodCData[i];
+        let baseRating = 0;
+
+        if (insulation === "xlpe") {
+          baseRating = (phasing === "230_1p") ? row.xlpe_1p : row.xlpe_3p;
+        } else {
+          baseRating = (phasing === "230_1p") ? row.pvc_1p : row.pvc_3p;
+        }
+
+        baseRating *= condMult;
+        const effectiveIz = baseRating * cTotal;
+
+        if (effectiveIz < In) continue;
+
+        let mvVal = (phasing === "230_1p") ? row.mv_1p : row.mv_3p;
+        if (conductor === "aluminium") mvVal *= 1.64;
+
+        const deltaV = (mvVal * Ib * length) / 1000;
+        const vdPct = (deltaV / vNom) * 100;
+
+        if (vdPct <= maxVd) {
+          selected = {
+            size: row.size,
+            baseI0: baseRating,
+            iz: effectiveIz,
+            deltaV: deltaV,
+            vdPct: vdPct
+          };
+          break;
+        }
+      }
+
+      document.getElementById("methCDeratingOut").innerText = cTotal.toFixed(3) + " (Ca=" + Ca.toFixed(2) + ", Cg=" + Cg.toFixed(2) + ")";
+
+      if (selected) {
+        document.getElementById("methCSizeOut").innerText = selected.size + " mm² (" + conductor.toUpperCase() + ")";
+        document.getElementById("methCBaseI0Out").innerText = selected.baseI0.toFixed(1) + " A";
+        document.getElementById("methCIzOut").innerText = selected.iz.toFixed(1) + " A";
+        document.getElementById("methCVdOut").innerText = selected.deltaV.toFixed(2) + " V (" + selected.vdPct.toFixed(2) + "%)";
+        document.getElementById("methCStatusOut").innerText = "Fully Compliant (Ib <= In <= Iz)";
+        document.getElementById("methCStatusOut").style.color = "#10b981";
+      } else {
+        document.getElementById("methCSizeOut").innerText = "> 240 mm² (Parallel Conductors Needed)";
+        document.getElementById("methCBaseI0Out").innerText = "--";
+        document.getElementById("methCIzOut").innerText = "--";
+        document.getElementById("methCVdOut").innerText = "Exceeds Drop Limit";
+        document.getElementById("methCStatusOut").innerText = "Non-Compliant: Upsize or Parallel Runs Required";
+        document.getElementById("methCStatusOut").style.color = "#ef4444";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      calculateMethC();
+    });
+  </script>
+</body>
+</html>

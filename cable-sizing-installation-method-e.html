@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cable Sizing Installation Method E Calculator | Perforated Tray & Ladder</title>
+  <meta name="description" content="Calculate electrical cable sizing for IEC 60364 and BS 7671 Installation Method E (multi-core cables on perforated horizontal cable trays, ladders, or wire mesh in free air).">
+  <link rel="canonical" href="https://calchub.cloud/cable-sizing-installation-method-e.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Cable Sizing Installation Method E Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "IEC 60364-5-52 and BS 7671 electrical cable dimensioning engine for Reference Method E (multicore cables in free air on perforated cable trays and cable ladders).",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What defines Installation Method E under IEC 60364 and BS 7671?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Installation Method E is defined as multi-core cables in free air supported on perforated horizontal cable trays, cable ladder systems, or wire mesh basket trays. Perforated trays must have holes occupying at least 30% of the surface area, allowing free air circulation beneath and around the cable bundle."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why does Method E provide higher current ratings than Method C?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In Method C (clipped direct to a wall), one side of the cable is blocked by the wall surface. In Method E, the cable is suspended above perforated metal or open ladder rungs, enabling complete 360-degree natural convection currents. This unrestricted airflow reduces thermal resistance to ambient air, yielding approximately 10% to 15% higher current capacity than Method C."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What grouping factors apply to multiple cables installed on a cable tray?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Per BS 7671 Table 4C1 and IEC 60364-5-52 Table B.52.18, multicore cables touching in a single layer on a perforated horizontal tray carry grouping derating factors: 2 cables = 0.88, 3 cables = 0.82, 4 cables = 0.77, 6 cables = 0.72. If cables are spaced with a clear gap >= 1x cable diameter, C_g = 1.0 (no grouping penalty)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between Method E and Method F?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Method E is specifically designated for multi-core cables (3-core or 4-core sheathed cables) on trays or in free air. Method F applies to single-core cables laid touching in trefoil or flat configuration on open trays or ladders in free air."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="engineering">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="fire-safety.html">Fire Safety</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="engineering.html">Electrical &amp; Power Systems</a> &rsaquo;
+      <span>Method E Cable Sizing Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">IEC 60364-5-52 &amp; BS 7671 Method E</div>
+          <h1 class="calc-title">Cable Sizing Installation Method E Calculator</h1>
+          <p class="calc-tagline">Dimension multicore cables routed in free air on perforated cable trays, cable ladders, and wire baskets.</p>
+        </header>
+
+        <!-- Tool Card -->
+        <div class="tool-card">
+          <form id="methEForm" onsubmit="return false;">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="methESupportType" class="form-label">Support Infrastructure</label>
+                <select id="methESupportType" class="form-control" onchange="calculateMethE()">
+                  <option value="perf_tray" selected>Perforated Cable Tray (>= 30% holes)</option>
+                  <option value="ladder">Open Cable Ladder Rack (Unrestricted Flow)</option>
+                  <option value="wire_mesh">Wire Mesh Basket Tray</option>
+                </select>
+                <small class="form-hint">Physical mounting tray type</small>
+              </div>
+
+              <div class="form-group">
+                <label for="methEConductor" class="form-label">Conductor Metallurgy</label>
+                <select id="methEConductor" class="form-control" onchange="calculateMethE()">
+                  <option value="copper" selected>Electrolytic Copper (Cu)</option>
+                  <option value="aluminium">Electrical Grade Aluminium (Al)</option>
+                </select>
+                <small class="form-hint">Conductor core metal</small>
+              </div>
+
+              <div class="form-group">
+                <label for="methEInsulation" class="form-label">Insulation Material</label>
+                <select id="methEInsulation" class="form-control" onchange="calculateMethE()">
+                  <option value="xlpe" selected>XLPE / 90°C Thermosetting (EPR)</option>
+                  <option value="pvc">PVC / 70°C Thermoplastic</option>
+                </select>
+                <small class="form-hint">Operating temperature limit</small>
+              </div>
+
+              <div class="form-group">
+                <label for="methEPhasing" class="form-label">Supply Voltage &amp; Phasing</label>
+                <select id="methEPhasing" class="form-control" onchange="calculateMethE()">
+                  <option value="400_3p" selected>Three-Phase 400V AC (Industrial/Commercial)</option>
+                  <option value="230_1p">Single-Phase 230V AC</option>
+                </select>
+                <small class="form-hint">System line-to-line voltage</small>
+              </div>
+
+              <div class="form-group">
+                <label for="methEDesignCurrent" class="form-label">Design Current ($I_b$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="methEDesignCurrent" class="form-control" value="115" min="1" step="1" oninput="calculateMethE()">
+                  <span class="unit-badge">Amps</span>
+                </div>
+                <small class="form-hint">Continuous operating load</small>
+              </div>
+
+              <div class="form-group">
+                <label for="methEBreakerIn" class="form-label">Protective Device Rating ($I_n$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="methEBreakerIn" class="form-control" value="125" min="1" step="1" oninput="calculateMethE()">
+                  <span class="unit-badge">Amps</span>
+                </div>
+                <small class="form-hint">Upstream MCCB / fuse rating</small>
+              </div>
+
+              <div class="form-group">
+                <label for="methEAmbientTemp" class="form-label">Ambient Air Temperature</label>
+                <div class="input-with-unit">
+                  <input type="number" id="methEAmbientTemp" class="form-control" value="35" min="10" max="65" step="1" oninput="calculateMethE()">
+                  <span class="unit-badge">°C</span>
+                </div>
+                <small class="form-hint">Switchroom or riser temperature</small>
+              </div>
+
+              <div class="form-group">
+                <label for="methEGrouping" class="form-label">Grouping on Tray ($C_g$)</label>
+                <select id="methEGrouping" class="form-control" onchange="calculateMethE()">
+                  <option value="1.0">Single Circuit (Cg = 1.0)</option>
+                  <option value="0.88">2 Cables Touching on Tray (Cg = 0.88)</option>
+                  <option value="0.82" selected>3 Cables Touching on Tray (Cg = 0.82)</option>
+                  <option value="0.77">4 Cables Touching on Tray (Cg = 0.77)</option>
+                  <option value="0.72">6 Cables Touching on Tray (Cg = 0.72)</option>
+                  <option value="spaced">Cables Spaced >= 1x Diameter (Cg = 1.0)</option>
+                </select>
+                <small class="form-hint">Proximity derating factor on tray</small>
+              </div>
+
+              <div class="form-group">
+                <label for="methERouteLength" class="form-label">Total Cable Tray Route Length</label>
+                <div class="input-with-unit">
+                  <input type="number" id="methERouteLength" class="form-control" value="65" min="1" step="1" oninput="calculateMethE()">
+                  <span class="unit-badge">metres</span>
+                </div>
+                <small class="form-hint">One-way distance along tray</small>
+              </div>
+
+              <div class="form-group">
+                <label for="methEMaxVd" class="form-label">Maximum Allowable Voltage Drop</label>
+                <div class="input-with-unit">
+                  <input type="number" id="methEMaxVd" class="form-control" value="4.0" min="1.0" max="10.0" step="0.1" oninput="calculateMethE()">
+                  <span class="unit-badge">%</span>
+                </div>
+                <small class="form-hint">Typically 4.0% for sub-mains</small>
+              </div>
+            </div>
+
+            <button type="button" id="calcMethEBtn" class="btn btn-primary btn-block" onclick="calculateMethE()">Dimension Cable (Method E)</button>
+          </form>
+
+          <div id="methEResultBox" class="results-container" style="margin-top:20px;">
+            <h3>Method E Dimensioning Results</h3>
+            <div class="results-grid">
+              <div class="result-tile">
+                <span class="result-label">Recommended Conductor Area</span>
+                <span id="methESizeOut" class="result-value">-- mm²</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Base Method E Rating ($I_0$)</span>
+                <span id="methEBaseI0Out" class="result-value">-- A</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Derated Continuous Capacity ($I_z$)</span>
+                <span id="methEIzOut" class="result-value">-- A</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Tray Thermal Advantage vs Method A</span>
+                <span id="methEThermalAdvOut" class="result-value">-- %</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Calculated Voltage Drop ($\Delta V$)</span>
+                <span id="methEVdOut" class="result-value">-- V (-- %)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Overcurrent Protection Coordination</span>
+                <span id="methEStatusOut" class="result-value">--</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Engineering Analysis: Sizing Cables on Cable Trays &amp; Ladders (Method E)</h2>
+          
+          <p>In high-density commercial, institutional, and industrial power distribution, routing cables inside enclosed conduits becomes structurally impractical and cost-prohibitive. Instead, electrical consulting engineers specify overhead cable containment systems utilizing perforated sheet steel cable trays, open cable ladders, or stainless steel wire mesh baskets. Under <strong>IEC 60364-5-52 Table A.52.3</strong> and the UK <strong>BS 7671 (IET Wiring Regulations, Table 4A2)</strong>, multicore cables routed in open free air across horizontal or vertical cable trays are codified as <strong>Installation Reference Method E</strong>.</p>
+
+          <p>Method E represents the gold standard for high-amperage sub-main distribution because it maximizes natural aerodynamic ventilation. Convective air currents pass unimpeded through the perforated tray bed (minimum $30\%$ perforation ratio) and open ladder rungs, creating continuous buoyancy drafts that rapidly sweep away joule heat generated by high load currents.</p>
+
+          <div class="formula-box">
+            <h3>Aerodynamic Convective Boundary Layer Mechanics</h3>
+            <p>The rate of heat transfer from an energized cable sheath into surrounding switchroom air is governed by Newton's Law of Cooling:</p>
+            <p>$$q_{conv} = h_c \cdot A_{surface} \cdot (T_{sheath} - T_{ambient})$$</p>
+            <p>Where $h_c$ is the convective heat transfer coefficient. On an open ladder or perforated tray:</p>
+            <ul>
+              <li><strong>360-Degree Perimeter Dissipation:</strong> Unlike surface-clipped runs (Method C) where the wall interface impedes airflow across roughly $30\%$ of the sheath, Method E permits complete radial heat convection around the entire $2\pi r$ perimeter.</li>
+              <li><strong>Stack Buoyancy Draft:</strong> Warm air heated by bottom cables accelerates upward through perforated tray slots, creating an active natural chimney draft that draws cooler ambient air into the cable bed.</li>
+              <li><strong>Thermal Efficiency Gain:</strong> As a result, Method E cables enjoy the highest tabulated continuous ampacities of any standard multi-core installation topology&mdash;exceeding enclosed conduit methods (Method A) by up to $60\%$!</li>
+            </ul>
+          </div>
+
+          <h3>Comparative Ampacity Performance: Method E vs. Other Methods</h3>
+          <p>The engineering advantage of cable tray installations is demonstrated in the tabulated current ratings extracted from BS 7671 Table 4E2A and IEC 60364-5-52 Table B.52.4 for three-phase XLPE ($90^\circ\text{C}$) multi-core copper cables at $30^\circ\text{C}$ ambient:</p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Conductor Cross-Section (mm²)</th>
+                <th>Method A2 (Enclosed in Insulated Cavity)</th>
+                <th>Method C (Clipped Direct to Masonry)</th>
+                <th>Method E (Perforated Cable Tray in Free Air)</th>
+                <th>Method E Thermal Advantage vs. Method A2</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>16 mm²</strong></td>
+                <td>76 A</td>
+                <td>98 A</td>
+                <td><strong>110 A</strong></td>
+                <td><strong>+44.7%</strong> Higher Capacity</td>
+              </tr>
+              <tr>
+                <td><strong>25 mm²</strong></td>
+                <td>99 A</td>
+                <td>127 A</td>
+                <td><strong>146 A</strong></td>
+                <td><strong>+47.5%</strong> Higher Capacity</td>
+              </tr>
+              <tr>
+                <td><strong>35 mm²</strong></td>
+                <td>121 A</td>
+                <td>158 A</td>
+                <td><strong>180 A</strong></td>
+                <td><strong>+48.8%</strong> Higher Capacity</td>
+              </tr>
+              <tr>
+                <td><strong>50 mm²</strong></td>
+                <td>145 A</td>
+                <td>192 A</td>
+                <td><strong>219 A</strong></td>
+                <td><strong>+51.0%</strong> Higher Capacity</td>
+              </tr>
+              <tr>
+                <td><strong>70 mm²</strong></td>
+                <td>183 A</td>
+                <td>246 A</td>
+                <td><strong>279 A</strong></td>
+                <td><strong>+52.5%</strong> Higher Capacity</td>
+              </tr>
+              <tr>
+                <td><strong>95 mm²</strong></td>
+                <td>220 A</td>
+                <td>298 A</td>
+                <td><strong>338 A</strong></td>
+                <td><strong>+53.6%</strong> Higher Capacity</td>
+              </tr>
+              <tr>
+                <td><strong>120 mm²</strong></td>
+                <td>253 A</td>
+                <td>346 A</td>
+                <td><strong>392 A</strong></td>
+                <td><strong>+54.9%</strong> Higher Capacity</td>
+              </tr>
+              <tr>
+                <td><strong>185 mm²</strong></td>
+                <td>322 A</td>
+                <td>456 A</td>
+                <td><strong>515 A</strong></td>
+                <td><strong>+59.9%</strong> Higher Capacity</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="formula-box">
+            <h3>Grouping Deratings on Horizontal Cable Trays (Table 4C1)</h3>
+            <p>In high-capacity switchrooms, multiple sub-feeders are routed side-by-side on the same tray. When multi-core cables are bundled touching in a single layer, mutual radiant heating reduces capacity, governed by factor $C_g$:</p>
+            <p>$$I_z = I_0 \times C_a \times C_g$$</p>
+            <p>Per IEC 60364-5-52 Table B.52.18 for horizontal perforated trays:</p>
+            <ul>
+              <li>2 circuits touching: $C_g = 0.88$</li>
+              <li>3 circuits touching: $C_g = 0.82$</li>
+              <li>4 circuits touching: $C_g = 0.77$</li>
+              <li>6 circuits touching: $C_g = 0.72$</li>
+            </ul>
+            <p><strong>Spacing Optimization Strategy:</strong> If the design engineer maintains a clear spacing of at least one overall cable diameter ($s \ge 1.0 \cdot d_e$) between adjacent cables on the tray, <strong>$C_g = 1.0$ (no derating penalty applies)</strong>. Specifying a wider cable tray (e.g. $450\text{ mm}$ instead of $300\text{ mm}$) frequently avoids thousands of dollars in cable conductor upsizing!</p>
+          </div>
+
+          <div class="worked-example-card">
+            <h3>Practical Worked Engineering Example: Industrial MCC Main Sub-Feeder</h3>
+            <p><strong>Design Scenario:</strong> Dimensioning a 3-phase, 400V, 50 Hz feeder cable supplying a Motor Control Center (MCC) in a chemical plant. Continuous running load is $I_b = 115\text{ A}$ protected by a $125\text{ A}$ electronic trip MCCB ($I_n = 125\text{ A}$). The cable is routed overhead along a perforated steel cable tray (Method E) for $65\text{ meters}$. The tray carries 2 other parallel multicore feeders (total 3 circuits touching in single layer, $C_g = 0.82$). Plant ambient switchroom temperature peaks at $35^\circ\text{C}$. Multi-core copper cable with XLPE ($90^\circ\text{C}$) insulation is specified. Max allowable voltage drop is $4.0\%$.</p>
+
+            <p><strong>Step 1: Compute Environmental Derating ($C_{total}$)</strong></p>
+            <p>For XLPE at $35^\circ\text{C}$ ambient, $C_a = \sqrt{\frac{90 - 35}{90 - 30}} = 0.957$.</p>
+            <p>With 3 circuits touching, $C_g = 0.82$.</p>
+            <p>$$C_{total} = C_a \times C_g = 0.957 \times 0.82 = 0.785$$</p>
+
+            <p><strong>Step 2: Minimum Required Tabulated Ampacity ($I_t$)</strong></p>
+            <p>$$I_{t,req} \ge \frac{I_n}{C_{total}} = \frac{125\text{ A}}{0.785} = 159.24\text{ A}$$</p>
+
+            <p><strong>Step 3: Conductor Area Selection from Table 4E2A (Method E XLPE)</strong></p>
+            <ul>
+              <li>$25\text{ mm}^2 \implies I_0 = 146\text{ A}$ (Insufficient: $146 < 159.24$)</li>
+              <li>$35\text{ mm}^2 \implies I_0 = 180\text{ A}$ (Compliant: $180 \ge 159.24\text{ A}$)</li>
+            </ul>
+            <p>Effective derated continuous capacity:</p>
+            <p>$$I_z = 180\text{ A} \times 0.785 = 141.3\text{ A}$$</p>
+            <p>Since $I_b (115\text{ A}) \le I_n (125\text{ A}) \le I_z (141.3\text{ A})$, overcurrent thermal coordination is fully satisfied.</p>
+
+            <p><strong>Step 4: Check Voltage Drop ($\Delta V$) on $35\text{ mm}^2$</strong></p>
+            <p>For $35\text{ mm}^2$ copper XLPE, the three-phase factor is $1.10\text{ mV/A/m}$:</p>
+            <p>$$\Delta V = \frac{1.10 \times 115\text{ A} \times 65\text{ m}}{1000} = \frac{8222.5}{1000} = 8.22\text{ Volts}$$</p>
+            <p>$$\Delta V\% = \frac{8.22\text{ V}}{400\text{ V}} \times 100 = 2.06\%$$</p>
+            <p>Since $2.06\% \le 4.0\%$, the $35\text{ mm}^2$ XLPE copper cable on tray is fully compliant with all electrical, safety, and operational standards.</p>
+          </div>
+
+          <h2>Frequently Asked Questions (Installation Method E)</h2>
+          <div class="faq-item">
+            <h3>What minimum perforation percentage is required for Method E ratings?</h3>
+            <p>Under IEC 60364-5-52 Table A.52.3, a cable tray must possess perforations occupying at least $30\%$ of the base surface area uniformly distributed along the tray length to qualify for Method E ratings. If a solid-bottom tray without perforations is used, ventilation is restricted and the installation must be derated to Reference Method C.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How do vertical cable ladder runs differ from horizontal trays?</h3>
+            <p>Vertical ladder runs (such as risers in commercial building electrical shafts) benefit from chimney stack thermal convection. However, cables must be clamped with cleats capable of supporting mechanical gravity loads without pinching cable insulation. In IEC 60364-5-52, vertical ladder runs with unobstructed airflow are rated identically to or slightly higher than horizontal trays.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What is the maximum permissible stacking of cables on a cable tray?</h3>
+            <p>Cables should strictly be installed in a <strong>single layer</strong> whenever possible. If multi-core cables are double-stacked in multiple layers, heat cannot escape from the bottom tier, requiring severe derating factors (typically $C_g \le 0.60$) and risking localized thermal melting. In industrial design, installing a second parallel tray tier is always preferable to stacking.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Do tray covers alter the installation reference method?</h3>
+            <p>Yes. If a solid metal dust or weather cover is installed directly onto a cable tray without ventilation risers, natural convection is blocked and heat is trapped. Standard engineering practice requires derating the cable ampacity by $10\%$ to $15\%$, effectively shifting the reference method from Method E to Method B or Method C.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar" id="toolSidebar">
+        <!-- Dynamically rendered sidebar -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Engineering and mathematical tools grounded in international standards.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="engineering.html">Engineering</a></li>
+        <li><a href="ohms-law-calculator.html">Ohm's Law</a></li>
+        <li><a href="sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // Standard IEC / BS 7671 Table 4E2A Method E ratings (Copper base values on perforated tray)
+    const methodEData = [
+      { size: 1.5,  pvc_1p: 22,  pvc_3p: 19.5, xlpe_1p: 29,  xlpe_3p: 25,  mv_1p: 29.0, mv_3p: 25.0 },
+      { size: 2.5,  pvc_1p: 30,  pvc_3p: 26.5, xlpe_1p: 39,  xlpe_3p: 33,  mv_1p: 18.0, mv_3p: 15.0 },
+      { size: 4.0,  pvc_1p: 40,  pvc_3p: 36.0, xlpe_1p: 52,  xlpe_3p: 45,  mv_1p: 11.0, mv_3p: 9.5 },
+      { size: 6.0,  pvc_1p: 51,  pvc_3p: 46.0, xlpe_1p: 66,  xlpe_3p: 58,  mv_1p: 7.3,  mv_3p: 6.4 },
+      { size: 10.0, pvc_1p: 70,  pvc_3p: 63.0, xlpe_1p: 90,  xlpe_3p: 80,  mv_1p: 4.4,  mv_3p: 3.8 },
+      { size: 16.0, pvc_1p: 94,  pvc_3p: 85.0, xlpe_1p: 115, xlpe_3p: 110, mv_1p: 2.8,  mv_3p: 2.4 },
+      { size: 25.0, pvc_1p: 119, pvc_3p: 110,  xlpe_1p: 152, xlpe_3p: 146, mv_1p: 1.75, mv_3p: 1.50 },
+      { size: 35.0, pvc_1p: 147, pvc_3p: 137,  xlpe_1p: 188, xlpe_3p: 180, mv_1p: 1.25, mv_3p: 1.10 },
+      { size: 50.0, pvc_1p: 179, pvc_3p: 167,  xlpe_1p: 228, xlpe_3p: 219, mv_1p: 0.93, mv_3p: 0.80 },
+      { size: 70.0, pvc_1p: 229, pvc_3p: 216,  xlpe_1p: 291, xlpe_3p: 279, mv_1p: 0.63, mv_3p: 0.55 },
+      { size: 95.0, pvc_1p: 278, pvc_3p: 264,  xlpe_1p: 354, xlpe_3p: 338, mv_1p: 0.46, mv_3p: 0.40 },
+      { size: 120,  pvc_1p: 322, pvc_3p: 308,  xlpe_1p: 410, xlpe_3p: 392, mv_1p: 0.36, mv_3p: 0.31 },
+      { size: 150,  pvc_1p: 371, pvc_3p: 356,  xlpe_1p: 472, xlpe_3p: 451, mv_1p: 0.29, mv_3p: 0.25 },
+      { size: 185,  pvc_1p: 424, pvc_3p: 409,  xlpe_1p: 539, xlpe_3p: 515, mv_1p: 0.23, mv_3p: 0.20 },
+      { size: 240,  pvc_1p: 500, pvc_3p: 485,  xlpe_1p: 636, xlpe_3p: 607, mv_1p: 0.18, mv_3p: 0.155 }
+    ];
+
+    function calculateMethE() {
+      const support = document.getElementById("methESupportType").value;
+      const conductor = document.getElementById("methEConductor").value;
+      const insulation = document.getElementById("methEInsulation").value;
+      const phasing = document.getElementById("methEPhasing").value;
+      const Ib = parseFloat(document.getElementById("methEDesignCurrent").value) || 0;
+      const In = parseFloat(document.getElementById("methEBreakerIn").value) || 0;
+      const ambTemp = parseFloat(document.getElementById("methEAmbientTemp").value) || 30;
+      const groupingVal = document.getElementById("methEGrouping").value;
+      const length = parseFloat(document.getElementById("methERouteLength").value) || 1;
+      const maxVd = parseFloat(document.getElementById("methEMaxVd").value) || 4.0;
+
+      // Ca
+      let Ca = 1.0;
+      if (insulation === "xlpe") {
+        Ca = Math.sqrt(Math.max(0.1, (90 - ambTemp) / (90 - 30)));
+      } else {
+        Ca = Math.sqrt(Math.max(0.1, (70 - ambTemp) / (70 - 30)));
+      }
+
+      // Cg
+      const Cg = (groupingVal === "spaced") ? 1.0 : parseFloat(groupingVal);
+      const cTotal = Ca * Cg;
+
+      // Ladder racks give slightly better convective flow (+5%)
+      let supportMult = 1.0;
+      if (support === "ladder") supportMult = 1.05;
+
+      const condMult = (conductor === "aluminium") ? 0.78 : 1.0;
+      const vNom = (phasing === "230_1p") ? 230 : 400;
+
+      let selected = null;
+
+      for (let i = 0; i < methodEData.length; i++) {
+        const row = methodEData[i];
+        let baseRating = 0;
+
+        if (insulation === "xlpe") {
+          baseRating = (phasing === "230_1p") ? row.xlpe_1p : row.xlpe_3p;
+        } else {
+          baseRating = (phasing === "230_1p") ? row.pvc_1p : row.pvc_3p;
+        }
+
+        baseRating = baseRating * condMult * supportMult;
+        const effectiveIz = baseRating * cTotal;
+
+        if (effectiveIz < In) continue;
+
+        let mvVal = (phasing === "230_1p") ? row.mv_1p : row.mv_3p;
+        if (conductor === "aluminium") mvVal *= 1.64;
+
+        const deltaV = (mvVal * Ib * length) / 1000;
+        const vdPct = (deltaV / vNom) * 100;
+
+        if (vdPct <= maxVd) {
+          selected = {
+            size: row.size,
+            baseI0: baseRating,
+            iz: effectiveIz,
+            deltaV: deltaV,
+            vdPct: vdPct
+          };
+          break;
+        }
+      }
+
+      if (selected) {
+        document.getElementById("methESizeOut").innerText = selected.size + " mm² (" + conductor.toUpperCase() + ")";
+        document.getElementById("methEBaseI0Out").innerText = selected.baseI0.toFixed(1) + " A";
+        document.getElementById("methEIzOut").innerText = selected.iz.toFixed(1) + " A";
+        document.getElementById("methEThermalAdvOut").innerText = "+51% vs Method A";
+        document.getElementById("methEVdOut").innerText = selected.deltaV.toFixed(2) + " V (" + selected.vdPct.toFixed(2) + "%)";
+        document.getElementById("methEStatusOut").innerText = "Fully Compliant (Ib <= In <= Iz)";
+        document.getElementById("methEStatusOut").style.color = "#10b981";
+      } else {
+        document.getElementById("methESizeOut").innerText = "> 240 mm² (Parallel Conductors Needed)";
+        document.getElementById("methEBaseI0Out").innerText = "--";
+        document.getElementById("methEIzOut").innerText = "--";
+        document.getElementById("methEThermalAdvOut").innerText = "--";
+        document.getElementById("methEVdOut").innerText = "Exceeds Drop Limit";
+        document.getElementById("methEStatusOut").innerText = "Non-Compliant: Parallel Runs Required";
+        document.getElementById("methEStatusOut").style.color = "#ef4444";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      calculateMethE();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Copper Cable Sizing Calculator | Electrical Conductor Dimensions & Voltage Drop</title>
+  <meta name="description" content="Calculate pure copper electrical cable cross-section (mm² and AWG). Computes temperature-adjusted copper DC/AC resistance, continuous ampacity, voltage drop, and I²R power loss.">
+  <link rel="canonical" href="https://calchub.cloud/copper-cable-sizing-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Copper Cable Sizing Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "High-precision electrical copper cable sizing calculator computing temperature-dependent resistivity (100% IACS ETP Cu), continuous ampacity, line voltage drop, and annual kilowatt-hour joule losses.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Why is copper the global benchmark conductor in electrical engineering?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Copper establishes the International Annealed Copper Standard (100% IACS). It possesses an extremely low electrical resistivity (1.724 x 10^-8 Ohm-m at 20°C), superior tensile strength (200 to 400 MPa), exceptional thermal conductivity (390 W/m-K), high resistance to terminal creep, and forms a conductive copper oxide film that prevents thermal runaway at lug terminations."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does operating temperature increase copper electrical resistance?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Copper has a positive temperature coefficient of resistance (alpha_20 = 0.00393 per °C). As current heats the conductor, resistance increases according to: R_T = R_20 * [1 + 0.00393 * (T - 20)]. When copper rises from 20°C to 75°C under continuous load, its electrical resistance increases by 21.6%."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the economic cost of undersizing copper conductors (I²R loss)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Conductors dissipate electrical energy as heat equal to P = I² * R. Sizing a cable strictly to thermal ampacity minimums results in high operating temperatures and continuous energy waste. Selecting one standard size larger copper cable reduces line resistance, frequently paying for its extra initial copper cost within 2 to 3 years through lower lifetime electricity bills."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does copper compare directly to aluminum in cross-sectional area?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Electrical aluminum (6101-T6 alloy) has a conductivity of roughly 61% IACS compared to 100% for copper. To achieve the exact same DC line resistance and voltage drop, an aluminum conductor must have a cross-sectional area 1.64 times larger than an equivalent copper conductor (A_Al = 1.64 * A_Cu)."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="engineering">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="fire-safety.html">Fire Safety</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="engineering.html">Electrical &amp; Power Systems</a> &rsaquo;
+      <span>Copper Cable Sizing Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">Electrolytic Tough Pitch (ETP Cu) 100% IACS</div>
+          <h1 class="calc-title">Copper Cable Sizing Calculator</h1>
+          <p class="calc-tagline">Calculate optimal copper conductor cross-section, temperature-adjusted resistance, continuous current capacity, and annual $I^2R$ power loss.</p>
+        </header>
+
+        <!-- Tool Card -->
+        <div class="tool-card">
+          <form id="cuForm" onsubmit="return false;">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="cuSystemSupply" class="form-label">System Phasing &amp; Voltage</label>
+                <select id="cuSystemSupply" class="form-control" onchange="calculateCopper()">
+                  <option value="400_3p" selected>Three-Phase 400V AC (50/60 Hz)</option>
+                  <option value="230_1p">Single-Phase 230V AC (50/60 Hz)</option>
+                  <option value="480_3p">Three-Phase 480V AC (North American Industrial)</option>
+                  <option value="120_1p">Single-Phase 120V AC</option>
+                </select>
+                <small class="form-hint">Nominal circuit voltage</small>
+              </div>
+
+              <div class="form-group">
+                <label for="cuInsulation" class="form-label">Insulation Thermal Class</label>
+                <select id="cuInsulation" class="form-control" onchange="calculateCopper()">
+                  <option value="xlpe" selected>XLPE / EPR Thermosetting (Max 90°C)</option>
+                  <option value="pvc70">PVC Thermoplastic (Max 70°C)</option>
+                  <option value="pvc75">THWN / 75°C Moisture Resistant</option>
+                </select>
+                <small class="form-hint">Max continuous core temperature</small>
+              </div>
+
+              <div class="form-group">
+                <label for="cuDesignCurrent" class="form-label">Operating Load Current ($I$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="cuDesignCurrent" class="form-control" value="70" min="1" step="1" oninput="calculateCopper()">
+                  <span class="unit-badge">Amps</span>
+                </div>
+                <small class="form-hint">Continuous operating RMS current</small>
+              </div>
+
+              <div class="form-group">
+                <label for="cuAmbientTemp" class="form-label">Ambient Temperature ($T_{amb}$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="cuAmbientTemp" class="form-control" value="30" min="10" max="60" step="1" oninput="calculateCopper()">
+                  <span class="unit-badge">°C</span>
+                </div>
+                <small class="form-hint">Local room or conduit temperature</small>
+              </div>
+
+              <div class="form-group">
+                <label for="cuRouteLength" class="form-label">One-Way Circuit Length ($L$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="cuRouteLength" class="form-control" value="60" min="1" step="5" oninput="calculateCopper()">
+                  <span class="unit-badge">metres</span>
+                </div>
+                <small class="form-hint">Route distance from source to load</small>
+              </div>
+
+              <div class="form-group">
+                <label for="cuMaxVd" class="form-label">Max Allowable Voltage Drop</label>
+                <div class="input-with-unit">
+                  <input type="number" id="cuMaxVd" class="form-control" value="3.5" min="1.0" max="10.0" step="0.1" oninput="calculateCopper()">
+                  <span class="unit-badge">%</span>
+                </div>
+                <small class="form-hint">Efficiency &amp; standards ceiling</small>
+              </div>
+
+              <div class="form-group">
+                <label for="electricityCostKwh" class="form-label">Electricity Cost</label>
+                <div class="input-with-unit">
+                  <input type="number" id="electricityCostKwh" class="form-control" value="0.16" min="0.01" step="0.01" oninput="calculateCopper()">
+                  <span class="unit-badge">$/kWh</span>
+                </div>
+                <small class="form-hint">Commercial rate for loss economics</small>
+              </div>
+
+              <div class="form-group">
+                <label for="annualHours" class="form-label">Annual Operational Hours</label>
+                <div class="input-with-unit">
+                  <input type="number" id="annualHours" class="form-control" value="5000" min="500" max="8760" step="500" oninput="calculateCopper()">
+                  <span class="unit-badge">hrs/yr</span>
+                </div>
+                <small class="form-hint">5000h = 16h/day industrial shift</small>
+              </div>
+            </div>
+
+            <button type="button" id="calcCuBtn" class="btn btn-primary btn-block" onclick="calculateCopper()">Calculate Copper Dimensions</button>
+          </form>
+
+          <div id="cuResultBox" class="results-container" style="margin-top:20px;">
+            <h3>Copper Cable Engineering Output</h3>
+            <div class="results-grid">
+              <div class="result-tile">
+                <span class="result-label">Recommended Copper Cross-Section</span>
+                <span id="cuSizeOut" class="result-value">-- mm²</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Operating Temperature Line Resistance ($R_T$)</span>
+                <span id="cuResistanceOut" class="result-value">-- &Omega;</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Line-to-Line Voltage Drop ($\Delta V$)</span>
+                <span id="cuVdOut" class="result-value">-- V (-- %)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Three-Phase $I^2R$ Power Loss</span>
+                <span id="cuPowerLossOut" class="result-value">-- Watts</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Annual Energy Loss Cost</span>
+                <span id="cuAnnualCostOut" class="result-value">-- $/year</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Equivalent Aluminum Size Required</span>
+                <span id="cuAlEquivOut" class="result-value">-- mm² Al</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Engineering Metallurgical Principles of Copper Cable Sizing</h2>
+          
+          <p>Since the dawn of modern commercial electrification, copper has served as the universal international standard of electrical conduction. In 1913, the International Electrotechnical Commission codified the <strong>International Annealed Copper Standard (IACS)</strong>, defining $100\%$ conductivity as an annealed copper wire with a density of $8.89\text{ g/cm}^3$, a length of one meter, and a mass of one gram having an electrical resistance of exactly $0.15328\ \Omega$ at $20^\circ\text{C}$ (corresponding to a volume resistivity of $\rho_{20} = 1.7241 \times 10^{-8}\ \Omega\cdot\text{m}$).</p>
+
+          <p>Modern electrical power cables are manufactured from <strong>Electrolytic Tough Pitch Copper (ETP Cu, UNS C11000)</strong>, refined to a minimum purity of $99.90\%$ copper with controlled residual oxygen content ($0.02\%$ to $0.04\%$). Understanding the exact thermodynamic and physical behavior of copper conductors under heavy operational currents is essential for safe sizing, voltage stability, and life-cycle energy efficiency.</p>
+
+          <div class="formula-box">
+            <h3>Temperature Dependence of Copper Electrical Resistance</h3>
+            <p>Unlike superconductors, copper exhibits a positive temperature coefficient of electrical resistance ($\alpha_{20} = 0.00393\ ^\circ\text{C}^{-1}$ at $20^\circ\text{C}$). As electrical current flows through the copper core, joule heating ($I^2 R$) raises the metal lattice temperature. Increased atomic thermal vibrations scatter conducting valence electrons, increasing electrical resistivity:</p>
+            <p>$$R_T = R_{20} \times [1 + \alpha_{20} (T - 20)]$$</p>
+            <p>Where $R_{20}$ is the baseline DC resistance at $20^\circ\text{C}$, $T$ is the continuous operating core temperature, and $\alpha_{20} = 0.00393\ ^\circ\text{C}^{-1}$.</p>
+            <ul>
+              <li>At $20^\circ\text{C}$: Resistivity $\rho = 1.724 \times 10^{-8}\ \Omega\cdot\text{m}$ ($100\%$ baseline)</li>
+              <li>At $70^\circ\text{C}$ (PVC limit): $R_{70} = R_{20} [1 + 0.00393(50)] = 1.1965 \times R_{20}$ (a $+19.7\%$ increase in line resistance!)</li>
+              <li>At $90^\circ\text{C}$ (XLPE limit): $R_{90} = R_{20} [1 + 0.00393(70)] = 1.2751 \times R_{20}$ (a $+27.5\%$ increase in line resistance!)</li>
+            </ul>
+            <p><em>Engineering Rule:</em> Failing to adjust copper resistance for maximum operating temperature results in underestimating real-world line voltage drop and power loss by up to $27.5\%$!</p>
+          </div>
+
+          <h3>Copper versus Aluminum: Direct Metallurgical Comparison</h3>
+          <p>Electrical engineers frequently evaluate copper versus electrical grade aluminum (AA-8000 alloy). The physical properties dictate distinct design choices:</p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Physical Property</th>
+                <th>Electrolytic Copper (ETP Cu)</th>
+                <th>Electrical Grade Aluminum (AA-8000)</th>
+                <th>Engineering Implication</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Electrical Conductivity</strong></td>
+                <td>$100\%$ IACS ($5.80 \times 10^7\text{ S/m}$)</td>
+                <td>$61\%$ IACS ($3.54 \times 10^7\text{ S/m}$)</td>
+                <td>Aluminum requires $1.64\times$ greater cross-sectional area to match copper DC resistance</td>
+              </tr>
+              <tr>
+                <td><strong>Mass Density</strong></td>
+                <td>$8.89\text{ g/cm}^3$</td>
+                <td>$2.70\text{ g/cm}^3$</td>
+                <td>Aluminum is 70% lighter per unit volume; 50% lighter for equivalent ampacity</td>
+              </tr>
+              <tr>
+                <td><strong>Thermal Conductivity</strong></td>
+                <td>$390\text{ W}/(\text{m}\cdot\text{K})$</td>
+                <td>$205\text{ W}/(\text{m}\cdot\text{K})$</td>
+                <td>Copper conducts heat away from terminations nearly twice as fast as aluminum</td>
+              </tr>
+              <tr>
+                <td><strong>Tensile Strength</strong></td>
+                <td>$200 - 400\text{ MPa}$</td>
+                <td>$70 - 110\text{ MPa}$</td>
+                <td>Copper withstands far higher mechanical pulling tension in long conduit pulls</td>
+              </tr>
+              <tr>
+                <td><strong>Thermal Expansion ($\alpha$)</strong></td>
+                <td>$16.5 \times 10^{-6}\ /\text{K}$</td>
+                <td>$23.1 \times 10^{-6}\ /\text{K}$</td>
+                <td>Aluminum expands 40% more under load cycles, requiring torque-limiting spring washers</td>
+              </tr>
+              <tr>
+                <td><strong>Oxide Behavior</strong></td>
+                <td>$\text{Cu}_2\text{O}$ is semi-conductive</td>
+                <td>$\text{Al}_2\text{O}_3$ is an electrical insulator</td>
+                <td>Aluminum requires anti-oxidant joint compound and wire brushing to prevent joint fires</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="formula-box">
+            <h3>Life-Cycle Economics: The True Cost of Joule Heating Losses ($I^2R$)</h3>
+            <p>Every meter of energized cable acts as a continuous low-temperature space heater. For a balanced three-phase circuit carrying continuous current $I$ through line conductors of resistance $R$, total power loss is:</p>
+            <p>$$P_{loss} = 3 \times I^2 \times R \quad [\text{Watts}]$$</p>
+            <p>Over an annual operating cycle of $H$ hours at commercial utility tariff $C_{kWh}$ ($/kWh):</p>
+            <p>$$\text{Annual Cost } (\$) = \frac{P_{loss} \times H \times C_{kWh}}{1000}$$</p>
+            <p><strong>The Economic Upsizing Opportunity:</strong> Sizing a cable strictly to thermal ampacity ratings saves initial capital expenditure on copper weight. However, stepping up one conductor cross-section (e.g. from $25\text{ mm}^2$ to $35\text{ mm}^2$, or #4 AWG to #2 AWG) slashes line resistance by roughly $30\%$. In continuous operating plants (hospitals, manufacturing, data centers), the energy savings over a 20-year building lifecycle frequently exceed the incremental cable material cost by a factor of 5 to 10!</p>
+          </div>
+
+          <div class="worked-example-card">
+            <h3>Practical Worked Engineering Example: High-Efficiency Factory Feeder</h3>
+            <p><strong>Design Scenario:</strong> Sizing a three-phase, 400V, 50 Hz copper feeder powering an industrial air compressor drawing a continuous running load of $I = 70\text{ A}$ at $0.85$ power factor. The one-way route length is $60\text{ meters}$. The cable is multicore copper with XLPE ($90^\circ\text{C}$) insulation installed on an open cable tray at $30^\circ\text{C}$ ambient. The plant operates 5,000 hours per year, and electricity costs $\$0.16/\text{kWh}$. Max allowable voltage drop is $3.5\%$.</p>
+
+            <p><strong>Step 1: Preliminary Thermal Sizing</strong></p>
+            <p>Referring to IEC 60364-5-52 Table B.52.4 (Method E, XLPE copper):</p>
+            <ul>
+              <li>$10\text{ mm}^2 \implies I_0 = 80\text{ A}$ (Marginal: $80 > 70\text{ A}$, but high heat losses)</li>
+              <li>$16\text{ mm}^2 \implies I_0 = 110\text{ A}$ (Robust thermal headroom)</li>
+            </ul>
+
+            <p><strong>Step 2: Resistance &amp; Voltage Drop Comparison: $10\text{ mm}^2$ vs. $16\text{ mm}^2$</strong></p>
+            <p>Operating temperature resistance $R$ for $60\text{ meters}$ at $90^\circ\text{C}$:</p>
+            <ul>
+              <li>For $10\text{ mm}^2$: $r_{90} \approx 2.33\ \Omega/\text{km} \implies R = 0.060\text{ km} \times 2.33 = 0.1398\ \Omega$
+                $$\Delta V = \sqrt{3} \times 70\text{ A} \times 0.1398\ \Omega = 16.95\text{ V} \implies \Delta V\% = \frac{16.95}{400} \times 100 = 4.24\% \quad (\text{FAILS } > 3.5\%!)$$
+              </li>
+              <li>For $16\text{ mm}^2$: $r_{90} \approx 1.46\ \Omega/\text{km} \implies R = 0.060\text{ km} \times 1.46 = 0.0876\ \Omega$
+                $$\Delta V = \sqrt{3} \times 70\text{ A} \times 0.0876\ \Omega = 10.62\text{ V} \implies \Delta V\% = \frac{10.62}{400} \times 100 = 2.66\% \quad (\text{PASSES } \le 3.5\%!)$$
+              </li>
+            </ul>
+
+            <p><strong>Step 3: Calculating Annual Energy Loss Cost</strong></p>
+            <p>For the compliant $16\text{ mm}^2$ copper cable:</p>
+            <p>$$P_{loss} = 3 \times (70\text{ A})^2 \times 0.0876\ \Omega = 3 \times 4900 \times 0.0876 = 1287.7\text{ Watts} = 1.288\text{ kW}$$</p>
+            <p>$$\text{Annual Energy Loss} = 1.288\text{ kW} \times 5000\text{ hrs} = 6440\text{ kWh/year}$$</p>
+            <p>$$\text{Annual Cost} = 6440\text{ kWh} \times \$0.16/\text{kWh} = \$1{,}030.40/\text{year}$$</p>
+
+            <p><strong>Step 4: The 25 mm² Economic Upsizing Analysis</strong></p>
+            <p>If the engineer selects $25\text{ mm}^2$ copper ($r_{90} = 0.927\ \Omega/\text{km} \implies R = 0.0556\ \Omega$):</p>
+            <p>$$P_{loss} = 3 \times 4900 \times 0.0556 = 817.3\text{ Watts} = 0.817\text{ kW}$$</p>
+            <p>$$\text{Annual Cost} = 0.817\text{ kW} \times 5000 \times \$0.16 = \$653.60/\text{year}$$</p>
+            <p>$$\text{Annual Savings} = \$1{,}030.40 - \$653.60 = \$376.80/\text{year}$$</p>
+            <p>Over a 20-year service life, selecting $25\text{ mm}^2$ saves <strong>$\$7,536$ in wasted electricity</strong>, far exceeding the initial $\$300$ copper premium!</p>
+          </div>
+
+          <h2>Frequently Asked Questions (Copper Conductor Engineering)</h2>
+          <div class="faq-item">
+            <h3>What is the difference between solid, stranded, and flexible copper conductors?</h3>
+            <p>Class 1 solid copper conductors consist of a single stiff wire used primarily in domestic conduit wiring up to 2.5 mm² (#10 AWG). Class 2 stranded conductors comprise multiple twisted wires (e.g. 7 or 19 strands) providing balance between flexibility and mechanical stiffness for commercial conduits. Class 5 and 6 flexible conductors utilize hundreds of fine copper strands (e.g. 0.2mm to 0.3mm wire) essential for equipment connections, elevator traveling cables, and robotic trailing leads subject to continuous bending fatigue.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What is skin effect in heavy copper cables?</h3>
+            <p>At 50 Hz and 60 Hz AC power frequencies, alternating magnetic flux induces eddy currents inside the copper core, pushing current density toward the outer surface. The skin depth $\delta$ in copper is approximately $9.3\text{ mm}$ at 50 Hz. In conductors larger than $70\text{ mm}^2$ (2/0 AWG), AC resistance exceeds DC resistance by several percent. For massive busbars and utility cables larger than $300\text{ mm}^2$, segmental Milliken conductors are used to suppress skin effect.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Why must tinned copper be used in marine and sulfurous environments?</h3>
+            <p>Bare copper reacts readily with sulfur, moisture, and chlorine to form non-conductive copper sulfides and green patina ($\text{CuCO}_3$). Applying a microscopic electro-plated coating of pure tin ($2\text{ to }5\ \mu\text{m}$) over individual copper strands creates a barrier against chemical corrosion, facilitates easy soldering, and prevents rubber insulation sulfur vulcanization.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How is adiabatic short-circuit withstand calculated for copper?</h3>
+            <p>During a short circuit, energy dissipates adiabatically before heat can conduct into the insulation. The minimum required copper area $S$ is calculated from the IEC adiabatic equation: $S = \sqrt{I_{sc}^2 \cdot t} / k$. For copper with XLPE insulation ($90^\circ\text{C} \to 250^\circ\text{C}$ limit), the thermodynamic material constant $k = 143\text{ A}\cdot\text{s}^{1/2}/\text{mm}^2$. For copper with PVC ($70^\circ\text{C} \to 160^\circ\text{C}$ limit), $k = 115\text{ A}\cdot\text{s}^{1/2}/\text{mm}^2$.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar" id="toolSidebar">
+        <!-- Dynamically rendered sidebar -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Engineering and mathematical tools grounded in international standards.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="engineering.html">Engineering</a></li>
+        <li><a href="ohms-law-calculator.html">Ohm's Law</a></li>
+        <li><a href="sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // Metric Copper cable standard data (IEC 60228 Class 2 annealed copper)
+    const copperMetricData = [
+      { size: 1.5,  r20: 12.1,  c_pvc: 19.5, c_xlpe: 23 },
+      { size: 2.5,  r20: 7.41,  c_pvc: 27.0, c_xlpe: 31 },
+      { size: 4.0,  r20: 4.61,  c_pvc: 36.0, c_xlpe: 42 },
+      { size: 6.0,  r20: 3.08,  c_pvc: 46.0, c_xlpe: 54 },
+      { size: 10.0, r20: 1.83,  c_pvc: 63.0, c_xlpe: 75 },
+      { size: 16.0, r20: 1.15,  c_pvc: 85.0, c_xlpe: 100 },
+      { size: 25.0, r20: 0.727, c_pvc: 112,  c_xlpe: 127 },
+      { size: 35.0, r20: 0.524, c_pvc: 138,  c_xlpe: 158 },
+      { size: 50.0, r20: 0.387, c_pvc: 168,  c_xlpe: 192 },
+      { size: 70.0, r20: 0.268, c_pvc: 213,  c_xlpe: 246 },
+      { size: 95.0, r20: 0.193, c_pvc: 258,  c_xlpe: 298 },
+      { size: 120,  r20: 0.153, c_pvc: 299,  c_xlpe: 346 },
+      { size: 150,  r20: 0.124, c_pvc: 344,  c_xlpe: 399 },
+      { size: 185,  r20: 0.0991, c_pvc: 392, c_xlpe: 456 },
+      { size: 240,  r20: 0.0754, c_pvc: 461, c_xlpe: 538 },
+      { size: 300,  r20: 0.0601, c_pvc: 530, c_xlpe: 621 }
+    ];
+
+    function calculateCopper() {
+      const supply = document.getElementById("cuSystemSupply").value;
+      const insulation = document.getElementById("cuInsulation").value;
+      const current = parseFloat(document.getElementById("cuDesignCurrent").value) || 1;
+      const ambTemp = parseFloat(document.getElementById("cuAmbientTemp").value) || 30;
+      const lengthMeters = parseFloat(document.getElementById("cuRouteLength").value) || 1;
+      const maxVdPct = parseFloat(document.getElementById("cuMaxVd").value) || 3.5;
+      const costKwh = parseFloat(document.getElementById("electricityCostKwh").value) || 0.16;
+      const hours = parseFloat(document.getElementById("annualHours").value) || 5000;
+
+      let vNom = 400;
+      let is3ph = true;
+      if (supply === "230_1p") { vNom = 230; is3ph = false; }
+      else if (supply === "120_1p") { vNom = 120; is3ph = false; }
+      else if (supply === "480_3p") { vNom = 480; is3ph = true; }
+
+      // Operating core temperature
+      let opTemp = 90;
+      if (insulation === "pvc70") opTemp = 70;
+      else if (insulation === "pvc75") opTemp = 75;
+
+      // Thermal derating Ca
+      const ca = Math.sqrt(Math.max(0.1, (opTemp - ambTemp) / (opTemp - 30)));
+
+      let selected = null;
+
+      for (let i = 0; i < copperMetricData.length; i++) {
+        const row = copperMetricData[i];
+        const baseCap = (insulation === "xlpe") ? row.c_xlpe : row.c_pvc;
+        const deratedCap = baseCap * ca;
+
+        if (deratedCap < current) continue;
+
+        // Temperature adjusted resistance
+        const rT_per_km = row.r20 * (1 + 0.00393 * (opTemp - 20));
+        const rT_circuit = (rT_per_km * (lengthMeters / 1000));
+
+        let deltaV = 0;
+        if (is3ph) {
+          deltaV = Math.sqrt(3) * current * rT_circuit;
+        } else {
+          deltaV = 2 * current * rT_circuit;
+        }
+
+        const vdPct = (deltaV / vNom) * 100;
+
+        if (vdPct <= maxVdPct) {
+          // Power loss calculation
+          let pLossWatts = 0;
+          if (is3ph) {
+            pLossWatts = 3 * current * current * rT_circuit;
+          } else {
+            pLossWatts = 2 * current * current * rT_circuit;
+          }
+
+          const annualCost = (pLossWatts * hours * costKwh) / 1000;
+          const alArea = row.size * 1.64;
+
+          selected = {
+            size: row.size,
+            rT: rT_circuit,
+            deltaV: deltaV,
+            vdPct: vdPct,
+            pLossWatts: pLossWatts,
+            annualCost: annualCost,
+            alArea: alArea
+          };
+          break;
+        }
+      }
+
+      if (selected) {
+        document.getElementById("cuSizeOut").innerText = selected.size + " mm² Copper";
+        document.getElementById("cuResistanceOut").innerText = selected.rT.toFixed(4) + " \u03A9";
+        document.getElementById("cuVdOut").innerText = selected.deltaV.toFixed(2) + " V (" + selected.vdPct.toFixed(2) + "%)";
+        document.getElementById("cuPowerLossOut").innerText = selected.pLossWatts.toFixed(1) + " W";
+        document.getElementById("cuAnnualCostOut").innerText = "$" + selected.annualCost.toFixed(2) + " / yr";
+        document.getElementById("cuAlEquivOut").innerText = selected.alArea.toFixed(1) + " mm² (Next: " + Math.ceil(selected.alArea) + " mm²)";
+      } else {
+        document.getElementById("cuSizeOut").innerText = "> 300 mm² (Parallel Conductors Needed)";
+        document.getElementById("cuResistanceOut").innerText = "--";
+        document.getElementById("cuVdOut").innerText = "Exceeds Drop Limit";
+        document.getElementById("cuPowerLossOut").innerText = "--";
+        document.getElementById("cuAnnualCostOut").innerText = "--";
+        document.getElementById("cuAlEquivOut").innerText = "--";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      calculateCopper();
+    });
+  </script>
+</body>
+</html>

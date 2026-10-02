@@ -85,6 +85,14 @@ CAT_MAP = {
             ("cable-sizing-calculator-bs-7671.html", "Cable Sizing (BS 7671 18th Ed)", "🔌", "UK wiring regulations & mV/A/m drop", "Ib ≤ In ≤ Iz | It ≥ In / (Ca·Cg·Cc·Ci)"),
             ("cable-sizing-calculator-iec-60364.html", "Cable Sizing (IEC 60364-5-52)", "🔌", "International LV dimensioning & adiabatic", "Ib ≤ In ≤ Iz | S ≥ √(Isc²·t) / k"),
             ("cable-sizing-installation-method-a.html", "Cable Sizing Method A (Insulated Wall)", "🔌", "A1 & A2 conduit in cavity derating", "Iz = I0 · Ca · Cg · Ci | High thermal penalty"),
+            ("fault-current-calculator.html", "Fault Current (IEEE 141 / IEC)", "💥", "Transformer secondary & point-to-point kA", "I_sc = I_FLA / (%Z/100) | I_down = I_up / (1+f)"),
+            ("filter-calculator.html", "Analog Filter (RC, RL, LC)", "🎛️", "Cutoff frequency, dB gain & phase angle", "fc = 1 / (2πRC) | fc = R / (2πL) | 1 / (2π√LC)"),
+            ("generator-sizing-calculator.html", "Generator Sizing (ISO 8528)", "⚡", "Standby kVA, motor inrush & altitude derate", "kVA = kW/PF | SkVA = HP×6.0 | k_env derate"),
+            ("heatsink-calculator.html", "Heatsink Sizing & Thermal", "❄️", "Thermal resistance θ_sa & junction temp", "θ_sa ≤ (Tj_max - Ta)/Pd - (θ_jc + θ_cs)"),
+            ("cable-sizing-installation-method-c.html", "Cable Sizing Method C (Clipped Direct)", "🔌", "Surface clipped to masonry ampacity", "Iz = I0 · Ca · Cg | High convective cooling"),
+            ("cable-sizing-installation-method-e.html", "Cable Sizing Method E (Cable Tray)", "🔌", "Perforated tray & ladder rack in free air", "Iz = I0 · Ca · Cg | 360° natural ventilation"),
+            ("cable-sizing-calculator-nec.html", "Cable Sizing (NEC Table 310.16)", "🔌", "125% continuous load & conduit fill derate", "MCA = 1.25·I_cont + I_noncont | NEC 110.14(C)"),
+            ("copper-cable-sizing-calculator.html", "Copper Cable Sizing (100% IACS)", "🔌", "Pure ETP Cu ampacity & I²R loss cost", "R_T = R_20·[1 + α(T-20)] | P_loss = 3·I²R"),
         ]
     },
     "solar-energy.html": {
