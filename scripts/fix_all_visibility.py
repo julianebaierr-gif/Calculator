@@ -42,6 +42,14 @@ CAT_MAP = {
             ("cd-calculator.html", "Certificate of Deposit (CD) Yield", "🏦", "Compound interest, APY & early withdrawal penalty", "A = P(1 + r/n)ⁿᵗ | EWP = P · r · (Penalty Mo / 12)"),
             ("credit-card-payoff-calculator.html", "Credit Card Payoff (Debt Freedom)", "💳", "Minimum payment trap vs fixed accelerated payoff", "DPR = APR/365 | Logarithmic payoff months"),
             ("debt-to-income-calculator.html", "Debt-to-Income (DTI) Ratios", "🏡", "Front-end housing & back-end total debt Fannie Mae sizer", "DTI_front = PITI/Income | DTI_back = (PITI+Debts)/Income"),
+            ("down-payment-calculator.html", "Down Payment & LTV Sizer", "🏡", "Home down payment %, LTV ratio & PMI elimination", "LTV = Loan / Value | PMI eliminated at ≤ 80% LTV"),
+            ("emergency-fund-calculator.html", "Emergency Fund (3-6 Months)", "🛡️", "Bare-bones survival expenses & liquid cash safety net", "Fund = Monthly Essentials × M (3 to 12 months)"),
+            ("inflation-calculator.html", "Inflation & Purchasing Power", "📉", "Future equivalent cost & purchasing power erosion", "FV = PV(1+i)ⁿ | Real Return = (r - i)/(1+i)"),
+            ("net-salary-calculator.html", "Net Salary & Take-Home Pay", "💼", "Gross to net paycheck, federal, FICA & state tax", "Net = Gross - (Fed + FICA 7.65% + State + PreTax)"),
+            ("net-worth-calculator.html", "Personal Net Worth & Solvency", "🏛️", "Personal balance sheet, liquid net worth & debt ratio", "Net Worth = Assets - Liabilities | Liquid NW"),
+            ("sales-tax-calculator.html", "Sales Tax & Reverse Pre-Tax", "🏷️", "Combined state & local rate + gross receipt extraction", "Tax = Net × Rate | Pre-Tax = Gross / (1 + Rate)"),
+            ("savings-calculator.html", "Compound Savings Growth", "📈", "Initial deposit + monthly contributions compounder", "FV = P(1+r/n)ⁿᵗ + PMT·[((1+r/n)ⁿᵗ - 1)/(r/n)]"),
+            ("savings-goal-calculator.html", "Savings Goal Target Sizer", "🎯", "Required monthly contribution to hit wealth target", "PMT = [FV - P(1+r/n)ⁿᵗ] / [((1+r/n)ⁿᵗ - 1)/(r/n)]"),
         ]
     },
     "math.html": {

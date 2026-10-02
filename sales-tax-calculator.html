@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales Tax Calculator | State, Local & Reverse Pre-Tax Sizer</title>
+  <meta name="description" content="Calculate sales tax amounts, gross checkout totals, combined state and municipal tax rates, and reverse tax-inclusive net price conversions.">
+  <link rel="canonical" href="https://calchub.cloud/sales-tax-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Sales Tax Calculator",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates forward sales tax additions and reverse tax-inclusive deductions across combined state, county, and municipal sales tax brackets.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How is sales tax calculated from a pre-tax retail price?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sales tax is calculated by multiplying the net pre-tax purchase price by the combined sales tax rate expressed as a decimal: Tax Amount = Pre-Tax Price × (Tax Rate / 100). The total cost equals Pre-Tax Price + Tax Amount."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do you calculate the pre-tax price from a tax-inclusive total (reverse sales tax)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "To find the pre-tax price from a final receipt total, divide the gross total by 1 plus the tax rate in decimal form: Pre-Tax Price = Gross Total / (1 + Tax Rate / 100). Subtracting the pre-tax price from the gross total yields the embedded tax amount."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between a single-stage sales tax and a Value-Added Tax (VAT)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A retail sales tax (common in the US) is assessed exclusively at the final point of retail sale to the end consumer. A Value-Added Tax (VAT / GST, prevalent in Europe and globally) is levied fractionally at every stage of the supply chain based on the value added by each producer."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which US states do not levy a statewide general sales tax?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Five US states—often referred to as the NOMAD states—levy zero statewide general sales tax: New Hampshire, Oregon, Montana, Alaska (though local municipalities may levy local taxes), and Delaware."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="logo">CalcHub</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="finance.html" class="active">Financial</a>
+        <a href="engineering.html">Electrical</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html">Civil</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <div class="content-wrapper">
+      <div class="calculator-container">
+        <h1>Sales Tax Calculator</h1>
+        <p class="lead-text">Calculate total checkout costs, embedded sales tax amounts, combined state and municipal rates, or execute reverse calculations to extract pre-tax prices from final receipts.</p>
+
+        <div class="calc-card">
+          <div class="calc-form">
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="priceInput">Transaction Price ($)</label>
+                <input type="number" id="priceInput" value="250.00" min="0.01" step="5" class="form-control">
+              </div>
+              <div class="form-group col-half">
+                <label for="calcMode">Calculation Mode</label>
+                <select id="calcMode" class="form-control">
+                  <option value="forward" selected>Add Sales Tax (Pre-Tax &rarr; Gross Total)</option>
+                  <option value="reverse">Extract Sales Tax (Gross Total &rarr; Pre-Tax)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-third">
+                <label for="stateRate">State Tax Rate (%)</label>
+                <input type="number" id="stateRate" value="6.0" min="0" max="25" step="0.25" class="form-control">
+              </div>
+              <div class="form-group col-third">
+                <label for="localRate">County / City Local Tax (%)</label>
+                <input type="number" id="localRate" value="2.25" min="0" max="15" step="0.25" class="form-control">
+              </div>
+              <div class="form-group col-third">
+                <label for="statePreset">Popular State Presets</label>
+                <select id="statePreset" class="form-control">
+                  <option value="custom" selected>Custom Tax Rate</option>
+                  <option value="ca">California (7.25% state + local)</option>
+                  <option value="tx">Texas (6.25% state + 2.0% local)</option>
+                  <option value="ny">New York (4.0% state + 4.875% NYC)</option>
+                  <option value="fl">Florida (6.0% state + 1.5% local)</option>
+                  <option value="or">Oregon (0.0% Tax Free)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="btn-group">
+              <button type="button" id="calcBtn" class="btn btn-primary">Calculate Sales Tax</button>
+              <button type="button" id="resetBtn" class="btn btn-secondary">Reset Defaults</button>
+            </div>
+          </div>
+
+          <div class="results-panel" id="resultsPanel">
+            <h2>Transaction Tax Breakdown</h2>
+            <div class="result-hero">
+              <span class="hero-label" id="resHeroLabel">Final Gross Checkout Total</span>
+              <span class="hero-value" id="resHeroValue">$270.63</span>
+            </div>
+
+            <div class="results-grid">
+              <div class="result-item">
+                <span class="sub-label">Net Pre-Tax Base Price</span>
+                <span class="sub-value" id="resNetPrice">$250.00</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Total Sales Tax Billed</span>
+                <span class="sub-value highlight" id="resTotalTax">$20.63</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Combined Effective Tax Rate</span>
+                <span class="sub-value" id="resCombinedRate">8.250%</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">State Tax Portion (6.00%)</span>
+                <span class="sub-value" id="resStatePortion">$15.00</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Local Municipal Portion (2.25%)</span>
+                <span class="sub-value" id="resLocalPortion">$5.63</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Tax Overhead Percentage</span>
+                <span class="sub-value" id="resOverheadPct">+8.25% on goods</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comprehensive Fiscal Law & Taxation Article (1,300+ Words) -->
+        <article class="article-body">
+          <h2>1. The Fiscal Mechanics of Retail Sales and Use Taxes</h2>
+          <p>A <strong>retail sales tax</strong> is an ad valorem consumption levy assessed by state, county, and municipal governmental authorities on the final retail transaction of taxable physical goods and specified consumer services. Unlike direct taxes (such as corporate or individual income taxes), sales taxes are categorized as <strong>indirect taxes</strong>: the retail vendor legally collects the tax from the end purchaser at the point of sale and remits the funds to the state department of revenue.</p>
+          <p>The mathematical formulation for forward sales tax computation is expressed as:</p>
+          <div class="math-block">
+            $$T = P_{\text{net}} \times \left( \frac{\tau_{\text{combined}}}{100} \right)$$
+          </div>
+          <p>Where:</p>
+          <ul>
+            <li>\(P_{\text{net}}\) represents the <strong>Net Pre-Tax Base Price</strong>.</li>
+            <li>\(\tau_{\text{combined}}\) represents the total aggregate sales tax rate in percent, defined as the sum of all overlapping jurisdictional levies: \(\tau_{\text{combined}} = \tau_{\text{state}} + \tau_{\text{county}} + \tau_{\text{city}} + \tau_{\text{special district}}\).</li>
+            <li>\(T\) represents the total sales tax collected in currency.</li>
+          </ul>
+          <p>The gross out-of-pocket invoice total paid by the customer is:</p>
+          <div class="math-block">
+            $$P_{\text{gross}} = P_{\text{net}} + T = P_{\text{net}} \cdot \left( 1 + \frac{\tau_{\text{combined}}}{100} \right)$$
+          </div>
+
+          <h2>2. The Inverse Algebra: Reverse Sales Tax Extraction</h2>
+          <p>Corporate bookkeepers, accountants, and expense auditors frequently encounter receipts displaying only a gross final total \(P_{\text{gross}}\) and must reverse-engineer the underlying pre-tax base cost and exact tax collected. A common amateur error is simply multiplying \(P_{\text{gross}}\) by \(\tau_{\text{combined}}\), which yields an inflated, legally inaccurate figure because sales tax is assessed on the <em>pre-tax base</em>, not the gross sum.</p>
+          <p>The correct mathematical inversion isolates \(P_{\text{net}}\):</p>
+          <div class="math-block">
+            $$P_{\text{net}} = \frac{P_{\text{gross}}}{1 + \frac{\tau_{\text{combined}}}{100}}$$
+          </div>
+          <p>Once \(P_{\text{net}}\) is established, the embedded sales tax \(T\) is recovered via subtraction:</p>
+          <div class="math-block">
+            $$T = P_{\text{gross}} - P_{\text{net}} = P_{\text{gross}} \cdot \left[ \frac{\frac{\tau_{\text{combined}}}{100}}{1 + \frac{\tau_{\text{combined}}}{100}} \right]$$
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Gross Total Paid</th>
+                <th>Combined Tax Rate (\(\tau\))</th>
+                <th>Correct Pre-Tax Net Price</th>
+                <th>Actual Tax Paid</th>
+                <th>Flawed Simple % Error</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>$100.00</td>
+                <td>5.0%</td>
+                <td>$95.24</td>
+                <td>$4.76</td>
+                <td>+$0.24 overestimate</td>
+              </tr>
+              <tr>
+                <td>$100.00</td>
+                <td>8.25%</td>
+                <td>$92.38</td>
+                <td>$7.62</td>
+                <td>+$0.63 overestimate</td>
+              </tr>
+              <tr>
+                <td>$100.00</td>
+                <td>10.0%</td>
+                <td>$90.91</td>
+                <td>$9.09</td>
+                <td>+$0.91 overestimate</td>
+              </tr>
+              <tr>
+                <td>$500.00</td>
+                <td>8.875% (NYC)</td>
+                <td>$459.24</td>
+                <td>$40.76</td>
+                <td>+$3.62 overestimate</td>
+              </tr>
+              <tr>
+                <td>$1,000.00</td>
+                <td>9.5% (TN/LA)</td>
+                <td>$913.24</td>
+                <td>$86.76</td>
+                <td>+$8.24 overestimate</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>3. Multi-Tiered Jurisdictional Layering in the United States</h2>
+          <p>Unlike European and Asian countries where a unified national Value-Added Tax (VAT) prevails, the United States possesses no federal sales tax. Instead, sales tax policy is decentralized across over <strong>13,000 distinct taxing jurisdictions</strong> nationwide:</p>
+          <ul>
+            <li><strong>State Baseline Tax:</strong> Forty-five states plus Washington D.C. impose a statewide baseline tax rate ranging from 2.9% (Colorado) to 7.25% (California).</li>
+            <li><strong>County & Municipal Piggyback Taxes:</strong> Local county commissioners and municipal city councils routinely levy local option sales taxes (typically 0.5% to 3.5%) atop the state rate to fund municipal infrastructure, public schools, and police services.</li>
+            <li><strong>Special District Assessments:</strong> Specialized public entities (such as Regional Transportation Districts, stadium authorities, or emergency medical response zones) levy targeted surcharges of 0.1% to 1.0% within micro-geographic boundaries.</li>
+          </ul>
+
+          <div class="worked-example-card">
+            <h3>Worked Accounting Case Study: Commercial Asset Acquisition</h3>
+            <p><strong>Scenario:</strong> A design engineering consultancy purchases $18,500 of computer CAD workstations in an urban municipality featuring a 6.25% state sales tax, a 1.25% county transit tax, and a 0.75% municipal police district levy.</p>
+            <p><strong>Step 1: Compute Aggregate Combined Tax Rate</strong></p>
+            <div class="math-block">
+              $$\tau_{\text{combined}} = 6.25\% + 1.25\% + 0.75\% = 8.25\%$$
+            </div>
+            <p><strong>Step 2: Calculate Tax Liability per Jurisdictional Tranche</strong></p>
+            <ul>
+              <li>State Tax: \(\$18,500 \times 0.0625 = \$1,156.25\)</li>
+              <li>County Transit Tax: \(\$18,500 \times 0.0125 = \$231.25\)</li>
+              <li>City District Tax: \(\$18,500 \times 0.0075 = \$138.75\)</li>
+              <li><strong>Total Sales Tax Billed (\(T\)):</strong> \(\$1,156.25 + \$231.25 + \$138.75 = \$1,526.25\)</li>
+            </ul>
+            <p><strong>Step 3: Determine Gross Final Invoice Total</strong></p>
+            <div class="math-block">
+              $$P_{\text{gross}} = \$18,500.00 + \$1,526.25 = \$20,026.25$$
+            </div>
+            <p><strong>Accounting Conclusion:</strong> The firm capitalizes the asset at its net basis ($18,500) while recording $1,526.25 under input tax expenses for corporate tax deductions.</p>
+          </div>
+
+          <h2>4. Sales Tax vs. Value-Added Tax (VAT) vs. Use Tax</h2>
+          <p>Global taxation frameworks utilize distinct structures that must not be conflated:</p>
+          <ul>
+            <li><strong>Retail Sales Tax (RST):</strong> A single-stage turnover tax collected exclusively on final end-consumer transactions. Wholesalers, manufacturers, and business-to-business (B2B) supply chains escape sales tax through <strong>Resale Exemption Certificates</strong> to avoid cascading tax pyramiding.</li>
+            <li><strong>Value-Added Tax (VAT / GST):</strong> A multi-stage tax prevalent in over 160 nations. Every intermediary business in the supply chain collects tax on its gross output, claims an "input tax credit" for tax paid on raw inputs, and remits the net differential to the state.</li>
+            <li><strong>Consumer Use Tax:</strong> A complementary excise tax levied on out-of-state purchases. Following the landmark 2018 Supreme Court ruling in <em>South Dakota v. Wayfair, Inc.</em>, out-of-state online retailers with economic nexus ($100k+ in sales or 200+ transactions) must collect destination sales tax at the buyer's home address.</li>
+          </ul>
+
+          <h2>5. Origin-Based vs. Destination-Based Tax Sourcing</h2>
+          <p>For intra-state commerce and e-commerce transactions, state departments of revenue enforce one of two divergent sourcing doctrines:</p>
+          <ul>
+            <li><strong>Destination-Based Sourcing (Majority of States):</strong> Sales tax is assessed based on the delivery location where the purchaser takes physical possession of the product. An online merchant shipping from rural Texas to Houston must charge Houston's combined 8.25% municipal rate.</li>
+            <li><strong>Origin-Based Sourcing (Minority of States):</strong> Sales tax is assessed based on the location of the seller's physical warehouse, office, or storefront (e.g., Texas in-state store sales, Ohio, Pennsylvania, Illinois).</li>
+            <li><strong>Digital Goods and SaaS Taxation:</strong> Historically, sales taxes targeted tangible personal property. Today, over thirty states have expanded statutes to tax Software-as-a-Service (SaaS), cloud storage, e-books, and digital streaming subscriptions as taxable services.</li>
+          </ul>
+
+          <h2>6. Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <h3>What goods and services are typically exempt from retail sales tax?</h3>
+            <p>In most US states, necessities of life are fully or partially exempt: prescription pharmaceuticals, unprocessed grocery foods, residential utilities, and medical devices. Additionally, non-profit institutions and government agencies possess tax-exempt status.</p>
+          </div>
+          <div class="faq-item">
+            <h3>What are the NOMAD states?</h3>
+            <p>The acronym <strong>NOMAD</strong> represents the five US states that impose no statewide general sales tax: <strong>N</strong>ew Hampshire, <strong>O</strong>regon, <strong>M</strong>ontana, <strong>A</strong>laska, and <strong>D</strong>elaware. However, Alaskan local municipalities retain statutory authority to levy local municipal sales taxes.</p>
+          </div>
+          <div class="faq-item">
+            <h3>How do sales tax holidays work?</h3>
+            <p>Many US states enact statutory sales tax holidays (typically 2 to 3 days in August before the school year) temporarily waiving sales taxes on designated categories such as back-to-school clothing, computers under $1,500, or hurricane emergency preparedness gear.</p>
+          </div>
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏦</span>
+            <h3 class="widget-title">Related Finance & Investment</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="rule-of-72-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rule of 72 Doubling Time</a></li>
+            <li><a href="car-loan-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Car Loan Financing</a></li>
+            <li><a href="roi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ROI & Annualized CAGR</a></li>
+            <li><a href="loan-emi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan EMI Calculator</a></li>
+            <li><a href="mortgage-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Mortgage & PITI</a></li>
+            <li><a href="compound-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Compound Interest</a></li>
+            <li><a href="simple-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Simple Interest</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck</a></li>
+            <li><a href="discount-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Discount & Sale</a></li>
+            <li><a href="tip-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Tip & Bill Splitter</a></li>
+            <li><a href="amortization-schedule-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan Amortization Schedule</a></li>
+            <li><a href="apr-apy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> APR to APY Compounding Converter</a></li>
+            <li><a href="break-even-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Break-Even Point (Units & Sales)</a></li>
+            <li><a href="capital-gains-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capital Gains Tax (Short & Long)</a></li>
+            <li><a href="cd-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Certificate of Deposit (CD) Yield</a></li>
+            <li><a href="credit-card-payoff-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Credit Card Payoff (Debt Freedom)</a></li>
+            <li><a href="debt-to-income-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Debt-to-Income (DTI) Ratios</a></li>
+            <li><a href="down-payment-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Down Payment & LTV Sizer</a></li>
+            <li><a href="emergency-fund-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Emergency Fund (3-6 Months)</a></li>
+            <li><a href="inflation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Inflation & Purchasing Power</a></li>
+            <li><a href="net-salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Net Salary & Take-Home Pay</a></li>
+            <li><a href="net-worth-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Personal Net Worth & Solvency</a></li>
+            <li><a href="sales-tax-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Sales Tax & Reverse Pre-Tax</a></li>
+            <li><a href="savings-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Compound Savings Growth</a></li>
+            <li><a href="savings-goal-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Savings Goal Target Sizer</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="finance.html" class="sidebar-category-link">View All Finance & Investment Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, science, and technical calculation tools.</p>
+    </div>
+  </footer>
+
+  <script>
+    const presets = {
+      ca: { state: 7.25, local: 1.50 },
+      tx: { state: 6.25, local: 2.00 },
+      ny: { state: 4.00, local: 4.875 },
+      fl: { state: 6.00, local: 1.50 },
+      or: { state: 0.00, local: 0.00 }
+    };
+
+    function applyPreset() {
+      const p = document.getElementById('statePreset').value;
+      if (p !== 'custom' && presets[p]) {
+        document.getElementById('stateRate').value = presets[p].state;
+        document.getElementById('localRate').value = presets[p].local;
+      }
+      calculate();
+    }
+
+    function calculate() {
+      const price = parseFloat(document.getElementById('priceInput').value) || 0;
+      const mode = document.getElementById('calcMode').value;
+      const stateRate = parseFloat(document.getElementById('stateRate').value) || 0;
+      const localRate = parseFloat(document.getElementById('localRate').value) || 0;
+
+      const combinedRate = stateRate + localRate;
+      const rateDecimal = combinedRate / 100;
+
+      let netPrice = 0;
+      let totalTax = 0;
+      let grossPrice = 0;
+
+      if (mode === 'forward') {
+        netPrice = price;
+        totalTax = netPrice * rateDecimal;
+        grossPrice = netPrice + totalTax;
+      } else {
+        // Reverse mode: price is gross
+        grossPrice = price;
+        netPrice = grossPrice / (1 + rateDecimal);
+        totalTax = grossPrice - netPrice;
+      }
+
+      const statePortion = combinedRate > 0 ? totalTax * (stateRate / combinedRate) : 0;
+      const localPortion = combinedRate > 0 ? totalTax * (localRate / combinedRate) : 0;
+
+      const fmtCur = (v) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      if (mode === 'forward') {
+        document.getElementById('resHeroLabel').textContent = 'Final Gross Checkout Total';
+        document.getElementById('resHeroValue').textContent = fmtCur(grossPrice);
+      } else {
+        document.getElementById('resHeroLabel').textContent = 'Net Pre-Tax Base Price';
+        document.getElementById('resHeroValue').textContent = fmtCur(netPrice);
+      }
+
+      document.getElementById('resNetPrice').textContent = fmtCur(netPrice);
+      document.getElementById('resTotalTax').textContent = fmtCur(totalTax);
+      document.getElementById('resCombinedRate').textContent = combinedRate.toFixed(3) + '%';
+      document.getElementById('resStatePortion').textContent = fmtCur(statePortion);
+      document.getElementById('resLocalPortion').textContent = fmtCur(localPortion);
+      document.getElementById('resOverheadPct').textContent = '+' + combinedRate.toFixed(2) + '% on goods';
+    }
+
+    document.getElementById('statePreset').addEventListener('change', applyPreset);
+    document.querySelectorAll('input, select').forEach(el => {
+      if (el.id !== 'statePreset') {
+        el.addEventListener('input', () => {
+          if (el.id === 'stateRate' || el.id === 'localRate') {
+            document.getElementById('statePreset').value = 'custom';
+          }
+          calculate();
+        });
+        el.addEventListener('change', () => {
+          if (el.id === 'stateRate' || el.id === 'localRate') {
+            document.getElementById('statePreset').value = 'custom';
+          }
+          calculate();
+        });
+      }
+    });
+
+    document.getElementById('calcBtn').addEventListener('click', calculate);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('priceInput').value = '250.00';
+      document.getElementById('calcMode').value = 'forward';
+      document.getElementById('statePreset').value = 'custom';
+      document.getElementById('stateRate').value = '6.0';
+      document.getElementById('localRate').value = '2.25';
+      calculate();
+    });
+
+    window.addEventListener('DOMContentLoaded', calculate);
+  </script>
+</body>
+</html>

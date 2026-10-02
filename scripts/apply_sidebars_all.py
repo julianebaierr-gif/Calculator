@@ -41,6 +41,14 @@ CATEGORIES = {
             ("cd-calculator.html", "Certificate of Deposit (CD) Yield", "🏦", "Compound interest, APY & early withdrawal penalty"),
             ("credit-card-payoff-calculator.html", "Credit Card Payoff (Debt Freedom)", "💳", "Minimum payment trap vs fixed accelerated payoff"),
             ("debt-to-income-calculator.html", "Debt-to-Income (DTI) Ratios", "🏡", "Front-end housing & back-end total debt Fannie Mae sizer"),
+            ("down-payment-calculator.html", "Down Payment & LTV Sizer", "🏡", "Home down payment %, LTV ratio & PMI elimination"),
+            ("emergency-fund-calculator.html", "Emergency Fund (3-6 Months)", "🛡️", "Bare-bones survival expenses & liquid cash safety net"),
+            ("inflation-calculator.html", "Inflation & Purchasing Power", "📉", "Future equivalent cost & purchasing power erosion"),
+            ("net-salary-calculator.html", "Net Salary & Take-Home Pay", "💼", "Gross to net paycheck, federal, FICA & state tax"),
+            ("net-worth-calculator.html", "Personal Net Worth & Solvency", "🏛️", "Personal balance sheet, liquid net worth & debt ratio"),
+            ("sales-tax-calculator.html", "Sales Tax & Reverse Pre-Tax", "🏷️", "Combined state & local rate + gross receipt extraction"),
+            ("savings-calculator.html", "Compound Savings Growth", "📈", "Initial deposit + monthly contributions compounder"),
+            ("savings-goal-calculator.html", "Savings Goal Target Sizer", "🎯", "Required monthly contribution to hit wealth target"),
         ]
     },
     "math": {
@@ -304,7 +312,7 @@ def determine_tool_cat(filename):
     f = filename.lower()
     if any(k in f for k in ["bmi", "calorie", "body-fat", "ideal-weight", "water-intake", "bmr", "macro"]):
         return "health"
-    if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72", "amortization", "apr-apy", "break-even", "capital-gains", "cd-calculator", "credit-card", "debt-to-income"]):
+    if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72", "amortization", "apr-apy", "break-even", "capital-gains", "cd-calculator", "credit-card", "debt-to-income", "down-payment", "emergency-fund", "inflation", "net-salary", "net-worth", "sales-tax", "savings"]):
         return "finance"
     if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity", "power-factor", "parallel-resistor", "battery-life", "555-timer", "led-resistor", "capacitive-reactance", "inductive-reactance", "op-amp-gain", "three-phase-power", "adc-dac", "antenna-length", "battery-short-circuit", "bjt-transistor", "breaker-size", "decibel", "earth-pit", "electrical-power", "microstrip", "busbar", "fault-current", "filter", "generator", "heatsink", "copper-cable", "earthing", "kw-to-cable", "single-phase", "three-phase", "wire-gauge"]):
         return "engineering"

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Net Salary Calculator | Gross to Take-Home Pay & Tax Withholding Sizer</title>
+  <meta name="description" content="Calculate your net take-home salary after federal income tax, FICA Social Security (6.2%), Medicare (1.45%), state tax, and pre-tax retirement deductions.">
+  <link rel="canonical" href="https://calchub.cloud/net-salary-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Net Salary Calculator",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates take-home pay, federal progressive tax withholdings, FICA payroll taxes, state tax deductions, and monthly/bi-weekly paycheck values.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the difference between gross salary and net take-home pay?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Gross salary is your total contractual compensation before any deductions. Net salary (take-home pay) is the remaining cash deposited into your bank account after mandatory federal taxes, state taxes, FICA payroll taxes (Social Security and Medicare), and voluntary pre-tax benefit contributions."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are FICA taxes and how are they calculated on paychecks?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "FICA (Federal Insurance Contributions Act) taxes fund Social Security and Medicare. Employees pay 6.2% for Social Security (up to an annual wage base cap) and 1.45% for Medicare with no wage cap, plus an additional 0.9% Medicare surtax for single earnings above $200,000."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do pre-tax deductions like a 401(k) or HSA increase take-home efficiency?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Pre-tax contributions (traditional 401k, 403b, HSA, FSA) are deducted from your gross earnings before federal and state income taxes are calculated. This reduces your taxable income bracket, saving 22% to 37% in marginal income taxes on every dollar contributed."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do progressive federal tax brackets work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Federal income tax uses progressive marginal brackets (10%, 12%, 22%, 24%, 32%, 35%, 37%). Income is not taxed at a single flat rate; each tier of income is taxed only at its corresponding marginal percentage after subtracting standard or itemized deductions."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="logo">CalcHub</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="finance.html" class="active">Financial</a>
+        <a href="engineering.html">Electrical</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html">Civil</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <div class="content-wrapper">
+      <div class="calculator-container">
+        <h1>Net Salary Calculator</h1>
+        <p class="lead-text">Calculate your true net take-home paycheck from gross annual wages. Model federal progressive income tax brackets, FICA payroll deductions, state income taxes, and pre-tax retirement savings.</p>
+
+        <div class="calc-card">
+          <div class="calc-form">
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="grossSalary">Gross Annual Salary ($)</label>
+                <input type="number" id="grossSalary" value="95000" min="5000" step="2500" class="form-control">
+              </div>
+              <div class="form-group col-half">
+                <label for="filingStatus">Tax Filing Status</label>
+                <select id="filingStatus" class="form-control">
+                  <option value="single" selected>Single Filer</option>
+                  <option value="married">Married Filing Jointly</option>
+                  <option value="head">Head of Household</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-third">
+                <label for="stateTaxRate">Est. State Income Tax (%)</label>
+                <input type="number" id="stateTaxRate" value="4.5" min="0" max="15" step="0.25" class="form-control">
+              </div>
+              <div class="form-group col-third">
+                <label for="preTax401k">Pre-Tax 401(k) / HSA ($/yr)</label>
+                <input type="number" id="preTax401k" value="5000" min="0" step="500" class="form-control">
+              </div>
+              <div class="form-group col-third">
+                <label for="payFrequency">Paycheck Frequency</label>
+                <select id="payFrequency" class="form-control">
+                  <option value="12">Monthly (12 checks/yr)</option>
+                  <option value="24">Semi-Monthly (24 checks/yr)</option>
+                  <option value="26" selected>Bi-Weekly (26 checks/yr)</option>
+                  <option value="52">Weekly (52 checks/yr)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="btn-group">
+              <button type="button" id="calcBtn" class="btn btn-primary">Calculate Take-Home Pay</button>
+              <button type="button" id="resetBtn" class="btn btn-secondary">Reset Defaults</button>
+            </div>
+          </div>
+
+          <div class="results-panel" id="resultsPanel">
+            <h2>Paycheck & Tax Withholding Summary</h2>
+            <div class="result-hero">
+              <span class="hero-label" id="resHeroLabel">Net Paycheck (Bi-Weekly)</span>
+              <span class="hero-value" id="resNetPaycheck">$2,631</span>
+            </div>
+
+            <div class="results-grid">
+              <div class="result-item">
+                <span class="sub-label">Annual Net Take-Home Pay</span>
+                <span class="sub-value highlight" id="resNetAnnual">$68,412</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Effective Overall Tax Rate</span>
+                <span class="sub-value" id="resEffTaxRate">28.0%</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Federal Income Tax Withholding</span>
+                <span class="sub-value" id="resFedTax">$11,821 / yr</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">FICA Social Security (6.2%)</span>
+                <span class="sub-value" id="resSocSec">$5,890 / yr</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">FICA Medicare (1.45%)</span>
+                <span class="sub-value" id="resMedicare">$1,378 / yr</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Estimated State Income Tax</span>
+                <span class="sub-value" id="resStateTax">$4,050 / yr</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comprehensive Payroll Tax Article (1,300+ Words) -->
+        <article class="article-body">
+          <h2>1. The Decomposition of Employee Payroll Compensation</h2>
+          <p>When an employee signs an employment agreement stipulating an annual gross compensation \(Y_{\text{gross}}\), the nominal contract figure does not represent the liquid funds deposited into their checking account. In modern economies, mandatory sovereign tax withholdings, statutory social safety net deductions, and elective employer benefit plans consume between 20% and 45% of total earnings.</p>
+          <p>The universal payroll balance equation defining <strong>Net Take-Home Salary (\(Y_{\text{net}}\))</strong> is:</p>
+          <div class="math-block">
+            $$Y_{\text{net}} = Y_{\text{gross}} - \left[ \text{Federal Income Tax} + \text{FICA Taxes} + \text{State/Local Taxes} + \text{Voluntary Pre-Tax Deductions} \right]$$
+          </div>
+          <p>Per-period paycheck distributions are computed simply by dividing annual net take-home by the organization's payroll cycle frequency \(N_{\text{periods}}\) (e.g., \(N = 26\) for bi-weekly, \(N = 24\) for semi-monthly, \(N = 12\) for monthly):</p>
+          <div class="math-block">
+            $$\text{Paycheck}_{\text{net}} = \frac{Y_{\text{net}}}{N_{\text{periods}}}$$
+          </div>
+
+          <h2>2. Progressive Federal Income Tax Calculation Mechanics</h2>
+          <p>Under United States Internal Revenue Code (IRC), federal income taxes are assessed on a <strong>progressive marginal basis</strong>. Gross income is first shielded by the <strong>Standard Deduction</strong> (indexed annually for inflation; approximately $14,600 for single filers and $29,200 for married couples filing jointly). Pre-tax retirement and healthcare contributions further reduce gross wages to determine <strong>Taxable Income (\(Y_{\text{taxable}}\))</strong>:</p>
+          <div class="math-block">
+            $$Y_{\text{taxable}} = \max\left(0, Y_{\text{gross}} - \text{PreTax Deductions} - \text{Standard Deduction}\right)$$
+          </div>
+          <p>Taxable income is then processed through 7 progressive tiers: <strong>10%, 12%, 22%, 24%, 32%, 35%, and 37%</strong>. Crossing into a higher tax bracket does <em>not</em> cause all prior earnings to be taxed at the higher percentage; only the incremental dollars within that specific tier are taxed at the higher marginal rate:</p>
+          <div class="math-block">
+            $$\text{Federal Tax} = \sum_{k=1}^{7} \tau_k \cdot \max\left(0, \min(Y_{\text{taxable}}, B_k) - B_{k-1}\right)$$
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Marginal Bracket Rate</th>
+                <th>Single Filer Taxable Income Tier</th>
+                <th>Married Filing Jointly Tier</th>
+                <th>Marginal Tax on $1,000 Extra</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>10%</strong></td>
+                <td>$0 &ndash; $11,600</td>
+                <td>$0 &ndash; $23,200</td>
+                <td>$100</td>
+              </tr>
+              <tr>
+                <td><strong>12%</strong></td>
+                <td>$11,601 &ndash; $47,150</td>
+                <td>$23,201 &ndash; $94,300</td>
+                <td>$120</td>
+              </tr>
+              <tr>
+                <td><strong>22%</strong></td>
+                <td>$47,151 &ndash; $100,525</td>
+                <td>$94,301 &ndash; $201,050</td>
+                <td>$220</td>
+              </tr>
+              <tr>
+                <td><strong>24%</strong></td>
+                <td>$100,526 &ndash; $191,950</td>
+                <td>$201,051 &ndash; $383,900</td>
+                <td>$240</td>
+              </tr>
+              <tr>
+                <td><strong>32%</strong></td>
+                <td>$191,951 &ndash; $243,725</td>
+                <td>$383,901 &ndash; $487,450</td>
+                <td>$320</td>
+              </tr>
+              <tr>
+                <td><strong>35%</strong></td>
+                <td>$243,726 &ndash; $609,350</td>
+                <td>$487,451 &ndash; $731,200</td>
+                <td>$350</td>
+              </tr>
+              <tr>
+                <td><strong>37%</strong></td>
+                <td>Over $609,350</td>
+                <td>Over $731,200</td>
+                <td>$370</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>3. FICA Payroll Taxes: Social Security and Medicare</h2>
+          <p>In addition to progressive income taxes, the <strong>Federal Insurance Contributions Act (FICA)</strong> levies mandatory payroll taxes directly on gross wages to fund public social safety nets:</p>
+          <ul>
+            <li><strong>Social Security (OASDI):</strong> Levied at <strong>6.2%</strong> on both employee and employer (12.4% combined). Crucially, Social Security is capped at an annual wage base limit ($168,600 for recent tax years). Earnings above this threshold incur zero additional Social Security tax.</li>
+            <li><strong>Medicare (HI):</strong> Levied at <strong>1.45%</strong> on both employee and employer (2.9% combined) with <em>no wage cap</em>. Under the Affordable Care Act, an <strong>Additional Medicare Tax of 0.9%</strong> applies to employee wages exceeding $200,000 for single filers ($250,000 for married couples), bringing the top employee Medicare rate to 2.35%.</li>
+          </ul>
+
+          <div class="worked-example-card">
+            <h3>Worked Quantitative Case Study: Detailed Paycheck Decomposition</h3>
+            <p><strong>Scenario:</strong> An employee earns $120,000 gross annual salary as a Single filer. They contribute $8,000 annually to a pre-tax traditional 401(k) and live in a state with an effective 5.0% flat income tax rate. Paychecks are issued bi-weekly (\(N = 26\)).</p>
+            <p><strong>Step 1: Calculate Adjusted Gross Income and Deductions</strong></p>
+            <div class="math-block">
+              $$\text{Taxable Income} = \$120,000 - \$8,000\text{ (401k)} - \$14,600\text{ (standard deduction)} = \$97,400$$
+            </div>
+            <p><strong>Step 2: Compute Federal Progressive Income Tax</strong></p>
+            <ul>
+              <li>10% on first $11,600 = $1,160.00</li>
+              <li>12% on ($47,150 - $11,600 = $35,550) = $4,266.00</li>
+              <li>22% on remaining ($97,400 - $47,150 = $50,250) = $11,055.00</li>
+              <li><strong>Total Federal Tax Liability:</strong> \(\$1,160 + \$4,266 + \$11,055 = \$16,481.00\)</li>
+            </ul>
+            <p><strong>Step 3: Compute FICA Payroll Taxes</strong></p>
+            <ul>
+              <li>Social Security (\(6.2\%\) of $120,000) = \(\$7,440.00\)</li>
+              <li>Medicare (\(1.45\%\) of $120,000) = \(\$1,740.00\)</li>
+              <li><strong>Total FICA:</strong> \(\$9,180.00\)</li>
+            </ul>
+            <p><strong>Step 4: Compute State Income Tax (5% of $112,000 state taxable)</strong></p>
+            <div class="math-block">
+              $$\text{State Tax} = \$112,000 \times 0.05 = \$5,600.00$$
+            </div>
+            <p><strong>Step 5: Compute Net Annual Take-Home and Bi-Weekly Paycheck</strong></p>
+            <div class="math-block">
+              $$Y_{\text{net}} = \$120,000 - [\$16,481 + \$9,180 + \$5,600 + \$8,000] = \$80,739.00$$
+            </div>
+            <div class="math-block">
+              $$\text{Bi-Weekly Net Check} = \frac{\$80,739}{26} = \$3,105.35$$
+            </div>
+            <p><strong>Financial Summary:</strong> Total tax withholdings equal $31,261 (an effective overall tax rate of 26.05%). Contributing $8,000 to the 401(k) saved the employee $1,760 in federal taxes and $400 in state taxes, demonstrating the tremendous power of pre-tax investing.</p>
+          </div>
+
+          <h2>4. Optimizing Take-Home Pay: Pre-Tax vs. Post-Tax Strategies</h2>
+          <p>Employees can strategically maximize their wealth efficiency by leveraging statutory tax-advantaged accounts:</p>
+          <ul>
+            <li><strong>Traditional 401(k) / 403(b):</strong> Contributions are exempt from federal and state income taxes in the year contributed, lowering current-year tax brackets. Taxes are deferred until retirement withdrawals.</li>
+            <li><strong>Health Savings Accounts (HSAs):</strong> The "Triple Tax-Advantaged" instrument. Contributions are exempt from federal income tax, state income tax, <em>and FICA taxes</em> when made via employer payroll deduction. Growth is tax-free, and withdrawals for qualified medical expenses are 100% tax-free.</li>
+            <li><strong>Flexible Spending Accounts (FSAs):</strong> Pre-tax payroll deductions for dependent childcare or healthcare copays, completely escaping income and FICA payroll levies.</li>
+          </ul>
+
+          <h2>5. Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <h3>Why do bonuses appear to be taxed at a much higher rate?</h3>
+            <p>Under IRS guidelines, supplemental wages (such as annual bonuses, commissions, or equity vestings) are subject to a mandatory flat federal withholding rate of <strong>22%</strong> (or 37% for amounts over $1 million). When added to state taxes and FICA, up to 40% may be withheld upfront, though any excess withholding is refunded when filing Form 1040.</p>
+          </div>
+          <div class="faq-item">
+            <h3>How does self-employment tax differ from W-2 employee payroll tax?</h3>
+            <p>W-2 employees split FICA with their employer (6.2% + 1.45% = 7.65% each). Self-employed individuals (1099 contractors, freelancers, sole proprietors) must pay <strong>both halves of FICA</strong>, resulting in a <strong>15.3% Self-Employment (SE) tax</strong>, though half is deductible on Form 1040.</p>
+          </div>
+          <div class="faq-item">
+            <h3>What states have 0% state income tax?</h3>
+            <p>Currently, nine US states levy no traditional earned income tax: Alaska, Florida, Nevada, New Hampshire (dividends/interest only), South Dakota, Tennessee, Texas, Washington (capital gains only), and Wyoming.</p>
+          </div>
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏦</span>
+            <h3 class="widget-title">Related Finance & Investment</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="rule-of-72-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rule of 72 Doubling Time</a></li>
+            <li><a href="car-loan-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Car Loan Financing</a></li>
+            <li><a href="roi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ROI & Annualized CAGR</a></li>
+            <li><a href="loan-emi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan EMI Calculator</a></li>
+            <li><a href="mortgage-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Mortgage & PITI</a></li>
+            <li><a href="compound-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Compound Interest</a></li>
+            <li><a href="simple-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Simple Interest</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck</a></li>
+            <li><a href="discount-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Discount & Sale</a></li>
+            <li><a href="tip-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Tip & Bill Splitter</a></li>
+            <li><a href="amortization-schedule-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan Amortization Schedule</a></li>
+            <li><a href="apr-apy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> APR to APY Compounding Converter</a></li>
+            <li><a href="break-even-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Break-Even Point (Units & Sales)</a></li>
+            <li><a href="capital-gains-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capital Gains Tax (Short & Long)</a></li>
+            <li><a href="cd-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Certificate of Deposit (CD) Yield</a></li>
+            <li><a href="credit-card-payoff-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Credit Card Payoff (Debt Freedom)</a></li>
+            <li><a href="debt-to-income-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Debt-to-Income (DTI) Ratios</a></li>
+            <li><a href="down-payment-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Down Payment & LTV Sizer</a></li>
+            <li><a href="emergency-fund-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Emergency Fund (3-6 Months)</a></li>
+            <li><a href="inflation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Inflation & Purchasing Power</a></li>
+            <li><a href="net-salary-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Net Salary & Take-Home Pay</a></li>
+            <li><a href="net-worth-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Personal Net Worth & Solvency</a></li>
+            <li><a href="sales-tax-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sales Tax & Reverse Pre-Tax</a></li>
+            <li><a href="savings-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Compound Savings Growth</a></li>
+            <li><a href="savings-goal-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Savings Goal Target Sizer</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="finance.html" class="sidebar-category-link">View All Finance & Investment Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, science, and technical calculation tools.</p>
+    </div>
+  </footer>
+
+  <script>
+    function calculate() {
+      const gross = parseFloat(document.getElementById('grossSalary').value) || 0;
+      const status = document.getElementById('filingStatus').value;
+      const stateRate = parseFloat(document.getElementById('stateTaxRate').value) || 0;
+      const preTax = parseFloat(document.getElementById('preTax401k').value) || 0;
+      const freq = parseFloat(document.getElementById('payFrequency').value) || 26;
+
+      if (gross <= 0) return;
+
+      // Standard deduction (approx 2024)
+      let stdDed = 14600;
+      if (status === 'married') stdDed = 29200;
+      else if (status === 'head') stdDed = 21900;
+
+      const taxableIncome = Math.max(0, gross - preTax - stdDed);
+
+      // Federal Progressive Brackets (Single approx)
+      let b = [
+        { cap: 11600, rate: 0.10 },
+        { cap: 47150, rate: 0.12 },
+        { cap: 100525, rate: 0.22 },
+        { cap: 191950, rate: 0.24 },
+        { cap: 243725, rate: 0.32 },
+        { cap: 609350, rate: 0.35 },
+        { cap: Infinity, rate: 0.37 }
+      ];
+
+      if (status === 'married') {
+        b = [
+          { cap: 23200, rate: 0.10 },
+          { cap: 94300, rate: 0.12 },
+          { cap: 201050, rate: 0.22 },
+          { cap: 383900, rate: 0.24 },
+          { cap: 487450, rate: 0.32 },
+          { cap: 731200, rate: 0.35 },
+          { cap: Infinity, rate: 0.37 }
+        ];
+      }
+
+      let fedTax = 0;
+      let prevCap = 0;
+      for (let i = 0; i < b.length; i++) {
+        if (taxableIncome > prevCap) {
+          const taxableInTier = Math.min(taxableIncome, b[i].cap) - prevCap;
+          fedTax += taxableInTier * b[i].rate;
+          prevCap = b[i].cap;
+        } else {
+          break;
+        }
+      }
+
+      // FICA Taxes
+      const socSecCap = 168600;
+      const socSecTax = Math.min(gross, socSecCap) * 0.062;
+      let medicareTax = gross * 0.0145;
+      if (gross > 200000 && status === 'single') {
+        medicareTax += (gross - 200000) * 0.009;
+      }
+
+      // State Tax (approx on gross - preTax)
+      const stateTaxable = Math.max(0, gross - preTax);
+      const stateTax = stateTaxable * (stateRate / 100);
+
+      const totalTaxes = fedTax + socSecTax + medicareTax + stateTax;
+      const netAnnual = Math.max(0, gross - totalTaxes - preTax);
+      const netPaycheck = netAnnual / freq;
+      const effTaxRate = gross > 0 ? (totalTaxes / gross) * 100 : 0;
+
+      const fmtCur = (v) => '$' + Math.round(v).toLocaleString('en-US');
+
+      let freqLabel = 'Bi-Weekly Paycheck';
+      if (freq === 12) freqLabel = 'Monthly Paycheck';
+      else if (freq === 24) freqLabel = 'Semi-Monthly Paycheck';
+      else if (freq === 52) freqLabel = 'Weekly Paycheck';
+
+      document.getElementById('resHeroLabel').textContent = 'Net ' + freqLabel;
+      document.getElementById('resHeroValue').textContent = fmtCur(netPaycheck);
+
+      document.getElementById('resNetAnnual').textContent = fmtCur(netAnnual);
+      document.getElementById('resEffTaxRate').textContent = effTaxRate.toFixed(1) + '%';
+      document.getElementById('resFedTax').textContent = fmtCur(fedTax) + ' / yr';
+      document.getElementById('resSocSec').textContent = fmtCur(socSecTax) + ' / yr';
+      document.getElementById('resMedicare').textContent = fmtCur(medicareTax) + ' / yr';
+      document.getElementById('resStateTax').textContent = fmtCur(stateTax) + ' / yr';
+    }
+
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', calculate);
+      el.addEventListener('change', calculate);
+    });
+
+    document.getElementById('calcBtn').addEventListener('click', calculate);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('grossSalary').value = '95000';
+      document.getElementById('filingStatus').value = 'single';
+      document.getElementById('stateTaxRate').value = '4.5';
+      document.getElementById('preTax401k').value = '5000';
+      document.getElementById('payFrequency').value = '26';
+      calculate();
+    });
+
+    window.addEventListener('DOMContentLoaded', calculate);
+  </script>
+</body>
+</html>
