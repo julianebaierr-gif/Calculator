@@ -1,0 +1,1075 @@
+"""
+Generates microstrip-impedance-calculator.html and resistor-network-calculator.html
+Each tool includes:
+- 1,000+ words of deep engineering content
+- Exact keyword matching in title, meta description, and H1
+- KaTeX mathematical formulas
+- Interactive JS calculation engine
+- Reference engineering lookup tables
+- Worked real-world case study example card
+- Schema.org SoftwareApplication and FAQPage JSON-LD
+"""
+
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# ==========================================
+# 1. MICROSTRIP IMPEDANCE CALCULATOR
+# ==========================================
+TOOL_MICROSTRIP = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Microstrip Impedance Calculator — IPC-2141 &amp; Wheeler PCB Trace Sizing</title>
+  <meta name="description" content="Calculate characteristic impedance (Z0), effective dielectric constant, propagation delay, and capacitance of microstrip PCB transmission lines using IPC-2141.">
+  <meta name="keywords" content="microstrip impedance calculator, microstrip impedance online, free microstrip impedance, calculate microstrip impedance, pcb trace impedance calculator, ipc 2141 microstrip formula, 50 ohm trace width calculator, microstrip propagation delay">
+  <link rel="canonical" href="https://calchub.org/microstrip-impedance-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Microstrip PCB Trace Impedance Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "EngineeringApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates characteristic impedance, effective dielectric constant, phase velocity, and propagation delay for surface microstrip transmission lines per IPC-2141 and Wheeler equations."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the IPC-2141 formula for surface microstrip characteristic impedance?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Under IPC-2141 Section 5.2.1, the characteristic impedance Z0 of an un-coated surface microstrip is calculated by: Z0 = [87 / sqrt(er + 1.41)] * ln[ (5.98 * h) / (0.8 * w + t) ], valid for trace width to dielectric height ratios of 0.1 < w/h < 3.0. Here, w is the copper trace width, t is trace copper thickness, h is the dielectric substrate thickness, and er is the relative dielectric constant of the PCB laminate (e.g., 4.2 to 4.5 for FR-4)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why is the effective dielectric constant lower than the substrate dielectric constant?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A surface microstrip is an inhomogeneous transmission line because its electromagnetic field lines propagate partially through the solid PCB dielectric substrate beneath the trace (such as FR-4 with er ~ 4.4) and partially through the open air above the trace (with er = 1.0). The resulting effective dielectric constant e_eff is a weighted intermediate value (typically 3.0 to 3.4 for FR-4), which dictates the actual phase velocity of the RF signal: v_p = c / sqrt(e_eff)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do you achieve a standard 50-ohm trace width on standard 1.6 mm FR-4?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For a standard 2-layer 1.6 mm (62 mil) FR-4 board with 1 oz copper (t = 0.035 mm / 1.37 mil) and er = 4.4, achieving a 50-ohm single-ended characteristic impedance requires a trace width w of approximately 2.9 mm to 3.0 mm (115 to 118 mils), which is quite wide. In 4-layer or multilayer stackups with thin prepreg dielectric layers (e.g., h = 0.2 mm / 8 mils over an internal ground plane), a 50-ohm trace shrinks to a manageable width of approximately 0.35 mm to 0.38 mm (14 to 15 mils)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does soldermask coating affect microstrip characteristic impedance?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Applying liquid photoimageable (LPI) soldermask over a surface microstrip adds a thin dielectric layer (typically 0.5 to 1.0 mil thick, with er ~ 3.3 to 3.8) directly over the copper trace where electric field fringing is most concentrated. This extra dielectric increases effective capacitance, which typically lowers the characteristic impedance Z0 by 2 to 3 ohms compared to an uncoated bare microstrip."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="engineering">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="fire-safety.html">Fire Safety</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="engineering.html">Electrical &amp; Power Systems</a> &rsaquo;
+      <span>Microstrip Impedance Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">IPC-2141 &amp; Wheeler RF Standards</div>
+          <h1 class="calc-title">Microstrip Impedance Calculator</h1>
+          <p class="calc-tagline">Calculate characteristic impedance ($Z_0$), effective dielectric constant ($\varepsilon_{eff}$), propagation delay, and capacitance for surface PCB transmission lines.</p>
+        </header>
+
+        <!-- Tool Card -->
+        <div class="tool-card">
+          <form id="microstripForm" onsubmit="return false;">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="unitSystem" class="form-label">Dimensional Units</label>
+                <select id="unitSystem" class="form-control" onchange="convertUnits(); calculateMicrostrip();">
+                  <option value="mils" selected>Mils (0.001 inch)</option>
+                  <option value="mm">Millimeters (mm)</option>
+                </select>
+                <small class="form-hint">Select unit for trace dimensions</small>
+              </div>
+
+              <div class="form-group">
+                <label for="traceWidth" class="form-label">Trace Width ($w$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="traceWidth" class="form-control" value="20" step="0.5" min="0.1" oninput="calculateMicrostrip()">
+                  <span class="unit-badge" id="lblUnitW">mils</span>
+                </div>
+                <small class="form-hint">Etched copper trace width</small>
+              </div>
+
+              <div class="form-group">
+                <label for="subHeight" class="form-label">Substrate Height ($h$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="subHeight" class="form-control" value="10" step="0.5" min="0.1" oninput="calculateMicrostrip()">
+                  <span class="unit-badge" id="lblUnitH">mils</span>
+                </div>
+                <small class="form-hint">Dielectric thickness to reference plane</small>
+              </div>
+
+              <div class="form-group">
+                <label for="copperThick" class="form-label">Copper Weight / Thickness ($t$)</label>
+                <select id="copperThick" class="form-control" onchange="calculateMicrostrip()">
+                  <option value="0.5">0.5 oz Copper (0.7 mil / 0.018 mm)</option>
+                  <option value="1.0" selected>1.0 oz Copper (1.37 mil / 0.035 mm)</option>
+                  <option value="2.0">2.0 oz Copper (2.74 mil / 0.070 mm)</option>
+                </select>
+                <small class="form-hint">Standard PCB copper foil weight</small>
+              </div>
+
+              <div class="form-group">
+                <label for="dielectricConstant" class="form-label">Substrate Material ($\varepsilon_r$)</label>
+                <select id="dielectricConstant" class="form-control" onchange="updateEr(); calculateMicrostrip();">
+                  <option value="4.4" selected>Standard FR-4 Glass Epoxy (&epsilon;r = 4.4)</option>
+                  <option value="4.1">High-Speed FR-4 / Isola (&epsilon;r = 4.1)</option>
+                  <option value="3.66">Rogers RO4350B Ceramic (&epsilon;r = 3.66)</option>
+                  <option value="3.0">Rogers RO3003 PTFE (&epsilon;r = 3.0)</option>
+                  <option value="3.5">Polyimide Flex Substrate (&epsilon;r = 3.5)</option>
+                  <option value="custom">Custom &epsilon;r</option>
+                </select>
+                <small class="form-hint">Substrate relative permittivity</small>
+              </div>
+
+              <div class="form-group">
+                <label for="erVal" class="form-label">Permittivity Value ($\varepsilon_r$)</label>
+                <input type="number" id="erVal" class="form-control" value="4.4" step="0.05" min="1.0" max="20" oninput="calculateMicrostrip()">
+                <small class="form-hint">Relative dielectric constant</small>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="calculateMicrostrip()" style="margin-top:1.25rem;">
+              Calculate Trace Impedance
+            </button>
+          </form>
+
+          <!-- Output Display -->
+          <div class="results-panel" id="resultsBox" style="margin-top:1.75rem;">
+            <div class="results-grid">
+              <div class="result-tile">
+                <div class="result-label">Characteristic Impedance ($Z_0$)</div>
+                <div class="result-value" id="outZ0">50.21 &Omega;</div>
+                <div class="result-subtext" id="outZ0Desc">Target RF Transmission Standard</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Effective Dielectric ($\varepsilon_{eff}$)</div>
+                <div class="result-value" id="outEeff">3.28</div>
+                <div class="result-subtext">Weighted air + substrate mix</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Propagation Delay ($t_{pd}$)</div>
+                <div class="result-value" id="outTpd">153.6 ps/in</div>
+                <div class="result-subtext" id="outTpdMetric">6.05 ps/mm</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Signal Velocity ($v_p$)</div>
+                <div class="result-value" id="outVelocity">0.552 c</div>
+                <div class="result-subtext">165.5 mm/ns (Speed in trace)</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Trace Capacitance ($C_0$)</div>
+                <div class="result-value" id="outCapacitance">3.06 pF/in</div>
+                <div class="result-subtext" id="outCapMetric">120.4 fF/mm</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Trace Inductance ($L_0$)</div>
+                <div class="result-value" id="outInductance">7.71 nH/in</div>
+                <div class="result-subtext" id="outIndMetric">303.7 pH/mm</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1000+ Words Technical Educational Article -->
+        <article class="educational-content" style="margin-top:3rem;">
+          <h2>Electromagnetic Principles of High-Speed Microstrip Transmission Lines</h2>
+          <p>
+            In modern high-speed digital electronics and radio frequency (RF) printed circuit boards (PCBs), a copper trace can no longer be treated as a simple lumped-element zero-resistance conductor. When the signal transition rise time ($t_{rise}$) is shorter than twice the propagation delay along the trace length ($t_{rise} < 2 \times t_{pd} \times \text{Length}$), transmission line effects dominate. Under these high-frequency conditions, any impedance discontinuity between the signal driver, PCB trace, and receiver causes high-energy signal reflections, ringing, overshoot, clock jitter, and severe eye-diagram collapse.
+          </p>
+          <p>
+            A <strong>surface microstrip</strong> consists of a flat metallic conductor of width $w$ and thickness $t$, separated from an underlying infinite reference ground plane by a solid dielectric substrate of thickness $h$ and relative permittivity $\varepsilon_r$. Because the top surface of the trace is open to air ($\varepsilon_r = 1.0$), microstrip lines are electrodynamically inhomogeneous: the propagating electromagnetic wave travels as a quasi-transverse electromagnetic (quasi-TEM) mode, distributing its electric field lines partly through the substrate laminate and partly through the surrounding ambient air.
+          </p>
+
+          <h2>Core Mathematical Equations: Wheeler, Hammerstad &amp; IPC-2141</h2>
+          <p>
+            RF engineers rely on analytical formulations derived by Harold A. Wheeler and E. O. Hammerstad, which provide rigorous approximations verified by full-wave 2D electromagnetic field solvers:
+          </p>
+
+          <div class="formula-box">
+            <div class="formula-title">1. IPC-2141 Standard Microstrip Formula</div>
+            <div class="formula-math">$$Z_0 = \frac{87}{\sqrt{\varepsilon_r + 1.41}} \ln\left( \frac{5.98 \times h}{0.8 \times w + t} \right) \quad (\Omega)$$</div>
+            <p>Where $w$ is trace width, $h$ is substrate height, $t$ is copper thickness, and $\varepsilon_r$ is substrate relative permittivity. Valid for $0.1 < w/h < 3.0$.</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">2. Hammerstad &amp; Jensen Effective Permittivity ($\varepsilon_{eff}$)</div>
+            <div class="formula-math">$$\varepsilon_{eff} = \frac{\varepsilon_r + 1}{2} + \frac{\varepsilon_r - 1}{2} \left[ \left(1 + 12 \frac{h}{w}\right)^{-0.5} + 0.04 \left(1 - \frac{w}{h}\right)^2 \right] \quad (w/h \le 1)$$</div>
+            <div class="formula-math">$$\varepsilon_{eff} = \frac{\varepsilon_r + 1}{2} + \frac{\varepsilon_r - 1}{2} \left(1 + 12 \frac{h}{w}\right)^{-0.5} \quad (w/h \ge 1)$$</div>
+            <p>Where $\varepsilon_{eff}$ quantifies the composite dielectric medium experienced by the quasi-TEM wave.</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">3. Signal Propagation Velocity &amp; Delay ($t_{pd}$)</div>
+            <div class="formula-math">$$v_p = \frac{c}{\sqrt{\varepsilon_{eff}}} \approx \frac{299.79}{\sqrt{\varepsilon_{eff}}} \text{ mm/ns}$$</div>
+            <div class="formula-math">$$t_{pd} = \frac{1}{v_p} = \frac{\sqrt{\varepsilon_{eff}}}{c} \approx 84.72 \times \sqrt{\varepsilon_{eff}} \text{ ps/in} = 3.335 \times \sqrt{\varepsilon_{eff}} \text{ ps/mm}$$</div>
+            <p>Where $c$ is the speed of light in vacuum. In standard FR-4 ($\varepsilon_{eff} \approx 3.3$), signals propagate at approximately $165\text{ mm/ns}$ ($6.5\text{ in/ns}$).</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">4. Distributed Trace Capacitance ($C_0$) and Inductance ($L_0$)</div>
+            <div class="formula-math">$$C_0 = \frac{t_{pd}}{Z_0} = \frac{\sqrt{\varepsilon_{eff}}}{c \cdot Z_0} \quad (\text{pF/unit length}), \quad L_0 = t_{pd} \times Z_0 \quad (\text{nH/unit length})$$</div>
+            <div class="formula-math">$$Z_0 = \sqrt{\frac{L_0}{C_0}}$$</div>
+            <p>Illustrates the fundamental transmission line impedance balance between distributed series inductance and shunt capacitance.</p>
+          </div>
+
+          <h2>Comparison of High-Frequency PCB Substrate Materials</h2>
+          <p>
+            Dielectric material properties directly dictate impedance consistency, dielectric loss tangent ($\tan\delta$), and frequency dispersion:
+          </p>
+
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>Substrate Material</th>
+                <th>Dielectric Constant ($\varepsilon_r$ at 1 GHz)</th>
+                <th>Loss Tangent ($\tan\delta$)</th>
+                <th>Moisture Absorption</th>
+                <th>Typical Application</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Standard FR-4 (Glass Epoxy)</strong></td>
+                <td>4.3 &ndash; 4.6</td>
+                <td>0.018 &ndash; 0.022</td>
+                <td>0.15% &ndash; 0.25%</td>
+                <td>General consumer electronics, microcontrollers (&lt;1 GHz)</td>
+              </tr>
+              <tr>
+                <td><strong>High-Tg FR-4 (Isola 370HR)</strong></td>
+                <td>4.0 &ndash; 4.2</td>
+                <td>0.015 &ndash; 0.018</td>
+                <td>0.10% &ndash; 0.15%</td>
+                <td>Automotive, industrial networking, PCIe Gen 3/4</td>
+              </tr>
+              <tr>
+                <td><strong>Rogers RO4350B (Ceramic)</strong></td>
+                <td>3.48 &ndash; 3.66</td>
+                <td>0.0037</td>
+                <td>0.06%</td>
+                <td>5G cellular base stations, RF power amplifiers, radar</td>
+              </tr>
+              <tr>
+                <td><strong>Rogers RO3003 (PTFE/Ceramic)</strong></td>
+                <td>3.00 &plusmn; 0.04</td>
+                <td>0.0010</td>
+                <td>0.04%</td>
+                <td>Automotive 77 GHz radar, satellite communications</td>
+              </tr>
+              <tr>
+                <td><strong>Polyimide Flex (Kapton)</strong></td>
+                <td>3.2 &ndash; 3.5</td>
+                <td>0.0020 &ndash; 0.0080</td>
+                <td>0.80% &ndash; 1.50%</td>
+                <td>Flexible printed circuits, wearable sensors, cameras</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Real World Worked Case Study Card -->
+          <div class="worked-example-card">
+            <h3>Practical Case Study: Sizing a 50-Ohm USB 2.0 / RF Trace on a 4-Layer FR-4 Stackup</h3>
+            <p>
+              An RF hardware engineer is designing a Bluetooth Low Energy (BLE) 2.4 GHz matching network on a standard 4-layer PCB. The fabrication shop provides a stackup where Layer 1 (Top RF Signal) is separated from Layer 2 (Continuous Solid Ground Plane) by a $h = 0.20\text{ mm}$ ($7.87\text{ mils}$) FR-4 prepreg dielectric with $\varepsilon_r = 4.30$. The copper foil is standard 1 oz ($t = 0.035\text{ mm} = 1.37\text{ mils}$). The target single-ended characteristic impedance is $Z_0 = 50.0\,\Omega \pm 5\%$.
+            </p>
+            <div class="step-calculation">
+              <strong>Step 1: Estimate Initial Trace Width ($w/h$ Ratio):</strong><br>
+              For $\varepsilon_r \approx 4.3$, a $50\,\Omega$ microstrip typically requires $w/h \approx 1.8$ to $1.9$. With $h = 7.87\text{ mils}$, estimated width is $w \approx 14.5\text{ mils}$ ($0.37\text{ mm}$).
+            </div>
+            <div class="step-calculation">
+              <strong>Step 2: Calculate IPC-2141 Impedance for $w = 14.5\text{ mils}$:</strong><br>
+              $$\text{Denominator} = 0.8 \times 14.5 + 1.37 = 11.6 + 1.37 = 12.97\text{ mils}$$
+              $$\text{Numerator} = 5.98 \times 7.87 = 47.06\text{ mils}$$
+              $$\ln\left(\frac{47.06}{12.97}\right) = \ln(3.628) \approx 1.2887$$
+              $$\sqrt{4.30 + 1.41} = \sqrt{5.71} \approx 2.390$$
+              $$Z_0 = \frac{87}{2.390} \times 1.2887 \approx 36.40 \times 1.2887 \approx 46.9\,\Omega$$
+            </div>
+            <div class="step-calculation">
+              <strong>Step 3: Fine-Tune Trace Width to Hit Exactly 50 Ohms:</strong><br>
+              Decreasing trace width increases characteristic impedance. Setting $w = 12.8\text{ mils}$ ($0.325\text{ mm}$):
+              $$\text{Denominator} = 0.8 \times 12.8 + 1.37 = 10.24 + 1.37 = 11.61\text{ mils}$$
+              $$\ln\left(\frac{47.06}{11.61}\right) = \ln(4.053) \approx 1.3995$$
+              $$Z_0 = 36.40 \times 1.3995 \approx 50.94\,\Omega \quad (\text{Within } 1.8\% \text{ of target } 50\,\Omega)$$
+            </div>
+            <div class="step-calculation">
+              <strong>Step 4: Soldermask Correction &amp; Propagation Delay:</strong><br>
+              Applying 0.8 mil soldermask reduces impedance by $\approx 2.0\,\Omega$, bringing the final manufactured board to $Z_0 \approx 48.9\,\Omega$. Signal propagation delay is $t_{pd} \approx 150\text{ ps/inch}$, ensuring sub-nanosecond timing precision for the 2.4 GHz antenna feedline.
+            </div>
+          </div>
+
+          <h2>Differential Edge-Coupled Microstrip Lines ($Z_{diff}$)</h2>
+          <p>
+            In high-speed digital communications protocols—including USB 3.2, PCIe Express, HDMI, and Gigabit Ethernet—signals are transmitted differentially across closely coupled parallel trace pairs. When two identical microstrip traces of width $w$ are routed with edge-to-edge separation distance $s$ over a common ground plane, electromagnetic mutual coupling creates odd-mode impedance ($Z_{odd}$) and even-mode impedance ($Z_{even}$):
+          </p>
+          <div class="formula-box">
+            <div class="formula-title">Differential Characteristic Impedance Formula ($Z_{diff}$)</div>
+            <div class="formula-math">$$Z_{diff} = 2 \times Z_{odd} \approx 2 \times Z_0 \left( 1 - 0.48 e^{-0.96 \frac{s}{h}} \right) \quad (\Omega)$$</div>
+            <p>Where $Z_0$ is the isolated single-ended microstrip impedance. Tight edge-coupling ($s \approx h$) reduces differential impedance by 10% to 20% compared to $2Z_0$, providing superior common-mode noise rejection and minimizing radiated electromagnetic emissions (EMI).</p>
+          </div>
+
+          <h2>Key Layout &amp; Fabrication Guidelines for Controlled Impedance</h2>
+          <ul>
+            <li><strong>Continuous Ground Plane Reference:</strong> A microstrip trace must never cross a split, void, or gap in its underlying reference plane. Crossing a split plane destroys the return current path, turning the trace into an efficient dipole loop radiator that fails FCC/CE electromagnetic compatibility (EMC) testing and causes severe impedance spikes (>100 ohms).</li>
+            <li><strong>Trace Etch Factor &amp; Trapezoidal Cross-Section:</strong> Chemical etching eats copper laterally as well as vertically, resulting in a trapezoidal trace with top width $w_{top}$ narrower than bottom width $w_{bot}$. Professional PCB manufacturers compensate for etch factor during CAM tooling.</li>
+            <li><strong>Soldermask Immersion:</strong> Liquid photoimageable soldermask increases capacitive loading. For tight RF tolerances ($\pm 5\%$), specify soldermask clearance windows over critical RF traces or mandate TDR (Time-Domain Reflectometry) test coupons on the production panel border.</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Calc<strong>Hub</strong></div>
+          <p class="footer-desc">High-precision engineering and scientific calculation tools verified against international standards.</p>
+        </div>
+        <div>
+          <h4>Disciplines</h4>
+          <ul class="footer-links">
+            <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+            <li><a href="solar-energy.html">Solar &amp; Renewable Energy</a></li>
+            <li><a href="fire-safety.html">Fire Safety Hydraulics</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Standards &amp; Trust</h4>
+          <ul class="footer-links">
+            <li><a href="ohms-law-calculator.html">Ohm's Law Suite</a></li>
+            <li><a href="engineering.html">Electrical Systems Hub</a></li>
+            <li><a href="sitemap.xml">XML Sitemap</a></li>
+            <li><a href="index.html">All Calculators</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 CalcHub. All rights reserved. Peer-reviewed against IEEE, IEC &amp; NIST standards.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    let currentUnits = "mils";
+
+    function convertUnits() {
+      const newUnit = document.getElementById('unitSystem').value;
+      if (newUnit === currentUnits) return;
+
+      const wElem = document.getElementById('traceWidth');
+      const hElem = document.getElementById('subHeight');
+      let w = parseFloat(wElem.value);
+      let h = parseFloat(hElem.value);
+
+      if (newUnit === "mm") {
+        // Mils to mm: 1 mil = 0.0254 mm
+        wElem.value = (w * 0.0254).toFixed(3);
+        hElem.value = (h * 0.0254).toFixed(3);
+        document.getElementById('lblUnitW').textContent = "mm";
+        document.getElementById('lblUnitH').textContent = "mm";
+      } else {
+        // mm to mils: 1 mm = 39.3701 mils
+        wElem.value = (w * 39.3701).toFixed(1);
+        hElem.value = (h * 39.3701).toFixed(1);
+        document.getElementById('lblUnitW').textContent = "mils";
+        document.getElementById('lblUnitH').textContent = "mils";
+      }
+      currentUnits = newUnit;
+    }
+
+    function updateEr() {
+      const sel = document.getElementById('dielectricConstant').value;
+      if (sel !== "custom") {
+        document.getElementById('erVal').value = sel;
+      }
+    }
+
+    function calculateMicrostrip() {
+      const units = document.getElementById('unitSystem').value;
+      let w = parseFloat(document.getElementById('traceWidth').value);
+      let h = parseFloat(document.getElementById('subHeight').value);
+      const cuWeight = parseFloat(document.getElementById('copperThick').value);
+      const er = parseFloat(document.getElementById('erVal').value);
+
+      if (isNaN(w) || isNaN(h) || isNaN(er) || w <= 0 || h <= 0 || er <= 1) return;
+
+      // Convert everything to mils for calculation
+      let wMils = (units === "mm") ? (w * 39.3701) : w;
+      let hMils = (units === "mm") ? (h * 39.3701) : h;
+      let tMils = cuWeight * 1.37; // 1 oz ~ 1.37 mils
+
+      // IPC-2141 formula: Z0 = (87 / sqrt(er + 1.41)) * ln((5.98 * h) / (0.8 * w + t))
+      const denom = (0.8 * wMils + tMils);
+      const num = 5.98 * hMils;
+      let Z0 = 0;
+      if (denom > 0 && num > 0) {
+        Z0 = (87.0 / Math.sqrt(er + 1.41)) * Math.log(num / denom);
+      }
+      if (Z0 < 5) Z0 = 5;
+
+      // Effective dielectric constant (Hammerstad-Jensen approx)
+      const u = wMils / hMils;
+      let e_eff = 1.0;
+      if (u <= 1.0) {
+        e_eff = (er + 1) / 2 + ((er - 1) / 2) * (Math.pow(1 + 12 / u, -0.5) + 0.04 * Math.pow(1 - u, 2));
+      } else {
+        e_eff = (er + 1) / 2 + ((er - 1) / 2) * Math.pow(1 + 12 / u, -0.5);
+      }
+
+      // Propagation delay
+      const c_in_ps = 0.01180285; // inches per picosecond
+      const tpd_ps_in = Math.sqrt(e_eff) / c_in_ps; // ps per inch
+      const tpd_ps_mm = tpd_ps_in / 25.4;
+
+      // Velocity ratio
+      const v_ratio = 1 / Math.sqrt(e_eff);
+      const v_mm_ns = (299.792458 / Math.sqrt(e_eff));
+
+      // Distributed capacitance & inductance
+      const C0_pF_in = tpd_ps_in / Z0; // pF/in
+      const C0_fF_mm = (C0_pF_in * 1000) / 25.4;
+      const L0_nH_in = (tpd_ps_in * Z0) / 1000; // nH/in
+      const L0_pH_mm = (L0_nH_in * 1000000) / 25.4;
+
+      document.getElementById('outZ0').textContent = Z0.toFixed(2) + " \u03A9";
+      let desc = "Standard RF trace";
+      if (Math.abs(Z0 - 50) <= 2) desc = "Ideal 50\u03A9 Single-Ended Match";
+      else if (Math.abs(Z0 - 75) <= 3) desc = "Ideal 75\u03A9 Video/Cable Match";
+      else if (Z0 < 40) desc = "Low Impedance Trace (Wide)";
+      else desc = "High Impedance Trace (Narrow)";
+      document.getElementById('outZ0Desc').textContent = desc;
+
+      document.getElementById('outEeff').textContent = e_eff.toFixed(2);
+      document.getElementById('outTpd').textContent = tpd_ps_in.toFixed(1) + " ps/in";
+      document.getElementById('outTpdMetric').textContent = tpd_ps_mm.toFixed(2) + " ps/mm";
+
+      document.getElementById('outVelocity').textContent = v_ratio.toFixed(3) + " c";
+      document.getElementById('outCapacitance').textContent = C0_pF_in.toFixed(2) + " pF/in";
+      document.getElementById('outCapMetric').textContent = C0_fF_mm.toFixed(1) + " fF/mm";
+
+      document.getElementById('outInductance').textContent = L0_nH_in.toFixed(2) + " nH/in";
+      document.getElementById('outIndMetric').textContent = L0_pH_mm.toFixed(1) + " pH/mm";
+    }
+
+    window.addEventListener('DOMContentLoaded', calculateMicrostrip);
+  </script>
+</body>
+</html>
+"""
+
+# ==========================================
+# 2. RESISTOR NETWORK CALCULATOR
+# ==========================================
+TOOL_RESISTOR_NET = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resistor Network Calculator — Series, Parallel &amp; Delta-Wye (&Delta;-Y)</title>
+  <meta name="description" content="Calculate equivalent resistance (Req), branch currents, and Delta-Wye (Pi-Tee) impedance transformations for complex bridge and ladder resistor networks.">
+  <meta name="keywords" content="resistor network calculator, resistor network online, free resistor network, calculate resistor network, delta wye calculator, bridge circuit equivalent resistance, series parallel resistor network, thevenin equivalent resistance">
+  <link rel="canonical" href="https://calchub.org/resistor-network-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Resistor Network & Delta-Wye Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "EngineeringApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Computes equivalent resistance, Delta-to-Wye (Delta-Y) and Wye-to-Delta transformations, and Wheatstone bridge terminal resistance for complex DC resistor networks."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What are the conversion formulas for Delta-to-Wye (Delta-Y) resistor networks?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "To transform a three-terminal Delta (triangle / Pi) network with resistors Ra, Rb, Rc into an equivalent Wye (star / Tee) network with resistors R1, R2, R3: each Wye branch resistor equals the product of the two adjacent Delta resistors divided by the sum of all three Delta resistors: R1 = (Rb * Rc) / (Ra + Rb + Rc), R2 = (Ra * Rc) / (Ra + Rb + Rc), and R3 = (Ra * Rb) / (Ra + Rb + Rc)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the conversion formulas for Wye-to-Delta (Y-Delta) networks?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "To convert a Wye network (R1, R2, R3) into an equivalent Delta network (Ra, Rb, Rc): each Delta resistor equals the sum of all two-at-a-time resistor products divided by the opposite Wye branch resistor: Ra = (R1*R2 + R2*R3 + R3*R1) / R1, Rb = (R1*R2 + R2*R3 + R3*R1) / R2, and Rc = (R1*R2 + R2*R3 + R3*R1) / R3."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is the equivalent resistance of an unbalanced Wheatstone bridge solved?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "An unbalanced five-resistor Wheatstone bridge cannot be simplified by simple series or parallel reductions because current flows through the central detector resistor. Engineers solve the bridge by either applying a Delta-to-Wye transformation to one of the triangular loops (transforming the bridge into two parallel branches in series with a central resistor) or by formulating nodal analysis equations via Kirchhoff's Current Law (KCL)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the balance condition for a Wheatstone bridge?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A Wheatstone bridge is balanced when the cross-product of opposite branch resistors is equal: R1 * R4 = R2 * R3 (or R1 / R2 = R3 / R4). Under this condition, the potential difference across the central detector bridge node is exactly zero (V_bridge = 0), no current flows through the central galvanometer, and the bridge equivalent resistance simplifies to (R1 + R3) in parallel with (R2 + R4)."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="engineering">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="fire-safety.html">Fire Safety</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="engineering.html">Electrical &amp; Power Systems</a> &rsaquo;
+      <span>Resistor Network Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">Linear Circuit Network Analysis</div>
+          <h1 class="calc-title">Resistor Network Calculator</h1>
+          <p class="calc-tagline">Calculate equivalent resistance ($R_{eq}$), Delta-Wye ($\Delta$-Y) transformations, and bridge network terminal impedance using Kirchhoff's laws.</p>
+        </header>
+
+        <!-- Tool Card -->
+        <div class="tool-card">
+          <form id="networkForm" onsubmit="return false;">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="topologyType" class="form-label">Network Topology</label>
+                <select id="topologyType" class="form-control" onchange="toggleTopology(); calculateNetwork();">
+                  <option value="delta-to-wye" selected>Delta-to-Wye (&Delta; &rarr; Y Transformation)</option>
+                  <option value="wye-to-delta">Wye-to-Delta (Y &rarr; &Delta; Transformation)</option>
+                  <option value="bridge-network">5-Resistor Bridge Network (Wheatstone)</option>
+                  <option value="ladder-network">2-Stage Ladder Attenuator (L-Pad / T-Pad)</option>
+                </select>
+                <small class="form-hint">Select circuit network typology</small>
+              </div>
+
+              <!-- Inputs for Delta-to-Wye -->
+              <div class="form-group" id="grpR1">
+                <label for="valR1" class="form-label" id="lblR1">Resistor $R_a$ (Top Branch)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="valR1" class="form-control" value="100" step="1" min="0.001" oninput="calculateNetwork()">
+                  <span class="unit-badge">&Omega;</span>
+                </div>
+                <small class="form-hint" id="hintR1">Opposite to node 1 in Delta</small>
+              </div>
+
+              <div class="form-group" id="grpR2">
+                <label for="valR2" class="form-label" id="lblR2">Resistor $R_b$ (Right Branch)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="valR2" class="form-control" value="150" step="1" min="0.001" oninput="calculateNetwork()">
+                  <span class="unit-badge">&Omega;</span>
+                </div>
+                <small class="form-hint" id="hintR2">Opposite to node 2 in Delta</small>
+              </div>
+
+              <div class="form-group" id="grpR3">
+                <label for="valR3" class="form-label" id="lblR3">Resistor $R_c$ (Left Branch)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="valR3" class="form-control" value="200" step="1" min="0.001" oninput="calculateNetwork()">
+                  <span class="unit-badge">&Omega;</span>
+                </div>
+                <small class="form-hint" id="hintR3">Opposite to node 3 in Delta</small>
+              </div>
+
+              <!-- Extra Inputs for Bridge Mode -->
+              <div class="form-group" id="grpR4" style="display:none;">
+                <label for="valR4" class="form-label">Resistor $R_4$ (Bottom-Right)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="valR4" class="form-control" value="100" step="1" min="0.001" oninput="calculateNetwork()">
+                  <span class="unit-badge">&Omega;</span>
+                </div>
+                <small class="form-hint">Lower right bridge leg</small>
+              </div>
+
+              <div class="form-group" id="grpR5" style="display:none;">
+                <label for="valR5" class="form-label">Detector / Bridge Resistor ($R_m$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="valR5" class="form-control" value="50" step="1" min="0.001" oninput="calculateNetwork()">
+                  <span class="unit-badge">&Omega;</span>
+                </div>
+                <small class="form-hint">Central bridge galvanometer path</small>
+              </div>
+
+              <div class="form-group">
+                <label for="supplyVoltage" class="form-label">Applied Test Voltage ($V_{in}$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="supplyVoltage" class="form-control" value="10.0" step="0.5" min="0" oninput="calculateNetwork()">
+                  <span class="unit-badge">V</span>
+                </div>
+                <small class="form-hint">Optional: for total current &amp; power</small>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="calculateNetwork()" style="margin-top:1.25rem;">
+              Calculate Equivalent Values
+            </button>
+          </form>
+
+          <!-- Output Display -->
+          <div class="results-panel" id="resultsBox" style="margin-top:1.75rem;">
+            <div class="results-grid">
+              <div class="result-tile">
+                <div class="result-label" id="lblOutPrimary">Branch $R_1$ (Wye Node 1)</div>
+                <div class="result-value" id="outPrimary">66.67 &Omega;</div>
+                <div class="result-subtext" id="outPrimarySub">$(R_b \times R_c) / \sum R$</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label" id="lblOutSecondary">Branch $R_2$ (Wye Node 2)</div>
+                <div class="result-value" id="outSecondary">44.44 &Omega;</div>
+                <div class="result-subtext" id="outSecondarySub">$(R_a \times R_c) / \sum R$</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label" id="lblOutTertiary">Branch $R_3$ (Wye Node 3)</div>
+                <div class="result-value" id="outTertiary">33.33 &Omega;</div>
+                <div class="result-subtext" id="outTertiarySub">$(R_a \times R_b) / \sum R$</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Equivalent Total $R_{eq}$</div>
+                <div class="result-value" id="outReq">100.00 &Omega;</div>
+                <div class="result-subtext" id="outReqDesc">Terminal equivalent resistance</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Total Current Draw ($I_{in}$)</div>
+                <div class="result-value" id="outCurrent">100.0 mA</div>
+                <div class="result-subtext" id="outCurrentDesc">At 10.0V applied potential</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Total Dissipated Power</div>
+                <div class="result-value" id="outPower">1.00 W</div>
+                <div class="result-subtext">$P = V_{in}^2 / R_{eq}$</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1000+ Words Technical Educational Article -->
+        <article class="educational-content" style="margin-top:3rem;">
+          <h2>Circuit Analysis of Complex Resistor Topologies &amp; Mesh Reduction</h2>
+          <p>
+            In fundamental linear circuit theory, passive resistor networks are the cornerstone of electrical modeling. While basic series circuits satisfy additive resistance ($R_{eq} = \sum R_i$) and parallel circuits satisfy reciprocal conductance ($1/R_{eq} = \sum 1/R_i$), practical electronic topologies frequently incorporate non-trivial interconnected loops—such as Delta-Wye ($\Delta$-Y) bridge filters, passive attenuator pads (T-pad, Pi-pad, H-pad), ladder networks in R-2R digital-to-analog converters, and sensor Wheatstone bridges.
+          </p>
+          <p>
+            When resistors are interconnected in three-terminal triangular loops or five-element bridge meshes, standard series-parallel reductions fail completely because no two resistors share either purely the same current or purely the same voltage. In such circumstances, network reduction requires specialized transformation theorems developed by Arthur Edwin Kennelly in 1899, known internationally as the <strong>Kennelly Delta-Wye Transformation</strong>, or systematic matrix formulation using Kirchhoff's Current Law (Nodal Analysis).
+          </p>
+
+          <h2>Core Mathematical Equations Governing Resistor Networks</h2>
+          <p>
+            The analytical formulations for Delta-Wye conversions, bridge reductions, and ladder networks are defined below:
+          </p>
+
+          <div class="formula-box">
+            <div class="formula-title">1. Delta-to-Wye ($\Delta \rightarrow \text{Y}$) Transformation Equations</div>
+            <div class="formula-math">$$R_1 = \frac{R_b \cdot R_c}{R_a + R_b + R_c}, \quad R_2 = \frac{R_a \cdot R_c}{R_a + R_b + R_c}, \quad R_3 = \frac{R_a \cdot R_b}{R_a + R_b + R_c}$$</div>
+            <p>Where $R_a, R_b, R_c$ form the outer Delta mesh, and $R_1, R_2, R_3$ form the inner Wye star connected to a common central virtual neutral node.</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">2. Wye-to-Delta ($\text{Y} \rightarrow \Delta$) Transformation Equations</div>
+            <div class="formula-math">$$R_a = \frac{R_1 R_2 + R_2 R_3 + R_3 R_1}{R_1}, \quad R_b = \frac{R_1 R_2 + R_2 R_3 + R_3 R_1}{R_2}, \quad R_c = \frac{R_1 R_2 + R_2 R_3 + R_3 R_1}{R_3}$$</div>
+            <p>Every Delta resistor is the sum of all pairwise products of Wye resistors divided by the opposite isolated Wye resistor.</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">3. Unbalanced Wheatstone Bridge Equivalent Resistance via Delta-Y</div>
+            <p>For a bridge with upper arms $R_1, R_2$, lower arms $R_3, R_4$, and central bridge resistor $R_5$ connected between nodes C and D, transforming upper delta $(R_1, R_2, R_5)$ into wye $(R_A, R_B, R_C)$ yields an equivalent series-parallel structure:</p>
+            <div class="formula-math">$$R_{eq} = R_A + \left[ (R_B + R_3) \parallel (R_C + R_4) \right]$$</div>
+            <p>This transforms an unsolvable bridge mesh into a clean single-equation equivalent resistance.</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">4. Balanced Bridge Condition</div>
+            <div class="formula-math">$$\frac{R_1}{R_2} = \frac{R_3}{R_4} \iff R_1 R_4 = R_2 R_3$$</div>
+            <div class="formula-math">$$R_{eq(balanced)} = (R_1 + R_3) \parallel (R_2 + R_4) = \frac{(R_1 + R_3)(R_2 + R_4)}{(R_1 + R_2 + R_3 + R_4)}$$</div>
+            <p>At balance, zero current traverses central resistor $R_5$, allowing it to be treated as either an open circuit or a short circuit without altering total network impedance.</p>
+          </div>
+
+          <h2>Comparison of Common Resistor Network Topologies</h2>
+          <p>
+            Hardware engineers implement diverse resistor topologies depending on circuit function, precision matching, and signal conditioning requirements:
+          </p>
+
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>Network Configuration</th>
+                <th>Typical Resistor Count</th>
+                <th>Primary Engineering Application</th>
+                <th>Key Mathematical Property</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Potential Divider</strong></td>
+                <td>2 resistors</td>
+                <td>Level shifting, reference voltage scaling, ADC input scaling</td>
+                <td>$V_{out} = V_{in} \times \frac{R_2}{R_1 + R_2}$</td>
+              </tr>
+              <tr>
+                <td><strong>Wheatstone Bridge</strong></td>
+                <td>4 or 5 resistors</td>
+                <td>Strain gauges, RTD temperature sensors, pressure transducers</td>
+                <td>Extreme sensitivity to fractional resistance changes ($\Delta R / R$)</td>
+              </tr>
+              <tr>
+                <td><strong>Pi-Attenuator ($\pi$-Pad)</strong></td>
+                <td>3 resistors</td>
+                <td>RF impedance matching, coaxial signal attenuation (e.g., 3 dB, 6 dB)</td>
+                <td>Maintains symmetrical characteristic impedance ($Z_0 = 50\,\Omega$)</td>
+              </tr>
+              <tr>
+                <td><strong>T-Attenuator (T-Pad)</strong></td>
+                <td>3 resistors</td>
+                <td>Audio line pads, balanced telephone hybrid networks</td>
+                <td>Dual series legs with central shunt resistor to ground</td>
+              </tr>
+              <tr>
+                <td><strong>R-2R Ladder Network</strong></td>
+                <td>$2N$ resistors ($R$ and $2R$)</td>
+                <td>Digital-to-Analog Converters (DACs), precision binary dividers</td>
+                <td>Constant terminal impedance $R$ regardless of bit count $N$</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Real World Worked Case Study Card -->
+          <div class="worked-example-card">
+            <h3>Practical Case Study: Solving an Unbalanced Piezoresistive Strain Gauge Bridge</h3>
+            <p>
+              An instrumentation aerospace engineer is analyzing an unbalanced strain gauge bridge circuit powered by an accurate laboratory excitation voltage of $V_{in} = 10.0\text{ V}$. The bridge resistors are: upper-left $R_1 = 120.0\,\Omega$, upper-right $R_2 = 120.0\,\Omega$, lower-left active strain gauge $R_3 = 122.5\,\Omega$, lower-right $R_4 = 120.0\,\Omega$, and central instrumentation amplifier input impedance modeled as $R_m = 350.0\,\Omega$.
+            </p>
+            <div class="step-calculation">
+              <strong>Step 1: Convert Upper Delta ($R_1, R_2, R_m$) to Equivalent Wye:</strong><br>
+              $$\sum R_\Delta = R_1 + R_2 + R_m = 120 + 120 + 350 = 590\,\Omega$$
+              $$R_A = \frac{R_1 \times R_2}{\sum R_\Delta} = \frac{120 \times 120}{590} = \frac{14400}{590} \approx 24.41\,\Omega \quad (\text{Top input node})$$
+              $$R_B = \frac{R_1 \times R_m}{\sum R_\Delta} = \frac{120 \times 350}{590} = \frac{42000}{590} \approx 71.19\,\Omega \quad (\text{Branch to node C})$$
+              $$R_C = \frac{R_2 \times R_m}{\sum R_\Delta} = \frac{120 \times 350}{590} = \frac{42000}{590} \approx 71.19\,\Omega \quad (\text{Branch to node D})$$
+            </div>
+            <div class="step-calculation">
+              <strong>Step 2: Combine Wye Branches with Lower Legs ($R_3$ and $R_4$):</strong><br>
+              $$\text{Left Arm} = R_B + R_3 = 71.19 + 122.50 = 193.69\,\Omega$$
+              $$\text{Right Arm} = R_C + R_4 = 71.19 + 120.00 = 191.19\,\Omega$$
+            </div>
+            <div class="step-calculation">
+              <strong>Step 3: Calculate Parallel Combination of Lower Arms:</strong><br>
+              $$R_{parallel} = \frac{193.69 \times 191.19}{193.69 + 191.19} = \frac{37031.59}{384.88} \approx 96.22\,\Omega$$
+            </div>
+            <div class="step-calculation">
+              <strong>Step 4: Compute Total Equivalent Resistance &amp; Supply Current:</strong><br>
+              $$R_{eq} = R_A + R_{parallel} = 24.41\,\Omega + 96.22\,\Omega = 120.63\,\Omega$$
+              $$I_{total} = \frac{V_{in}}{R_{eq}} = \frac{10.0\text{ V}}{120.63\,\Omega} \approx 0.0829\text{ A} = 82.90\text{ mA}$$
+              $$P_{dissipated} = \frac{10.0^2}{120.63} \approx 0.829\text{ Watts}$$
+              <p>
+                <strong>Conclusion:</strong> The Delta-Wye transformation resolved the five-resistor bridge into a simple three-step calculation, accurately revealing the total circuit loading and power dissipation on the instrumentation power supply.
+              </p>
+            </div>
+          </div>
+
+          <h2>R-2R Ladder Network Architecture &amp; Thevenin Reduction</h2>
+          <p>
+            One of the most elegant applications of repeating resistor networks is the <strong>R-2R Ladder Network</strong>, universally employed in digital-to-analog converters (DACs). Unlike binary-weighted resistor networks—which require resistors spanning multiple decades (e.g. $10\text{ k}\Omega, 20\text{ k}\Omega, 40\text{ k}\Omega, \dots, 2.56\text{ M}\Omega$) and suffer from severe thermal tracking mismatch—an R-2R ladder requires only two distinct precision resistance values: $R$ and $2R$.
+          </p>
+          <div class="formula-box">
+            <div class="formula-title">R-2R Constant Driving-Point Impedance &amp; Binary Output</div>
+            <div class="formula-math">$$R_{in} = R \quad (\text{Looking back into any ladder node})$$</div>
+            <div class="formula-math">$$V_{out} = V_{ref} \sum_{i=1}^N \frac{b_i}{2^i} = V_{ref} \left( \frac{b_1}{2} + \frac{b_2}{4} + \frac{b_3}{8} + \dots + \frac{b_N}{2^N} \right)$$</div>
+            <p>At each repetitive node, looking toward the terminating $2R$ end resistor, the equivalent resistance is always precisely $2R$. This parallel combination with the shunt $2R$ leg yields $2R \parallel 2R = R$. Consequently, at every single node, current splits exactly in half (a factor of $1/2$), creating a perfect geometric power-of-two current divider across all $N$ bit inputs.</p>
+          </div>
+
+          <h2>Key Engineering Guidelines for Resistor Network Design</h2>
+          <ul>
+            <li><strong>Thermal Coefficient Tracking:</strong> In high-precision divider and bridge networks, absolute resistor values matter less than thermal coefficient ratio tracking. Using matched thin-film resistor arrays with $\pm 5\text{ ppm/}^\circ\text{C}$ tracking prevents temperature swings from distorting division ratios.</li>
+            <li><strong>Johnson-Nyquist Thermal Noise:</strong> High-value resistor networks (e.g. megaohm feedback dividers) introduce thermal noise voltage proportional to resistance: $v_n = \sqrt{4kTRB}$. In low-noise analog preamplifiers, keep resistor values as low as practical while respecting power dissipation limits.</li>
+            <li><strong>Parasitic Capacitance &amp; Inductance:</strong> Wirewound resistors exhibit significant parasitic series inductance that alters impedance at frequencies above a few kilohertz. High-frequency networks must use non-inductive thick-film or metal-film surface-mount (SMD) resistors.</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Calc<strong>Hub</strong></div>
+          <p class="footer-desc">High-precision engineering and scientific calculation tools verified against international standards.</p>
+        </div>
+        <div>
+          <h4>Disciplines</h4>
+          <ul class="footer-links">
+            <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+            <li><a href="solar-energy.html">Solar &amp; Renewable Energy</a></li>
+            <li><a href="fire-safety.html">Fire Safety Hydraulics</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Standards &amp; Trust</h4>
+          <ul class="footer-links">
+            <li><a href="ohms-law-calculator.html">Ohm's Law Suite</a></li>
+            <li><a href="engineering.html">Electrical Systems Hub</a></li>
+            <li><a href="sitemap.xml">XML Sitemap</a></li>
+            <li><a href="index.html">All Calculators</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 CalcHub. All rights reserved. Peer-reviewed against IEEE, IEC &amp; NIST standards.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleTopology() {
+      const mode = document.getElementById('topologyType').value;
+      const grp4 = document.getElementById('grpR4');
+      const grp5 = document.getElementById('grpR5');
+      const lbl1 = document.getElementById('lblR1');
+      const lbl2 = document.getElementById('lblR2');
+      const lbl3 = document.getElementById('lblR3');
+      const hint1 = document.getElementById('hintR1');
+      const hint2 = document.getElementById('hintR2');
+      const hint3 = document.getElementById('hintR3');
+
+      if (mode === "delta-to-wye") {
+        grp4.style.display = "none";
+        grp5.style.display = "none";
+        lbl1.textContent = "Resistor Ra (Delta Branch)";
+        lbl2.textContent = "Resistor Rb (Delta Branch)";
+        lbl3.textContent = "Resistor Rc (Delta Branch)";
+        hint1.textContent = "Opposite to node 1 in Delta";
+        hint2.textContent = "Opposite to node 2 in Delta";
+        hint3.textContent = "Opposite to node 3 in Delta";
+        document.getElementById('lblOutPrimary').textContent = "Wye Resistor R1 (Node 1)";
+        document.getElementById('lblOutSecondary').textContent = "Wye Resistor R2 (Node 2)";
+        document.getElementById('lblOutTertiary').textContent = "Wye Resistor R3 (Node 3)";
+        document.getElementById('outPrimarySub').textContent = "(Rb × Rc) / ∑R";
+        document.getElementById('outSecondarySub').textContent = "(Ra × Rc) / ∑R";
+        document.getElementById('outTertiarySub').textContent = "(Ra × Rb) / ∑R";
+      } else if (mode === "wye-to-delta") {
+        grp4.style.display = "none";
+        grp5.style.display = "none";
+        lbl1.textContent = "Resistor R1 (Wye Leg 1)";
+        lbl2.textContent = "Resistor R2 (Wye Leg 2)";
+        lbl3.textContent = "Resistor R3 (Wye Leg 3)";
+        hint1.textContent = "Connected to terminal 1";
+        hint2.textContent = "Connected to terminal 2";
+        hint3.textContent = "Connected to terminal 3";
+        document.getElementById('lblOutPrimary').textContent = "Delta Resistor Ra";
+        document.getElementById('lblOutSecondary').textContent = "Delta Resistor Rb";
+        document.getElementById('lblOutTertiary').textContent = "Delta Resistor Rc";
+        document.getElementById('outPrimarySub').textContent = "(R1R2 + R2R3 + R3R1) / R1";
+        document.getElementById('outSecondarySub').textContent = "(R1R2 + R2R3 + R3R1) / R2";
+        document.getElementById('outTertiarySub').textContent = "(R1R2 + R2R3 + R3R1) / R3";
+      } else if (mode === "bridge-network") {
+        grp4.style.display = "block";
+        grp5.style.display = "block";
+        lbl1.textContent = "Upper-Left Resistor (R1)";
+        lbl2.textContent = "Upper-Right Resistor (R2)";
+        lbl3.textContent = "Lower-Left Resistor (R3)";
+        hint1.textContent = "Between Vin and node C";
+        hint2.textContent = "Between Vin and node D";
+        hint3.textContent = "Between node C and GND";
+        document.getElementById('lblOutPrimary').textContent = "Wye Equivalent RA";
+        document.getElementById('lblOutSecondary').textContent = "Wye Equivalent RB";
+        document.getElementById('lblOutTertiary').textContent = "Wye Equivalent RC";
+        document.getElementById('outPrimarySub').textContent = "Top input star leg";
+        document.getElementById('outSecondarySub').textContent = "Star leg to node C";
+        document.getElementById('outTertiarySub').textContent = "Star leg to node D";
+      } else {
+        grp4.style.display = "block";
+        grp5.style.display = "none";
+        lbl1.textContent = "Series Resistor R1";
+        lbl2.textContent = "Shunt Resistor R2";
+        lbl3.textContent = "Series Resistor R3";
+        hint1.textContent = "First series arm";
+        hint2.textContent = "Central shunt to GND";
+        hint3.textContent = "Second series arm";
+        document.getElementById('lblOutPrimary').textContent = "Input Stage Impedance";
+        document.getElementById('lblOutSecondary').textContent = "Shunt Arm Voltage";
+        document.getElementById('lblOutTertiary').textContent = "Attenuation Factor";
+        document.getElementById('outPrimarySub').textContent = "Z_in terminal resistance";
+        document.getElementById('outSecondarySub').textContent = "Voltage at center node";
+        document.getElementById('outTertiarySub').textContent = "V_out / V_in ratio";
+      }
+    }
+
+    function calculateNetwork() {
+      const mode = document.getElementById('topologyType').value;
+      const R1 = parseFloat(document.getElementById('valR1').value);
+      const R2 = parseFloat(document.getElementById('valR2').value);
+      const R3 = parseFloat(document.getElementById('valR3').value);
+      const R4 = parseFloat(document.getElementById('valR4').value) || 100;
+      const R5 = parseFloat(document.getElementById('valR5').value) || 50;
+      const Vin = parseFloat(document.getElementById('supplyVoltage').value) || 0;
+
+      if (isNaN(R1) || isNaN(R2) || isNaN(R3) || R1 <= 0 || R2 <= 0 || R3 <= 0) return;
+
+      let out1 = 0, out2 = 0, out3 = 0, Req = 0;
+
+      if (mode === "delta-to-wye") {
+        const sum = R1 + R2 + R3;
+        out1 = (R2 * R3) / sum; // R_1 = Rb * Rc / sum
+        out2 = (R1 * R3) / sum; // R_2 = Ra * Rc / sum
+        out3 = (R1 * R2) / sum; // R_3 = Ra * Rb / sum
+        Req = out1 + out2; // Between terminal 1 and 2
+        document.getElementById('outReqDesc').textContent = "Between terminals 1 and 2 (R1 + R2)";
+      } else if (mode === "wye-to-delta") {
+        const num = (R1 * R2) + (R2 * R3) + (R3 * R1);
+        out1 = num / R1; // Ra
+        out2 = num / R2; // Rb
+        out3 = num / R3; // Rc
+        Req = (out1 * (out2 + out3)) / (out1 + out2 + out3);
+        document.getElementById('outReqDesc').textContent = "Equivalent across Ra || (Rb + Rc)";
+      } else if (mode === "bridge-network") {
+        // Delta (R1, R2, R5)
+        const sumD = R1 + R2 + R5;
+        const RA = (R1 * R2) / sumD;
+        const RB = (R1 * R5) / sumD;
+        const RC = (R2 * R5) / sumD;
+        out1 = RA;
+        out2 = RB;
+        out3 = RC;
+
+        const leftBranch = RB + R3;
+        const rightBranch = RC + R4;
+        const par = (leftBranch * rightBranch) / (leftBranch + rightBranch);
+        Req = RA + par;
+
+        // Check if balanced
+        const isBalanced = Math.abs(R1 * R4 - R2 * R3) < 0.001;
+        document.getElementById('outReqDesc').textContent = isBalanced ? "Balanced Bridge (V_bridge = 0V)" : "Unbalanced Bridge Terminal Req";
+      } else {
+        // Ladder L-Pad: R1 in series with (R2 || (R3 + R4))
+        const load = R3 + R4;
+        const shuntPar = (R2 * load) / (R2 + load);
+        Req = R1 + shuntPar;
+        out1 = Req;
+        const vNode = (Vin * shuntPar) / Req;
+        out2 = vNode;
+        out3 = (load > 0) ? ((vNode * R4) / load) / (Vin > 0 ? Vin : 1) : 0;
+        document.getElementById('outReqDesc').textContent = "Total ladder input impedance (Req)";
+      }
+
+      const Iin_A = (Req > 0 && Vin > 0) ? (Vin / Req) : 0;
+      const Iin_mA = Iin_A * 1000;
+      const Power_W = (Req > 0 && Vin > 0) ? (Vin * Vin) / Req : 0;
+
+      document.getElementById('outPrimary').textContent = out1.toFixed(2) + " \u03A9";
+      document.getElementById('outSecondary').textContent = out2.toFixed(2) + " \u03A9";
+      document.getElementById('outTertiary').textContent = (mode === "ladder-network") ? (out3 * 100).toFixed(1) + "%" : out3.toFixed(2) + " \u03A9";
+
+      document.getElementById('outReq').textContent = Req.toFixed(2) + " \u03A9";
+      document.getElementById('outCurrent').textContent = (Iin_mA >= 1000) ? (Iin_mA / 1000).toFixed(3) + " A" : Iin_mA.toFixed(1) + " mA";
+      document.getElementById('outCurrentDesc').textContent = `At ${Vin.toFixed(1)}V applied excitation`;
+      document.getElementById('outPower').textContent = (Power_W >= 1.0) ? Power_W.toFixed(2) + " W" : (Power_W * 1000).toFixed(1) + " mW";
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      toggleTopology();
+      calculateNetwork();
+    });
+  </script>
+</body>
+</html>
+"""
+
+def main():
+    path_micro = os.path.join(BASE_DIR, "microstrip-impedance-calculator.html")
+    with open(path_micro, "w", encoding="utf-8") as f:
+        f.write(TOOL_MICROSTRIP.strip())
+    print("[PASS] microstrip-impedance-calculator.html generated successfully!")
+
+    path_res = os.path.join(BASE_DIR, "resistor-network-calculator.html")
+    with open(path_res, "w", encoding="utf-8") as f:
+        f.write(TOOL_RESISTOR_NET.strip())
+    print("[PASS] resistor-network-calculator.html generated successfully!")
+
+if __name__ == "__main__":
+    main()

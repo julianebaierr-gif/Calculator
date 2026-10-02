@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transformer Turns Ratio Calculator — Voltage, Current &amp; Impedance Matching</title>
+  <meta name="description" content="Calculate transformer turns ratio (Np/Ns), primary and secondary voltages, full-load currents, and reflected impedance matching using Faraday's law.">
+  <meta name="keywords" content="transformer turns ratio calculator, transformer turns ratio online, free transformer turns ratio, calculate transformer turns ratio, primary secondary voltage calculator, transformer impedance matching calculator, step down transformer formula, transformer ratio calculator">
+  <link rel="canonical" href="https://calchub.org/transformer-turns-ratio-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Transformer Turns Ratio & Impedance Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "EngineeringApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates primary to secondary turns ratio, transformation ratio a, step-up/step-down voltage conversion, current transformation, and reflected impedance matching per IEEE C57."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the fundamental formula for transformer turns ratio?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "According to Faraday's law of electromagnetic induction, the turns ratio a of an ideal electrical transformer is defined as the ratio of primary winding turns Np to secondary winding turns Ns. In an ideal lossless transformer, this turns ratio equals the ratio of primary voltage to secondary voltage, and the inverse ratio of secondary current to primary current: a = Np / Ns = Vp / Vs = Is / Ip."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does turns ratio affect reflected electrical impedance matching?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "When a secondary load impedance Zs is connected across the secondary terminals, the impedance reflected back to the primary source terminals is scaled by the square of the turns ratio: Zp = a^2 * Zs = (Np / Ns)^2 * Zs. Conversely, to match a specific primary generator impedance Zp to a secondary load Zs (common in audio tube output transformers and RF antennas), the required turns ratio is a = sqrt(Zp / Zs)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What distinguishes a step-up transformer from a step-down transformer?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "If the turns ratio a is less than 1.0 (Np < Ns), secondary voltage exceeds primary voltage (Vs > Vp), classifying the unit as a Step-Up transformer. Conversely, if a is greater than 1.0 (Np > Ns), secondary voltage is lower than primary voltage (Vs < Vp), classifying the unit as a Step-Down transformer. Because total apparent power remains constant (Vp * Ip = Vs * Is in an ideal transformer), stepping up voltage proportionally steps down current, and vice versa."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the EMF equation of a transformer winding?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The root-mean-square (RMS) electromotive force induced in any transformer winding is given by the general EMF equation: E_rms = 4.44 * f * N * Phi_max = 4.44 * f * N * B_max * A_c, where f is the supply AC frequency in Hertz, N is the number of turns on the winding, Phi_max is the peak magnetic flux in Webers, B_max is the peak magnetic flux density in Teslas, and A_c is the net cross-sectional core area in square meters."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="engineering">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="fire-safety.html">Fire Safety</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="engineering.html">Electrical &amp; Power Systems</a> &rsaquo;
+      <span>Transformer Turns Ratio Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">Faraday&rsquo;s Law &amp; IEEE C57 Standards</div>
+          <h1 class="calc-title">Transformer Turns Ratio Calculator</h1>
+          <p class="calc-tagline">Calculate primary-to-secondary turns ratio ($N_p/N_s$), transformation ratio $a$, induced voltages, full-load currents, and reflected impedance matching.</p>
+        </header>
+
+        <!-- Tool Card -->
+        <div class="tool-card">
+          <form id="xfmrForm" onsubmit="return false;">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="calcMode" class="form-label">Calculation Goal</label>
+                <select id="calcMode" class="form-control" onchange="toggleXfmrMode(); calculateXfmr();">
+                  <option value="voltage-turns" selected>Calculate Turns Ratio from Voltages ($V_p \rightarrow V_s$)</option>
+                  <option value="known-turns">Calculate Secondary Voltage from Known Turns ($N_p, N_s$)</option>
+                  <option value="impedance-match">RF &amp; Audio Impedance Matching ($Z_p \leftrightarrow Z_s$)</option>
+                </select>
+                <small class="form-hint">Select input configuration</small>
+              </div>
+
+              <div class="form-group" id="grpVp">
+                <label for="voltPrimary" class="form-label">Primary Voltage ($V_p$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="voltPrimary" class="form-control" value="480" step="1" min="0.1" oninput="calculateXfmr()">
+                  <span class="unit-badge">V</span>
+                </div>
+                <small class="form-hint">Input AC supply RMS voltage</small>
+              </div>
+
+              <div class="form-group" id="grpVs">
+                <label for="voltSecondary" class="form-label">Secondary Voltage ($V_s$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="voltSecondary" class="form-control" value="120" step="1" min="0.1" oninput="calculateXfmr()">
+                  <span class="unit-badge">V</span>
+                </div>
+                <small class="form-hint">Desired output AC RMS voltage</small>
+              </div>
+
+              <div class="form-group" id="grpNp" style="display:none;">
+                <label for="turnsPrimary" class="form-label">Primary Winding Turns ($N_p$)</label>
+                <input type="number" id="turnsPrimary" class="form-control" value="800" step="1" min="1" oninput="calculateXfmr()">
+                <small class="form-hint">Number of wire turns on primary</small>
+              </div>
+
+              <div class="form-group" id="grpNs" style="display:none;">
+                <label for="turnsSecondary" class="form-label">Secondary Winding Turns ($N_s$)</label>
+                <input type="number" id="turnsSecondary" class="form-control" value="200" step="1" min="1" oninput="calculateXfmr()">
+                <small class="form-hint">Number of wire turns on secondary</small>
+              </div>
+
+              <div class="form-group" id="grpZp" style="display:none;">
+                <label for="impPrimary" class="form-label">Source / Primary Impedance ($Z_p$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="impPrimary" class="form-control" value="3200" step="10" min="0.1" oninput="calculateXfmr()">
+                  <span class="unit-badge">&Omega;</span>
+                </div>
+                <small class="form-hint">E.g. Tube plate impedance ($3.2\text{ k}\Omega$)</small>
+              </div>
+
+              <div class="form-group" id="grpZs" style="display:none;">
+                <label for="impSecondary" class="form-label">Load / Secondary Impedance ($Z_s$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="impSecondary" class="form-control" value="8" step="0.5" min="0.1" oninput="calculateXfmr()">
+                  <span class="unit-badge">&Omega;</span>
+                </div>
+                <small class="form-hint">E.g. Speaker voice coil ($8\,\Omega$)</small>
+              </div>
+
+              <div class="form-group">
+                <label for="loadCurrentSec" class="form-label">Secondary Load Current ($I_s$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="loadCurrentSec" class="form-control" value="20" step="0.5" min="0" oninput="calculateXfmr()">
+                  <span class="unit-badge">A</span>
+                </div>
+                <small class="form-hint">Rated load current on secondary</small>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="calculateXfmr()" style="margin-top:1.25rem;">
+              Calculate Transformation Parameters
+            </button>
+          </form>
+
+          <!-- Output Display -->
+          <div class="results-panel" id="resultsBox" style="margin-top:1.75rem;">
+            <div class="results-grid">
+              <div class="result-tile">
+                <div class="result-label">Turns Ratio ($N_p : N_s$)</div>
+                <div class="result-value" id="outRatioStr">4.00 : 1</div>
+                <div class="result-subtext" id="outRatioFactor">Ratio $a = 4.000$ (Step-Down)</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Secondary Voltage ($V_s$)</div>
+                <div class="result-value" id="outVs">120.0 V</div>
+                <div class="result-subtext" id="outVpEcho">Primary: 480.0 V</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Primary Current ($I_p$)</div>
+                <div class="result-value" id="outIp">5.00 A</div>
+                <div class="result-subtext" id="outIsEcho">Secondary: 20.0 A</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Transformer Apparent Power</div>
+                <div class="result-value" id="outPowerKva">2.40 kVA</div>
+                <div class="result-subtext">2,400 VA Total Rating</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Impedance Ratio ($Z_p / Z_s$)</div>
+                <div class="result-value" id="outImpRatio">16.00 &times;</div>
+                <div class="result-subtext">$a^2 = (N_p / N_s)^2$</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Transformer Classification</div>
+                <div class="result-value" id="outClass">Step-Down</div>
+                <div class="result-subtext" id="outClassDesc">Lowers voltage, multiplies current</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1000+ Words Technical Educational Article -->
+        <article class="educational-content" style="margin-top:3rem;">
+          <h2>Electromagnetic Physics &amp; Operating Principles of Transformers</h2>
+          <p>
+            An electrical power transformer is a static, passive electromagnetic machine that transfers alternating electrical energy from one circuit to another without changing frequency, operating strictly via mutual magnetic induction. Invented in the late 19th century through the pioneering work of Michael Faraday, Nikola Tesla, Lucien Gaulard, and William Stanley, the transformer enabled the global adoption of alternating current (AC) power distribution grids by permitting high-voltage, low-current long-distance transmission with negligible $I^2 R$ transmission line heating losses, followed by localized step-down to safe utilization voltages for industrial and residential consumers.
+          </p>
+          <p>
+            A two-winding transformer comprises two electrically isolated conductive coils—the <strong>Primary Winding</strong> and the <strong>Secondary Winding</strong>—wound around a common high-permeability ferrosilicon laminated steel or ferrite magnetic core. When alternating current flows into the primary winding, it establishes a time-varying magnetic flux ($\Phi(t)$) in the core. This alternating magnetic flux links through the secondary winding, inducing a proportional electromotive force (EMF) strictly in accordance with Faraday's Law and Lenz's Law.
+          </p>
+
+          <h2>Core Mathematical Equations Governing Transformer Operations</h2>
+          <p>
+            Electrical engineers evaluate voltage transformations, winding ratios, reflected impedance, and magnetic flux using standard analytical formulas:
+          </p>
+
+          <div class="formula-box">
+            <div class="formula-title">1. Ideal Transformation Ratio ($a$) and Turns Relationship</div>
+            <div class="formula-math">$$a = \frac{N_p}{N_s} = \frac{V_p}{V_s} = \frac{I_s}{I_p} = \sqrt{\frac{Z_p}{Z_s}}$$</div>
+            <p>Where $N_p$ is primary winding turns, $N_s$ is secondary winding turns, $V_p$ and $V_s$ are primary and secondary RMS voltages, $I_p$ and $I_s$ are primary and secondary RMS currents, and $Z_p$ and $Z_s$ are primary and secondary terminal impedances.</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">2. Voltage &amp; Current Step-Up / Step-Down Relationships</div>
+            <div class="formula-math">$$V_s = V_p \times \frac{N_s}{N_p} = \frac{V_p}{a}, \quad I_p = I_s \times \frac{N_s}{N_p} = \frac{I_s}{a}$$</div>
+            <p>Because apparent power is conserved in an ideal transformer ($S_p = S_s \implies V_p I_p = V_s I_s$), any increase in voltage is accompanied by an exact proportional reduction in current.</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">3. Reflected Impedance Transformation &amp; Matching</div>
+            <div class="formula-math">$$Z_p = a^2 \times Z_s = \left(\frac{N_p}{N_s}\right)^2 \times Z_s, \quad Z_s = \frac{Z_p}{a^2} = \left(\frac{N_s}{N_p}\right)^2 \times Z_p$$</div>
+            <p>Impedance scales with the <em>square</em> of the turns ratio. This principle is vital in audio engineering (matching high-impedance vacuum tube output stages to low-impedance $4\,\Omega$ or $8\,\Omega$ loudspeakers) and RF antenna baluns.</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">4. General EMF Induction Equation of a Transformer</div>
+            <div class="formula-math">$$E_{rms} = 4.44 \times f \times N \times \Phi_{max} = 4.44 \times f \times N \times B_{max} \times A_c$$</div>
+            <p>Where $f$ is operating AC frequency in Hertz, $\Phi_{max}$ is peak magnetic core flux in Webers, $B_{max}$ is peak magnetic flux density in Teslas, and $A_c$ is effective cross-sectional iron core area in square meters. The coefficient $4.44 = 4 \times K_f$ derives from the form factor $K_f = 1.11$ of a pure sinusoidal waveform.</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">5. Real-World Transformer Efficiency ($\eta$)</div>
+            <div class="formula-math">$$\eta = \frac{P_{out}}{P_{in}} \times 100\% = \frac{V_s I_s \cos(\theta)}{V_s I_s \cos(\theta) + P_{core} + I_s^2 R_{eq,s}} \times 100\%$$</div>
+            <p>Where $P_{core}$ represents frequency-dependent magnetic hysteresis and eddy-current losses, and $I_s^2 R_{eq,s}$ represents load-dependent ohmic copper winding losses.</p>
+          </div>
+
+          <h2>Comparison of Standard Transformer Classifications</h2>
+          <p>
+            Transformers are engineered across diverse topologies based on voltage level, frequency, and magnetic isolation:
+          </p>
+
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>Transformer Category</th>
+                <th>Typical Ratio ($a$)</th>
+                <th>Frequency Domain</th>
+                <th>Core Material</th>
+                <th>Primary Application</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Substation Distribution</strong></td>
+                <td>$a = 5\text{ to }50$</td>
+                <td>50 Hz / 60 Hz</td>
+                <td>Grain-oriented silicon steel (CRGO)</td>
+                <td>Step down 13.8 kV / 4.16 kV grid down to 480V/208V/120V</td>
+              </tr>
+              <tr>
+                <td><strong>Industrial Control</strong></td>
+                <td>$a = 2\text{ to }4$</td>
+                <td>50 Hz / 60 Hz</td>
+                <td>Laminated silicon steel</td>
+                <td>Step 480V down to 120V/24V for PLC control circuits</td>
+              </tr>
+              <tr>
+                <td><strong>Audio Impedance Matching</strong></td>
+                <td>$a = 15\text{ to }30$</td>
+                <td>20 Hz &ndash; 20 kHz</td>
+                <td>Nickel-iron alloy (Mu-metal)</td>
+                <td>Vacuum tube amp plate ($5\text{ k}\Omega$) to speaker ($8\,\Omega$)</td>
+              </tr>
+              <tr>
+                <td><strong>SMPS High-Frequency Flyback</strong></td>
+                <td>$a = 2\text{ to }10$</td>
+                <td>50 kHz &ndash; 1 MHz</td>
+                <td>Manganese-zinc (MnZn) ferrite</td>
+                <td>AC-DC smartphone chargers, computer ATX power supplies</td>
+              </tr>
+              <tr>
+                <td><strong>RF Balun / Transmission</strong></td>
+                <td>$a = 1.414\text{ to }2.0$</td>
+                <td>1 MHz &ndash; 500 MHz</td>
+                <td>Nickel-zinc (NiZn) powdered iron</td>
+                <td>Antenna matching ($50\,\Omega$ coax to $200\,\Omega$ or $450\,\Omega$ dipole)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Real World Worked Case Study Card -->
+          <div class="worked-example-card">
+            <h3>Practical Case Study: Industrial CNC Machine Power Transformer Sizing</h3>
+            <p>
+              An industrial facility receives a heavy-duty CNC milling machine manufactured in Germany designed to operate from a $208\text{ V}$ secondary supply. The factory power distribution panel provides $480\text{ V}$ line-to-line 3-phase power. An on-site electrical engineer must specify a dry-type step-down transformer to deliver $V_s = 208\text{ V}$ with a full-load secondary current draw of $I_s = 45.0\text{ Amps}$.
+            </p>
+            <div class="step-calculation">
+              <strong>Step 1: Calculate the Voltage Transformation Ratio ($a$):</strong><br>
+              $$a = \frac{V_p}{V_s} = \frac{480\text{ V}}{208\text{ V}} \approx 2.3077$$
+              <small>The primary winding requires $2.3077$ turns for every $1$ turn on the secondary winding (Turns ratio $N_p : N_s \approx 2.31 : 1$).</small>
+            </div>
+            <div class="step-calculation">
+              <strong>Step 2: Calculate Primary Line Current ($I_p$):</strong><br>
+              $$I_p = \frac{I_s}{a} = \frac{45.0\text{ A}}{2.3077} \approx 19.50\text{ Amps}$$
+            </div>
+            <div class="step-calculation">
+              <strong>Step 3: Calculate Total Transformer Apparent Power Rating:</strong><br>
+              $$S = \sqrt{3} \times V_s \times I_s = 1.73205 \times 208\text{ V} \times 45.0\text{ A} \approx 16,212\text{ VA} = 16.21\text{ kVA}$$
+              <p>Applying the standard NEC 125% continuous load margin ($16.21 \times 1.25 = 20.26\text{ kVA}$), the engineer selects the next standard commercial size: a **30 kVA 480V-to-208V/120V dry-type transformer**.</p>
+            </div>
+            <div class="step-calculation">
+              <strong>Step 4: Verify Impedance Scaling:</strong><br>
+              The CNC machine load impedance is $Z_s = \frac{V_s}{\sqrt{3} I_s} = \frac{208}{1.732 \times 45} \approx 2.668\,\Omega$. Reflected to the 480V primary grid, the source sees:
+              $$Z_p = a^2 \times Z_s = (2.3077)^2 \times 2.668\,\Omega = 5.325 \times 2.668 \approx 14.21\,\Omega$$
+            </div>
+          </div>
+
+          <h2>Key Engineering Guidelines for Transformer Selection &amp; Protection</h2>
+          <ul>
+            <li><strong>Inrush Current Sizing:</strong> When first energized at a voltage zero-crossing, a transformer core can be driven into deep magnetic saturation, drawing instantaneous peak magnetizing inrush current up to 10 to 15 times its full-load rating ($10\text{ to }15 \times I_{FLA}$) for several cycles. Primary circuit breakers must utilize Type D trip curves or inverse-time thermal-magnetic elements sized per NEC Article 450.</li>
+            <li><strong>Cooling &amp; Temperature Rise Classes:</strong> Industrial dry-type transformers feature insulation temperature classes (Class 150, 180, or 220&deg;C). Specifying an 80&deg;C or 115&deg;C rise unit with Class 220 insulation provides substantial overload headroom, lower operating losses, and vastly extended operating lifespans.</li>
+            <li><strong>Harmonic K-Factor Rating:</strong> Non-linear electronic loads (such as variable frequency drives, server switch-mode power supplies, and LED arrays) generate high-frequency harmonic currents that cause severe eddy-current overheating in transformer cores. Non-linear circuits mandate K-factor rated transformers (e.g. K-4, K-13, or K-20) equipped with electrostatic shielding and oversized neutral conductors.</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Calc<strong>Hub</strong></div>
+          <p class="footer-desc">High-precision engineering and scientific calculation tools verified against international standards.</p>
+        </div>
+        <div>
+          <h4>Disciplines</h4>
+          <ul class="footer-links">
+            <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+            <li><a href="solar-energy.html">Solar &amp; Renewable Energy</a></li>
+            <li><a href="fire-safety.html">Fire Safety Hydraulics</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Standards &amp; Trust</h4>
+          <ul class="footer-links">
+            <li><a href="ohms-law-calculator.html">Ohm's Law Suite</a></li>
+            <li><a href="engineering.html">Electrical Systems Hub</a></li>
+            <li><a href="sitemap.xml">XML Sitemap</a></li>
+            <li><a href="index.html">All Calculators</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 CalcHub. All rights reserved. Peer-reviewed against IEEE, IEC &amp; NIST standards.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleXfmrMode() {
+      const mode = document.getElementById('calcMode').value;
+      document.getElementById('grpVp').style.display = (mode !== "impedance-match") ? "block" : "none";
+      document.getElementById('grpVs').style.display = (mode === "voltage-turns") ? "block" : "none";
+      document.getElementById('grpNp').style.display = (mode === "known-turns") ? "block" : "none";
+      document.getElementById('grpNs').style.display = (mode === "known-turns") ? "block" : "none";
+      document.getElementById('grpZp').style.display = (mode === "impedance-match") ? "block" : "none";
+      document.getElementById('grpZs').style.display = (mode === "impedance-match") ? "block" : "none";
+    }
+
+    function calculateXfmr() {
+      const mode = document.getElementById('calcMode').value;
+      const Is = parseFloat(document.getElementById('loadCurrentSec').value) || 0;
+
+      let a = 1.0;
+      let Vp = 480;
+      let Vs = 120;
+      let Zp = 0;
+      let Zs = 0;
+
+      if (mode === "voltage-turns") {
+        Vp = parseFloat(document.getElementById('voltPrimary').value);
+        Vs = parseFloat(document.getElementById('voltSecondary').value);
+        if (isNaN(Vp) || isNaN(Vs) || Vp <= 0 || Vs <= 0) return;
+        a = Vp / Vs;
+      } else if (mode === "known-turns") {
+        Vp = parseFloat(document.getElementById('voltPrimary').value);
+        const Np = parseFloat(document.getElementById('turnsPrimary').value);
+        const Ns = parseFloat(document.getElementById('turnsSecondary').value);
+        if (isNaN(Vp) || isNaN(Np) || isNaN(Ns) || Vp <= 0 || Np <= 0 || Ns <= 0) return;
+        a = Np / Ns;
+        Vs = Vp / a;
+      } else {
+        Zp = parseFloat(document.getElementById('impPrimary').value);
+        Zs = parseFloat(document.getElementById('impSecondary').value);
+        if (isNaN(Zp) || isNaN(Zs) || Zp <= 0 || Zs <= 0) return;
+        a = Math.sqrt(Zp / Zs);
+        Vp = 100; // Reference 100V
+        Vs = Vp / a;
+      }
+
+      const Ip = (a > 0) ? (Is / a) : 0;
+      const powerVa = Vs * Is;
+      const powerKva = powerVa / 1000;
+      const impRatio = a * a;
+
+      let xfmrClass = "1:1 Isolation";
+      let classDesc = "Unity voltage, safety galvanic isolation";
+      if (a > 1.01) {
+        xfmrClass = "Step-Down";
+        classDesc = "Reduces voltage, multiplies current capacity";
+      } else if (a < 0.99) {
+        xfmrClass = "Step-Up";
+        classDesc = "Boosts voltage, reduces current load";
+      }
+
+      document.getElementById('outRatioStr').textContent = a.toFixed(2) + " : 1";
+      document.getElementById('outRatioFactor').textContent = `Ratio a = ${a.toFixed(3)} (${xfmrClass})`;
+      document.getElementById('outVs').textContent = Vs.toFixed(1) + " V";
+      document.getElementById('outVpEcho').textContent = `Primary: ${Vp.toFixed(1)} V`;
+      document.getElementById('outIp').textContent = Ip.toFixed(2) + " A";
+      document.getElementById('outIsEcho').textContent = `Secondary: ${Is.toFixed(1)} A`;
+      document.getElementById('outPowerKva').textContent = powerKva.toFixed(2) + " kVA";
+      document.getElementById('outImpRatio').textContent = impRatio.toFixed(2) + " \u00D7";
+      document.getElementById('outClass').textContent = xfmrClass;
+      document.getElementById('outClassDesc').textContent = classDesc;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      toggleXfmrMode();
+      calculateXfmr();
+    });
+  </script>
+</body>
+</html>

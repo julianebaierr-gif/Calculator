@@ -77,6 +77,14 @@ CAT_MAP = {
             ("decibel-calculator.html", "Decibel Calculator (dB, dBm, SPL)", "🔊", "Power, voltage, dBm to Watts & dB SPL", "dB = 10·log(P1/P0) | 20·log(V1/V0)"),
             ("earth-pit-resistance-calculator.html", "Earth Pit Resistance (IEEE 80)", "🌍", "Grounding rod dissipation & soil resistivity", "R = (ρ/2πL)·[ln(8L/d) - 1]"),
             ("electrical-power-calculator.html", "Electrical Power & Energy Cost", "⚡", "Real, reactive, apparent & kWh cost", "P = VI·cos(θ) | P_3φ = √3·V_LL·I_L·PF"),
+            ("microstrip-impedance-calculator.html", "Microstrip Impedance (IPC-2141)", "📡", "Single-ended & differential Z0", "Z0 = [87 / √(εr + 1.41)] · ln[5.98h / (0.8w + t)]"),
+            ("resistor-network-calculator.html", "Resistor Network (Delta-Wye & Ladder)", "⚡", "Δ-Y Kennelly transform & R-2R ladder", "R_A = (R1·R2) / (R1+R2+R3) | V_out = V_ref·(D/2^N)"),
+            ("transformer-turns-ratio-calculator.html", "Transformer Turns Ratio (a)", "⚡", "Voltage, current & impedance matching", "a = Np/Ns = Vp/Vs = Is/Ip = √(Zp/Zs)"),
+            ("aluminium-cable-sizing-calculator.html", "Aluminium Cable Sizing (NEC/IEC)", "🔌", "AA-8000 ampacity, lugs & AL/CU area", "A_Al = 1.64 × A_Cu | Dual Rated AL9CU"),
+            ("busbar-sizing-calculator.html", "Busbar Sizing (DIN 43671 / IEC)", "⚡", "Continuous ampacity & short-circuit force", "I = C · A^0.61 · √ΔT | F = (μ0/2π)·(i_p²/s)·L"),
+            ("cable-sizing-calculator-bs-7671.html", "Cable Sizing (BS 7671 18th Ed)", "🔌", "UK wiring regulations & mV/A/m drop", "Ib ≤ In ≤ Iz | It ≥ In / (Ca·Cg·Cc·Ci)"),
+            ("cable-sizing-calculator-iec-60364.html", "Cable Sizing (IEC 60364-5-52)", "🔌", "International LV dimensioning & adiabatic", "Ib ≤ In ≤ Iz | S ≥ √(Isc²·t) / k"),
+            ("cable-sizing-installation-method-a.html", "Cable Sizing Method A (Insulated Wall)", "🔌", "A1 & A2 conduit in cavity derating", "Iz = I0 · Ca · Cg · Ci | High thermal penalty"),
         ]
     },
     "solar-energy.html": {
