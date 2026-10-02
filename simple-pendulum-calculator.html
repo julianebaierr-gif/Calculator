@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Pendulum Calculator | Period, Length & Gravitational Oscillation</title>
+  <meta name="description" content="Calculate simple pendulum oscillation period, frequency, pendulum length, local gravity (g), and large angle amplitude corrections.">
+  <link rel="canonical" href="https://calchub.cloud/simple-pendulum-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Simple Pendulum Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates simple harmonic pendulum period, cycle frequency, required rod length, local gravitational acceleration, and large-angle Borda amplitude series expansions.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the formula for the period of a simple pendulum?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For small angular amplitudes (θ < 15°), the period of a simple pendulum is T = 2π × √(L / g), where 'T' is oscillation period in seconds, 'L' is pendulum length in meters, and 'g' is local gravitational acceleration (9.80665 m/s² on Earth)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does the mass of the pendulum bob affect the period?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. In an ideal simple pendulum, the period is completely independent of the mass of the bob. Both the gravitational driving torque (τ = mgL sin θ) and the rotational inertia (I = mL²) scale linearly with mass, causing mass to cancel out of the equation of motion."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is a 'seconds pendulum'?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A seconds pendulum is a pendulum whose half-period (the time for one swing or 'tick') is precisely one second, meaning its full back-and-forth period is T = 2.000 seconds. On Earth (g = 9.81 m/s²), a seconds pendulum requires a length of L = g / π² ≈ 0.9936 meters (39.12 inches)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does large amplitude affect the pendulum period?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "At larger amplitudes where sin θ cannot be approximated by θ, the period lengthens according to the Borda series expansion: T ≈ T₀ × [1 + (1/16)θ₀² + (11/3072)θ₀⁴], where θ₀ is maximum release angle in radians. At θ₀ = 30°, the period increases by roughly 1.7%."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="logo">CalcHub</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="physics.html" class="active">Physics</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="engineering.html">Electrical</a>
+        <a href="civil.html">Civil</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <div class="content-wrapper">
+      <div class="calculator-container">
+        <h1>Simple Pendulum Calculator</h1>
+        <p class="lead-text">Calculate pendulum oscillation period, cycle frequency, required length, local gravity (g), and peak bottom swing velocity with large-angle amplitude corrections.</p>
+
+        <div class="calc-card">
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="solveTarget">Calculation Target</label>
+              <select id="solveTarget" class="form-control">
+                <option value="find_t" selected>Solve for Period (T) & Frequency (f)</option>
+                <option value="find_l">Solve for Pendulum Length (L)</option>
+                <option value="find_g">Solve for Local Gravity (g)</option>
+              </select>
+            </div>
+
+            <div class="form-group col-half">
+              <label for="gravEnv">Gravity Preset Environment</label>
+              <select id="gravEnv" class="form-control">
+                <option value="9.80665" selected>Earth Sea-Level (g = 9.81 m/s²)</option>
+                <option value="1.62">Moon Surface (g = 1.62 m/s²)</option>
+                <option value="3.72">Mars Surface (g = 3.72 m/s²)</option>
+                <option value="24.79">Jupiter Cloudtops (g = 24.79 m/s²)</option>
+                <option value="custom">Custom Gravity</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half" id="grpL">
+              <label for="valLength">Pendulum Rod / String Length (L)</label>
+              <div class="input-with-unit">
+                <input type="number" id="valLength" class="form-control" value="0.9936" step="any" min="0.001">
+                <select id="unitLength" class="unit-select">
+                  <option value="m" selected>Meters (m)</option>
+                  <option value="cm">Centimeters (cm)</option>
+                  <option value="ft">Feet (ft)</option>
+                  <option value="in">Inches (in)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group col-half" id="grpT" style="display:none;">
+              <label for="valPeriod">Desired Oscillation Period (T)</label>
+              <div class="input-with-unit">
+                <input type="number" id="valPeriod" class="form-control" value="2.0" step="any" min="0.001">
+                <span style="font-size:12px; padding:6px 12px; background:#fff; border:1px solid #cbd5e1; border-left:none; border-radius:0 4px 4px 0; display:flex; align-items:center;">Seconds</span>
+              </div>
+            </div>
+
+            <div class="form-group col-half">
+              <label for="valAngle">Initial Release Angle (&theta;₀)</label>
+              <div class="input-with-unit">
+                <input type="number" id="valAngle" class="form-control" value="5" step="1" min="0.1" max="89.9">
+                <span style="font-size:12px; padding:6px 12px; background:#fff; border:1px solid #cbd5e1; border-left:none; border-radius:0 4px 4px 0; display:flex; align-items:center;">Degrees (°)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button type="button" id="calcBtn" class="btn btn-primary">Calculate Pendulum</button>
+            <button type="button" id="resetBtn" class="btn btn-secondary">Reset to Seconds Pendulum (L ≈ 1m)</button>
+          </div>
+
+          <div id="resultsPanel" class="results-panel">
+            <div class="result-box primary-result">
+              <div class="result-label" id="resPrimaryLabel">Oscillation Period (T)</div>
+              <div class="result-value" id="resPrimaryVal">2.000 s</div>
+              <div class="result-sub" id="resPrimarySub">Frequency: 0.500 Hz (30.0 cycles/min) • Small-angle: 1.999 s</div>
+            </div>
+
+            <div class="result-grid">
+              <div class="result-item">
+                <span class="sub-label">Pendulum Length (L)</span>
+                <span class="sub-value" id="resLength">0.994 m (39.12 in)</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Angular Frequency (&omega;)</span>
+                <span class="sub-value" id="resOmega">3.142 rad/s</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Max Speed at Lowest Point (v_max)</span>
+                <span class="sub-value" id="resVmax">0.275 m/s (0.99 km/h)</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Large Angle Period Increase</span>
+                <span class="sub-value" id="resAmpCorr">+0.05% (Borda Series Correction)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>1. Classical Physics of the Simple Gravitational Pendulum</h2>
+          <p>A simple pendulum consists of an idealized point mass \(m\) (the bob) suspended from a frictionless pivot by a light, inextensible, unstretchable string or rod of length \(L\). When displaced laterally by an angle \(\theta\) from its vertical downward equilibrium and released, the tangential component of gravity exerts a restoring torque that accelerates the bob back toward the central vertical axis.</p>
+          <p>According to Newton's Second Law for rotational motion (\(\tau = I \alpha\)), the differential equation governing the angular position \(\theta(t)\) is:</p>
+          <div class="math-block">
+            $$-m g L \sin\theta = (m L^2) \frac{d^2\theta}{dt^2} \implies \frac{d^2\theta}{dt^2} + \frac{g}{L} \sin\theta = 0$$
+          </div>
+          <p>This is a non-linear second-order differential equation. Notice that the mass \(m\) cancels out entirely: the motion of an ideal pendulum is completely independent of the bob's mass, volume, or material density—a fact first observed by Galileo Galilei in 1582 while watching a swinging bronze chandelier in the Cathedral of Pisa.</p>
+
+          <h2>2. Small-Angle Approximation & The Harmonic Period Equation</h2>
+          <p>For modest displacement angles (\(\theta < 15^\circ \approx 0.26\text{ radians}\)), the Maclaurin series expansion for sine (\(\sin\theta = \theta - \frac{\theta^3}{6} + \frac{\theta^5}{120} - \dots\)) allows the approximation \(\sin\theta \approx \theta\). Substituting this linear approximation transforms the equation into the canonical <strong>Simple Harmonic Motion (SHM)</strong> differential equation:</p>
+          <div class="math-block">
+            $$\frac{d^2\theta}{dt^2} + \left(\frac{g}{L}\right) \theta = 0$$
+          </div>
+          <p>The natural angular frequency of oscillation is \(\omega = \sqrt{g / L}\). Because period \(T = 2\pi / \omega\), the celebrated small-angle period formulation is:</p>
+          <div class="math-block">
+            $$T_0 = 2\pi \sqrt{\frac{L}{g}}$$
+          </div>
+          <p>And the corresponding temporal cycle frequency \(f\) in Hertz (\(\text{cycles/sec}\)) is:</p>
+          <div class="math-block">
+            $$f = \frac{1}{T_0} = \frac{1}{2\pi} \sqrt{\frac{g}{L}}$$
+          </div>
+
+          <h2>3. Large-Angle Amplitude Correction (Borda's Series)</h2>
+          <p>When the initial release amplitude \(\theta_0\) exceeds \(15^\circ\), the small-angle approximation introduces measurable timing error. The exact period requires evaluating a complete elliptic integral of the first kind \(K(\sin(\theta_0 / 2))\). Expanding this integral via the <strong>Borda series</strong> yields:</p>
+          <div class="math-block">
+            $$T = T_0 \left[ 1 + \frac{1}{16}\theta_0^2 + \frac{11}{3072}\theta_0^4 + \frac{173}{737280}\theta_0^6 + \dots \right]$$
+          </div>
+          <p>Where \(\theta_0\) is expressed in radians. For example, at an amplitude of \(\theta_0 = 30^\circ\) (\(0.5236\text{ rad}\)), the first correction term adds \(\frac{1}{16}(0.5236)^2 \approx 0.0171\), increasing the oscillation period by \(1.71\%\) (a clock error of roughly \(24\text{ minutes per day}\)).</p>
+
+          <h2>4. Historical and Engineering Benchmark Reference Table</h2>
+          <p>To assist horologists, structural dynamics engineers, and science educators, the table below documents representative pendulums across history and modern engineering:</p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Pendulum System</th>
+                <th>Effective Length (\(L\))</th>
+                <th>Local Gravity (\(g\))</th>
+                <th>Period (\(T\))</th>
+                <th>Engineering Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Standard Seconds Pendulum (Earth)</td>
+                <td>0.9936 m (39.12 in)</td>
+                <td>9.807 m/s²</td>
+                <td>2.000 seconds (1-sec tick)</td>
+                <td>Horological benchmark for precision longcase grandfather clocks</td>
+              </tr>
+              <tr>
+                <td>Mantle / Shelf Clock Pendulum</td>
+                <td>0.248 m (9.76 in)</td>
+                <td>9.807 m/s²</td>
+                <td>1.000 second (0.5-sec tick)</td>
+                <td>Compact domestic mechanical clock escapement</td>
+              </tr>
+              <tr>
+                <td>Original Foucault Pendulum (Panthéon, Paris)</td>
+                <td>67.0 meters</td>
+                <td>9.81 m/s²</td>
+                <td>16.42 seconds</td>
+                <td>Demonstrating Earth's daily planetary rotation (1851)</td>
+              </tr>
+              <tr>
+                <td>Taipei 101 Tuned Mass Damper (TMD)</td>
+                <td>42.0 meters (Cables)</td>
+                <td>9.79 m/s²</td>
+                <td>13.02 seconds</td>
+                <td>660-tonne steel sphere mitigating typhoon & earthquake sway</td>
+              </tr>
+              <tr>
+                <td>Apollo 15 Lunar Surface Pendulum</td>
+                <td>0.9936 m</td>
+                <td>1.62 m/s² (Moon)</td>
+                <td>4.922 seconds</td>
+                <td>Measuring local lunar gravitational acceleration anomalies</td>
+              </tr>
+              <tr>
+                <td>Industrial Crane Hoist Cable Load</td>
+                <td>25.0 meters</td>
+                <td>9.81 m/s²</td>
+                <td>10.03 seconds</td>
+                <td>Anti-sway automation algorithm calibration for container ports</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>5. Worked Engineering Case Study: Gravity Measurement via Precision Pendulum</h2>
+          <div class="worked-example-card">
+            <h3>Problem Statement</h3>
+            <p>A geophysics survey team is determining local gravitational acceleration \(g\) atop a mountain observatory using a calibrated invar-rod simple pendulum. The distance from the suspension pivot knife-edge to the center of mass of the spherical bob is measured as \(L = 1.2500\text{ meters}\). The pendulum is released from a small amplitude of \(\theta_0 = 4.0^\circ\) (\(0.06981\text{ rad}\)). An optical photogate measures the elapsed time for 100 complete oscillations as \(t_{\text{total}} = 224.62\text{ seconds}\).</p>
+            <p><strong>Required:</strong></p>
+            <ol>
+              <li>Compute the experimental oscillation period \(T\).</li>
+              <li>Evaluate the small-angle amplitude correction factor.</li>
+              <li>Calculate the exact local gravitational acceleration \(g\) to four decimal places.</li>
+            </ol>
+
+            <h3>Step-by-Step Mathematical Solution</h3>
+            <p><strong>Step 1: Calculate measured period \(T\):</strong></p>
+            <div class="math-block">
+              $$T = \frac{t_{\text{total}}}{100} = \frac{224.62\text{ s}}{100} = 2.24620\text{ seconds}$$
+            </div>
+
+            <p><strong>Step 2: Apply Borda's amplitude correction to isolate small-angle period \(T_0\):</strong></p>
+            <div class="math-block">
+              $$T = T_0 \left(1 + \frac{\theta_0^2}{16}\right) \implies T_0 = \frac{T}{1 + \frac{(0.06981)^2}{16}} = \frac{2.24620}{1 + 0.0003046} \approx 2.24552\text{ seconds}$$
+            </div>
+
+            <p><strong>Step 3: Solve for gravitational acceleration \(g\):</strong></p>
+            <div class="math-block">
+              $$T_0 = 2\pi \sqrt{\frac{L}{g}} \implies T_0^2 = \frac{4\pi^2 L}{g} \implies g = \frac{4\pi^2 L}{T_0^2}$$
+            </div>
+            <div class="math-block">
+              $$g = \frac{4 \times (3.14159265)^2 \times 1.2500}{(2.24552)^2} = \frac{49.34802}{5.04236} \approx 9.7867\text{ m/s}^2$$
+            </div>
+            <p><strong>Geophysical Interpretation:</strong> The calculated value of \(g = 9.7867\text{ m/s}^2\) is noticeably lower than standard sea-level gravity (\(9.80665\text{ m/s}^2\)), reflecting the Free-Air Gravity Anomaly caused by the mountain observatory's high altitude (\(\approx 2,100\text{ meters}\) above sea level).</p>
+          </div>
+
+          <h2>6. Physical Pendulums vs. Simple Pendulums</h2>
+          <p>Real physical objects (such as a swinging baseball bat or a solid metal pendulum rod) are <strong>compound (physical) pendulums</strong> with distributed mass rather than an idealized point mass. By applying the parallel axis theorem (\(I = I_{\text{cm}} + md^2\)), the period of a physical pendulum is:</p>
+          <div class="math-block">
+            $$T = 2\pi \sqrt{\frac{I}{m g d}}$$
+          </div>
+          <p>Where \(I\) is total moment of inertia about the pivot, and \(d\) is distance from the pivot to the center of mass. Every physical pendulum possesses an equivalent simple pendulum length \(L_{\text{eq}} = I / (md)\), identifying the <strong>center of oscillation</strong> (the "sweet spot" where impact forces generate zero reaction kick at the pivot).</p>
+
+          <h2>7. Frequently Asked Questions (FAQ)</h2>
+          <div class="faq-item">
+            <h3>Why did historical pendulum clocks lose time during hot summer months?</h3>
+            <p>Thermal expansion causes the metal pendulum rod to lengthen as ambient temperature rises (\(\Delta L = \alpha L \Delta T\)). Because period scales with \(\sqrt{L}\), a longer rod swings slower, causing uncompensated clocks to lose several seconds per day. Horologists solved this by inventing temperature-compensated "gridiron" pendulums (combining alternating brass and steel rods) and mercury-filled pendulum bobs.</p>
+          </div>
+          <div class="faq-item">
+            <h3>How does the Foucault Pendulum prove Earth's rotation?</h3>
+            <p>A Foucault pendulum swings freely in an invariant inertial plane of oscillation. As Earth rotates beneath the pendulum, the floor appears to turn relative to the plane of the swing. The rate of apparent plane precession depends on latitude: \(\omega = 360^\circ \sin(\text{latitude})\) per day. At the North Pole, it completes a full \(360^\circ\) clockwise circle every 24 hours.</p>
+          </div>
+          <div class="faq-item">
+            <h3>What is the maximum velocity of a pendulum bob during its swing?</h3>
+            <p>By conservation of mechanical energy (\(mgh = \frac{1}{2}mv^2\)), the maximum velocity occurs at the lowest point of the swing where potential energy is completely converted into kinetic energy: \(v_{\max} = \sqrt{2gL(1 - \cos\theta_0)}\).</p>
+          </div>
+          <div class="faq-item">
+            <h3>What is the maximum string tension experienced during a pendulum swing?</h3>
+            <p>At the bottom of the swing, the string must support both gravitational weight (\(mg\)) and supply centripetal acceleration (\(m v^2 / L\)). The peak tension is \(T_{\text{max}} = mg + \frac{mv^2}{L} = mg(3 - 2\cos\theta_0)\). When released from \(90^\circ\) (\(\cos 90^\circ = 0\)), the maximum string tension is exactly three times the bob's resting weight (\(3mg\)).</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="sidebar" id="toolSidebar">
+        <!-- Injected via apply_sidebars_all.py -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, science, and technical calculation tools.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Simple Pendulum Engine
+    const toMeters = (l, unit) => {
+      switch(unit) {
+        case 'cm': return l / 100;
+        case 'ft': return l * 0.3048;
+        case 'in': return l * 0.0254;
+        default: return l;
+      }
+    };
+
+    function updateTarget() {
+      const mode = document.getElementById('solveTarget').value;
+      document.getElementById('grpL').style.display = mode === 'find_l' ? 'none' : 'block';
+      document.getElementById('grpT').style.display = mode === 'find_l' ? 'block' : 'none';
+      calculate();
+    }
+
+    function calculate() {
+      const mode = document.getElementById('solveTarget').value;
+      const g = parseFloat(document.getElementById('gravEnv').value) || 9.80665;
+      const angleDeg = parseFloat(document.getElementById('valAngle').value) || 5;
+      const theta0 = angleDeg * (Math.PI / 180);
+
+      // Borda expansion factor: 1 + theta^2/16 + 11*theta^4/3072
+      const bordaFactor = 1 + (theta0 * theta0) / 16 + (11 * Math.pow(theta0, 4)) / 3072;
+      const pctIncrease = (bordaFactor - 1) * 100;
+
+      let L = 0, T = 0, T0 = 0;
+
+      if (mode === 'find_t') {
+        L = toMeters(parseFloat(document.getElementById('valLength').value) || 1, document.getElementById('unitLength').value);
+        if (L <= 0 || g <= 0) return;
+        T0 = 2 * Math.PI * Math.sqrt(L / g);
+        T = T0 * bordaFactor;
+      } else if (mode === 'find_l') {
+        T = parseFloat(document.getElementById('valPeriod').value) || 2.0;
+        T0 = T / bordaFactor;
+        L = (g * T0 * T0) / (4 * Math.PI * Math.PI);
+      } else if (mode === 'find_g') {
+        L = toMeters(parseFloat(document.getElementById('valLength').value) || 1, document.getElementById('unitLength').value);
+        T = parseFloat(document.getElementById('valPeriod').value) || 2.0;
+        T0 = T / bordaFactor;
+        const calc_g = (4 * Math.PI * Math.PI * L) / (T0 * T0);
+
+        document.getElementById('resPrimaryLabel').textContent = "Calculated Local Gravity (g)";
+        document.getElementById('resPrimaryVal').textContent = calc_g.toFixed(4) + " m/s²";
+        document.getElementById('resPrimarySub').textContent = 
+          "Equivalent to " + (calc_g / 9.80665).toFixed(4) + " Earth g (" + (calc_g * 3.28084).toFixed(3) + " ft/s²)";
+
+        document.getElementById('resLength').textContent = L.toFixed(4) + " m";
+        document.getElementById('resOmega').textContent = (2 * Math.PI / T).toFixed(3) + " rad/s";
+        document.getElementById('resVmax').textContent = "N/A";
+        document.getElementById('resAmpCorr').textContent = "+" + pctIncrease.toFixed(3) + "% Borda correction";
+        return;
+      }
+
+      const f = 1 / T;
+      const omega = Math.sqrt(g / L);
+      // Max velocity at bottom v_max = sqrt(2*g*L*(1 - cos(theta)))
+      const v_max = Math.sqrt(2 * g * L * (1 - Math.cos(theta0)));
+
+      // Render Primary Box
+      if (mode === 'find_t') {
+        document.getElementById('resPrimaryLabel').textContent = "Oscillation Period (T)";
+        document.getElementById('resPrimaryVal').textContent = T.toFixed(3) + " s";
+        document.getElementById('resPrimarySub').textContent = 
+          "Frequency: " + f.toFixed(3) + " Hz (" + (f * 60).toFixed(1) + " cycles/min) • Small-angle T₀: " + T0.toFixed(3) + " s";
+      } else if (mode === 'find_l') {
+        document.getElementById('resPrimaryLabel').textContent = "Required Pendulum Length (L)";
+        document.getElementById('resPrimaryVal').textContent = L.toFixed(4) + " m (" + (L * 100).toFixed(2) + " cm)";
+        document.getElementById('resPrimarySub').textContent = 
+          "Equivalent to " + (L * 39.3701).toFixed(2) + " inches (" + (L * 3.28084).toFixed(3) + " ft)";
+      }
+
+      // Render Grid Items
+      document.getElementById('resLength').textContent = 
+        L.toFixed(3) + " m (" + (L * 39.3701).toFixed(2) + " in)";
+
+      document.getElementById('resOmega').textContent = omega.toFixed(3) + " rad/s";
+      document.getElementById('resVmax').textContent = 
+        v_max.toFixed(3) + " m/s (" + (v_max * 3.6).toFixed(2) + " km/h)";
+
+      document.getElementById('resAmpCorr').textContent = 
+        "+" + pctIncrease.toFixed(3) + "% (Borda Series Expansion)";
+    }
+
+    document.getElementById('solveTarget').addEventListener('change', updateTarget);
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', calculate);
+      el.addEventListener('change', calculate);
+    });
+
+    document.getElementById('calcBtn').addEventListener('click', calculate);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('solveTarget').value = 'find_t';
+      document.getElementById('gravEnv').value = '9.80665';
+      document.getElementById('valLength').value = '0.9936';
+      document.getElementById('unitLength').value = 'm';
+      document.getElementById('valAngle').value = '5';
+      updateTarget();
+    });
+
+    window.addEventListener('DOMContentLoaded', calculate);
+  </script>
+</body>
+</html>

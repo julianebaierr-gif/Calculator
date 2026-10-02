@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snell's Law Calculator | Refraction Angle, Critical Angle & Fiber TIR</title>
+  <meta name="description" content="Calculate light refraction angles, critical angle for total internal reflection, Brewster's angle, and numerical aperture using Snell's Law across optical media.">
+  <link rel="canonical" href="https://calchub.cloud/snells-law-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Snell's Law Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates optical refraction angles, critical angle for total internal reflection (TIR), Brewster's polarization angle, and fiber optic numerical aperture.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is Snell's Law formula for light refraction?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Snell's Law states that the ratio of sines of the angles of incidence and refraction equals the reciprocal ratio of indices of refraction: n₁ × sin(θ₁) = n₂ × sin(θ₂), where n₁ and n₂ are refractive indices of the first and second media, θ₁ is the angle of incidence, and θ₂ is the angle of refraction relative to the surface normal."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is total internal reflection (TIR) and how is the critical angle calculated?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Total internal reflection occurs when light attempts to travel from an optically denser medium (higher n₁) into a rarer medium (lower n₂) at an angle exceeding the critical angle. The critical angle is calculated as θ_c = arcsin(n₂ / n₁). Beyond this angle, sin(θ₂) > 1, so 100% of light reflects internally without refractive transmission."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is Brewster's angle in optics?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Brewster's angle (polarizing angle) is the specific angle of incidence at which light with p-polarization is perfectly transmitted through a transparent dielectric interface with zero reflection: θ_B = arctan(n₂ / n₁). Reflected light at this angle is 100% s-polarized."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does Snell's Law govern telecommunications fiber optics?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Optical fibers consist of a high-index silica glass core (n_core ≈ 1.48) enclosed by a lower-index cladding (n_clad ≈ 1.46). Light injected into the core at angles shallower than the critical angle undergoes repeated total internal reflection, propagating data signals over hundreds of kilometers with minimal optical loss."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="logo">CalcHub</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="physics.html" class="active">Physics</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="engineering.html">Electrical</a>
+        <a href="civil.html">Civil</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <div class="content-wrapper">
+      <div class="calculator-container">
+        <h1>Snell's Law Calculator</h1>
+        <p class="lead-text">Calculate optical refraction angles, critical angles for total internal reflection (TIR), Brewster's polarization angle, and light speed across optical media.</p>
+
+        <div class="calc-card">
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="med1Preset">Medium 1 (Incident Medium)</label>
+              <select id="med1Preset" class="form-control">
+                <option value="air" selected>Air (n₁ = 1.0003)</option>
+                <option value="water">Water (n₁ = 1.333)</option>
+                <option value="crownglass">Crown Glass (n₁ = 1.520)</option>
+                <option value="flintglass">Dense Flint Glass (n₁ = 1.660)</option>
+                <option value="diamond">Diamond (n₁ = 2.417)</option>
+                <option value="fiber_core">Optical Fiber Core (n₁ = 1.480)</option>
+                <option value="custom">Custom Refractive Index</option>
+              </select>
+            </div>
+
+            <div class="form-group col-half">
+              <label for="med2Preset">Medium 2 (Refracting Medium)</label>
+              <select id="med2Preset" class="form-control">
+                <option value="crownglass" selected>Crown Glass (n₂ = 1.520)</option>
+                <option value="air">Air (n₂ = 1.0003)</option>
+                <option value="water">Water (n₂ = 1.333)</option>
+                <option value="flintglass">Dense Flint Glass (n₂ = 1.660)</option>
+                <option value="diamond">Diamond (n₂ = 2.417)</option>
+                <option value="fiber_clad">Optical Fiber Cladding (n₂ = 1.460)</option>
+                <option value="custom">Custom Refractive Index</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-third">
+              <label for="n1Val">Refractive Index 1 (n₁)</label>
+              <input type="number" id="n1Val" class="form-control" value="1.0003" step="0.0001" min="1.0">
+            </div>
+
+            <div class="form-group col-third">
+              <label for="n2Val">Refractive Index 2 (n₂)</label>
+              <input type="number" id="n2Val" class="form-control" value="1.520" step="0.0001" min="1.0">
+            </div>
+
+            <div class="form-group col-third">
+              <label for="angle1Val">Angle of Incidence (&theta;₁)</label>
+              <div class="input-with-unit">
+                <input type="number" id="angle1Val" class="form-control" value="30" step="0.1" min="0" max="89.9">
+                <span style="font-size:12px; padding:6px 12px; background:#fff; border:1px solid #cbd5e1; border-left:none; border-radius:0 4px 4px 0; display:flex; align-items:center;">Degrees (°)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button type="button" id="calcBtn" class="btn btn-primary">Calculate Refraction</button>
+            <button type="button" id="resetBtn" class="btn btn-secondary">Reset to Air &rarr; Glass (30°)</button>
+          </div>
+
+          <div id="resultsPanel" class="results-panel">
+            <div class="result-box primary-result">
+              <div class="result-label" id="resPrimaryLabel">Angle of Refraction (&theta;₂)</div>
+              <div class="result-value" id="resPrimaryVal">19.21°</div>
+              <div class="result-sub" id="resPrimarySub">Light bends toward the normal (slower medium)</div>
+            </div>
+
+            <div class="result-grid">
+              <div class="result-item">
+                <span class="sub-label">Critical Angle for TIR (&theta;_c)</span>
+                <span class="sub-value" id="resCritAngle">None (n₁ &le; n₂)</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Brewster's Polarizing Angle (&theta;_B)</span>
+                <span class="sub-value" id="resBrewster">56.65°</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Phase Velocity in Medium 1</span>
+                <span class="sub-value" id="resV1">299,705 km/s (0.9997 c)</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Phase Velocity in Medium 2</span>
+                <span class="sub-value" id="resV2">197,232 km/s (0.6579 c)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>1. Physical Foundations of Optical Refraction & Fermat's Principle</h2>
+          <p>Refraction describes the abrupt redirection of an electromagnetic wave (such as visible light) as it passes obliquely across the interface separating two media possessing different optical phase velocities. While the temporal frequency of the wave remains completely invariant, the phase velocity \(v\) within any transparent dielectric medium is reduced relative to the vacuum speed of light (\(c = 299,792,458\text{ m/s}\)) by a dimensionless material property known as the <strong>refractive index</strong> (\(n\)):</p>
+          <div class="math-block">
+            $$n = \frac{c}{v}$$
+          </div>
+          <p>First quantified mathematically by Dutch astronomer Willebrord Snellius in 1621 and independently derived by René Descartes in 1637, <strong>Snell's Law</strong> governs the directional relationship between the angle of incidence \(\theta_1\) and angle of refraction \(\theta_2\) measured relative to the surface normal perpendicular to the boundary:</p>
+          <div class="math-block">
+            $$n_1 \sin\theta_1 = n_2 \sin\theta_2 \iff \frac{\sin\theta_1}{\sin\theta_2} = \frac{v_1}{v_2} = \frac{n_2}{n_1}$$
+          </div>
+          <p>In 1658, French mathematician Pierre de Fermat established the deep foundational physics underlying Snell's law through <strong>Fermat's Principle of Least Time</strong>: light rays traversing between two points follow the path that minimizes total elapsed transit time (\(t = \int \frac{ds}{v}\)). Just as a lifeguard runs along a sandy beach before diving into the water to reach a swimmer in the shortest time, light refracts toward the normal in a slower, optically denser medium to minimize optical path length.</p>
+
+          <h2>2. Total Internal Reflection & The Critical Angle</h2>
+          <p>When light attempts to cross from an optically denser medium into a rarer medium (\(n_1 > n_2\), such as light exiting crown glass or water into air), Snell's law reveals that the angle of refraction \(\theta_2\) is always greater than the angle of incidence \(\theta_1\) (\(\theta_2 > \theta_1\)).</p>
+          <p>As the angle of incidence increases, \(\theta_2\) eventually reaches \(90^\circ\), meaning the refracted ray grazes along the boundary surface. Setting \(\theta_2 = 90^\circ\) (\(\sin 90^\circ = 1\)) defines the <strong>critical angle</strong> (\(\theta_c\)):</p>
+          <div class="math-block">
+            $$n_1 \sin\theta_c = n_2 \sin(90^\circ) \implies \theta_c = \arcsin\left(\frac{n_2}{n_1}\right)$$
+          </div>
+          <p>If the incident angle exceeds the critical angle (\(\theta_1 > \theta_c\)), Snell's equation mathematically requires \(\sin\theta_2 > 1\), which has no real trigonometric solution. Physically, refraction ceases entirely: \(100\%\) of the incident electromagnetic power reflects back into the first medium without any transmission loss—a phenomenon known as <strong>Total Internal Reflection (TIR)</strong>.</p>
+
+          <h2>3. Optical Benchmark Refractive Index Reference Table</h2>
+          <p>To assist optical lens designers, laser engineers, and gemologists, the table below documents representative refractive indices (\(n\)) measured at the standard yellow sodium D-line wavelength (\(\lambda = 589.3\text{ nm}\)) and corresponding critical angles into air (\(n_2 = 1.0003\)):</p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Optical Material / Dielectric Medium</th>
+                <th>Refractive Index (\(n\))</th>
+                <th>Speed of Light in Medium (\(v\))</th>
+                <th>Critical Angle into Air (\(\theta_c\))</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Vacuum (Physical Reference Standard)</td>
+                <td>1.000000</td>
+                <td>299,792 km/s (1.000 c)</td>
+                <td>N/A</td>
+              </tr>
+              <tr>
+                <td>Air (Dry, Standard Sea Level, 15°C)</td>
+                <td>1.000293</td>
+                <td>299,705 km/s (0.9997 c)</td>
+                <td>N/A</td>
+              </tr>
+              <tr>
+                <td>Water (Pure Distilled, 20°C)</td>
+                <td>1.3330</td>
+                <td>224,895 km/s (0.7502 c)</td>
+                <td>48.61°</td>
+              </tr>
+              <tr>
+                <td>Fused Silica Glass (SiO₂)</td>
+                <td>1.4585</td>
+                <td>205,548 km/s (0.6856 c)</td>
+                <td>43.30°</td>
+              </tr>
+              <tr>
+                <td>Crown Glass (Schott N-BK7 Standard)</td>
+                <td>1.5168</td>
+                <td>197,648 km/s (0.6593 c)</td>
+                <td>41.26°</td>
+              </tr>
+              <tr>
+                <td>Dense Flint Glass (Schott SF11 High-Index)</td>
+                <td>1.7847</td>
+                <td>167,979 km/s (0.5603 c)</td>
+                <td>34.10°</td>
+              </tr>
+              <tr>
+                <td>Sapphire Crystal (Al₂O₃)</td>
+                <td>1.7682</td>
+                <td>169,547 km/s (0.5656 c)</td>
+                <td>34.46°</td>
+              </tr>
+              <tr>
+                <td>Natural Diamond (Carbon Crystalline)</td>
+                <td>2.4173</td>
+                <td>124,020 km/s (0.4137 c)</td>
+                <td>24.44° (Extreme fire & brilliance)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>4. Worked Engineering Case Study: Fiber Optic Core Acceptance Cone</h2>
+          <div class="worked-example-card">
+            <h3>Problem Statement</h3>
+            <p>An optical telecommunications engineer is designing a step-index silica optical fiber for long-haul internet data transmission. The fiber features a germanium-doped silica core with refractive index \(n_{\text{core}} = 1.480\) surrounded by a pure silica cladding with refractive index \(n_{\text{clad}} = 1.460\). The fiber end-face is terminated in ambient air (\(n_0 = 1.0003\)).</p>
+            <p><strong>Required:</strong></p>
+            <ol>
+              <li>Compute the critical angle \(\theta_c\) required for total internal reflection along the core-cladding boundary.</li>
+              <li>Determine the <strong>Numerical Aperture (NA)</strong> of the fiber.</li>
+              <li>Calculate the maximum external acceptance half-angle \(\theta_{\text{max}}\) in air within which launched light rays will successfully guide through the cable.</li>
+            </ol>
+
+            <h3>Step-by-Step Mathematical Solution</h3>
+            <p><strong>Step 1: Calculate core-cladding critical angle \(\theta_c\):</strong></p>
+            <div class="math-block">
+              $$\theta_c = \arcsin\left(\frac{n_{\text{clad}}}{n_{\text{core}}}\right) = \arcsin\left(\frac{1.460}{1.480}\right) = \arcsin(0.986486) \approx 80.57^\circ$$
+            </div>
+            <p>For total internal reflection to occur, rays inside the core must strike the cladding at a grazing angle \(\ge 80.57^\circ\) relative to the cladding normal.</p>
+
+            <p><strong>Step 2: Calculate the fiber Numerical Aperture (NA):</strong></p>
+            <p>Numerical aperture quantifies the light-gathering capability of an optical fiber:</p>
+            <div class="math-block">
+              $$\text{NA} = \sqrt{n_{\text{core}}^2 - n_{\text{clad}}^2} = \sqrt{(1.480)^2 - (1.460)^2} = \sqrt{2.1904 - 2.1316} = \sqrt{0.0588} \approx 0.2425$$
+            </div>
+
+            <p><strong>Step 3: Calculate the maximum external acceptance angle \(\theta_{\text{max}}\) in air:</strong></p>
+            <p>Applying Snell's law at the front air-core interface (\(n_0 \sin\theta_{\text{max}} = \text{NA}\)):</p>
+            <div class="math-block">
+              $$\sin\theta_{\text{max}} = \frac{\text{NA}}{n_0} = \frac{0.2425}{1.0003} \approx 0.2424$$
+            </div>
+            <div class="math-block">
+              $$\theta_{\text{max}} = \arcsin(0.2424) \approx 14.03^\circ$$
+            </div>
+            <p><strong>Engineering Design Verdict:</strong> The fiber possesses an acceptance cone with a full apex angle of \(2\theta_{\text{max}} = 28.06^\circ\). Laser launch optics must focus the input beam within this cone to guarantee 100% total internal reflection guidance without leakage into the cladding.</p>
+          </div>
+
+          <h2>5. Polarization by Reflection & Brewster's Angle</h2>
+          <p>When unpolarized light strikes a transparent dielectric surface, the reflected and refracted rays exhibit polarization dictated by the Fresnel reflection coefficients. Scottish physicist Sir David Brewster discovered in 1815 that when the angle between the reflected ray and refracted ray is exactly \(90^\circ\) (\(\theta_1 + \theta_2 = 90^\circ\)), the reflected beam is \(100\%\) linearly s-polarized perpendicular to the plane of incidence.</p>
+          <p>Applying Snell's law at this condition yields <strong>Brewster's Angle</strong> (\(\theta_B\)):</p>
+          <div class="math-block">
+            $$n_1 \sin\theta_B = n_2 \sin(90^\circ - \theta_B) = n_2 \cos\theta_B \implies \tan\theta_B = \frac{n_2}{n_1} \implies \theta_B = \arctan\left(\frac{n_2}{n_1}\right)$$
+          </div>
+          <p>For an air-to-glass interface (\(n_1 = 1.0, n_2 = 1.52\)), Brewster's angle is \(\arctan(1.52) \approx 56.7^\circ\). Polarized sunglasses exploit this principle: because glare reflected from horizontal surfaces (water, wet roadways, car windshields) is predominantly horizontally polarized, vertically oriented polarizing filters extinguish the glare completely.</p>
+
+          <h2>6. Frequently Asked Questions (FAQ)</h2>
+          <div class="faq-item">
+            <h3>Why do diamonds sparkle with such intense brilliance compared to glass?</h3>
+            <p>Diamond has an exceptionally high refractive index (\(n = 2.417\)), resulting in an unusually small critical angle of just \(\theta_c = 24.4^\circ\) (compared to \(41.3^\circ\) for crown glass). Lapidary master jewelers cut diamond facets so that virtually all light entering the top table undergoes multiple total internal reflections before exiting back through the crown, maximizing fire and brilliance.</p>
+          </div>
+          <div class="faq-item">
+            <h3>What causes a mirage on hot asphalt roads during summer?</h3>
+            <p>Sunlight intensely heats the dark pavement, creating a thin layer of hot, low-density air immediately above the road. Because hotter air has a lower refractive index than cooler upper air, downward-slanting light rays bend upward via continuous refraction away from the normal until undergoing total internal reflection, projecting a displaced image of the blue sky that drivers perceive as a puddle of water.</p>
+          </div>
+          <div class="faq-item">
+            <h3>How does dispersion split white light into a rainbow in a prism?</h3>
+            <p>The refractive index of transparent media is not constant across all wavelengths: due to atomic resonance, optical glasses exhibit chromatic dispersion, where shorter blue wavelengths experience a higher refractive index than longer red wavelengths (\(n_{\text{blue}} > n_{\text{red}}\)). Consequently, blue light refracts through a sharper angle than red light, fanning white light out into its constituent spectral colors.</p>
+          </div>
+          <div class="faq-item">
+            <h3>Can Snell's Law be applied to acoustic sound waves and seismic waves?</h3>
+            <p>Yes. Snell's law is a universal wave equation applicable to any wave propagating across velocity discontinuities, including seismic P-waves and S-waves traveling through Earth's crustal layers and ultrasound waves passing between soft human tissue and bone in medical imaging.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="sidebar" id="toolSidebar">
+        <!-- Injected via apply_sidebars_all.py -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, science, and technical calculation tools.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Snell's Law Calculation Engine
+    const c_light = 299792.458; // km/s
+
+    const medPresets = {
+      air: 1.0003,
+      water: 1.3330,
+      crownglass: 1.5200,
+      flintglass: 1.6600,
+      diamond: 2.4170,
+      fiber_core: 1.4800,
+      fiber_clad: 1.4600
+    };
+
+    function applyPresets() {
+      const p1 = document.getElementById('med1Preset').value;
+      if (p1 !== 'custom' && medPresets[p1]) {
+        document.getElementById('n1Val').value = medPresets[p1];
+      }
+      const p2 = document.getElementById('med2Preset').value;
+      if (p2 !== 'custom' && medPresets[p2]) {
+        document.getElementById('n2Val').value = medPresets[p2];
+      }
+      calculate();
+    }
+
+    function calculate() {
+      const n1 = parseFloat(document.getElementById('n1Val').value) || 1.0;
+      const n2 = parseFloat(document.getElementById('n2Val').value) || 1.0;
+      const theta1_deg = parseFloat(document.getElementById('angle1Val').value) || 0;
+
+      const theta1_rad = theta1_deg * (Math.PI / 180);
+
+      // Phase velocities
+      const v1 = c_light / n1;
+      const v2 = c_light / n2;
+
+      // Brewster's angle tan(theta_B) = n2 / n1
+      const brewster_rad = Math.atan(n2 / n1);
+      const brewster_deg = brewster_rad * (180 / Math.PI);
+
+      // Critical angle theta_c = asin(n2 / n1) if n1 > n2
+      let crit_deg = null;
+      let isTIR = false;
+      if (n1 > n2) {
+        const crit_rad = Math.asin(n2 / n1);
+        crit_deg = crit_rad * (180 / Math.PI);
+        if (theta1_deg >= crit_deg) {
+          isTIR = true;
+        }
+      }
+
+      // Snell's law: sin(theta2) = (n1 / n2) * sin(theta1)
+      const sinTheta2 = (n1 / n2) * Math.sin(theta1_rad);
+
+      // Render Primary Box
+      if (isTIR || sinTheta2 > 1.0) {
+        document.getElementById('resPrimaryLabel').textContent = "Total Internal Reflection (TIR)";
+        document.getElementById('resPrimaryVal').textContent = "100% Reflection (No Refraction)";
+        document.getElementById('resPrimarySub').textContent = 
+          "Incident angle " + theta1_deg.toFixed(1) + "° exceeds critical angle " + (crit_deg ? crit_deg.toFixed(2) + "°" : "");
+      } else {
+        const theta2_rad = Math.asin(sinTheta2);
+        const theta2_deg = theta2_rad * (180 / Math.PI);
+
+        document.getElementById('resPrimaryLabel').textContent = "Angle of Refraction (θ₂)";
+        document.getElementById('resPrimaryVal').textContent = theta2_deg.toFixed(2) + "°";
+
+        let bendText = "";
+        if (theta2_deg < theta1_deg) {
+          bendText = "Light bends toward normal (slower denser medium)";
+        } else if (theta2_deg > theta1_deg) {
+          bendText = "Light bends away from normal (faster rarer medium)";
+        } else {
+          bendText = "Straight propagation (Identical media or normal incidence)";
+        }
+        document.getElementById('resPrimarySub').textContent = bendText;
+      }
+
+      // Render Grid Items
+      if (crit_deg !== null) {
+        document.getElementById('resCritAngle').textContent = 
+          crit_deg.toFixed(2) + "° (TIR threshold)";
+      } else {
+        document.getElementById('resCritAngle').textContent = "None (n₁ ≤ n₂)";
+      }
+
+      document.getElementById('resBrewster').textContent = brewster_deg.toFixed(2) + "°";
+      document.getElementById('resV1').textContent = 
+        v1.toLocaleString('en-US', {maximumFractionDigits: 0}) + " km/s (" + (v1 / c_light).toFixed(4) + " c)";
+      document.getElementById('resV2').textContent = 
+        v2.toLocaleString('en-US', {maximumFractionDigits: 0}) + " km/s (" + (v2 / c_light).toFixed(4) + " c)";
+    }
+
+    document.getElementById('med1Preset').addEventListener('change', applyPresets);
+    document.getElementById('med2Preset').addEventListener('change', applyPresets);
+    document.querySelectorAll('input, select').forEach(el => {
+      if (el.id !== 'med1Preset' && el.id !== 'med2Preset') {
+        el.addEventListener('input', () => {
+          if (el.id === 'n1Val') document.getElementById('med1Preset').value = 'custom';
+          if (el.id === 'n2Val') document.getElementById('med2Preset').value = 'custom';
+          calculate();
+        });
+        el.addEventListener('change', () => {
+          if (el.id === 'n1Val') document.getElementById('med1Preset').value = 'custom';
+          if (el.id === 'n2Val') document.getElementById('med2Preset').value = 'custom';
+          calculate();
+        });
+      }
+    });
+
+    document.getElementById('calcBtn').addEventListener('click', calculate);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('med1Preset').value = 'air';
+      document.getElementById('med2Preset').value = 'crownglass';
+      document.getElementById('angle1Val').value = '30';
+      applyPresets();
+    });
+
+    window.addEventListener('DOMContentLoaded', calculate);
+  </script>
+</body>
+</html>

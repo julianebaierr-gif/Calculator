@@ -230,6 +230,14 @@ CATEGORIES = {
             ("doppler-effect-calculator.html", "Doppler Effect", "🔊", "Sound & radar frequency shift"),
             ("escape-velocity-calculator.html", "Escape Velocity", "🪐", "Planetary gravity & orbital speed"),
             ("free-fall-calculator.html", "Free Fall Calculator", "🪂", "Impact speed & air drag terminal velocity"),
+            ("friction-calculator.html", "Friction (Static & Kinetic)", "🧱", "Friction force, normal force & angle of repose"),
+            ("gravitational-force-calculator.html", "Gravitational Force", "🌌", "Mutual planetary attraction & orbital dynamics"),
+            ("hookes-law-calculator.html", "Hooke's Law (Springs)", "🪢", "Restoring force, elastic energy & spring constant"),
+            ("kinetic-energy-calculator.html", "Kinetic Energy", "⚡", "Translational ½mv² & rotational flywheel energy"),
+            ("photon-energy-calculator.html", "Photon Energy", "💡", "Planck relation E = hf = hc/λ & electron-volts"),
+            ("simple-pendulum-calculator.html", "Simple Pendulum", "🕰️", "Oscillation period, frequency & seconds pendulum"),
+            ("snells-law-calculator.html", "Snell's Law (Refraction)", "🔍", "Refraction angle, critical angle & optical fiber TIR"),
+            ("specific-heat-calculator.html", "Specific Heat Capacity", "🔥", "Sensible heat Q = mcΔT & thermal equilibrium"),
         ]
     },
     "fire": {
@@ -300,7 +308,7 @@ def determine_tool_cat(filename):
         return "civil"
     if any(k in f for k in ["chemical", "chlorine", "alum", "boyle", "calcium-hypochlorite", "caustic", "charles", "chlorine-dioxide", "coagulant", "combined-gas", "dilution", "gay-lussac", "half-life", "henderson", "hydrazine", "ideal-gas", "lime-dosing", "molar-mass", "molarity", "ph-calculator", "ph-poh", "phosphate", "polymer", "ro-antiscalant", "sulphuric", "titration"]):
         return "chemical"
-    if any(k in f for k in ["acceleration", "angular-velocity", "centripetal-force", "doppler-effect", "escape-velocity", "free-fall"]):
+    if any(k in f for k in ["acceleration", "angular-velocity", "centripetal-force", "doppler-effect", "escape-velocity", "free-fall", "friction", "gravitational-force", "hookes-law", "kinetic-energy", "photon-energy", "simple-pendulum", "snells-law", "specific-heat"]):
         return "physics"
     if any(k in f for k in ["sprinkler", "smoke", "fire-alarm", "hydrant", "fire-pump", "nac", "strobe"]):
         return "fire"

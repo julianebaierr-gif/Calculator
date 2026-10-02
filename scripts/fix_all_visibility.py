@@ -216,6 +216,14 @@ CAT_MAP = {
             ("doppler-effect-calculator.html", "Doppler Effect (Sound & Radar Shift)", "🔊", "Acoustic frequency shift, apparent pitch & medical ultrasound", "f' = f₀ · (c ± v_o) / (c ∓ v_s) | Mach cone"),
             ("escape-velocity-calculator.html", "Escape Velocity (Planetary Gravity)", "🪐", "Gravitational escape speed, orbital speed & Schwarzschild radius", "v_e = √(2GM/r) = √(2gr) | v_orb = v_e / √2"),
             ("free-fall-calculator.html", "Free Fall (Vacuum & Air Drag)", "🪂", "Impact velocity, fall time & terminal velocity modeling", "v = gt = √(2gh) | v_t = √((2mg)/(ρ·Cd·A))"),
+            ("friction-calculator.html", "Friction (Static & Kinetic)", "🧱", "Friction force, normal force, ramp angle of repose & slide acceleration", "F_f = μ·N | θ_c = arctan(μ_s) | a = g(sinθ - μ_k·cosθ)"),
+            ("gravitational-force-calculator.html", "Gravitational Force (Newton)", "🌌", "Mutual planetary attraction, orbital acceleration & potential energy", "F = G·(m₁·m₂)/r² | U = -G·(m₁·m₂)/r"),
+            ("hookes-law-calculator.html", "Hooke's Law (Spring Stiffness)", "🪢", "Restoring force, elastic potential energy & harmonic frequency", "F = -k·x | U = ½·k·x² | f = (1/2π)√(k/m)"),
+            ("kinetic-energy-calculator.html", "Kinetic Energy (Motion Work)", "⚡", "Translational ½mv², rotational flywheel ½Iω² & relativistic energy", "E_k = ½·m·v² | E_rot = ½·I·ω² | E = (γ-1)mc²"),
+            ("photon-energy-calculator.html", "Photon Energy (Planck-Einstein)", "💡", "Quantum energy in eV & Joules, momentum & EM wavelength", "E = hf = hc/λ | E(eV) ≈ 1239.84/λ(nm) | p = h/λ"),
+            ("simple-pendulum-calculator.html", "Simple Pendulum (Period & Gravity)", "🕰️", "Oscillation period T, frequency, seconds pendulum & Borda correction", "T = 2π√(L/g) | T ≈ T₀(1 + θ₀²/16)"),
+            ("snells-law-calculator.html", "Snell's Law (Refraction & TIR)", "🔍", "Refraction angle, critical angle for total internal reflection & fiber", "n₁·sin(θ₁) = n₂·sin(θ₂) | θ_c = arcsin(n₂/n₁)"),
+            ("specific-heat-calculator.html", "Specific Heat (Heat Transfer Q)", "🔥", "Sensible heat Q = mcΔT, calorimetry equilibrium & heating time", "Q = m·c·ΔT | T_eq = (m₁c₁T₁ + m₂c₂T₂)/(m₁c₁ + m₂c₂)"),
         ]
     },
     "fire-safety.html": {

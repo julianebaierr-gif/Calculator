@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specific Heat Calculator | Heat Transfer Q = mcΔT & Calorimetry</title>
+  <meta name="description" content="Calculate heat energy transferred (Q), specific heat capacity (c), mass, temperature change, and thermal equilibrium mixing using Q = mcΔT.">
+  <link rel="canonical" href="https://calchub.cloud/specific-heat-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Specific Heat Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates thermodynamic sensible heat transfer Q = mcΔT, specific heat capacity, heating electrical runtime, and calorimeter thermal equilibrium.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the formula for heat energy transfer?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The primary thermodynamic sensible heat equation is Q = m × c × ΔT, where 'Q' is thermal heat energy transferred in Joules, 'm' is mass in kilograms, 'c' is specific heat capacity in J/(kg·K) or J/(kg·°C), and 'ΔT' is temperature change (T_final - T_initial) in Kelvin or degrees Celsius."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the specific heat capacity of liquid water?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Pure liquid water possesses an exceptionally high specific heat capacity of approximately 4,184 J/(kg·°C) or 1.000 cal/(g·°C). This allows water to absorb or release immense quantities of thermal energy with minimal temperature shifts, making it the universal fluid for hydronic HVAC heating and engine cooling."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is thermal equilibrium temperature calculated when two substances mix?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Assuming an insulated calorimeter where heat loss to the surroundings is zero (Q_lost + Q_gained = 0), the equilibrium temperature is: T_eq = (m₁·c₁·T₁ + m₂·c₂·T₂) / (m₁·c₁ + m₂·c₂)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between heat capacity and specific heat capacity?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Specific heat capacity (c) is an intensive physical property representing heat required per unit mass (J/(kg·K)). Heat capacity (C = m × c) is an extensive property representing total heat required to raise the temperature of the entire object by 1 degree (J/K)."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="logo">CalcHub</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="physics.html" class="active">Physics</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="engineering.html">Electrical</a>
+        <a href="civil.html">Civil</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <div class="content-wrapper">
+      <div class="calculator-container">
+        <h1>Specific Heat Calculator</h1>
+        <p class="lead-text">Calculate thermodynamic heat transfer (Q = mcΔT), specific heat capacity, temperature change, and thermal equilibrium mixing temperatures.</p>
+
+        <div class="calc-card">
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="solveTarget">Calculation Target</label>
+              <select id="solveTarget" class="form-control">
+                <option value="solve_q" selected>Solve for Heat Energy (Q) [Given m, c, ΔT]</option>
+                <option value="solve_c">Solve for Specific Heat (c) [Given Q, m, ΔT]</option>
+                <option value="solve_m">Solve for Required Mass (m) [Given Q, c, ΔT]</option>
+                <option value="solve_dt">Solve for Temperature Change (ΔT) [Given Q, m, c]</option>
+              </select>
+            </div>
+
+            <div class="form-group col-half">
+              <label for="matPreset">Material Specific Heat Preset</label>
+              <select id="matPreset" class="form-control">
+                <option value="water" selected>Liquid Water (c = 4,184 J/kg·K)</option>
+                <option value="ice">Ice (-10°C, c = 2,090 J/kg·K)</option>
+                <option value="steam">Steam (100°C, c = 2,010 J/kg·K)</option>
+                <option value="aluminum">Aluminum (c = 900 J/kg·K)</option>
+                <option value="iron">Iron / Structural Steel (c = 450 J/kg·K)</option>
+                <option value="copper">Pure Copper (c = 385 J/kg·K)</option>
+                <option value="concrete">Concrete / Masonry (c = 880 J/kg·K)</option>
+                <option value="oil">Engine Oil (c = 1,900 J/kg·K)</option>
+                <option value="air">Dry Air (c_p = 1,005 J/kg·K)</option>
+                <option value="custom">Custom Specific Heat</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-third" id="grpMass">
+              <label for="valMass">Substance Mass (m)</label>
+              <div class="input-with-unit">
+                <input type="number" id="valMass" class="form-control" value="50" step="any" min="0.001">
+                <select id="unitMass" class="unit-select">
+                  <option value="kg" selected>kg</option>
+                  <option value="g">grams (g)</option>
+                  <option value="lbs">lbs</option>
+                  <option value="ton">Metric Tons</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group col-third" id="grpC">
+              <label for="valC">Specific Heat Capacity (c)</label>
+              <div class="input-with-unit">
+                <input type="number" id="valC" class="form-control" value="4184" step="any" min="1">
+                <span style="font-size:12px; padding:6px 8px; background:#fff; border:1px solid #cbd5e1; border-left:none; border-radius:0 4px 4px 0; display:flex; align-items:center;">J/kg·K</span>
+              </div>
+            </div>
+
+            <div class="form-group col-third" id="grpDT">
+              <label for="valDT">Temperature Change (&Delta;T)</label>
+              <div class="input-with-unit">
+                <input type="number" id="valDT" class="form-control" value="40" step="any">
+                <select id="unitDT" class="unit-select">
+                  <option value="c" selected>&Delta;&deg;C / K</option>
+                  <option value="f">&Delta;&deg;F</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group col-third" id="grpQ" style="display:none;">
+              <label for="valQ">Thermal Heat Energy (Q)</label>
+              <div class="input-with-unit">
+                <input type="number" id="valQ" class="form-control" value="8368" step="any">
+                <select id="unitQ" class="unit-select">
+                  <option value="kj" selected>kJ</option>
+                  <option value="j">Joules (J)</option>
+                  <option value="kwh">kWh</option>
+                  <option value="btu">BTU</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button type="button" id="calcBtn" class="btn btn-primary">Calculate Thermal Energy</button>
+            <button type="button" id="resetBtn" class="btn btn-secondary">Reset to 50 kg Water (40°C Rise)</button>
+          </div>
+
+          <div id="resultsPanel" class="results-panel">
+            <div class="result-box primary-result">
+              <div class="result-label" id="resPrimaryLabel">Heat Energy Transferred (Q)</div>
+              <div class="result-value" id="resPrimaryVal">8,368.0 kJ</div>
+              <div class="result-sub" id="resPrimarySub">8.368 Megajoules • 2.324 kWh • 7,931 BTU</div>
+            </div>
+
+            <div class="result-grid">
+              <div class="result-item">
+                <span class="sub-label">Heat Capacity (C = m·c)</span>
+                <span class="sub-value" id="resHeatCap">209.2 kJ/K</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Nutritional Food Calories</span>
+                <span class="sub-value" id="resKcal">2,000 kcal (Cal)</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Electrical Heating Time (at 3 kW)</span>
+                <span class="sub-value" id="resTime3kW">46.5 minutes</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Equivalent Temperature Rise</span>
+                <span class="sub-value" id="resTempRise">40.0°C (72.0°F)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>1. Thermodynamic Foundations of Sensible Heat Transfer</h2>
+          <p>In classical thermodynamics, thermal energy transfer occurring across a temperature gradient without inducing a physical phase change is designated as <strong>sensible heat</strong>. When heat energy \(Q\) is transferred into a substance, it increases the microscopic kinetic energy of its constituent atoms and molecules—accelerating translational motion, molecular rotational spinning, and interatomic vibrational oscillations.</p>
+          <p>The mathematical relationship governing sensible heat transfer is defined by the fundamental calorimetric formula:</p>
+          <div class="math-block">
+            $$Q = m \cdot c \cdot \Delta T = m \cdot c \cdot (T_{\text{final}} - T_{\text{initial}})$$
+          </div>
+          <p>Where:</p>
+          <ul>
+            <li>\(Q\) = Sensible heat thermal energy transferred in Joules (\(\text{J}\))</li>
+            <li>\(m\) = Mass of the substance in kilograms (\(\text{kg}\))</li>
+            <li>\(c\) = <strong>Specific heat capacity</strong> of the material in Joules per kilogram-Kelvin (\(\text{J}/(\text{kg}\cdot\text{K})\) or \(\text{J}/(\text{kg}\cdot^\circ\text{C})\))</li>
+            <li>\(\Delta T\) = Temperature difference (\(T_f - T_i\)) in Kelvin or degrees Celsius</li>
+          </ul>
+          <p>The <strong>specific heat capacity</strong> \(c\) is an intensive physical property measuring the quantity of thermal energy required to elevate the temperature of one kilogram of a given substance by exactly one Kelvin (or one degree Celsius). By contrast, total <strong>heat capacity</strong> (\(C = m \cdot c\)) is an extensive property measuring the heat required to raise the entire physical body by one degree.</p>
+
+          <h2>2. Benchmark Specific Heat Capacity Reference Table</h2>
+          <p>To assist HVAC mechanical engineers, metallurgical process designers, and physics students, the reference table below outlines standard specific heat capacities across common solids, liquids, and gases measured at standard atmospheric pressure (\(1\text{ atm}\), \(25^\circ\text{C}\)):</p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Substance / Material</th>
+                <th>Specific Heat \(c\) (\(\text{J/kg}\cdot\text{K}\))</th>
+                <th>Specific Heat (\(\text{cal/g}\cdot^\circ\text{C}\))</th>
+                <th>Engineering Thermal Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Liquid Water (\(\text{H}_2\text{O}\), 20°C)</td>
+                <td>4,184</td>
+                <td>1.000</td>
+                <td>Hydronic heating, cooling towers, global climate thermal sink</td>
+              </tr>
+              <tr>
+                <td>Solid Ice (\(-10^\circ\text{C}\))</td>
+                <td>2,090</td>
+                <td>0.499</td>
+                <td>Cryogenic food storage and thermal ice-bank HVAC storage</td>
+              </tr>
+              <tr>
+                <td>Water Vapor / Steam (100°C)</td>
+                <td>2,010</td>
+                <td>0.480</td>
+                <td>Steam turbine rankine cycles and industrial heating</td>
+              </tr>
+              <tr>
+                <td>Engine Oil (Synthetic SAE 5W-30)</td>
+                <td>1,900 – 2,100</td>
+                <td>0.454 – 0.502</td>
+                <td>Internal combustion engine piston and cylinder cooling</td>
+              </tr>
+              <tr>
+                <td>Dry Air (Isobaric \(c_p\), Sea Level)</td>
+                <td>1,005</td>
+                <td>0.240</td>
+                <td>HVAC psychrometric ductwork sensible heating/cooling</td>
+              </tr>
+              <tr>
+                <td>Aluminum Alloy (6061-T6)</td>
+                <td>897</td>
+                <td>0.214</td>
+                <td>Electronics heatsinks and automotive engine blocks</td>
+              </tr>
+              <tr>
+                <td>Dense Concrete / Solid Masonry</td>
+                <td>880</td>
+                <td>0.210</td>
+                <td>Passive solar thermal building mass and floor radiant heating</td>
+              </tr>
+              <tr>
+                <td>Carbon Steel / Cast Iron</td>
+                <td>450 – 490</td>
+                <td>0.108 – 0.117</td>
+                <td>Industrial pressure vessels, boilers, and brake rotors</td>
+              </tr>
+              <tr>
+                <td>Pure Copper (ETP UNS C11000)</td>
+                <td>385</td>
+                <td>0.092</td>
+                <td>High-efficiency shell-and-tube heat exchanger tubing</td>
+              </tr>
+              <tr>
+                <td>Pure Lead (\(\text{Pb}\))</td>
+                <td>129</td>
+                <td>0.031</td>
+                <td>Radiation shielding (rapid heating due to low thermal capacity)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>3. Calorimetry & Thermal Equilibrium Mixtures</h2>
+          <p>According to the <strong>First Law of Thermodynamics</strong> (conservation of energy), in an isolated calorimeter where thermal exchange with the surrounding environment is negligible, the total heat lost by warm bodies must identically equal the total heat gained by cold bodies:</p>
+          <div class="math-block">
+            $$\Sigma Q = Q_{\text{lost}} + Q_{\text{gained}} = 0$$
+          </div>
+          <p>When mixing two substances of masses \(m_1\) and \(m_2\), specific heat capacities \(c_1\) and \(c_2\), and initial temperatures \(T_1\) and \(T_2\), setting \(m_1 c_1 (T_{\text{final}} - T_1) + m_2 c_2 (T_{\text{final}} - T_2) = 0\) allows direct algebraic isolation of the final <strong>thermal equilibrium temperature</strong> (\(T_{\text{final}}\)):</p>
+          <div class="math-block">
+            $$T_{\text{final}} = \frac{m_1 c_1 T_1 + m_2 c_2 T_2}{m_1 c_1 + m_2 c_2}$$
+          </div>
+
+          <h2>4. Worked Engineering Case Study: Commercial Water Heater Sizing</h2>
+          <div class="worked-example-card">
+            <h3>Problem Statement</h3>
+            <p>A commercial hotel requires an electric storage water heater to supply a 300-liter storage tank (\(m = 300\text{ kg}\)). Cold municipal water enters the facility at an initial temperature of \(T_i = 15^\circ\text{C}\). The domestic hot water standard mandates raising the tank to \(T_f = 60^\circ\text{C}\) (a temperature rise of \(\Delta T = 45^\circ\text{C}\)) to prevent <em>Legionella pneumophila</em> bacterial colonization. The heating tank is powered by an electric immersion heater rated at \(P = 9.0\text{ kW}\) (\(9,000\text{ J/s}\)). Specific heat of water is \(c = 4,184\text{ J/kg}\cdot\text{K}\).</p>
+            <p><strong>Required:</strong></p>
+            <ol>
+              <li>Compute the total sensible heat energy \(Q\) in Joules, megajoules, and kilowatt-hours (kWh).</li>
+              <li>Calculate the theoretical recovery time \(t\) required to heat the cold tank to \(60^\circ\text{C}\) assuming zero standby jacket loss.</li>
+              <li>Determine the monthly electrical energy cost assuming one full tank recovery per day at an industrial electricity tariff of \(\$0.14\text{ per kWh}\).</li>
+            </ol>
+
+            <h3>Step-by-Step Mathematical Solution</h3>
+            <p><strong>Step 1: Calculate sensible heat energy \(Q\):</strong></p>
+            <div class="math-block">
+              $$Q = m \cdot c \cdot \Delta T = 300\text{ kg} \times 4,184\text{ J/kg}\cdot\text{K} \times 45\text{ K}$$
+            </div>
+            <div class="math-block">
+              $$Q = 1,255,200 \times 45 = 56,484,000\text{ Joules (56.484 MJ)}$$
+            </div>
+
+            <p><strong>Step 2: Convert heat energy to kilowatt-hours (kWh):</strong></p>
+            <p>Because \(1\text{ kWh} = 3,600,000\text{ Joules}\):</p>
+            <div class="math-block">
+              $$E_{\text{elec}} = \frac{56,484,000\text{ J}}{3,600,000\text{ J/kWh}} \approx 15.69\text{ kWh}$$
+            </div>
+
+            <p><strong>Step 3: Calculate heating recovery time \(t\):</strong></p>
+            <div class="math-block">
+              $$t = \frac{Q}{P} = \frac{56,484,000\text{ J}}{9,000\text{ W}} = 6,276\text{ seconds}$$
+            </div>
+            <p>Converting to minutes and hours: \(6,276 \div 60 = 104.6\text{ minutes (1 hour 44.6 minutes)}\).</p>
+
+            <p><strong>Step 4: Calculate monthly electricity operational cost:</strong></p>
+            <div class="math-block">
+              $$\text{Daily Cost} = 15.69\text{ kWh} \times \$0.14/\text{kWh} \approx \$2.20\text{ per day}$$
+            </div>
+            <div class="math-block">
+              $$\text{Monthly Cost} = \$2.1966 \times 30\text{ days} \approx \$65.90\text{ per month}$$
+            </div>
+            <p><strong>Engineering Conclusion:</strong> The 9 kW immersion element recovers the 300-liter water heater in under 1.75 hours, meeting commercial hospitality hot water peak demand requirements.</p>
+          </div>
+
+          <h2>5. The Anomalous High Specific Heat of Water & Global Climate</h2>
+          <p>Liquid water possesses one of the highest specific heat capacities of any known substance on Earth (\(4,184\text{ J/kg}\cdot\text{K}\)), more than four times greater than aluminum and over nine times greater than iron. This extreme value arises from strong intermolecular <strong>hydrogen bonding</strong>: extensive hydrogen bond networks absorb substantial thermal energy into vibrational bending modes before exhibiting increases in molecular kinetic velocity.</p>
+          <p>This thermodynamic anomaly is vital for terrestrial life. Earth's oceans act as vast planetary thermal buffers, absorbing enormous solar heat loads during summer and slowly releasing thermal energy during winter. Consequently, coastal maritime climates experience mild temperature swings, in stark contrast to continental deserts where low-specific-heat sand and dry air produce extreme diurnal temperature swings exceeding \(35^\circ\text{C}\) between day and night.</p>
+
+          <h2>6. Frequently Asked Questions (FAQ)</h2>
+          <div class="faq-item">
+            <h3>How do specific heat units of J/(kg·K) relate to cal/(g·°C) and BTU/(lb·°F)?</h3>
+            <p>By international definition, \(1\text{ cal/(g}\cdot^\circ\text{C}) = 1\text{ BTU/(lb}\cdot^\circ\text{F}) = 4,184\text{ J/(kg}\cdot\text{K})\). Water has a specific heat of exactly \(1.0\text{ cal/(g}\cdot^\circ\text{C})\) and \(1.0\text{ BTU/(lb}\cdot^\circ\text{F})\), serving as the foundational calibration reference for both metric and Imperial thermal systems.</p>
+          </div>
+          <div class="faq-item">
+            <h3>Does specific heat capacity vary with temperature?</h3>
+            <p>Yes. For solids, specific heat drops toward zero as temperatures approach absolute zero (\(0\text{ K}\)) following the Debye \(T^3\) law. In engineering ranges (\(0^\circ\text{C}\text{ to }100^\circ\text{C}\)), specific heat for most structural solids and liquids is treated as constant with less than \(1\%\) error.</p>
+          </div>
+          <div class="faq-item">
+            <h3>Why do metals heat up and cool down much faster than water?</h3>
+            <p>Metals like copper (\(385\text{ J/kg}\cdot\text{K}\)) and iron (\(450\text{ J/kg}\cdot\text{K}\)) require less than one-tenth the thermal energy per kilogram compared to water to undergo the same temperature increase. Combined with their high thermal conductivities, metals respond rapidly to heating and cooling cycles.</p>
+          </div>
+          <div class="faq-item">
+            <h3>What is the difference between Cp (constant pressure) and Cv (constant volume)?</h3>
+            <p>For incompressible solids and liquids, \(c_p \approx c_v\). For gases, heating at constant pressure requires additional energy to perform boundary expansion work against the atmosphere (\(P\Delta V = nR\Delta T\)). Consequently, for ideal gases, \(c_p = c_v + R_{\text{specific}}\), giving \(c_p > c_v\).</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="sidebar" id="toolSidebar">
+        <!-- Injected via apply_sidebars_all.py -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, science, and technical calculation tools.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Specific Heat Calculation Engine
+    const presets = {
+      water: 4184,
+      ice: 2090,
+      steam: 2010,
+      aluminum: 900,
+      iron: 450,
+      copper: 385,
+      concrete: 880,
+      oil: 1900,
+      air: 1005
+    };
+
+    const toKg = (m, unit) => {
+      switch(unit) {
+        case 'g': return m / 1000;
+        case 'lbs': return m * 0.45359237;
+        case 'ton': return m * 1000;
+        default: return m;
+      }
+    };
+    const toDeltaK = (dt, unit) => {
+      return unit === 'f' ? dt * (5 / 9) : dt;
+    };
+    const toJoules = (q, unit) => {
+      switch(unit) {
+        case 'kj': return q * 1000;
+        case 'kwh': return q * 3600000;
+        case 'btu': return q * 1055.05585;
+        default: return q;
+      }
+    };
+
+    function updateTarget() {
+      const mode = document.getElementById('solveTarget').value;
+      document.getElementById('grpMass').style.display = mode === 'solve_m' ? 'none' : 'block';
+      document.getElementById('grpC').style.display = mode === 'solve_c' ? 'none' : 'block';
+      document.getElementById('grpDT').style.display = mode === 'solve_dt' ? 'none' : 'block';
+      document.getElementById('grpQ').style.display = mode === 'solve_q' ? 'none' : 'block';
+      calculate();
+    }
+
+    function applyPreset() {
+      const p = document.getElementById('matPreset').value;
+      if (p !== 'custom' && presets[p]) {
+        document.getElementById('valC').value = presets[p];
+      }
+      calculate();
+    }
+
+    function calculate() {
+      const mode = document.getElementById('solveTarget').value;
+
+      let calc_q = 0, calc_m = 0, calc_c = 0, calc_dt = 0;
+
+      if (mode === 'solve_q') {
+        calc_m = toKg(parseFloat(document.getElementById('valMass').value) || 0, document.getElementById('unitMass').value);
+        calc_c = parseFloat(document.getElementById('valC').value) || 4184;
+        calc_dt = toDeltaK(parseFloat(document.getElementById('valDT').value) || 0, document.getElementById('unitDT').value);
+        calc_q = calc_m * calc_c * calc_dt;
+      } else if (mode === 'solve_c') {
+        calc_q = toJoules(parseFloat(document.getElementById('valQ').value) || 0, document.getElementById('unitQ').value);
+        calc_m = toKg(parseFloat(document.getElementById('valMass').value) || 1, document.getElementById('unitMass').value);
+        calc_dt = toDeltaK(parseFloat(document.getElementById('valDT').value) || 1, document.getElementById('unitDT').value);
+        calc_c = (calc_m * calc_dt > 0) ? calc_q / (calc_m * calc_dt) : 0;
+      } else if (mode === 'solve_m') {
+        calc_q = toJoules(parseFloat(document.getElementById('valQ').value) || 0, document.getElementById('unitQ').value);
+        calc_c = parseFloat(document.getElementById('valC').value) || 4184;
+        calc_dt = toDeltaK(parseFloat(document.getElementById('valDT').value) || 1, document.getElementById('unitDT').value);
+        calc_m = (calc_c * calc_dt > 0) ? calc_q / (calc_c * calc_dt) : 0;
+      } else if (mode === 'solve_dt') {
+        calc_q = toJoules(parseFloat(document.getElementById('valQ').value) || 0, document.getElementById('unitQ').value);
+        calc_m = toKg(parseFloat(document.getElementById('valMass').value) || 1, document.getElementById('unitMass').value);
+        calc_c = parseFloat(document.getElementById('valC').value) || 4184;
+        calc_dt = (calc_m * calc_c > 0) ? calc_q / (calc_m * calc_c) : 0;
+      }
+
+      // Render Primary Box
+      if (mode === 'solve_q') {
+        document.getElementById('resPrimaryLabel').textContent = "Heat Energy Transferred (Q)";
+        if (calc_q > 1e9) {
+          document.getElementById('resPrimaryVal').textContent = (calc_q / 1e9).toFixed(3) + " GJ";
+        } else if (calc_q > 1e6) {
+          document.getElementById('resPrimaryVal').textContent = (calc_q / 1e6).toFixed(3) + " MJ";
+        } else if (calc_q > 1000) {
+          document.getElementById('resPrimaryVal').textContent = (calc_q / 1000).toFixed(1) + " kJ";
+        } else {
+          document.getElementById('resPrimaryVal').textContent = calc_q.toFixed(1) + " Joules";
+        }
+
+        const kWh = calc_q / 3600000;
+        const btu = calc_q / 1055.056;
+        document.getElementById('resPrimarySub').textContent = 
+          kWh.toFixed(3) + " kWh • " + btu.toLocaleString('en-US', {maximumFractionDigits: 0}) + " BTU";
+      } else if (mode === 'solve_c') {
+        document.getElementById('resPrimaryLabel').textContent = "Calculated Specific Heat (c)";
+        document.getElementById('resPrimaryVal').textContent = calc_c.toFixed(1) + " J/(kg·K)";
+        document.getElementById('resPrimarySub').textContent = (calc_c / 4184).toFixed(4) + " cal/(g·°C)";
+      } else if (mode === 'solve_m') {
+        document.getElementById('resPrimaryLabel').textContent = "Calculated Mass (m)";
+        document.getElementById('resPrimaryVal').textContent = calc_m.toFixed(2) + " kg";
+        document.getElementById('resPrimarySub').textContent = (calc_m * 2.20462).toFixed(2) + " lbs";
+      } else if (mode === 'solve_dt') {
+        document.getElementById('resPrimaryLabel').textContent = "Temperature Change (ΔT)";
+        document.getElementById('resPrimaryVal').textContent = calc_dt.toFixed(2) + " °C (K)";
+        document.getElementById('resPrimarySub').textContent = (calc_dt * 1.8).toFixed(2) + " °F change";
+      }
+
+      // Secondary Grid Items
+      const heatCapacity = calc_m * calc_c;
+      if (heatCapacity > 1000) {
+        document.getElementById('resHeatCap').textContent = (heatCapacity / 1000).toFixed(2) + " kJ/K";
+      } else {
+        document.getElementById('resHeatCap').textContent = heatCapacity.toFixed(1) + " J/K";
+      }
+
+      const kcal = calc_q / 4184;
+      document.getElementById('resKcal').textContent = 
+        kcal.toLocaleString('en-US', {maximumFractionDigits: 1}) + " kcal (Food Cal)";
+
+      // Time at 3 kW: t = Q / 3000
+      const seconds3kW = calc_q / 3000;
+      if (seconds3kW > 3600) {
+        document.getElementById('resTime3kW').textContent = (seconds3kW / 3600).toFixed(2) + " hours";
+      } else {
+        document.getElementById('resTime3kW').textContent = (seconds3kW / 60).toFixed(1) + " minutes";
+      }
+
+      document.getElementById('resTempRise').textContent = 
+        calc_dt.toFixed(1) + "°C (" + (calc_dt * 1.8).toFixed(1) + "°F)";
+    }
+
+    document.getElementById('solveTarget').addEventListener('change', updateTarget);
+    document.getElementById('matPreset').addEventListener('change', applyPreset);
+    document.querySelectorAll('input, select').forEach(el => {
+      if (el.id !== 'solveTarget' && el.id !== 'matPreset') {
+        el.addEventListener('input', () => {
+          if (el.id === 'valC') document.getElementById('matPreset').value = 'custom';
+          calculate();
+        });
+        el.addEventListener('change', () => {
+          if (el.id === 'valC') document.getElementById('matPreset').value = 'custom';
+          calculate();
+        });
+      }
+    });
+
+    document.getElementById('calcBtn').addEventListener('click', calculate);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('solveTarget').value = 'solve_q';
+      document.getElementById('matPreset').value = 'water';
+      document.getElementById('valMass').value = '50';
+      document.getElementById('unitMass').value = 'kg';
+      document.getElementById('valDT').value = '40';
+      document.getElementById('unitDT').value = 'c';
+      applyPreset();
+      updateTarget();
+    });
+
+    window.addEventListener('DOMContentLoaded', calculate);
+  </script>
+</body>
+</html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hooke's Law Calculator | Spring Constant, Force & Elastic Energy</title>
+  <meta name="description" content="Calculate spring restoring force, spring constant (k), displacement elongation, elastic potential energy, and series/parallel combinations using Hooke's Law.">
+  <link rel="canonical" href="https://calchub.cloud/hookes-law-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Hooke's Law Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates linear spring restoring force, spring stiffness constant (k), elastic potential energy, harmonic oscillation period, and series/parallel spring rates.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is Hooke's Law mathematical formula?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Hooke's Law states that the restoring force exerted by an ideal elastic spring is directly proportional to its displacement from equilibrium: F = -k × x, where 'F' is restoring force in Newtons, 'k' is the spring stiffness constant in N/m (or N/mm), and 'x' is displacement in meters. The negative sign denotes that restoring force opposes displacement."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is elastic potential energy stored in a spring calculated?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Elastic potential energy is derived by integrating the force over displacement: U = ∫ k·x dx = ½ × k × x². Stored energy scales with the square of displacement, meaning doubling compression quadruples the stored mechanical work."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What happens when multiple springs are connected in series versus parallel?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For springs in parallel, stiffness adds directly: k_eq = k₁ + k₂. For springs in series, the reciprocal of stiffness adds: 1/k_eq = 1/k₁ + 1/k₂ (making the combined spring softer than any individual spring)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the elastic limit of a spring?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The elastic limit is the maximum stress or extension a material can sustain without undergoing permanent plastic deformation. If stretched beyond its elastic limit (yield strength), Hooke's linear law fails, and the spring will not return to its original free length."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="logo">CalcHub</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="physics.html" class="active">Physics</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="engineering.html">Electrical</a>
+        <a href="civil.html">Civil</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <div class="content-wrapper">
+      <div class="calculator-container">
+        <h1>Hooke's Law Calculator</h1>
+        <p class="lead-text">Calculate spring restoring force, stiffness constant (k), displacement elongation, stored elastic energy, and natural harmonic oscillation frequency.</p>
+
+        <div class="calc-card">
+          <div class="form-group">
+            <label for="calcMode">Calculation Target</label>
+            <select id="calcMode" class="form-control">
+              <option value="solve_f" selected>Solve for Force (F) [Given k and x]</option>
+              <option value="solve_k">Solve for Spring Constant (k) [Given F and x]</option>
+              <option value="solve_x">Solve for Displacement (x) [Given F and k]</option>
+              <option value="solve_network">Spring Network Combinations (Series & Parallel)</option>
+            </select>
+          </div>
+
+          <div class="form-row" id="rowMain">
+            <div class="form-group col-half" id="grpK">
+              <label for="valK">Spring Constant / Stiffness (k)</label>
+              <div class="input-with-unit">
+                <input type="number" id="valK" class="form-control" value="2500" step="any" min="0">
+                <select id="unitK" class="unit-select">
+                  <option value="npm" selected>N/m</option>
+                  <option value="npmm">N/mm</option>
+                  <option value="lbpin">lbf/in</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group col-half" id="grpX">
+              <label for="valX">Displacement Elongation / Compression (x)</label>
+              <div class="input-with-unit">
+                <input type="number" id="valX" class="form-control" value="0.08" step="any">
+                <select id="unitX" class="unit-select">
+                  <option value="m" selected>Meters (m)</option>
+                  <option value="mm">Millimeters (mm)</option>
+                  <option value="cm">Centimeters (cm)</option>
+                  <option value="in">Inches (in)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group col-half" id="grpF" style="display:none;">
+              <label for="valF">Applied Restoring Force (F)</label>
+              <div class="input-with-unit">
+                <input type="number" id="valF" class="form-control" value="200" step="any">
+                <select id="unitF" class="unit-select">
+                  <option value="n" selected>Newtons (N)</option>
+                  <option value="kn">kilonewtons (kN)</option>
+                  <option value="lbf">Pounds force (lbf)</option>
+                  <option value="kgf">kgf</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row" id="rowNetwork" style="display:none;">
+            <div class="form-group col-half">
+              <label for="valK1">Spring 1 Constant (k₁)</label>
+              <div class="input-with-unit">
+                <input type="number" id="valK1" class="form-control" value="1000" step="any" min="0">
+                <span style="font-size:12px; padding:6px 12px; background:#fff; border:1px solid #cbd5e1; border-left:none; border-radius:0 4px 4px 0; display:flex; align-items:center;">N/m</span>
+              </div>
+            </div>
+            <div class="form-group col-half">
+              <label for="valK2">Spring 2 Constant (k₂)</label>
+              <div class="input-with-unit">
+                <input type="number" id="valK2" class="form-control" value="2000" step="any" min="0">
+                <span style="font-size:12px; padding:6px 12px; background:#fff; border:1px solid #cbd5e1; border-left:none; border-radius:0 4px 4px 0; display:flex; align-items:center;">N/m</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-full">
+              <label for="attachedMass">Attached Mass (Optional, for Oscillation Frequency)</label>
+              <div class="input-with-unit">
+                <input type="number" id="attachedMass" class="form-control" value="5.0" step="any" min="0">
+                <span style="font-size:12px; padding:6px 12px; background:#fff; border:1px solid #cbd5e1; border-left:none; border-radius:0 4px 4px 0; display:flex; align-items:center;">kg</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button type="button" id="calcBtn" class="btn btn-primary">Calculate Spring Mechanics</button>
+            <button type="button" id="resetBtn" class="btn btn-secondary">Reset Defaults</button>
+          </div>
+
+          <div id="resultsPanel" class="results-panel">
+            <div class="result-box primary-result">
+              <div class="result-label" id="resPrimaryLabel">Spring Restoring Force (F)</div>
+              <div class="result-value" id="resPrimaryVal">200.0 N</div>
+              <div class="result-sub" id="resPrimarySub">Equivalent to 44.96 lbf (20.39 kgf)</div>
+            </div>
+
+            <div class="result-grid">
+              <div class="result-item">
+                <span class="sub-label">Elastic Potential Energy (U)</span>
+                <span class="sub-value" id="resEnergy">8.000 Joules</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Spring Stiffness (k)</span>
+                <span class="sub-value" id="resStiffness">2,500 N/m (2.50 N/mm)</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Harmonic Natural Frequency (f₀)</span>
+                <span class="sub-value" id="resFreq">3.56 Hz (cycles/sec)</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Oscillation Period (T)</span>
+                <span class="sub-value" id="resPeriod">0.281 seconds</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>1. Physical Foundations of Hooke's Law of Elasticity</h2>
+          <p>Hooke's Law represents the foundational empirical principle governing the elastic deformation of materials. First conceived in 1676 by English polymath Robert Hooke and published in 1678 under the famous Latin anagram <em>ut tensio, sic vis</em> ("as the extension, so the force"), the law states that the mechanical force required to compress or extend a spring by some displacement distance is strictly proportional to that distance.</p>
+          <p>In vector mechanics, the restoring force \(\vec{F}\) exerted by an elastic spring on whatever is attached to it acts in the direction opposite to the displacement \(\vec{x}\) from its relaxed equilibrium position:</p>
+          <div class="math-block">
+            $$F = -k \cdot x$$
+          </div>
+          <p>Where:</p>
+          <ul>
+            <li>\(F\) = Spring restoring force in Newtons (\(\text{N}\))</li>
+            <li>\(k\) = Spring stiffness constant in Newtons per meter (\(\text{N/m}\) or \(\text{N/mm}\))</li>
+            <li>\(x\) = Elongation or compression displacement from equilibrium length (\(\text{meters, m}\))</li>
+          </ul>
+          <p>At the microscopic solid-state physics level, Hooke's law originates in interatomic potential wells. Solid crystalline materials (such as high-carbon spring steel or titanium alloys) consist of atoms bound in periodic lattice geometries by electromagnetic forces. When a tensile or compressive external force displaces atoms from their equilibrium lattice spacings, the interatomic potential curve closely resembles a parabolic well (\(U \propto \Delta r^2\)), producing a linear restoring force that drives atoms back toward minimum potential energy.</p>
+
+          <h2>2. Elastic Potential Energy Formulation</h2>
+          <p>Because the spring restoring force is not constant but increases linearly with displacement (\(F(x) = kx\)), the work required to stretch or compress a spring from equilibrium (\(x = 0\)) to displacement \(x\) must be determined through integral calculus:</p>
+          <div class="math-block">
+            $$U = \int_0^x F(x')\,dx' = \int_0^x k x'\,dx' = \frac{1}{2} k x^2$$
+          </div>
+          <p>This <strong>elastic potential energy</strong> (\(U\) in Joules) represents stored mechanical work ready to be converted into kinetic energy when the spring is released. The quadratic relationship (\(\propto x^2\)) carries immense engineering significance: doubling the compression displacement of an automotive suspension bump stop quadruples the absorbed impact energy (\(2^2 = 4\)), while tripling compression absorbs nine times the energy.</p>
+
+          <h2>3. Spring Network Combinations: Series vs. Parallel Sizing</h2>
+          <p>Mechanical assemblies frequently employ multi-spring configurations to tailor suspension travel, progressive damping, and package envelope constraints:</p>
+          <ul>
+            <li><strong>Parallel Spring Configurations:</strong> When two or more springs sit side by side sharing an applied load, every spring undergoes the exact same displacement (\(x_1 = x_2 = x\)). The total restoring force is the algebraic sum of the individual forces (\(F_{\text{total}} = F_1 + F_2 = k_1 x + k_2 x\)). Consequently, the equivalent parallel stiffness is simply additive:
+              <div class="math-block">
+                $$k_{\text{parallel}} = k_1 + k_2 + \dots + k_n$$
+              </div>
+            </li>
+            <li><strong>Series Spring Configurations:</strong> When springs are linked end-to-end, each spring transmits the exact same force (\(F_1 = F_2 = F\)), but the total displacement is the sum of individual extensions (\(x_{\text{total}} = x_1 + x_2\)). Because \(x = F / k\), substituting gives \(F/k_{\text{eq}} = F/k_1 + F/k_2\), leading to the reciprocal series stiffness rule:
+              <div class="math-block">
+                $$\frac{1}{k_{\text{series}}} = \frac{1}{k_1} + \frac{1}{k_2} + \dots + \frac{1}{k_n} \implies k_{\text{series}} = \frac{k_1 k_2}{k_1 + k_2}$$
+              </div>
+              Connecting springs in series always yields an equivalent spring rate that is softer than the softest individual spring in the chain.
+            </li>
+          </ul>
+
+          <h2>4. Engineering Benchmark Spring Rates Reference Table</h2>
+          <p>To assist mechanical rotating equipment designers and test engineers, the reference table below outlines typical spring stiffness rates across diverse consumer and industrial engineering domains:</p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Spring Application / Mechanical Assembly</th>
+                <th>Typical Spring Rate (N/mm)</th>
+                <th>Spring Rate (lbf/in)</th>
+                <th>Primary Engineering Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Ballpoint Pen Retraction Spring</td>
+                <td>0.05 – 0.15 N/mm</td>
+                <td>0.28 – 0.85 lbf/in</td>
+                <td>Tactile button return force and latching retention</td>
+              </tr>
+              <tr>
+                <td>Computer Keyboard Mechanical Key Switch</td>
+                <td>0.10 – 0.30 N/mm</td>
+                <td>0.57 – 1.71 lbf/in</td>
+                <td>Ergonomic finger activation force (Cherry MX style)</td>
+              </tr>
+              <tr>
+                <td>Pocket Innerspring Mattress Coil</td>
+                <td>0.40 – 0.80 N/mm</td>
+                <td>2.28 – 4.56 lbf/in</td>
+                <td>Orthopedic human body contour pressure distribution</td>
+              </tr>
+              <tr>
+                <td>Mountain Bike Rear Suspension Shock Coil</td>
+                <td>60 – 110 N/mm</td>
+                <td>350 – 650 lbf/in</td>
+                <td>Off-road terrain bump compliance and wheel travel</td>
+              </tr>
+              <tr>
+                <td>Passenger Sedan Front Suspension Coil Spring</td>
+                <td>25 – 45 N/mm</td>
+                <td>140 – 250 lbf/in</td>
+                <td>Ride comfort, body roll control, and chassis isolation</td>
+              </tr>
+              <tr>
+                <td>Formula 1 Racing Pushrod Spring</td>
+                <td>150 – 350 N/mm</td>
+                <td>850 – 2,000 lbf/in</td>
+                <td>Aerodynamic ride height stability under downforce</td>
+              </tr>
+              <tr>
+                <td>Internal Combustion Engine Valve Spring</td>
+                <td>80 – 160 N/mm</td>
+                <td>450 – 900 lbf/in</td>
+                <td>Preventing valve float at high engine RPM redlines</td>
+              </tr>
+              <tr>
+                <td>Heavy Industrial Stamping Die Spring (High-Load)</td>
+                <td>250 – 800 N/mm</td>
+                <td>1,400 – 4,500 lbf/in</td>
+                <td>Sheet metal blanking and sheet stripper pad clamping</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>5. Worked Engineering Case Study: Vehicle Suspension Coil Jounce Design</h2>
+          <div class="worked-example-card">
+            <h3>Problem Statement</h3>
+            <p>An automotive chassis development engineer is sizing the front suspension coil spring for an electric passenger vehicle. The corner sprung mass supported by the front left wheel assembly is \(m = 420\text{ kg}\). Under normal stationary curb load, the coil spring must compress by exactly \(x_0 = 70\text{ mm}\) (\(0.070\text{ m}\)) to achieve the target vehicle ride height. During an extreme \(2.5g\) bump impact event, the suspension jounce bumper allows an additional \(x_{\text{bump}} = 55\text{ mm}\) of compression travel.</p>
+            <p><strong>Required:</strong></p>
+            <ol>
+              <li>Compute the required spring stiffness constant \(k\) in \(\text{N/m}\) and \(\text{N/mm}\).</li>
+              <li>Determine the maximum compressive restoring force \(F_{\max}\) exerted by the spring at full jounce travel (\(x_{\text{total}} = 125\text{ mm}\)).</li>
+              <li>Calculate the total elastic potential energy \(U_{\max}\) absorbed by the spring at peak compression.</li>
+              <li>Determine the natural vertical bounce frequency \(f_0\) of the corner mass.</li>
+            </ol>
+
+            <h3>Step-by-Step Mathematical Solution</h3>
+            <p><strong>Step 1: Calculate static corner weight force \(F_{\text{static}}\):</strong></p>
+            <div class="math-block">
+              $$F_{\text{static}} = m \cdot g = 420\text{ kg} \times 9.80665\text{ m/s}^2 = 4,118.8\text{ N (4.12 kN)}$$
+            </div>
+
+            <p><strong>Step 2: Calculate spring constant \(k\):</strong></p>
+            <div class="math-block">
+              $$k = \frac{F_{\text{static}}}{x_0} = \frac{4,118.8\text{ N}}{0.070\text{ m}} = 58,840\text{ N/m} = 58.84\text{ N/mm}$$
+            </div>
+            <p>Converting to US automotive units: \(58.84\text{ N/mm} \times 5.71015 \approx 336.0\text{ lbf/in}\).</p>
+
+            <p><strong>Step 3: Calculate peak compressive force \(F_{\max}\) at full jounce:</strong></p>
+            <p>Total displacement: \(x_{\text{total}} = 70\text{ mm} + 55\text{ mm} = 125\text{ mm} = 0.125\text{ m}\).</p>
+            <div class="math-block">
+              $$F_{\max} = k \cdot x_{\text{total}} = 58,840\text{ N/m} \times 0.125\text{ m} = 7,355.0\text{ N (7.36 kN or 1,653.5 lbf)}$$
+            </div>
+
+            <p><strong>Step 4: Compute peak absorbed elastic potential energy \(U_{\max}\):</strong></p>
+            <div class="math-block">
+              $$U_{\max} = \frac{1}{2} k x_{\text{total}}^2 = \frac{1}{2} \times 58,840 \times (0.125)^2 = 29,420 \times 0.015625 \approx 459.7\text{ Joules}$$
+            </div>
+
+            <p><strong>Step 5: Determine corner natural oscillation frequency \(f_0\):</strong></p>
+            <div class="math-block">
+              $$f_0 = \frac{1}{2\pi} \sqrt{\frac{k}{m}} = \frac{1}{2\pi} \sqrt{\frac{58,840}{420}} = \frac{1}{2\pi} \sqrt{140.1} = \frac{11.836}{6.2832} \approx 1.88\text{ Hz}$$
+            </div>
+            <p><strong>Chassis Dynamic Evaluation:</strong> A natural bounce frequency of \(1.88\text{ Hz}\) provides firm, sport-oriented vehicle handling while remaining within the human comfort boundary for European automotive ride quality standards (typically \(1.2\text{ to }2.0\text{ Hz}\)).</p>
+          </div>
+
+          <h2>6. Elastic Limits, Yielding, and Spring Fatigue</h2>
+          <p>Real-world springs do not follow Hooke's law indefinitely. In mechanical design, materials exhibit distinct stress-strain behavioral regimes:</p>
+          <ul>
+            <li><strong>Elastic Limit & Yield Strength (\(\sigma_y\)):</strong> When shear stress inside the helical wire coils exceeds the material's yield strength (\(\tau > \tau_y\)), microscopic dislocations slide irreversibly through the crystal lattice. The spring undergoes permanent set (plastic deformation) and will fail to return to its original free height.</li>
+            <li><strong>Mechanical Hysteresis:</strong> During rapid cyclic compression, internal atomic friction dissipates a small fraction of deformation energy as heat, causing the unloading curve on a force-deflection plot to lag below the loading curve. This hysteresis loop represents internal damping.</li>
+          </ul>
+
+          <h2>7. Frequently Asked Questions (FAQ)</h2>
+          <div class="faq-item">
+            <h3>Why is the spring constant sometimes written with a negative sign?</h3>
+            <p>The negative sign in \(F = -kx\) is a vector convention indicating that the force is a <em>restoring force</em>: if the spring is stretched forward (\(x > 0\)), the spring pulls backward (\(F < 0\)). When analyzing scalar magnitudes in engineering sizing, the negative sign is often dropped (\(F = kx\)).</p>
+          </div>
+          <div class="faq-item">
+            <h3>How does temperature affect the spring constant?</h3>
+            <p>Elevated operating temperatures expand interatomic lattice spacing and decrease the shear modulus (\(G\)) of the spring steel alloy. Consequently, the spring constant \(k\) softens slightly as temperature rises (typically \(1\%\text{ to }2\%\) reduction per \(50^\circ\text{C}\) rise in standard steel).</p>
+          </div>
+          <div class="faq-item">
+            <h3>What is the relationship between Hooke's Law and Young's Modulus?</h3>
+            <p>Hooke's Law for a 1D spring (\(F = kx\)) is the macroscopic integral of the microscopic continuum stress-strain relationship: \(\sigma = E \cdot \epsilon\), where \(\sigma = F/A\) is normal stress, \(\epsilon = \Delta L / L\) is engineering strain, and \(E\) is Young's Modulus of elasticity. For a uniform rod, the effective spring constant is \(k = E \cdot A / L\).</p>
+          </div>
+          <div class="faq-item">
+            <h3>How do you calculate spring rate for a helical coil spring from geometry?</h3>
+            <p>The theoretical spring rate of a round-wire helical coil spring is \(k = (G \cdot d^4) / (8 \cdot D^3 \cdot N_a)\), where \(G\) is shear modulus, \(d\) is wire diameter, \(D\) is mean coil diameter, and \(N_a\) is the number of active coils.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="sidebar" id="toolSidebar">
+        <!-- Injected via apply_sidebars_all.py -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, science, and technical calculation tools.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Hooke's Law Calculation Engine
+    const toNpm = (k, unit) => {
+      switch(unit) {
+        case 'npmm': return k * 1000;
+        case 'lbpin': return k * 175.126835;
+        default: return k;
+      }
+    };
+    const fromNpm = (k, unit) => {
+      switch(unit) {
+        case 'npmm': return k / 1000;
+        case 'lbpin': return k / 175.126835;
+        default: return k;
+      }
+    };
+    const toMeters = (x, unit) => {
+      switch(unit) {
+        case 'mm': return x / 1000;
+        case 'cm': return x / 100;
+        case 'in': return x * 0.0254;
+        default: return x;
+      }
+    };
+    const toNewtons = (f, unit) => {
+      switch(unit) {
+        case 'kn': return f * 1000;
+        case 'lbf': return f * 4.4482216;
+        case 'kgf': return f * 9.80665;
+        default: return f;
+      }
+    };
+
+    function updateMode() {
+      const mode = document.getElementById('calcMode').value;
+      document.getElementById('rowMain').style.display = mode === 'solve_network' ? 'none' : 'flex';
+      document.getElementById('rowNetwork').style.display = mode === 'solve_network' ? 'flex' : 'none';
+
+      document.getElementById('grpK').style.display = 'block';
+      document.getElementById('grpX').style.display = 'block';
+      document.getElementById('grpF').style.display = 'none';
+
+      if (mode === 'solve_k') {
+        document.getElementById('grpK').style.display = 'none';
+        document.getElementById('grpF').style.display = 'block';
+      } else if (mode === 'solve_x') {
+        document.getElementById('grpX').style.display = 'none';
+        document.getElementById('grpF').style.display = 'block';
+      }
+      calculate();
+    }
+
+    function calculate() {
+      const mode = document.getElementById('calcMode').value;
+      const rawMass = parseFloat(document.getElementById('attachedMass').value) || 0;
+
+      let calc_k = 0, calc_x = 0, calc_f = 0, calc_u = 0;
+
+      if (mode === 'solve_network') {
+        const k1 = parseFloat(document.getElementById('valK1').value) || 0;
+        const k2 = parseFloat(document.getElementById('valK2').value) || 0;
+        const k_par = k1 + k2;
+        const k_ser = (k1 > 0 && k2 > 0) ? (k1 * k2) / (k1 + k2) : 0;
+
+        document.getElementById('resPrimaryLabel').textContent = "Parallel Network Stiffness (k_parallel)";
+        document.getElementById('resPrimaryVal').textContent = k_par.toFixed(1) + " N/m (" + (k_par / 1000).toFixed(3) + " N/mm)";
+        document.getElementById('resPrimarySub').textContent = 
+          "Series Network Stiffness: " + k_ser.toFixed(1) + " N/m (" + (k_ser / 1000).toFixed(3) + " N/mm)";
+
+        document.getElementById('resEnergy').textContent = "N/A (Displacement Variable)";
+        document.getElementById('resStiffness').textContent = "k₁: " + k1 + " N/m | k₂: " + k2 + " N/m";
+
+        if (rawMass > 0) {
+          const f_par = (1 / (2 * Math.PI)) * Math.sqrt(k_par / rawMass);
+          const f_ser = (1 / (2 * Math.PI)) * Math.sqrt(k_ser / rawMass);
+          document.getElementById('resFreq').textContent = f_par.toFixed(2) + " Hz (Par) | " + f_ser.toFixed(2) + " Hz (Ser)";
+          document.getElementById('resPeriod').textContent = (1/f_par).toFixed(3) + " s (Par) | " + (1/f_ser).toFixed(3) + " s (Ser)";
+        }
+        return;
+      }
+
+      if (mode === 'solve_f') {
+        calc_k = toNpm(parseFloat(document.getElementById('valK').value) || 0, document.getElementById('unitK').value);
+        calc_x = toMeters(parseFloat(document.getElementById('valX').value) || 0, document.getElementById('unitX').value);
+        calc_f = calc_k * calc_x;
+        calc_u = 0.5 * calc_k * calc_x * calc_x;
+      } else if (mode === 'solve_k') {
+        calc_f = toNewtons(parseFloat(document.getElementById('valF').value) || 0, document.getElementById('unitF').value);
+        calc_x = toMeters(parseFloat(document.getElementById('valX').value) || 0.001, document.getElementById('unitX').value);
+        calc_k = calc_x > 0 ? calc_f / calc_x : 0;
+        calc_u = 0.5 * calc_k * calc_x * calc_x;
+      } else if (mode === 'solve_x') {
+        calc_f = toNewtons(parseFloat(document.getElementById('valF').value) || 0, document.getElementById('unitF').value);
+        calc_k = toNpm(parseFloat(document.getElementById('valK').value) || 1, document.getElementById('unitK').value);
+        calc_x = calc_k > 0 ? calc_f / calc_k : 0;
+        calc_u = 0.5 * calc_k * calc_x * calc_x;
+      }
+
+      // Render Primary Box
+      if (mode === 'solve_f') {
+        document.getElementById('resPrimaryLabel').textContent = "Spring Restoring Force (F)";
+        document.getElementById('resPrimaryVal').textContent = calc_f.toFixed(1) + " N";
+        document.getElementById('resPrimarySub').textContent = 
+          "Equivalent to " + (calc_f / 4.44822).toFixed(2) + " lbf (" + (calc_f / 9.80665).toFixed(2) + " kgf)";
+      } else if (mode === 'solve_k') {
+        document.getElementById('resPrimaryLabel').textContent = "Calculated Spring Constant (k)";
+        document.getElementById('resPrimaryVal').textContent = calc_k.toFixed(1) + " N/m (" + (calc_k / 1000).toFixed(3) + " N/mm)";
+        document.getElementById('resPrimarySub').textContent = "Equivalent to " + (calc_k / 175.127).toFixed(2) + " lbf/in";
+      } else if (mode === 'solve_x') {
+        document.getElementById('resPrimaryLabel').textContent = "Displacement Elongation / Compression (x)";
+        document.getElementById('resPrimaryVal').textContent = (calc_x * 1000).toFixed(2) + " mm (" + calc_x.toFixed(4) + " m)";
+        document.getElementById('resPrimarySub').textContent = "Equivalent to " + (calc_x / 0.0254).toFixed(3) + " inches";
+      }
+
+      // Render Grid Items
+      if (calc_u > 1000) {
+        document.getElementById('resEnergy').textContent = (calc_u / 1000).toFixed(3) + " kJ (" + calc_u.toFixed(1) + " J)";
+      } else {
+        document.getElementById('resEnergy').textContent = calc_u.toFixed(3) + " Joules (" + (calc_u * 0.737562).toFixed(3) + " ft-lb)";
+      }
+
+      document.getElementById('resStiffness').textContent = 
+        calc_k.toLocaleString('en-US', {maximumFractionDigits: 1}) + " N/m (" + (calc_k / 1000).toFixed(3) + " N/mm)";
+
+      if (rawMass > 0 && calc_k > 0) {
+        const omega0 = Math.sqrt(calc_k / rawMass);
+        const f0 = omega0 / (2 * Math.PI);
+        const T0 = f0 > 0 ? 1 / f0 : 0;
+        document.getElementById('resFreq').textContent = f0.toFixed(2) + " Hz (" + omega0.toFixed(2) + " rad/s)";
+        document.getElementById('resPeriod').textContent = T0.toFixed(3) + " seconds";
+      } else {
+        document.getElementById('resFreq').textContent = "N/A (Specify mass)";
+        document.getElementById('resPeriod').textContent = "N/A (Specify mass)";
+      }
+    }
+
+    document.getElementById('calcMode').addEventListener('change', updateMode);
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', calculate);
+      el.addEventListener('change', calculate);
+    });
+    document.getElementById('calcBtn').addEventListener('click', calculate);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('calcMode').value = 'solve_f';
+      document.getElementById('valK').value = '2500';
+      document.getElementById('valX').value = '0.08';
+      document.getElementById('valF').value = '200';
+      document.getElementById('attachedMass').value = '5.0';
+      updateMode();
+    });
+
+    window.addEventListener('DOMContentLoaded', updateMode);
+  </script>
+</body>
+</html>
