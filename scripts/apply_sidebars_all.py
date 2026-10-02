@@ -164,6 +164,14 @@ CATEGORIES = {
             ("concrete-calculator.html", "Concrete Slab, Footing & Column", "🏗️", "Wet concrete m³ & cement bags"),
             ("rebar-calculator.html", "Rebar Weight & Grid Spacing", "🔩", "Cut bar counts & linear mass kg/lbs"),
             ("rainwater-downpipe-calculator.html", "Rainwater Downpipe Sizing", "🌧️", "BS EN 12056 roof catchment & leader sizing"),
+            ("beam-calculator.html", "Beam Bending Moment & Shear", "📐", "AISC 360 simply supported & cantilever SFD/BMD"),
+            ("block-calculator.html", "Block Masonry Estimator", "🧱", "CMU block counts, Type S mortar & core grout"),
+            ("concrete-block-calculator.html", "Concrete Block Calculator", "🧱", "ASTM C90 CMU counts, mortar & ASTM C476 grout"),
+            ("concrete-mix-ratio-calculator.html", "Concrete Mix Ratio", "🏗️", "ACI 211.1 1.54 factor, cement bags & aggregate"),
+            ("drywall-calculator.html", "Drywall Sheets, Mud & Tape", "🏠", "ASTM C840 gypsum sheets 4x8 to 4x12 & compound"),
+            ("excavation-calculator.html", "Excavation & Earthwork Haul", "🚜", "OSHA 1926 bank vs loose cubic yards & haul fleet"),
+            ("excavation-volume-calculator.html", "Excavation Volume Calculator", "📐", "Prismoidal formula & trapezoidal trench slopes"),
+            ("flooring-calculator.html", "Flooring Area & Box Estimator", "🪵", "NWFA hardwood, LVP & tile carton boxes & underlay"),
         ]
     },
     "chemical": {
@@ -241,7 +249,7 @@ def determine_tool_cat(filename):
         return "solar"
     if any(k in f for k in ["cooling", "pipe", "torque", "pump-head", "gear-ratio", "bolt-torque", "bearing-life", "belt-length", "conveyor-belt", "cutting-speed", "feed-rate", "flywheel", "gear-module", "heat-exchanger", "hvac", "hydraulic-cylinder", "hydraulic-pump", "power-to-torque", "psychrometric", "pulley", "pump-flow", "reynolds-number", "shaft-diameter", "spring-rate", "thermal-expansion", "torque-converter", "torque-to-hp"]):
         return "mechanical"
-    if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt", "rainwater-downpipe"]):
+    if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt", "rainwater-downpipe", "block", "drywall", "excavation", "flooring"]):
         return "civil"
     if any(k in f for k in ["chemical", "chlorine"]):
         return "chemical"
@@ -316,6 +324,12 @@ def update_all_sidebars():
         elif '<aside class="post-sidebar"' in content:
             alt_regex = re.compile(r'<aside class="post-sidebar"[^>]*>.*?</aside>', re.DOTALL | re.IGNORECASE)
             content = alt_regex.sub(lambda m: new_sidebar, content)
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(content)
+            updated_count += 1
+        elif '<aside class="calc-sidebar"' in content:
+            calc_regex = re.compile(r'<aside class="calc-sidebar"[^>]*>.*?</aside>', re.DOTALL | re.IGNORECASE)
+            content = calc_regex.sub(lambda m: new_sidebar, content)
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write(content)
             updated_count += 1

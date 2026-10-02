@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Concrete Block Calculator | ASTM C90 CMU &amp; Mortar Estimator</title>
+  <meta name="description" content="Calculate concrete masonry blocks (CMU), ASTM C270 mortar bags, masonry sand, and ASTM C476 core grout volume with opening deductions and waste allowances.">
+  <link rel="canonical" href="https://calchub.cloud/concrete-block-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Concrete Block Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates concrete masonry unit (CMU) counts, Type S/N mortar batches, masonry sand tonnage, and core-fill grout volumes per ASTM C90 and TMS 402.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How many standard concrete blocks (CMU) are required per square foot and square meter of wall?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A standard nominal 8x8x16 inch CMU block (actual 7-5/8 x 7-5/8 x 15-5/8 inches plus 3/8-inch mortar joint) has a nominal face area of 128 sq in (0.8889 sq ft or 0.08 m²). Therefore, exactly 1.125 blocks are needed per square foot (112.5 blocks per 100 sq ft) or 12.5 blocks per square meter."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How much mortar and sand is needed for 100 concrete blocks?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For standard face-shell bedding of 8-inch CMU blocks, approximately 3 bags (80-lb / 36-kg) of ASTM C270 Type S or Type N masonry cement and 0.28 to 0.32 metric tons (7.5 to 8.5 cu ft) of masonry sand are required per 100 blocks."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How much concrete grout is needed to fill cores in concrete block walls?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For standard 8-inch hollow CMU blocks, 100% solid core grouting requires approximately 0.95 m³ (33.5 cu ft) of grout per 100 blocks. Grouting every 24 inches on-center consumes ~0.32 m³ per 100 blocks, and grouting every 48 inches consumes ~0.16 m³ per 100 blocks."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the compressive strength requirement for ASTM C90 loadbearing CMU?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "ASTM C90 mandates a minimum average net-area compressive strength of 2,000 psi (13.79 MPa) for individual units, and 1,900 psi (13.1 MPa) minimum for any single unit, ensuring sufficient capacity for multistory loadbearing masonry structures."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="civil">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html" class="active">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="civil.html">Civil &amp; Construction</a> &rsaquo; 
+      <span>Concrete Block Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calculator-main">
+        <div class="calc-header">
+          <h1>Concrete Block Calculator</h1>
+          <p>Estimate CMU concrete block counts, mortar cement bags, masonry sand, and core grout volume per ASTM C90 and TMS 402 specifications.</p>
+        </div>
+
+        <div class="calculator-card">
+          <form id="cmuCalcForm" onsubmit="return false;">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="wallLength">Wall Length (meters):</label>
+                <input type="number" id="wallLength" value="12.0" step="0.1" min="0.1" required>
+                <span class="hint">Total horizontal run of masonry wall</span>
+              </div>
+              <div class="form-group">
+                <label for="wallHeight">Wall Height (meters):</label>
+                <input type="number" id="wallHeight" value="2.8" step="0.05" min="0.1" required>
+                <span class="hint">Total finished height from top of footing</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="openingArea">Deductions for Openings (m²):</label>
+                <input type="number" id="openingArea" value="3.6" step="0.1" min="0" required>
+                <span class="hint">Total area of doors, windows, and louvers</span>
+              </div>
+              <div class="form-group">
+                <label for="blockSize">Block Nominal Size:</label>
+                <select id="blockSize">
+                  <option value="4">4" CMU (100 × 200 × 400 mm) - Partition</option>
+                  <option value="6">6" CMU (150 × 200 × 400 mm) - Light Load</option>
+                  <option value="8" selected>8" CMU (200 × 200 × 400 mm) - Standard Loadbearing</option>
+                  <option value="10">10" CMU (250 × 200 × 400 mm) - Heavy Foundation</option>
+                  <option value="12">12" CMU (300 × 200 × 400 mm) - Retaining &amp; Basements</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="groutSpacing">Core Grouting Specification:</label>
+                <select id="groutSpacing">
+                  <option value="0">No Core Grout (Hollow Non-Structural)</option>
+                  <option value="48">Grout Every 48" (1200 mm oc)</option>
+                  <option value="32">Grout Every 32" (800 mm oc)</option>
+                  <option value="24">Grout Every 24" (600 mm oc)</option>
+                  <option value="16">Grout Every 16" (400 mm oc - Every Cell)</option>
+                  <option value="100" selected>100% Solid Grout (Retaining / Shear Wall)</option>
+                </select>
+                <span class="hint">Frequency of vertical rebar core cells filled</span>
+              </div>
+              <div class="form-group">
+                <label for="wasteMargin">Waste &amp; Cutting Allowance (%):</label>
+                <input type="number" id="wasteMargin" value="8" step="1" min="0" max="25" required>
+                <span class="hint">Recommended 5% to 10% for cuts &amp; breakage</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="calcCmuBtn">Calculate Materials</button>
+              <button type="reset" class="btn btn-secondary" id="resetCmuBtn">Reset</button>
+            </div>
+          </form>
+
+          <div class="results-box" id="cmuResultBox" style="display:none; margin-top:25px;">
+            <h3>Concrete Masonry Material Bill of Quantities</h3>
+            <div class="result-grid">
+              <div class="result-tile highlight">
+                <span class="result-label">Total CMU Blocks to Order</span>
+                <span class="result-value" id="resTotalBlocks">0</span>
+                <span class="result-unit">Units (including waste)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Net Masonry Wall Area</span>
+                <span class="result-value" id="resNetArea">0.00</span>
+                <span class="result-unit">m² (sq meters)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Type S/N Mortar Cement</span>
+                <span class="result-value" id="resMortarBags">0</span>
+                <span class="result-unit">Bags (80 lb / 36.3 kg)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Masonry Sand Volume</span>
+                <span class="result-value" id="resSandTonnes">0.00</span>
+                <span class="result-unit">Metric Tonnes (~0.0 m³)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Concrete Core Grout Volume</span>
+                <span class="result-value" id="resGroutVol">0.00</span>
+                <span class="result-unit">m³ (Cubic Meters)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Total Assembled Wall Mass</span>
+                <span class="result-value" id="resWallMass">0</span>
+                <span class="result-unit">kg (~0.0 metric tons)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Concrete Masonry Unit (CMU) Engineering &amp; Sizing Principles</h2>
+          <p>
+            Concrete masonry construction relies on precast hollow or solid block units manufactured from Portland cement, graded mineral aggregates, and water under high compaction and steam curing. In modern commercial, institutional, and residential structures, <strong>Concrete Masonry Units (CMU)</strong> serve as loadbearing exterior walls, interior acoustic partitions, fire separation barriers, and retaining wall assemblies.
+          </p>
+          <p>
+            Under <strong>ASTM C90 (Standard Specification for Loadbearing Concrete Masonry Units)</strong>, manufactured blocks must satisfy strict physical criteria regarding compressive strength, water absorption, dimensional tolerances, and moisture shrinkage. Standard modular blocks are designed around a $4\text{-inch}$ ($100\text{ mm}$) modular grid system. The nominal dimensions of a standard block are $8 \times 8 \times 16\text{ inches}$ ($200 \times 200 \times 400\text{ mm}$), while its actual physical dimensions are $7\frac{5}{8} \times 7\frac{5}{8} \times 15\frac{5}{8}\text{ inches}$ ($194 \times 194 \times 397\text{ mm}$). The planned $\frac{3}{8}\text{-inch}$ ($9.5\text{ mm}$) mortar joint brings the installed dimensions precisely to modular grid lines.
+          </p>
+
+          <h2>Mathematical Geometry of CMU Wall Layout</h2>
+          <p>
+            The face area of an individual installed modular unit, including its surrounding $\frac{3}{8}\text{-inch}$ ($9.5\text{ mm}$) bed and head mortar joints, is:
+          </p>
+          <div class="formula-box">
+            $$A_{unit} = H_{nom} \times L_{nom} = 0.20\text{ m} \times 0.40\text{ m} = 0.080\text{ m}^2 \quad (0.8889\text{ sq ft})$$
+          </div>
+          <p>
+            To compute the total block requirement for a wall with surface length $L$, height $H$, and total window/door opening deductions $A_{openings}$:
+          </p>
+          <div class="formula-box">
+            $$A_{gross} = L \times H$$
+            $$A_{net} = A_{gross} - A_{openings}$$
+            $$N_{net} = \frac{A_{net}}{A_{unit}} = A_{net} \times 12.50\text{ blocks/m}^2 \quad \left(A_{net} \text{ in ft}^2 \times 1.125\text{ blocks/ft}^2\right)$$
+            $$N_{total} = \lceil N_{net} \times (1 + \text{Waste Factor}) \rceil$$
+          </div>
+
+          <h2>ASTM C270 Mortar Proportioning &amp; Sand Quantities</h2>
+          <p>
+            Masonry mortar bonds units into an integrated monolithic structural diaphragm while sealing joints against moisture penetration and air infiltration. Mortar selection is governed by <strong>ASTM C270 (Standard Specification for Mortar for Unit Masonry)</strong>:
+          </p>
+          <ul>
+            <li><strong>Type M Mortar ($17.2\text{ MPa} / 2,500\text{ psi}$):</strong> High-strength compressive mix used for below-grade foundations, heavy retaining walls, and earth-contact structures subject to severe frost action.</li>
+            <li><strong>Type S Mortar ($12.4\text{ MPa} / 1,800\text{ psi}$):</strong> High flexural bond strength mix mandatory for exterior loadbearing masonry walls, seismic shear walls, and below-grade foundation basements.</li>
+            <li><strong>Type N Mortar ($5.2\text{ MPa} / 750\text{ psi}$):</strong> Medium-strength, highly workable mix optimized for exterior above-grade veneers and interior architectural partitions.</li>
+          </ul>
+          <p>
+            For standard face-shell bedding of $8\text{-inch}$ ($200\text{ mm}$) blocks, mortar consumption adheres to empirical site-tested ratios:
+          </p>
+          <div class="formula-box">
+            $$\text{Mortar Cement Bags (80 lb / 36.3 kg)} \approx \frac{N_{total}}{33.0}$$
+            $$\text{Masonry Sand (Metric Tonnes)} \approx N_{total} \times 0.0030 \text{ tonnes}$$
+          </div>
+
+          <h2>Core Grouting Mechanics &amp; Reinforcement (ASTM C476 &amp; TMS 402)</h2>
+          <p>
+            Hollow CMUs have an internal void volume of approximately $48\%$ to $52\%$ divided into two large hollow cores. In structural reinforced masonry designed per <strong>TMS 402/602 (Building Code Requirements and Specification for Masonry Structures)</strong>, vertical reinforcing rebar (typically #4, #5, or #6 deformed bars) is positioned within these hollow cells. High-slump concrete grout (compressive strength $f'_g \ge 13.8\text{ MPa} / 2,000\text{ psi}$, slump $200 - 275\text{ mm}$ per <strong>ASTM C476</strong>) is then poured or pumped to encapsulate the steel.
+          </p>
+          <p>
+            The required grout volume varies directly with cell grouting frequency:
+          </p>
+          <ul>
+            <li><strong>100% Solid Grout:</strong> Every core cell is grouted solid ($0.0095\text{ m}^3 / 0.335\text{ cu ft}$ per $8\text{-inch}$ block). Mandatory for basement retaining walls, storm shelters, and foundation walls.</li>
+            <li><strong>Grout @ 16" oc ($400\text{ mm}$):</strong> Every vertical cell aligned with rebar is filled ($0.0095\text{ m}^3$ per block).</li>
+            <li><strong>Grout @ 24" oc ($600\text{ mm}$):</strong> Two out of every three units contain filled cells ($0.0063\text{ m}^3$ per block).</li>
+            <li><strong>Grout @ 32" oc ($800\text{ mm}$):</strong> Every other block has one cell filled ($0.00475\text{ m}^3$ per block).</li>
+            <li><strong>Grout @ 48" oc ($1200\text{ mm}$):</strong> One cell out of every three blocks is filled ($0.00317\text{ m}^3$ per block).</li>
+          </ul>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Nominal CMU Size (W &times; H &times; L)</th>
+                <th>Actual Dimensions</th>
+                <th>Unit Weight (Medium Wt)</th>
+                <th>100% Solid Grout Vol / 100 Blocks</th>
+                <th>Typical Structural Application</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>4 &times; 8 &times; 16 in (100 mm)</td>
+                <td>3⅝ &times; 7⅝ &times; 15⅝ in</td>
+                <td>10.5 kg (23 lb)</td>
+                <td>0.45 m³ (15.9 cu ft)</td>
+                <td>Interior non-bearing firewalls, pipe chases</td>
+              </tr>
+              <tr>
+                <td>6 &times; 8 &times; 16 in (150 mm)</td>
+                <td>5⅝ &times; 7⅝ &times; 15⅝ in</td>
+                <td>13.8 kg (30 lb)</td>
+                <td>0.70 m³ (24.7 cu ft)</td>
+                <td>Light commercial perimeter, residential 1-story</td>
+              </tr>
+              <tr>
+                <td>8 &times; 8 &times; 16 in (200 mm)</td>
+                <td>7⅝ &times; 7⅝ &times; 15⅝ in</td>
+                <td>16.3 kg (36 lb)</td>
+                <td>0.95 m³ (33.5 cu ft)</td>
+                <td>Standard multistory loadbearing, shear walls</td>
+              </tr>
+              <tr>
+                <td>10 &times; 8 &times; 16 in (250 mm)</td>
+                <td>9⅝ &times; 7⅝ &times; 15⅝ in</td>
+                <td>19.5 kg (43 lb)</td>
+                <td>1.20 m³ (42.4 cu ft)</td>
+                <td>Industrial blast walls, deep earth retaining</td>
+              </tr>
+              <tr>
+                <td>12 &times; 8 &times; 16 in (300 mm)</td>
+                <td>11⅝ &times; 7⅝ &times; 15⅝ in</td>
+                <td>23.1 kg (51 lb)</td>
+                <td>1.45 m³ (51.2 cu ft)</td>
+                <td>Heavy basement retaining walls, bridge abutments</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Control Joint Spacing &amp; Thermal Movement Details</h2>
+          <p>
+            Because concrete masonry units undergo hydration shrinkage and thermal cycling, horizontal expansion and contraction must be accommodated. Continuous unreinforced block runs must incorporate vertical control joints (CJ) sealed with backer rod and elastomeric sealant at maximum intervals governed by <strong>NCMA TEK 10-2C</strong>:
+          </p>
+          <div class="formula-box">
+            $$\text{Maximum Joint Spacing } S_{CJ} \le 1.5 \times H_{wall} \quad \text{and} \quad S_{CJ} \le 7.62\text{ m } (25\text{ ft})$$
+          </div>
+          <p>
+            Furthermore, continuous prefabricated joint reinforcement (ladder-type or truss-type 9-gauge galvanized wire) should be embedded into horizontal bed joints every $16\text{ inches}$ ($400\text{ mm}$, every second course) to resist tensile shear stresses and prevent unsightly stair-step cracking.
+          </p>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Case Study: Commercial Cold Storage Exterior Perimeter Wall</h3>
+            <p><strong>Design Scenario:</strong> A commercial logistics warehouse requires a reinforced concrete masonry perimeter fire wall. The wall dimensions are $L = 18.0\text{ meters}$ in length and $H = 3.6\text{ meters}$ in clear height. The wall incorporates two overhead dock doors ($2.4\text{ m} \times 2.8\text{ m}$ each, totaling $A_{openings} = 13.44\text{ m}^2$). Structural plans mandate standard $8\times 8\times 16\text{ inch}$ ($200\text{ mm}$) loadbearing CMU blocks. Because of lateral hurricane wind loads, vertical cores must be grouted at $24\text{ inches}$ on-center ($600\text{ mm}$). With an $8\%$ cutting waste factor, calculate total blocks to purchase, Type S mortar bags, masonry sand, and core grout volume.</p>
+            
+            <p><strong>Step 1: Compute Gross, Deducted, and Net Wall Area</strong></p>
+            <div class="formula-box">
+              $$A_{gross} = 18.0\text{ m} \times 3.6\text{ m} = 64.80\text{ m}^2$$
+              $$A_{net} = A_{gross} - A_{openings} = 64.80\text{ m}^2 - 13.44\text{ m}^2 = 51.36\text{ m}^2$$
+            </div>
+
+            <p><strong>Step 2: Determine Net and Gross Block Quantities</strong></p>
+            <div class="formula-box">
+              $$N_{net} = 51.36\text{ m}^2 \times 12.50\text{ blocks/m}^2 = 642\text{ blocks}$$
+              $$N_{total} = \lceil 642 \times (1 + 0.08) \rceil = \lceil 642 \times 1.08 \rceil = \lceil 693.36 \rceil = 694\text{ Blocks}$$
+            </div>
+
+            <p><strong>Step 3: Estimate Mortar Cement and Masonry Sand</strong></p>
+            <div class="formula-box">
+              $$\text{Mortar Bags (80 lb / 36.3 kg)} = \frac{694}{33.0} \approx 21.03 \implies 21\text{ Bags of Type S Mortar}$$
+              $$\text{Masonry Sand} = 694 \times 0.0030\text{ tonnes} = 2.08\text{ Metric Tonnes of Sand}$$
+            </div>
+
+            <p><strong>Step 4: Compute Concrete Core Grout Volume (@ 24" oc)</strong></p>
+            <div class="formula-box">
+              $$V_{grout} = 642 \text{ (net blocks)} \times 0.0063\text{ m}^3/\text{block} \approx 4.04\text{ m}^3 \quad (\approx 5.28\text{ cu yd})$$
+            </div>
+            <p>
+              <strong>Procurement Recommendation:</strong> Order <strong>694 units</strong> of 8-inch CMU, <strong>21 bags</strong> of Type S cement, <strong>2.1 tonnes</strong> of masonry sand, and schedule <strong>$4.25\text{ m}^3$</strong> (including 5% pump line waste) of fine aggregate core-fill concrete grout.
+            </p>
+          </div>
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏗️</span>
+            <h3 class="widget-title">Related Civil & Construction</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="brick-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Brick & Masonry Calculator</a></li>
+            <li><a href="asphalt-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Asphalt Paving & Tonnage</a></li>
+            <li><a href="beam-deflection-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Deflection & Moments</a></li>
+            <li><a href="retaining-wall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Retaining Wall Stability</a></li>
+            <li><a href="concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Slab, Footing & Column</a></li>
+            <li><a href="rebar-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rebar Weight & Grid Spacing</a></li>
+            <li><a href="rainwater-downpipe-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rainwater Downpipe Sizing</a></li>
+            <li><a href="beam-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Bending Moment & Shear</a></li>
+            <li><a href="block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Block Masonry Estimator</a></li>
+            <li><a href="concrete-block-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Concrete Block Calculator</a></li>
+            <li><a href="concrete-mix-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Mix Ratio</a></li>
+            <li><a href="drywall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Drywall Sheets, Mud & Tape</a></li>
+            <li><a href="excavation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation & Earthwork Haul</a></li>
+            <li><a href="excavation-volume-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation Volume Calculator</a></li>
+            <li><a href="flooring-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Flooring Area & Box Estimator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="civil.html" class="sidebar-category-link">View All Civil & Construction Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>High-precision professional engineering and scientific calculation engines.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Directories</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="civil.html">Civil &amp; Construction</a></li>
+          <li><a href="mechanical.html">Mechanical Engineering</a></li>
+          <li><a href="engineering.html">Civil &amp; Structural</a></li>
+          <li><a href="sitemap.xml">XML Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 CalcHub. Standard Engineering Reference Systems.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calcBtn = document.getElementById('calcCmuBtn');
+      const resetBtn = document.getElementById('resetCmuBtn');
+      const resultBox = document.getElementById('cmuResultBox');
+
+      function calculateCMU() {
+        const L = parseFloat(document.getElementById('wallLength').value);
+        const H = parseFloat(document.getElementById('wallHeight').value);
+        const A_openings = parseFloat(document.getElementById('openingArea').value) || 0;
+        const blockW = parseInt(document.getElementById('blockSize').value);
+        const groutMode = document.getElementById('groutSpacing').value;
+        const wastePct = parseFloat(document.getElementById('wasteMargin').value) || 0;
+
+        if (isNaN(L) || L <= 0 || isNaN(H) || H <= 0) {
+          alert('Please enter valid positive dimensions for wall length and height.');
+          return;
+        }
+
+        const A_gross = L * H;
+        const A_net = Math.max(0.1, A_gross - A_openings);
+
+        const BLOCKS_PER_M2 = 12.5; // Standard 8x8x16 modular block with 3/8" joint
+        const netBlocks = A_net * BLOCKS_PER_M2;
+        const totalBlocks = Math.ceil(netBlocks * (1 + wastePct / 100.0));
+
+        // Mortar: approx 1 bag (80 lb) per 33 blocks
+        const mortarBags = Math.ceil(totalBlocks / 33.0);
+        const sandTonnes = totalBlocks * 0.0030;
+
+        // Core grout volume per block based on width and spacing
+        // Standard 8" solid is 0.0095 m3/block
+        let unitGroutSolid = 0.0095;
+        let blockWeightKg = 16.3;
+
+        if (blockW === 4) { unitGroutSolid = 0.0045; blockWeightKg = 10.5; }
+        else if (blockW === 6) { unitGroutSolid = 0.0070; blockWeightKg = 13.8; }
+        else if (blockW === 8) { unitGroutSolid = 0.0095; blockWeightKg = 16.3; }
+        else if (blockW === 10) { unitGroutSolid = 0.0120; blockWeightKg = 19.5; }
+        else if (blockW === 12) { unitGroutSolid = 0.0145; blockWeightKg = 23.1; }
+
+        let groutRatio = 0.0;
+        if (groutMode === '100') groutRatio = 1.0;
+        else if (groutMode === '16') groutRatio = 1.0;
+        else if (groutMode === '24') groutRatio = 0.667;
+        else if (groutMode === '32') groutRatio = 0.50;
+        else if (groutMode === '48') groutRatio = 0.333;
+        else groutRatio = 0.0;
+
+        const totalGroutM3 = netBlocks * unitGroutSolid * groutRatio;
+        const groutMassKg = totalGroutM3 * 2300.0; // standard grout density ~2300 kg/m3
+        const mortarMassKg = mortarBags * 36.3 + sandTonnes * 1000.0;
+        const totalWallMassKg = Math.round(netBlocks * blockWeightKg + mortarMassKg + groutMassKg);
+
+        document.getElementById('resTotalBlocks').textContent = totalBlocks.toLocaleString();
+        document.getElementById('resNetArea').textContent = A_net.toFixed(2);
+        document.getElementById('resMortarBags').textContent = mortarBags.toLocaleString();
+        document.getElementById('resSandTonnes').textContent = sandTonnes.toFixed(2);
+        document.getElementById('resGroutVol').textContent = totalGroutM3.toFixed(2);
+        document.getElementById('resWallMass').textContent = totalWallMassKg.toLocaleString();
+
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      calcBtn.addEventListener('click', calculateCMU);
+      resetBtn.addEventListener('click', function() {
+        resultBox.style.display = 'none';
+      });
+      calculateCMU();
+    });
+  </script>
+</body>
+</html>

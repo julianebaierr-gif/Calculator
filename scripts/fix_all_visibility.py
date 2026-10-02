@@ -156,6 +156,14 @@ CAT_MAP = {
             ("beam-deflection-calculator.html", "Beam Deflection & Moments", "📐", "AISC 360 deflection & moment", "δmax = 5wL⁴ / 384EI"),
             ("retaining-wall-calculator.html", "Retaining Wall Stability", "🧱", "Rankine earth pressure & overturning", "Pa = 0.5 × γ × H² × Ka"),
             ("rainwater-downpipe-calculator.html", "Rainwater Downpipe Sizing (BS EN 12056)", "🌧️", "Roof catchment area, storm runoff L/s & leader diameter", "Ae = L·(W + H/2) | Q = (r·Ae·C)/3600 | Annular flow"),
+            ("beam-calculator.html", "Beam Bending Moment & Shear (AISC 360)", "📐", "Simply supported & cantilever SFD, BMD & deflection", "M_max = wL²/8 | δ = 5wL⁴/384EI | σ = M/S"),
+            ("block-calculator.html", "Block Masonry Estimator (NCMA TEK)", "🧱", "CMU block counts, Type S mortar bags & core grout", "N = Area × 12.5 blocks/m² | Mortar = N / 33.3 bags"),
+            ("concrete-block-calculator.html", "Concrete Block Calculator (ASTM C90)", "🧱", "CMU counts, Type S/N mortar, sand & ASTM C476 grout", "N = Net Area × 12.5 | Grout = 0.95 m³/100 blocks"),
+            ("concrete-mix-ratio-calculator.html", "Concrete Mix Ratio (ACI 211.1)", "🏗️", "Dry batch volume 1.54 factor, cement bags, sand & stone", "V_dry = V_wet × 1.54 | M10 to M25 grades | w/c ratio"),
+            ("drywall-calculator.html", "Drywall Sheets, Mud & Tape (ASTM C840)", "🏠", "Gypsum board sheets 4x8 to 4x12, joint compound & screws", "Sheets = Net Area / Board Area | Level 4 & 5 finish"),
+            ("excavation-calculator.html", "Excavation & Earthwork Haul (OSHA 1926)", "🚜", "Bank (BCY) vs loose (LCY) volume, swell factor & dump trucks", "V_loose = V_bank × (1 + Swell) | OSHA Type A, B, C slopes"),
+            ("excavation-volume-calculator.html", "Excavation Volume (Prismoidal & End Area)", "📐", "Trapezoidal trench side slopes & prismoidal cut-and-fill", "V = (L/6)·(A1 + 4Am + A2) | Cp = (L/12)·(c1-c2)·(w1-w2)"),
+            ("flooring-calculator.html", "Flooring Area & Box Estimator (NWFA)", "🪵", "Hardwood, LVP, tile carton counts, pattern waste & underlay", "Boxes = ⌈Area × (1+Waste) / Box Coverage⌉ | 1/4\" gap"),
         ]
     },
     "chemical.html": {

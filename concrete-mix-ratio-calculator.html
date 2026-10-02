@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Concrete Mix Ratio Calculator | ACI 211.1 Batch Proportioning</title>
+  <meta name="description" content="Calculate concrete mix proportions (cement bags, sand, gravel &amp; water) for standard grades (M10, M15, M20, M25, M30) per ACI 211.1 &amp; IS 456.">
+  <link rel="canonical" href="https://calchub.cloud/concrete-mix-ratio-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Concrete Mix Ratio Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates volumetric and gravimetric concrete batch proportions (cement, sand, coarse aggregate, water) using dry volume expansion factors per ACI 211.1.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Why is a dry volume factor of 1.54 to 1.57 used when calculating concrete mix proportions?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "When dry ingredients (cement, sand, and coarse aggregates) are mixed with water, the fine particles fill the interstitial voids between larger stones. Consequently, the dry volume contracts by approximately 54% to 57%. Therefore, to produce 1.0 m³ of compacted wet concrete, approximately 1.54 m³ of dry materials must be batched."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the standard volumetric mix ratios for nominal concrete grades?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Standard nominal volumetric ratios (Cement : Sand : Aggregate) are: M10 (1:3:6) for lean sub-base blinding; M15 (1:2:4) for plain mass concrete and paths; M20 (1:1.5:3) for standard residential reinforced slabs and beams; and M25 (1:1:2) for heavy-duty columns and water-retaining structures."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does the water-cement (w/c) ratio govern concrete compressive strength?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Per Abrams' Law, concrete compressive strength is inversely proportional to the water-cement ratio by weight. Lower w/c ratios (e.g., 0.40 to 0.45) produce high compressive strength and low capillary permeability, whereas higher w/c ratios (0.55 to 0.65) increase workability at the expense of strength and durability."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How many 50 kg bags of cement are required for 1 cubic meter of M20 (1:1.5:3) concrete?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For 1.0 m³ of M20 concrete (1:1.5:3, total parts = 5.5): Dry volume = 1.54 m³. Cement volume = 1.54 / 5.5 = 0.28 m³. Multiplying by cement bulk density (1440 kg/m³) gives 403.2 kg of cement, which equals approximately 8.06 standard 50-kg bags (or ~8.5 bags including 5% site wastage)."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="civil">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html" class="active">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="civil.html">Civil &amp; Construction</a> &rsaquo; 
+      <span>Concrete Mix Ratio Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calculator-main">
+        <div class="calc-header">
+          <h1>Concrete Mix Ratio Calculator</h1>
+          <p>Compute precise batch quantities of cement bags, fine sand, coarse gravel, and mixing water based on ACI 211.1 volumetric proportions.</p>
+        </div>
+
+        <div class="calculator-card">
+          <form id="mixCalcForm" onsubmit="return false;">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="wetVolume">Wet Concrete Volume Required (m³):</label>
+                <input type="number" id="wetVolume" value="5.0" step="0.1" min="0.1" required>
+                <span class="hint">In-place compacted concrete volume</span>
+              </div>
+              <div class="form-group">
+                <label for="concreteGrade">Concrete Grade / Nominal Ratio:</label>
+                <select id="concreteGrade">
+                  <option value="1:3:6">M10 (1 : 3 : 6) - Lean Concrete / Blinding Bed</option>
+                  <option value="1:2:4">M15 (1 : 2 : 4) - Mass Concrete, Footpaths, Floors</option>
+                  <option value="1:1.5:3" selected>M20 (1 : 1.5 : 3) - Standard Reinforced Concrete (RCC)</option>
+                  <option value="1:1:2">M25 (1 : 1 : 2) - Heavy Beams, Columns, Retaining Walls</option>
+                  <option value="custom">Custom Ratio (C : S : A)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row" id="customRatioRow" style="display:none;">
+              <div class="form-group">
+                <label for="custCement">Cement Part:</label>
+                <input type="number" id="custCement" value="1.0" step="0.1" min="0.1">
+              </div>
+              <div class="form-group">
+                <label for="custSand">Sand (Fine Aggregate) Part:</label>
+                <input type="number" id="custSand" value="2.0" step="0.1" min="0.1">
+              </div>
+              <div class="form-group">
+                <label for="custAggregate">Coarse Stone Aggregate Part:</label>
+                <input type="number" id="custAggregate" value="4.0" step="0.1" min="0.1">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="waterCementRatio">Water-Cement (w/c) Ratio:</label>
+                <input type="number" id="waterCementRatio" value="0.50" step="0.01" min="0.30" max="0.75" required>
+                <span class="hint">Standard RCC range: 0.45 to 0.55 by weight</span>
+              </div>
+              <div class="form-group">
+                <label for="mixWaste">Wastage &amp; Compaction Allowance (%):</label>
+                <input type="number" id="mixWaste" value="5" step="1" min="0" max="20" required>
+                <span class="hint">Accounts for transit spillage, formwork bulking</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="calcMixBtn">Calculate Concrete Batch</button>
+              <button type="reset" class="btn btn-secondary" id="resetMixBtn">Reset</button>
+            </div>
+          </form>
+
+          <div class="results-box" id="mixResultBox" style="display:none; margin-top:25px;">
+            <h3>Batch Proportioning &amp; Material Quantities</h3>
+            <div class="result-grid">
+              <div class="result-tile highlight">
+                <span class="result-label">Cement Quantity (50 kg Bags)</span>
+                <span class="result-value" id="resCementBags">0</span>
+                <span class="result-unit">Bags (~0 kg total)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Fine Aggregate (Sand)</span>
+                <span class="result-value" id="resSandMass">0.00</span>
+                <span class="result-unit">Metric Tonnes (~0.00 m³)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Coarse Gravel Aggregate</span>
+                <span class="result-value" id="resStoneMass">0.00</span>
+                <span class="result-unit">Metric Tonnes (~0.00 m³)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Mixing Water Required</span>
+                <span class="result-value" id="resWaterLiters">0</span>
+                <span class="result-unit">Liters (kg)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Calculated Dry Batch Volume</span>
+                <span class="result-value" id="resDryVol">0.00</span>
+                <span class="result-unit">m³ (Expansion Factor: 1.54)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Estimated Wet Batch Weight</span>
+                <span class="result-value" id="resTotalWeight">0</span>
+                <span class="result-unit">kg (~0.00 metric tons)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Concrete Proportioning Fundamentals (ACI 211.1 &amp; IS 456)</h2>
+          <p>
+            Concrete is an artificial composite building material composed of a hydraulic binder (ordinary Portland cement), water, fine aggregate (clean masonry sand), and coarse aggregates (crushed gravel or granite rock). The fundamental objective of concrete mix design per <strong>ACI 211.1 (Standard Practice for Selecting Proportions for Normal, Heavyweight, and Mass Concrete)</strong> is to select the most economical proportions of materials that produce fresh concrete with the necessary workability and finishability, followed by hardened concrete satisfying specified compressive strength, durability, and low permeability.
+          </p>
+          <p>
+            Standard nominal mixes rely on fixed volumetric batch proportions denoted as $(1 : X : Y)$, representing the ratio of <strong>Cement : Fine Aggregate (Sand) : Coarse Aggregate (Gravel)</strong>. For critical structural elements, mix design is determined through laboratory trial batches to optimize particle packing, aggregate gradation curves, and slump behavior.
+          </p>
+
+          <h2>The Dry Volume Expansion Factor (1.54 to 1.57 Multiplier)</h2>
+          <p>
+            A common source of under-ordering and structural site deficits is failure to account for aggregate void structure. Dry coarse stones and sand contain loose air voids ranging between $30\%$ and $40\%$ of their bulk volume. When water and micro-fine cement particles are introduced and the mixture is thoroughly mechanically agitated, the cement paste lubricates and fills these interstitial interstitial voids.
+          </p>
+          <p>
+            As a direct physical consequence, the volume of fresh wet, fully compacted concrete is significantly smaller than the cumulative loose dry volumes of its individual constituents. Rigorous empirical civil engineering standards employ a <strong>dry volume conversion factor of 1.54 to 1.57</strong>:
+          </p>
+          <div class="formula-box">
+            $$V_{dry} = V_{wet} \times 1.54 \quad \text{(or up to } 1.57 \text{ for angular crushed granite)}$$
+          </div>
+          <p>
+            This means to cast exactly $1.0\text{ m}^3$ of in-place dense concrete slab or column, the batch plant must meter out $1.54\text{ m}^3$ of unmixed dry raw ingredients.
+          </p>
+
+          <h2>Mathematical Formulation for Component Volumes and Masses</h2>
+          <p>
+            Let a nominal concrete mix have proportions $c : s : a$ corresponding to cement, fine aggregate, and coarse aggregate respectively. Let the total ratio sum be $S_r = c + s + a$. For a specified wet volume $V_{wet}$ and site wastage allowance $W_{\%}$:
+          </p>
+          <div class="formula-box">
+            $$V_{gross} = V_{wet} \times \left(1 + \frac{W_{\%}}{100}\right)$$
+            $$V_{dry} = V_{gross} \times 1.54$$
+          </div>
+          <p>
+            The volume and mass of each individual constituent are computed as:
+          </p>
+          <div class="formula-box">
+            $$V_{cement} = \frac{c}{S_r} \times V_{dry} \implies M_{cement} = V_{cement} \times \rho_{cement} \quad (\rho_{cement} \approx 1440\text{ kg/m}^3)$$
+            $$\text{Number of 50-kg Bags} = \frac{M_{cement}}{50\text{ kg}}$$
+            $$V_{sand} = \frac{s}{S_r} \times V_{dry} \implies M_{sand} = V_{sand} \times \rho_{sand} \quad (\rho_{sand} \approx 1600\text{ kg/m}^3)$$
+            $$V_{stone} = \frac{a}{S_r} \times V_{dry} \implies M_{stone} = V_{stone} \times \rho_{stone} \quad (\rho_{stone} \approx 1550\text{ kg/m}^3)$$
+          </div>
+
+          <h2>Water-Cement Ratio ($w/c$) &amp; Abrams' Compressive Strength Law</h2>
+          <p>
+            Formulated by Duff Abrams in 1918, <strong>Abrams' Law</strong> dictates that for given materials and curing conditions, the compressive strength of fully compacted concrete is strictly governed by the water-to-cement ratio by mass:
+          </p>
+          <div class="formula-box">
+            $$f'_c = \frac{A}{B^{1.5 (w/c)}}$$
+          </div>
+          <p>
+            Here, $A$ and $B$ are empirical empirical constants. While chemical hydration of Portland cement only requires approximately $0.23$ to $0.25$ parts of water by weight (with an additional $0.15$ bound in gel pores), such dry mixtures have zero workability without superplasticizers. Practical water-cement ratios range from:
+          </p>
+          <ul>
+            <li><strong>Low w/c ($0.38 - 0.42$):</strong> High-strength concrete ($f'_c \ge 40\text{ MPa}$), prestressed bridge girders, marine structures exposed to chlorides.</li>
+            <li><strong>Standard w/c ($0.45 - 0.50$):</strong> Commercial multi-story frames, foundation slabs, waterproof basements.</li>
+            <li><strong>Medium w/c ($0.52 - 0.60$):</strong> Plain mass footings, non-structural blinding, residential pavements.</li>
+          </ul>
+          <p>
+            The required volume of batch mixing water is calculated directly from total cement mass:
+          </p>
+          <div class="formula-box">
+            $$W_{liters} = M_{cement}\text{ (kg)} \times (w/c)$$
+          </div>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Concrete Grade</th>
+                <th>Volumetric Ratio (C : S : A)</th>
+                <th>28-Day Strength ($f_{ck}$)</th>
+                <th>Typical w/c</th>
+                <th>Cement Bags / m³</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>M10</td>
+                <td>1 : 3 : 6</td>
+                <td>10 MPa (1,450 psi)</td>
+                <td>0.55 – 0.60</td>
+                <td>~4.4 bags</td>
+              </tr>
+              <tr>
+                <td>M15</td>
+                <td>1 : 2 : 4</td>
+                <td>15 MPa (2,175 psi)</td>
+                <td>0.50 – 0.55</td>
+                <td>~6.3 bags</td>
+              </tr>
+              <tr>
+                <td>M20</td>
+                <td>1 : 1.5 : 3</td>
+                <td>20 MPa (2,900 psi)</td>
+                <td>0.45 – 0.50</td>
+                <td>~8.1 bags</td>
+              </tr>
+              <tr>
+                <td>M25</td>
+                <td>1 : 1 : 2</td>
+                <td>25 MPa (3,625 psi)</td>
+                <td>0.40 – 0.45</td>
+                <td>~11.1 bags</td>
+              </tr>
+              <tr>
+                <td>M30 / M35</td>
+                <td>Designed Mix (ACI 211)</td>
+                <td>30 – 35 MPa</td>
+                <td>0.38 – 0.42</td>
+                <td>~12.5 bags</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Field Aggregate Bulking &amp; Moisture Corrections</h2>
+          <p>
+            When batching concrete on construction job sites by volume rather than mass, fine sand exhibits a critical physical phenomenon known as <strong>sand bulking</strong>. Surface tension in moisture films surrounding fine sand particles pushes them apart, causing a volumetric expansion of up to $20\%$ to $30\%$ at moisture contents of $4\%$ to $6\%$.
+          </p>
+          <p>
+            If uncorrected, bulking causes severely lean, under-sanded, harsh concrete batches susceptible to honeycombing. Civil engineers must perform a simple field displacement test in a graduated cylinder to measure bulking percentage and proportionally increase the loose sand volume batched into the concrete mixer.
+          </p>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Case Study: Casting a Ground Floor Reinforced Concrete Slab</h3>
+            <p><strong>Design Scenario:</strong> An engineer is casting a continuous reinforced concrete slab for a multi-family residential building. The slab dimensions are $10.0\text{ m}$ in length, $8.0\text{ m}$ in width, and $0.15\text{ m}$ ($150\text{ mm}$) in uniform thickness. The structural drawings specify <strong>Grade M20</strong> concrete with nominal volumetric proportions $(1 : 1.5 : 3)$. The target water-cement ratio is specified as $w/c = 0.50$ by weight, and a standard site wastage and over-excavation allowance of $5\%$ is budgeted. Calculate the required quantities of 50-kg cement bags, sand tonnage, crushed stone tonnage, and mixing water.</p>
+            
+            <p><strong>Step 1: Compute Wet Compacted Concrete Volume ($V_{wet}$)</strong></p>
+            <div class="formula-box">
+              $$V_{net} = 10.0\text{ m} \times 8.0\text{ m} \times 0.15\text{ m} = 12.0\text{ m}^3$$
+              $$V_{gross} = 12.0\text{ m}^3 \times (1 + 0.05) = 12.60\text{ m}^3$$
+            </div>
+
+            <p><strong>Step 2: Determine Required Total Dry Batch Volume ($V_{dry}$)</strong></p>
+            <div class="formula-box">
+              $$V_{dry} = V_{gross} \times 1.54 = 12.60\text{ m}^3 \times 1.54 = 19.404\text{ m}^3$$
+            </div>
+
+            <p><strong>Step 3: Proportion Cement, Sand, and Coarse Aggregate</strong></p>
+            <p>For Grade M20 $(1 : 1.5 : 3)$, the sum of parts is $S_r = 1 + 1.5 + 3 = 5.5$.</p>
+            <div class="formula-box">
+              $$V_{cement} = \frac{1.0}{5.5} \times 19.404\text{ m}^3 = 3.528\text{ m}^3$$
+              $$M_{cement} = 3.528\text{ m}^3 \times 1440\text{ kg/m}^3 = 5,080.32\text{ kg}$$
+              $$\text{Number of 50-kg Cement Bags} = \frac{5,080.32}{50} \approx 101.6 \implies \mathbf{102\text{ Bags of Cement}}$$
+            </div>
+
+            <p><strong>Step 4: Compute Sand and Stone Quantities</strong></p>
+            <div class="formula-box">
+              $$V_{sand} = \frac{1.5}{5.5} \times 19.404\text{ m}^3 = 5.292\text{ m}^3 \implies M_{sand} = 5.292 \times 1600\text{ kg/m}^3 = 8,467\text{ kg} \ (\mathbf{8.47\text{ Tonnes}})$$
+              $$V_{stone} = \frac{3.0}{5.5} \times 19.404\text{ m}^3 = 10.584\text{ m}^3 \implies M_{stone} = 10.584 \times 1550\text{ kg/m}^3 = 16,405\text{ kg} \ (\mathbf{16.41\text{ Tonnes}})$$
+            </div>
+
+            <p><strong>Step 5: Determine Required Mixing Water</strong></p>
+            <div class="formula-box">
+              $$W_{water} = M_{cement} \times (w/c) = 5,080.32\text{ kg} \times 0.50 = \mathbf{2,540\text{ Liters of Water}}$$
+            </div>
+            <p>
+              <strong>Site Batch Summary:</strong> To cast the $12.0\text{ m}^3$ slab with zero shortage, the site manager must procure <strong>102 bags of cement</strong>, <strong>8.5 tonnes of sand</strong>, <strong>16.5 tonnes of crushed aggregate</strong>, and verify supply of <strong>2,540 liters of clean mixing water</strong>.
+            </p>
+          </div>
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏗️</span>
+            <h3 class="widget-title">Related Civil & Construction</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="brick-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Brick & Masonry Calculator</a></li>
+            <li><a href="asphalt-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Asphalt Paving & Tonnage</a></li>
+            <li><a href="beam-deflection-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Deflection & Moments</a></li>
+            <li><a href="retaining-wall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Retaining Wall Stability</a></li>
+            <li><a href="concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Slab, Footing & Column</a></li>
+            <li><a href="rebar-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rebar Weight & Grid Spacing</a></li>
+            <li><a href="rainwater-downpipe-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rainwater Downpipe Sizing</a></li>
+            <li><a href="beam-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Bending Moment & Shear</a></li>
+            <li><a href="block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Block Masonry Estimator</a></li>
+            <li><a href="concrete-block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Block Calculator</a></li>
+            <li><a href="concrete-mix-ratio-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Concrete Mix Ratio</a></li>
+            <li><a href="drywall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Drywall Sheets, Mud & Tape</a></li>
+            <li><a href="excavation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation & Earthwork Haul</a></li>
+            <li><a href="excavation-volume-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation Volume Calculator</a></li>
+            <li><a href="flooring-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Flooring Area & Box Estimator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="civil.html" class="sidebar-category-link">View All Civil & Construction Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>High-precision professional engineering and scientific calculation engines.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Directories</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="civil.html">Civil &amp; Construction</a></li>
+          <li><a href="mechanical.html">Mechanical Engineering</a></li>
+          <li><a href="engineering.html">Civil &amp; Structural</a></li>
+          <li><a href="sitemap.xml">XML Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 CalcHub. Standard Engineering Reference Systems.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calcBtn = document.getElementById('calcMixBtn');
+      const resetBtn = document.getElementById('resetMixBtn');
+      const resultBox = document.getElementById('mixResultBox');
+      const gradeSelect = document.getElementById('concreteGrade');
+      const customRow = document.getElementById('customRatioRow');
+
+      gradeSelect.addEventListener('change', function() {
+        if (this.value === 'custom') {
+          customRow.style.display = 'flex';
+        } else {
+          customRow.style.display = 'none';
+        }
+      });
+
+      function calculateMix() {
+        const V_wet = parseFloat(document.getElementById('wetVolume').value);
+        const gradeVal = gradeSelect.value;
+        const wc = parseFloat(document.getElementById('waterCementRatio').value);
+        const wastePct = parseFloat(document.getElementById('mixWaste').value) || 0;
+
+        if (isNaN(V_wet) || V_wet <= 0 || isNaN(wc) || wc <= 0) {
+          alert('Please enter valid positive numbers for concrete volume and water-cement ratio.');
+          return;
+        }
+
+        let c = 1.0, s = 2.0, a = 4.0;
+        if (gradeVal === '1:3:6') { c = 1.0; s = 3.0; a = 6.0; }
+        else if (gradeVal === '1:2:4') { c = 1.0; s = 2.0; a = 4.0; }
+        else if (gradeVal === '1:1.5:3') { c = 1.0; s = 1.5; a = 3.0; }
+        else if (gradeVal === '1:1:2') { c = 1.0; s = 1.0; a = 2.0; }
+        else if (gradeVal === 'custom') {
+          c = parseFloat(document.getElementById('custCement').value) || 1.0;
+          s = parseFloat(document.getElementById('custSand').value) || 2.0;
+          a = parseFloat(document.getElementById('custAggregate').value) || 4.0;
+        }
+
+        const sumParts = c + s + a;
+        const V_gross = V_wet * (1 + wastePct / 100.0);
+        const DRY_FACTOR = 1.54;
+        const V_dry = V_gross * DRY_FACTOR;
+
+        const V_c = (c / sumParts) * V_dry;
+        const V_s = (s / sumParts) * V_dry;
+        const V_a = (a / sumParts) * V_dry;
+
+        const DENSITY_CEMENT = 1440.0; // kg/m3
+        const DENSITY_SAND = 1600.0;   // kg/m3
+        const DENSITY_STONE = 1550.0;  // kg/m3
+
+        const M_c = V_c * DENSITY_CEMENT;
+        const M_s = V_s * DENSITY_SAND;
+        const M_a = V_a * DENSITY_STONE;
+
+        const cementBags = Math.ceil(M_c / 50.0);
+        const sandTonnes = M_s / 1000.0;
+        const stoneTonnes = M_a / 1000.0;
+        const waterLiters = Math.round(M_c * wc);
+
+        const totalBatchKg = Math.round(M_c + M_s + M_a + waterLiters);
+
+        document.getElementById('resCementBags').textContent = cementBags.toLocaleString();
+        document.getElementById('resSandMass').textContent = sandTonnes.toFixed(2);
+        document.getElementById('resStoneMass').textContent = stoneTonnes.toFixed(2);
+        document.getElementById('resWaterLiters').textContent = waterLiters.toLocaleString();
+        document.getElementById('resDryVol').textContent = V_dry.toFixed(2);
+        document.getElementById('resTotalWeight').textContent = totalBatchKg.toLocaleString();
+
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      calcBtn.addEventListener('click', calculateMix);
+      resetBtn.addEventListener('click', function() {
+        resultBox.style.display = 'none';
+        customRow.style.display = 'none';
+      });
+      calculateMix();
+    });
+  </script>
+</body>
+</html>

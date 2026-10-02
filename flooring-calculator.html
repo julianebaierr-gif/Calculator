@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flooring Calculator | Square Footage, Boxes &amp; Waste Estimator</title>
+  <meta name="description" content="Calculate flooring square footage, cartons/boxes to purchase, pattern waste allowances (hardwood, LVP, tile), and underlayment rolls per NWFA standards.">
+  <link rel="canonical" href="https://calchub.cloud/flooring-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Flooring Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates flooring square footage, carton packaging counts, installation waste factors, and underlayment rolls per NWFA and TCNA standards.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What percentage of waste should be added when ordering flooring?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For standard straight plank installations (hardwood, laminate, LVP) in rectangular rooms, add 5% to 7% waste. For diagonal or brick patterns, add 10% to 12%. For complex herringbone, chevron, or tile patterns with multiple doorways and angled corners, add 15% to 20% waste."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do you calculate the number of boxes of flooring to buy?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "First, compute net room square footage (Length x Width) and multiply by (1 + Waste Percentage / 100). Next, divide this gross area by the square footage coverage per box (found on the carton label, typically 18 to 24 sq ft for wood/LVP, or 10 to 15 sq ft for tile) and round UP to the nearest whole carton."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why is an expansion gap necessary when installing hardwood or laminate flooring?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Per NWFA guidelines, organic wood fibers and click-lock laminate cores expand and contract with seasonal relative humidity changes. A continuous 1/4-inch to 1/2-inch (6 to 12 mm) expansion gap must be preserved around all perimeter walls and vertical obstructions, later concealed by baseboards or quarter-round molding."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How many rolls of underlayment are needed for a flooring installation?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Divide the total floor area by the square footage of the underlayment roll (standard rolls cover 100 sq ft). Include a 5% allowance for overlapping seam edges and perimeter wall trimming."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="civil">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html" class="active">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="civil.html">Civil &amp; Construction</a> &rsaquo; 
+      <span>Flooring Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calculator-main">
+        <div class="calc-header">
+          <h1>Flooring Calculator</h1>
+          <p>Estimate floor square footage, required carton boxes, pattern cutting waste, and underlayment rolls per NWFA and TCNA standards.</p>
+        </div>
+
+        <div class="calculator-card">
+          <form id="flooringForm" onsubmit="return false;">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="roomL">Room Length (feet):</label>
+                <input type="number" id="roomL" value="22.0" step="0.5" min="1" required>
+                <span class="hint">Long wall dimension</span>
+              </div>
+              <div class="form-group">
+                <label for="roomW">Room Width (feet):</label>
+                <input type="number" id="roomW" value="16.0" step="0.5" min="1" required>
+                <span class="hint">Short wall dimension</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="closetArea">Additional Closets / Alcoves (sq ft):</label>
+                <input type="number" id="closetArea" value="24.0" step="1" min="0" required>
+                <span class="hint">Add entryway nooks or walk-in closets</span>
+              </div>
+              <div class="form-group">
+                <label for="islandDeduct">Obstruction Deductions (sq ft):</label>
+                <input type="number" id="islandDeduct" value="0.0" step="1" min="0" required>
+                <span class="hint">Kitchen islands, fire hearths, built-ins</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="flooringType">Flooring Material &amp; Format:</label>
+                <select id="flooringType">
+                  <option value="wood" selected>Solid / Engineered Hardwood Plank</option>
+                  <option value="lvp">Luxury Vinyl Plank (LVP / SPC Rigid Core)</option>
+                  <option value="laminate">Laminate Click-Lock Flooring</option>
+                  <option value="tile">Porcelain / Ceramic Floor Tile</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="boxCoverage">Coverage Per Box / Carton (sq ft):</label>
+                <input type="number" id="boxCoverage" value="20.5" step="0.1" min="1.0" required>
+                <span class="hint">Check carton specification label</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="layoutPattern">Installation Layout &amp; Waste Factor:</label>
+                <select id="layoutPattern">
+                  <option value="7" selected>Standard Straight Planks (7% Waste)</option>
+                  <option value="10">Offset Staggered / Running Bond (10% Waste)</option>
+                  <option value="12">Diagonal / 45-Degree Angle (12% Waste)</option>
+                  <option value="15">Herringbone / Parquet Pattern (15% Waste)</option>
+                  <option value="custom">Custom Waste Percentage</option>
+                </select>
+              </div>
+              <div class="form-group" id="customWasteGroup" style="display:none;">
+                <label for="customWastePct">Custom Waste (%):</label>
+                <input type="number" id="customWastePct" value="10" step="1" min="0" max="30">
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="calcFloorBtn">Calculate Flooring Materials</button>
+              <button type="reset" class="btn btn-secondary" id="resetFloorBtn">Reset</button>
+            </div>
+          </form>
+
+          <div class="results-box" id="floorResultBox" style="display:none; margin-top:25px;">
+            <h3>Flooring Material Bill of Quantities</h3>
+            <div class="result-grid">
+              <div class="result-tile highlight">
+                <span class="result-label">Full Cartons / Boxes to Buy</span>
+                <span class="result-value" id="resBoxes">0</span>
+                <span class="result-unit">Cartons (covers waste)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Net Floor Surface Area</span>
+                <span class="result-value" id="resNetArea">0</span>
+                <span class="result-unit">sq ft (~0 m²)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Purchased Total Coverage</span>
+                <span class="result-value" id="resPurchasedSqFt">0.0</span>
+                <span class="result-unit">sq ft (Total in boxes)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Underlayment Rolls (100 sq ft)</span>
+                <span class="result-value" id="resUnderlayRolls">0</span>
+                <span class="result-unit">Rolls (Acoustic / Vapor)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Perimeter Molding / Baseboard</span>
+                <span class="result-value" id="resBaseboardLF">0</span>
+                <span class="result-unit">Linear Feet (10% waste)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Total Material Weight</span>
+                <span class="result-value" id="resFloorWeight">0</span>
+                <span class="result-unit">lbs (~0 kg)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Flooring Surface Area Estimation &amp; Industry Standards</h2>
+          <p>
+            Whether specifying prefinished solid oak, rigid core stone-polymer composite (SPC) luxury vinyl plank, or large-format rectified porcelain tile, accurate dimensional quantification is critical. Under-ordering results in project work stoppages and color-dye-lot mismatch risks, while excessive over-ordering wastes budget capital.
+          </p>
+          <p>
+            Professional trade organizations—including the <strong>National Wood Flooring Association (NWFA)</strong> and the <strong>Tile Council of North America (TCNA)</strong>—mandate rigorous formulas accounting for net floor geometry, cutting waste allowances, packaging unit minimums, and expansion gap perimeters.
+          </p>
+
+          <h2>Net Surface Area Formulation</h2>
+          <p>
+            The net required surface area ($A_{net}$) accounts for the primary room footprint, adjacent alcoves or closets, and deductions for unfloored fixtures (such as built-in kitchen cabinetry islands, brick masonry fireplaces, or bathtub bases):
+          </p>
+          <div class="formula-box">
+            $$A_{room} = L_{room} \times W_{room}$$
+            $$A_{net} = A_{room} + A_{closets} - A_{deductions}$$
+          </div>
+          <p>
+            To determine the gross area that must be purchased ($A_{gross}$), an empirical pattern cutting waste factor ($W_{\%}$) is applied:
+          </p>
+          <div class="formula-box">
+            $$A_{gross} = A_{net} \times \left(1 + \frac{W_{\%}}{100}\right)$$
+          </div>
+
+          <h2>Carton Packaging Logic and Over-Order Rounding</h2>
+          <p>
+            Hardwood, LVP, laminate, and ceramic tiles are sold exclusively in factory-sealed cartons containing a fixed nominal area ($C_{box}$). Retailers do not break cartons. Therefore, the required purchase quantity must always be rounded up to the nearest whole integer:
+          </p>
+          <div class="formula-box">
+            $$N_{boxes} = \left\lceil \frac{A_{gross}}{C_{box}} \right\rceil$$
+            $$A_{purchased} = N_{boxes} \times C_{box}$$
+            $$\text{Reserve Attic Stock} = A_{purchased} - A_{net}$$
+          </div>
+          <p>
+            The reserve attic stock provides homeowners and facility managers with matching dye-lot replacement planks or tiles to repair future water damage, heavy scratches, or plumbing access cuts over the building lifespan.
+          </p>
+
+          <h2>Pattern Waste Guidelines per TCNA and NWFA</h2>
+          <p>
+            Different aesthetic laying patterns generate varying amounts of off-cut scrap:
+          </p>
+          <ul>
+            <li><strong>Straight Plank (Parallel to Longest Wall):</strong> $5\% - 7\%$ waste. Standard layout with lowest scrap rate. Planks cut at the end of one run start the next course.</li>
+            <li><strong>Offset / Staggered Running Bond (1/2 or 1/3 lap):</strong> $8\% - 10\%$ waste. Mandatory for large-format tiles ($12 \times 24\text{ in}$ or larger) per ANSI A108.02 to avoid lippage.</li>
+            <li><strong>Diagonal Layout (45° Orientation):</strong> $12\% - 15\%$ waste. Every perimeter wall contact requires two triangular angled cuts, eliminating reuse of short scrap.</li>
+            <li><strong>Herringbone and Chevron Parquet:</strong> $15\% - 20\%$ waste. Demands dedicated left-and-right milled tongue-and-groove planks with extensive boundary miter trimmings.</li>
+          </ul>
+
+          <h2>Perimeter Expansion Gaps and Transition Moldings</h2>
+          <p>
+            Natural wood is hygroscopic, expanding when absorbing ambient air humidity and contracting during winter heating cycles. Floating click-lock LVP and laminate floors similarly experience thermal expansion.
+          </p>
+          <div class="formula-box">
+            $$\text{Perimeter Expansion Gap} = \frac{1}{4}\text{ to }\frac{1}{2}\text{ inch } (6.35 - 12.7\text{ mm})$$
+          </div>
+          <p>
+            This expansion perimeter must remain completely unhindered around all drywall walls, structural columns, and door casings. The gap is subsequently concealed by installing baseboards and shoe molding (quarter-round).
+          </p>
+          <p>
+            The required linear footage of baseboard molding ($LF_{molding}$) is:
+          </p>
+          <div class="formula-box">
+            $$\text{Perimeter} = 2 \times (L_{room} + W_{room})$$
+            $$LF_{molding} = \lceil \text{Perimeter} \times 1.10 \rceil \quad (10\% \text{ allowance for 45° corner miters})$$
+          </div>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Flooring Type</th>
+                <th>Typical Box Area</th>
+                <th>Carton Weight</th>
+                <th>Typical Waste %</th>
+                <th>Subfloor Requirements</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Solid Hardwood (3/4" Oak)</td>
+                <td>18.0 – 24.0 sq ft</td>
+                <td>55 – 70 lbs (25 – 32 kg)</td>
+                <td>7% – 10%</td>
+                <td>3/4" Plywood, nailed/cleated</td>
+              </tr>
+              <tr>
+                <td>Rigid Core SPC LVP (5–7 mm)</td>
+                <td>20.0 – 26.0 sq ft</td>
+                <td>38 – 48 lbs (17 – 22 kg)</td>
+                <td>7% – 12%</td>
+                <td>Flat within 3/16" over 10 ft</td>
+              </tr>
+              <tr>
+                <td>Laminate Plank (8–12 mm)</td>
+                <td>17.0 – 22.0 sq ft</td>
+                <td>32 – 42 lbs (15 – 19 kg)</td>
+                <td>7% – 10%</td>
+                <td>Vapor barrier underlayment</td>
+              </tr>
+              <tr>
+                <td>Porcelain Tile (12x24 / 24x24)</td>
+                <td>12.0 – 16.0 sq ft</td>
+                <td>50 – 65 lbs (23 – 30 kg)</td>
+                <td>10% – 15%</td>
+                <td>Cement backer board / uncoupling</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Subfloor Preparation, Moisture Testing (ASTM F1869 &amp; F2170) &amp; Acoustic Underlayment</h2>
+          <p>
+            A high-performance flooring installation is only as durable as the subfloor substrate beneath it. According to the <strong>National Wood Flooring Association (NWFA)</strong> and ASTM specifications, subfloor deflection must not exceed $L / 360$ under total design load, and subfloor flatness must satisfy strict tolerances: maximum $\frac{3}{16}\text{ inch}$ variation over a $10\text{-foot}$ radius ($4.8\text{ mm}$ over $3\text{ m}$) for floating click-lock systems, or $\frac{1}{8}\text{ inch}$ over $6\text{ feet}$ for glue-down hardwoods.
+          </p>
+          <p>
+            <strong>Subfloor Moisture Vapor Emissions:</strong> Concrete slab subfloors must undergo quantitative moisture vapor emission testing prior to installation:
+          </p>
+          <ul>
+            <li><strong>ASTM F1869 (Calcium Chloride Test):</strong> Measures moisture vapor emission rate (MVER). Most flooring adhesives require MVER below $3.0\text{ lbs} / 1,000\text{ sq ft} / 24\text{ hours}$.</li>
+            <li><strong>ASTM F2170 (In-Situ Relative Humidity Probes):</strong> Internal concrete relative humidity must typically remain under $75\% - 85\%$ RH unless an epoxy moisture mitigation membrane is applied.</li>
+          </ul>
+          <p>
+            <strong>Acoustic Isolation (IIC and STC Ratings):</strong> In multi-family condominiums and high-rise developments, building codes mandate minimum <strong>Impact Insulation Class (IIC)</strong> and <strong>Sound Transmission Class (STC)</strong> ratings of 50 or higher (ASTM E492 / E90). Specialized closed-cell cross-linked polyethylene (XLPE) or natural cork underlayment rolls dampen footfall impact resonance, ensuring compliant acoustic isolation.
+          </p>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Case Study: Commercial Executive Office Suite Fit-Out</h3>
+            <p><strong>Design Scenario:</strong> An architect specifies luxury SPC rigid-core vinyl plank flooring for a corporate executive suite. The main room measures $L = 26.0\text{ feet}$ by $W = 18.0\text{ feet}$, plus an adjoining coffee pantry alcove measuring $6.0\text{ ft} \times 8.0\text{ ft}$ ($48.0\text{ sq ft}$). A permanent conference buffet island deducts $16.0\text{ sq ft}$ of floor space. The selected architectural plank is packaged at $21.5\text{ sq ft}$ per carton, weighing $42\text{ lbs}$ per box. The floor will be laid in a staggered straight plank pattern with a recommended $8\%$ waste factor. Calculate net floor square footage, total gross area to order, full cartons to purchase, underlayment rolls ($100\text{ sq ft}$ each), and perimeter baseboard linear footage.</p>
+            
+            <p><strong>Step 1: Calculate Net Floor Surface Area ($A_{net}$)</strong></p>
+            <div class="formula-box">
+              $$A_{main} = 26.0\text{ ft} \times 18.0\text{ ft} = 468.0\text{ sq ft}$$
+              $$A_{net} = 468.0\text{ sq ft} + 48.0\text{ sq ft} - 16.0\text{ sq ft} = \mathbf{500.0\text{ sq ft}} \quad (\approx 46.45\text{ m}^2)$$
+            </div>
+
+            <p><strong>Step 2: Apply 8% Installation Waste Allowance</strong></p>
+            <div class="formula-box">
+              $$A_{gross} = 500.0\text{ sq ft} \times (1 + 0.08) = 500.0 \times 1.08 = \mathbf{540.0\text{ sq ft}}$$
+            </div>
+
+            <p><strong>Step 3: Determine Required Carton Boxes to Purchase</strong></p>
+            <div class="formula-box">
+              $$N_{boxes} = \left\lceil \frac{540.0\text{ sq ft}}{21.5\text{ sq ft/box}} \right\rceil = \lceil 25.116 \rceil = \mathbf{26\text{ Cartons of LVP}}$$
+              $$A_{purchased} = 26 \times 21.5\text{ sq ft} = 559.0\text{ sq ft} \implies (59.0\text{ sq ft reserve spare})$$
+            </div>
+
+            <p><strong>Step 4: Compute Underlayment Rolls and Perimeter Baseboards</strong></p>
+            <div class="formula-box">
+              $$\text{Underlayment Rolls} = \left\lceil \frac{500.0\text{ sq ft} \times 1.05}{100\text{ sq ft/roll}} \right\rceil = \left\lceil \frac{525.0}{100} \right\rceil = \mathbf{6\text{ Rolls of 100 sq ft Underlayment}}$$
+              $$\text{Perimeter Baseboard} = \lceil (2 \times (26 + 18) + (2 \times 6)) \times 1.10 \rceil = \lceil 100 \times 1.10 \rceil = \mathbf{110\text{ Linear Feet}}$$
+            </div>
+            <p>
+              <strong>Procurement Summary:</strong> Order <strong>26 boxes</strong> of LVP ($1,092\text{ lbs}$ shipping mass), <strong>6 rolls</strong> of acoustic underlayment, and <strong>110 linear feet</strong> of primed baseboard molding.
+            </p>
+          </div>
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏗️</span>
+            <h3 class="widget-title">Related Civil & Construction</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="brick-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Brick & Masonry Calculator</a></li>
+            <li><a href="asphalt-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Asphalt Paving & Tonnage</a></li>
+            <li><a href="beam-deflection-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Deflection & Moments</a></li>
+            <li><a href="retaining-wall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Retaining Wall Stability</a></li>
+            <li><a href="concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Slab, Footing & Column</a></li>
+            <li><a href="rebar-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rebar Weight & Grid Spacing</a></li>
+            <li><a href="rainwater-downpipe-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rainwater Downpipe Sizing</a></li>
+            <li><a href="beam-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Bending Moment & Shear</a></li>
+            <li><a href="block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Block Masonry Estimator</a></li>
+            <li><a href="concrete-block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Block Calculator</a></li>
+            <li><a href="concrete-mix-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Mix Ratio</a></li>
+            <li><a href="drywall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Drywall Sheets, Mud & Tape</a></li>
+            <li><a href="excavation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation & Earthwork Haul</a></li>
+            <li><a href="excavation-volume-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation Volume Calculator</a></li>
+            <li><a href="flooring-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Flooring Area & Box Estimator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="civil.html" class="sidebar-category-link">View All Civil & Construction Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>High-precision professional engineering and scientific calculation engines.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Directories</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="civil.html">Civil &amp; Construction</a></li>
+          <li><a href="mechanical.html">Mechanical Engineering</a></li>
+          <li><a href="engineering.html">Civil &amp; Structural</a></li>
+          <li><a href="sitemap.xml">XML Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 CalcHub. Standard Engineering Reference Systems.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calcBtn = document.getElementById('calcFloorBtn');
+      const resetBtn = document.getElementById('resetFloorBtn');
+      const resultBox = document.getElementById('floorResultBox');
+      const patternSelect = document.getElementById('layoutPattern');
+      const customWasteGroup = document.getElementById('customWasteGroup');
+      const floorTypeSelect = document.getElementById('flooringType');
+      const boxCoverageInput = document.getElementById('boxCoverage');
+
+      patternSelect.addEventListener('change', function() {
+        if (this.value === 'custom') {
+          customWasteGroup.style.display = 'block';
+        } else {
+          customWasteGroup.style.display = 'none';
+        }
+      });
+
+      floorTypeSelect.addEventListener('change', function() {
+        const val = this.value;
+        if (val === 'wood') boxCoverageInput.value = '20.5';
+        else if (val === 'lvp') boxCoverageInput.value = '23.8';
+        else if (val === 'laminate') boxCoverageInput.value = '19.2';
+        else if (val === 'tile') boxCoverageInput.value = '14.4';
+      });
+
+      function calculateFlooring() {
+        const L = parseFloat(document.getElementById('roomL').value);
+        const W = parseFloat(document.getElementById('roomW').value);
+        const closetSqFt = parseFloat(document.getElementById('closetArea').value) || 0;
+        const deductSqFt = parseFloat(document.getElementById('islandDeduct').value) || 0;
+        const boxCov = parseFloat(boxCoverageInput.value);
+
+        if (isNaN(L) || L <= 0 || isNaN(W) || W <= 0 || isNaN(boxCov) || boxCov <= 0) {
+          alert('Please enter valid positive dimensions and box coverage.');
+          return;
+        }
+
+        let wastePct = 7.0;
+        if (patternSelect.value === 'custom') {
+          wastePct = parseFloat(document.getElementById('customWastePct').value) || 10.0;
+        } else {
+          wastePct = parseFloat(patternSelect.value);
+        }
+
+        const roomArea = L * W;
+        const netArea = Math.max(1.0, roomArea + closetSqFt - deductSqFt);
+        const grossArea = netArea * (1 + wastePct / 100.0);
+        const boxesNeeded = Math.ceil(grossArea / boxCov);
+        const purchasedSqFt = boxesNeeded * boxCov;
+
+        // Underlayment: 100 sq ft per roll with 5% lap waste
+        const underlayRolls = Math.max(1, Math.ceil((netArea * 1.05) / 100.0));
+
+        // Perimeter molding: 2*(L+W) + 10% waste
+        const perimeter = 2 * (L + W);
+        const moldingLF = Math.ceil(perimeter * 1.10);
+
+        // Approximate weight per sq ft based on material
+        const mType = floorTypeSelect.value;
+        let weightPerSqFt = 2.0; // LVP approx 2 lb/sqft
+        if (mType === 'wood') weightPerSqFt = 2.8;
+        else if (mType === 'laminate') weightPerSqFt = 1.8;
+        else if (mType === 'tile') weightPerSqFt = 4.2;
+
+        const totalWeightLbs = Math.round(purchasedSqFt * weightPerSqFt);
+        const totalWeightKg = Math.round(totalWeightLbs * 0.453592);
+        const netAreaM2 = (netArea * 0.092903).toFixed(1);
+
+        document.getElementById('resBoxes').textContent = boxesNeeded.toLocaleString();
+        document.getElementById('resNetArea').textContent = Math.round(netArea).toLocaleString() + ` (~${netAreaM2} m²)`;
+        document.getElementById('resPurchasedSqFt').textContent = purchasedSqFt.toFixed(1);
+        document.getElementById('resUnderlayRolls').textContent = underlayRolls.toLocaleString();
+        document.getElementById('resBaseboardLF').textContent = moldingLF.toLocaleString();
+        document.getElementById('resFloorWeight').textContent = totalWeightLbs.toLocaleString() + ` (~${totalWeightKg} kg)`;
+
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      calcBtn.addEventListener('click', calculateFlooring);
+      resetBtn.addEventListener('click', function() {
+        resultBox.style.display = 'none';
+        customWasteGroup.style.display = 'none';
+      });
+      calculateFlooring();
+    });
+  </script>
+</body>
+</html>

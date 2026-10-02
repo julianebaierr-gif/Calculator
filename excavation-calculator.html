@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Excavation Calculator | Earthwork Volume &amp; Truck Haul Estimator</title>
+  <meta name="description" content="Calculate earthwork excavation volumes (Bank, Loose, Compacted Cubic Yards), soil swell factors, trench slope benching per OSHA, and dump truck trips.">
+  <link rel="canonical" href="https://calchub.cloud/excavation-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Excavation Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates earthwork excavation bank cubic yards (BCY), loose cubic yards (LCY) with soil swell factors, and dump truck haul cycles per OSHA 1926.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the difference between Bank Cubic Yards (BCY) and Loose Cubic Yards (LCY)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bank Cubic Yards (BCY) measures soil in its natural, undisturbed in-situ state before excavation. When dug up, soil particles separate and create air voids, expanding by 15% to 40% into Loose Cubic Yards (LCY). LCY is the actual volume that must be hauled away by dump trucks."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the soil swell factor formula?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Loose volume is calculated as: V_loose = V_bank * (1 + S_w / 100), where S_w is the swell percentage. Conversely, the Load Factor (L_f) is defined as L_f = V_bank / V_loose = 1 / (1 + S_w / 100)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How many dump truck loads are required for an excavation project?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Divide the total Loose Cubic Yards (LCY) or loose cubic meters by the rated hauling capacity of the dump truck (typically 10 to 12 cubic yards for standard tri-axle dump trucks, or 14 to 18 cubic yards for end-dump trailers), rounding up to the next whole number."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are OSHA trench sloping and benching requirements?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Per OSHA 29 CFR 1926 Subpart P, excavations deeper than 5 feet (1.5 m) require protective systems. Allowable maximum side slopes are: Type A Soil (dense clay): 3/4:1 (53°); Type B Soil (silt, loam, sandy clay): 1:1 (45°); and Type C Soil (sand, gravel, submerged): 1.5:1 (34°)."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="civil">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html" class="active">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="civil.html">Civil &amp; Construction</a> &rsaquo; 
+      <span>Excavation Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calculator-main">
+        <div class="calc-header">
+          <h1>Excavation Calculator</h1>
+          <p>Compute earthwork bank volume (BCY), loose haul volume (LCY), soil swell expansion, and dump truck trips per OSHA standards.</p>
+        </div>
+
+        <div class="calculator-card">
+          <form id="excavationForm" onsubmit="return false;">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="excavationShape">Excavation Geometry:</label>
+                <select id="excavationShape">
+                  <option value="rect" selected>Rectangular Trench or Basement Pit</option>
+                  <option value="cylinder">Circular Pier / Caisson Shaft</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="excavationDepth">Excavation Depth (meters):</label>
+                <input type="number" id="excavationDepth" value="2.5" step="0.1" min="0.1" required>
+                <span class="hint">Vertical cut depth</span>
+              </div>
+            </div>
+
+            <div class="form-row" id="rectDimRow">
+              <div class="form-group">
+                <label for="excavLength">Length at Surface (meters):</label>
+                <input type="number" id="excavLength" value="15.0" step="0.5" min="0.1" required>
+              </div>
+              <div class="form-group">
+                <label for="excavWidth">Width at Surface (meters):</label>
+                <input type="number" id="excavWidth" value="8.0" step="0.5" min="0.1" required>
+              </div>
+            </div>
+
+            <div class="form-row" id="cylDimRow" style="display:none;">
+              <div class="form-group">
+                <label for="excavDiameter">Shaft Diameter (meters):</label>
+                <input type="number" id="excavDiameter" value="3.0" step="0.1" min="0.1">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="soilType">Soil Classification &amp; Swell:</label>
+                <select id="soilType">
+                  <option value="15">Sand &amp; Gravel (15% Swell, Type C Soil)</option>
+                  <option value="25" selected>Common Earth / Loam (25% Swell, Type B Soil)</option>
+                  <option value="40">Dense Heavy Clay (40% Swell, Type A Soil)</option>
+                  <option value="60">Blasted Solid Rock (60% Swell)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="truckCapacity">Dump Truck Capacity (m³):</label>
+                <input type="number" id="truckCapacity" value="10.0" step="0.5" min="1.0" required>
+                <span class="hint">Standard 10-wheeler ~8-10 m³ (10-13 cu yd)</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="calcExcavBtn">Calculate Earthwork Volume</button>
+              <button type="reset" class="btn btn-secondary" id="resetExcavBtn">Reset</button>
+            </div>
+          </form>
+
+          <div class="results-box" id="excavResultBox" style="display:none; margin-top:25px;">
+            <h3>Earthwork Mass Haul &amp; Volume Estimates</h3>
+            <div class="result-grid">
+              <div class="result-tile highlight">
+                <span class="result-label">Loose Haul Volume (LCY)</span>
+                <span class="result-value" id="resLooseVol">0.00</span>
+                <span class="result-unit">m³ (~0 cu yd)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Bank In-Situ Volume (BCY)</span>
+                <span class="result-value" id="resBankVol">0.00</span>
+                <span class="result-unit">m³ (~0 cu yd)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Dump Truck Loads Needed</span>
+                <span class="result-value" id="resTruckLoads">0</span>
+                <span class="result-unit">Haul Trips</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Volumetric Soil Swell</span>
+                <span class="result-value" id="resSwellVol">+0.00</span>
+                <span class="result-unit">m³ Expansion Air Voids</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Total Excavated Mass</span>
+                <span class="result-value" id="resSoilMass">0</span>
+                <span class="result-unit">Metric Tonnes (~0 US tons)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">OSHA Trench Slope Guidance</span>
+                <span class="result-value" id="resOshaSlope">Type B</span>
+                <span class="result-unit">1:1 (45° angle)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Earthwork Principles: Bank, Loose, and Compacted Volumes</h2>
+          <p>
+            Civil earthwork engineering involves excavating, hauling, grading, and compacting soil and rock materials. A fundamental tenet of geotechnical engineering is that soil volume changes dramatically throughout the excavation and embankment construction lifecycle. Civil engineers classify earth materials into three distinct volumetric states:
+          </p>
+          <ul>
+            <li><strong>Bank Cubic Yards (BCY / In-Situ $m^3$):</strong> The volume of soil or rock in its natural, undisturbed ground state prior to excavation. All contractual earthwork pay quantities are typically measured in bank volume.</li>
+            <li><strong>Loose Cubic Yards (LCY / Haul $m^3$):</strong> The expanded volume of material after mechanical excavation and loading into dump trucks. Mechanical shearing breaks internal soil cohesion, causing particles to rearrange with increased pore voids.</li>
+            <li><strong>Compacted Cubic Yards (CCY / Fill $m^3$):</strong> The volume of soil after placement in embankments and mechanical densification using vibratory rollers or sheep's foot compactors to eliminate air voids.</li>
+          </ul>
+
+          <h2>Soil Swell and Load Factor Equations</h2>
+          <p>
+            The expansion of soil from undisturbed bank state to loose state is governed by the <strong>Swell Percentage ($S_w$)</strong>:
+          </p>
+          <div class="formula-box">
+            $$V_{loose} = V_{bank} \times \left(1 + \frac{S_w}{100}\right)$$
+          </div>
+          <p>
+            Conversely, the <strong>Load Factor ($L_f$)</strong> defines the proportion of bank volume contained within a unit loose volume:
+          </p>
+          <div class="formula-box">
+            $$L_f = \frac{V_{bank}}{V_{loose}} = \frac{1}{1 + \frac{S_w}{100}} = \frac{\rho_{loose}}{\rho_{bank}}$$
+          </div>
+          <p>
+            When soil is subsequently placed in structural engineered fills, it experiences <strong>Shrinkage Factor ($S_h$)</strong> relative to the bank state:
+          </p>
+          <div class="formula-box">
+            $$V_{compacted} = V_{bank} \times (1 - S_h)$$
+          </div>
+
+          <h2>Excavation Geometry &amp; Prismoidal Formulas</h2>
+          <p>
+            For a vertical-walled rectangular pit or foundation basement of length $L$, width $W$, and depth $D$:
+          </p>
+          <div class="formula-box">
+            $$V_{bank} = L \times W \times D$$
+          </div>
+          <p>
+            For circular deep foundation caissons, bored piles, or cylindrical shaft excavations with diameter $d$:
+          </p>
+          <div class="formula-box">
+            $$V_{bank} = \pi \times \left(\frac{d}{2}\right)^2 \times D$$
+          </div>
+          <p>
+            For deep foundation cuts with sloped side embankments conforming to angle of repose, the <strong>Prismoidal Formula</strong> provides exact volumetric evaluation between top surface area $A_1$, bottom area $A_2$, and mid-depth area $A_m$:
+          </p>
+          <div class="formula-box">
+            $$V_{bank} = \frac{D}{6} (A_1 + 4 A_m + A_2)$$
+          </div>
+
+          <h2>OSHA Excavation Safety Standards (29 CFR 1926 Subpart P)</h2>
+          <p>
+            Trench collapses represent one of the deadliest hazards in heavy construction. Under federal standard <strong>OSHA 29 CFR 1926 Subpart P</strong>, any trench deeper than $5\text{ feet}$ ($1.52\text{ meters}$) requires an engineered protective system: sloping, benching, shoring, or trench shield boxes.
+          </p>
+          <p>
+            Soil classification dictates maximum allowable side slopes ($H:V$):
+          </p>
+          <ul>
+            <li><strong>Type A Soil ($q_u \ge 144\text{ kPa} / 1.5\text{ tsf}$):</strong> Stiff, cohesive clays, cemented sands (caliche). Maximum allowable slope: $\frac{3}{4}:1$ ($53^\circ$ angle).</li>
+            <li><strong>Type B Soil ($48\text{ kPa} \le q_u < 144\text{ kPa}$):</strong> Cohesive silt, loam, silt clay, sandy loam. Maximum allowable slope: $1:1$ ($45^\circ$ angle).</li>
+            <li><strong>Type C Soil ($q_u < 48\text{ kPa} / 0.5\text{ tsf}$):</strong> Granular soils including gravel, sand, submerged soil with seeping water. Maximum allowable slope: $1.5:1$ ($34^\circ$ angle).</li>
+          </ul>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Soil Type</th>
+                <th>Bank Density (kg/m³ / lb/cu yd)</th>
+                <th>Swell Factor ($S_w$)</th>
+                <th>Load Factor ($L_f$)</th>
+                <th>OSHA Maximum Slope</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Clean Sand &amp; Fine Gravel</td>
+                <td>1,780 kg/m³ (3,000 lb/yd³)</td>
+                <td>12% – 18%</td>
+                <td>0.86</td>
+                <td>1.5:1 (34°, Type C)</td>
+              </tr>
+              <tr>
+                <td>Common Earth / Loam</td>
+                <td>1,600 kg/m³ (2,700 lb/yd³)</td>
+                <td>20% – 28%</td>
+                <td>0.80</td>
+                <td>1:1 (45°, Type B)</td>
+              </tr>
+              <tr>
+                <td>Dense Heavy Clay</td>
+                <td>1,900 kg/m³ (3,200 lb/yd³)</td>
+                <td>35% – 45%</td>
+                <td>0.70</td>
+                <td>0.75:1 (53°, Type A)</td>
+              </tr>
+              <tr>
+                <td>Blasted Solid Rock / Granite</td>
+                <td>2,600 kg/m³ (4,400 lb/yd³)</td>
+                <td>50% – 70%</td>
+                <td>0.60</td>
+                <td>Vertical (Stable Rock)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Mass-Haul Diagrams, Cut-and-Fill Balancing &amp; Trench Shoring Systems</h2>
+          <p>
+            On highway, pipeline, and large-scale industrial site grading developments, minimizing earth haul expenses is the paramount engineering challenge. The cumulative volume of cut (excavation) and fill (embankment placement) along a project alignment is analyzed using a <strong>Mass-Haul Diagram</strong>.
+          </p>
+          <p>
+            The mass-haul curve plots station along the horizontal axis versus cumulative net earthwork volume on the vertical axis (with cut represented as rising positive slopes and fill as falling negative slopes). The balance points occur where the profile curve intersects the baseline. The economic <strong>Limit of Economic Haul (LEH)</strong> is formulated by equating haul cost against the alternative expense of borrowing off-site material:
+          </p>
+          <div class="formula-box">
+            $$\text{LEH} = \text{Free-Haul Distance} + \frac{\text{Unit Cost of Borrow Soil}}{\text{Unit Overhaul Cost per Station}}$$
+          </div>
+          <p>
+            <strong>Excavation Support Systems:</strong> When property line constraints, adjacent foundations, or underground utilities prevent OSHA open sloping, temporary retaining shoring must be engineered:
+          </p>
+          <ul>
+            <li><strong>Soldier Piles and Lagging:</strong> Vertical wide-flange steel H-beams driven or grouted into pre-drilled holes at $6\text{ to }10\text{ foot}$ spacing, with heavy horizontal timber lagging planks slotted between flanges.</li>
+            <li><strong>Interlocking Steel Sheet Piling:</strong> Hot-rolled Z-profile or U-profile steel sheets vibrated into the ground to provide a continuous impervious barrier against unstable running sand and high groundwater tables.</li>
+            <li><strong>Trench Boxes (Shields):</strong> Heavy dual-wall steel or aluminum protective shields dragged along pipeline trenches to safeguard pipelayers from catastrophic sidewall cave-ins.</li>
+          </ul>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Case Study: Commercial Basement Earthwork Mass Haul</h3>
+            <p><strong>Design Scenario:</strong> An earthwork contractor is excavating a foundation basement for a commercial medical clinic. The excavation pit is rectangular with vertical shored perimeter walls measuring $L = 20.0\text{ meters}$ in length, $W = 12.0\text{ meters}$ in width, and $D = 3.0\text{ meters}$ in finished cut depth. The geotechnical bore report classifies the subsoil as <strong>Common Earth / Silty Clay</strong> with an in-situ bank density of $\rho_{bank} = 1,750\text{ kg/m}^3$ and an established soil swell factor of $S_w = 25\%$. Material will be hauled off-site using tri-axle dump trucks with a legal highway volumetric box capacity of $10.0\text{ m}^3$ ($13.1\text{ cu yd}$). Calculate Bank Volume (BCY), Loose Hauled Volume (LCY), total earth mass, and number of truck haul cycles.</p>
+            
+            <p><strong>Step 1: Compute Undisturbed In-Situ Bank Volume ($V_{bank}$)</strong></p>
+            <div class="formula-box">
+              $$V_{bank} = L \times W \times D = 20.0\text{ m} \times 12.0\text{ m} \times 3.0\text{ m} = \mathbf{720.0\text{ m}^3} \quad (\approx 941.7\text{ cu yd})$$
+            </div>
+
+            <p><strong>Step 2: Determine Loose Hauled Volume ($V_{loose}$) with Swell Factor</strong></p>
+            <div class="formula-box">
+              $$V_{loose} = V_{bank} \times \left(1 + \frac{S_w}{100}\right) = 720.0\text{ m}^3 \times 1.25 = \mathbf{900.0\text{ m}^3} \quad (\approx 1,177.2\text{ cu yd})$$
+              $$\Delta V_{swell} = 900.0\text{ m}^3 - 720.0\text{ m}^3 = 180.0\text{ m}^3 \text{ of added void volume}$$
+            </div>
+
+            <p><strong>Step 3: Evaluate Total In-Situ Mass</strong></p>
+            <div class="formula-box">
+              $$M_{total} = V_{bank} \times \rho_{bank} = 720.0\text{ m}^3 \times 1,750\text{ kg/m}^3 = 1,260,000\text{ kg} = \mathbf{1,260\text{ Metric Tonnes}}$$
+            </div>
+
+            <p><strong>Step 4: Determine Number of Dump Truck Haul Trips</strong></p>
+            <div class="formula-box">
+              $$N_{trips} = \left\lceil \frac{V_{loose}}{\text{Truck Capacity}} \right\rceil = \left\lceil \frac{900.0\text{ m}^3}{10.0\text{ m}^3/\text{load}} \right\rceil = \mathbf{90\text{ Dump Truck Loads}}$$
+            </div>
+            <p>
+              <strong>Earthwork Operational Summary:</strong> Contracting requires booking <strong>90 truck trips</strong> to haul $900.0\text{ m}^3$ of loose earth. At an average fleet cycle time of 45 minutes per truck across a 5-truck convoy, the excavation job will require approximately 13.5 operating hours of earthmoving.
+            </p>
+          </div>
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏗️</span>
+            <h3 class="widget-title">Related Civil & Construction</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="brick-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Brick & Masonry Calculator</a></li>
+            <li><a href="asphalt-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Asphalt Paving & Tonnage</a></li>
+            <li><a href="beam-deflection-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Deflection & Moments</a></li>
+            <li><a href="retaining-wall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Retaining Wall Stability</a></li>
+            <li><a href="concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Slab, Footing & Column</a></li>
+            <li><a href="rebar-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rebar Weight & Grid Spacing</a></li>
+            <li><a href="rainwater-downpipe-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rainwater Downpipe Sizing</a></li>
+            <li><a href="beam-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Bending Moment & Shear</a></li>
+            <li><a href="block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Block Masonry Estimator</a></li>
+            <li><a href="concrete-block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Block Calculator</a></li>
+            <li><a href="concrete-mix-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Mix Ratio</a></li>
+            <li><a href="drywall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Drywall Sheets, Mud & Tape</a></li>
+            <li><a href="excavation-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Excavation & Earthwork Haul</a></li>
+            <li><a href="excavation-volume-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation Volume Calculator</a></li>
+            <li><a href="flooring-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Flooring Area & Box Estimator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="civil.html" class="sidebar-category-link">View All Civil & Construction Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>High-precision professional engineering and scientific calculation engines.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Directories</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="civil.html">Civil &amp; Construction</a></li>
+          <li><a href="mechanical.html">Mechanical Engineering</a></li>
+          <li><a href="engineering.html">Civil &amp; Structural</a></li>
+          <li><a href="sitemap.xml">XML Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 CalcHub. Standard Engineering Reference Systems.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calcBtn = document.getElementById('calcExcavBtn');
+      const resetBtn = document.getElementById('resetExcavBtn');
+      const resultBox = document.getElementById('excavResultBox');
+      const shapeSelect = document.getElementById('excavationShape');
+      const rectRow = document.getElementById('rectDimRow');
+      const cylRow = document.getElementById('cylDimRow');
+
+      shapeSelect.addEventListener('change', function() {
+        if (this.value === 'cylinder') {
+          rectRow.style.display = 'none';
+          cylRow.style.display = 'flex';
+        } else {
+          rectRow.style.display = 'flex';
+          cylRow.style.display = 'none';
+        }
+      });
+
+      function calculateExcavation() {
+        const shape = shapeSelect.value;
+        const depth = parseFloat(document.getElementById('excavationDepth').value);
+        const swellPct = parseFloat(document.getElementById('soilType').value);
+        const truckCap = parseFloat(document.getElementById('truckCapacity').value);
+
+        if (isNaN(depth) || depth <= 0 || isNaN(truckCap) || truckCap <= 0) {
+          alert('Please enter valid positive dimensions for depth and truck capacity.');
+          return;
+        }
+
+        let V_bank = 0;
+        if (shape === 'cylinder') {
+          const dia = parseFloat(document.getElementById('excavDiameter').value);
+          if (isNaN(dia) || dia <= 0) {
+            alert('Please enter a valid diameter.');
+            return;
+          }
+          const radius = dia / 2.0;
+          V_bank = Math.PI * radius * radius * depth;
+        } else {
+          const L = parseFloat(document.getElementById('excavLength').value);
+          const W = parseFloat(document.getElementById('excavWidth').value);
+          if (isNaN(L) || L <= 0 || isNaN(W) || W <= 0) {
+            alert('Please enter valid length and width dimensions.');
+            return;
+          }
+          V_bank = L * W * depth;
+        }
+
+        const V_loose = V_bank * (1.0 + swellPct / 100.0);
+        const V_swell = V_loose - V_bank;
+        const truckLoads = Math.ceil(V_loose / truckCap);
+
+        // Standard density ~1750 kg/m3 bank
+        const massTonnes = Math.round(V_bank * 1.75);
+        const massUsTons = Math.round(massTonnes * 1.10231);
+
+        const bankYards = (V_bank * 1.30795).toFixed(1);
+        const looseYards = (V_loose * 1.30795).toFixed(1);
+
+        let oshaSlope = 'Type B: 1:1 (45°)';
+        if (swellPct === 15) oshaSlope = 'Type C: 1.5:1 (34°)';
+        else if (swellPct === 40) oshaSlope = 'Type A: 0.75:1 (53°)';
+        else if (swellPct === 60) oshaSlope = 'Stable Rock: Vertical (90°)';
+
+        document.getElementById('resLooseVol').textContent = V_loose.toFixed(1) + ` (~${looseYards} yd³)`;
+        document.getElementById('resBankVol').textContent = V_bank.toFixed(1) + ` (~${bankYards} yd³)`;
+        document.getElementById('resTruckLoads').textContent = truckLoads.toLocaleString();
+        document.getElementById('resSwellVol').textContent = '+' + V_swell.toFixed(1);
+        document.getElementById('resSoilMass').textContent = massTonnes.toLocaleString() + ` (~${massUsTons} US tons)`;
+        document.getElementById('resOshaSlope').textContent = oshaSlope;
+
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      calcBtn.addEventListener('click', calculateExcavation);
+      resetBtn.addEventListener('click', function() {
+        resultBox.style.display = 'none';
+        shapeSelect.value = 'rect';
+        rectRow.style.display = 'flex';
+        cylRow.style.display = 'none';
+      });
+      calculateExcavation();
+    });
+  </script>
+</body>
+</html>
