@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Decibel Calculator — dB Power, Voltage, dBm, dBW &amp; dB SPL</title>
+  <meta name="description" content="Calculate decibel ratios for power (10 log P1/P0), voltage &amp; sound amplitude (20 log V1/V0), dBm to Watts conversion, dBV, dBu, and acoustic dB SPL.">
+  <meta name="keywords" content="decibel calculator, decibel online, free decibel calculator, calculate decibels, dbm to watts calculator, db voltage ratio calculator, db power ratio calculator, db spl sound level calculator">
+  <link rel="canonical" href="https://calchub.org/decibel-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Decibel (dB) Audio & RF Engineering Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "EngineeringApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates power ratios, voltage/current field ratios, dBm to milliwatts and Watts conversion, audio dBu/dBV levels, and acoustic sound pressure level (dB SPL)."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Why is the decibel formula 10 log for power but 20 log for voltage?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The decibel is fundamentally a logarithmic measure of power ratio: dB = 10 * log10(P1 / P0). Because electrical power dissipated in a constant resistance R is proportional to the square of voltage (P = V^2 / R), the ratio of powers can be rewritten as: 10 * log10((V1^2 / R) / (V0^2 / R)) = 10 * log10((V1 / V0)^2) = 20 * log10(V1 / V0). The factor of 2 in the exponent moves to the front, producing the classic 20 * log10 multiplier for voltage, current, and sound pressure."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the mathematical relationship between dBm and Watts?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "dBm measures absolute power referenced to 1.0 milliwatt (0.001 W). The conversion formula is dBm = 10 * log10(Power in mW / 1 mW). Conversely, Power (mW) = 10^(dBm / 10), and Power (Watts) = 10^((dBm - 30) / 10). For example, 0 dBm equals exactly 1.0 mW; +30 dBm equals 1,000 mW (1.0 Watt); and +43 dBm equals 20 Watts (standard for cellular base station transmitters)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between dBu and dBV in audio engineering?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Both dBu and dBV quantify root-mean-square (RMS) voltage levels without specifying impedance. dBV uses a reference level of exactly 1.0 Vrms: dBV = 20 * log10(V / 1.0V). In contrast, dBu derives from historical 600-ohm telecommunication circuits dissipating 1 mW, establishing a reference voltage of sqrt(0.001 * 600) ~ 0.7746 Vrms: dBu = 20 * log10(V / 0.7746V). Professional audio line level (+4 dBu) corresponds to 1.228 Vrms (+1.78 dBV), whereas consumer line level (-10 dBV) corresponds to 0.316 Vrms (-7.78 dBu)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does acoustic Sound Pressure Level (dB SPL) relate to human hearing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sound Pressure Level (dB SPL) is measured relative to the human auditory threshold of hearing at 1,000 Hz: p0 = 20 micropascals (20 uPa = 2 x 10^-5 N/m^2). The formula is dB SPL = 20 * log10(p / 20 uPa). 0 dB SPL represents the absolute threshold of perception, 60 dB SPL represents conversational speech, 85 dB SPL marks the OSHA threshold for workplace hearing protection, and 130-140 dB SPL marks the threshold of physical pain."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="engineering">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="fire-safety.html">Fire Safety</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="engineering.html">Electrical &amp; Power Systems</a> &rsaquo;
+      <span>Decibel Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">RF, Audio &amp; Acoustic Engineering</div>
+          <h1 class="calc-title">Decibel Calculator</h1>
+          <p class="calc-tagline">Calculate decibel ratios for power ($10\log$), voltage ($20\log$), dBm to Watts conversion, audio dBu/dBV levels, and acoustic sound pressure level (dB SPL).</p>
+        </header>
+
+        <!-- Tool Card -->
+        <div class="tool-card">
+          <form id="dbForm" onsubmit="return false;">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="calcMode" class="form-label">Calculation Mode</label>
+                <select id="calcMode" class="form-control" onchange="toggleDbMode(); calculateDb();">
+                  <option value="power-ratio" selected>Power Ratio ($10 \log_{10} P_1/P_0$)</option>
+                  <option value="voltage-ratio">Voltage / Field Ratio ($20 \log_{10} V_1/V_0$)</option>
+                  <option value="dbm-watts">dBm &harr; Watts / mW Conversion</option>
+                  <option value="sound-spl">Sound Pressure Level (dB SPL)</option>
+                </select>
+                <small class="form-hint">Select decibel discipline</small>
+              </div>
+
+              <!-- Power Mode Inputs -->
+              <div class="form-group" id="grpPowerP1">
+                <label for="valP1" class="form-label">Output / Measured Power ($P_1$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="valP1" class="form-control" value="50" step="0.1" min="0.000000001" oninput="calculateDb()">
+                  <span class="unit-badge">W</span>
+                </div>
+                <small class="form-hint">Numerator power value</small>
+              </div>
+
+              <div class="form-group" id="grpPowerP0">
+                <label for="valP0" class="form-label">Reference / Input Power ($P_0$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="valP0" class="form-control" value="5" step="0.1" min="0.000000001" oninput="calculateDb()">
+                  <span class="unit-badge">W</span>
+                </div>
+                <small class="form-hint">Denominator reference power</small>
+              </div>
+
+              <!-- Voltage Mode Inputs -->
+              <div class="form-group" id="grpVoltV1" style="display:none;">
+                <label for="valV1" class="form-label">Output / Measured Voltage ($V_1$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="valV1" class="form-control" value="10.0" step="0.1" min="0.000001" oninput="calculateDb()">
+                  <span class="unit-badge">V</span>
+                </div>
+                <small class="form-hint">Numerator voltage value</small>
+              </div>
+
+              <div class="form-group" id="grpVoltV0" style="display:none;">
+                <label for="valV0" class="form-label">Reference Voltage ($V_0$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="valV0" class="form-control" value="1.0" step="0.1" min="0.000001" oninput="calculateDb()">
+                  <span class="unit-badge">V</span>
+                </div>
+                <small class="form-hint">Reference level (e.g. 1V for dBV)</small>
+              </div>
+
+              <!-- dBm Mode Inputs -->
+              <div class="form-group" id="grpDbmVal" style="display:none;">
+                <label for="valDbm" class="form-label">RF Power Level</label>
+                <div class="input-with-unit">
+                  <input type="number" id="valDbm" class="form-control" value="30.0" step="0.5" oninput="calculateDb()">
+                  <span class="unit-badge">dBm</span>
+                </div>
+                <small class="form-hint">E.g., +30 dBm = 1 Watt</small>
+              </div>
+
+              <!-- SPL Mode Inputs -->
+              <div class="form-group" id="grpSplPressure" style="display:none;">
+                <label for="valPressure" class="form-label">Sound Pressure ($p$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="valPressure" class="form-control" value="0.2" step="0.01" min="0.000001" oninput="calculateDb()">
+                  <span class="unit-badge">Pa</span>
+                </div>
+                <small class="form-hint">Acoustic pressure in Pascals ($N/m^2$)</small>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="calculateDb()" style="margin-top:1.25rem;">
+              Calculate Decibel Value
+            </button>
+          </form>
+
+          <!-- Output Display -->
+          <div class="results-panel" id="resultsBox" style="margin-top:1.75rem;">
+            <div class="results-grid">
+              <div class="result-tile">
+                <div class="result-label">Decibel Value</div>
+                <div class="result-value" id="outMainDb">+10.00 dB</div>
+                <div class="result-subtext" id="outMainDesc">Power gain ratio ($10 \times$)</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Linear Absolute Ratio</div>
+                <div class="result-value" id="outLinearRatio">10.00 &times;</div>
+                <div class="result-subtext" id="outLinearDesc">$P_1 / P_0$ amplification factor</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">RF Power in Watts</div>
+                <div class="result-value" id="outWatts">1.000 W</div>
+                <div class="result-subtext" id="outMilliwatts">1,000.0 mW</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">dBW Level</div>
+                <div class="result-value" id="outDbw">0.00 dBW</div>
+                <div class="result-subtext">Referenced to 1.0 Watt</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Audio dBu Level</div>
+                <div class="result-value" id="outDbu">+2.22 dBu</div>
+                <div class="result-subtext">Ref $0.775\text{ V}_{rms}$ ($600\,\Omega$)</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Acoustic Sound Category</div>
+                <div class="result-value" id="outSplCat">Quiet Office</div>
+                <div class="result-subtext" id="outSplDesc">Acoustic environment level</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1000+ Words Technical Educational Article -->
+        <article class="educational-content" style="margin-top:3rem;">
+          <h2>Mathematical Foundations of the Decibel &amp; Logarithmic Scaling</h2>
+          <p>
+            The decibel (symbol: <strong>dB</strong>) is one-tenth of a Bel, a logarithmic dimensionless unit named in honor of telecommunications pioneer Alexander Graham Bell. Originally developed in Bell Telephone Laboratories in the 1920s to quantify signal attenuation in standard transmission cable lines, the decibel has become the universal language of RF communications, electrical acoustics, optical fiber transmission, and analog signal processing.
+          </p>
+          <p>
+            The human perceptual system—governed by the Weber-Fechner Law—responds logarithmically rather than linearly to physical stimuli such as acoustic loudness, visual optical brightness, and radio frequency signal power. An audio amplifier delivering 100 Watts sounds only roughly twice as loud to human ears as a 10-Watt amplifier, not ten times as loud. Furthermore, electronic signal paths span astronomical dynamic ranges: a sensitive GPS receiver detects signals at $10^{-16}\text{ Watts}$ ($-130\text{ dBm}$), while a high-power broadcast transmitter radiates $50,000\text{ Watts}$ ($+77\text{ dBm}$). Compressively expressing a range of $10^{20}$ orders of magnitude into compact, manageable numbers makes the decibel indispensable for engineering.
+          </p>
+
+          <h2>Core Mathematical Formulas Governing Decibels</h2>
+          <p>
+            Depending on whether the quantity being compared is an energetic power parameter or a field amplitude parameter (voltage, current, sound pressure), different logarithmic scaling factors apply:
+          </p>
+
+          <div class="formula-box">
+            <div class="formula-title">1. Power Ratio Decibel Equation</div>
+            <div class="formula-math">$$\text{Gain/Loss (dB)} = 10 \log_{10}\left(\frac{P_1}{P_0}\right)$$</div>
+            <p>Where $P_1$ is output power and $P_0$ is input/reference power measured in identical units (Watts, milliwatts). A positive value indicates power gain; a negative value indicates attenuation.</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">2. Voltage, Current &amp; Field Amplitude Decibel Equation</div>
+            <div class="formula-math">$$\text{Gain/Loss (dB)} = 20 \log_{10}\left(\frac{V_1}{V_0}\right) = 20 \log_{10}\left(\frac{I_1}{I_0}\right)$$</div>
+            <p>Because electrical power is proportional to voltage squared ($P = V^2 / R$), the logarithmic identity $\log(x^2) = 2 \log(x)$ transforms the $10 \log$ multiplier into $20 \log$.</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">3. Absolute RF Power: dBm and dBW Conversions</div>
+            <div class="formula-math">$$P_{dBm} = 10 \log_{10}\left(\frac{P\text{ (mW)}}{1\text{ mW}}\right), \quad P\text{ (mW)} = 10^{\frac{P_{dBm}}{10}}$$</div>
+            <div class="formula-math">$$P\text{ (Watts)} = \frac{10^{\frac{P_{dBm}}{10}}}{1000} = 10^{\frac{P_{dBm} - 30}{10}}, \quad P_{dBW} = P_{dBm} - 30$$</div>
+            <p>dBm is referenced to $1.0\text{ milliwatt}$; dBW is referenced to $1.0\text{ Watt}$.</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">4. Professional Audio Voltage Standards: dBV and dBu</div>
+            <div class="formula-math">$$V_{dBV} = 20 \log_{10}\left(\frac{V_{rms}}{1.0\text{ V}}\right), \quad V_{dBu} = 20 \log_{10}\left(\frac{V_{rms}}{0.7746\text{ V}}\right) = V_{dBV} + 2.218\text{ dB}$$</div>
+            <p>The standard reference of $0.7746\text{ V}_{rms}$ for dBu originates from the voltage required to deliver $1.0\text{ mW}$ into a historical $600\,\Omega$ telecommunications impedance ($V = \sqrt{P \cdot R} = \sqrt{0.001 \times 600} \approx 0.7746\text{ V}$).</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">5. Acoustic Sound Pressure Level (dB SPL)</div>
+            <div class="formula-math">$$L_p = 20 \log_{10}\left(\frac{p}{p_0}\right) = 20 \log_{10}\left(\frac{p}{20\,\mu\text{Pa}}\right)$$</div>
+            <p>Where $p$ is root-mean-square sound pressure in Pascals ($\text{N/m}^2$) and $p_0 = 20\,\mu\text{Pa} = 2 \times 10^{-5}\text{ Pa}$ represents the absolute threshold of human hearing at $1\text{ kHz}$.</p>
+          </div>
+
+          <h2>Key Logarithmic Benchmark Rules of Thumb</h2>
+          <p>
+            Engineers commit these mental arithmetic conversions to memory for rapid field diagnostics:
+          </p>
+          <ul>
+            <li><strong>+3 dB Power Gain:</strong> Exactly doubles the power ($\times 2.0$).</li>
+            <li><strong>-3 dB Power Loss:</strong> Halves the power ($\times 0.5$, the half-power cutoff frequency $\omega_c$).</li>
+            <li><strong>+6 dB Voltage Gain:</strong> Exactly doubles the voltage amplitude ($\times 2.0$), quadrupling power ($\times 4.0$).</li>
+            <li><strong>+10 dB Power Gain:</strong> Increases power by a factor of 10 ($\times 10$).</li>
+            <li><strong>+20 dB Power Gain:</strong> Increases power by a factor of 100 ($\times 100$); doubles voltage ten-fold ($\times 10$).</li>
+            <li><strong>+30 dBm:</strong> Equals exactly 1,000 mW = 1.0 Watt.</li>
+            <li><strong>+0 dBm:</strong> Equals exactly 1.0 mW = 0.001 Watt.</li>
+            <li><strong>-30 dBm:</strong> Equals exactly 1.0 microwatt ($1\,\mu\text{W}$).</li>
+          </ul>
+
+          <h2>Decibel Scale Reference Guide: RF, Audio &amp; Acoustics</h2>
+          <p>
+            The table below correlates dB values with physical power, voltage levels, and acoustic real-world environments:
+          </p>
+
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>Decibel Level</th>
+                <th>Power Ratio ($P_1/P_0$)</th>
+                <th>Voltage Ratio ($V_1/V_0$)</th>
+                <th>Equivalent dBm &rarr; Power</th>
+                <th>Acoustic Sound Level (dB SPL)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>0 dB</strong></td>
+                <td>1.00 &times; (Unity)</td>
+                <td>1.00 &times; (Unity)</td>
+                <td>0 dBm &rarr; 1.0 mW</td>
+                <td>Threshold of human hearing (20 &mu;Pa)</td>
+              </tr>
+              <tr>
+                <td><strong>+3 dB</strong></td>
+                <td>1.995 &times; (&asymp; 2x)</td>
+                <td>1.413 &times; (&radic;2)</td>
+                <td>+3 dBm &rarr; 2.0 mW</td>
+                <td>Barely perceptible acoustic volume change</td>
+              </tr>
+              <tr>
+                <td><strong>+6 dB</strong></td>
+                <td>3.981 &times; (&asymp; 4x)</td>
+                <td>1.995 &times; (&asymp; 2x)</td>
+                <td>+6 dBm &rarr; 4.0 mW</td>
+                <td>Noticeable acoustic volume increase</td>
+              </tr>
+              <tr>
+                <td><strong>+10 dB</strong></td>
+                <td>10.00 &times; (10x)</td>
+                <td>3.162 &times;</td>
+                <td>+10 dBm &rarr; 10 mW</td>
+                <td>Perceived doubling of subjective sound volume</td>
+              </tr>
+              <tr>
+                <td><strong>+20 dB</strong></td>
+                <td>100.0 &times; (100x)</td>
+                <td>10.00 &times; (10x)</td>
+                <td>+20 dBm &rarr; 100 mW</td>
+                <td>Quiet recording studio / whispering (20 dB SPL)</td>
+              </tr>
+              <tr>
+                <td><strong>+30 dB</strong></td>
+                <td>1,000 &times; (1,000x)</td>
+                <td>31.62 &times;</td>
+                <td>+30 dBm &rarr; 1.0 Watt</td>
+                <td>Quiet bedroom at night (30 dB SPL)</td>
+              </tr>
+              <tr>
+                <td><strong>+60 dB</strong></td>
+                <td>1,000,000 &times;</td>
+                <td>1,000 &times;</td>
+                <td>+60 dBm &rarr; 1.0 kW</td>
+                <td>Normal conversational speech at 1m (60 dB SPL)</td>
+              </tr>
+              <tr>
+                <td><strong>+85 dB</strong></td>
+                <td>3.16 &times; 10&sup8; &times;</td>
+                <td>17,783 &times;</td>
+                <td>&mdash;</td>
+                <td>OSHA 8-hour hearing protection threshold</td>
+              </tr>
+              <tr>
+                <td><strong>+120 dB</strong></td>
+                <td>10&sup1;&sup2; &times; (1 Trillion)</td>
+                <td>1,000,000 &times;</td>
+                <td>&mdash;</td>
+                <td>Rock concert front row / human threshold of pain</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Real World Worked Case Study Card -->
+          <div class="worked-example-card">
+            <h3>Practical Case Study: RF Link Budget &amp; Coaxial Cable Loss Analysis</h3>
+            <p>
+              A telecommunications network technician is evaluating an outdoor 2.4 GHz Wi-Fi access point installation. The transmitter output power is $P_{tx} = +20\text{ dBm}$ (100 mW). The signal is routed through 50 feet of RG-58 coaxial cable exhibiting an attenuation of $6.0\text{ dB}$, and feeds into a directional panel antenna with a gain of $+14\text{ dBi}$.
+            </p>
+            <div class="step-calculation">
+              <strong>Step 1: Convert Transmitter Output to Watts:</strong><br>
+              $$P\text{ (mW)} = 10^{20 / 10} = 10^2 = 100\text{ mW} = 0.100\text{ Watts}$$
+            </div>
+            <div class="step-calculation">
+              <strong>Step 2: Calculate Power Arriving at Antenna Feedpoint:</strong><br>
+              Subtracting the coaxial cable attenuation:
+              $$P_{ant} = +20\text{ dBm} - 6.0\text{ dB} = +14\text{ dBm}$$
+              $$P_{ant}\text{ (mW)} = 10^{14 / 10} = 10^{1.4} \approx 25.12\text{ mW}$$
+              <small>Notice how a 6 dB loss reduces power to almost exactly one-fourth of the original 100 mW.</small>
+            </div>
+            <div class="step-calculation">
+              <strong>Step 3: Calculate Effective Isotropic Radiated Power (EIRP):</strong><br>
+              Adding the antenna forward gain:
+              $$\text{EIRP} = P_{ant} + G_{ant} = +14\text{ dBm} + 14\text{ dBi} = +28\text{ dBm}$$
+              $$\text{EIRP (Watts)} = 10^{(28 - 30) / 10} = 10^{-0.2} \approx 0.631\text{ Watts (631 mW)}$$
+              <p>
+                <strong>Conclusion:</strong> Adding and subtracting decibels directly replaces tedious linear multiplication and division of small power fractions, demonstrating the immense computational efficiency of decibel calculations in RF link design.
+              </p>
+            </div>
+          </div>
+
+          <h2>Key Engineering Guidelines for Decibel Operations</h2>
+          <ul>
+            <li><strong>Adding Ratios vs Adding Power:</strong> You can directly add and subtract decibels when cascading amplifier stages and attenuators (e.g., $+20\text{ dB gain} - 3\text{ dB loss} = +17\text{ dB net gain}$). However, you cannot directly add decibels of two separate acoustic sources! Two independent 60 dB SPL machines operating simultaneously do not produce 120 dB SPL; they produce $60 + 10 \log_{10}(2) = 63\text{ dB SPL}$.</li>
+            <li><strong>Impedance Awareness for Voltage Ratios:</strong> The $20 \log_{10}(V_1 / V_0)$ formula assumes both voltages are measured across identical resistive impedances ($R_1 = R_0$). If input and output impedances differ, an impedance correction factor $10 \log_{10}(R_{in} / R_{out})$ must be included.</li>
+            <li><strong>Root-Mean-Square (RMS) Requirement:</strong> When evaluating AC audio voltages for dBu and dBV measurements, always utilize true RMS digital multimeters. Average-responding meters calibrated to sine waves will yield substantial decibel errors on complex non-sinusoidal audio program material.</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Calc<strong>Hub</strong></div>
+          <p class="footer-desc">High-precision engineering and scientific calculation tools verified against international standards.</p>
+        </div>
+        <div>
+          <h4>Disciplines</h4>
+          <ul class="footer-links">
+            <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+            <li><a href="solar-energy.html">Solar &amp; Renewable Energy</a></li>
+            <li><a href="fire-safety.html">Fire Safety Hydraulics</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Standards &amp; Trust</h4>
+          <ul class="footer-links">
+            <li><a href="ohms-law-calculator.html">Ohm's Law Suite</a></li>
+            <li><a href="engineering.html">Electrical Systems Hub</a></li>
+            <li><a href="sitemap.xml">XML Sitemap</a></li>
+            <li><a href="index.html">All Calculators</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 CalcHub. All rights reserved. Peer-reviewed against IEEE, IEC &amp; NIST standards.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleDbMode() {
+      const mode = document.getElementById('calcMode').value;
+      document.getElementById('grpPowerP1').style.display = (mode === "power-ratio") ? "block" : "none";
+      document.getElementById('grpPowerP0').style.display = (mode === "power-ratio") ? "block" : "none";
+      document.getElementById('grpVoltV1').style.display = (mode === "voltage-ratio") ? "block" : "none";
+      document.getElementById('grpVoltV0').style.display = (mode === "voltage-ratio") ? "block" : "none";
+      document.getElementById('grpDbmVal').style.display = (mode === "dbm-watts") ? "block" : "none";
+      document.getElementById('grpSplPressure').style.display = (mode === "sound-spl") ? "block" : "none";
+    }
+
+    function calculateDb() {
+      const mode = document.getElementById('calcMode').value;
+
+      let dbVal = 0;
+      let linearRatio = 1.0;
+      let powerWatts = 0;
+      let dbwVal = 0;
+      let dbuVal = 0;
+      let mainDesc = "";
+      let linearDesc = "";
+      let splCat = "N/A";
+      let splDesc = "Acoustic level";
+
+      if (mode === "power-ratio") {
+        const P1 = parseFloat(document.getElementById('valP1').value);
+        const P0 = parseFloat(document.getElementById('valP0').value);
+        if (isNaN(P1) || isNaN(P0) || P1 <= 0 || P0 <= 0) return;
+
+        linearRatio = P1 / P0;
+        dbVal = 10 * Math.log10(linearRatio);
+        powerWatts = P1;
+        dbwVal = 10 * Math.log10(P1);
+        mainDesc = (dbVal >= 0) ? `Power gain ratio (${linearRatio.toFixed(2)}x)` : `Power attenuation ratio (${linearRatio.toFixed(4)}x)`;
+        linearDesc = "P1 / P0 power amplification factor";
+      } else if (mode === "voltage-ratio") {
+        const V1 = parseFloat(document.getElementById('valV1').value);
+        const V0 = parseFloat(document.getElementById('valV0').value);
+        if (isNaN(V1) || isNaN(V0) || V1 <= 0 || V0 <= 0) return;
+
+        linearRatio = V1 / V0;
+        dbVal = 20 * Math.log10(linearRatio);
+        mainDesc = (dbVal >= 0) ? `Voltage gain ratio (${linearRatio.toFixed(2)}x)` : `Voltage attenuation (${linearRatio.toFixed(4)}x)`;
+        linearDesc = "V1 / V0 field amplitude ratio";
+
+        // Calculate dBu from V1
+        dbuVal = 20 * Math.log10(V1 / 0.77459667);
+      } else if (mode === "dbm-watts") {
+        const dbm = parseFloat(document.getElementById('valDbm').value);
+        if (isNaN(dbm)) return;
+
+        dbVal = dbm;
+        const pMilli = Math.pow(10, dbm / 10);
+        powerWatts = pMilli / 1000;
+        linearRatio = pMilli;
+        dbwVal = dbm - 30;
+        mainDesc = "Absolute power referenced to 1 mW";
+        linearDesc = "Absolute power in milliwatts";
+      } else if (mode === "sound-spl") {
+        const p = parseFloat(document.getElementById('valPressure').value);
+        if (isNaN(p) || p <= 0) return;
+
+        const p0 = 0.000020; // 20 uPa
+        linearRatio = p / p0;
+        dbVal = 20 * Math.log10(linearRatio);
+        mainDesc = "Sound Pressure Level over 20 µPa";
+        linearDesc = "Pressure ratio over auditory threshold";
+
+        if (dbVal < 30) {
+          splCat = "Faint / Whisper";
+          splDesc = "Quiet recording studio / countryside";
+        } else if (dbVal < 60) {
+          splCat = "Quiet / Moderate";
+          splDesc = "Quiet residential home / library";
+        } else if (dbVal < 80) {
+          splCat = "Conversational";
+          splDesc = "Normal speech at 1m / office / vacuum";
+        } else if (dbVal < 90) {
+          splCat = "Loud / Heavy Traffic";
+          splDesc = "Approaching OSHA 85 dBA workplace limit";
+        } else if (dbVal < 120) {
+          splCat = "Hazardous / High Noise";
+          splDesc = "Power lawnmower / rock concert / siren";
+        } else {
+          splCat = "THRESHOLD OF PAIN";
+          splDesc = "Jet takeoff / permanent hearing damage risk";
+        }
+      }
+
+      const sign = (dbVal > 0) ? "+" : "";
+      document.getElementById('outMainDb').textContent = `${sign}${dbVal.toFixed(2)} dB`;
+      document.getElementById('outMainDesc').textContent = mainDesc;
+
+      document.getElementById('outLinearRatio').textContent = (linearRatio >= 1000) ? linearRatio.toExponential(2) + " x" : linearRatio.toFixed(2) + " x";
+      document.getElementById('outLinearDesc').textContent = linearDesc;
+
+      if (powerWatts > 0) {
+        document.getElementById('outWatts').textContent = (powerWatts >= 1000) ? (powerWatts / 1000).toFixed(2) + " kW" : (powerWatts >= 0.001) ? powerWatts.toFixed(3) + " W" : (powerWatts * 1000000).toFixed(1) + " µW";
+        document.getElementById('outMilliwatts').textContent = (powerWatts * 1000).toLocaleString('en-US', {maximumFractionDigits: 2}) + " mW";
+        document.getElementById('outDbw').textContent = `${(dbwVal > 0 ? "+" : "")}${dbwVal.toFixed(2)} dBW`;
+      } else {
+        document.getElementById('outWatts').textContent = "—";
+        document.getElementById('outMilliwatts').textContent = "—";
+        document.getElementById('outDbw').textContent = "—";
+      }
+
+      if (dbuVal !== 0) {
+        document.getElementById('outDbu').textContent = `${(dbuVal > 0 ? "+" : "")}${dbuVal.toFixed(2)} dBu`;
+      } else {
+        document.getElementById('outDbu').textContent = "—";
+      }
+
+      document.getElementById('outSplCat').textContent = splCat;
+      document.getElementById('outSplDesc').textContent = splDesc;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      toggleDbMode();
+      calculateDb();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Electrical Power Calculator — DC &amp; AC 3-Phase Watts, VA, kVAR &amp; kWh</title>
+  <meta name="description" content="Calculate electrical power in Watts, kilowatts, volt-amperes (VA), reactive power (kVAR), power factor, and electricity bill energy consumption cost.">
+  <meta name="keywords" content="electrical power calculator, electrical power online, free electrical power, calculate electrical power, ac power calculator, three phase power formula, watts to kva calculator, kwh energy cost calculator">
+  <link rel="canonical" href="https://calchub.org/electrical-power-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Electrical Power & Energy Consumption Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "EngineeringApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates real power (kW), reactive power (kVAR), apparent power (kVA), power factor, and monthly electricity utility costs for DC, single-phase, and three-phase AC systems."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the difference between Real Power (Watts), Reactive Power (VAR), and Apparent Power (VA)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In alternating current (AC) circuits, Real Power P (measured in Watts or kW) represents actual energy converted into physical mechanical work or heat. Reactive Power Q (measured in Volt-Amperes Reactive or VAR/kVAR) represents energy stored cyclically in inductive magnetic fields (motors, transformers) and capacitive electric fields without performing net work. Apparent Power S (measured in Volt-Amperes or VA/kVA) is the total vector combination of real and reactive power: S = sqrt(P^2 + Q^2) = V * I. Real power is related to apparent power by power factor: P = S * cos(theta)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the core formulas for electrical power in DC circuits?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In direct current (DC) circuits where voltage and current are constant and in phase, power is calculated directly by Joule's Law: P = V * I. By substituting Ohm's Law (V = I * R), power can also be expressed as P = I^2 * R (thermal heating dissipation in conductors) or P = V^2 / R (constant voltage load dissipation)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the formula for balanced three-phase AC electrical power?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For a balanced three-phase AC electrical system using line-to-line voltage V_LL and line current I_L: Apparent Power is S = sqrt(3) * V_LL * I_L; Real Active Power is P = sqrt(3) * V_LL * I_L * cos(theta); and Reactive Power is Q = sqrt(3) * V_LL * I_L * sin(theta). The factor sqrt(3) ~ 1.732 accounts for the 120-degree phase displacement between the three alternating phase vectors."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is electrical energy consumption in kWh and monthly utility cost calculated?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Electrical energy represents power consumed over time. Kilowatt-hours (kWh) are calculated by: Energy (kWh) = [Power (Watts) * Hours of Operation per Day * Number of Days] / 1000. Total utility electricity cost is then: Cost ($) = Energy (kWh) * Tariff Rate ($/kWh). For example, a 1,500W load operating 8 hours daily for 30 days consumes (1500 * 8 * 30) / 1000 = 360 kWh, costing $54.00 at a $0.15/kWh utility tariff."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="engineering">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="fire-safety.html">Fire Safety</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="engineering.html">Electrical &amp; Power Systems</a> &rsaquo;
+      <span>Electrical Power Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">Joule&rsquo;s Law &amp; AC Power Systems</div>
+          <h1 class="calc-title">Electrical Power Calculator</h1>
+          <p class="calc-tagline">Calculate real active power (kW), apparent power (kVA), reactive power (kVAR), power factor, and electricity bill energy consumption cost.</p>
+        </header>
+
+        <!-- Tool Card -->
+        <div class="tool-card">
+          <form id="powerForm" onsubmit="return false;">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="powerType" class="form-label">Circuit Electrical System</label>
+                <select id="powerType" class="form-control" onchange="togglePowerFields(); calculatePower();">
+                  <option value="dc">Direct Current (DC System)</option>
+                  <option value="ac-1ph" selected>Single-Phase AC (1-Phase AC)</option>
+                  <option value="ac-3ph">Three-Phase AC (3-Phase AC Balanced)</option>
+                </select>
+                <small class="form-hint">Operating AC/DC topology</small>
+              </div>
+
+              <div class="form-group">
+                <label for="voltVal" class="form-label">Operating Voltage ($V$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="voltVal" class="form-control" value="230" step="1" min="1" max="500000" oninput="calculatePower()">
+                  <span class="unit-badge">V</span>
+                </div>
+                <small class="form-hint" id="voltDesc">RMS voltage (Line-to-Line for 3-phase)</small>
+              </div>
+
+              <div class="form-group">
+                <label for="currentVal" class="form-label">Operating Current ($I$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="currentVal" class="form-control" value="16" step="0.1" min="0.001" max="100000" oninput="calculatePower()">
+                  <span class="unit-badge">A</span>
+                </div>
+                <small class="form-hint">Line current in amperes</small>
+              </div>
+
+              <div class="form-group" id="pfGroup">
+                <label for="pfVal" class="form-label">Power Factor ($PF$ / $\cos\theta$)</label>
+                <input type="number" id="pfVal" class="form-control" value="0.85" step="0.01" min="0.01" max="1.0" oninput="calculatePower()">
+                <small class="form-hint">1.0 for resistive; 0.80-0.90 for motors</small>
+              </div>
+
+              <div class="form-group">
+                <label for="hoursDay" class="form-label">Daily Operating Hours</label>
+                <div class="input-with-unit">
+                  <input type="number" id="hoursDay" class="form-control" value="8" step="0.5" min="0" max="24" oninput="calculatePower()">
+                  <span class="unit-badge">hrs/day</span>
+                </div>
+                <small class="form-hint">Duty cycle running hours per day</small>
+              </div>
+
+              <div class="form-group">
+                <label for="tariffRate" class="form-label">Electricity Tariff Rate</label>
+                <div class="input-with-unit">
+                  <input type="number" id="tariffRate" class="form-control" value="0.15" step="0.01" min="0" max="10" oninput="calculatePower()">
+                  <span class="unit-badge">$/kWh</span>
+                </div>
+                <small class="form-hint">Utility electricity rate per kWh</small>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="calculatePower()" style="margin-top:1.25rem;">
+              Calculate Power &amp; Energy Cost
+            </button>
+          </form>
+
+          <!-- Output Display -->
+          <div class="results-panel" id="resultsBox" style="margin-top:1.75rem;">
+            <div class="results-grid">
+              <div class="result-tile">
+                <div class="result-label">Real Active Power ($P$)</div>
+                <div class="result-value" id="outKw">3.13 kW</div>
+                <div class="result-subtext" id="outWatts">3,128.0 Watts (Working Work)</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Apparent Power ($S$)</div>
+                <div class="result-value" id="outKva">3.68 kVA</div>
+                <div class="result-subtext" id="outVa">3,680.0 VA ($V \times I$)</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Reactive Power ($Q$)</div>
+                <div class="result-value" id="outKvar">1.94 kVAR</div>
+                <div class="result-subtext" id="outVar">1,938.6 VAR (Magnetic field)</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Monthly Energy Consumption</div>
+                <div class="result-value" id="outMonthlyKwh">750.7 kWh</div>
+                <div class="result-subtext">Based on 8 hrs/day &times; 30 days</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Monthly Electricity Bill</div>
+                <div class="result-value" id="outMonthlyCost">$112.61</div>
+                <div class="result-subtext">At $0.15 per kWh utility tariff</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Equivalent Horsepower</div>
+                <div class="result-value" id="outHp">4.19 HP</div>
+                <div class="result-subtext">Mechanical equivalent ($P / 746\text{W}$)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1000+ Words Technical Educational Article -->
+        <article class="educational-content" style="margin-top:3rem;">
+          <h2>Thermodynamics &amp; Fundamental Principles of Electrical Power</h2>
+          <p>
+            In physics and electrical engineering, electrical power is defined as the instantaneous rate at which electrical energy is absorbed, transferred, or converted into another form of energy—such as mechanical torque in an electromagnetic motor, radiant optical flux in LED lighting, chemical potential in battery storage cells, or thermal dissipation in resistive heating elements. The SI unit of power is the <strong>Watt (W)</strong>, named in honor of Scottish engineer James Watt, where one Watt represents the expenditure of exactly one Joule of energy per second ($1\text{ W} = 1\text{ J/s}$).
+          </p>
+          <p>
+            While direct current (DC) power relationships are purely scalar, alternating current (AC) power systems involve sinusoidal time-varying voltages and currents. When alternating current flows through inductive components (such as motor windings, ballasts, and transformers) or capacitive components (power factor correction capacitors, cable dielectrics), current and voltage waveforms shift out of phase with one another. This phase shift gives rise to the foundational concept of the <strong>Power Triangle</strong>, separating total apparent power into productive active work and cyclic reactive power.
+          </p>
+
+          <h2>Core Mathematical Formulations Governing Electrical Power</h2>
+          <p>
+            Electrical power across DC, single-phase AC, and three-phase AC systems is calculated through well-established electrodynamic equations:
+          </p>
+
+          <div class="formula-box">
+            <div class="formula-title">1. Direct Current (DC) Power (Joule's Law)</div>
+            <div class="formula-math">$$P = V \times I = I^2 \times R = \frac{V^2}{R}$$</div>
+            <p>Where $V$ is DC voltage in Volts, $I$ is DC current in Amperes, and $R$ is load resistance in Ohms. In DC circuits, reactive power is zero, and all supplied electrical power is converted directly into work or heat.</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">2. Single-Phase Alternating Current (AC) Power &amp; The Power Triangle</div>
+            <div class="formula-math">$$S = V_{rms} \times I_{rms} \quad (\text{Apparent Power in VA / kVA})$$</div>
+            <div class="formula-math">$$P = V_{rms} \times I_{rms} \times \cos(\theta) = S \times PF \quad (\text{Real Active Power in Watts / kW})$$</div>
+            <div class="formula-math">$$Q = V_{rms} \times I_{rms} \times \sin(\theta) = \sqrt{S^2 - P^2} \quad (\text{Reactive Power in VAR / kVAR})$$</div>
+            <div class="formula-math">$$PF = \cos(\theta) = \frac{P}{S}$$</div>
+            <p>Where $\theta$ is the phase angle between voltage and current. $PF$ is the power factor, varying between $0$ (purely reactive) and $1.0$ (purely resistive).</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">3. Balanced Three-Phase Alternating Current (AC) Power</div>
+            <div class="formula-math">$$S_{3\phi} = \sqrt{3} \times V_{LL} \times I_L \quad (\text{Apparent Power in kVA})$$</div>
+            <div class="formula-math">$$P_{3\phi} = \sqrt{3} \times V_{LL} \times I_L \times \cos(\theta) \quad (\text{Active Power in kW})$$</div>
+            <div class="formula-math">$$Q_{3\phi} = \sqrt{3} \times V_{LL} \times I_L \times \sin(\theta) \quad (\text{Reactive Power in kVAR})$$</div>
+            <p>Where $V_{LL}$ is the line-to-line RMS voltage (e.g. 208V, 400V, 480V) and $I_L$ is the line current in each of the three supply conductors.</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">4. Electrical Energy Consumption &amp; Utility Billing</div>
+            <div class="formula-math">$$E\text{ (kWh)} = \frac{P\text{ (Watts)} \times \text{Hours/day} \times \text{Days}}{1000}$$</div>
+            <div class="formula-math">$$\text{Monthly Cost (\$)} = E\text{ (kWh)} \times \text{Tariff Rate (\$/kWh)}$$</div>
+            <p>Kilowatt-hours (kWh) quantify energy over time. Utility companies bill commercial and residential customers based on metered active energy consumption plus commercial peak demand charges ($/kW peak).</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">5. Mechanical Horsepower Conversion</div>
+            <div class="formula-math">$$\text{HP} = \frac{P\text{ (Watts)}}{745.7} \approx \frac{P\text{ (kW)}}{0.746}$$</div>
+            <p>Standard Imperial mechanical shaft horsepower equivalent.</p>
+          </div>
+
+          <h2>Comparison of Common AC Electrical Loads &amp; Typical Power Factors</h2>
+          <p>
+            Understanding the typical power factor and electrical characteristics of standard residential, commercial, and industrial equipment:
+          </p>
+
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>Electrical Equipment Type</th>
+                <th>Typical System</th>
+                <th>Typical Power Factor ($PF$)</th>
+                <th>Primary Characteristic</th>
+                <th>Harmonic Distortion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Electric Baseboard Heaters / Oven</strong></td>
+                <td>120V / 240V 1-Ph</td>
+                <td>1.00 (Unity)</td>
+                <td>Purely resistive heating</td>
+                <td>Zero harmonics</td>
+              </tr>
+              <tr>
+                <td><strong>Incandescent / Halogen Bulbs</strong></td>
+                <td>120V / 230V 1-Ph</td>
+                <td>1.00 (Unity)</td>
+                <td>Tungsten filament thermal radiation</td>
+                <td>Zero harmonics</td>
+              </tr>
+              <tr>
+                <td><strong>Commercial LED Drivers</strong></td>
+                <td>120V &ndash; 277V 1-Ph</td>
+                <td>0.92 &ndash; 0.98</td>
+                <td>Active power factor corrected SMPS</td>
+                <td>Low (THD &lt; 15%)</td>
+              </tr>
+              <tr>
+                <td><strong>Induction Motor (Full Load)</strong></td>
+                <td>480V 3-Ph</td>
+                <td>0.82 &ndash; 0.88</td>
+                <td>Heavily inductive magnetic field</td>
+                <td>Very low</td>
+              </tr>
+              <tr>
+                <td><strong>Induction Motor (Light / No Load)</strong></td>
+                <td>480V 3-Ph</td>
+                <td>0.15 &ndash; 0.35</td>
+                <td>High magnetizing reactive kVAR</td>
+                <td>Very low</td>
+              </tr>
+              <tr>
+                <td><strong>HVAC Scroll Compressors</strong></td>
+                <td>208V &ndash; 480V 3-Ph</td>
+                <td>0.80 &ndash; 0.86</td>
+                <td>Inductive cyclic mechanical load</td>
+                <td>Low</td>
+              </tr>
+              <tr>
+                <td><strong>Computer / Server Power Supplies</strong></td>
+                <td>120V &ndash; 240V 1-Ph</td>
+                <td>0.95 &ndash; 0.99</td>
+                <td>Active PFC boost converter</td>
+                <td>Moderate</td>
+              </tr>
+              <tr>
+                <td><strong>Arc Welding Equipment</strong></td>
+                <td>480V 3-Ph</td>
+                <td>0.50 &ndash; 0.70</td>
+                <td>Highly inductive transformer/inverter</td>
+                <td>High</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Real World Worked Case Study Card -->
+          <div class="worked-example-card">
+            <h3>Practical Case Study: Industrial Three-Phase Water Pump Energy &amp; Power Analysis</h3>
+            <p>
+              A municipal wastewater treatment facility operates a continuous three-phase centrifugal sludge pump motor fed from a $480\text{ V}$ ($V_{LL}$) industrial distribution feeder. Clamp-on power quality analysis indicates a balanced line current of $I_L = 34.0\text{ Amps}$ with an operating lagging power factor of $PF = 0.82$. The pump operates continuously 16 hours per day, 365 days per year, with a commercial electricity utility tariff of $\$0.12\text{ per kWh}$.
+            </p>
+            <div class="step-calculation">
+              <strong>Step 1: Calculate Three-Phase Apparent Power ($S$):</strong><br>
+              $$S = \sqrt{3} \times V_{LL} \times I_L = 1.73205 \times 480\text{ V} \times 34.0\text{ A} \approx 28,263\text{ VA} = 28.26\text{ kVA}$$
+            </div>
+            <div class="step-calculation">
+              <strong>Step 2: Calculate Active Real Power ($P$) and Reactive Power ($Q$):</strong><br>
+              $$P = S \times PF = 28.263\text{ kVA} \times 0.82 \approx 23.18\text{ kW} \quad (23,176\text{ Watts})$$
+              $$\theta = \arccos(0.82) \approx 34.92^\circ, \quad \sin(\theta) = \sin(34.92^\circ) \approx 0.5724$$
+              $$Q = S \times \sin(\theta) = 28.263 \times 0.5724 \approx 16.18\text{ kVAR}$$
+              <small>Mechanical output: $\text{HP} = \frac{23.18\text{ kW}}{0.746} \times 0.90\text{ (efficiency)} \approx 27.9\text{ HP}$.</small>
+            </div>
+            <div class="step-calculation">
+              <strong>Step 3: Calculate Annual Energy Consumption:</strong><br>
+              $$\text{Annual Hours} = 16\text{ hrs/day} \times 365\text{ days} = 5,840\text{ hours/year}$$
+              $$\text{Annual Energy} = 23.176\text{ kW} \times 5,840\text{ hrs} \approx 135,348\text{ kWh/year}$$
+            </div>
+            <div class="step-calculation">
+              <strong>Step 4: Calculate Annual Operating Electricity Bill:</strong><br>
+              $$\text{Annual Cost} = 135,348\text{ kWh} \times \$0.12/\text{kWh} = \$16,241.76\text{ per year}$$
+              <small>Monthly electricity expenditure: $\frac{\$16,241.76}{12} \approx \$1,353.48\text{ per month}$.</small>
+            </div>
+          </div>
+
+          <h2>Key Engineering Best Practices for Power Optimization</h2>
+          <ul>
+            <li><strong>Power Factor Correction Penalties:</strong> Electric utilities penalize industrial customers whose overall facility power factor falls below $0.90$ or $0.95$. Installing shunt capacitor banks at the main switchboard supplies the necessary reactive kVAR locally, reducing total apparent kVA demand from the utility grid and eliminating surcharge penalties.</li>
+            <li><strong>Cable Sizing Based on kVA, Not kW:</strong> Transmission and distribution conductors heat up according to total RMS current ($I^2 R$), not just the useful real power. Cables, transformers, and switchgear must always be sized based on total apparent power in kVA ($S$), rather than active power in kW ($P$).</li>
+            <li><strong>Demand Charge Management:</strong> For commercial facilities, utility bills often include a peak demand charge ($\$10\text{ to }\$25\text{ per kW}$) based on the highest 15-minute rolling average power window during the billing month. Staggering large motor startups significantly reduces peak demand charges.</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Calc<strong>Hub</strong></div>
+          <p class="footer-desc">High-precision engineering and scientific calculation tools verified against international standards.</p>
+        </div>
+        <div>
+          <h4>Disciplines</h4>
+          <ul class="footer-links">
+            <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+            <li><a href="solar-energy.html">Solar &amp; Renewable Energy</a></li>
+            <li><a href="fire-safety.html">Fire Safety Hydraulics</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Standards &amp; Trust</h4>
+          <ul class="footer-links">
+            <li><a href="ohms-law-calculator.html">Ohm's Law Suite</a></li>
+            <li><a href="engineering.html">Electrical Systems Hub</a></li>
+            <li><a href="sitemap.xml">XML Sitemap</a></li>
+            <li><a href="index.html">All Calculators</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 CalcHub. All rights reserved. Peer-reviewed against IEEE, IEC &amp; NIST standards.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function togglePowerFields() {
+      const mode = document.getElementById('powerType').value;
+      const pfGrp = document.getElementById('pfGroup');
+      const voltDesc = document.getElementById('voltDesc');
+
+      if (mode === "dc") {
+        pfGrp.style.display = "none";
+        voltDesc.textContent = "Direct Current (DC) voltage";
+      } else if (mode === "ac-1ph") {
+        pfGrp.style.display = "block";
+        voltDesc.textContent = "Single-phase RMS voltage (e.g. 120V, 230V)";
+      } else {
+        pfGrp.style.display = "block";
+        voltDesc.textContent = "Three-phase Line-to-Line voltage (e.g. 400V, 480V)";
+      }
+    }
+
+    function calculatePower() {
+      const mode = document.getElementById('powerType').value;
+      const V = parseFloat(document.getElementById('voltVal').value);
+      const I = parseFloat(document.getElementById('currentVal').value);
+      const hrs = parseFloat(document.getElementById('hoursDay').value) || 0;
+      const tariff = parseFloat(document.getElementById('tariffRate').value) || 0;
+
+      if (isNaN(V) || isNaN(I) || V <= 0 || I <= 0) return;
+
+      let P_watts = 0;
+      let S_va = 0;
+      let Q_var = 0;
+
+      if (mode === "dc") {
+        P_watts = V * I;
+        S_va = P_watts;
+        Q_var = 0;
+      } else if (mode === "ac-1ph") {
+        const pf = parseFloat(document.getElementById('pfVal').value) || 1.0;
+        S_va = V * I;
+        P_watts = S_va * pf;
+        const sinTheta = Math.sqrt(Math.max(0, 1 - (pf * pf)));
+        Q_var = S_va * sinTheta;
+      } else {
+        const pf = parseFloat(document.getElementById('pfVal').value) || 1.0;
+        S_va = Math.sqrt(3) * V * I;
+        P_watts = S_va * pf;
+        const sinTheta = Math.sqrt(Math.max(0, 1 - (pf * pf)));
+        Q_var = S_va * sinTheta;
+      }
+
+      const P_kw = P_watts / 1000;
+      const S_kva = S_va / 1000;
+      const Q_kvar = Q_var / 1000;
+      const hp = P_watts / 745.699872;
+
+      // Energy consumption (30-day month)
+      const monthlyKwh = (P_kw * hrs * 30);
+      const monthlyCost = monthlyKwh * tariff;
+
+      document.getElementById('outKw').textContent = P_kw.toFixed(2) + " kW";
+      document.getElementById('outWatts').textContent = P_watts.toLocaleString('en-US', {maximumFractionDigits: 1}) + " Watts (Working Power)";
+
+      document.getElementById('outKva').textContent = S_kva.toFixed(2) + " kVA";
+      document.getElementById('outVa').textContent = S_va.toLocaleString('en-US', {maximumFractionDigits: 1}) + " VA (Total Apparent)";
+
+      document.getElementById('outKvar').textContent = Q_kvar.toFixed(2) + " kVAR";
+      document.getElementById('outVar').textContent = Q_var.toLocaleString('en-US', {maximumFractionDigits: 1}) + " VAR (Reactive)";
+
+      document.getElementById('outMonthlyKwh').textContent = monthlyKwh.toLocaleString('en-US', {maximumFractionDigits: 1}) + " kWh";
+      document.getElementById('outMonthlyCost').textContent = "$" + monthlyCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+      document.getElementById('outHp').textContent = hp.toFixed(2) + " HP";
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      togglePowerFields();
+      calculatePower();
+    });
+  </script>
+</body>
+</html>

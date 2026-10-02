@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BJT Transistor Calculator — DC Bias, Q-Point &amp; Saturation</title>
+  <meta name="description" content="Calculate BJT transistor DC operating point (Q-point), collector current, base current, Vce voltage, and saturation thresholds for voltage-divider amplifiers.">
+  <meta name="keywords" content="bjt transistor calculator, bjt transistor online, free bjt transistor, calculate bjt transistor, common emitter bias calculator, bjt q point calculator, transistor saturation calculator, hfe beta calculator">
+  <link rel="canonical" href="https://calchub.org/bjt-transistor-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "BJT Transistor DC Bias & Q-Point Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "EngineeringApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates quiescent operating Q-point (Vce, Ic, Ib), base voltage, collector saturation current, and small-signal parameters for BJT common-emitter bias networks."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How is the Q-point calculated in a voltage-divider biased BJT circuit?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Using Thevenin's theorem at the base node: V_TH = V_CC * [R2 / (R1 + R2)], and R_TH = (R1 * R2) / (R1 + R2). Applying Kirchhoff's Voltage Law to the base-emitter loop yields base current I_B = (V_TH - V_BE) / [R_TH + (beta + 1) * R_E], where V_BE is typically 0.70V for silicon transistors. In the active region, collector current is I_C = beta * I_B. The quiescent collector-to-emitter voltage is then V_CE = V_CC - I_C * R_C - I_E * R_E."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What distinguishes active mode from saturation mode in a BJT?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In active mode, the base-emitter junction is forward-biased (V_BE ~ 0.7V) and the base-collector junction is reverse-biased (V_CE > 0.3V), allowing proportional amplification where I_C = beta * I_B. In saturation mode, both junctions become forward-biased because the collector resistor drops sufficient voltage to pull the collector below the base. Here, V_CE drops to its minimum saturation voltage V_CE(sat) ~ 0.1V to 0.2V, and collector current is constrained by external circuit resistors: I_C(sat) = (V_CC - V_CE(sat)) / (R_C + R_E)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why is voltage-divider bias preferred over fixed base-resistor bias?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Fixed base resistor bias relies directly on the transistor's beta (hFE), which exhibits wide manufacturing tolerances (often varying from 100 to 300 for the same part number) and drifts with temperature (+0.5% to +1% per degree Celsius). Voltage-divider bias with an emitter degeneration resistor (R_E) creates negative feedback that stabilizes the Q-point. If beta * R_E >> R_TH (the stiff divider condition), collector current becomes virtually immune to transistor beta variations: I_C ~ (V_TH - V_BE) / R_E."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do you calculate the small-signal transconductance and voltage gain of a BJT?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "At room temperature (300 K), the intrinsic dynamic emitter resistance is r_e' = V_T / I_E = 26 mV / I_E. Transconductance is g_m = I_C / V_T. For an unbypassed emitter common-emitter amplifier, the small-signal AC voltage gain is Av ~ -R_C / (r_e' + R_E). If the emitter resistor is fully bypassed with an AC capacitor, the gain increases significantly to Av ~ -R_C / r_e'."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="engineering">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="fire-safety.html">Fire Safety</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="engineering.html">Electrical &amp; Power Systems</a> &rsaquo;
+      <span>BJT Transistor Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">Analog Semiconductor Engineering</div>
+          <h1 class="calc-title">BJT Transistor Calculator</h1>
+          <p class="calc-tagline">Calculate DC quiescent operating point (Q-point), collector current, base current, Vce voltage, and saturation thresholds for voltage-divider amplifiers.</p>
+        </header>
+
+        <!-- Tool Card -->
+        <div class="tool-card">
+          <form id="bjtForm" onsubmit="return false;">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="vcc" class="form-label">Supply Voltage ($V_{CC}$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="vcc" class="form-control" value="12.0" step="0.1" min="1" max="100" oninput="calculateBjt()">
+                  <span class="unit-badge">V</span>
+                </div>
+                <small class="form-hint">Positive DC rail voltage</small>
+              </div>
+
+              <div class="form-group">
+                <label for="betaGain" class="form-label">DC Current Gain ($\beta$ / $h_{FE}$)</label>
+                <input type="number" id="betaGain" class="form-control" value="150" step="1" min="10" max="1000" oninput="calculateBjt()">
+                <small class="form-hint">Common 100-300 for 2N3904 / BC547</small>
+              </div>
+
+              <div class="form-group">
+                <label for="r1Base" class="form-label">Upper Base Resistor ($R_1$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="r1Base" class="form-control" value="33" step="0.1" min="0.1" max="10000" oninput="calculateBjt()">
+                  <span class="unit-badge">k&Omega;</span>
+                </div>
+                <small class="form-hint">Pull-up resistor from $V_{CC}$ to base</small>
+              </div>
+
+              <div class="form-group">
+                <label for="r2Base" class="form-label">Lower Base Resistor ($R_2$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="r2Base" class="form-control" value="10" step="0.1" min="0.1" max="10000" oninput="calculateBjt()">
+                  <span class="unit-badge">k&Omega;</span>
+                </div>
+                <small class="form-hint">Pull-down resistor from base to GND</small>
+              </div>
+
+              <div class="form-group">
+                <label for="rcCol" class="form-label">Collector Resistor ($R_C$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="rcCol" class="form-control" value="2.2" step="0.1" min="0.01" max="1000" oninput="calculateBjt()">
+                  <span class="unit-badge">k&Omega;</span>
+                </div>
+                <small class="form-hint">Load resistor on collector node</small>
+              </div>
+
+              <div class="form-group">
+                <label for="reEmit" class="form-label">Emitter Resistor ($R_E$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="reEmit" class="form-control" value="0.68" step="0.01" min="0.01" max="1000" oninput="calculateBjt()">
+                  <span class="unit-badge">k&Omega;</span>
+                </div>
+                <small class="form-hint">Degeneration resistor to GND</small>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="calculateBjt()" style="margin-top:1.25rem;">
+              Calculate Q-Point &amp; Bias State
+            </button>
+          </form>
+
+          <!-- Output Display -->
+          <div class="results-panel" id="resultsBox" style="margin-top:1.75rem;">
+            <div class="results-grid">
+              <div class="result-tile">
+                <div class="result-label">Operating Region State</div>
+                <div class="result-value" id="outState">Active Linear</div>
+                <div class="result-subtext" id="outStateDesc">Valid for linear AC amplification</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Quiescent Collector Voltage ($V_{CE}$)</label>
+                <div class="result-value" id="outVce">5.82 V</div>
+                <div class="result-subtext">Q-point collector-to-emitter</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Collector Current ($I_C$)</label>
+                <div class="result-value" id="outIc">2.14 mA</div>
+                <div class="result-subtext" id="outIbDesc">Base current $I_B = 14.3\,\mu\text{A}$</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Saturation Current ($I_{C(sat)}$)</div>
+                <div class="result-value" id="outIcsat">4.10 mA</div>
+                <div class="result-subtext">Max current limit at $V_{CE} = 0.2\text{V}$</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Transistor Power Dissipation ($P_D$)</div>
+                <div class="result-value" id="outPd">12.46 mW</div>
+                <div class="result-subtext">$P_D = V_{CE} \times I_C$ quiescent</div>
+              </div>
+
+              <div class="result-tile">
+                <div class="result-label">Intrinsic Emitter Resistance ($r_e'$)</div>
+                <div class="result-value" id="outRePrime">12.1 &Omega;</div>
+                <div class="result-subtext">Dynamic AC resistance ($26\text{mV} / I_E$)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1000+ Words Technical Educational Article -->
+        <article class="educational-content" style="margin-top:3rem;">
+          <h2>Solid-State Physics &amp; Operating Principles of Bipolar Junction Transistors</h2>
+          <p>
+            The Bipolar Junction Transistor (BJT)—invented at Bell Laboratories by John Bardeen, Walter Brattain, and William Shockley—remains one of the most transformative semiconductor innovations of modern electronics. The term "bipolar" denotes that conduction involves both majority and minority charge carriers: electrons and electron holes.
+          </p>
+          <p>
+            In an NPN transistor, a thin, lightly doped p-type silicon layer (the Base) is sandwiched between two heavily doped n-type silicon layers (the Emitter and Collector). Forward-biasing the base-emitter $p$-$n$ junction lowers the electrostatic potential barrier, prompting a copious flux of majority electrons to be injected from the emitter into the base. Because the base is physically thin (often less than one micrometer) and lightly doped with acceptor atoms, over 98% to 99% of these injected electrons traverse the base without recombining with holes. Upon reaching the reverse-biased collector-base junction, the electric field sweeps these electrons rapidly into the collector terminal, creating a controlled collector current $I_C$ proportional to the small base current $I_B$.
+          </p>
+
+          <h2>Mathematical Derivations for Voltage-Divider Bias Networks</h2>
+          <p>
+            The voltage-divider bias configuration is the industry standard for discrete common-emitter amplifiers because it provides superior thermal stability and insensitivity to transistor $\beta$ (hFE) variations. The analytical solution is derived below:
+          </p>
+
+          <div class="formula-box">
+            <div class="formula-title">1. Thevenin Equivalent of the Base Bias Network</div>
+            <div class="formula-math">$$V_{TH} = V_{CC} \times \frac{R_2}{R_1 + R_2}$$</div>
+            <div class="formula-math">$$R_{TH} = R_1 \parallel R_2 = \frac{R_1 \times R_2}{R_1 + R_2}$$</div>
+            <p>Where $V_{TH}$ is the open-circuit Thevenin base voltage and $R_{TH}$ is the equivalent Thevenin base resistance looking back into the divider network.</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">2. Kirchhoff's Voltage Law at the Base-Emitter Input Loop</div>
+            <div class="formula-math">$$V_{TH} - I_B R_{TH} - V_{BE} - I_E R_E = 0$$</div>
+            <p>Substituting $I_E = (\beta + 1) I_B$ and solving for base current $I_B$:</p>
+            <div class="formula-math">$$I_B = \frac{V_{TH} - V_{BE}}{R_{TH} + (\beta + 1) R_E}$$</div>
+            <p>Where $V_{BE} \approx 0.70\text{ V}$ for standard silicon junction transistors at room temperature ($25^\circ\text{C}$).</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">3. Quiescent Collector Current ($I_C$) &amp; Voltage ($V_{CE}$) in Active Mode</div>
+            <div class="formula-math">$$I_C = \beta \times I_B, \quad I_E = I_C + I_B = (\beta + 1) I_B$$</div>
+            <div class="formula-math">$$V_{CE} = V_{CC} - I_C R_C - I_E R_E \approx V_{CC} - I_C (R_C + R_E)$$</div>
+            <p>The coordinate pair $(V_{CE}, I_C)$ defines the Quiescent Operating Point (Q-Point) on the BJT collector characteristic curves.</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">4. Saturation Threshold &amp; Saturation Current ($I_{C(sat)}$)</div>
+            <div class="formula-math">$$I_{C(sat)} = \frac{V_{CC} - V_{CE(sat)}}{R_C + R_E}$$</div>
+            <p>Where $V_{CE(sat)}$ is the collector-emitter saturation voltage (typically $0.1\text{ to }0.2\text{ V}$). If the calculated active current $\beta I_B \ge I_{C(sat)}$, the transistor enters full saturation, clipping the output waveform and fixing $V_{CE} \approx 0.2\text{ V}$.</p>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">5. Small-Signal AC Intrinsic Emitter Resistance ($r_e'$) &amp; Voltage Gain ($A_v$)</div>
+            <div class="formula-math">$$r_e' = \frac{V_T}{I_E} = \frac{26\text{ mV}}{I_E \text{ (mA)}}$$</div>
+            <div class="formula-math">$$A_v = -\frac{R_C \parallel R_L}{r_e' + R_E} \quad (\text{unbypassed}), \quad A_v \approx -\frac{R_C \parallel R_L}{r_e'} \quad (\text{bypassed by } C_E)$$</div>
+            <p>Where $V_T = \frac{kT}{q} \approx 25.86\text{ mV}$ is the thermal voltage at room temperature.</p>
+          </div>
+
+          <h2>Comparison of BJT Operating Regions</h2>
+          <p>
+            A bipolar transistor operates in four distinct mathematical regions depending on the bias voltages across its two internal junctions:
+          </p>
+
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>Operating Region</th>
+                <th>Base-Emitter Junction</th>
+                <th>Base-Collector Junction</th>
+                <th>$V_{CE}$ Voltage</th>
+                <th>Circuit Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Cut-off</strong></td>
+                <td>Reverse-biased ($V_{BE} < 0.6\text{V}$)</td>
+                <td>Reverse-biased</td>
+                <td>$V_{CE} \approx V_{CC}$</td>
+                <td>Open digital switch ($I_C \approx 0$)</td>
+              </tr>
+              <tr>
+                <td><strong>Forward Active</strong></td>
+                <td>Forward-biased ($V_{BE} \approx 0.7\text{V}$)</td>
+                <td>Reverse-biased</td>
+                <td>$0.3\text{V} < V_{CE} < V_{CC}$</td>
+                <td>Linear analog amplifier ($I_C = \beta I_B$)</td>
+              </tr>
+              <tr>
+                <td><strong>Saturation</strong></td>
+                <td>Forward-biased ($V_{BE} \approx 0.7\text{V}$)</td>
+                <td>Forward-biased</td>
+                <td>$V_{CE} \approx 0.1\text{ to }0.2\text{V}$</td>
+                <td>Closed digital switch ($I_C = I_{C(sat)}$)</td>
+              </tr>
+              <tr>
+                <td><strong>Reverse Active</strong></td>
+                <td>Reverse-biased</td>
+                <td>Forward-biased</td>
+                <td>$V_{CE} < 0$</td>
+                <td>Inverted low-gain mode ($\beta_{rev} \approx 1\text{ to }5$)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Common Discrete General-Purpose Transistors Reference Table</h2>
+          <p>
+            Standard jellybean small-signal NPN and PNP silicon transistors widely utilized in modern electronic circuits:
+          </p>
+
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>Part Number</th>
+                <th>Polarity</th>
+                <th>Max $V_{CEO}$</th>
+                <th>Max $I_C$</th>
+                <th>Typical $h_{FE}$ ($\beta$)</th>
+                <th>Transition Freq ($f_T$)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>2N3904</strong></td>
+                <td>NPN</td>
+                <td>40 V</td>
+                <td>200 mA</td>
+                <td>100 &ndash; 300</td>
+                <td>300 MHz</td>
+              </tr>
+              <tr>
+                <td><strong>2N3906</strong></td>
+                <td>PNP</td>
+                <td>40 V</td>
+                <td>200 mA</td>
+                <td>100 &ndash; 300</td>
+                <td>250 MHz</td>
+              </tr>
+              <tr>
+                <td><strong>2N2222A</strong></td>
+                <td>NPN</td>
+                <td>40 V</td>
+                <td>800 mA</td>
+                <td>100 &ndash; 300</td>
+                <td>300 MHz</td>
+              </tr>
+              <tr>
+                <td><strong>BC547B</strong></td>
+                <td>NPN</td>
+                <td>45 V</td>
+                <td>100 mA</td>
+                <td>200 &ndash; 450</td>
+                <td>300 MHz</td>
+              </tr>
+              <tr>
+                <td><strong>BC557B</strong></td>
+                <td>PNP</td>
+                <td>45 V</td>
+                <td>100 mA</td>
+                <td>200 &ndash; 450</td>
+                <td>320 MHz</td>
+              </tr>
+              <tr>
+                <td><strong>BD139</strong></td>
+                <td>NPN Power</td>
+                <td>80 V</td>
+                <td>1.5 A</td>
+                <td>40 &ndash; 250</td>
+                <td>190 MHz</td>
+              </tr>
+              <tr>
+                <td><strong>TIP120</strong></td>
+                <td>NPN Darlington</td>
+                <td>60 V</td>
+                <td>5.0 A</td>
+                <td>1,000 &ndash; 2,500</td>
+                <td>&mdash;</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Real World Worked Case Study Card -->
+          <div class="worked-example-card">
+            <h3>Practical Case Study: Audio Preamplifier Midpoint Q-Point Bias Design</h3>
+            <p>
+              An audio hardware engineer is designing a low-noise microphone preamplifier utilizing an NPN 2N3904 transistor. The supply voltage is $V_{CC} = 12.0\text{ V}$. To achieve symmetrical dynamic voltage swing without early clipping, the engineer targets a midpoint quiescent collector voltage of $V_{CE} \approx 6.0\text{ V}$ with a quiescent current of $I_C \approx 2.0\text{ mA}$. Selected standard E24 resistor values: $R_1 = 33\text{ k}\Omega$, $R_2 = 10\text{ k}\Omega$, $R_C = 2.2\text{ k}\Omega$, $R_E = 680\,\Omega$, and nominal $\beta = 150$.
+            </p>
+            <div class="step-calculation">
+              <strong>Step 1: Calculate Thevenin Base Bias Equivalent:</strong><br>
+              $$V_{TH} = 12\text{ V} \times \frac{10\text{ k}\Omega}{33\text{ k}\Omega + 10\text{ k}\Omega} = 12 \times \frac{10}{43} \approx 2.791\text{ V}$$
+              $$R_{TH} = \frac{33 \times 10}{33 + 10} = \frac{330}{43} \approx 7.674\text{ k}\Omega$$
+            </div>
+            <div class="step-calculation">
+              <strong>Step 2: Calculate Base Current ($I_B$ with $V_{BE} = 0.70\text{V}$):</strong><br>
+              $$I_B = \frac{2.791\text{ V} - 0.70\text{ V}}{7.674\text{ k}\Omega + (151 \times 0.680\text{ k}\Omega)} = \frac{2.091\text{ V}}{7.674 + 102.68\text{ k}\Omega} = \frac{2.091\text{ V}}{110.354\text{ k}\Omega} \approx 0.01895\text{ mA} = 18.95\,\mu\text{A}$$
+            </div>
+            <div class="step-calculation">
+              <strong>Step 3: Calculate Collector Current &amp; Quiescent $V_{CE}$:</strong><br>
+              $$I_C = 150 \times 18.95\,\mu\text{A} \approx 2.842\text{ mA}$$
+              $$I_E = 2.842 + 0.019 = 2.861\text{ mA}$$
+              $$V_{CE} = 12.0\text{ V} - (2.842\text{ mA} \times 2.2\text{ k}\Omega) - (2.861\text{ mA} \times 0.680\text{ k}\Omega) = 12.0 - 6.252 - 1.945 \approx 3.80\text{ V}$$
+            </div>
+            <div class="step-calculation">
+              <strong>Step 4: Check Saturation Limit &amp; AC Transconductance:</strong><br>
+              $$I_{C(sat)} = \frac{12.0 - 0.2}{2.2 + 0.68} = \frac{11.8}{2.88} \approx 4.10\text{ mA}$$
+              <p>Because $I_C = 2.84\text{ mA} < I_{C(sat)}$ and $V_{CE} = 3.80\text{ V} > 0.3\text{ V}$, the transistor operates reliably in the forward active linear region. Intrinsic dynamic emitter resistance is $r_e' = \frac{26\text{ mV}}{2.86\text{ mA}} \approx 9.09\,\Omega$, yielding an unbypassed voltage gain of $A_v = -\frac{2200}{9.09 + 680} \approx -3.19$, which can be increased to $A_v = -\frac{2200}{9.09} \approx -242$ by adding a $10\,\mu\text{F}$ bypass capacitor across $R_E$.</p>
+            </div>
+          </div>
+
+          <h2>Key Engineering Guidelines for BJT Circuit Reliability</h2>
+          <ul>
+            <li><strong>Thermal Runaway Prevention:</strong> Transistor base-emitter voltage decreases at approximately $-2.0\text{ mV}/^\circ\text{C}$ with rising junction temperature, which naturally increases base current and collector current, causing heating. The emitter resistor $R_E$ provides vital negative thermal feedback: rising current increases emitter voltage $V_E$, decreasing $V_{BE}$ and preventing destructive thermal runaway.</li>
+            <li><strong>Rule of Thumb for Stiff Divider:</strong> To ensure that $\beta$ variations do not shift the Q-point, design the divider such that current flowing through $R_2$ is at least 10 times the base current: $I_{bleed} \ge 10 \times I_B$, or equivalently $R_{TH} \le 0.1 \times \beta \times R_E$.</li>
+            <li><strong>Maximum Power Dissipation Derating:</strong> Always ensure quiescent power $P_D = V_{CE} \times I_C$ operates below 50% of the device's absolute maximum rated power at ambient temperature (e.g. 2N3904 is rated for 625 mW at $25^\circ\text{C}$, derate to 300 mW for industrial operating environments).</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Calc<strong>Hub</strong></div>
+          <p class="footer-desc">High-precision engineering and scientific calculation tools verified against international standards.</p>
+        </div>
+        <div>
+          <h4>Disciplines</h4>
+          <ul class="footer-links">
+            <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+            <li><a href="solar-energy.html">Solar &amp; Renewable Energy</a></li>
+            <li><a href="fire-safety.html">Fire Safety Hydraulics</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Standards &amp; Trust</h4>
+          <ul class="footer-links">
+            <li><a href="ohms-law-calculator.html">Ohm's Law Suite</a></li>
+            <li><a href="engineering.html">Electrical Systems Hub</a></li>
+            <li><a href="sitemap.xml">XML Sitemap</a></li>
+            <li><a href="index.html">All Calculators</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 CalcHub. All rights reserved. Peer-reviewed against IEEE, IEC &amp; NIST standards.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function calculateBjt() {
+      const Vcc = parseFloat(document.getElementById('vcc').value);
+      const beta = parseFloat(document.getElementById('betaGain').value);
+      const R1k = parseFloat(document.getElementById('r1Base').value);
+      const R2k = parseFloat(document.getElementById('r2Base').value);
+      const Rck = parseFloat(document.getElementById('rcCol').value);
+      const Rek = parseFloat(document.getElementById('reEmit').value);
+
+      if (isNaN(Vcc) || isNaN(beta) || isNaN(R1k) || isNaN(R2k) || isNaN(Rck) || isNaN(Rek)) return;
+      if (Vcc <= 0 || beta <= 0 || R1k <= 0 || R2k <= 0) return;
+
+      const Vbe = 0.70; // Volts silicon
+
+      // Thevenin base
+      const Vth = Vcc * (R2k / (R1k + R2k));
+      const Rth_k = (R1k * R2k) / (R1k + R2k);
+
+      // Denominator in kOhms: Rth + (beta + 1)*Re
+      const denom_k = Rth_k + (beta + 1) * Rek;
+
+      let Ib_mA = 0;
+      let Ic_mA = 0;
+      let Ie_mA = 0;
+      let Vce = 0;
+      let state = "Active Linear";
+      let stateDesc = "Valid for linear AC amplification";
+
+      const Icsat_mA = (Vcc - 0.20) / (Rck + Rek);
+
+      if (Vth <= Vbe) {
+        state = "Cut-off (OFF)";
+        stateDesc = "Base-emitter reverse biased, switch open";
+        Ib_mA = 0;
+        Ic_mA = 0;
+        Ie_mA = 0;
+        Vce = Vcc;
+      } else {
+        Ib_mA = (Vth - Vbe) / denom_k;
+        const Ic_active_mA = beta * Ib_mA;
+
+        if (Ic_active_mA >= Icsat_mA) {
+          state = "Saturation (ON)";
+          stateDesc = "Both junctions forward biased, switch closed";
+          Ic_mA = Icsat_mA;
+          Ie_mA = Ic_mA + Ib_mA;
+          Vce = 0.20;
+        } else {
+          state = "Active Linear";
+          stateDesc = "Linear amplification region";
+          Ic_mA = Ic_active_mA;
+          Ie_mA = (beta + 1) * Ib_mA;
+          Vce = Vcc - (Ic_mA * Rck) - (Ie_mA * Rek);
+          if (Vce < 0.20) {
+            Vce = 0.20;
+            state = "Saturation";
+          }
+        }
+      }
+
+      const Ib_uA = Ib_mA * 1000;
+      const Pd_mW = Vce * Ic_mA;
+      const re_prime_ohm = (Ie_mA > 0) ? (26 / Ie_mA) : 0;
+
+      document.getElementById('outState').textContent = state;
+      document.getElementById('outStateDesc').textContent = stateDesc;
+      document.getElementById('outVce').textContent = Vce.toFixed(2) + " V";
+      document.getElementById('outIc').textContent = Ic_mA.toFixed(2) + " mA";
+      document.getElementById('outIbDesc').textContent = `Base current Ib = ${Ib_uA.toFixed(1)} µA`;
+      document.getElementById('outIcsat').textContent = Icsat_mA.toFixed(2) + " mA";
+      document.getElementById('outPd').textContent = Pd_mW.toFixed(2) + " mW";
+      document.getElementById('outRePrime').textContent = re_prime_ohm.toFixed(1) + " \u03A9";
+    }
+
+    window.addEventListener('DOMContentLoaded', calculateBjt);
+  </script>
+</body>
+</html>

@@ -71,6 +71,14 @@ CATEGORIES = {
             ("inductive-reactance-calculator.html", "Inductive Reactance (Xl)", "⚡", "AC inductor reactance & back-EMF"),
             ("op-amp-gain-calculator.html", "Op-Amp Gain & Inverting/Non-Inv", "📈", "Closed loop gain, bandwidth & dB"),
             ("three-phase-power-calculator.html", "Three-Phase AC Power (kVA/kW)", "⚡", "Real, reactive & apparent 3-phase power"),
+            ("adc-dac-calculator.html", "ADC & DAC Converter Resolution", "🎛️", "Quantization LSB, SQNR & ENOB"),
+            ("antenna-length-calculator.html", "Antenna Length & Resonant Dipole", "📡", "Half-wave & quarter-wave velocity factor"),
+            ("battery-short-circuit-current-calculator.html", "Battery Short Circuit (IEC 60896)", "🔋", "DC prospective fault current & arc flash"),
+            ("bjt-transistor-calculator.html", "BJT Transistor Bias & Q-Point", "⚡", "Voltage divider bias & saturation limit"),
+            ("breaker-size-calculator.html", "Breaker Size (NEC 125% Rule)", "🛡️", "Continuous load sizing & trip curves"),
+            ("decibel-calculator.html", "Decibel Calculator (dB, dBm, SPL)", "🔊", "Power, voltage, dBm to Watts & dB SPL"),
+            ("earth-pit-resistance-calculator.html", "Earth Pit Resistance (IEEE 80)", "🌍", "Grounding rod dissipation & soil resistivity"),
+            ("electrical-power-calculator.html", "Electrical Power & Energy Cost", "⚡", "Real, reactive, apparent & kWh cost"),
         ]
     },
     "solar": {
@@ -179,7 +187,7 @@ def determine_tool_cat(filename):
         return "health"
     if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72"]):
         return "finance"
-    if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity", "power-factor", "parallel-resistor", "battery-life", "555-timer", "led-resistor", "capacitive-reactance", "inductive-reactance", "op-amp-gain", "three-phase-power"]):
+    if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity", "power-factor", "parallel-resistor", "battery-life", "555-timer", "led-resistor", "capacitive-reactance", "inductive-reactance", "op-amp-gain", "three-phase-power", "adc-dac", "antenna-length", "battery-short-circuit", "bjt-transistor", "breaker-size", "decibel", "earth-pit", "electrical-power"]):
         return "engineering"
     if any(k in f for k in ["solar", "charging", "pv-string", "ev-charging"]):
         return "solar"

@@ -69,6 +69,14 @@ CAT_MAP = {
             ("inductive-reactance-calculator.html", "Inductive Reactance (Xl)", "⚡", "AC inductor reactance & back-EMF", "Xl = 2π · f · L"),
             ("op-amp-gain-calculator.html", "Op-Amp Gain & Inverting/Non-Inv", "📈", "Closed loop gain, bandwidth & dB", "Av = -Rf/Rin | 1 + Rf/Rin"),
             ("three-phase-power-calculator.html", "Three-Phase AC Power (kVA/kW)", "⚡", "Real, reactive & apparent 3-phase power", "P = √3 × V_LL × I_L × cos(θ)"),
+            ("adc-dac-calculator.html", "ADC & DAC Converter Resolution", "🎛️", "Quantization LSB, SQNR & ENOB", "LSB = V_ref / 2^N | SQNR = 6.02N + 1.76"),
+            ("antenna-length-calculator.html", "Antenna Length & Resonant Dipole", "📡", "Half-wave & quarter-wave velocity factor", "L = 142.65·k / f (MHz) | 468/f"),
+            ("battery-short-circuit-current-calculator.html", "Battery Short Circuit (IEC 60896)", "🔋", "DC prospective fault current & arc flash", "I_sc = U_n / R_total | Doan Arc Flash"),
+            ("bjt-transistor-calculator.html", "BJT Transistor Bias & Q-Point", "⚡", "Voltage divider bias & saturation limit", "I_B = (V_TH - V_BE) / [R_TH + (β+1)R_E]"),
+            ("breaker-size-calculator.html", "Breaker Size (NEC 125% Rule)", "🛡️", "Continuous load sizing & trip curves", "I_min = 1.25·I_cont + I_noncont | NEC 240.6"),
+            ("decibel-calculator.html", "Decibel Calculator (dB, dBm, SPL)", "🔊", "Power, voltage, dBm to Watts & dB SPL", "dB = 10·log(P1/P0) | 20·log(V1/V0)"),
+            ("earth-pit-resistance-calculator.html", "Earth Pit Resistance (IEEE 80)", "🌍", "Grounding rod dissipation & soil resistivity", "R = (ρ/2πL)·[ln(8L/d) - 1]"),
+            ("electrical-power-calculator.html", "Electrical Power & Energy Cost", "⚡", "Real, reactive, apparent & kWh cost", "P = VI·cos(θ) | P_3φ = √3·V_LL·I_L·PF"),
         ]
     },
     "solar-energy.html": {
