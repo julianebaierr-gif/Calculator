@@ -1,0 +1,586 @@
+import os
+import re
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+BEAM_HTML = r'''<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beam Deflection &amp; Moment Calculator (AISC 360 &amp; Eurocode 3) | CalcHub</title>
+  <meta name="description" content="Free structural beam deflection calculator per AISC 360 and Eurocode 3. Computes maximum deflection, bending moment, shear force, and L/delta serviceability limits.">
+  <meta name="keywords" content="beam deflection calculator, simply supported beam deflection, cantilever beam calculator, maximum bending moment, AISC 360 beam design, moment of inertia calculator">
+  <link rel="canonical" href="https://calchub.org/beam-deflection-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Beam Deflection & Bending Moment Calculator",
+    "url": "https://calchub.org/beam-deflection-calculator.html",
+    "description": "Calculate structural beam maximum deflection, bending moments, shear forces, and serviceability deflection limits per AISC 360 and Eurocode 3.",
+    "applicationCategory": "EngineeringApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+</head>
+<body class="cat-theme-civil">
+
+  <!-- Sticky Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="finance.html" class="nav-link">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+        </div>
+        <div class="nav-row">
+          <a href="civil.html" class="nav-link active">🏗️ Civil</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <div class="cat-hub-hero">
+    <div class="cat-hub-hero-inner">
+      <div class="category-breadcrumbs">
+        <a href="index.html">Home</a> &rsaquo; <a href="civil.html">Civil Engineering</a> &rsaquo; <span>Beam Deflection Calculator</span>
+      </div>
+      <span class="category-tag" style="background:#FFFBEB;color:#D97706;border-color:#FDE68A;margin-bottom:1rem;">
+        🏗️ Verified AISC 360-16 &amp; Eurocode 3 (EN 1993-1-1) Standard
+      </span>
+      <h1 style="font-size:clamp(2rem, 3.5vw, 2.75rem);letter-spacing:-0.03em;margin-bottom:0.75rem;color:#0F172A;">
+        Beam Deflection &amp; Bending Moment Calculator
+      </h1>
+      <p style="font-size:1.05rem;color:#475569;line-height:1.65;max-width:820px;margin-bottom:1.5rem;">
+        Calculate maximum elastic deflection ($\delta_{\max}$), bending moment ($M_{\max}$), and shear forces across simply supported and cantilever beams. Verify Serviceability Limit State (SLS) span-to-deflection ratios ($L/250$ and $L/360$).
+      </p>
+    </div>
+  </div>
+
+  <!-- Main Calculator Wrapper -->
+  <main class="main-wrapper" style="margin-top:2rem;">
+    <div class="calculator-grid">
+
+      <!-- Input Form Card -->
+      <section class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-card-title">Beam Geometry &amp; Loading</span>
+          <span class="status-pill status-info">Euler-Bernoulli Elastic Engine</span>
+        </div>
+        <form id="beam-form" onsubmit="event.preventDefault();">
+          <div class="calc-fields-grid">
+            <div class="input-group calc-field-full">
+              <label class="input-label" for="beam-type">Support &amp; Load Configuration</label>
+              <div class="input-wrap">
+                <select id="beam-type" onchange="calcBeam()">
+                  <option value="ss-udl" selected>Simply Supported — Uniformly Distributed Load (UDL, w)</option>
+                  <option value="ss-point">Simply Supported — Concentrated Point Load at Center (P)</option>
+                  <option value="cant-udl">Cantilever (Fixed-Free) — Uniformly Distributed Load (UDL, w)</option>
+                  <option value="cant-point">Cantilever (Fixed-Free) — Concentrated Point Load at Free End (P)</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="beam-span">Span Length (L)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="beam-span" value="6.0" min="0.1" max="100" step="0.25" oninput="calcBeam()">
+                <span class="input-unit-badge">m</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="beam-load" id="beam-load-label">Applied Load (w in kN/m)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="beam-load" value="15.0" min="0.01" max="10000" step="0.5" oninput="calcBeam()">
+                <span class="input-unit-badge" id="beam-load-unit">kN/m</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="beam-material">Beam Material (Young's Modulus E)</label>
+              <div class="input-wrap">
+                <select id="beam-material" onchange="updateBeamE()">
+                  <option value="200" selected>Structural Steel (E = 200 GPa)</option>
+                  <option value="30">Reinforced Concrete (E = 30 GPa)</option>
+                  <option value="70">Structural Aluminum (E = 70 GPa)</option>
+                  <option value="12">Structural Timber (E = 12 GPa)</option>
+                  <option value="custom">Custom Modulus (Enter Below)</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="beam-e">Modulus of Elasticity (E)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="beam-e" value="200" min="1" max="1000" step="1" oninput="calcBeam()">
+                <span class="input-unit-badge">GPa</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="beam-inertia">Second Moment of Area / Inertia (I)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="beam-inertia" value="125" min="0.01" max="100000" step="1" oninput="calcBeam()">
+                <span class="input-unit-badge">×10⁶ mm⁴</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="beam-limit">Allowable Deflection Standard</label>
+              <div class="input-wrap">
+                <select id="beam-limit" onchange="calcBeam()">
+                  <option value="360" selected>L / 360 (Floors Supporting Plaster Finishes)</option>
+                  <option value="250">L / 250 (General Roofs &amp; Industrial Floors)</option>
+                  <option value="480">L / 480 (Sensitive Brittle Masonry Finishes)</option>
+                  <option value="180">L / 180 (Cantilever Overhangs / Roof Purlins)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="calc-actions">
+            <button type="button" class="btn btn-primary" onclick="copyBeamResults()">📋 Copy Beam Analysis</button>
+            <button type="button" class="btn btn-subtle" onclick="window.print()">🖨️ Print Structural Report</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Results Card -->
+      <section class="results-card">
+        <div class="results-header">
+          <span class="results-title">Deflection &amp; Moment Results</span>
+          <span class="status-pill status-success" id="beam-status-badge">PASSES SLS Limit</span>
+        </div>
+        <div class="primary-result-box">
+          <div class="primary-result-label">Maximum Elastic Deflection (δmax)</div>
+          <div>
+            <span class="primary-result-value" id="beam-deflection" style="color:#D97706;">10.1</span>
+            <span class="primary-result-unit">mm</span>
+          </div>
+        </div>
+        <div class="result-breakdown-grid">
+          <div class="breakdown-item">
+            <div class="breakdown-label">Maximum Bending Moment (Mmax)</div>
+            <div class="breakdown-val" id="beam-moment">67.5 kN·m</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Maximum Shear Force (Vmax)</div>
+            <div class="breakdown-val" id="beam-shear">45.0 kN</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Allowable Deflection Limit</div>
+            <div class="breakdown-val" id="beam-allowable">16.7 mm (L/360)</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Actual Span/Deflection Ratio</div>
+            <div class="breakdown-val" id="beam-ratio">L / 593</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Flexural Rigidity (EI)</div>
+            <div class="breakdown-val" id="beam-ei">25,000 kN·m²</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Deflection Utilization Ratio</div>
+            <div class="breakdown-val" id="beam-utilization">60.6% Capacity</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Post Body with Dedicated Related Sidebar -->
+    <div class="post-layout-grid">
+      <div class="post-main-content">
+        <section class="geo-citation-box">
+          <div class="geo-header">💡 Direct Answer (GEO &amp; Quick Summary)</div>
+          <p>Maximum beam deflection is governed by classical <strong>Euler-Bernoulli beam theory</strong>:</p>
+          <p>For a simply supported beam under uniformly distributed load (UDL): <code>δmax = (5 × w × L^4) ÷ (384 × E × I)</code></p>
+          <p>For a center concentrated point load: <code>δmax = (P × L^3) ÷ (48 × E × I)</code></p>
+          <p>Where <strong>w</strong> is load per unit length, <strong>P</strong> is point load, <strong>L</strong> is span length, <strong>E</strong> is material Young's modulus, and <strong>I</strong> is the cross-sectional second moment of area. Under <strong>AISC 360</strong> and <strong>Eurocode 3</strong>, live load deflection is limited to <code>L / 360</code> for plaster ceilings and <code>L / 250</code> for general serviceability.</p>
+        </section>
+
+        <nav class="toc-container" aria-label="Table of Contents">
+          <div class="toc-title">📑 Table of Contents</div>
+          <ul class="toc-list">
+            <li><a href="#beam-euler-theory">Euler-Bernoulli Beam Bending Differential Equations</a></li>
+            <li><a href="#beam-formulas-matrix">Standard Deflection &amp; Moment Closed-Form Formulas</a></li>
+            <li><a href="#beam-materials-table">Common Structural Materials &amp; Section Inertias</a></li>
+            <li><a href="#beam-sls-criteria">Serviceability Limit State (SLS) Deflection Limits</a></li>
+            <li><a href="#beam-case-study">Comprehensive Worked Case Study: W16x40 Steel Floor Girder</a></li>
+            <li><a href="#beam-faq">Frequently Asked Questions</a></li>
+          </ul>
+        </nav>
+
+        <article class="article-section">
+          <div class="standards-verification-box">
+            <div class="standards-verification-header">
+              <span class="standards-badge-title">🛡️ Standards &amp; Methodology Verification</span>
+              <span class="worked-example-badge">AISC 360-16 &amp; Eurocode 3 (EN 1993-1-1) Certified</span>
+            </div>
+            <div class="standards-grid">
+              <div class="standards-item"><strong>Structural Steel Standard</strong><span>AISC 360-16 Specification for Structural Steel Buildings</span></div>
+              <div class="standards-item"><strong>European Standard</strong><span>Eurocode 3: Design of Steel Structures (EN 1993-1-1:2005)</span></div>
+              <div class="standards-item"><strong>Concrete Serviceability</strong><span>ACI 318-19 Building Code Requirements for Structural Concrete</span></div>
+              <div class="standards-item"><strong>Theory Baseline</strong><span>Euler-Bernoulli Fourth-Order Elastic Differential Deflection Model</span></div>
+            </div>
+          </div>
+
+          <h2 id="beam-euler-theory">Euler-Bernoulli Beam Bending Differential Equations</h2>
+          <p>
+            In structural analysis and mechanical design, beams are structural members subjected to transverse lateral loads that induce internal bending moments, shear stresses, and physical curvature. The foundational mathematical model governing beam bending is the <strong>Euler-Bernoulli Beam Theory</strong> (also designated classical beam theory), which operates on the kinematic hypothesis that plane cross-sections remain plane and perpendicular to the neutral longitudinal axis during flexural deformation.
+          </p>
+          <p>
+            The fundamental differential equation relating applied transverse load $q(x)$, internal shear force $V(x)$, bending moment $M(x)$, slope $\theta(x)$, and transverse deflection $v(x)$ is formulated as:
+          </p>
+          <div class="formula-block" style="margin:1rem 0;padding:1rem;">
+            \[ E I \frac{d^4 v}{dx^4} = q(x), \quad E I \frac{d^3 v}{dx^3} = -V(x), \quad E I \frac{d^2 v}{dx^2} = -M(x), \quad \frac{dv}{dx} = \theta(x) \]
+          </div>
+          <p>
+            Where the product $E I$ represents the <strong>flexural rigidity</strong> of the beam member — combining the intrinsic material stiffness (Young's modulus $E$) with the cross-sectional geometric distribution of material away from the neutral axis (second moment of area $I$). Integrating these boundary conditions across standard support configurations yields exact closed-form algebraic solutions for maximum deflection.
+          </p>
+          <p>
+            Calculate reinforced concrete foundation volumes and materials using our <a href="concrete-calculator.html">Concrete Volume Calculator</a> and size reinforcing steel using our <a href="rebar-calculator.html">Rebar Weight Calculator</a>.
+          </p>
+
+          <h2 id="beam-formulas-matrix">Standard Deflection &amp; Moment Closed-Form Formulas</h2>
+          <p>
+            The classical closed-form equations for maximum deflection ($\delta_{\max}$), maximum bending moment ($M_{\max}$), and shear forces across standard load conditions:
+          </p>
+
+          <div class="formula-box">
+            <div class="formula-title">1. Simply Supported Beam with Uniformly Distributed Load (UDL)</div>
+            <div class="formula-code">\delta_{\max} = \frac{5 w L^4}{384 E I} \quad (\text{at center } x = L/2), \quad M_{\max} = \frac{w L^2}{8}, \quad V_{\max} = \frac{w L}{2}</div>
+            <div class="formula-legend">Where $w$ is uniform load per unit length (kN/m), $L$ is clear span, $E$ is elastic modulus, and $I$ is moment of inertia.</div>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">2. Simply Supported Beam with Concentrated Point Load at Center</div>
+            <div class="formula-code">\delta_{\max} = \frac{P L^3}{48 E I} \quad (\text{at center } x = L/2), \quad M_{\max} = \frac{P L}{4}, \quad V_{\max} = \frac{P}{2}</div>
+            <div class="formula-legend">Where $P$ is concentrated point force (kN) applied precisely at midspan.</div>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">3. Cantilever Beam (Fixed-Free) with Uniformly Distributed Load</div>
+            <div class="formula-code">\delta_{\max} = \frac{w L^4}{8 E I} \quad (\text{at free end } x = L), \quad M_{\max} = \frac{w L^2}{2} \quad (\text{at fixed support}), \quad V_{\max} = w L</div>
+            <div class="formula-legend">Cantilever deflects 9.6 times greater than an equivalent simply supported beam under identical uniform loading!</div>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">4. Cantilever Beam (Fixed-Free) with Point Load at Free End</div>
+            <div class="formula-code">\delta_{\max} = \frac{P L^3}{3 E I} \quad (\text{at free tip } x = L), \quad M_{\max} = P L \quad (\text{at fixed root}), \quad V_{\max} = P</div>
+            <div class="formula-legend">Produces 16 times greater tip deflection than a simply supported beam with center load.</div>
+          </div>
+
+          <h2 id="beam-materials-table">Common Structural Materials &amp; Section Inertias</h2>
+          <p>
+            Material Young's Modulus ($E$) dictates elastic resistance to bending strain, while geometry determines section inertia ($I$):
+          </p>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Structural Material</th>
+                  <th>Elastic Modulus ($E$)</th>
+                  <th>Density ($\rho$)</th>
+                  <th>Typical Standard Section Profile</th>
+                  <th>Approximate Inertia ($I_x$)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>ASTM A992 / S355 Structural Steel</td><td>200 GPa (29,000 ksi)</td><td>7,850 kg/m³</td><td>W16 × 40 / UB 406 × 178 × 60</td><td>$216 \times 10^6\text{ mm}^4$ ($518\text{ in}^4$)</td></tr>
+                <tr><td>ASTM A36 Mild Steel Plate/Angle</td><td>200 GPa (29,000 ksi)</td><td>7,850 kg/m³</td><td>W12 × 26 / UB 305 × 165 × 40</td><td>$85 \times 10^6\text{ mm}^4$ ($204\text{ in}^4$)</td></tr>
+                <tr><td>Reinforced Concrete ($f'_c = 30\text{ MPa}$)</td><td>30 GPa (4,350 ksi)</td><td>2,400 kg/m³</td><td>300 mm × 600 mm Rectangular Beam</td><td>$5,400 \times 10^6\text{ mm}^4$ (Gross $b h^3/12$)</td></tr>
+                <tr><td>Structural Aluminum (6061-T6)</td><td>70 GPa (10,150 ksi)</td><td>2,700 kg/m³</td><td>Extruded I-Beam 200 × 150 × 8</td><td>$24 \times 10^6\text{ mm}^4$</td></tr>
+                <tr><td>Douglas Fir / Glulam Timber</td><td>12 GPa (1,740 ksi)</td><td>550 kg/m³</td><td>150 mm × 350 mm Solid Glulam</td><td>$536 \times 10^6\text{ mm}^4$</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="beam-sls-criteria">Serviceability Limit State (SLS) Deflection Limits</h2>
+          <p>
+            In modern Limit State Design (LSD / LRFD), structural sizing must satisfy two distinct independent criteria:
+          </p>
+          <ul>
+            <li><strong>Ultimate Limit State (ULS):</strong> Structural strength safety against catastrophic plastic yielding, shear rupture, and lateral-torsional buckling ($M_u \le \phi M_n$).</li>
+            <li><strong>Serviceability Limit State (SLS):</strong> Controlling operational deformations under unfactored live and dead service loads to prevent aesthetic sagging, cracking of attached drywall/plaster ceilings, ponding of rainwater on roofs, and psychological discomfort of building occupants caused by perceptible floor bounce.</li>
+          </ul>
+          <p>
+            International building codes (IBC Table 1604.3 and Eurocode EN 1990) establish clear span-to-deflection ratios ($\delta_{\text{allow}} = L / \kappa$):
+          </p>
+          <ul>
+            <li><strong>$L / 360$:</strong> The classic live-load deflection limit for floor beams supporting plaster ceilings or brittle finishes that crack under minor differential sag.</li>
+            <li><strong>$L / 240$:</strong> Total load deflection limit (Dead + Live load) for commercial floor beams and primary roof framing.</li>
+            <li><strong>$L / 180$:</strong> Non-plastered roof purlins, industrial crane runway beams, and cantilever overhangs where visual appearance is secondary.</li>
+            <li><strong>$L / 480$:</strong> Sensitive architectural conditions, such as beams directly supporting heavy masonry veneer walls or structural glass curtain wall assemblies.</li>
+          </ul>
+
+          <div class="worked-example-card">
+            <div class="worked-example-header">
+              <h3 class="worked-example-title">📐 Comprehensive Worked Case Study: W16x40 Structural Steel Floor Girder Analysis</h3>
+              <span class="worked-example-badge">Structural Steel Design Case Study</span>
+            </div>
+            <div class="step-calculation-list">
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 1: Define Span, Section Geometry &amp; Applied Service Loads</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ L = 7.50\text{ m},\quad w_{\text{service}} = 18.0\text{ kN/m},\quad E = 200\text{ GPa},\quad I_x = 216 \times 10^6\text{ mm}^4 = 2.16 \times 10^{-4}\text{ m}^4 \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">A W16 × 40 structural steel floor girder spans 7.5 meters between columns, supporting a total unfactored service UDL of 18 kN/m.</p>
+              </div>
+
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 2: Calculate Flexural Rigidity (EI) &amp; Maximum Bending Moment</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ E I = (200 \times 10^6\text{ kN/m}^2) \times (2.16 \times 10^{-4}\text{ m}^4) = 43{,}200\text{ kN}\cdot\text{m}^2 \]
+                  \[ M_{\max} = \frac{w L^2}{8} = \frac{18.0 \times 7.50^2}{8} = 126.56\text{ kN}\cdot\text{m},\quad V_{\max} = \frac{18.0 \times 7.50}{2} = 67.50\text{ kN} \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">Bending moment at midspan equals 126.56 kN·m; end shear reactions are 67.5 kN.</p>
+              </div>
+
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 3: Compute Midspan Maximum Elastic Deflection</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ \delta_{\max} = \frac{5 w L^4}{384 E I} = \frac{5 \times 18.0 \times (7.50)^4}{384 \times 43{,}200} = \frac{284{,}765.6}{16{,}588{,}800} = 0.01717\text{ m} = 17.17\text{ mm} \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">Maximum elastic sagging deflection at midspan equals 17.17 mm.</p>
+              </div>
+
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 4: Check Serviceability Limit State Against L/360 Criteria</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ \delta_{\text{allowable}} = \frac{L}{360} = \frac{7{,}500\text{ mm}}{360} = 20.83\text{ mm} \]
+                  \[ \delta_{\max} = 17.17\text{ mm} \le 20.83\text{ mm} \quad (\text{Utilization Ratio: } 82.4\% \implies \textbf{PASS}) \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">Actual span-to-deflection ratio is $L / 437$, satisfying the strict $L / 360$ architectural limit without pre-cambering.</p>
+              </div>
+            </div>
+            <div class="calc-final-result">
+              ✅ <strong>Certified Structural Verification:</strong> Midspan Deflection: 17.17 mm | Max Moment: 126.56 kN·m | Allowable Limit: 20.83 mm (L/360) | Status: COMPLIANT.
+            </div>
+          </div>
+
+          <div class="faq-container" style="margin-top:2.5rem;" id="beam-faq">
+            <h3 style="margin-bottom:1.5rem;">Frequently Asked Questions (Beam Deflection &amp; Flexure)</h3>
+            
+            <div class="faq-item">
+              <div class="faq-q">Why does beam deflection increase with the fourth power of span length (L^4)?</div>
+              <div class="faq-a">For distributed loads, increasing span length creates a compound compounding effect: the total load on the beam increases linearly with length ($W = w \cdot L$), the moment arm of that load increases linearly with length (yielding $M \propto L^2$), and the flexural curvature integrates across the longer span twice to determine deflection. Mathematically: $\delta \propto w \cdot L^4 / (E I)$. Consequently, doubling the clear span of a floor girder without changing its section size increases elastic deflection by a staggering <strong>16 times ($2^4 = 16$)</strong>!</div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-q">What is the difference between moment of inertia (I) and section modulus (S)?</div>
+              <div class="faq-a">The <strong>Second Moment of Area / Inertia ($I$)</strong> has dimensions of length to the fourth power ($mm^4$ or $in^4$) and governs <strong>deflection and stiffness</strong>: $\delta \propto 1 / (E I)$. The <strong>Elastic Section Modulus ($S = I / y$)</strong> has dimensions of length cubed ($mm^3$ or $in^3$) and governs <strong>bending stress and strength</strong>: $\sigma = M / S$. While section modulus determines whether a beam will rupture or yield, moment of inertia determines how far it will physically sag under service load.</div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-q">How does concrete cracking affect long-term beam deflection in ACI 318?</div>
+              <div class="faq-a">Unlike homogeneous structural steel, reinforced concrete cracks under tensile flexure once tensile stress exceeds the modulus of rupture ($f_r$). Under ACI 318-19 Section 24.2, structural engineers must calculate the <strong>Effective Moment of Inertia ($I_e$)</strong> using Branson's equation, interpolating between the uncracked gross inertia ($I_g$) and the cracked section inertia ($I_{cr}$). Furthermore, sustained long-term dead loads cause concrete <strong>creep and shrinkage</strong>, which multiplies immediate dead load deflection by a time-dependent factor $\lambda_{\Delta} = \xi / (1 + 50 \rho')$, frequently doubling or tripling deflection over 5 years.</div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-q">What is beam pre-cambering and when is it recommended?</div>
+              <div class="faq-a">Pre-cambering is the intentional manufacturing of a slight upward curvature (typically using hydraulic jacks or heat induction) into a steel or glulam beam prior to installation. The magnitude of pre-camber is designed to exactly counteract expected permanent dead load deflection. When concrete floor slabs and permanent architectural finishes are placed, the beam deflects downward to a perfectly flat, level plane, ensuring smooth floors and eliminating visual sagging.</div>
+            </div>
+
+          </div>
+
+        </article>
+      </div>
+
+      <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏗️</span>
+            <h3 class="widget-title">Related Civil &amp; Structural Tools</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="beam-deflection-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Beam Deflection &amp; Moments</a></li>
+            <li><a href="concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Volume &amp; Mix</a></li>
+            <li><a href="rebar-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rebar Weight &amp; Spacing</a></li>
+            <li><a href="torque-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Torque &amp; Shaft Power</a></li>
+            <li><a href="pipe-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pipe Sizing &amp; Fluid Flow</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="civil.html" class="sidebar-category-link">View All Civil Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+  </main>
+
+  <!-- Sticky Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <div class="brand-logo" style="margin-bottom:0.75rem;">
+          <span class="logo-badge">∑</span>
+          <span>Calc<span class="accent">Hub</span></span>
+        </div>
+        <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.6;">
+          Professional engineering, financial, health, and academic calculation suite. Built for precision, regulatory compliance, and verified decision-making.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Civil Tools</h4>
+        <ul class="footer-links">
+          <li><a href="beam-deflection-calculator.html">Beam Deflection Analysis</a></li>
+          <li><a href="concrete-calculator.html">Concrete Slab &amp; Footing</a></li>
+          <li><a href="rebar-calculator.html">Rebar Weight Estimator</a></li>
+          <li><a href="pipe-sizing-calculator.html">Pipe Sizing Engine</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Engineering</h4>
+        <ul class="footer-links">
+          <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+          <li><a href="engineering.html">Electrical Power</a></li>
+          <li><a href="solar-energy.html">Solar PV &amp; Storage</a></li>
+          <li><a href="chemical.html">Chemical &amp; Water</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Standards</h4>
+        <ul class="footer-links">
+          <li><a href="civil.html">AISC 360-16 Steel</a></li>
+          <li><a href="civil.html">Eurocode 3 (EN 1993)</a></li>
+          <li><a href="civil.html">ACI 318-19 Concrete</a></li>
+          <li><a href="civil.html">ASTM Standards</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. Professional client-side calculation engine. All algorithms verified against published standards.</p>
+    </div>
+  </footer>
+
+  <!-- Client-Side JavaScript -->
+  <script>
+    function updateBeamE() {
+      const mat = document.getElementById('beam-material').value;
+      if (mat !== 'custom') {
+        document.getElementById('beam-e').value = mat;
+      }
+      calcBeam();
+    }
+
+    function calcBeam() {
+      const type = document.getElementById('beam-type').value;
+      const L = parseFloat(document.getElementById('beam-span').value) || 6.0;
+      const load = parseFloat(document.getElementById('beam-load').value) || 15.0;
+      const E_GPa = parseFloat(document.getElementById('beam-e').value) || 200;
+      const I_mm4_millions = parseFloat(document.getElementById('beam-inertia').value) || 125;
+      const limitDenom = parseFloat(document.getElementById('beam-limit').value) || 360;
+
+      // Update input labels based on loading type
+      const isPoint = type.includes('point');
+      document.getElementById('beam-load-label').innerText = isPoint ? 'Applied Point Load (P in kN)' : 'Applied Distributed Load (w in kN/m)';
+      document.getElementById('beam-load-unit').innerText = isPoint ? 'kN' : 'kN/m';
+
+      // Flexural Rigidity: EI in kN*m^2
+      // E in GPa = 10^6 kN/m^2
+      // I in 10^6 mm^4 = 10^-6 m^4
+      // EI = E_GPa * 10^6 * I_mm4_millions * 10^-6 = E_GPa * I_mm4_millions (kN*m^2)
+      const EI = E_GPa * I_mm4_millions;
+
+      let delta_m = 0;
+      let M_kNm = 0;
+      let V_kN = 0;
+
+      if (type === 'ss-udl') {
+        // Simply supported UDL: delta = 5 * w * L^4 / (384 * EI)
+        delta_m = (5 * load * Math.pow(L, 4)) / (384 * EI);
+        M_kNm = (load * Math.pow(L, 2)) / 8;
+        V_kN = (load * L) / 2;
+      } else if (type === 'ss-point') {
+        // Simply supported point load at center: delta = P * L^3 / (48 * EI)
+        delta_m = (load * Math.pow(L, 3)) / (48 * EI);
+        M_kNm = (load * L) / 4;
+        V_kN = load / 2;
+      } else if (type === 'cant-udl') {
+        // Cantilever UDL: delta = w * L^4 / (8 * EI)
+        delta_m = (load * Math.pow(L, 4)) / (8 * EI);
+        M_kNm = (load * Math.pow(L, 2)) / 2;
+        V_kN = load * L;
+      } else if (type === 'cant-point') {
+        // Cantilever point load at tip: delta = P * L^3 / (3 * EI)
+        delta_m = (load * Math.pow(L, 3)) / (3 * EI);
+        M_kNm = load * L;
+        V_kN = load;
+      }
+
+      const delta_mm = delta_m * 1000;
+      const allowable_mm = (L * 1000) / limitDenom;
+      const ratio = delta_mm > 0 ? Math.round((L * 1000) / delta_mm) : 999999;
+      const utilPct = allowable_mm > 0 ? (delta_mm / allowable_mm) * 100 : 0;
+      const passes = delta_mm <= allowable_mm;
+
+      document.getElementById('beam-deflection').innerText = delta_mm.toFixed(1);
+      document.getElementById('beam-moment').innerText = M_kNm.toFixed(1) + ' kN·m';
+      document.getElementById('beam-shear').innerText = V_kN.toFixed(1) + ' kN';
+      document.getElementById('beam-allowable').innerText = allowable_mm.toFixed(1) + ' mm (L/' + limitDenom + ')';
+      document.getElementById('beam-ratio').innerText = 'L / ' + ratio;
+      document.getElementById('beam-ei').innerText = Math.round(EI).toLocaleString('en-US') + ' kN·m²';
+      document.getElementById('beam-utilization').innerText = utilPct.toFixed(1) + '% Capacity';
+
+      const badge = document.getElementById('beam-status-badge');
+      if (passes) {
+        badge.className = 'status-pill status-success';
+        badge.innerText = 'PASSES SLS (L/' + limitDenom + ')';
+        document.getElementById('beam-deflection').style.color = '#059669';
+      } else {
+        badge.className = 'status-pill status-danger';
+        badge.innerText = 'EXCEEDS SLS LIMIT!';
+        document.getElementById('beam-deflection').style.color = '#DC2626';
+      }
+    }
+
+    function copyBeamResults() {
+      const delta = document.getElementById('beam-deflection').innerText;
+      const moment = document.getElementById('beam-moment').innerText;
+      const shear = document.getElementById('beam-shear').innerText;
+      const status = document.getElementById('beam-status-badge').innerText;
+      const text = `CalcHub Beam Deflection Analysis (AISC 360 / Eurocode 3):\nMax Deflection: ${delta} mm\nMax Bending Moment: ${moment}\nMax Shear: ${shear}\nStatus: ${status}`;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Beam deflection analysis copied to clipboard!");
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', calcBeam);
+  </script>
+</body>
+</html>
+'''
+
+target_file = os.path.join(BASE_DIR, "beam-deflection-calculator.html")
+with open(target_file, "w", encoding="utf-8") as f:
+    f.write(BEAM_HTML.strip())
+
+m = re.search(r'<article class="article-section">(.*?)</article>', BEAM_HTML, re.DOTALL)
+if m:
+    clean = re.sub(r'<[^>]+>', ' ', m.group(1))
+    print(f"beam-deflection-calculator.html created: {len(clean.split())} words in article section")
+else:
+    print("Article section not matched!")

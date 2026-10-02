@@ -24,7 +24,7 @@ def main():
                 errors += 1
 
     if errors == 0:
-        print("SUCCESS: All 25 HTML files and internal links are 100% valid with zero broken links!")
+        print(f"SUCCESS: All {len(html_files)} HTML files and internal links are 100% valid with zero broken links!")
     else:
         print(f"Found {errors} errors.")
 

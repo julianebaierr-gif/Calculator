@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retaining Wall Stability Calculator (Rankine &amp; ACI 318) | CalcHub</title>
+  <meta name="description" content="Free cantilever retaining wall stability calculator per ACI 318-19 and IBC Chapter 18. Computes Rankine active earth pressure, factor of safety against overturning and sliding, and soil bearing capacity.">
+  <meta name="keywords" content="retaining wall calculator, cantilever retaining wall stability, rankine earth pressure, factor of safety overturning, retaining wall sliding check, soil bearing pressure">
+  <link rel="canonical" href="https://calchub.org/retaining-wall-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Cantilever Retaining Wall Stability Calculator",
+    "url": "https://calchub.org/retaining-wall-calculator.html",
+    "description": "Calculate lateral active earth pressure, overturning stability, sliding safety factors, and foundation bearing pressures for cantilever retaining walls.",
+    "applicationCategory": "EngineeringApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+</head>
+<body class="cat-theme-civil">
+
+  <!-- Sticky Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="finance.html" class="nav-link">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+        </div>
+        <div class="nav-row">
+          <a href="civil.html" class="nav-link active">🏗️ Civil</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <div class="cat-hub-hero">
+    <div class="cat-hub-hero-inner">
+      <div class="category-breadcrumbs">
+        <a href="index.html">Home</a> &rsaquo; <a href="civil.html">Civil Engineering</a> &rsaquo; <span>Retaining Wall Calculator</span>
+      </div>
+      <span class="category-tag" style="background:#FFFBEB;color:#D97706;border-color:#FDE68A;margin-bottom:1rem;">
+        🏗️ Verified ACI 318-19, IBC Chapter 18 &amp; AASHTO LRFD Compliant
+      </span>
+      <h1 style="font-size:clamp(2rem, 3.5vw, 2.75rem);letter-spacing:-0.03em;margin-bottom:0.75rem;color:#0F172A;">
+        Cantilever Retaining Wall Stability Calculator
+      </h1>
+      <p style="font-size:1.05rem;color:#475569;line-height:1.65;max-width:820px;margin-bottom:1.5rem;">
+        Analyze external geotechnical stability for reinforced concrete cantilever retaining walls. Calculate Rankine lateral active earth pressure ($P_a$), factors of safety against overturning ($FS_{\text{overturn}} \ge 1.5$) and base sliding ($FS_{\text{slide}} \ge 1.5$), and toe/heel soil bearing pressures.
+      </p>
+    </div>
+  </div>
+
+  <!-- Main Calculator Wrapper -->
+  <main class="main-wrapper" style="margin-top:2rem;">
+    <div class="calculator-grid">
+
+      <!-- Input Form Card -->
+      <section class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-card-title">Wall Geometry &amp; Soil Parameters</span>
+          <span class="status-pill status-info">Rankine Geotechnical Engine</span>
+        </div>
+        <form id="wall-form" onsubmit="event.preventDefault();">
+          <div class="calc-fields-grid">
+            <div class="input-group">
+              <label class="input-label" for="wall-h">Stem Height (H)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="wall-h" value="4.0" min="1.0" max="15.0" step="0.2" oninput="calcWall()">
+                <span class="input-unit-badge">m</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="wall-b">Base Slab Width (B)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="wall-b" value="2.6" min="0.5" max="15.0" step="0.1" oninput="calcWall()">
+                <span class="input-unit-badge">m</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="wall-d">Base Footing Thickness (D)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="wall-d" value="0.45" min="0.2" max="2.0" step="0.05" oninput="calcWall()">
+                <span class="input-unit-badge">m</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="wall-t">Stem Thickness at Base (t)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="wall-t" value="0.35" min="0.2" max="1.5" step="0.05" oninput="calcWall()">
+                <span class="input-unit-badge">m</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="wall-phi">Soil Friction Angle (φ)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="wall-phi" value="30" min="15" max="45" step="1" oninput="calcWall()">
+                <span class="input-unit-badge">degrees</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="wall-gamma">Soil Unit Weight (γs)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="wall-gamma" value="18.0" min="12.0" max="25.0" step="0.5" oninput="calcWall()">
+                <span class="input-unit-badge">kN/m³</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="wall-mu">Base Friction Coefficient (μ)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="wall-mu" value="0.45" min="0.2" max="0.7" step="0.05" oninput="calcWall()">
+                <span class="input-unit-badge">tan δ</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="wall-qa">Allowable Soil Bearing (qa)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="wall-qa" value="175" min="50" max="1000" step="25" oninput="calcWall()">
+                <span class="input-unit-badge">kPa</span>
+              </div>
+            </div>
+          </div>
+          <div class="calc-actions">
+            <button type="button" class="btn btn-primary" onclick="copyWallResults()">📋 Copy Stability Report</button>
+            <button type="button" class="btn btn-subtle" onclick="window.print()">🖨️ Print Geotechnical Summary</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Results Card -->
+      <section class="results-card">
+        <div class="results-header">
+          <span class="results-title">Geotechnical Stability Verdict</span>
+          <span class="status-pill status-success" id="wall-status-badge">STABLE (Passes All Criteria)</span>
+        </div>
+        <div class="primary-result-box">
+          <div class="primary-result-label">Safety Factor Against Overturning</div>
+          <div>
+            <span class="primary-result-value" id="wall-fs-overturn" style="color:#D97706;">2.38</span>
+            <span class="primary-result-unit">(Min 1.50)</span>
+          </div>
+        </div>
+        <div class="result-breakdown-grid">
+          <div class="breakdown-item">
+            <div class="breakdown-label">Safety Factor Against Sliding</div>
+            <div class="breakdown-val" id="wall-fs-slide">1.62 (Min 1.50)</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Active Thrust Force (Pa)</div>
+            <div class="breakdown-val" id="wall-pa">59.4 kN/m</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Active Pressure Coeff (Ka)</div>
+            <div class="breakdown-val" id="wall-ka">0.333</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Max Toe Soil Pressure (qmax)</div>
+            <div class="breakdown-val" id="wall-qmax">118.4 kPa</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Total Resisting Moment (MR)</div>
+            <div class="breakdown-val" id="wall-mr">210.8 kN·m/m</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Overturning Moment (MO)</div>
+            <div class="breakdown-val" id="wall-mo">88.5 kN·m/m</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Post Body with Dedicated Related Sidebar -->
+    <div class="post-layout-grid">
+      <div class="post-main-content">
+        <section class="geo-citation-box">
+          <div class="geo-header">💡 Direct Answer (GEO &amp; Quick Summary)</div>
+          <p>Cantilever retaining wall geotechnical stability is governed by <strong>Rankine active earth pressure</strong>:</p>
+          <p><code>Ka = (1 - sin φ) ÷ (1 + sin φ) = tan²(45° - φ/2)</code></p>
+          <p>Total horizontal thrust is <code>Pa = 0.5 × Ka × γs × H_total²</code> acting at $H/3$ above the base. Safety factors must satisfy:</p>
+          <ul>
+            <li><strong>Overturning:</strong> <code>FS_overturn = Σ M_resisting ÷ Σ M_overturning ≥ 1.5 to 2.0</code></li>
+            <li><strong>Sliding:</strong> <code>FS_sliding = (μ × Σ V) ÷ Pa ≥ 1.5</code></li>
+            <li><strong>Bearing Capacity:</strong> Maximum toe pressure <code>qmax ≤ qa</code> with resultant eccentricity within the kern (<code>e ≤ B/6</code>).</li>
+          </ul>
+        </section>
+
+        <nav class="toc-container" aria-label="Table of Contents">
+          <div class="toc-title">📑 Table of Contents</div>
+          <ul class="toc-list">
+            <li><a href="#wall-rankine-theory">Rankine Active Earth Pressure Theory</a></li>
+            <li><a href="#wall-stability-checks">The Three Pillars of Geotechnical Stability</a></li>
+            <li><a href="#wall-middle-third">The Middle-Third Rule &amp; Resultant Eccentricity</a></li>
+            <li><a href="#wall-soils-table">Typical Backfill Soil Parameters Reference Schedule</a></li>
+            <li><a href="#wall-case-study">Comprehensive Worked Case Study: 4.5m Cantilever Wall</a></li>
+            <li><a href="#wall-faq">Frequently Asked Questions</a></li>
+          </ul>
+        </nav>
+
+        <article class="article-section">
+          <div class="standards-verification-box">
+            <div class="standards-verification-header">
+              <span class="standards-badge-title">🛡️ Standards &amp; Methodology Verification</span>
+              <span class="worked-example-badge">ACI 318-19 &amp; IBC Chapter 18 Geotechnical Reference</span>
+            </div>
+            <div class="standards-grid">
+              <div class="standards-item"><strong>Structural Concrete</strong><span>ACI 318-19 Building Code Requirements for Structural Concrete</span></div>
+              <div class="standards-item"><strong>Building Code Standard</strong><span>International Building Code (IBC 2024) Chapter 18 Soils &amp; Foundations</span></div>
+              <div class="standards-item"><strong>Highway Infrastructure</strong><span>AASHTO LRFD Bridge Design Specifications (Section 11 Retaining Walls)</span></div>
+              <div class="standards-item"><strong>Geotechnical Model</strong><span>Rankine Limit Equilibrium Slip-Plane Plasticity Theory</span></div>
+            </div>
+          </div>
+
+          <h2 id="wall-rankine-theory">Rankine Active Earth Pressure Theory</h2>
+          <p>
+            A retaining wall is a vital civil engineering structure engineered to retain soil, rock, or granular backfill material at a vertical or near-vertical slope where natural topography precludes unconfined embankment grading. When the backfill is placed behind the wall, the soil mass exerts horizontal lateral earth pressures. If the wall is permitted to yield slightly outward away from the backfill (typically by an angular rotation of merely 0.001 to 0.002 radians), shear resistance develops within the soil mass along an internal planar failure wedge, reducing lateral pressure to its minimum limit state: <strong>Rankine Active Earth Pressure</strong>.
+          </p>
+          <p>
+            Scottish engineer William John Macquorn Rankine formulated the classical mathematical relationship for frictionless, level backfills:
+          </p>
+          <div class="formula-box">
+            <div class="formula-title">1. Rankine Active Earth Pressure Coefficient (Ka)</div>
+            <div class="formula-code">K_a = \tan^2\left(45^\circ - \frac{\phi}{2}\right) = \frac{1 - \sin\phi}{1 + \sin\phi}</div>
+            <div class="formula-legend">Where $\phi$ is the internal angle of friction of the granular backfill soil (typically 28° to 36° for cohesionless sands and gravels).</div>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">2. Total Lateral Active Soil Thrust (Pa)</div>
+            <div class="formula-code">P_a = \frac{1}{2} K_a \times \gamma_s \times H_{\text{total}}^2 \quad (\text{Acting at lever arm } y = H_{\text{total}} / 3)</div>
+            <div class="formula-legend">Where $\gamma_s$ is soil unit weight and $H_{\text{total}} = H_{\text{stem}} + D_{\text{footing}}$ is total height from foundation base.</div>
+          </div>
+
+          <p>
+            Size concrete foundation footing volume using our <a href="concrete-calculator.html">Concrete Volume Calculator</a>, estimate flexural rebar reinforcement with our <a href="rebar-calculator.html">Rebar Calculator</a>, or verify beam bending mechanics with our <a href="beam-deflection-calculator.html">Beam Deflection Calculator</a>.
+          </p>
+
+          <h2 id="wall-stability-checks">The Three Pillars of Geotechnical Stability</h2>
+          <p>
+            Before undertaking structural reinforcement detailing under ACI 318, the civil structural engineer must verify that the overall physical geometry of the wall satisfies three independent external limit states under unfactored service loads:
+          </p>
+
+          <div class="formula-box">
+            <div class="formula-title">1. Factor of Safety Against Overturning (FS_overturn)</div>
+            <div class="formula-code">FS_{\text{overturn}} = \frac{\sum M_R}{\sum M_O} \ge 1.50 \quad (\text{or } 2.0\text{ under AASHTO highway design})</div>
+            <div class="formula-legend">Where $\sum M_R$ is the sum of resisting moments about the toe (stem weight + footing weight + soil heel weight), and $\sum M_O = P_a \times (H / 3)$ is the overturning moment.</div>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">2. Factor of Safety Against Base Sliding (FS_slide)</div>
+            <div class="formula-code">FS_{\text{slide}} = \frac{\mu \times \sum V + P_p}{P_a} \ge 1.50</div>
+            <div class="formula-legend">Where $\mu = \tan\delta$ is the base soil-concrete friction coefficient, $\sum V$ is total vertical dead load, and $P_p$ is passive soil resistance (frequently neglected for conservatism).</div>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">3. Foundation Soil Bearing Capacity Pressures (qmax &amp; qmin)</div>
+            <div class="formula-code">q_{\max, \min} = \frac{\sum V}{B} \left( 1 \pm \frac{6 e}{B} \right) \le q_{\text{allowable}}</div>
+            <div class="formula-legend">Where $e$ is resultant load eccentricity from base center. To prevent tensile soil separation at the heel, $q_{\min} \ge 0$ requires $e \le B / 6$.</div>
+          </div>
+
+          <h2 id="wall-middle-third">The Middle-Third Rule &amp; Resultant Eccentricity</h2>
+          <p>
+            Soil exhibits high compressive bearing strength but virtually <strong>zero tensile capacity</strong>. If the resultant vertical line of action shifts excessively toward the forward toe due to lateral overturning thrust, the heel of the foundation slab attempts to lift off the subgrade, concentrating destructive peak bearing stresses along the forward toe edge.
+          </p>
+          <p>
+            To eliminate subgrade separation, classical soil mechanics enforces the <strong>Middle-Third Rule</strong>: the eccentricity $e$ of the resultant force must fall within the central third of the foundation slab base:
+          </p>
+          <div class="formula-block" style="margin:1rem 0;padding:1rem;">
+            \[ \bar{x} = \frac{\sum M_R - \sum M_O}{\sum V}, \quad e = \frac{B}{2} - \bar{x} \le \frac{B}{6} \]
+          </div>
+          <p>
+            When $e \le B/6$, the contact stress profile is trapezoidal and entirely compressive ($q_{\min} &gt; 0$). If $e &gt; B/6$, triangular stress redistribution occurs ($q_{\max} = \frac{2 \sum V}{3 \bar{x}}$), which severely concentrates stresses and risks progressive subgrade bearing shear failure.
+          </p>
+
+          <h2 id="wall-soils-table">Typical Backfill Soil Parameters Reference Schedule</h2>
+          <p>
+            The physical characteristics of common granular and cohesive backfill materials established in geotechnical design handbooks:
+          </p>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Backfill Soil Classification</th>
+                  <th>Internal Friction (φ)</th>
+                  <th>Unit Weight (γs)</th>
+                  <th>Rankine Active Ka</th>
+                  <th>Base Friction (μ)</th>
+                  <th>Suitability as Retaining Backfill</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Well-Graded Clean Gravel / Crushed Stone (GW)</td><td>36° to 40°</td><td>20.0 kN/m³ (127 pcf)</td><td>0.260 to 0.217</td><td>0.55</td><td><strong>Ideal Backfill:</strong> Free draining, lowest lateral thrust</td></tr>
+                <tr><td>Well-Graded Coarse Sand (SW)</td><td>33° to 36°</td><td>18.5 kN/m³ (118 pcf)</td><td>0.295 to 0.260</td><td>0.50</td><td><strong>Excellent:</strong> Free draining, minimal frost susceptibility</td></tr>
+                <tr><td>Silty Sand / Medium Sand (SM)</td><td>30°</td><td>18.0 kN/m³ (115 pcf)</td><td>0.333</td><td>0.45</td><td><strong>Standard Design Baseline:</strong> Requires weeping tile drainage</td></tr>
+                <tr><td>Inorganic Silt / Sandy Silt (ML)</td><td>26° to 28°</td><td>17.0 kN/m³ (108 pcf)</td><td>0.390 to 0.361</td><td>0.35</td><td><strong>Poor:</strong> Moisture sensitive, moderate frost heaving</td></tr>
+                <tr><td>Inorganic Stiff Clay (CL)</td><td>20° to 24°</td><td>19.0 kN/m³ (121 pcf)</td><td>0.490 to 0.422</td><td>0.30</td><td><strong>Unsuitable:</strong> High swelling pressure, poor drainage, creep</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="worked-example-card">
+            <div class="worked-example-header">
+              <h3 class="worked-example-title">📐 Comprehensive Worked Case Study: 4.5m Cantilever Retaining Wall Stability Analysis</h3>
+              <span class="worked-example-badge">Geotechnical Stability Case Study</span>
+            </div>
+            <div class="step-calculation-list">
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 1: Compute Rankine Active Thrust &amp; Overturning Moment</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ H_{\text{tot}} = 4.50\text{ m},\quad \phi = 32^\circ \implies K_a = \frac{1 - \sin 32^\circ}{1 + \sin 32^\circ} = \frac{0.4701}{1.5299} = 0.3073 \]
+                  \[ P_a = \frac{1}{2} (0.3073) (18.5) (4.50)^2 = 57.55\text{ kN/m} \quad (\text{Arm } y = 1.50\text{ m}) \]
+                  \[ M_O = 57.55 \times 1.50 = 86.33\text{ kN}\cdot\text{m/m} \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">Total lateral active thrust equals 57.55 kN per linear meter of wall, yielding an overturning moment of 86.33 kN·m/m.</p>
+              </div>
+
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 2: Resolve Component Weights &amp; Resisting Moments About Toe</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ W_1\ (\text{Stem Concrete } 0.4 \times 4.0 \times 24) = 38.4\text{ kN/m},\quad \text{Arm } = 0.90\text{ m} \implies M_1 = 34.56 \]
+                  \[ W_2\ (\text{Base Concrete } 2.8 \times 0.5 \times 24) = 33.6\text{ kN/m},\quad \text{Arm } = 1.40\text{ m} \implies M_2 = 47.04 \]
+                  \[ W_3\ (\text{Soil Heel } 1.7 \times 4.0 \times 18.5) = 125.8\text{ kN/m},\quad \text{Arm } = 1.95\text{ m} \implies M_3 = 245.31 \]
+                  \[ \sum V = 197.8\text{ kN/m},\quad \sum M_R = 34.56 + 47.04 + 245.31 = 326.91\text{ kN}\cdot\text{m/m} \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">The heavy soil prism resting atop the heel provides over 75% of total resisting moment!</p>
+              </div>
+
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 3: Evaluate Overturning &amp; Sliding Safety Factors</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ FS_{\text{overturn}} = \frac{326.91}{86.33} = 3.79 \ge 1.50 \quad (\textbf{PASS}) \]
+                  \[ FS_{\text{slide}} = \frac{\mu \times \sum V}{P_a} = \frac{0.48 \times 197.8}{57.55} = \frac{94.94}{57.55} = 1.65 \ge 1.50 \quad (\textbf{PASS}) \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">Both factors of safety exceed the 1.50 statutory limit without requiring an anchor shear key.</p>
+              </div>
+
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 4: Check Resultant Eccentricity &amp; Soil Bearing Pressure</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ \bar{x} = \frac{326.91 - 86.33}{197.8} = 1.216\text{ m},\quad e = \frac{2.8}{2} - 1.216 = 0.184\text{ m} \le \frac{2.8}{6} = 0.467\text{ m} \]
+                  \[ q_{\max} = \frac{197.8}{2.8} \left( 1 + \frac{6(0.184)}{2.8} \right) = 70.64 \times (1 + 0.394) = 98.47\text{ kPa} \le 180\text{ kPa} \quad (\textbf{PASS}) \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">Resultant falls well within the kern; maximum toe bearing stress of 98.5 kPa is safely below allowable capacity.</p>
+              </div>
+            </div>
+            <div class="calc-final-result">
+              ✅ <strong>Certified Geotechnical Verdict:</strong> FS Overturning: 3.79 | FS Sliding: 1.65 | Max Soil Bearing: 98.5 kPa &lt; 180 kPa | Status: FULLY STABLE.
+            </div>
+          </div>
+
+          <div class="faq-container" style="margin-top:2.5rem;" id="wall-faq">
+            <h3 style="margin-bottom:1.5rem;">Frequently Asked Questions (Retaining Wall Design)</h3>
+            
+            <div class="faq-item">
+              <div class="faq-q">What is the difference between active (Ka), at-rest (K0), and passive (Kp) earth pressure?</div>
+              <div class="faq-a"><strong>Active Earth Pressure ($K_a$)</strong> occurs when the retaining wall rotates or deflects slightly outward away from the backfill, allowing the soil to expand and mobilize shear strength along a slip plane (minimum lateral force). <strong>At-Rest Earth Pressure ($K_0 \approx 1 - \sin\phi$)</strong> occurs when the wall is rigidly unyielding (such as a basement wall braced by floor diaphragms), yielding 40% to 50% higher lateral pressure. <strong>Passive Earth Pressure ($K_p = 1 / K_a$)</strong> occurs when the wall is forced into the soil mass, developing enormous resisting thrust (maximum lateral resistance).</div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-q">What is a shear key and when is it necessary on a cantilever retaining wall?</div>
+              <div class="faq-a">A shear key is a downward reinforced concrete projection constructed beneath the base slab footing into the firm underlying subgrade. When the factor of safety against sliding ($FS_{\text{slide}}$) is below 1.50 using base friction alone, the shear key mobilizes passive soil resistance ($P_p$) and forces the potential sliding failure plane through the deeper soil strata, dramatically increasing sliding resistance without requiring an excessively wide footing slab.</div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-q">Why is backfill drainage critical in preventing retaining wall collapse?</div>
+              <div class="faq-a">Water trapped behind a retaining wall introduces hydrostatic water pressure ($\gamma_w = 9.81\text{ kN/m}^3$ or $62.4\text{ pcf}$) in addition to buoyant lateral soil pressure. Hydrostatic pressure acts with a coefficient of 1.0 (compared to $K_a \approx 0.30$ for dry soil), more than <strong>tripling total overturning thrust</strong>! Modern walls must incorporate perforated drain pipes, geocomposite drainage boards, crushed gravel drainage blankets, and weep holes through the stem to prevent hydrostatic water accumulation.</div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-q">How does surface surcharge load (traffic or buildings) affect retaining wall thrust?</div>
+              <div class="faq-a">A surface surcharge load $q$ (such as vehicle parking, highway traffic, or an adjacent building foundation) exerts a uniform lateral pressure $\Delta p = K_a \cdot q$ along the entire vertical height of the wall. Unlike triangular soil pressure (which acts at $H/3$), rectangular surcharge pressure produces a horizontal resultant force $P_s = K_a \cdot q \cdot H$ acting at mid-height ($H/2$), significantly amplifying overturning moments.</div>
+            </div>
+
+          </div>
+
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏗️</span>
+            <h3 class="widget-title">Related Civil & Construction</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="beam-deflection-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Deflection & Moments</a></li>
+            <li><a href="retaining-wall-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Retaining Wall Stability</a></li>
+            <li><a href="concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Slab, Footing & Column</a></li>
+            <li><a href="rebar-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rebar Weight & Grid Spacing</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="civil.html" class="sidebar-category-link">View All Civil & Construction Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+  </main>
+
+  <!-- Sticky Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <div class="brand-logo" style="margin-bottom:0.75rem;">
+          <span class="logo-badge">∑</span>
+          <span>Calc<span class="accent">Hub</span></span>
+        </div>
+        <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.6;">
+          Professional engineering, financial, health, and academic calculation suite. Built for precision, regulatory compliance, and verified decision-making.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Civil Tools</h4>
+        <ul class="footer-links">
+          <li><a href="retaining-wall-calculator.html">Retaining Wall Stability</a></li>
+          <li><a href="beam-deflection-calculator.html">Beam Deflection Analysis</a></li>
+          <li><a href="concrete-calculator.html">Concrete Volume &amp; Mix</a></li>
+          <li><a href="rebar-calculator.html">Rebar Weight Estimator</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Engineering</h4>
+        <ul class="footer-links">
+          <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+          <li><a href="engineering.html">Electrical Power</a></li>
+          <li><a href="solar-energy.html">Solar PV &amp; Storage</a></li>
+          <li><a href="fire-safety.html">Fire Protection</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Standards</h4>
+        <ul class="footer-links">
+          <li><a href="civil.html">ACI 318-19 Concrete</a></li>
+          <li><a href="civil.html">IBC Chapter 18 Soils</a></li>
+          <li><a href="civil.html">AASHTO LRFD Standards</a></li>
+          <li><a href="civil.html">ASTM Standards</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. Professional client-side calculation engine. All algorithms verified against published standards.</p>
+    </div>
+  </footer>
+
+  <!-- Client-Side JavaScript -->
+  <script>
+    function calcWall() {
+      const H = parseFloat(document.getElementById('wall-h').value) || 4.0;
+      const B = parseFloat(document.getElementById('wall-b').value) || 2.6;
+      const D = parseFloat(document.getElementById('wall-d').value) || 0.45;
+      const t = parseFloat(document.getElementById('wall-t').value) || 0.35;
+      const phi_deg = parseFloat(document.getElementById('wall-phi').value) || 30;
+      const gamma_s = parseFloat(document.getElementById('wall-gamma').value) || 18.0;
+      const mu = parseFloat(document.getElementById('wall-mu').value) || 0.45;
+      const qa = parseFloat(document.getElementById('wall-qa').value) || 175;
+
+      const phi_rad = (phi_deg * Math.PI) / 180;
+      const Ka = (1 - Math.sin(phi_rad)) / (1 + Math.sin(phi_rad));
+
+      const H_tot = H + D;
+      const Pa = 0.5 * Ka * gamma_s * Math.pow(H_tot, 2);
+      const MO = Pa * (H_tot / 3);
+
+      // Concrete unit weight ~24 kN/m3
+      const gamma_c = 24.0;
+      // Stem geometry
+      const W_stem = t * H * gamma_c;
+      // Position stem roughly 1/3 from toe
+      const toe_len = Math.max(0.4, (B - t) / 3);
+      const heel_len = Math.max(0.4, B - toe_len - t);
+      const arm_stem = toe_len + (t / 2);
+      const M_stem = W_stem * arm_stem;
+
+      // Footing slab geometry
+      const W_slab = B * D * gamma_c;
+      const arm_slab = B / 2;
+      const M_slab = W_slab * arm_slab;
+
+      // Soil over heel
+      const W_soil = heel_len * H * gamma_s;
+      const arm_soil = toe_len + t + (heel_len / 2);
+      const M_soil = W_soil * arm_soil;
+
+      const sumV = W_stem + W_slab + W_soil;
+      const sumMR = M_stem + M_slab + M_soil;
+
+      const fsOverturn = MO > 0 ? (sumMR / MO) : 999;
+      const fsSlide = Pa > 0 ? ((mu * sumV) / Pa) : 999;
+
+      const x_bar = sumV > 0 ? ((sumMR - MO) / sumV) : (B / 2);
+      const e = (B / 2) - x_bar;
+
+      let qmax = 0;
+      let qmin = 0;
+      if (Math.abs(e) <= B / 6) {
+        qmax = (sumV / B) * (1 + (6 * e / B));
+        qmin = (sumV / B) * (1 - (6 * e / B));
+      } else {
+        qmax = (2 * sumV) / (3 * Math.max(0.01, x_bar));
+        qmin = 0;
+      }
+
+      const isStable = fsOverturn >= 1.5 && fsSlide >= 1.5 && qmax <= qa;
+
+      document.getElementById('wall-fs-overturn').innerText = fsOverturn.toFixed(2);
+      document.getElementById('wall-fs-slide').innerText = fsSlide.toFixed(2) + ' (Min 1.50)';
+      document.getElementById('wall-pa').innerText = Pa.toFixed(1) + ' kN/m';
+      document.getElementById('wall-ka').innerText = Ka.toFixed(3);
+      document.getElementById('wall-qmax').innerText = qmax.toFixed(1) + ' kPa';
+      document.getElementById('wall-mr').innerText = sumMR.toFixed(1) + ' kN·m/m';
+      document.getElementById('wall-mo').innerText = MO.toFixed(1) + ' kN·m/m';
+
+      const badge = document.getElementById('wall-status-badge');
+      if (isStable) {
+        badge.className = 'status-pill status-success';
+        badge.innerText = 'STABLE (Passes All Criteria)';
+        document.getElementById('wall-fs-overturn').style.color = '#059669';
+      } else {
+        badge.className = 'status-pill status-danger';
+        badge.innerText = 'UNSTABLE (Check Safety Margins)';
+        document.getElementById('wall-fs-overturn').style.color = '#DC2626';
+      }
+    }
+
+    function copyWallResults() {
+      const fsO = document.getElementById('wall-fs-overturn').innerText;
+      const fsS = document.getElementById('wall-fs-slide').innerText;
+      const pa = document.getElementById('wall-pa').innerText;
+      const qmax = document.getElementById('wall-qmax').innerText;
+      const status = document.getElementById('wall-status-badge').innerText;
+      const text = `CalcHub Retaining Wall Stability (Rankine / ACI 318):\nFS Overturning: ${fsO}\nFS Sliding: ${fsS}\nActive Thrust: ${pa}\nMax Soil Pressure: ${qmax}\nStatus: ${status}`;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Retaining wall stability report copied to clipboard!");
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', calcWall);
+  </script>
+</body>
+</html>

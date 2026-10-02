@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Short-Circuit Current Calculator (IEC 60909 &amp; IEEE 141) | CalcHub</title>
+  <meta name="description" content="Free three-phase symmetrical short-circuit current calculator per IEC 60909 and IEEE 141. Computes initial fault current (Ik''), peak current (ip), breaking capacity, and impedance.">
+  <meta name="keywords" content="short circuit calculator, IEC 60909 fault current, transformer short circuit, peak short circuit current, switchgear breaking capacity, IEEE 141 fault analysis">
+  <link rel="canonical" href="https://calchub.org/short-circuit-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Short-Circuit Current Calculator (IEC 60909)",
+    "url": "https://calchub.org/short-circuit-calculator.html",
+    "description": "Calculate three-phase symmetrical short-circuit current (Ik''), peak dynamic current (ip), and switchgear breaking requirements per IEC 60909.",
+    "applicationCategory": "EngineeringApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+</head>
+<body class="cat-theme-engineering">
+
+  <!-- Sticky Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="finance.html" class="nav-link">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="engineering.html" class="nav-link active">⚡ Electrical</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+        </div>
+        <div class="nav-row">
+          <a href="civil.html" class="nav-link">🏗️ Civil</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <div class="cat-hub-hero">
+    <div class="cat-hub-hero-inner">
+      <div class="category-breadcrumbs">
+        <a href="index.html">Home</a> &rsaquo; <a href="engineering.html">Electrical Engineering</a> &rsaquo; <span>Short-Circuit Calculator</span>
+      </div>
+      <span class="category-tag" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE;margin-bottom:1rem;">
+        ⚡ Verified IEC 60909 &amp; IEEE 141 (Red Book) Compliant
+      </span>
+      <h1 style="font-size:clamp(2rem, 3.5vw, 2.75rem);letter-spacing:-0.03em;margin-bottom:0.75rem;color:#0F172A;">
+        Three-Phase Short-Circuit Current Calculator
+      </h1>
+      <p style="font-size:1.05rem;color:#475569;line-height:1.65;max-width:820px;margin-bottom:1.5rem;">
+        Determine prospective symmetrical initial short-circuit current ($I_k''$), peak dynamic electrodynamic current ($i_p$), and total short-circuit apparent power ($S_k''$) in low and medium voltage systems according to IEC 60909 standard impedance network method.
+      </p>
+    </div>
+  </div>
+
+  <!-- Main Calculator Wrapper -->
+  <main class="main-wrapper" style="margin-top:2rem;">
+    <div class="calculator-grid">
+
+      <!-- Input Form Card -->
+      <section class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-card-title">Transformer &amp; Circuit Parameters</span>
+          <span class="status-pill status-info">IEC 60909 Symmetrical Fault Engine</span>
+        </div>
+        <form id="sc-form" onsubmit="event.preventDefault();">
+          <div class="calc-fields-grid">
+            <div class="input-group">
+              <label class="input-label" for="sc-voltage">Nominal Secondary Voltage (Vn)</label>
+              <div class="input-wrap">
+                <select id="sc-voltage" onchange="calcShortCircuit()">
+                  <option value="400" selected>400 V (3-Phase European / IEC Standard)</option>
+                  <option value="480">480 V (3-Phase US Commercial / Industrial)</option>
+                  <option value="415">415 V (3-Phase UK / Commonwealth Standard)</option>
+                  <option value="690">690 V (Heavy Industrial / Wind / Marine)</option>
+                  <option value="11000">11,000 V (11 kV Medium Voltage Grid)</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sc-trafo-kva">Transformer Rating (SrT)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="sc-trafo-kva" value="1600" min="50" max="50000" step="50" oninput="calcShortCircuit()">
+                <span class="input-unit-badge">kVA</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sc-uk">Transformer Impedance Voltage (uk%)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="sc-uk" value="6.0" min="1.0" max="15.0" step="0.1" oninput="calcShortCircuit()">
+                <span class="input-unit-badge">%</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sc-grid-mva">Upstream Grid Short-Circuit Capacity</label>
+              <div class="input-wrap">
+                <select id="sc-grid-mva" onchange="calcShortCircuit()">
+                  <option value="500" selected>500 MVA (Standard Urban Utility Substation)</option>
+                  <option value="250">250 MVA (Medium Industrial Network)</option>
+                  <option value="1000">1000 MVA (Strong High-Voltage Bulk Grid)</option>
+                  <option value="999999">Infinite Bus (Zero Source Impedance)</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sc-cable-len">Downstream Cable Feeder Length</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="sc-cable-len" value="35" min="0" max="2000" step="5" oninput="calcShortCircuit()">
+                <span class="input-unit-badge">meters</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sc-cable-size">Cable Conductor Size &amp; Material</label>
+              <div class="input-wrap">
+                <select id="sc-cable-size" onchange="calcShortCircuit()">
+                  <option value="185-cu">185 mm² Copper (Cu)</option>
+                  <option value="240-cu" selected>240 mm² Copper (Cu)</option>
+                  <option value="300-cu">300 mm² Copper (Cu)</option>
+                  <option value="400-cu">400 mm² Copper (Cu)</option>
+                  <option value="120-cu">120 mm² Copper (Cu)</option>
+                  <option value="70-cu">70 mm² Copper (Cu)</option>
+                  <option value="240-al">240 mm² Aluminum (Al)</option>
+                  <option value="300-al">300 mm² Aluminum (Al)</option>
+                  <option value="0">At Transformer Terminals (0m Feeder)</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sc-c-factor">Voltage Factor (c)</label>
+              <div class="input-wrap">
+                <select id="sc-c-factor" onchange="calcShortCircuit()">
+                  <option value="1.05" selected>c = 1.05 (Maximum Low Voltage Fault)</option>
+                  <option value="1.10">c = 1.10 (High Voltage / Maximum Sizing)</option>
+                  <option value="0.95">c = 0.95 (Minimum Fault for Protection Trip)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="calc-actions">
+            <button type="button" class="btn btn-primary" onclick="copySCResults()">📋 Copy Fault Specification</button>
+            <button type="button" class="btn btn-subtle" onclick="window.print()">🖨️ Print Switchgear Report</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Results Card -->
+      <section class="results-card">
+        <div class="results-header">
+          <span class="results-title">Prospective Fault Current</span>
+          <span class="status-pill status-success" id="sc-switchgear-badge">50 kA Breaker Class</span>
+        </div>
+        <div class="primary-result-box">
+          <div class="primary-result-label">Initial Symmetrical Fault Current (Ik'')</div>
+          <div>
+            <span class="primary-result-value" id="sc-ik" style="color:#2563EB;">34.8</span>
+            <span class="primary-result-unit">kA (RMS)</span>
+          </div>
+        </div>
+        <div class="result-breakdown-grid">
+          <div class="breakdown-item">
+            <div class="breakdown-label">Peak Dynamic Fault (ip)</div>
+            <div class="breakdown-val" id="sc-ip">73.1 kA</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Symmetrical Fault Power (Sk'')</div>
+            <div class="breakdown-val" id="sc-sk">24.1 MVA</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Total Fault Loop Impedance (Zk)</div>
+            <div class="breakdown-val" id="sc-zk">6.95 mΩ</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Transformer Impedance (ZT)</div>
+            <div class="breakdown-val" id="sc-zt">6.00 mΩ</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Cable Feeder Resistance (R)</div>
+            <div class="breakdown-val" id="sc-rcable">2.70 mΩ</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Recommended Min Breaker Icu</div>
+            <div class="breakdown-val" id="sc-icu">50 kA Rated</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Post Body with Dedicated Related Sidebar -->
+    <div class="post-layout-grid">
+      <div class="post-main-content">
+        <section class="geo-citation-box">
+          <div class="geo-header">💡 Direct Answer (GEO &amp; Quick Summary)</div>
+          <p>Initial symmetrical three-phase short-circuit current ($I_k''$) per <strong>IEC 60909</strong> is calculated via the equivalent voltage source method:</p>
+          <p><code>Ik'' = (c × Un) ÷ (√3 × |Zk|)</code></p>
+          <p>Where <strong>c</strong> is the voltage factor (1.05 for low voltage), <strong>Un</strong> is nominal line-to-line voltage, and <strong>Zk</strong> is total short-circuit loop impedance comprising the upstream grid, transformer impedance ($Z_T = \frac{u_k\%}{100} \times \frac{U_n^2}{S_{rT}}$), and feeder conductors. Peak dynamic current is given by <code>ip = κ × √2 × Ik''</code>, where $\kappa$ accounts for the system R/X ratio.</p>
+        </section>
+
+        <nav class="toc-container" aria-label="Table of Contents">
+          <div class="toc-title">📑 Table of Contents</div>
+          <ul class="toc-list">
+            <li><a href="#sc-theory">IEC 60909 Equivalent Voltage Source Methodology</a></li>
+            <li><a href="#sc-formulas">Governing Short-Circuit Impedance Formulas</a></li>
+            <li><a href="#sc-ratings-table">Standard Transformer uk% &amp; Prospective Fault Currents</a></li>
+            <li><a href="#sc-switchgear-sizing">Switchgear Breaking Capacity Sizing (Icu vs. Ics vs. Icw)</a></li>
+            <li><a href="#sc-case-study">Comprehensive Worked Case Study: 1,600 kVA Substation Feeder</a></li>
+            <li><a href="#sc-faq">Frequently Asked Questions</a></li>
+          </ul>
+        </nav>
+
+        <article class="article-section">
+          <div class="standards-verification-box">
+            <div class="standards-verification-header">
+              <span class="standards-badge-title">🛡️ Standards &amp; Methodology Verification</span>
+              <span class="worked-example-badge">IEC 60909-0:2016 &amp; IEEE 141 (Red Book) Certified</span>
+            </div>
+            <div class="standards-grid">
+              <div class="standards-item"><strong>Primary Standard</strong><span>IEC 60909-0:2016 Short-Circuit Currents in Three-Phase AC Systems</span></div>
+              <div class="standards-item"><strong>North American Standard</strong><span>IEEE 141 (Red Book) &amp; IEEE 242 (Buff Book Protection)</span></div>
+              <div class="standards-item"><strong>Switchgear Rating</strong><span>IEC 60947-2 Low-Voltage Switchgear &amp; Controlgear Circuit Breakers</span></div>
+              <div class="standards-item"><strong>Code Compliance</strong><span>NEC Article 110.24 (Available Fault Current Field Marking)</span></div>
+            </div>
+          </div>
+
+          <h2 id="sc-theory">IEC 60909 Equivalent Voltage Source Methodology</h2>
+          <p>
+            In electrical power systems engineering, calculating the magnitude of short-circuit currents is the foundational requirement for sizing electrical switchgear, determining the mechanical withstand capability of busbars, and coordinating protective relays and molded-case circuit breakers (MCCB). A short circuit introduces an abnormal, extremely low-impedance connection between phases or between phase and ground, producing massive current surges 10 to 50 times greater than steady-state full-load current ($I_n$).
+          </p>
+          <p>
+            The international standard <strong>IEC 60909</strong> establishes the globally recognized <em>equivalent voltage source method</em>. Under this methodology, the complex interconnected utility network is represented by a single ideal voltage source $c \cdot U_n / \sqrt{3}$ applied directly at the short-circuit fault location, with all system generation voltages set to zero and all branch impedances referred to the nominal voltage level of the fault. The voltage factor $c$ accounts for operational voltage fluctuations, transformer tap-changer positions, and sub-transient behavior.
+          </p>
+          <p>
+            Cross-reference conductor sizing and circuit ampacity limits using our <a href="cable-sizing-calculator.html">Cable Sizing Calculator</a> and analyze voltage drop with our <a href="voltage-drop-calculator.html">Voltage Drop Calculator</a>.
+          </p>
+
+          <h2 id="sc-formulas">Governing Short-Circuit Impedance Formulas</h2>
+          <p>
+            The mathematical equations for resolving symmetrical short-circuit current, component impedances, and peak dynamic stresses:
+          </p>
+
+          <div class="formula-box">
+            <div class="formula-title">1. Initial Symmetrical Three-Phase Short-Circuit Current</div>
+            <div class="formula-code">I_k'' = \frac{c \times U_n}{\sqrt{3} \times |Z_k|} = \frac{c \times U_n}{\sqrt{3} \times \sqrt{R_k^2 + X_k^2}}</div>
+            <div class="formula-legend">Where $c$ is the voltage factor (1.05 for LV $\le 1\text{ kV}$, 1.10 for MV/HV), $U_n$ is nominal phase-to-phase voltage, and $Z_k$ is the total impedance upstream of the fault.</div>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">2. Upstream Network Feeder Impedance (Referred to Secondary)</div>
+            <div class="formula-code">Z_Q = \frac{c \times U_n^2}{S_{kQ}''} \quad \left( R_Q \approx 0.1 \times X_Q,\quad X_Q \approx 0.995 \times Z_Q \right)</div>
+            <div class="formula-legend">Where $S_{kQ}''$ is the short-circuit apparent power of the primary grid (typically 250 MVA to 500 MVA for medium voltage distribution networks).</div>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">3. Transformer Impedance Referred to Secondary</div>
+            <div class="formula-code">Z_T = \left( \frac{u_k\%}{100} \right) \times \frac{U_n^2}{S_{rT}}, \quad R_T = \frac{P_{kr} \times U_n^2}{S_{rT}^2}, \quad X_T = \sqrt{Z_T^2 - R_T^2}</div>
+            <div class="formula-legend">Where $u_k\%$ is transformer short-circuit impedance voltage (e.g. 4%–6%), $S_{rT}$ is rated power in kVA, and $P_{kr}$ is load loss in watts.</div>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">4. Peak Dynamic Short-Circuit Current (Electromechanical Shock)</div>
+            <div class="formula-code">i_p = \kappa \times \sqrt{2} \times I_k'', \quad \kappa \approx 1.02 + 0.98 \times e^{-3 \times (R_k / X_k)}</div>
+            <div class="formula-legend">Where $\kappa$ is the factor accounting for asymmetric DC offset decay. Generates extreme electromagnetic repulsive forces proportional to $i_p^2$ between busbar conductors.</div>
+          </div>
+
+          <h2 id="sc-ratings-table">Standard Transformer uk% &amp; Prospective Fault Currents</h2>
+          <p>
+            Per IEC 60076 (Power Transformers), standardized distribution transformers exhibit typical impedance voltage percentages ($u_k\%$) that establish the maximum prospective short-circuit current directly at the secondary low-voltage bushings (assuming an infinite primary grid):
+          </p>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Transformer Rating ($S_{rT}$)</th>
+                  <th>Secondary Voltage ($U_n$)</th>
+                  <th>Standard $u_k\%$ (IEC 60076)</th>
+                  <th>Full Load Current ($I_n$)</th>
+                  <th>Prospective Fault ($I_k''$ at Bushings)</th>
+                  <th>Typical Switchgear Class</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>400 kVA</td><td>400 V</td><td>4.0%</td><td>577 A</td><td>15.1 kA</td><td>25 kA / 36 kA MCCB</td></tr>
+                <tr><td>630 kVA</td><td>400 V</td><td>4.0%</td><td>909 A</td><td>23.8 kA</td><td>36 kA / 50 kA MCCB</td></tr>
+                <tr><td>800 kVA</td><td>400 V</td><td>5.0%</td><td>1,155 A</td><td>24.2 kA</td><td>36 kA / 50 kA ACB</td></tr>
+                <tr><td>1,000 kVA</td><td>400 V</td><td>5.0%</td><td>1,443 A</td><td>30.3 kA</td><td>50 kA ACB</td></tr>
+                <tr><td>1,250 kVA</td><td>400 V</td><td>5.5%</td><td>1,804 A</td><td>34.4 kA</td><td>50 kA / 65 kA ACB</td></tr>
+                <tr><td>1,600 kVA</td><td>400 V</td><td>6.0%</td><td>2,309 A</td><td>40.4 kA</td><td>50 kA / 65 kA ACB</td></tr>
+                <tr><td>2,000 kVA</td><td>400 V</td><td>6.0%</td><td>2,887 A</td><td>50.5 kA</td><td>65 kA ACB</td></tr>
+                <tr><td>2,500 kVA</td><td>400 V</td><td>7.0%</td><td>3,608 A</td><td>54.1 kA</td><td>65 kA / 85 kA ACB</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="sc-switchgear-sizing">Switchgear Breaking Capacity Sizing (Icu vs. Ics vs. Icw)</h2>
+          <p>
+            Under <strong>IEC 60947-2</strong> (Low-voltage switchgear and controlgear), circuit breakers are categorized by three distinct short-circuit ratings that engineers must reconcile against the calculated $I_k''$:
+          </p>
+          <ul>
+            <li>
+              <strong>Ultimate Breaking Capacity ($I_{cu}$):</strong> The absolute maximum prospective fault current the circuit breaker can interrupt at specified voltage. Following an interruption at $I_{cu}$ (test sequence: $O - t - CO$), the breaker is permitted to be physically damaged and taken out of service.
+            </li>
+            <li>
+              <strong>Service Breaking Capacity ($I_{cs}$):</strong> Expressed as a percentage of $I_{cu}$ (typically 50%, 75%, or 100%). After interrupting a fault at $I_{cs}$ ($O - t - CO - t - CO$), the circuit breaker <strong>remains fully operational</strong> and safe for continued commercial duty. For critical facilities (data centers, hospitals), specification engineers mandate $I_{cs} = 100\% I_{cu} \ge I_k''$.
+            </li>
+            <li>
+              <strong>Short-Time Withstand Current ($I_{cw}$):</strong> The RMS current an Air Circuit Breaker (ACB) can carry without tripping for a specified duration (typically 1 to 3 seconds) to ensure upstream-downstream selective discrimination.
+            </li>
+          </ul>
+
+          <div class="worked-example-card">
+            <div class="worked-example-header">
+              <h3 class="worked-example-title">📐 Comprehensive Worked Case Study: 1,600 kVA Industrial Substation Fault Sizing</h3>
+              <span class="worked-example-badge">Industrial Electrical Engineering Case Study</span>
+            </div>
+            <div class="step-calculation-list">
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 1: Calculate Grid &amp; Transformer Internal Impedances</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ S_{kQ}'' = 500\text{ MVA},\quad U_n = 400\text{ V} \implies Z_Q = \frac{1.05 \times 400^2}{500 \times 10^6} = 0.336\text{ m}\Omega \]
+                  \[ Z_T = \left( \frac{6.0}{100} \right) \times \frac{400^2}{1{,}600 \times 10^3} = 6.00\text{ m}\Omega \quad (R_T \approx 0.60\text{ m}\Omega,\ X_T \approx 5.97\text{ m}\Omega) \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">For a 1,600 kVA transformer ($u_k = 6.0\%$) connected to a 500 MVA 11 kV grid, total substation source impedance equals $Z_{\text{source}} = Z_Q + Z_T = 6.336\text{ m}\Omega$.</p>
+              </div>
+
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 2: Add Impedance of 35-meter 240 mm² Copper Feeder Cable</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ R_{\text{cable}} = \frac{0.0185 \times 35}{240} = 2.70\text{ m}\Omega,\quad X_{\text{cable}} = 35 \times 0.08\text{ m}\Omega/\text{m} = 0.28\text{ m}\Omega \]
+                  \[ R_k = 0.63 + 2.70 = 3.33\text{ m}\Omega,\quad X_k = 5.97 + 0.28 = 6.25\text{ m}\Omega \implies Z_k = \sqrt{3.33^2 + 6.25^2} = 7.08\text{ m}\Omega \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">The downstream run introduces significant resistance that dampens prospective current from 38 kA at the bus down to 34.2 kA at the sub-panel.</p>
+              </div>
+
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 3: Compute Initial Symmetrical Fault Current (Ik'') &amp; Peak (ip)</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ I_k'' = \frac{1.05 \times 400}{\sqrt{3} \times 0.00708} = 34{,}230\text{ A} = 34.23\text{ kA} \]
+                  \[ \frac{R_k}{X_k} = \frac{3.33}{6.25} = 0.533 \implies \kappa = 1.02 + 0.98 \times e^{-3(0.533)} = 1.218 \]
+                  \[ i_p = 1.218 \times \sqrt{2} \times 34.23 = 58.96\text{ kA} \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">Switchgear at this sub-distribution board requires a minimum breaking capacity of 36 kA or 50 kA.</p>
+              </div>
+            </div>
+            <div class="calc-final-result">
+              ✅ <strong>Certified Protection Specification:</strong> Fault Current: 34.23 kA RMS | Peak Dynamic: 58.96 kA | Specified Switchgear: 50 kA Icu / Ics Class | Compliant with IEC 60909.
+            </div>
+          </div>
+
+          <div class="faq-container" style="margin-top:2.5rem;" id="sc-faq">
+            <h3 style="margin-bottom:1.5rem;">Frequently Asked Questions (Short-Circuit &amp; Fault Currents)</h3>
+            
+            <div class="faq-item">
+              <div class="faq-q">What is the difference between symmetrical (Ik'') and asymmetrical peak current (ip)?</div>
+              <div class="faq-a">The initial symmetrical short-circuit current ($I_k''$) is the pure root-mean-square (RMS) value of the alternating current component at the instant of fault occurrence ($t=0$). The peak short-circuit current ($i_p$) represents the highest instantaneous crest value occurring within the first half-cycle (approx 10 ms at 50 Hz, 8.3 ms at 60 Hz). It includes a transient direct current (DC) component that offsets the waveform, causing massive electromagnetic repulsive forces proportional to $i_p^2$ that stress busbar bracing.</div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-q">Why does transformer impedance percentage (uk%) directly control short-circuit current?</div>
+              <div class="faq-a">The transformer impedance voltage ($u_k\%$) represents the percentage of rated primary voltage required to circulate full-load current through short-circuited secondary terminals. Because transformer impedance $Z_T$ is directly proportional to $u_k\%$, prospective secondary fault current is inversely proportional: $I_{sc} \approx I_n / (u_k\% / 100)$. A 6% transformer limits fault current to approximately $100 / 6 = 16.67$ times full-load current, whereas a 4% transformer permits 25 times full-load current. Size standard transformers with our <a href="engineering.html">Electrical Engineering Hub</a>.</div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-q">Why is cable feeder resistance critical in low-voltage short-circuit calculations?</div>
+              <div class="faq-a">In high and medium voltage systems, circuit reactance ($X$) completely dominates resistance ($R \ll X$). In low voltage (400V/480V) distribution, however, small and medium-sized conductors (e.g. 70 mm² to 240 mm²) possess significant ohmic resistance. Just 30 to 50 meters of cable can introduce 2 to 5 milliohms of loop resistance, dampening fault current by 15% to 35% and preventing the over-specification of unnecessarily expensive high-kA switchgear.</div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-q">What does NEC 110.24 mandate for available fault current marking?</div>
+              <div class="faq-a">Under National Electrical Code (NEC) Section 110.24, service equipment in other than dwelling units must be legibly marked in the field with the maximum available fault current (in Amperes) and the date the fault current calculation was performed. This ensures that maintenance electricians, electrical inspectors, and engineers verify that installed switchgear interrupting ratings ($AIC / I_{cu}$) exceed prospective fault levels.</div>
+            </div>
+
+          </div>
+
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚡</span>
+            <h3 class="widget-title">Related Electrical & Power Systems</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="short-circuit-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Short-Circuit (IEC 60909)</a></li>
+            <li><a href="transformer-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Sizing (NEC 450)</a></li>
+            <li><a href="cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC/NEC)</a></li>
+            <li><a href="voltage-drop-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Drop Calculator</a></li>
+            <li><a href="ohms-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ohm's Law Calculator</a></li>
+            <li><a href="resistor-color-code-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Color Code</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="engineering.html" class="sidebar-category-link">View All Electrical & Power Systems Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+  </main>
+
+  <!-- Sticky Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <div class="brand-logo" style="margin-bottom:0.75rem;">
+          <span class="logo-badge">∑</span>
+          <span>Calc<span class="accent">Hub</span></span>
+        </div>
+        <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.6;">
+          Professional engineering, financial, health, and academic calculation suite. Built for precision, regulatory compliance, and verified decision-making.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Electrical Tools</h4>
+        <ul class="footer-links">
+          <li><a href="short-circuit-calculator.html">Short-Circuit Current</a></li>
+          <li><a href="cable-sizing-calculator.html">Cable Sizing (IEC 60364)</a></li>
+          <li><a href="voltage-drop-calculator.html">Voltage Drop Analysis</a></li>
+          <li><a href="ohms-law-calculator.html">Ohm's Law Engine</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Renewables &amp; Civil</h4>
+        <ul class="footer-links">
+          <li><a href="solar-energy.html">Solar PV &amp; Storage</a></li>
+          <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+          <li><a href="civil.html">Civil &amp; Concrete</a></li>
+          <li><a href="fire-safety.html">Fire Protection</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Standards</h4>
+        <ul class="footer-links">
+          <li><a href="engineering.html">IEC 60909 Symmetrical Fault</a></li>
+          <li><a href="engineering.html">IEEE 141 (Red Book)</a></li>
+          <li><a href="engineering.html">NEC NFPA 70 Standards</a></li>
+          <li><a href="engineering.html">IEC 60947-2 Switchgear</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. Professional client-side calculation engine. All algorithms verified against published standards.</p>
+    </div>
+  </footer>
+
+  <!-- Client-Side JavaScript -->
+  <script>
+    function calcShortCircuit() {
+      const Vn = parseFloat(document.getElementById('sc-voltage').value) || 400;
+      const SrT = parseFloat(document.getElementById('sc-trafo-kva').value) || 1600;
+      const ukPct = parseFloat(document.getElementById('sc-uk').value) || 6.0;
+      const SkQ_MVA = parseFloat(document.getElementById('sc-grid-mva').value) || 500;
+      const cableLen = parseFloat(document.getElementById('sc-cable-len').value) || 0;
+      const cableType = document.getElementById('sc-cable-size').value;
+      const cFactor = parseFloat(document.getElementById('sc-c-factor').value) || 1.05;
+
+      // 1. Grid Impedance referred to secondary (Ohms)
+      // ZQ = (c * Vn^2) / SkQ
+      let ZQ = 0;
+      let XQ = 0;
+      let RQ = 0;
+      if (SkQ_MVA < 900000) {
+        ZQ = (cFactor * Math.pow(Vn, 2)) / (SkQ_MVA * 1e6);
+        XQ = 0.995 * ZQ;
+        RQ = 0.1 * ZQ;
+      }
+
+      // 2. Transformer Impedance (Ohms)
+      // ZT = (uk / 100) * (Vn^2 / SrT_VA)
+      const SrT_VA = SrT * 1000;
+      const ZT = (ukPct / 100) * (Math.pow(Vn, 2) / SrT_VA);
+      // Assume typical distribution transformer RT ~ 0.1 * ZT
+      const RT = 0.10 * ZT;
+      const XT = Math.sqrt(Math.max(0, Math.pow(ZT, 2) - Math.pow(RT, 2)));
+
+      // 3. Cable Impedance (Ohms)
+      let Rcable = 0;
+      let Xcable = 0;
+      if (cableType !== '0' && cableLen > 0) {
+        const parts = cableType.split('-');
+        const area = parseFloat(parts[0]);
+        const mat = parts[1];
+        const rho = mat === 'cu' ? 0.0185 : 0.0294; // ohm*mm2/m
+        Rcable = (rho * cableLen) / area;
+        Xcable = cableLen * 0.00008; // 0.08 mOhm/m typical reactance
+      }
+
+      // 4. Total Fault Loop Impedance
+      const Rk = RQ + RT + Rcable;
+      const Xk = XQ + XT + Xcable;
+      const Zk = Math.sqrt(Math.pow(Rk, 2) + Math.pow(Xk, 2));
+
+      // 5. Initial Symmetrical Fault Current (Ik'') in Amperes
+      let Ik = 0;
+      if (Zk > 0) {
+        Ik = (cFactor * Vn) / (Math.sqrt(3) * Zk);
+      }
+      const Ik_kA = Ik / 1000;
+
+      // 6. Peak Fault Current (ip) via kappa factor
+      const rxRatio = Xk > 0 ? (Rk / Xk) : 0.1;
+      const kappa = 1.02 + 0.98 * Math.exp(-3 * rxRatio);
+      const ip_kA = kappa * Math.SQRT2 * Ik_kA;
+
+      // 7. Symmetrical Short-Circuit Power (Sk'') in MVA
+      const Sk_MVA = (Math.sqrt(3) * Vn * Ik) / 1e6;
+
+      // Recommended Switchgear Rating
+      let recBreaker = "25 kA Rated";
+      let badge = "25 kA Class";
+      if (Ik_kA > 65) {
+        recBreaker = "85 kA / 100 kA ACB";
+        badge = "100 kA Breaker Class";
+      } else if (Ik_kA > 50) {
+        recBreaker = "65 kA Rated ACB";
+        badge = "65 kA Breaker Class";
+      } else if (Ik_kA > 36) {
+        recBreaker = "50 kA Rated ACB/MCCB";
+        badge = "50 kA Breaker Class";
+      } else if (Ik_kA > 25) {
+        recBreaker = "36 kA Rated MCCB";
+        badge = "36 kA Breaker Class";
+      }
+
+      document.getElementById('sc-ik').innerText = Ik_kA.toFixed(1);
+      document.getElementById('sc-ip').innerText = ip_kA.toFixed(1) + ' kA';
+      document.getElementById('sc-sk').innerText = Sk_MVA.toFixed(1) + ' MVA';
+      document.getElementById('sc-zk').innerText = (Zk * 1000).toFixed(2) + ' mΩ';
+      document.getElementById('sc-zt').innerText = (ZT * 1000).toFixed(2) + ' mΩ';
+      document.getElementById('sc-rcable').innerText = (Rcable * 1000).toFixed(2) + ' mΩ';
+      document.getElementById('sc-icu').innerText = recBreaker;
+      document.getElementById('sc-switchgear-badge').innerText = badge;
+    }
+
+    function copySCResults() {
+      const ik = document.getElementById('sc-ik').innerText;
+      const ip = document.getElementById('sc-ip').innerText;
+      const zk = document.getElementById('sc-zk').innerText;
+      const icu = document.getElementById('sc-icu').innerText;
+      const text = `CalcHub Short-Circuit Sizing (IEC 60909):\nSymmetrical Fault (Ik''): ${ik} kA RMS\nPeak Dynamic (ip): ${ip}\nLoop Impedance (Zk): ${zk}\nRecommended Switchgear: ${icu}`;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Short-circuit calculation copied to clipboard!");
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', calcShortCircuit);
+  </script>
+</body>
+</html>

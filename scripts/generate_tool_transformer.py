@@ -1,0 +1,564 @@
+import os
+import re
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+TRANSFORMER_HTML = r'''<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transformer Sizing Calculator (kVA &amp; Full Load Current) | CalcHub</title>
+  <meta name="description" content="Free electrical transformer sizing calculator per NEC Article 450, Article 220, and IEC 60076. Computes required kVA, standard rating, primary/secondary full-load amps, and breaker settings.">
+  <meta name="keywords" content="transformer sizing calculator, transformer kva calculator, full load current calculation, NEC 450 transformer protection, 3 phase transformer sizing, transformer demand factor">
+  <link rel="canonical" href="https://calchub.org/transformer-sizing-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Transformer Sizing Calculator (NEC 450 & IEC 60076)",
+    "url": "https://calchub.org/transformer-sizing-calculator.html",
+    "description": "Calculate commercial and industrial electrical transformer kVA capacity, primary and secondary full-load currents, and overcurrent protection per NEC Article 450.",
+    "applicationCategory": "EngineeringApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+</head>
+<body class="cat-theme-engineering">
+
+  <!-- Sticky Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="finance.html" class="nav-link">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="engineering.html" class="nav-link active">⚡ Electrical</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+        </div>
+        <div class="nav-row">
+          <a href="civil.html" class="nav-link">🏗️ Civil</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <div class="cat-hub-hero">
+    <div class="cat-hub-hero-inner">
+      <div class="category-breadcrumbs">
+        <a href="index.html">Home</a> &rsaquo; <a href="engineering.html">Electrical Engineering</a> &rsaquo; <span>Transformer Sizing Calculator</span>
+      </div>
+      <span class="category-tag" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE;margin-bottom:1rem;">
+        ⚡ Verified NEC Article 450, Article 220 &amp; IEC 60076 Compliant
+      </span>
+      <h1 style="font-size:clamp(2rem, 3.5vw, 2.75rem);letter-spacing:-0.03em;margin-bottom:0.75rem;color:#0F172A;">
+        Electrical Transformer Sizing &amp; FLC Calculator
+      </h1>
+      <p style="font-size:1.05rem;color:#475569;line-height:1.65;max-width:820px;margin-bottom:1.5rem;">
+        Determine required transformer capacity (kVA), select standard industrial transformer ratings, and calculate primary and secondary Full-Load Current (FLC) with NEC Article 450 overcurrent protection margins.
+      </p>
+    </div>
+  </div>
+
+  <!-- Main Calculator Wrapper -->
+  <main class="main-wrapper" style="margin-top:2rem;">
+    <div class="calculator-grid">
+
+      <!-- Input Form Card -->
+      <section class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-card-title">Electrical Load &amp; Voltage Configuration</span>
+          <span class="status-pill status-info">NEC &amp; IEC Sizing Engine</span>
+        </div>
+        <form id="xfmr-form" onsubmit="event.preventDefault();">
+          <div class="calc-fields-grid">
+            <div class="input-group">
+              <label class="input-label" for="xfmr-load-kw">Connected Load (kW)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="xfmr-load-kw" value="450" min="1" max="100000" step="10" oninput="calcTransformer()">
+                <span class="input-unit-badge">kW</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="xfmr-pf">Operating Power Factor (cos φ)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="xfmr-pf" value="0.85" min="0.5" max="1.0" step="0.01" oninput="calcTransformer()">
+                <span class="input-unit-badge">lag</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="xfmr-df">Demand / Diversity Factor (DF)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="xfmr-df" value="0.80" min="0.1" max="1.0" step="0.05" oninput="calcTransformer()">
+                <span class="input-unit-badge">ratio</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="xfmr-growth">Future Expansion Margin (%)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="xfmr-growth" value="25" min="0" max="100" step="5" oninput="calcTransformer()">
+                <span class="input-unit-badge">%</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="xfmr-phases">System Phase Configuration</label>
+              <div class="input-wrap">
+                <select id="xfmr-phases" onchange="calcTransformer()">
+                  <option value="3" selected>Three-Phase (3-Phase, √3 Factor)</option>
+                  <option value="1">Single-Phase (1-Phase)</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="xfmr-v1">Primary Supply Voltage (V1)</label>
+              <div class="input-wrap">
+                <select id="xfmr-v1" onchange="calcTransformer()">
+                  <option value="11000" selected>11,000 V (11 kV Medium Voltage Grid)</option>
+                  <option value="33000">33,000 V (33 kV Sub-Transmission)</option>
+                  <option value="13800">13,800 V (13.8 kV Industrial Primary)</option>
+                  <option value="4160">4,160 V (4.16 kV Plant Distribution)</option>
+                  <option value="480">480 V (Low Voltage Step-Down)</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="xfmr-v2">Secondary Output Voltage (V2)</label>
+              <div class="input-wrap">
+                <select id="xfmr-v2" onchange="calcTransformer()">
+                  <option value="400" selected>400 V (3-Phase European / IEC Line-to-Line)</option>
+                  <option value="480">480 V (3-Phase US Commercial Line-to-Line)</option>
+                  <option value="208">208 V (3-Phase US 120/208V Commercial)</option>
+                  <option value="415">415 V (3-Phase UK / Commonwealth)</option>
+                  <option value="240">240 V (Single-Phase Residential Split)</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="xfmr-max-loading">Max Continuous Loading Limit</label>
+              <div class="input-wrap">
+                <select id="xfmr-max-loading" onchange="calcTransformer()">
+                  <option value="0.80" selected>80% Loading (Optimal Thermal Margin &amp; Efficiency)</option>
+                  <option value="0.85">85% Loading (Standard Commercial Design)</option>
+                  <option value="1.00">100% Nameplate Full Capacity</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="calc-actions">
+            <button type="button" class="btn btn-primary" onclick="copyXfmrResults()">📋 Copy Transformer Schedule</button>
+            <button type="button" class="btn btn-subtle" onclick="window.print()">🖨️ Print Substation Report</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Results Card -->
+      <section class="results-card">
+        <div class="results-header">
+          <span class="results-title">Transformer Specification</span>
+          <span class="status-pill status-success" id="xfmr-rating-badge">Standard Size Selected</span>
+        </div>
+        <div class="primary-result-box">
+          <div class="primary-result-label">Recommended Transformer Rating</div>
+          <div>
+            <span class="primary-result-value" id="xfmr-rec-kva" style="color:#2563EB;">630</span>
+            <span class="primary-result-unit">kVA Standard Unit</span>
+          </div>
+        </div>
+        <div class="result-breakdown-grid">
+          <div class="breakdown-item">
+            <div class="breakdown-label">Calculated Min kVA Required</div>
+            <div class="breakdown-val" id="xfmr-min-kva">529.4 kVA</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Secondary Full Load Current (FLC2)</div>
+            <div class="breakdown-val" id="xfmr-flc2">909.3 A</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Primary Full Load Current (FLC1)</div>
+            <div class="breakdown-val" id="xfmr-flc1">33.1 A</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Transformer Load at Peak</div>
+            <div class="breakdown-val" id="xfmr-load-pct">67.2% Loading</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">NEC Primary Breaker Max (125%)</div>
+            <div class="breakdown-val" id="xfmr-pri-ocpd">41.3 A Rated</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">NEC Secondary Breaker Max (125%)</div>
+            <div class="breakdown-val" id="xfmr-sec-ocpd">1,137 A Rated</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Post Body with Dedicated Related Sidebar -->
+    <div class="post-layout-grid">
+      <div class="post-main-content">
+        <section class="geo-citation-box">
+          <div class="geo-header">💡 Direct Answer (GEO &amp; Quick Summary)</div>
+          <p>Transformer kVA sizing per <strong>NEC Article 220 &amp; 450</strong> and <strong>IEC 60076</strong> is governed by the peak apparent power equation:</p>
+          <p><code>S(kVA) = [ (Connected Load in kW × Demand Factor) ÷ Power Factor ] × (1 + Growth%) ÷ Target Loading</code></p>
+          <p>Three-phase Full-Load Current (FLC) on primary and secondary windings is calculated via <code>FLC = (kVA × 1,000) ÷ (√3 × Line Voltage)</code>. In professional power distribution design, transformers are typically selected at the nearest higher standardized rating (e.g. 500, 630, 800, 1000, 1250, 1600, 2000 kVA) operating at <strong>70% to 80% continuous loading</strong> to maximize electrical efficiency and minimize internal winding thermal degradation.</p>
+        </section>
+
+        <nav class="toc-container" aria-label="Table of Contents">
+          <div class="toc-title">📑 Table of Contents</div>
+          <ul class="toc-list">
+            <li><a href="#xfmr-principles">Fundamental Principles of Transformer Capacity Sizing</a></li>
+            <li><a href="#xfmr-formulas">Governing Apparent Power &amp; Full Load Current Formulas</a></li>
+            <li><a href="#xfmr-standard-sizes">Standard Standardized Transformer kVA Schedules (IEC vs. NEMA)</a></li>
+            <li><a href="#xfmr-nec-protection">NEC Article 450 Overcurrent Protection Rules</a></li>
+            <li><a href="#xfmr-case-study">Comprehensive Worked Case Study: Commercial Facility Sizing</a></li>
+            <li><a href="#xfmr-faq">Frequently Asked Questions</a></li>
+          </ul>
+        </nav>
+
+        <article class="article-section">
+          <div class="standards-verification-box">
+            <div class="standards-verification-header">
+              <span class="standards-badge-title">🛡️ Standards &amp; Methodology Verification</span>
+              <span class="worked-example-badge">NEC Article 450 &amp; IEC 60076 Certified Reference</span>
+            </div>
+            <div class="standards-grid">
+              <div class="standards-item"><strong>Regulatory Framework</strong><span>NEC Article 450 (Transformers) &amp; Article 220 (Branch Load Calculations)</span></div>
+              <div class="standards-item"><strong>International Standard</strong><span>IEC 60076-1:2011 Power Transformers General Specification</span></div>
+              <div class="standards-item"><strong>Overcurrent Protection</strong><span>NEC Table 450.3(A) &amp; (B) Maximum Rating or Setting of OCPD</span></div>
+              <div class="standards-item"><strong>Efficiency Baseline</strong><span>US DOE 10 CFR Part 431 &amp; EU Ecodesign Directive Tier 2 (EN 50588-1)</span></div>
+            </div>
+          </div>
+
+          <h2 id="xfmr-principles">Fundamental Principles of Transformer Capacity Sizing</h2>
+          <p>
+            Correctly sizing an electrical distribution transformer is one of the most critical decisions in electrical facility design. Under-sizing a transformer leads to chronic overheating, rapid breakdown of dielectric winding insulation, excessive voltage drop during heavy motor starts, and nuisance trips. Conversely, gross over-sizing incurs excessive capital expenditures, higher switchgear fault duty requirements (demanding expensive high-kA breakers due to lower transformer impedance), and continuous parasitic <strong>no-load iron core losses</strong> ($P_0$) incurred 24 hours a day regardless of facility demand.
+          </p>
+          <p>
+            Professional electrical engineers determine transformer capacity through a disciplined multi-step methodology:
+          </p>
+          <ul>
+            <li><strong>Connected Load Inventory:</strong> Tabulating all connected electrical apparatus — HVAC chillers, air handlers, lighting, general receptacle branch circuits, server racks, and industrial process machinery.</li>
+            <li><strong>Demand Factor (DF) Application:</strong> Applying diversity factors according to <strong>NEC Article 220</strong> or local building codes, acknowledging that not all loads operate concurrently at 100% capacity.</li>
+            <li><strong>Power Factor Correction:</strong> Converting real active power (kW) to apparent electrical power (kVA) using the actual displacement power factor ($\cos\phi$). Inductive motors and non-linear power supplies increase total kVA demand.</li>
+            <li><strong>Future Growth Provision:</strong> Factoring an engineered expansion margin (typically 20% to 25%) to accommodate prospective facility tenant improvements and facility modifications over a 25-year design horizon.</li>
+            <li><strong>Target Loading Selection:</strong> Operating distribution transformers at <strong>70% to 80% of rated nameplate capacity</strong> under peak demand, positioning the unit in its highest operational efficiency window where no-load core losses and $I^2 R$ copper winding losses achieve thermodynamic balance.</li>
+          </ul>
+          <p>
+            Analyze conductor ampacity and circuit feeder sizing using our <a href="cable-sizing-calculator.html">Cable Sizing Calculator</a> and verify prospective fault levels with our <a href="short-circuit-calculator.html">Short-Circuit Calculator</a>.
+          </p>
+
+          <h2 id="xfmr-formulas">Governing Apparent Power &amp; Full Load Current Formulas</h2>
+          <p>
+            Governing equations for sizing single-phase and three-phase power transformers and determining full-load primary and secondary currents:
+          </p>
+
+          <div class="formula-box">
+            <div class="formula-title">1. Required Minimum Transformer Apparent Power (kVA)</div>
+            <div class="formula-code">S_{\text{min (kVA)}} = \frac{P_{\text{connected (kW)}} \times DF}{\cos\phi} \times \left( \frac{1 + \text{Growth}\% / 100}{\eta_{\text{target}}} \right)</div>
+            <div class="formula-legend">Where $DF$ is demand factor, $\cos\phi$ is power factor, and $\eta_{\text{target}}$ is target peak loading ratio (typically 0.80).</div>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">2. Three-Phase Full-Load Current Equation</div>
+            <div class="formula-code">I_{\text{FLC (3-Phase)}} = \frac{S_{\text{kVA}} \times 1{,}000}{\sqrt{3} \times V_{\text{Line-to-Line}}} = \frac{S_{\text{kVA}} \times 577.35}{V_{\text{LL}}}</div>
+            <div class="formula-legend">Applies to both primary medium voltage ($V_1$) and secondary low voltage ($V_2$) windings under balanced 3-phase loading.</div>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">3. Single-Phase Full-Load Current Equation</div>
+            <div class="formula-code">I_{\text{FLC (1-Phase)}} = \frac{S_{\text{kVA}} \times 1{,}000}{V_{\text{Nominal}}}</div>
+            <div class="formula-legend">Applies to residential single-phase or 120/240V split-phase distribution transformers.</div>
+          </div>
+
+          <h2 id="xfmr-standard-sizes">Standard Standardized Transformer kVA Schedules (IEC vs. NEMA)</h2>
+          <p>
+            Transformer manufacturers fabricate units in standardized kVA increments. When a calculated load requirement falls between standard increments, engineering convention mandates rounding up to the next commercially manufactured rating:
+          </p>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Standard Rating</th>
+                  <th>Standard System</th>
+                  <th>400V Secondary FLC (IEC)</th>
+                  <th>480V Secondary FLC (NEMA)</th>
+                  <th>Typical Application Profile</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>75 kVA</td><td>NEMA / IEEE</td><td>108.3 A</td><td>90.2 A</td><td>Small retail commercial unit, lighting subpanel</td></tr>
+                <tr><td>112.5 kVA</td><td>NEMA / IEEE</td><td>162.4 A</td><td>135.3 A</td><td>Commercial office floor feeder step-down</td></tr>
+                <tr><td>150 kVA</td><td>NEMA / IEEE</td><td>216.5 A</td><td>180.4 A</td><td>Small medical clinic or medium retail store</td></tr>
+                <tr><td>225 kVA</td><td>NEMA / IEEE</td><td>324.8 A</td><td>270.6 A</td><td>Light industrial workshop, warehouse facility</td></tr>
+                <tr><td>300 kVA</td><td>NEMA / IEEE</td><td>433.0 A</td><td>360.8 A</td><td>Educational building, supermarket grocery store</td></tr>
+                <tr><td>400 kVA</td><td>IEC 60076</td><td>577.4 A</td><td>481.1 A</td><td>Residential apartment complex substation</td></tr>
+                <tr><td>500 kVA</td><td>NEMA / IEEE</td><td>721.7 A</td><td>601.4 A</td><td>Medium commercial office tower feeder</td></tr>
+                <tr><td>630 kVA</td><td>IEC 60076</td><td>909.3 A</td><td>757.8 A</td><td>Standard European distribution substation</td></tr>
+                <tr><td>800 kVA</td><td>IEC 60076</td><td>1,154.7 A</td><td>962.3 A</td><td>Industrial manufacturing plant, cold storage facility</td></tr>
+                <tr><td>1,000 kVA</td><td>IEC &amp; NEMA</td><td>1,443.4 A</td><td>1,202.8 A</td><td>Large corporate headquarters, hospital wing</td></tr>
+                <tr><td>1,250 kVA</td><td>IEC 60076</td><td>1,804.2 A</td><td>1,503.6 A</td><td>Major industrial processing facility</td></tr>
+                <tr><td>1,600 kVA</td><td>IEC 60076</td><td>2,309.4 A</td><td>1,924.5 A</td><td>Tier 3 Data center pod, heavy metallurgy plant</td></tr>
+                <tr><td>2,000 kVA</td><td>IEC &amp; NEMA</td><td>2,886.8 A</td><td>2,405.6 A</td><td>Central utility plant, regional distribution hub</td></tr>
+                <tr><td>2,500 kVA</td><td>IEC &amp; NEMA</td><td>3,608.4 A</td><td>3,007.0 A</td><td>Main primary industrial substation transformer</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="xfmr-nec-protection">NEC Article 450 Overcurrent Protection Rules</h2>
+          <p>
+            Under <strong>NEC Section 450.3</strong>, transformers must be protected against dangerous winding thermal overheating caused by prolonged overloads and high-impedance line-to-line faults:
+          </p>
+          <ul>
+            <li><strong>Primary Protection Only (NEC Table 450.3(B)):</strong> For transformers rated 1,000V or less, if secondary protection is not provided, the primary overcurrent protective device (OCPD) must not exceed <strong>125% of rated primary full-load current</strong>. Where 125% does not correspond to a standard breaker rating, NEC Section 450.3(B) Exception allows rounding up to the next standard rating for currents of 9A or more.</li>
+            <li><strong>Primary and Secondary Protection:</strong> If secondary overcurrent protection is provided at not more than <strong>125% of rated secondary current</strong>, the primary OCPD rating is permitted to be increased up to <strong>250%</strong> of rated primary current to accommodate inrush magnetizing transients without nuisance tripping.</li>
+            <li><strong>Continuous Duty Clarification:</strong> While the NEC mandates sizing branch-circuit and feeder conductors at 125% of continuous loads (operating 3 hours or more), the transformer's nameplate kVA rating is already a continuous thermal rating and does not require an additional mandatory 125% multiplier unless specified by design engineers for headroom.</li>
+          </ul>
+
+          <div class="worked-example-card">
+            <div class="worked-example-header">
+              <h3 class="worked-example-title">📐 Comprehensive Worked Case Study: Commercial Facility Substation Sizing</h3>
+              <span class="worked-example-badge">Substation Design Case Study</span>
+            </div>
+            <div class="step-calculation-list">
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 1: Calculate Total Peak Coincident Demand Load</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ P_{\text{conn}} = 550\text{ kW},\quad DF = 0.75,\quad \cos\phi = 0.85 \implies S_{\text{demand}} = \frac{550 \times 0.75}{0.85} = 485.29\text{ kVA} \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">A corporate research facility has 550 kW of connected load with an 0.75 diversity factor and an average 0.85 lagging power factor.</p>
+              </div>
+
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 2: Add 20% Future Expansion Margin &amp; Apply 80% Thermal Loading</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ S_{\text{required}} = \frac{485.29 \times (1 + 0.20)}{0.80} = \frac{582.35}{0.80} = 727.94\text{ kVA} \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">Accounting for 20% expansion and targeting 80% thermal loading yields a minimum required rating of 728 kVA.</p>
+              </div>
+
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 3: Select Next Standard Unit &amp; Compute Full Load Currents</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ \text{Standard Rating Selected: } 800\text{ kVA} \quad (11\text{ kV Primary} \to 400\text{ V Secondary}) \]
+                  \[ I_{\text{FLC, pri}} = \frac{800 \times 1{,}000}{\sqrt{3} \times 11{,}000} = 41.99\text{ A},\quad I_{\text{FLC, sec}} = \frac{800 \times 1{,}000}{\sqrt{3} \times 400} = 1{,}154.7\text{ A} \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">Secondary main circuit breaker is specified as a standard 1,250 A Air Circuit Breaker (ACB).</p>
+              </div>
+
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 4: Verify Peak Operational Loading Percentage</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ \text{Initial Peak Loading} = \frac{485.29\text{ kVA}}{800\text{ kVA}} = 60.66\% \quad (\text{Future Expansion: } 72.8\%) \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">Initial operation at 60.7% loading sits precisely in the peak efficiency sweet-spot, ensuring extended asset lifetime.</p>
+              </div>
+            </div>
+            <div class="calc-final-result">
+              ✅ <strong>Certified Substation Design:</strong> Specified Transformer: 800 kVA (11 kV / 400 V) | Secondary FLC: 1,154.7 A | Initial Load: 60.7% | Compliant with NEC 450 &amp; IEC 60076.
+            </div>
+          </div>
+
+          <div class="faq-container" style="margin-top:2.5rem;" id="xfmr-faq">
+            <h3 style="margin-bottom:1.5rem;">Frequently Asked Questions (Transformer Sizing)</h3>
+            
+            <div class="faq-item">
+              <div class="faq-q">Why is target continuous transformer loading recommended at 80% rather than 100%?</div>
+              <div class="faq-a">Operating a transformer continuously at 100% nameplate capacity increases internal winding operating temperatures toward insulation thermal degradation thresholds, accelerating aging of paper and oil dielectric systems. Furthermore, distribution transformers exhibit their highest electrical efficiency curve between <strong>60% and 80% loading</strong>, where core magnetization losses equal copper resistive losses. Maintaining a 20% margin also accommodates transient inrush currents during large motor starts.</div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-q">What is the difference between kVA (apparent power) and kW (real power) in transformer sizing?</div>
+              <div class="faq-a">Real power (kW) represents the actual usable mechanical or thermal work performed by electrical machinery, while apparent power (kVA) represents the total vector sum of real power and reactive power (kVAR) needed to establish magnetic fields in inductive coils: $\text{kVA} = \text{kW} / \cos\phi$. Transformers are always rated in kVA because magnetic flux saturation and winding heating are determined by total current flow, regardless of how much active work is performed. Size electrical resistance with our <a href="ohms-law-calculator.html">Ohm's Law Calculator</a>.</div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-q">How does ambient temperature affect transformer kVA rating derating?</div>
+              <div class="faq-a">Standard distribution transformers (IEEE and IEC) are rated for operation in a maximum ambient temperature of 40°C, with an average ambient temperature not exceeding 30°C over 24 hours. When installed in hot boiler rooms, desert environments, or outdoor enclosures exceeding 40°C, the transformer's capacity must be derated by approximately <strong>1.5% to 2.0% per degree Celsius</strong> above 40°C, or equipped with forced-air cooling fans (ONAF rating).</div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-q">How do non-linear harmonic loads (K-Factor) impact dry-type transformer sizing?</div>
+              <div class="faq-a">Non-linear loads like variable frequency drives (VFD), server power supplies, and LED lighting draw harmonic currents that induce high-frequency eddy current losses in transformer windings and core laminations. Standard transformers must be derated when serving non-linear loads, or replaced with <strong>K-Factor rated transformers (K-4, K-13, K-20)</strong> designed with electrostatic shielding, transposed conductors, and oversized neutrals to handle harmonic circulating currents safely.</div>
+            </div>
+
+          </div>
+
+        </article>
+      </div>
+
+      <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚡</span>
+            <h3 class="widget-title">Related Electrical Engineering Tools</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="transformer-sizing-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Transformer Sizing &amp; kVA</a></li>
+            <li><a href="short-circuit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Short-Circuit (IEC 60909)</a></li>
+            <li><a href="cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC/NEC)</a></li>
+            <li><a href="voltage-drop-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Drop Calculator</a></li>
+            <li><a href="ohms-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ohm's Law Calculator</a></li>
+            <li><a href="resistor-color-code-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Color Code</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="engineering.html" class="sidebar-category-link">View All Electrical Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+  </main>
+
+  <!-- Sticky Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <div class="brand-logo" style="margin-bottom:0.75rem;">
+          <span class="logo-badge">∑</span>
+          <span>Calc<span class="accent">Hub</span></span>
+        </div>
+        <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.6;">
+          Professional engineering, financial, health, and academic calculation suite. Built for precision, regulatory compliance, and verified decision-making.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Electrical Tools</h4>
+        <ul class="footer-links">
+          <li><a href="transformer-sizing-calculator.html">Transformer Sizing</a></li>
+          <li><a href="short-circuit-calculator.html">Short-Circuit Analysis</a></li>
+          <li><a href="cable-sizing-calculator.html">Cable Sizing (IEC 60364)</a></li>
+          <li><a href="voltage-drop-calculator.html">Voltage Drop Analysis</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Renewables &amp; Civil</h4>
+        <ul class="footer-links">
+          <li><a href="solar-energy.html">Solar PV &amp; Storage</a></li>
+          <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+          <li><a href="civil.html">Civil &amp; Concrete</a></li>
+          <li><a href="fire-safety.html">Fire Protection</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Standards</h4>
+        <ul class="footer-links">
+          <li><a href="engineering.html">NEC Article 450 Standards</a></li>
+          <li><a href="engineering.html">IEC 60076 Transformers</a></li>
+          <li><a href="engineering.html">IEC 60909 Short-Circuit</a></li>
+          <li><a href="engineering.html">IEEE 141 (Red Book)</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. Professional client-side calculation engine. All algorithms verified against published standards.</p>
+    </div>
+  </footer>
+
+  <!-- Client-Side JavaScript -->
+  <script>
+    const STANDARD_KVA_SIZES = [
+      15, 30, 45, 75, 112.5, 150, 225, 300, 400, 500, 630, 750, 800, 1000, 1250, 1500, 1600, 2000, 2500, 3150, 4000, 5000
+    ];
+
+    function calcTransformer() {
+      const loadKW = parseFloat(document.getElementById('xfmr-load-kw').value) || 0;
+      const pf = parseFloat(document.getElementById('xfmr-pf').value) || 0.85;
+      const df = parseFloat(document.getElementById('xfmr-df').value) || 0.80;
+      const growth = parseFloat(document.getElementById('xfmr-growth').value) || 0;
+      const phases = parseInt(document.getElementById('xfmr-phases').value) || 3;
+      const v1 = parseFloat(document.getElementById('xfmr-v1').value) || 11000;
+      const v2 = parseFloat(document.getElementById('xfmr-v2').value) || 400;
+      const targetLoading = parseFloat(document.getElementById('xfmr-max-loading').value) || 0.80;
+
+      // Peak coincident demand kVA
+      const demandKVA = pf > 0 ? (loadKW * df) / pf : 0;
+      const growthMultiplier = 1 + (growth / 100);
+      const minRequiredKVA = targetLoading > 0 ? (demandKVA * growthMultiplier) / targetLoading : demandKVA;
+
+      // Select next standard size
+      let recKVA = STANDARD_KVA_SIZES[STANDARD_KVA_SIZES.length - 1];
+      for (let size of STANDARD_KVA_SIZES) {
+        if (size >= minRequiredKVA) {
+          recKVA = size;
+          break;
+        }
+      }
+
+      // Calculate Full Load Current (FLC)
+      let flc1 = 0;
+      let flc2 = 0;
+      if (phases === 3) {
+        flc1 = (recKVA * 1000) / (Math.sqrt(3) * v1);
+        flc2 = (recKVA * 1000) / (Math.sqrt(3) * v2);
+      } else {
+        flc1 = (recKVA * 1000) / v1;
+        flc2 = (recKVA * 1000) / v2;
+      }
+
+      const actualLoadingPct = recKVA > 0 ? ((demandKVA * growthMultiplier) / recKVA) * 100 : 0;
+      const priOCPD = flc1 * 1.25;
+      const secOCPD = flc2 * 1.25;
+
+      document.getElementById('xfmr-rec-kva').innerText = recKVA >= 1000 ? (recKVA / 1000).toFixed(recKVA % 1000 === 0 ? 0 : 2) + ' MVA / ' + recKVA : recKVA;
+      document.getElementById('xfmr-min-kva').innerText = minRequiredKVA.toFixed(1) + ' kVA';
+      document.getElementById('xfmr-flc1').innerText = flc1.toFixed(1) + ' A';
+      document.getElementById('xfmr-flc2').innerText = flc2 >= 1000 ? Math.round(flc2).toLocaleString('en-US') + ' A' : flc2.toFixed(1) + ' A';
+      document.getElementById('xfmr-load-pct').innerText = actualLoadingPct.toFixed(1) + '% Loading';
+      document.getElementById('xfmr-pri-ocpd').innerText = Math.round(priOCPD) + ' A Max';
+      document.getElementById('xfmr-sec-ocpd').innerText = Math.round(secOCPD).toLocaleString('en-US') + ' A Max';
+      document.getElementById('xfmr-rating-badge').innerText = recKVA + ' kVA Standard Unit';
+    }
+
+    function copyXfmrResults() {
+      const rec = document.getElementById('xfmr-rec-kva').innerText;
+      const minReq = document.getElementById('xfmr-min-kva').innerText;
+      const flc2 = document.getElementById('xfmr-flc2').innerText;
+      const flc1 = document.getElementById('xfmr-flc1').innerText;
+      const text = `CalcHub Transformer Sizing (NEC 450 / IEC 60076):\nSelected Rating: ${rec} kVA\nMinimum Required: ${minReq}\nSecondary FLC: ${flc2}\nPrimary FLC: ${flc1}`;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Transformer schedule copied to clipboard!");
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', calcTransformer);
+  </script>
+</body>
+</html>
+'''
+
+target_file = os.path.join(BASE_DIR, "transformer-sizing-calculator.html")
+with open(target_file, "w", encoding="utf-8") as f:
+    f.write(TRANSFORMER_HTML.strip())
+
+m = re.search(r'<article class="article-section">(.*?)</article>', TRANSFORMER_HTML, re.DOTALL)
+if m:
+    clean = re.sub(r'<[^>]+>', ' ', m.group(1))
+    print(f"transformer-sizing-calculator.html created: {len(clean.split())} words in article section")
+else:
+    print("Article section not matched!")

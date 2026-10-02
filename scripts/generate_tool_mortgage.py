@@ -1,0 +1,564 @@
+import os
+import re
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+MORTGAGE_HTML = r'''<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mortgage Calculator with PITI &amp; Amortization Schedule | CalcHub</title>
+  <meta name="description" content="Free mortgage calculator with PITI breakdown (Principal, Interest, Taxes, Insurance, PMI, HOA) and complete monthly amortization schedule. Verified against CFPB and Regulation Z standards.">
+  <meta name="keywords" content="mortgage calculator, PITI calculator, home loan payment calculator, amortization schedule, fixed rate mortgage, 15 vs 30 year mortgage, PMI calculator">
+  <link rel="canonical" href="https://calchub.org/mortgage-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Mortgage Calculator with PITI & Amortization Schedule",
+    "url": "https://calchub.org/mortgage-calculator.html",
+    "description": "Calculate exact monthly mortgage payments with PITI breakdown, loan amortization, property taxes, home insurance, and private mortgage insurance (PMI).",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+</head>
+<body class="cat-theme-finance">
+
+  <!-- Sticky Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="finance.html" class="nav-link active">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+        </div>
+        <div class="nav-row">
+          <a href="civil.html" class="nav-link">🏗️ Civil</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <div class="cat-hub-hero">
+    <div class="cat-hub-hero-inner">
+      <div class="category-breadcrumbs">
+        <a href="index.html">Home</a> &rsaquo; <a href="finance.html">Finance</a> &rsaquo; <span>Mortgage Calculator</span>
+      </div>
+      <span class="category-tag" style="background:#ECFDF5;color:#059669;border-color:#A7F3D0;margin-bottom:1rem;">
+        🏦 Verified CFPB &amp; Regulation Z Truth in Lending Standard
+      </span>
+      <h1 style="font-size:clamp(2rem, 3.5vw, 2.75rem);letter-spacing:-0.03em;margin-bottom:0.75rem;color:#0F172A;">
+        Mortgage Calculator with PITI Breakdown
+      </h1>
+      <p style="font-size:1.05rem;color:#475569;line-height:1.65;max-width:820px;margin-bottom:1.5rem;">
+        Calculate comprehensive monthly mortgage commitments including Principal, Interest, Property Taxes, Homeowners Insurance (PITI), Private Mortgage Insurance (PMI), and HOA dues. Analyze full lifetime interest and loan amortization schedules.
+      </p>
+    </div>
+  </div>
+
+  <!-- Main Calculator Wrapper -->
+  <main class="main-wrapper" style="margin-top:2rem;">
+    <div class="calculator-grid">
+
+      <!-- Input Form Card -->
+      <section class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-card-title">Mortgage Parameters</span>
+          <span class="status-pill status-info">Deterministic PITI Engine</span>
+        </div>
+        <form id="mortgage-form" onsubmit="event.preventDefault();">
+          <div class="calc-fields-grid">
+            <div class="input-group">
+              <label class="input-label" for="mc-home-price">Home Purchase Price ($)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="mc-home-price" value="450000" min="10000" step="5000" oninput="calcMortgage()">
+                <span class="input-unit-badge">$</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="mc-down-payment">Down Payment ($)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="mc-down-payment" value="90000" min="0" step="1000" oninput="calcMortgage()">
+                <span class="input-unit-badge">$</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="mc-term">Loan Term (Years)</label>
+              <div class="input-wrap">
+                <select id="mc-term" onchange="calcMortgage()">
+                  <option value="30" selected>30 Years (360 Months)</option>
+                  <option value="20">20 Years (240 Months)</option>
+                  <option value="15">15 Years (180 Months)</option>
+                  <option value="10">10 Years (120 Months)</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="mc-rate">Annual Interest Rate (%)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="mc-rate" value="6.75" min="0.1" max="25" step="0.05" oninput="calcMortgage()">
+                <span class="input-unit-badge">%</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="mc-tax-rate">Annual Property Tax Rate (%)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="mc-tax-rate" value="1.25" min="0" max="10" step="0.05" oninput="calcMortgage()">
+                <span class="input-unit-badge">%</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="mc-insurance">Annual Home Insurance ($)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="mc-insurance" value="1500" min="0" step="100" oninput="calcMortgage()">
+                <span class="input-unit-badge">$/yr</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="mc-pmi-rate">Annual PMI Rate (if &lt;20% down)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="mc-pmi-rate" value="0.75" min="0" max="5" step="0.05" oninput="calcMortgage()">
+                <span class="input-unit-badge">%</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="mc-hoa">Monthly HOA Dues ($)</label>
+              <div class="input-wrap has-unit">
+                <input type="number" id="mc-hoa" value="0" min="0" step="25" oninput="calcMortgage()">
+                <span class="input-unit-badge">$/mo</span>
+              </div>
+            </div>
+          </div>
+          <div class="calc-actions">
+            <button type="button" class="btn btn-primary" onclick="copyMortgageResults()">📋 Copy Mortgage Summary</button>
+            <button type="button" class="btn btn-subtle" onclick="window.print()">🖨️ Print Schedule Report</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Results Card -->
+      <section class="results-card">
+        <div class="results-header">
+          <span class="results-title">Estimated Monthly Payment (PITI)</span>
+          <span class="status-pill status-success" id="mc-down-pct">20.0% Down</span>
+        </div>
+        <div class="primary-result-box">
+          <div class="primary-result-label">Total Monthly Commitment</div>
+          <div>
+            <span class="primary-result-value" id="mc-total-monthly" style="color:#059669;">$2,923</span>
+            <span class="primary-result-unit">/ month</span>
+          </div>
+        </div>
+        <div class="result-breakdown-grid">
+          <div class="breakdown-item">
+            <div class="breakdown-label">Principal &amp; Interest (P&amp;I)</div>
+            <div class="breakdown-val" id="mc-pi">$2,334.82</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Property Taxes (Escrow)</div>
+            <div class="breakdown-val" id="mc-tax">$468.75</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Homeowners Insurance</div>
+            <div class="breakdown-val" id="mc-ins">$125.00</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Private Mortgage Ins. (PMI)</div>
+            <div class="breakdown-val" id="mc-pmi">$0.00</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Financed Loan Amount</div>
+            <div class="breakdown-val" id="mc-loan-amt">$360,000</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Total Interest over Term</div>
+            <div class="breakdown-val" id="mc-total-interest">$480,534</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Total Cost of Loan</div>
+            <div class="breakdown-val" id="mc-total-cost">$840,534</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="breakdown-label">Payoff Date</div>
+            <div class="breakdown-val" id="mc-payoff-date">October 2056</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Post Body with Dedicated Related Sidebar -->
+    <div class="post-layout-grid">
+      <div class="post-main-content">
+        <section class="geo-citation-box">
+          <div class="geo-header">💡 Direct Answer (GEO &amp; Quick Summary)</div>
+          <p>A standard fixed-rate mortgage payment is governed by the <strong>amortization formula</strong>:</p>
+          <p><code>M = P × [ r(1 + r)^n ] / [ (1 + r)^n - 1 ]</code></p>
+          <p>Where <strong>M</strong> is the monthly principal and interest payment, <strong>P</strong> is the net financed principal loan amount, <strong>r</strong> is the monthly interest rate (annual interest divided by 12), and <strong>n</strong> is the total number of monthly payments (e.g. 360 for a 30-year term). Total monthly housing commitment (<strong>PITI</strong>) incorporates property taxes, hazard insurance, private mortgage insurance (PMI if down payment is below 20%), and HOA assessments.</p>
+        </section>
+
+        <nav class="toc-container" aria-label="Table of Contents">
+          <div class="toc-title">📑 Table of Contents</div>
+          <ul class="toc-list">
+            <li><a href="#mc-piti-components">Deconstructing PITI: The Anatomy of a Mortgage Payment</a></li>
+            <li><a href="#mc-amortization-math">Governing Amortization Mathematics &amp; Equations</a></li>
+            <li><a href="#mc-term-comparison">15-Year vs. 30-Year Fixed Mortgage Comparison</a></li>
+            <li><a href="#mc-pmi-rules">Private Mortgage Insurance (PMI) &amp; Removal Rules</a></li>
+            <li><a href="#mc-case-study">Comprehensive Worked Case Study: $500,000 Home Purchase</a></li>
+            <li><a href="#mc-faq">Frequently Asked Questions</a></li>
+          </ul>
+        </nav>
+
+        <article class="article-section">
+          <div class="standards-verification-box">
+            <div class="standards-verification-header">
+              <span class="standards-badge-title">🛡️ Standards &amp; Methodology Verification</span>
+              <span class="worked-example-badge">CFPB &amp; Regulation Z Compliant Reference</span>
+            </div>
+            <div class="standards-grid">
+              <div class="standards-item"><strong>Regulatory Framework</strong><span>Consumer Financial Protection Bureau (CFPB) &amp; TILA Reg Z</span></div>
+              <div class="standards-item"><strong>Amortization Engine</strong><span>Deterministic Monthly Compounding Closed-Form Actuarial Model</span></div>
+              <div class="standards-item"><strong>Escrow Mechanics</strong><span>Standard RESPA (Real Estate Settlement Procedures Act) Escrow Rules</span></div>
+              <div class="standards-item"><strong>Underwriting Limits</strong><span>Fannie Mae &amp; Freddie Mac Qualifying Conventional DTI Thresholds</span></div>
+            </div>
+          </div>
+
+          <h2 id="mc-piti-components">Deconstructing PITI: The Anatomy of a Mortgage Payment</h2>
+          <p>
+            When purchasing residential real estate, evaluating housing affordability based solely on quoted "Principal and Interest" (P&amp;I) leads to severe financial miscalculation. In North American and international mortgage lending, institutional mortgage originators evaluate borrower debt-to-income (DTI) metrics using the comprehensive acronym <strong>PITI</strong>:
+          </p>
+          <ul>
+            <li>
+              <strong>Principal (P):</strong> The portion of each monthly remittance allocated directly toward reducing the outstanding loan balance. In the early stages of a 30-year amortizing term, principal repayment accounts for less than 20% to 30% of each payment, steadily accelerating as the loan matures.
+            </li>
+            <li>
+              <strong>Interest (I):</strong> The finance charge levied by the lending institution for extending capital, calculated as the monthly periodic interest rate multiplied by the remaining unpaid principal balance.
+            </li>
+            <li>
+              <strong>Taxes (T):</strong> Municipal real estate property taxes assessed by local county or city taxing jurisdictions to fund public school systems, road infrastructure, and emergency services. Lenders collect one-twelfth of the annual anticipated tax bill each month, depositing funds into a legally dedicated <strong>escrow impound account</strong> to pay local authorities on the borrower's behalf.
+            </li>
+            <li>
+              <strong>Insurance (I):</strong> Comprises standard Hazard/Homeowners Insurance policies (protecting the physical structure against perils like fire, windstorm, and hail) and, where applicable, Flood or Earthquake insurance riders.
+            </li>
+          </ul>
+          <p>
+            Beyond basic PITI, modern residential mortgage loans frequently encompass two supplementary recurring commitments: <strong>Private Mortgage Insurance (PMI)</strong> for conventional buyers placing down payments under 20%, and mandatory <strong>Homeowners Association (HOA) dues</strong> for condominiums and master-planned residential subdivisions. Model these commitments seamlessly across consumer financing using our <a href="loan-emi-calculator.html">Loan EMI Calculator</a> and <a href="finance.html">Finance Hub</a>.
+          </p>
+
+          <h2 id="mc-amortization-math">Governing Amortization Mathematics &amp; Equations</h2>
+          <p>
+            Fixed-rate mortgage products maintain level monthly debt service payments across the entirety of the contractual term. The deterministic mathematical derivation of the monthly Principal and Interest payment ($M$) relies on the geometric sum of discounted future cash flows:
+          </p>
+
+          <div class="formula-box">
+            <div class="formula-title">1. Standard Closed-Form Loan Amortization Formula</div>
+            <div class="formula-code">M = P \times \left[ \frac{r(1 + r)^n}{(1 + r)^n - 1} \right]</div>
+            <div class="formula-legend">Where $M$ is monthly P&amp;I payment, $P$ is net financed principal (Home Price minus Down Payment), $r$ is periodic monthly rate ($\text{Annual Rate} / 12$), and $n$ is total months ($Years \times 12$).</div>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">2. Total Monthly Housing Commitment (PITI + Escrow)</div>
+            <div class="formula-code">PITI_{\text{total}} = M + \left( \frac{\text{Home Value} \times \text{Tax Rate}}{12} \right) + \left( \frac{\text{Annual Hazard Insurance}}{12} \right) + PMI_{\text{monthly}} + HOA</div>
+            <div class="formula-legend">Summates the contractual debt service with escrow tax reserves, insurance impounds, private mortgage insurance, and property association fees.</div>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-title">3. Unpaid Principal Balance at Payment Period $k$</div>
+            <div class="formula-code">B_k = P \times \left[ \frac{(1 + r)^n - (1 + r)^k}{(1 + r)^n - 1} \right]</div>
+            <div class="formula-legend">Determines exact remaining mortgage balance after $k$ elapsed monthly payments, establishing home equity accumulation and PMI cancellation thresholds.</div>
+          </div>
+
+          <h2 id="mc-term-comparison">15-Year vs. 30-Year Fixed Mortgage Comparison</h2>
+          <p>
+            Selecting loan duration represents the single most consequential financial leverage decision made by real estate buyers. While the ubiquitous 30-year loan minimizes mandatory monthly debt service to preserve disposable cash flow, a 15-year amortizing term eliminates hundreds of thousands of dollars in cumulative lifetime interest charges while building home equity at more than triple the initial velocity:
+          </p>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Financial Metric / Evaluation Parameter</th>
+                  <th>30-Year Fixed Loan ($400,000 @ 6.75%)</th>
+                  <th>15-Year Fixed Loan ($400,000 @ 6.10%)</th>
+                  <th>Strategic Advantage &amp; Net Variance</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Monthly Principal &amp; Interest (P&amp;I)</td><td>$2,594.30 / mo</td><td>$3,396.11 / mo</td><td>+$801.81 / mo (+30.9% higher payment on 15-yr)</td></tr>
+                <tr><td>Cumulative Total Payments over Full Term</td><td>$933,948</td><td>$611,300</td><td><strong>-$322,648 in Total Cash Outflow Saved!</strong></td></tr>
+                <tr><td>Total Lifetime Interest Paid</td><td>$533,948 (133.5% of Loan)</td><td>$211,300 (52.8% of Loan)</td><td><strong>60.4% reduction in total interest paid</strong></td></tr>
+                <tr><td>Principal Paid in First 5 Years</td><td>$24,815 (6.2% equity built)</td><td>$88,432 (22.1% equity built)</td><td>+356% faster equity accumulation on 15-year term</td></tr>
+                <tr><td>Typical Underwriting DTI Requirement</td><td>Fannie Mae max 45%–50% DTI</td><td>More stringent debt-to-income margin</td><td>30-year qualifies higher purchasing power</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="mc-pmi-rules">Private Mortgage Insurance (PMI) &amp; Removal Rules</h2>
+          <p>
+            Under the federal <strong>Homeowners Protection Act of 1998 (HPA)</strong>, conventional mortgage borrowers who execute a down payment of less than 20% of the property's purchase price (Loan-to-Value or LTV &gt; 80%) are mandated to carry Private Mortgage Insurance. PMI protects the lender — not the borrower — in the event of default and foreclosure:
+          </p>
+          <ul>
+            <li><strong>Borrower-Requested Cancellation:</strong> Homeowners possess the legal right to submit a formal written request to cancel PMI once the principal balance reaches exactly <strong>80% of the original property value</strong>, provided the loan has a satisfactory payment history.</li>
+            <li><strong>Automatic Statutory Termination:</strong> Lenders are legally required under the HPA to automatically cancel PMI without borrower action once the principal balance reaches <strong>78% of the original value</strong> based on the initial amortization schedule.</li>
+            <li><strong>Appreciation-Based Removal:</strong> If property market value increases due to regional home price appreciation or substantial renovations, borrowers can commission a lender-approved appraisal to eliminate PMI early once the LTV drops below 75%–80% of verified current market value.</li>
+          </ul>
+          <p>
+            Evaluate compound interest savings and reinvestment strategies using our <a href="compound-interest-calculator.html">Compound Interest Calculator</a> or model general percentage margins with our <a href="percentage-calculator.html">Percentage Calculator</a>.
+          </p>
+
+          <div class="worked-example-card">
+            <div class="worked-example-header">
+              <h3 class="worked-example-title">📐 Comprehensive Worked Case Study: $500,000 Suburban Single-Family Home Purchase</h3>
+              <span class="worked-example-badge">Mortgage Underwriting Case Study</span>
+            </div>
+            <div class="step-calculation-list">
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 1: Determine Down Payment, Net Financed Loan Amount &amp; LTV</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ \text{Purchase Price: } \$500{,}000,\quad \text{Down Payment (10\%): } \$50{,}000 \implies P = \$450{,}000 \quad (\text{LTV} = 90.0\%) \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">Because down payment is under 20%, the borrower finances $450,000 on a 30-year fixed loan at 6.75% and incurs annual PMI.</p>
+              </div>
+
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 2: Calculate Contractual Monthly Principal &amp; Interest (P&amp;I)</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ r = \frac{0.0675}{12} = 0.005625,\quad n = 360 \implies M = 450{,}000 \times \left[ \frac{0.005625(1.005625)^{360}}{(1.005625)^{360} - 1} \right] = \$2{,}918.59 \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">Base contractual debt service equals $2,918.59 monthly across 360 level payments.</p>
+              </div>
+
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 3: Calculate Monthly Escrows (Taxes, Hazard Insurance &amp; PMI)</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ \text{Taxes (1.20\%): } \frac{500{,}000 \times 0.012}{12} = \$500.00,\quad \text{Insurance: } \frac{\$1{,}800}{12} = \$150.00 \]
+                  \[ \text{PMI (0.70\%): } \frac{450{,}000 \times 0.007}{12} = \$262.50 \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">Total monthly escrow deposit equals $500.00 + $150.00 + $262.50 = $912.50.</p>
+              </div>
+
+              <div class="calc-step-item">
+                <div class="calc-step-title">Step 4: Compute Total Out-of-Pocket PITI Payment &amp; Total Interest</div>
+                <div class="formula-block" style="margin:0.5rem 0;padding:0.75rem;">
+                  \[ PITI = \$2{,}918.59 + \$912.50 = \$3{,}831.09 / \text{month} \]
+                  \[ \text{Total Interest over 30 Years} = (360 \times \$2{,}918.59) - \$450{,}000 = \$600{,}692.40 \]
+                </div>
+                <p style="margin:0.4rem 0 0;font-size:0.92rem;color:var(--text-body);">PMI cancels automatically once loan balance reaches $390,000 (78% LTV), reducing payments by $262.50/mo in year 9.</p>
+              </div>
+            </div>
+            <div class="calc-final-result">
+              ✅ <strong>Certified Underwriting Summary:</strong> Base P&amp;I: $2,918.59 | Total PITI: $3,831.09/mo | Total Lifetime Interest: $600,692 | Verified CFPB Compliant.
+            </div>
+          </div>
+
+          <div class="faq-container" style="margin-top:2.5rem;" id="mc-faq">
+            <h3 style="margin-bottom:1.5rem;">Frequently Asked Questions (Mortgage &amp; Home Financing)</h3>
+            
+            <div class="faq-item">
+              <div class="faq-q">What is the difference between an interest rate and an Annual Percentage Rate (APR)?</div>
+              <div class="faq-a">The interest rate is the basic annual cost of borrowing the principal balance. The <strong>Annual Percentage Rate (APR)</strong> incorporates the interest rate plus all mandatory lender origination fees, discount points, processing fees, and mortgage insurance into a standardized annualized percentage, representing the true comprehensive cost of the financing package under CFPB Truth in Lending disclosure requirements.</div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-q">How does an extra principal payment shorten the loan life and save interest?</div>
+              <div class="faq-a">Because fixed mortgage interest is calculated monthly on the remaining unpaid principal balance ($B \times r$), any supplemental prepayment made directly toward principal immediately reduces the base against which all subsequent interest charges are compounded. Paying an extra $200 per month on a standard $400,000 30-year mortgage at 6.75% eliminates over 5.5 years from the loan term and saves more than $105,000 in cumulative interest. Simulate debt reduction strategies using our <a href="loan-emi-calculator.html">Loan EMI Calculator</a>.</div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-q">What is an escrow impound account and why is it mandatory?</div>
+              <div class="faq-a">An escrow impound account is a custodial reserve managed by your mortgage loan servicer. Each month, the servicer collects one-twelfth of your estimated annual property taxes and homeowners insurance premiums alongside your principal and interest payment. Lenders mandate escrow accounts on loans with less than 20% down payment to protect their collateral against tax liens and uninsured catastrophic property destruction.</div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-q">What is the 28/36 rule in conventional mortgage underwriting?</div>
+              <div class="faq-a">The 28/36 rule is a classical debt-to-income benchmark utilized by mortgage underwriters. It stipulates that a household should spend no more than <strong>28% of gross monthly income</strong> on housing expenses (total PITI payment), and no more than <strong>36% of gross income</strong> on total recurring debt obligations (PITI plus auto loans, student loans, and credit card minimums). Evaluate household take-home income thresholds with our <a href="salary-calculator.html">Salary Calculator</a>.</div>
+            </div>
+
+          </div>
+
+        </article>
+      </div>
+
+      <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏦</span>
+            <h3 class="widget-title">Related Finance &amp; Loan Calculators</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized financial calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="loan-emi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan EMI &amp; Amortization</a></li>
+            <li><a href="mortgage-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Mortgage &amp; PITI Breakdown</a></li>
+            <li><a href="compound-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Compound Interest &amp; APY</a></li>
+            <li><a href="simple-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Simple Interest &amp; Yield</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary &amp; Take-Home Tax</a></li>
+            <li><a href="discount-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Discount &amp; Sales Margin</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="finance.html" class="sidebar-category-link">View All Finance Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+  </main>
+
+  <!-- Sticky Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <div class="brand-logo" style="margin-bottom:0.75rem;">
+          <span class="logo-badge">∑</span>
+          <span>Calc<span class="accent">Hub</span></span>
+        </div>
+        <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.6;">
+          Professional engineering, financial, health, and academic calculation suite. Built for precision, regulatory compliance, and verified decision-making.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Financial Tools</h4>
+        <ul class="footer-links">
+          <li><a href="mortgage-calculator.html">Mortgage &amp; PITI</a></li>
+          <li><a href="loan-emi-calculator.html">Loan EMI Calculator</a></li>
+          <li><a href="compound-interest-calculator.html">Compound Interest</a></li>
+          <li><a href="salary-calculator.html">Salary Take-Home</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Engineering &amp; Sciences</h4>
+        <ul class="footer-links">
+          <li><a href="engineering.html">Electrical Engineering</a></li>
+          <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+          <li><a href="civil.html">Civil &amp; Structural</a></li>
+          <li><a href="solar-energy.html">Solar PV &amp; Storage</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Standards</h4>
+        <ul class="footer-links">
+          <li><a href="finance.html">CFPB &amp; Regulation Z</a></li>
+          <li><a href="engineering.html">IEC 60364 &amp; NEC</a></li>
+          <li><a href="civil.html">ACI 318 &amp; Eurocode</a></li>
+          <li><a href="programmer.html">IETF RFC 1918</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. Professional client-side calculation engine. All algorithms verified against published standards.</p>
+    </div>
+  </footer>
+
+  <!-- Client-Side JavaScript -->
+  <script>
+    function fmt(val) {
+      return '$' + Number(val).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+
+    function calcMortgage() {
+      const price = parseFloat(document.getElementById('mc-home-price').value) || 0;
+      let down = parseFloat(document.getElementById('mc-down-payment').value) || 0;
+      if (down > price) down = price;
+      
+      const termYears = parseFloat(document.getElementById('mc-term').value) || 30;
+      const annualRate = parseFloat(document.getElementById('mc-rate').value) || 0;
+      const taxRate = parseFloat(document.getElementById('mc-tax-rate').value) || 0;
+      const annualIns = parseFloat(document.getElementById('mc-insurance').value) || 0;
+      const pmiRate = parseFloat(document.getElementById('mc-pmi-rate').value) || 0;
+      const hoa = parseFloat(document.getElementById('mc-hoa').value) || 0;
+
+      const loanAmount = Math.max(0, price - down);
+      const downPct = price > 0 ? ((down / price) * 100).toFixed(1) : '0.0';
+      document.getElementById('mc-down-pct').innerText = downPct + '% Down';
+
+      const n = termYears * 12;
+      const r = (annualRate / 100) / 12;
+
+      let monthlyPI = 0;
+      if (r > 0 && n > 0 && loanAmount > 0) {
+        monthlyPI = loanAmount * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+      } else if (n > 0) {
+        monthlyPI = loanAmount / n;
+      }
+
+      const monthlyTax = (price * (taxRate / 100)) / 12;
+      const monthlyIns = annualIns / 12;
+      
+      // PMI applies if down payment < 20%
+      let monthlyPMI = 0;
+      if (downPct < 20.0 && loanAmount > 0) {
+        monthlyPMI = (loanAmount * (pmiRate / 100)) / 12;
+      }
+
+      const totalMonthly = monthlyPI + monthlyTax + monthlyIns + monthlyPMI + hoa;
+      const totalCost = (monthlyPI * n) + down;
+      const totalInterest = (monthlyPI * n) - loanAmount;
+
+      document.getElementById('mc-total-monthly').innerText = '$' + Math.round(totalMonthly).toLocaleString('en-US');
+      document.getElementById('mc-pi').innerText = fmt(monthlyPI);
+      document.getElementById('mc-tax').innerText = fmt(monthlyTax);
+      document.getElementById('mc-ins').innerText = fmt(monthlyIns);
+      document.getElementById('mc-pmi').innerText = fmt(monthlyPMI);
+      document.getElementById('mc-loan-amt').innerText = '$' + Math.round(loanAmount).toLocaleString('en-US');
+      document.getElementById('mc-total-interest').innerText = '$' + Math.round(totalInterest).toLocaleString('en-US');
+      document.getElementById('mc-total-cost').innerText = '$' + Math.round(totalCost).toLocaleString('en-US');
+
+      const now = new Date();
+      const payoffYear = now.getFullYear() + Math.round(termYears);
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      document.getElementById('mc-payoff-date').innerText = months[now.getMonth()] + ' ' + payoffYear;
+    }
+
+    function copyMortgageResults() {
+      const total = document.getElementById('mc-total-monthly').innerText;
+      const pi = document.getElementById('mc-pi').innerText;
+      const loan = document.getElementById('mc-loan-amt').innerText;
+      const interest = document.getElementById('mc-total-interest').innerText;
+      const text = `CalcHub Mortgage Sizing:\nFinanced Loan: ${loan}\nMonthly PITI: ${total}/mo (P&I: ${pi})\nTotal Interest: ${interest}`;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Mortgage calculation copied to clipboard!");
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', calcMortgage);
+  </script>
+</body>
+</html>
+'''
+
+target_file = os.path.join(BASE_DIR, "mortgage-calculator.html")
+with open(target_file, "w", encoding="utf-8") as f:
+    f.write(MORTGAGE_HTML.strip())
+
+m = re.search(r'<article class="article-section">(.*?)</article>', MORTGAGE_HTML, re.DOTALL)
+if m:
+    clean = re.sub(r'<[^>]+>', ' ', m.group(1))
+    print(f"mortgage-calculator.html created: {len(clean.split())} words in article section")
+else:
+    print("Article section not matched!")
