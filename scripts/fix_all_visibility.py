@@ -129,6 +129,14 @@ CAT_MAP = {
             ("gear-module-calculator.html", "Gear Module & Pitch Geometry", "⚙️", "Metric module m, diametral pitch DP & tip dia", "m = d / z | da = m(z+2) | a = m(z1+z2)/2"),
             ("heat-exchanger-calculator.html", "Heat Exchanger (LMTD & NTU Area)", "🌡️", "Thermal duty, counter-flow LMTD & TEMA area", "Q = U·A·ΔTm | LMTD = (ΔT1 - ΔT2)/ln(ΔT1/ΔT2)"),
             ("hvac-calculator.html", "HVAC Sizing & Cooling Tonnage", "❄️", "Sensible, latent dehumidification & supply CFM", "Qs = 1.08·CFM·ΔT | 1 Ton = 12,000 BTU/hr"),
+            ("hydraulic-cylinder-calculator.html", "Hydraulic Cylinder Sizing (ISO 6020)", "🚜", "Push/pull force, fluid velocity & Euler buckling", "F_push = p·(π/4)·D² | F_pull = p·(π/4)·(D²-d²)"),
+            ("hydraulic-cylinder-force-calculator.html", "Hydraulic Cylinder Net Force (ISO 3320)", "🚜", "Net thrust, backpressure & seal friction drag", "F_net = (p1·A1 - p2·A2)·η_m - F_friction"),
+            ("hydraulic-cylinder-speed-calculator.html", "Hydraulic Cylinder Speed & Flow", "🚜", "Piston velocity, cycle time & regenerative boost", "v = Q / A | v_regen = Q_pump / A_rod"),
+            ("hydraulic-pump-power-calculator.html", "Hydraulic Pump Power (ISO 4409)", "⚙️", "Motor drive power, displacement & shaft torque", "P_kW = (p·Q) / (600·η_t) | T = (V_g·Δp)/(20π·η_hm)"),
+            ("power-to-torque-calculator.html", "Power to Torque & Shaft Sizing", "⚙️", "Rotary torque, gear ratio & shaft shear stress", "T = (9548.8·P) / N | d = ∛(16·T / π·τ)"),
+            ("psychrometric-calculator.html", "Psychrometric & Moist Air (ASHRAE)", "🌡️", "Dew point, humidity ratio W, wet bulb & enthalpy", "W = 0.62198·Pw / (Patm - Pw) | h = 1.006·T + W·(2501+1.86T)"),
+            ("pulley-mechanical-advantage-calculator.html", "Pulley Mechanical Advantage (CMAA 70)", "🏗️", "Block & tackle IMA, AMA & reeving friction", "IMA = n | AMA = n·η_total | η_total = (1-η^n)/(n(1-η))"),
+            ("pulley-rpm-calculator.html", "Pulley RPM & Belt Speed (ISO 5296)", "⚙️", "Rotational speed, ratio, belt velocity & slip", "N1·D1 = N2·D2 | N2 = N1·(D1/D2)·(1 - s/100)"),
         ]
     },
     "civil.html": {

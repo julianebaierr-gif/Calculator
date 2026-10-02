@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Power to Torque Calculator | Motor & Shaft Torsional Analysis</title>
+  <meta name="description" content="Calculate shaft torque from power and rotational speed (RPM) in N·m, lb·ft, and in·lb. Includes gear reduction ratio multiplication and motor shaft shear sizing.">
+  <link rel="canonical" href="https://calchub.cloud/power-to-torque-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Power to Torque Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Mechanical driveline torque sizing engine calculating rotary torque from electric motor or engine power and shaft RPM per DIN 743 and AGMA standards.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the relationship between power, rotational speed, and torque?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Rotational mechanical power is the mathematical product of angular velocity and torque: P = omega * T = (2 * pi * N / 60) * T. In metric SI units: T [N*m] = (9548.8 * P [kW]) / N [RPM]. In imperial mechanical units: T [lb*ft] = (5252.11 * P [HP]) / N [RPM]."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why is 5252 the crossover RPM between horsepower and torque?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In the imperial formula HP = (Torque [lb-ft] * RPM) / 5252.11, the constant 5252 originates from 33,000 ft-lb/min (James Watt's definition of 1 horsepower) divided by 2 * pi radians per revolution (33000 / 6.283185 = 5252.113). Consequently, whenever an engine runs at exactly 5252 RPM, its horsepower and torque in lb-ft are numerically identical."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does a speed reducer or gearbox affect output torque?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A gearbox reduces rotational speed while multiplying torque by the reduction gear ratio (i = N_in / N_out). Taking mechanical gearmesh and bearing friction into account: T_out = T_in * i * eta_gear, where eta_gear typically ranges from 94% to 98% for multi-stage helical gearsets and 60% to 88% for worm gear drives."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between rated motor torque and breakdown torque?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Rated full-load torque is the continuous torsional moment an electric motor safely produces at rated power and speed without overheating (Class F insulation limits). Breakdown torque (pull-out torque per NEMA MG-1) is the maximum transient peak torque the motor can develop (typically 200% to 300% of rated torque) before stalling."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="mechanical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html" class="active">Mechanical</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="engineering.html">Engineering</a> &rsaquo; 
+      <a href="mechanical.html">Mechanical</a> &rsaquo; 
+      <span>Power to Torque Calculator</span>
+    </nav>
+
+    <header class="calc-header">
+      <div class="calc-badge">Driveline &amp; Motor Mechanics</div>
+      <h1 class="calc-title">Power to Torque Calculator</h1>
+      <p class="calc-tagline">Calculate drive shaft torque, gearbox output torque multiplication, and solid shaft minimum diameter based on power input and rotational velocity.</p>
+    </header>
+
+    <div class="calc-grid">
+      <div class="calc-main">
+        <div class="tool-card">
+          <form id="p2tForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="powerUnit">Input Power Unit</label>
+                <select id="powerUnit" class="form-control">
+                  <option value="kw" selected>Kilowatts (kW)</option>
+                  <option value="hp">Mechanical Horsepower (HP / bhp)</option>
+                  <option value="w">Watts (W)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="powerVal">Shaft Power Input</label>
+                <input type="number" id="powerVal" class="form-control" value="15" min="0.001" step="any" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="rpmVal">Rotational Speed (RPM)</label>
+                <input type="number" id="rpmVal" class="form-control" value="1450" min="0.1" step="any" required>
+                <span class="hint">Standard 4-pole induction motor: ~1450 RPM (50Hz) or ~1750 RPM (60Hz)</span>
+              </div>
+              <div class="form-group">
+                <label for="serviceFactor">Application Service Factor ($K_a$)</label>
+                <select id="serviceFactor" class="form-control">
+                  <option value="1.0">1.00 - Uniform continuous load (fans, centrifugal pumps)</option>
+                  <option value="1.25" selected>1.25 - Moderate shock (conveyors, rotary compressors)</option>
+                  <option value="1.5">1.50 - Heavy shock (reciprocating pumps, crushers, mills)</option>
+                  <option value="2.0">2.00 - Extreme shock (presses, shears, vibratory screens)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="gearRatio">Gear Reduction Ratio ($i = N_{in} / N_{out}$)</label>
+                <input type="number" id="gearRatio" class="form-control" value="1.0" min="0.01" step="any">
+                <span class="hint">Set to 1.0 for direct direct-drive coupling</span>
+              </div>
+              <div class="form-group">
+                <label for="gearEff">Gearbox Mechanical Efficiency (%)</label>
+                <input type="number" id="gearEff" class="form-control" value="96" min="10" max="100" step="0.5">
+                <span class="hint">Helical ~96-98%, Bevel ~94-96%, Worm ~65-85%</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="shearAllowable">Allowable Shaft Shear Stress ($\tau_{allow}$ in MPa)</label>
+                <input type="number" id="shearAllowable" class="form-control" value="50" min="1" step="1">
+                <span class="hint">AISI 1045 steel ~45-55 MPa; 4140 quenched &amp; tempered ~70-90 MPa</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="calcBtn">Compute Torque &amp; Driveline Parameters</button>
+              <button type="reset" class="btn btn-secondary" id="resetBtn">Reset</button>
+            </div>
+          </form>
+
+          <div id="p2tResultBox" class="results-container" style="display: none; margin-top: 1.5rem;">
+            <h3>Calculated Torsional &amp; Driveline Sizing</h3>
+            <div class="results-grid">
+              <div class="result-tile highlight">
+                <span class="result-label">Motor Shaft Nominal Torque</span>
+                <span class="result-value" id="resTorqueNm">-- N·m</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Nominal Torque (Imperial)</span>
+                <span class="result-value" id="resTorqueFtLb">-- lb·ft</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Gearbox Output Torque</span>
+                <span class="result-value" id="resOutputTorque">-- N·m</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Output Speed (After Gearing)</span>
+                <span class="result-value" id="resOutputRpm">-- RPM</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Design Torque ($T_{design} = T \times K_a$)</span>
+                <span class="result-value" id="resDesignTorque">-- N·m</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Min. Solid Shaft Diameter ($d_{min}$)</span>
+                <span class="result-value" id="resShaftDiam">-- mm</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Fundamentals of Power and Torque in Rotating Machinery</h2>
+          <p>
+            In mechanical drive systems, understanding the physical distinction between mechanical <strong>power</strong> and <strong>torque</strong> is the cornerstone of machine design. Rotational torque ($\tau$ or $T$) represents the static or dynamic twisting moment exerted around a rotational axis. Expressed in Newton-meters ($\text{N}\cdot\text{m}$) or pound-feet ($\text{lb}\cdot\text{ft}$), torque defines the rotational force capacity available to overcome friction, inertia, and mechanical resistance. Power ($P$), conversely, represents the time rate at which rotational work is performed, quantified in kilowatts ($\text{kW}$) or horsepower ($\text{HP}$).
+          </p>
+          <p>
+            A high-power prime mover can produce high rotational velocity with modest torque (such as a 20,000 RPM aircraft turbine), or immense torque at low rotational velocity (such as a 12 RPM bucket-wheel excavator drum driven by the identical power input). The mathematical bridge between twisting moment and work rate is angular velocity ($\omega$ in radians per second):
+          </p>
+          <div class="formula-box">
+            $$P = T \cdot \omega = T \cdot \left(\frac{2\pi \cdot N}{60}\right)$$
+          </div>
+          <p>
+            Where $N$ is the shaft rotational speed in revolutions per minute ($\text{RPM}$). When rearranged to isolate torque as a function of power and operating speed, the fundamental governing relationships for both SI metric and US customary units emerge.
+          </p>
+
+          <h2>Governing Equations: Metric SI and Imperial Conversions</h2>
+          <p>
+            Depending on international industry practice and engineering standards (DIN, ISO, AGMA, or ANSI), driveline calculations apply specific conversion coefficients derived directly from mechanical fundamentals:
+          </p>
+          
+          <h3>1. Metric SI Formulation</h3>
+          <p>
+            With power $P$ expressed in kilowatts ($\text{kW}$) and rotational speed $N$ in $\text{RPM}$, dividing the conversion factor $60 / (2\pi \times 1000)$ yields the classic metric constant $9548.8$:
+          </p>
+          <div class="formula-box">
+            $$T (\text{N}\cdot\text{m}) = \frac{P (\text{kW}) \times 9548.8}{N (\text{RPM})} = \frac{P (\text{W})}{\omega (\text{rad/s})}$$
+          </div>
+          
+          <h3>2. US Customary (Imperial) Horsepower Formulation</h3>
+          <p>
+            In US heavy industry, prime movers are rated in brake horsepower ($\text{HP}$ or $\text{bhp}$), where $1\text{ HP} = 33,000\text{ ft}\cdot\text{lbf/min} = 550\text{ ft}\cdot\text{lbf/s}$. Dividing $33,000$ by $2\pi$ produces the ubiquitous driveline constant $5252.11$:
+          </p>
+          <div class="formula-box">
+            $$T (\text{lb}\cdot\text{ft}) = \frac{P (\text{HP}) \times 5252.11}{N (\text{RPM})}$$
+          </div>
+          <p>
+            If torque is required in pound-inches ($\text{in}\cdot\text{lb}$), multiplying $5252.11$ by $12\text{ in/ft}$ gives $63,025$:
+          </p>
+          <div class="formula-box">
+            $$T (\text{in}\cdot\text{lb}) = \frac{P (\text{HP}) \times 63025}{N (\text{RPM})}$$
+          </div>
+
+          <h2>Gearbox Torque Multiplication and Transmission Efficiency</h2>
+          <p>
+            Electric AC induction motors are economically constructed to rotate at synchronous speeds of 3000, 1500, 1000, or 750 RPM (at 50 Hz line frequency) or 3600, 1800, 1200 RPM (at 60 Hz). Most industrial end-effectors—such as conveyor head pulleys, agitator impellers, rolling mills, and hoists—require significantly lower rotational speeds ranging from 5 to 150 RPM. A mechanical speed reducer (gearbox) steps down the rotational speed while simultaneously magnifying torque:
+          </p>
+          <div class="formula-box">
+            $$N_{out} = \frac{N_{in}}{i}, \quad T_{out} = T_{in} \cdot i \cdot \eta_{gear}$$
+          </div>
+          <p>
+            Where $i$ is the gear reduction ratio ($i > 1.0$) and $\eta_{gear}$ is the transmission mechanical efficiency. Because of gear sliding friction, bearing churning, and lubricating oil shear losses, no speed reducer operates without parasitic loss. The table below illustrates typical efficiency bands across standard gear drive architectures:
+          </p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Gear Reducer Architecture</th>
+                <th>Standard Single-Stage Ratio ($i$)</th>
+                <th>Mechanical Efficiency ($\eta$)</th>
+                <th>Typical Industrial Applications</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Spur / Helical In-Line</td>
+                <td>1.5:1 to 6.3:1</td>
+                <td>97.0% &ndash; 98.5%</td>
+                <td>Pumps, blowers, machine tools, general industrial drives</td>
+              </tr>
+              <tr>
+                <td>Bevel-Helical (Right-Angle)</td>
+                <td>3.15:1 to 10:1</td>
+                <td>95.0% &ndash; 97.0%</td>
+                <td>Heavy conveyors, bucket elevators, paper mill rollers</td>
+              </tr>
+              <tr>
+                <td>Planetary (Epicyclic) Gearhead</td>
+                <td>3:1 to 10:1 (per stage)</td>
+                <td>94.0% &ndash; 97.0%</td>
+                <td>Robotics, CNC servo drives, wheel drives, wind turbines</td>
+              </tr>
+              <tr>
+                <td>Worm Gear Reducer (Single)</td>
+                <td>5:1 to 70:1</td>
+                <td>60.0% &ndash; 88.0%</td>
+                <td>Self-locking hoists, winches, packaging machines, dampers</td>
+              </tr>
+              <tr>
+                <td>Harmonic / Strain Wave</td>
+                <td>30:1 to 160:1</td>
+                <td>75.0% &ndash; 85.0%</td>
+                <td>Precision robotics, aerospace gimbals, surgical manipulators</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Application Service Factors ($K_a$) and Dynamic Peak Torques</h2>
+          <p>
+            Operating equipment rarely experiences steady, non-pulsating resistance. Starting shock loads, torsional vibration, product jamming, and rapid cyclical reversal impose dynamic loads far exceeding continuous nameplate ratings. International standards such as AGMA 6013 and ISO 6336 mandate applying an Application Service Factor ($K_a$) to establish the structural Design Torque ($T_{design}$):
+          </p>
+          <div class="formula-box">
+            $$T_{design} = T_{nominal} \cdot K_a$$
+          </div>
+          <p>
+            Selecting a service factor of $1.0$ on a positive-displacement mud pump or jaw crusher inevitably results in premature shaft fatigue failure, stripped gear teeth, or coupling shearing. For prime movers like internal combustion engines with high cyclic cylinder firing pulses, an additional engine service increment ($\Delta K_a \approx 0.25 - 0.50$) must be added.
+          </p>
+
+          <h2>Drive Shaft Torsional Shear Stress and Sizing (DIN 743 / ASME B106.1M)</h2>
+          <p>
+            A rotating solid circular shaft subject to pure torsional load develops maximum shear stress ($\tau_{max}$) at its outermost circumferential fibers. According to classic Saint-Venant torsional theory:
+          </p>
+          <div class="formula-box">
+            $$\tau = \frac{T \cdot r}{J} = \frac{T \cdot (d / 2)}{\frac{\pi d^4}{32}} = \frac{16 \cdot T_{design}}{\pi \cdot d^3}$$
+          </div>
+          <p>
+            Rearranging this equation to determine the minimum allowable solid shaft diameter ($d_{min}$) required to resist pure torsion without exceeding the allowable shear stress limit ($\tau_{allow}$):
+          </p>
+          <div class="formula-box">
+            $$d_{min} = \sqrt[3]{\frac{16 \cdot T_{design}}{\pi \cdot \tau_{allow}}}$$
+          </div>
+          <p>
+            For commercial medium-carbon steel shafts (such as AISI 1045 or EN8) operating with keyways (which introduce a stress concentration factor $K_t \approx 1.7$ to $2.2$), conservative engineering practice limits allowable continuous shear stress to $\tau_{allow} \approx 40 - 55\text{ MPa}$. For high-tensile alloy steels (such as AISI 4140 or 4340 Q&amp;T), allowable design shear stress may extend to $70 - 90\text{ MPa}$.
+          </p>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Case Study: Overland Conveyor Drive</h3>
+            <p><strong>Design Scenario:</strong> A bulk materials conveyor belt requires an electric motor drive operating continuously under moderate shock loading ($K_a = 1.35$). The selected 4-pole AC induction motor delivers $P = 45\text{ kW}$ at a nominal loaded speed of $N = 1465\text{ RPM}$. The drive uses a helical-bevel right-angle speed reducer with a gear ratio of $i = 18.5:1$ and an efficiency of $\eta_{gear} = 96\%$. Calculate motor nominal torque, gearbox output shaft torque, and the minimum diameter for an output shaft made of AISI 1045 steel ($\tau_{allow} = 45\text{ MPa}$).</p>
+            
+            <p><strong>Step 1: Calculate Nominal Motor Shaft Torque</strong></p>
+            <div class="formula-box">
+              $$T_{motor} = \frac{45\text{ kW} \times 9548.8}{1465\text{ RPM}} = 293.31\text{ N}\cdot\text{m}$$
+            </div>
+
+            <p><strong>Step 2: Calculate Output Speed and Output Shaft Torque</strong></p>
+            <div class="formula-box">
+              $$N_{out} = \frac{1465\text{ RPM}}{18.5} = 79.19\text{ RPM}$$
+              $$T_{out} = T_{motor} \times i \times \eta_{gear} = 293.31 \times 18.5 \times 0.96 = 5,209.11\text{ N}\cdot\text{m}$$
+            </div>
+
+            <p><strong>Step 3: Determine Structural Design Torque with Service Factor</strong></p>
+            <div class="formula-box">
+              $$T_{design} = 5,209.11\text{ N}\cdot\text{m} \times 1.35 = 7,032.30\text{ N}\cdot\text{m} = 7,032,300\text{ N}\cdot\text{mm}$$
+            </div>
+
+            <p><strong>Step 4: Size the Solid Output Drive Shaft</strong></p>
+            <div class="formula-box">
+              $$d_{min} = \sqrt[3]{\frac{16 \times 7,032,300}{\pi \times 45\text{ N/mm}^2}} = \sqrt[3]{\frac{112,516,800}{141.37}} = \sqrt[3]{795,903} \approx 92.67\text{ mm}$$
+            </div>
+            <p>
+              <strong>Engineering Conclusion:</strong> Specifying a standard commercial shaft diameter of <strong>$95\text{ mm}$</strong> or <strong>$100\text{ mm}$</strong> provides adequate torsional strength and structural rigidity, fully accounting for keyway stress concentrations and bending moments induced by the conveyor head pulley.
+            </p>
+          </div>
+
+          <h2>Electric Motor Torque-Speed Characteristics &amp; VFD Considerations</h2>
+          <p>
+            When utilizing Variable Frequency Drives (VFDs) to govern AC induction or permanent-magnet synchronous motors (PMSM), engineers must observe two distinct operational regimes:
+          </p>
+          <ul>
+            <li><strong>Constant Torque Region (Below Base Frequency, 0 to 50/60 Hz):</strong> As frequency and voltage scale linearly ($V/f$ ratio maintained constant), the motor core maintains saturated magnetic flux. Full rated torque ($T_{rated}$) is available continuously across the speed range, while shaft power scales linearly with speed: $P \propto N$.</li>
+            <li><strong>Constant Power Region (Above Base Frequency, Field Weakening Range):</strong> To protect motor insulation against over-voltage, voltage is clamped at maximum line voltage while frequency continues to increase. Magnetic flux weakens inversely with frequency ($\Phi \propto 1/f$). As a result, available shaft torque falls rapidly: $T \propto 1/N$, while output power remains constant at nameplate capacity.</li>
+          </ul>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar">
+        <div class="sidebar-card">
+          <h4>Related Mechanical Calculators</h4>
+          <ul class="sidebar-links">
+            <li><a href="hydraulic-pump-power-calculator.html">Hydraulic Pump Power Calculator</a></li>
+            <li><a href="hydraulic-cylinder-calculator.html">Hydraulic Cylinder Sizing</a></li>
+            <li><a href="pulley-rpm-calculator.html">Pulley RPM Calculator</a></li>
+            <li><a href="pulley-mechanical-advantage-calculator.html">Pulley Mechanical Advantage</a></li>
+            <li><a href="conveyor-belt-speed-calculator.html">Conveyor Belt Speed</a></li>
+            <li><a href="flywheel-energy-calculator.html">Flywheel Energy Storage</a></li>
+            <li><a href="gear-module-calculator.html">Gear Module &amp; Pitch</a></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>High-precision professional engineering and scientific calculation engines.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Directories</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="mechanical.html">Mechanical Engineering</a></li>
+          <li><a href="engineering.html">Civil &amp; Structural</a></li>
+          <li><a href="sitemap.xml">XML Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 CalcHub. Standard Engineering Reference Systems.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calcBtn = document.getElementById('calcBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const resultBox = document.getElementById('p2tResultBox');
+
+      function calculate() {
+        const pUnit = document.getElementById('powerUnit').value;
+        const pVal = parseFloat(document.getElementById('powerVal').value);
+        const rpm = parseFloat(document.getElementById('rpmVal').value);
+        const ka = parseFloat(document.getElementById('serviceFactor').value);
+        const gearRatio = parseFloat(document.getElementById('gearRatio').value) || 1.0;
+        const gearEffPct = parseFloat(document.getElementById('gearEff').value) || 100.0;
+        const tauAllow = parseFloat(document.getElementById('shearAllowable').value) || 50.0;
+
+        if (isNaN(pVal) || pVal <= 0 || isNaN(rpm) || rpm <= 0) {
+          alert('Please enter valid positive values for power and RPM.');
+          return;
+        }
+
+        // Convert power to kW and HP
+        let p_kW = 0;
+        let p_HP = 0;
+        if (pUnit === 'kw') {
+          p_kW = pVal;
+          p_HP = pVal * 1.34102;
+        } else if (pUnit === 'hp') {
+          p_HP = pVal;
+          p_kW = pVal * 0.74569987;
+        } else if (pUnit === 'w') {
+          p_kW = pVal / 1000;
+          p_HP = p_kW * 1.34102;
+        }
+
+        // Nominal motor torque: T = (9548.8 * P_kW) / RPM
+        const t_Nm = (9548.8 * p_kW) / rpm;
+        const t_ftlb = (5252.11 * p_HP) / rpm;
+
+        // Gearbox output calculations
+        const eff = Math.min(1.0, Math.max(0.01, gearEffPct / 100.0));
+        const outRpm = rpm / gearRatio;
+        const outTorqueNm = t_Nm * gearRatio * eff;
+
+        // Design torque considering service factor on output
+        const designTorqueNm = outTorqueNm * ka;
+
+        // Minimum solid shaft diameter: d = ( (16 * T_design_Nmm) / (pi * tau_MPa) )^(1/3)
+        const t_Nmm = designTorqueNm * 1000.0;
+        const d_mm = Math.cbrt((16.0 * t_Nmm) / (Math.PI * tauAllow));
+
+        document.getElementById('resTorqueNm').textContent = t_Nm.toLocaleString('en-US', {maximumFractionDigits: 2}) + ' N·m';
+        document.getElementById('resTorqueFtLb').textContent = t_ftlb.toLocaleString('en-US', {maximumFractionDigits: 2}) + ' lb·ft';
+        document.getElementById('resOutputTorque').textContent = outTorqueNm.toLocaleString('en-US', {maximumFractionDigits: 2}) + ' N·m';
+        document.getElementById('resOutputRpm').textContent = outRpm.toLocaleString('en-US', {maximumFractionDigits: 1}) + ' RPM';
+        document.getElementById('resDesignTorque').textContent = designTorqueNm.toLocaleString('en-US', {maximumFractionDigits: 2}) + ' N·m';
+        document.getElementById('resShaftDiam').textContent = d_mm.toFixed(1) + ' mm';
+
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      calcBtn.addEventListener('click', calculate);
+      resetBtn.addEventListener('click', function() {
+        resultBox.style.display = 'none';
+      });
+
+      calculate();
+    });
+  </script>
+</body>
+</html>

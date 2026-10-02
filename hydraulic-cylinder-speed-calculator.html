@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hydraulic Cylinder Speed Calculator | Piston Velocity & Flow Rate</title>
+  <meta name="description" content="Calculate hydraulic cylinder extension and retraction velocity, required pump flow rate (LPM & GPM), stroke cycle duration, and regenerative speed boost per ISO 6020.">
+  <link rel="canonical" href="https://calchub.cloud/hydraulic-cylinder-speed-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Hydraulic Cylinder Speed Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Fluid power kinematic sizing engine computing cylinder linear speed v = Q / A, stroke extension/retraction time, fluid port velocity, and regenerative circuit boost per ISO 6020.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the formula for hydraulic cylinder linear velocity?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Linear piston speed is calculated as: v = Q / A, where Q is volumetric flow rate entering the cylinder and A is the active piston cross-sectional area. In metric units: v [m/s] = (Q [L/min] * 1000) / (A [mm^2] * 60). In imperial units: v [in/s] = (231 * Q [GPM]) / (A [sq in] * 60) approx (3.85 * Q) / A."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why does a cylinder retract faster than it extends?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In a single-rod cylinder, the steel rod occupies space inside the rod-end cap. When oil is pumped into the rod end during retraction, it only fills the annular area: A_annulus = A_bore - A_rod. Because this area is significantly smaller than the full bore area, the same pump flow rate fills the chamber faster, driving higher retraction speed."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does a regenerative hydraulic circuit increase extension speed?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A regenerative circuit routes oil exhausted from the rod end directly into the cap end during extension, combining with the pump flow. Because fluid acts on both sides, the effective advance area equals only the rod area: v_regen = Q_pump / A_rod. This increases extension velocity by 30% to 100%, though it reduces output force to: F_regen = P * A_rod."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are maximum safe fluid flow velocities through hydraulic ports and hoses?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "To prevent extreme pressure drops, oil overheating, and fluid cavitation: Pump suction lines are limited to 0.8 - 1.5 m/s (2 - 5 ft/s); return lines to tank are limited to 2.0 - 4.0 m/s (6 - 13 ft/s); high-pressure delivery lines are limited to 3.0 - 6.0 m/s (10 - 20 ft/s); short cylinder port passages are typically restricted below 7.5 m/s (25 ft/s)."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="mechanical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html" class="active">Mechanical</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="mechanical.html">Mechanical &amp; Machine Design</a> &rsaquo;
+      <span>Hydraulic Cylinder Speed Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">ISO 6020 &amp; NFPA Cylinder Kinematics</div>
+          <h1 class="calc-title">Hydraulic Cylinder Speed Calculator</h1>
+          <p class="calc-tagline">Calculate cylinder piston extension and retraction velocities, required pump flow rate, stroke travel times, port velocities, and regenerative circuit speed boost.</p>
+        </header>
+
+        <div class="tool-card">
+          <form id="cylSpeedCalcForm">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="speedCalcObjective">Calculation Objective</label>
+                <select id="speedCalcObjective">
+                  <option value="findSpeed" selected>Calculate Piston Speed from Known Pump Flow</option>
+                  <option value="findFlow">Calculate Required Pump Flow from Target Speed</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="speedUnits">Engineering Units</label>
+                <select id="speedUnits">
+                  <option value="metric" selected>Metric (mm, m/s, L/min, mm/s)</option>
+                  <option value="imperial">Imperial (in, in/s, GPM, ft/min)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="boreD" id="lblBoreD">Cylinder Bore Diameter (D) [mm]</label>
+                <input type="number" id="boreD" step="1" min="10" max="1500" value="80">
+              </div>
+
+              <div class="form-group">
+                <label for="rodD" id="lblRodD">Piston Rod Diameter (d) [mm]</label>
+                <input type="number" id="rodD" step="1" min="5" max="1400" value="45">
+              </div>
+
+              <div class="form-group">
+                <label for="strokeLen" id="lblStrokeLen">Stroke Length (S) [mm]</label>
+                <input type="number" id="strokeLen" step="10" min="10" max="10000" value="600">
+              </div>
+
+              <div class="form-group" id="grpInputFlow">
+                <label for="inputFlowRate" id="lblInputFlow">Pump Delivery Flow Rate (Q) [L/min]</label>
+                <input type="number" id="inputFlowRate" step="1" min="0.1" max="2500" value="35">
+              </div>
+
+              <div class="form-group" id="grpTargetSpeed" style="display: none;">
+                <label for="targetPistonSpeed" id="lblTargetSpeed">Target Extension Speed [m/s]</label>
+                <input type="number" id="targetPistonSpeed" step="0.01" min="0.005" max="5.0" value="0.15">
+              </div>
+
+              <div class="form-group">
+                <label for="portDiam" id="lblPortDiam">Cylinder Port Inside Diameter [mm]</label>
+                <input type="number" id="portDiam" step="0.5" min="2" max="150" value="12.0">
+              </div>
+
+              <div class="form-group">
+                <label for="circuitMode">Hydraulic Circuit Configuration</label>
+                <select id="circuitMode">
+                  <option value="standard" selected>Standard 4/3 Valve (Non-Regenerative)</option>
+                  <option value="regen">Regenerative Circuit (High-Speed Extend)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-actions">
+              <button type="button" id="calcSpeedBtn" class="btn btn-primary">Calculate Actuation Speed</button>
+              <button type="reset" id="resetSpeedBtn" class="btn btn-secondary">Reset Defaults</button>
+            </div>
+          </form>
+
+          <div id="cylSpeedResultBox" class="results-container" style="display: none;">
+            <h3>Cylinder Kinematic & Flow Velocity Results</h3>
+            <div class="results-grid">
+              <div class="result-tile">
+                <span class="result-label" id="resPrimaryExtSpeedLabel">Extension Speed (v_ext)</span>
+                <span id="resExtSpeed" class="result-value">-- m/s</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Retraction Speed (v_ret)</span>
+                <span id="resRetSpeed" class="result-value">-- m/s</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label" id="resPrimaryFlowLabel">Active Pump Flow Rate</span>
+                <span id="resPumpFlow" class="result-value">-- L/min</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Extension Travel Time (t_ext)</span>
+                <span id="resExtTime" class="result-value">-- s</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Retraction Travel Time (t_ret)</span>
+                <span id="resRetTime" class="result-value">-- s</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Full Stroke Cycle Duration</span>
+                <span id="resCycleTime" class="result-value">-- s</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Fluid Port Flow Velocity (v_port)</span>
+                <span id="resPortVelocity" class="result-value">-- m/s</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Speed Ratio (Retract / Extend)</span>
+                <span id="resSpeedRatio" class="result-value">--</span>
+              </div>
+            </div>
+            <div id="cylSpeedNotesBox" style="margin-top: 1rem; color: #1e40af; background: #eff6ff; border: 1px solid #bfdbfe; padding: 0.75rem; border-radius: 6px;"></div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Kinematic Principles of Hydraulic Actuator Velocity</h2>
+          <p>The operating velocity of a hydraulic cylinder is governed entirely by fluid kinematics: the volumetric rate at which incompressible hydraulic fluid is pumped into the cylinder barrel divided by the internal cross-sectional area displacing that fluid. While hydraulic system pressure dictates available force, <strong>pump flow rate dictates piston velocity</strong>.</p>
+
+          <p>Proper speed regulation is crucial in industrial automated assembly, plastics molding, metal shearing, and aerospace flight control actuators. If a cylinder moves too rapidly without deceleration cushioning, the kinetic energy of the moving mass (\(E_k = \frac{1}{2} m v^2\)) slams the piston head into the steel cylinder cap, generating destructive hydraulic shockwaves (water hammer) and cracking tie-rods. Conversely, if a cylinder operates too slowly, machine cycle times stretch, severely cutting factory throughput.</p>
+
+          <h2>Mathematical Velocity Formulations: Extension vs. Retraction</h2>
+          <p>In standard double-acting hydraulic cylinders, linear speed depends on whether the piston is extending or retracting:</p>
+
+          <h3>1. Extension (Forward Stroke) Velocity</h3>
+          <p>During extension, fluid enters the cap end to fill the full bore diameter (\(D_{\text{bore}}\)):</p>
+
+          <div class="formula-box">
+            $$v_{\text{ext}} = \frac{Q}{A_{\text{bore}}} = \frac{Q}{\frac{\pi}{4} D_{\text{bore}}^2}$$
+          </div>
+
+          <h3>2. Retraction (Return Stroke) Velocity</h3>
+          <p>During retraction, fluid enters the rod-end port to fill only the annular area (\(A_{\text{annulus}}\)):</p>
+
+          <div class="formula-box">
+            $$v_{\text{ret}} = \frac{Q}{A_{\text{annulus}}} = \frac{Q}{\frac{\pi}{4} (D_{\text{bore}}^2 - d_{\text{rod}}^2)}$$
+          </div>
+
+          <p>Because \(A_{\text{annulus}} < A_{\text{bore}}\), <strong>retraction speed is always higher than extension speed</strong> when driven by a fixed-displacement pump. The kinematic speed ratio is the inverse of the area ratio:</p>
+
+          <div class="formula-box">
+            $$\text{Speed Ratio} = \frac{v_{\text{ret}}}{v_{\text{ext}}} = \frac{A_{\text{bore}}}{A_{\text{annulus}}} = \frac{D_{\text{bore}}^2}{D_{\text{bore}}^2 - d_{\text{rod}}^2} = \frac{1}{1 - (d_{\text{rod}} / D_{\text{bore}})^2}$$
+          </div>
+
+          <h2>Regenerative High-Speed Circuit Mechanics</h2>
+          <p>In applications such as wood splitters, garbage truck compactors, and injection molding clamping units, the machine requires rapid advance during the unloaded approach stroke followed by high force during final contact. A <strong>regenerative circuit</strong> redirects oil exhausting from the rod end directly into the cap end, combining it with pump flow.</p>
+
+          <p>Because pressurized oil acts simultaneously on both sides of the piston, the effective forward advance area reduces to <em>only the rod cross-sectional area</em> (\(A_{\text{rod}}\)):</p>
+
+          <div class="formula-box">
+            $$v_{\text{regen}} = \frac{Q_{\text{pump}}}{A_{\text{rod}}} = \frac{Q_{\text{pump}}}{\frac{\pi}{4} d_{\text{rod}}^2}$$
+          </div>
+
+          <p>For a standard cylinder where \(d_{\text{rod}} \approx 0.707 \cdot D_{\text{bore}}\), the rod area equals half the bore area, exactly <strong>doubling extension velocity (100% speed increase)</strong> without requiring a larger, expensive hydraulic pump.</p>
+
+          <h2>Fluid Flow Velocity in Cylinder Ports & Hoses</h2>
+          <p>When high pump flows traverse narrow cylinder port fittings, fluid velocities can reach turbulent extremes. The fluid linear speed (\(v_{\text{port}}\)) traversing a port of inside diameter \(d_{\text{port}}\) is:</p>
+
+          <div class="formula-box">
+            $$v_{\text{port}} = \frac{Q}{\frac{\pi}{4} d_{\text{port}}^2}$$
+          </div>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Hydraulic Line Type</th>
+                <th>Recommended Max Fluid Speed (m/s)</th>
+                <th>Imperial Velocity Limit (ft/s)</th>
+                <th>Consequence of Exceeding Velocity Limits</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Pump Suction Lines</td>
+                <td>0.8 &ndash; 1.5 m/s</td>
+                <td>2.5 &ndash; 5.0 ft/s</td>
+                <td>Vapor cavitation, pump impeller erosion, extreme whine.</td>
+              </tr>
+              <tr>
+                <td>Return Lines to Tank</td>
+                <td>2.0 &ndash; 3.5 m/s</td>
+                <td>6.5 &ndash; 11.5 ft/s</td>
+                <td>High backpressure, reservoir aeration, filter bypass.</td>
+              </tr>
+              <tr>
+                <td>Medium Pressure Lines (&le; 160 bar)</td>
+                <td>3.0 &ndash; 5.0 m/s</td>
+                <td>10.0 &ndash; 16.5 ft/s</td>
+                <td>Elevated line friction, oil overheating.</td>
+              </tr>
+              <tr>
+                <td>High Pressure Lines (> 250 bar)</td>
+                <td>4.5 &ndash; 6.5 m/s</td>
+                <td>15.0 &ndash; 21.0 ft/s</td>
+                <td>Extreme laminar-to-turbulent friction losses.</td>
+              </tr>
+              <tr>
+                <td>Short Internal Cylinder Ports</td>
+                <td>6.0 &ndash; 8.0 m/s</td>
+                <td>20.0 &ndash; 26.0 ft/s</td>
+                <td>Localized pressure drop, seal thermal degradation.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="worked-example-card">
+            <h3>Step-by-Step Worked Case Study: Automated CNC Loading Cylinder</h3>
+            <p><strong>Design Scenario:</strong> An automation engineer is sizing the actuator kinematics for a robotic gantry loader servicing a CNC turning center:</p>
+            <ul>
+              <li>Piston bore: \(D_{\text{bore}} = 80\text{ mm}\) (\(0.080\text{ m}\)).</li>
+              <li>Piston rod: \(d_{\text{rod}} = 45\text{ mm}\) (\(0.045\text{ m}\)).</li>
+              <li>Stroke length: \(S = 600\text{ mm}\) (\(0.600\text{ m}\)).</li>
+              <li>Pump delivery flow: \(Q = 35\text{ L/min}\) (\(0.000583\text{ m}^3/\text{s}\)).</li>
+              <li>Cylinder port internal diameter: \(d_{\text{port}} = 12.0\text{ mm}\).</li>
+            </ul>
+
+            <p><strong>Step 1: Compute bore and annular effective areas</strong></p>
+            <div class="formula-box">
+              $$A_{\text{bore}} = \frac{\pi}{4} (80)^2 = 5,026.55\text{ mm}^2 = 5.0265 \times 10^{-3}\text{ m}^2$$
+              $$A_{\text{rod}} = \frac{\pi}{4} (45)^2 = 1,590.43\text{ mm}^2$$
+              $$A_{\text{annulus}} = 5,026.55 - 1,590.43 = 3,436.12\text{ mm}^2 = 3.4361 \times 10^{-3}\text{ m}^2$$
+            </div>
+
+            <p><strong>Step 2: Calculate extension and retraction speeds</strong></p>
+            <div class="formula-box">
+              $$v_{\text{ext}} = \frac{0.0005833\text{ m}^3/\text{s}}{0.0050265\text{ m}^2} = 0.1161\text{ m/s} = 116.1\text{ mm/s} \quad (4.57\text{ in/s})$$
+              $$v_{\text{ret}} = \frac{0.0005833\text{ m}^3/\text{s}}{0.0034361\text{ m}^2} = 0.1698\text{ m/s} = 169.8\text{ mm/s} \quad (6.68\text{ in/s})$$
+            </div>
+
+            <p><strong>Step 3: Determine travel times and total cycle duration</strong></p>
+            <div class="formula-box">
+              $$t_{\text{ext}} = \frac{0.600\text{ m}}{0.1161\text{ m/s}} = 5.17\text{ seconds}$$
+              $$t_{\text{ret}} = \frac{0.600\text{ m}}{0.1698\text{ m/s}} = 3.53\text{ seconds}$$
+              $$t_{\text{cycle}} = 5.17 + 3.53 = 8.70\text{ seconds}$$
+            </div>
+
+            <p><strong>Step 4: Check fluid velocity in 12 mm cylinder ports</strong></p>
+            <div class="formula-box">
+              $$A_{\text{port}} = \frac{\pi}{4} (12)^2 = 113.1\text{ mm}^2 = 1.131 \times 10^{-4}\text{ m}^2$$
+              $$v_{\text{port}} = \frac{0.0005833\text{ m}^3/\text{s}}{0.0001131\text{ m}^2} = 5.16\text{ m/s} \quad (16.9\text{ ft/s})$$
+            </div>
+            <p><strong>Engineering Conclusion:</strong> The port velocity of 5.16 m/s is within the safe 6.0 m/s limit for cylinder ports, and the complete stroke cycle of 8.7 seconds easily satisfies the required 10-second gantry load cycle.</p>
+          </div>
+
+          <h2>Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <h3>How do flow control valves (meter-in vs. meter-out) affect cylinder speed stability?</h3>
+            <p>Meter-in flow control restricts fluid entering the cylinder, making it suitable only for resistive loads. If the load is overrunning (pulling in the direction of motion, such as a descending hoist), meter-in allows the cylinder to runaway out of control. <strong>Meter-out control</strong> restricts fluid leaving the opposing chamber, creating a stabilizing hydraulic backpressure cushion that positively controls cylinder speed regardless of load direction.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Why does cylinder speed fluctuate when using a fixed displacement pump?</h3>
+            <p>Speed fluctuations typically stem from pressure-dependent fluid leakage past internal pump gear teeth or piston clearances (decreasing pump volumetric efficiency as system pressure climbs), or thermal oil thinning. Installing a <strong>pressure-compensated proportional flow control valve</strong> maintains a strictly constant flow rate to the cylinder regardless of fluctuating working pressures.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What is the maximum recommended speed for industrial hydraulic cylinders?</h3>
+            <p>Standard industrial cylinders equipped with nitrile/polyurethane lip seals operate optimally between <strong>0.05 m/s and 0.50 m/s (2 to 20 in/s)</strong>. Speeds below 0.03 m/s induce "stick-slip" chatter due to static seal friction breakout. Speeds above 0.80 m/s require specialized low-friction PTFE bronze step seals, high-temperature Viton compounds, and external proportional electronic deceleration profiling to prevent seal burning.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How do telescopic cylinders maintain speed across stages?</h3>
+            <p>In standard multi-stage telescopic cylinders, each successive sleeve has a smaller effective bore area. Driven by a constant pump flow rate, each smaller stage extends significantly faster than the previous stage (\(v \propto 1 / A\)). To achieve uniform linear speed across all stages, variable displacement pumps or proportional flow controllers must progressively throttle oil flow as each stage deploys.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar" id="toolSidebar">
+        <!-- Dynamically rendered sidebar -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Engineering and mathematical tools grounded in international standards.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="mechanical.html">Mechanical</a></li>
+        <li><a href="ohms-law-calculator.html">Ohm's Law</a></li>
+        <li><a href="sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    const speedCalcObjectiveSelect = document.getElementById('speedCalcObjective');
+    const speedUnitsSelect = document.getElementById('speedUnits');
+    const boreDInput = document.getElementById('boreD');
+    const rodDInput = document.getElementById('rodD');
+    const strokeLenInput = document.getElementById('strokeLen');
+    const inputFlowRateInput = document.getElementById('inputFlowRate');
+    const targetPistonSpeedInput = document.getElementById('targetPistonSpeed');
+    const portDiamInput = document.getElementById('portDiam');
+    const circuitModeSelect = document.getElementById('circuitMode');
+
+    const lblBoreD = document.getElementById('lblBoreD');
+    const lblRodD = document.getElementById('lblRodD');
+    const lblStrokeLen = document.getElementById('lblStrokeLen');
+    const lblInputFlow = document.getElementById('lblInputFlow');
+    const lblTargetSpeed = document.getElementById('lblTargetSpeed');
+    const lblPortDiam = document.getElementById('lblPortDiam');
+    const grpInputFlow = document.getElementById('grpInputFlow');
+    const grpTargetSpeed = document.getElementById('grpTargetSpeed');
+
+    const cylSpeedResultBox = document.getElementById('cylSpeedResultBox');
+    const resPrimaryExtSpeedLabel = document.getElementById('resPrimaryExtSpeedLabel');
+    const resExtSpeed = document.getElementById('resExtSpeed');
+    const resRetSpeed = document.getElementById('resRetSpeed');
+    const resPrimaryFlowLabel = document.getElementById('resPrimaryFlowLabel');
+    const resPumpFlow = document.getElementById('resPumpFlow');
+    const resExtTime = document.getElementById('resExtTime');
+    const resRetTime = document.getElementById('resRetTime');
+    const resCycleTime = document.getElementById('resCycleTime');
+    const resPortVelocity = document.getElementById('resPortVelocity');
+    const resSpeedRatio = document.getElementById('resSpeedRatio');
+    const cylSpeedNotesBox = document.getElementById('cylSpeedNotesBox');
+
+    speedCalcObjectiveSelect.addEventListener('change', function() {
+      if (this.value === 'findSpeed') {
+        grpInputFlow.style.display = 'block';
+        grpTargetSpeed.style.display = 'none';
+        resPrimaryExtSpeedLabel.textContent = "Extension Speed (v_ext)";
+        resPrimaryFlowLabel.textContent = "Active Pump Flow Rate";
+      } else {
+        grpInputFlow.style.display = 'none';
+        grpTargetSpeed.style.display = 'block';
+        resPrimaryExtSpeedLabel.textContent = "Specified Target Speed";
+        resPrimaryFlowLabel.textContent = "Required Pump Flow Rate";
+      }
+      calculateCylSpeed();
+    });
+
+    speedUnitsSelect.addEventListener('change', function() {
+      const isMetric = this.value === 'metric';
+      if (isMetric) {
+        lblBoreD.textContent = "Cylinder Bore Diameter (D) [mm]";
+        lblRodD.textContent = "Piston Rod Diameter (d) [mm]";
+        lblStrokeLen.textContent = "Stroke Length (S) [mm]";
+        lblInputFlow.textContent = "Pump Delivery Flow Rate (Q) [L/min]";
+        lblTargetSpeed.textContent = "Target Extension Speed [m/s]";
+        lblPortDiam.textContent = "Cylinder Port Inside Diameter [mm]";
+        boreDInput.value = 80;
+        rodDInput.value = 45;
+        strokeLenInput.value = 600;
+        inputFlowRateInput.value = 35;
+        targetPistonSpeedInput.value = 0.15;
+        portDiamInput.value = 12.0;
+      } else {
+        lblBoreD.textContent = "Cylinder Bore Diameter (D) [in]";
+        lblRodD.textContent = "Piston Rod Diameter (d) [in]";
+        lblStrokeLen.textContent = "Stroke Length (S) [in]";
+        lblInputFlow.textContent = "Pump Delivery Flow Rate (Q) [GPM]";
+        lblTargetSpeed.textContent = "Target Extension Speed [in/s]";
+        lblPortDiam.textContent = "Cylinder Port Inside Diameter [in]";
+        boreDInput.value = 3.25;
+        rodDInput.value = 1.75;
+        strokeLenInput.value = 24.0;
+        inputFlowRateInput.value = 9.0;
+        targetPistonSpeedInput.value = 6.0;
+        portDiamInput.value = 0.50;
+      }
+      calculateCylSpeed();
+    });
+
+    function calculateCylSpeed() {
+      const isMetric = speedUnitsSelect.value === 'metric';
+      const isFindSpeed = (speedCalcObjectiveSelect.value === 'findSpeed');
+      const isRegen = (circuitModeSelect.value === 'regen');
+
+      let D = parseFloat(boreDInput.value);
+      let d = parseFloat(rodDInput.value);
+      let S = parseFloat(strokeLenInput.value);
+      let d_port = parseFloat(portDiamInput.value);
+
+      if (isNaN(D) || D <= 0) D = isMetric ? 80 : 3.25;
+      if (isNaN(d) || d <= 0) d = isMetric ? 45 : 1.75;
+      if (d >= D) d = D * 0.55;
+      if (isNaN(S) || S <= 0) S = isMetric ? 600 : 24;
+      if (isNaN(d_port) || d_port <= 0) d_port = isMetric ? 12 : 0.5;
+
+      let A_bore = 0;
+      let A_rod = 0;
+      let A_ann = 0;
+      let A_port = 0;
+
+      let v_ext_disp = 0;
+      let v_ret_disp = 0;
+      let Q_disp = 0;
+      let v_port_disp = 0;
+
+      let t_ext = 0;
+      let t_ret = 0;
+
+      if (isMetric) {
+        A_bore = (Math.PI / 4) * Math.pow(D, 2); // mm^2
+        A_rod = (Math.PI / 4) * Math.pow(d, 2);
+        A_ann = A_bore - A_rod;
+        A_port = (Math.PI / 4) * Math.pow(d_port, 2);
+
+        const A_ext_active = isRegen ? A_rod : A_bore;
+
+        let Q_Lpm = 0;
+        let v_ext_mps = 0;
+
+        if (isFindSpeed) {
+          Q_Lpm = parseFloat(inputFlowRateInput.value);
+          if (isNaN(Q_Lpm) || Q_Lpm <= 0) Q_Lpm = 35;
+          // v [m/s] = (Q [L/min] * 10^3) / (A [mm^2] * 60)
+          v_ext_mps = (Q_Lpm * 1000) / (A_ext_active * 60);
+          Q_disp = Q_Lpm;
+        } else {
+          v_ext_mps = parseFloat(targetPistonSpeedInput.value);
+          if (isNaN(v_ext_mps) || v_ext_mps <= 0) v_ext_mps = 0.15;
+          // Q [L/min] = (v [m/s] * A [mm^2] * 60) / 1000
+          Q_Lpm = (v_ext_mps * A_ext_active * 60) / 1000;
+          Q_disp = Q_Lpm;
+        }
+
+        const v_ret_mps = (Q_Lpm * 1000) / (A_ann * 60);
+        v_ext_disp = v_ext_mps;
+        v_ret_disp = v_ret_mps;
+
+        t_ext = S / (v_ext_mps * 1000);
+        t_ret = S / (v_ret_mps * 1000);
+
+        // Fluid port speed (m/s)
+        const v_port_mps = (Q_Lpm * 1000) / (A_port * 60);
+        v_port_disp = v_port_mps;
+
+        resExtSpeed.textContent = (v_ext_disp * 1000).toFixed(0) + " mm/s (" + v_ext_disp.toFixed(3) + " m/s)";
+        resRetSpeed.textContent = (v_ret_disp * 1000).toFixed(0) + " mm/s (" + v_ret_disp.toFixed(3) + " m/s)";
+        resPumpFlow.textContent = Q_disp.toFixed(1) + " L/min";
+        resPortVelocity.textContent = v_port_disp.toFixed(2) + " m/s";
+      } else {
+        A_bore = (Math.PI / 4) * Math.pow(D, 2); // in^2
+        A_rod = (Math.PI / 4) * Math.pow(d, 2);
+        A_ann = A_bore - A_rod;
+        A_port = (Math.PI / 4) * Math.pow(d_port, 2);
+
+        const A_ext_active = isRegen ? A_rod : A_bore;
+
+        let Q_gpm = 0;
+        let v_ext_ips = 0;
+
+        if (isFindSpeed) {
+          Q_gpm = parseFloat(inputFlowRateInput.value);
+          if (isNaN(Q_gpm) || Q_gpm <= 0) Q_gpm = 9.0;
+          v_ext_ips = (231 * Q_gpm) / (A_ext_active * 60);
+          Q_disp = Q_gpm;
+        } else {
+          v_ext_ips = parseFloat(targetPistonSpeedInput.value);
+          if (isNaN(v_ext_ips) || v_ext_ips <= 0) v_ext_ips = 6.0;
+          Q_gpm = (v_ext_ips * A_ext_active * 60) / 231;
+          Q_disp = Q_gpm;
+        }
+
+        const v_ret_ips = (231 * Q_gpm) / (A_ann * 60);
+        v_ext_disp = v_ext_ips;
+        v_ret_disp = v_ret_ips;
+
+        t_ext = S / v_ext_ips;
+        t_ret = S / v_ret_ips;
+
+        // Port velocity ft/s
+        const v_port_fps = (Q_gpm * 0.3208) / A_port;
+        v_port_disp = v_port_fps;
+
+        resExtSpeed.textContent = v_ext_disp.toFixed(2) + " in/s (" + (v_ext_disp * 5).toFixed(0) + " ft/min)";
+        resRetSpeed.textContent = v_ret_disp.toFixed(2) + " in/s (" + (v_ret_disp * 5).toFixed(0) + " ft/min)";
+        resPumpFlow.textContent = Q_disp.toFixed(1) + " GPM";
+        resPortVelocity.textContent = v_port_disp.toFixed(1) + " ft/s";
+      }
+
+      const speedRatio = v_ret_disp / v_ext_disp;
+      resSpeedRatio.textContent = speedRatio.toFixed(2) + "× (Retract is " + ((speedRatio - 1) * 100).toFixed(0) + "% faster)";
+      resExtTime.textContent = t_ext.toFixed(2) + " s";
+      resRetTime.textContent = t_ret.toFixed(2) + " s";
+      resCycleTime.textContent = (t_ext + t_ret).toFixed(2) + " s (Complete Cycle)";
+
+      let notes = `<strong>Kinematic Assessment:</strong> At <strong>${Q_disp.toFixed(1)} ${isMetric ? 'L/min' : 'GPM'}</strong>, extension travel requires <strong>${t_ext.toFixed(1)} s</strong> and retraction requires <strong>${t_ret.toFixed(1)} s</strong>. `;
+      if (isRegen) {
+        notes += `Regenerative mode is <strong>ACTIVE</strong>: advancing across rod area only to boost extension speed. `;
+      }
+      if ((isMetric && v_port_disp > 6.0) || (!isMetric && v_port_disp > 20.0)) {
+        notes += `<span style="color:#b45309;">Warning: Port fluid velocity (${v_port_disp.toFixed(1)} ${isMetric ? 'm/s' : 'ft/s'}) exceeds the recommended threshold. Enlarge port size to avoid oil overheating.</span>`;
+      }
+      cylSpeedNotesBox.innerHTML = notes;
+
+      cylSpeedResultBox.style.display = 'block';
+    }
+
+    document.getElementById('calcSpeedBtn').addEventListener('click', calculateCylSpeed);
+    document.getElementById('resetSpeedBtn').addEventListener('click', function() {
+      setTimeout(calculateCylSpeed, 50);
+    });
+
+    window.addEventListener('DOMContentLoaded', calculateCylSpeed);
+  </script>
+</body>
+</html>

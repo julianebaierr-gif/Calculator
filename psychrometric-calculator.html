@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Psychrometric Calculator | Moist Air Properties &amp; HVAC Sizing</title>
+  <meta name="description" content="Calculate moist air psychrometric properties per ASHRAE Fundamentals: dew point, relative humidity, humidity ratio (W), wet bulb, enthalpy (h), and specific volume.">
+  <link rel="canonical" href="https://calchub.cloud/psychrometric-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Psychrometric Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Thermodynamic moist air psychrometric calculator solving ASHRAE Fundamentals Chapter 1 formulations for humidity ratio, dew point, wet-bulb, enthalpy, and moist air density.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the difference between dry-bulb, wet-bulb, and dew point temperatures?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Dry-bulb temperature is the true ambient air temperature measured by a standard thermometer shielded from radiation and moisture. Wet-bulb temperature reflects the lowest temperature achievable via evaporative water cooling into ambient air at adiabatic saturation. Dew point temperature is the exact threshold to which moist air must be cooled at constant barometric pressure and moisture content for water vapor to condense into liquid."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is the humidity ratio (specific humidity) calculated?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The humidity ratio (W) is the ratio of water vapor mass to dry air mass: W = 0.62198 * (P_w / (P_atm - P_w)), where P_w is the partial pressure of water vapor and P_atm is total barometric atmospheric pressure. The constant 0.62198 represents the molecular weight ratio of water vapor (18.015 g/mol) to dry air (28.966 g/mol)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why does psychrometric enthalpy matter for HVAC cooling and heating coil sizing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Specific enthalpy (h) measures the total thermal energy (sensible heat plus latent moisture heat) contained per kilogram of dry air: h = 1.006 * T_db + W * (2501 + 1.86 * T_db) kJ/kg. The total cooling or heating coil capacity required to condition an airstream is computed directly from mass airflow times enthalpy difference: Q_total = m_air * Delta_h."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does elevation or barometric pressure alter psychrometric properties?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "As elevation increases, atmospheric barometric pressure drops. According to Dalton's Law of partial pressures, lower barometric pressure forces water to evaporate faster, significantly elevating the saturation humidity ratio W for any given temperature. Consequently, HVAC equipment installed in high-altitude environments requires greater volumetric airflow (CFM or m^3/s) to achieve equivalent sensible cooling capacity."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="mechanical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html" class="active">Mechanical</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="engineering.html">Engineering</a> &rsaquo; 
+      <a href="mechanical.html">Mechanical</a> &rsaquo; 
+      <span>Psychrometric Calculator</span>
+    </nav>
+
+    <header class="calc-header">
+      <div class="calc-badge">Thermodynamics &amp; HVAC Sizing</div>
+      <h1 class="calc-title">Psychrometric Calculator</h1>
+      <p class="calc-tagline">Evaluate complete moist air state points: humidity ratio, dew point, wet-bulb temperature, enthalpy, specific volume, and air density per ASHRAE Fundamentals.</p>
+    </header>
+
+    <div class="calc-grid">
+      <div class="calc-main">
+        <div class="tool-card">
+          <form id="psychForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="tempDb">Dry-Bulb Temperature ($T_{db}$)</label>
+                <div style="display: flex; gap: 0.5rem;">
+                  <input type="number" id="tempDb" class="form-control" value="24" step="0.1" required>
+                  <select id="tempUnit" class="form-control" style="width: 100px;">
+                    <option value="c" selected>&deg;C</option>
+                    <option value="f">&deg;F</option>
+                  </select>
+                </div>
+                <span class="hint">Comfort range typically 20&deg;C &ndash; 26&deg;C (68&deg;F &ndash; 78&deg;F)</span>
+              </div>
+              <div class="form-group">
+                <label for="rhVal">Relative Humidity ($RH$ in %)</label>
+                <input type="number" id="rhVal" class="form-control" value="50" min="0" max="100" step="0.5" required>
+                <span class="hint">Standard indoor design target ~40% &ndash; 60%</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="pressureVal">Barometric Atmospheric Pressure ($P_{atm}$)</label>
+                <div style="display: flex; gap: 0.5rem;">
+                  <input type="number" id="pressureVal" class="form-control" value="101.325" step="any" required>
+                  <select id="pressureUnit" class="form-control" style="width: 110px;">
+                    <option value="kpa" selected>kPa</option>
+                    <option value="bar">bar</option>
+                    <option value="psi">psi</option>
+                    <option value="inhg">inHg</option>
+                  </select>
+                </div>
+                <span class="hint">Standard sea level pressure = 101.325 kPa (14.696 psi)</span>
+              </div>
+              <div class="form-group">
+                <label for="elevPreset">Elevation Preset (Barometric Estimate)</label>
+                <select id="elevPreset" class="form-control">
+                  <option value="101.325" selected>Sea Level (0 m / 0 ft &rarr; 101.325 kPa)</option>
+                  <option value="95.46">500 m / 1,640 ft &rarr; 95.46 kPa</option>
+                  <option value="89.87">1,000 m / 3,280 ft &rarr; 89.87 kPa</option>
+                  <option value="84.56">1,500 m / 4,920 ft &rarr; 84.56 kPa</option>
+                  <option value="79.50">2,000 m / 6,560 ft &rarr; 79.50 kPa</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="calcPsychBtn">Compute Psychrometric Properties</button>
+              <button type="reset" class="btn btn-secondary" id="resetPsychBtn">Reset</button>
+            </div>
+          </form>
+
+          <div id="psychResultBox" class="results-container" style="display: none; margin-top: 1.5rem;">
+            <h3>Calculated Moist Air Psychrometric State Point</h3>
+            <div class="results-grid">
+              <div class="result-tile highlight">
+                <span class="result-label">Dew Point Temperature ($T_{dp}$)</span>
+                <span class="result-value" id="resDewPoint">-- &deg;C</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Wet-Bulb Temperature ($T_{wb}$)</span>
+                <span class="result-value" id="resWetBulb">-- &deg;C</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Humidity Ratio ($W$)</span>
+                <span class="result-value" id="resHumRatio">-- g/kg</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Specific Enthalpy ($h$)</span>
+                <span class="result-value" id="resEnthalpy">-- kJ/kg</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Specific Volume ($v$)</span>
+                <span class="result-value" id="resSpecVol">-- m³/kg</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Moist Air Density ($\rho$)</span>
+                <span class="result-value" id="resDensity">-- kg/m³</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Vapor Pressure ($P_w$)</span>
+                <span class="result-value" id="resVaporPress">-- kPa</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Saturation Vapor Pressure ($P_{ws}$)</span>
+                <span class="result-value" id="resSatPress">-- kPa</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Psychrometrics and Moist Air Thermodynamics</h2>
+          <p>
+            <strong>Psychrometrics</strong> is the branch of applied thermodynamics that investigates the physical, thermal, and psychrometric properties of atmospheric gas mixtures comprising dry air and water vapor. In heating, ventilation, air conditioning (HVAC), industrial drying, cleanroom environmental control, and meteorology, precise evaluation of moist air thermodynamic properties is essential to size air handling units, cooling towers, dehumidifiers, and thermal comfort systems per standards such as <strong>ASHRAE 55</strong> and <strong>ASHRAE 62.1</strong>.
+          </p>
+          <p>
+            Atmospheric air is not a single uniform chemical species; rather, it behaves as a binary mixture of dry air (predominantly nitrogen, oxygen, argon, and carbon dioxide with an average molar mass $M_{da} = 28.966\text{ g/mol}$) and gaseous water vapor ($M_w = 18.01528\text{ g/mol}$). According to Dalton's Law of Partial Pressures, the total barometric atmospheric pressure ($P_{atm}$) is the sum of dry air partial pressure ($P_a$) and water vapor partial pressure ($P_w$):
+          </p>
+          <div class="formula-box">
+            $$P_{atm} = P_a + P_w$$
+          </div>
+
+          <h2>Key Psychrometric State Parameters &amp; Governing Equations</h2>
+          <p>
+            Under the formulation outlined in the <em>ASHRAE Handbook &ndash; Fundamentals (Chapter 1)</em>, the state of moist air at any given barometric pressure is uniquely determined by any two independent thermodynamic properties (most commonly dry-bulb temperature and relative humidity).
+          </p>
+
+          <h3>1. Saturation Vapor Pressure ($P_{ws}$)</h3>
+          <p>
+            Saturation vapor pressure represents the maximum partial pressure exerted by water vapor in equilibrium with pure liquid water at temperature $T$ (°C). Using the highly accurate Magnus-Tetens empirical formulation (valid between $-40^\circ\text{C}$ and $+50^\circ\text{C}$):
+          </p>
+          <div class="formula-box">
+            $$P_{ws}(T) = 0.61078 \times \exp\left(\frac{17.27 \cdot T}{T + 237.3}\right) \quad [\text{kPa}]$$
+          </div>
+
+          <h3>2. Actual Vapor Pressure ($P_w$) and Relative Humidity ($RH$)</h3>
+          <p>
+            Relative humidity ($RH$) is defined as the ratio of actual water vapor partial pressure to saturation vapor pressure at the identical dry-bulb temperature:
+          </p>
+          <div class="formula-box">
+            $$RH = \frac{P_w}{P_{ws}(T_{db})} \times 100\% \implies P_w = \left(\frac{RH}{100}\right) \cdot P_{ws}(T_{db})$$
+          </div>
+
+          <h3>3. Humidity Ratio ($W$, Specific Humidity)</h3>
+          <p>
+            The humidity ratio ($W$), also referred to as absolute or specific humidity, expresses the mass of water vapor associated with each unit mass of bone-dry air. Derived from the ideal gas law:
+          </p>
+          <div class="formula-box">
+            $$W = \frac{m_w}{m_{da}} = \frac{M_w \cdot P_w}{M_{da} \cdot P_a} = \frac{18.01528}{28.966} \cdot \left(\frac{P_w}{P_{atm} - P_w}\right) \approx 0.62198 \cdot \frac{P_w}{P_{atm} - P_w} \quad [\text{kg}_w/\text{kg}_{da}]$$
+          </div>
+
+          <h3>4. Dew Point Temperature ($T_{dp}$)</h3>
+          <p>
+            The dew point is the temperature at which water vapor in moist air begins to condense into liquid droplets at constant total atmospheric pressure. Inverting the Magnus-Tetens relationship with respect to actual vapor pressure $P_w$:
+          </p>
+          <div class="formula-box">
+            $$\alpha(T_{db}, RH) = \ln\left(\frac{P_w}{0.61078}\right), \quad T_{dp} = \frac{237.3 \cdot \alpha}{17.27 - \alpha} \quad [^\circ\text{C}]$$
+          </div>
+
+          <h3>5. Wet-Bulb Temperature ($T_{wb}$)</h3>
+          <p>
+            The wet-bulb temperature corresponds to the temperature indicated by a thermometer enveloped in a wetted wick exposed to rapid air currents. It denotes the thermodynamic limit of evaporative cooling. A widely utilized and continuous numerical approximation developed by Stull (2011) evaluates $T_{wb}$ directly from dry-bulb temperature and relative humidity:
+          </p>
+          <div class="formula-box">
+            $$\begin{aligned}
+            T_{wb} &= T_{db} \cdot \text{atan}(0.151977 \sqrt{RH + 8.313659}) + \text{atan}(T_{db} + RH) \\
+            &\quad - \text{atan}(RH - 1.676331) + 0.00391838 \cdot (RH)^{1.5} \cdot \text{atan}(0.023101 \cdot RH) - 4.686035
+            \end{aligned}$$
+          </div>
+
+          <h3>6. Specific Enthalpy of Moist Air ($h$)</h3>
+          <p>
+            Specific enthalpy ($h$) quantifies the total thermal energy content per kilogram of dry air, incorporating sensible thermal energy of dry air plus the latent and sensible heat of the associated water vapor (reference datum at $0^\circ\text{C}$ dry air and liquid water):
+          </p>
+          <div class="formula-box">
+            $$h = c_{pa} \cdot T_{db} + W \cdot (h_{we} + c_{pw} \cdot T_{db}) = 1.006 \cdot T_{db} + W \cdot (2501 + 1.86 \cdot T_{db}) \quad [\text{kJ/kg}_{da}]$$
+          </div>
+          <p>
+            Where $c_{pa} = 1.006\text{ kJ/(kg}\cdot\text{K)}$ is the specific heat capacity of dry air, $h_{we} = 2501\text{ kJ/kg}$ is the latent heat of vaporization of water at $0^\circ\text{C}$, and $c_{pw} = 1.86\text{ kJ/(kg}\cdot\text{K)}$ is the specific heat of water vapor.
+          </p>
+
+          <h3>7. Specific Volume ($v$) and Moist Air Density ($\rho$)</h3>
+          <p>
+            Specific volume represents the cubic meters of moist air mixture space occupied per kilogram of dry air:
+          </p>
+          <div class="formula-box">
+            $$v = \frac{R_a \cdot (T_{db} + 273.15) \cdot (1 + 1.6078 \cdot W)}{P_{atm}} \quad [\text{m}^3/\text{kg}_{da}]$$
+          </div>
+          <p>
+            Where $R_a = 0.287042\text{ kJ/(kg}\cdot\text{K)}$ is the specific gas constant of dry air, and $P_{atm}$ is in $\text{kPa}$. Moist air mixture mass density ($\rho$) is subsequently computed as:
+          </p>
+          <div class="formula-box">
+            $$\rho = \frac{1 + W}{v} \quad [\text{kg/m}^3]$$
+          </div>
+
+          <h2>Psychrometric Process Reference Matrix</h2>
+          <p>
+            Every HVAC conditioning process traces a distinct directional path across the psychrometric diagram:
+          </p>
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Psychrometric Process</th>
+                <th>Sensible Heat ($T_{db}$)</th>
+                <th>Humidity Ratio ($W$)</th>
+                <th>Relative Humidity ($RH$)</th>
+                <th>Enthalpy ($h$)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Sensible Heating (Electric Duct Heater)</td>
+                <td>Increases (&uarr;)</td>
+                <td>Constant (&rarr;)</td>
+                <td>Decreases (&darr;)</td>
+                <td>Increases (&uarr;)</td>
+              </tr>
+              <tr>
+                <td>Sensible Cooling (Dry Coil above $T_{dp}$)</td>
+                <td>Decreases (&darr;)</td>
+                <td>Constant (&rarr;)</td>
+                <td>Increases (&uarr;)</td>
+                <td>Decreases (&darr;)</td>
+              </tr>
+              <tr>
+                <td>Cooling &amp; Dehumidification (Chilled Water Coil)</td>
+                <td>Decreases (&darr;)</td>
+                <td>Decreases (&darr;)</td>
+                <td>Increases (&uarr;)</td>
+                <td>Decreases (&darr;)</td>
+              </tr>
+              <tr>
+                <td>Adiabatic Humidification (Evaporative Cooler)</td>
+                <td>Decreases (&darr;)</td>
+                <td>Increases (&uarr;)</td>
+                <td>Increases (&uarr;)</td>
+                <td>Constant (&rarr;)</td>
+              </tr>
+              <tr>
+                <td>Steam Humidification (Isothermal)</td>
+                <td>Constant (&rarr;)</td>
+                <td>Increases (&uarr;)</td>
+                <td>Increases (&uarr;)</td>
+                <td>Increases (&uarr;)</td>
+              </tr>
+              <tr>
+                <td>Chemical Dehumidification (Desiccant Wheel)</td>
+                <td>Increases (&uarr;)</td>
+                <td>Decreases (&darr;)</td>
+                <td>Decreases (&darr;)</td>
+                <td>Constant / Slight &uarr;</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Case Study: Cleanroom Air Conditioning Sizing</h3>
+            <p><strong>Design Scenario:</strong> An ISO Class 7 pharmaceutical cleanroom supply air system draws outdoor air at Summer design conditions: $T_{db} = 35.0^\circ\text{C}$, $RH = 60.0\%$, at standard atmospheric pressure $P_{atm} = 101.325\text{ kPa}$. The air handling unit conditions this air to a space supply state of $T_{supply} = 16.0^\circ\text{C}$ and $W_{supply} = 0.0085\text{ kg}_w/\text{kg}_{da}$. Calculate the outdoor air state point (dew point, humidity ratio, and enthalpy) and determine the total enthalpy extraction ($\Delta h$) required per kilogram of dry air.</p>
+            
+            <p><strong>Step 1: Calculate Outdoor Air Saturation and Actual Vapor Pressures</strong></p>
+            <div class="formula-box">
+              $$P_{ws}(35) = 0.61078 \times \exp\left(\frac{17.27 \times 35}{35 + 237.3}\right) = 0.61078 \times \exp(2.2198) = 5.623\text{ kPa}$$
+              $$P_w = 0.60 \times 5.623\text{ kPa} = 3.374\text{ kPa}$$
+            </div>
+
+            <p><strong>Step 2: Determine Outdoor Humidity Ratio ($W_{out}$)</strong></p>
+            <div class="formula-box">
+              $$W_{out} = 0.62198 \times \frac{3.374}{101.325 - 3.374} = 0.62198 \times \frac{3.374}{97.951} = 0.02142\text{ kg}_w/\text{kg}_{da} = 21.42\text{ g/kg}$$
+            </div>
+
+            <p><strong>Step 3: Calculate Outdoor Dew Point Temperature ($T_{dp}$)</strong></p>
+            <div class="formula-box">
+              $$\alpha = \ln\left(\frac{3.374}{0.61078}\right) = \ln(5.524) = 1.7091$$
+              $$T_{dp} = \frac{237.3 \times 1.7091}{17.27 - 1.7091} = \frac{405.57}{15.5609} \approx 26.06^\circ\text{C}$$
+            </div>
+
+            <p><strong>Step 4: Calculate Specific Enthalpies of Outdoor and Supply Air</strong></p>
+            <div class="formula-box">
+              $$h_{out} = 1.006 \times 35 + 0.02142 \times (2501 + 1.86 \times 35) = 35.21 + 0.02142 \times 2566.1 = 35.21 + 54.97 = 90.18\text{ kJ/kg}_{da}$$
+              $$h_{supply} = 1.006 \times 16 + 0.0085 \times (2501 + 1.86 \times 16) = 16.10 + 0.0085 \times 2530.76 = 16.10 + 21.51 = 37.61\text{ kJ/kg}_{da}$$
+            </div>
+
+            <p><strong>Step 5: Enthalpy Extraction Rate ($\Delta h$)</strong></p>
+            <div class="formula-box">
+              $$\Delta h = h_{out} - h_{supply} = 90.18 - 37.61 = 52.57\text{ kJ/kg}_{da}$$
+            </div>
+            <p>
+              <strong>Engineering Sizing Insight:</strong> Latent moisture removal accounts for $\frac{54.97 - 21.51}{52.57} = \frac{33.46}{52.57} \approx 63.6\%$ of the total cooling coil load. The coil must operate well below the $26.06^\circ\text{C}$ dew point to condense out $12.92\text{ g}$ of moisture per kilogram of processed dry air.
+            </p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar">
+        <div class="sidebar-card">
+          <h4>Related HVAC &amp; Fluid Calculators</h4>
+          <ul class="sidebar-links">
+            <li><a href="hvac-calculator.html">HVAC Duct Sizing &amp; CFM</a></li>
+            <li><a href="heat-exchanger-calculator.html">Heat Exchanger LMTD</a></li>
+            <li><a href="hydraulic-pump-power-calculator.html">Hydraulic Pump Power</a></li>
+            <li><a href="power-to-torque-calculator.html">Power to Torque Calculator</a></li>
+            <li><a href="cooling-load-calculator.html">Cooling Load Calculator</a></li>
+            <li><a href="pipe-sizing-calculator.html">Pipe Sizing Calculator</a></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>High-precision professional engineering and scientific calculation engines.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Directories</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="mechanical.html">Mechanical Engineering</a></li>
+          <li><a href="engineering.html">Civil &amp; Structural</a></li>
+          <li><a href="sitemap.xml">XML Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 CalcHub. Standard Engineering Reference Systems.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calcBtn = document.getElementById('calcPsychBtn');
+      const resetBtn = document.getElementById('resetPsychBtn');
+      const resultBox = document.getElementById('psychResultBox');
+      const elevPreset = document.getElementById('elevPreset');
+      const pressureVal = document.getElementById('pressureVal');
+      const pressureUnit = document.getElementById('pressureUnit');
+
+      elevPreset.addEventListener('change', function() {
+        if (pressureUnit.value === 'kpa') {
+          pressureVal.value = this.value;
+        } else if (pressureUnit.value === 'psi') {
+          pressureVal.value = (parseFloat(this.value) * 0.145038).toFixed(3);
+        } else if (pressureUnit.value === 'bar') {
+          pressureVal.value = (parseFloat(this.value) * 0.01).toFixed(4);
+        } else if (pressureUnit.value === 'inhg') {
+          pressureVal.value = (parseFloat(this.value) * 0.2953).toFixed(2);
+        }
+      });
+
+      function calculatePsych() {
+        const tUnit = document.getElementById('tempUnit').value;
+        let tInput = parseFloat(document.getElementById('tempDb').value);
+        let rh = parseFloat(document.getElementById('rhVal').value);
+        let pInput = parseFloat(pressureVal.value);
+        let pU = pressureUnit.value;
+
+        if (isNaN(tInput) || isNaN(rh) || isNaN(pInput) || pInput <= 0) {
+          alert('Please enter valid numerical parameters.');
+          return;
+        }
+
+        // Convert dry-bulb to Celsius
+        let tDb_C = (tUnit === 'f') ? (tInput - 32) * (5 / 9) : tInput;
+        // Clamp RH between 0.01 and 100
+        rh = Math.max(0.01, Math.min(100.0, rh));
+
+        // Convert atmospheric pressure to kPa
+        let pAtm_kPa = 101.325;
+        if (pU === 'kpa') pAtm_kPa = pInput;
+        else if (pU === 'bar') pAtm_kPa = pInput * 100.0;
+        else if (pU === 'psi') pAtm_kPa = pInput / 0.1450377;
+        else if (pU === 'inhg') pAtm_kPa = pInput / 0.2952998;
+
+        // 1. Saturation vapor pressure (kPa) via Magnus-Tetens
+        const pSat_kPa = 0.61078 * Math.exp((17.27 * tDb_C) / (tDb_C + 237.3));
+
+        // 2. Actual vapor pressure (kPa)
+        const pVapor_kPa = (rh / 100.0) * pSat_kPa;
+
+        // Ensure vapor pressure does not exceed atmospheric pressure
+        const effectiveVapor_kPa = Math.min(pVapor_kPa, pAtm_kPa * 0.99);
+
+        // 3. Humidity ratio W [kg_w / kg_da]
+        const humRatio = 0.62198 * (effectiveVapor_kPa / (pAtm_kPa - effectiveVapor_kPa));
+        const humRatio_g_kg = humRatio * 1000.0;
+
+        // 4. Dew point temperature [C]
+        const alpha = Math.log(effectiveVapor_kPa / 0.61078);
+        const tDp_C = (237.3 * alpha) / (17.27 - alpha);
+
+        // 5. Wet-bulb temperature [C] via Stull's equation
+        const atan = Math.atan;
+        const sqrt = Math.sqrt;
+        const tWb_C = tDb_C * atan(0.151977 * sqrt(rh + 8.313659)) +
+                      atan(tDb_C + rh) -
+                      atan(rh - 1.676331) +
+                      0.00391838 * Math.pow(rh, 1.5) * atan(0.023101 * rh) -
+                      4.686035;
+
+        // 6. Specific enthalpy [kJ / kg_da]
+        const enthalpy = 1.006 * tDb_C + humRatio * (2501.0 + 1.86 * tDb_C);
+
+        // 7. Specific volume [m^3 / kg_da]
+        // R_da = 0.287042 kPa * m^3 / (kg * K)
+        const specVol = (0.287042 * (tDb_C + 273.15) * (1.0 + 1.6078 * humRatio)) / pAtm_kPa;
+
+        // 8. Density [kg_moist_air / m^3]
+        const density = (1.0 + humRatio) / specVol;
+
+        // Render outputs
+        const unitSuffix = (tUnit === 'f') ? ' °F' : ' °C';
+        const displayDp = (tUnit === 'f') ? (tDp_C * (9/5) + 32) : tDp_C;
+        const displayWb = (tUnit === 'f') ? (tWb_C * (9/5) + 32) : tWb_C;
+
+        document.getElementById('resDewPoint').textContent = displayDp.toFixed(2) + unitSuffix;
+        document.getElementById('resWetBulb').textContent = displayWb.toFixed(2) + unitSuffix;
+        document.getElementById('resHumRatio').textContent = humRatio_g_kg.toFixed(3) + ' g/kg';
+        document.getElementById('resEnthalpy').textContent = enthalpy.toFixed(2) + ' kJ/kg';
+        document.getElementById('resSpecVol').textContent = specVol.toFixed(4) + ' m³/kg';
+        document.getElementById('resDensity').textContent = density.toFixed(3) + ' kg/m³';
+        document.getElementById('resVaporPress').textContent = effectiveVapor_kPa.toFixed(3) + ' kPa';
+        document.getElementById('resSatPress').textContent = pSat_kPa.toFixed(3) + ' kPa';
+
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      calcBtn.addEventListener('click', calculatePsych);
+      resetBtn.addEventListener('click', function() {
+        resultBox.style.display = 'none';
+      });
+
+      calculatePsych();
+    });
+  </script>
+</body>
+</html>

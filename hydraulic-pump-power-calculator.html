@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hydraulic Pump Power Calculator | Flow, Pressure, Electric Motor kW & HP</title>
+  <meta name="description" content="Calculate hydraulic pump power, electric motor size (kW & HP), drive shaft torque, pump displacement (cc/rev), and overall efficiency per ISO 4409 standards.">
+  <link rel="canonical" href="https://calchub.cloud/hydraulic-pump-power-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Hydraulic Pump Power Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Fluid power sizing calculator computing required electric motor drive power P = (p * Q) / (600 * eta), hydraulic fluid power, pump displacement, and shaft drive torque per ISO 4409.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the formula for hydraulic pump electric motor power?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In metric units: P_motor [kW] = (Pressure [bar] * Flow [L/min]) / (600 * eta_total), where eta_total is overall pump efficiency (typically 0.82 to 0.92). In imperial units: P_motor [HP] = (Pressure [psi] * Flow [GPM]) / (1714 * eta_total)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is hydraulic pump displacement (cc/rev) calculated from flow rate and RPM?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Pump geometric displacement per revolution (V_g) is: V_g [cm^3/rev] = (Flow [L/min] * 1000) / (N [RPM] * eta_volumetric). For example, a pump delivering 60 L/min at 1,500 RPM with 95% volumetric efficiency requires a displacement of 42.1 cc/rev."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between volumetric efficiency and hydromechanical efficiency?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Volumetric efficiency (eta_v) accounts for internal fluid slippage/leakage past rotating gear teeth, vanes, or piston clearances. Hydromechanical efficiency (eta_hm) accounts for mechanical friction in bearings, shaft seals, and fluid viscous shear drag. Overall efficiency is the product: eta_total = eta_v * eta_hm."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is input drive shaft torque calculated for a hydraulic pump?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Theoretical pump drive shaft torque is: T_theo [N*m] = (V_g [cm^3/rev] * Pressure [bar]) / (20 * pi). The actual required drive torque accounting for friction is: T_actual = T_theo / eta_hm."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="mechanical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html" class="active">Mechanical</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="mechanical.html">Mechanical &amp; Machine Design</a> &rsaquo;
+      <span>Hydraulic Pump Power Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">ISO 4409 &amp; NFPA Fluid Power Standards</div>
+          <h1 class="calc-title">Hydraulic Pump Power Calculator</h1>
+          <p class="calc-tagline">Calculate hydraulic pump output power, required electric motor drive sizing (kW & HP), drive shaft input torque, pump displacement (cc/rev), and overall efficiency.</p>
+        </header>
+
+        <div class="tool-card">
+          <form id="pumpPowerCalcForm">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="pumpCalcMode">Calculation Input Basis</label>
+                <select id="pumpCalcMode">
+                  <option value="fromFlow" selected>Specify Delivery Flow Rate (Q) & Pressure (P)</option>
+                  <option value="fromDisplacement">Specify Pump Displacement (Vg) & Drive RPM (N)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="powerUnits">Engineering Units</label>
+                <select id="powerUnits">
+                  <option value="metric" selected>Metric (bar, L/min, kW, N·m, cc/rev)</option>
+                  <option value="imperial">Imperial (psi, GPM, HP, lb·ft, cu in/rev)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="pumpType">Hydraulic Pump Type Preset</label>
+                <select id="pumpType">
+                  <option value="axialPiston" selected>Axial Piston Pump (High Pressure / &eta;t = 90%)</option>
+                  <option value="externalGear">External Gear Pump (Standard / &eta;t = 82%)</option>
+                  <option value="internalGear">Internal Gear / Gerotor Pump (&eta;t = 85%)</option>
+                  <option value="vanePump">Variable Vane Pump (&eta;t = 86%)</option>
+                  <option value="radialPiston">Radial Piston Pump (Ultra High Press / &eta;t = 92%)</option>
+                  <option value="custom">Custom Efficiency...</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="pumpPressure" id="lblPumpPress">Operating Working Pressure [bar]</label>
+                <input type="number" id="pumpPressure" step="5" min="5" max="1000" value="210">
+              </div>
+
+              <div class="form-group" id="grpFlowRate">
+                <label for="flowRateVal" id="lblFlowRate">Delivered Flow Rate (Q) [L/min]</label>
+                <input type="number" id="flowRateVal" step="1" min="0.5" max="2500" value="60">
+              </div>
+
+              <div class="form-group" id="grpDisplacement" style="display: none;">
+                <label for="displacementVal" id="lblDisplacement">Pump Displacement (Vg) [cc/rev]</label>
+                <input type="number" id="displacementVal" step="1" min="1" max="1000" value="45">
+              </div>
+
+              <div class="form-group">
+                <label for="driveRpm">Electric Motor Drive Speed (N) [RPM]</label>
+                <select id="driveRpm">
+                  <option value="1450">1,450 RPM (4-Pole 50 Hz European Standard)</option>
+                  <option value="1750" selected>1,750 RPM (4-Pole 60 Hz US Standard)</option>
+                  <option value="960">960 RPM (6-Pole 50 Hz)</option>
+                  <option value="1160">1,160 RPM (6-Pole 60 Hz)</option>
+                  <option value="2900">2,900 RPM (2-Pole 50 Hz High Speed)</option>
+                  <option value="3500">3,500 RPM (2-Pole 60 Hz High Speed)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="volEfficiency">Volumetric Efficiency (&eta;v)</label>
+                <input type="number" id="volEfficiency" step="1" min="60" max="100" value="95">
+              </div>
+
+              <div class="form-group">
+                <label for="mechEfficiency">Hydromechanical Efficiency (&eta;hm)</label>
+                <input type="number" id="mechEfficiency" step="1" min="60" max="100" value="92">
+              </div>
+            </div>
+
+            <div class="calc-actions">
+              <button type="button" id="calcPowerBtn" class="btn btn-primary">Calculate Power & Torque</button>
+              <button type="reset" id="resetPowerBtn" class="btn btn-secondary">Reset Defaults</button>
+            </div>
+          </form>
+
+          <div id="pumpPowerResultBox" class="results-container" style="display: none;">
+            <h3>Pump Power, Drive Motor Sizing & Torque Results</h3>
+            <div class="results-grid">
+              <div class="result-tile">
+                <span class="result-label">Required Electric Motor Shaft Power</span>
+                <span id="resMotorPower" class="result-value">-- kW</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Hydraulic Fluid Output Power (P_hyd)</span>
+                <span id="resHydPower" class="result-value">-- kW</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Drive Shaft Input Torque (T_shaft)</span>
+                <span id="resDriveTorque" class="result-value">-- N·m</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Calculated Pump Displacement (Vg)</span>
+                <span id="resDisplacement" class="result-value">-- cc/rev</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Delivered Actual Flow Rate (Q)</span>
+                <span id="resActualFlow" class="result-value">-- L/min</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Overall Total Efficiency (&eta;t)</span>
+                <span id="resTotalEfficiency" class="result-value">-- %</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Parasitic Internal Heat Loss</span>
+                <span id="resHeatLoss" class="result-value">-- kW</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Standard Motor Frame Recommendation</span>
+                <span id="resMotorRec" class="result-value">--</span>
+              </div>
+            </div>
+            <div id="pumpPowerNotesBox" style="margin-top: 1rem; color: #1e40af; background: #eff6ff; border: 1px solid #bfdbfe; padding: 0.75rem; border-radius: 6px;"></div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Applied Fluid Power & Hydraulic Prime Mover Sizing</h2>
+          <p>A hydraulic pump is the heart of every fluid power system, converting mechanical rotary power from an electric motor or internal combustion engine into high-pressure fluid energy. Sizing the drive motor is one of the most critical engineering steps in power unit (HPU) design. Over-sizing the motor multiplies capital cost and causes poor electrical power factor (\(\cos\varphi < 0.70\)), while undersizing causes the motor to stall, trip thermal overloads, or burn windings when the hydraulic system reaches full relief valve pressure.</p>
+
+          <p>Rigorous sizing per <strong>ISO 4409</strong> and <strong>NFPA Fluid Power Standards</strong> accounts for the thermodynamic transition from mechanical shaft torque to fluid hydrostatic work, including both volumetric slip leakage and mechanical bearing friction losses.</p>
+
+          <h2>Core Mathematical Equations for Hydraulic Power</h2>
+          <p>The useful fluid output power (\(P_{\text{hyd}}\)) delivered into the hydraulic circuit is the product of operating pressure and volumetric flow rate:</p>
+
+          <h3>Metric System Formulations (bar and L/min)</h3>
+          <p>Because \(1\text{ bar} = 10^5\text{ N/m}^2\) and \(1\text{ L/min} = 10^{-3} / 60\text{ m}^3/\text{s}\):</p>
+
+          <div class="formula-box">
+            $$P_{\text{hyd}} = \frac{P \cdot Q}{600} \quad [\text{kW}]$$
+          </div>
+
+          <h3>Imperial System Formulations (psi and GPM)</h3>
+          <p>Because 1 horsepower equals 33,000 ft-lbf/min and 1 gallon equals 231 cubic inches:</p>
+
+          <div class="formula-box">
+            $$P_{\text{hyd}} = \frac{P \cdot Q}{1714} \quad [\text{HP}]$$
+          </div>
+
+          <h2>Required Motor Shaft Drive Power & Efficiency Derating</h2>
+          <p>No hydraulic pump operates without losses. The input mechanical power (\(P_{\text{shaft}}\)) demanded from the electric motor or diesel engine must supply both fluid work and internal losses:</p>
+
+          <div class="formula-box">
+            $$P_{\text{shaft}} = \frac{P_{\text{hyd}}}{\eta_{\text{total}}} = \frac{P \cdot Q}{600 \cdot \eta_{\text{total}}} \quad [\text{kW}] \quad \Longleftrightarrow \quad P_{\text{shaft}} = \frac{P \cdot Q}{1714 \cdot \eta_{\text{total}}} \quad [\text{HP}]$$
+          </div>
+
+          <p>Overall pump efficiency (\(\eta_{\text{total}}\)) is the product of two distinct physical loss mechanisms:</p>
+
+          <div class="formula-box">
+            $$\eta_{\text{total}} = \eta_{\text{volumetric}} \cdot \eta_{\text{hydromechanical}}$$
+          </div>
+
+          <ol>
+            <li><strong>Volumetric Efficiency (\(\eta_v\)):</strong> Quantifies fluid slippage escaping through micro-clearances between rotating pistons, valve plates, or gear teeth from the high-pressure discharge port back to suction or case drain (typically 0.90 to 0.98).</li>
+            <li><strong>Hydromechanical Efficiency (\(\eta_{hm}\)):</strong> Quantifies mechanical friction inside shaft bearings, swashplate pivots, and oil viscous shear resistance (typically 0.85 to 0.95).</li>
+          </ol>
+
+          <h2>Drive Shaft Input Torque Formulation</h2>
+          <p>The mechanical torque (\(T\)) demanded by the pump shaft determines coupling selection and shaft shear safety:</p>
+
+          <div class="formula-box">
+            $$T = \frac{V_g \cdot P}{20 \cdot \pi \cdot \eta_{hm}} \quad [\text{N}\cdot\text{m}] \quad \Longleftrightarrow \quad T = \frac{V_g \cdot P}{24 \cdot \pi \cdot \eta_{hm}} \quad [\text{lb}\cdot\text{ft}]$$
+          </div>
+
+          <p>Where \(V_g\) is pump geometric displacement per revolution (\(\text{cm}^3/\text{rev}\) or \(\text{in}^3/\text{rev}\)).</p>
+
+          <h2>Pump Displacement & Delivery Flow Rate Relationships</h2>
+          <p>Theoretical discharge flow rate (\(Q_{\text{theo}}\)) is purely geometric, whereas actual delivered flow (\(Q_{\text{actual}}\)) reflects volumetric slippage:</p>
+
+          <div class="formula-box">
+            $$Q_{\text{theo}} = \frac{V_g \cdot N}{1000} \quad [\text{L/min}] \quad \implies \quad Q_{\text{actual}} = Q_{\text{theo}} \cdot \eta_v$$
+          </div>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Hydraulic Pump Architecture</th>
+                <th>Typical Pressure Rating</th>
+                <th>Volumetric Efficiency (\(\eta_v\))</th>
+                <th>Hydromechanical (\(\eta_{hm}\))</th>
+                <th>Overall Efficiency (\(\eta_t\))</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>External Gear Pump</td>
+                <td>150 &ndash; 250 bar (2,200 &ndash; 3,600 psi)</td>
+                <td>0.88 &ndash; 0.93</td>
+                <td>0.85 &ndash; 0.90</td>
+                <td>0.75 &ndash; 0.84</td>
+              </tr>
+              <tr>
+                <td>Internal Gear / Gerotor</td>
+                <td>100 &ndash; 210 bar (1,500 &ndash; 3,000 psi)</td>
+                <td>0.90 &ndash; 0.95</td>
+                <td>0.88 &ndash; 0.92</td>
+                <td>0.80 &ndash; 0.87</td>
+              </tr>
+              <tr>
+                <td>Vane Pump (Balanced)</td>
+                <td>140 &ndash; 210 bar (2,000 &ndash; 3,000 psi)</td>
+                <td>0.90 &ndash; 0.96</td>
+                <td>0.88 &ndash; 0.93</td>
+                <td>0.80 &ndash; 0.88</td>
+              </tr>
+              <tr>
+                <td>Axial Piston (Swashplate)</td>
+                <td>250 &ndash; 420 bar (3,600 &ndash; 6,000 psi)</td>
+                <td>0.95 &ndash; 0.98</td>
+                <td>0.92 &ndash; 0.96</td>
+                <td>0.88 &ndash; 0.94</td>
+              </tr>
+              <tr>
+                <td>Radial Piston Pump</td>
+                <td>350 &ndash; 700 bar (5,000 &ndash; 10,000 psi)</td>
+                <td>0.96 &ndash; 0.99</td>
+                <td>0.93 &ndash; 0.97</td>
+                <td>0.90 &ndash; 0.95</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="worked-example-card">
+            <h3>Step-by-Step Worked Case Study: CNC Machine Tool HPU Sizing</h3>
+            <p><strong>Design Scenario:</strong> An engineer is sizing the electric motor and pump for a modern CNC machine tool clamping and pallet changer hydraulic power unit:</p>
+            <ul>
+              <li>Required flow rate: \(Q = 60\text{ L/min}\) (\(15.85\text{ GPM}\)).</li>
+              <li>Maximum operating pressure: \(P = 210\text{ bar}\) (\(3,045\text{ psi}\)).</li>
+              <li>Drive motor speed: 4-pole 60 Hz electric motor running at \(N = 1,750\text{ RPM}\).</li>
+              <li>Pump type: Variable-displacement axial piston pump.</li>
+              <li>Efficiencies: Volumetric \(\eta_v = 0.95\) (\(95\%\)), Hydromechanical \(\eta_{hm} = 0.92\) (\(92\%\)).</li>
+            </ul>
+
+            <p><strong>Step 1: Compute overall total pump efficiency (\(\eta_{\text{total}}\))</strong></p>
+            <div class="formula-box">
+              $$\eta_{\text{total}} = \eta_v \cdot \eta_{hm} = 0.95 \times 0.92 = 0.874 \quad (87.4\%)$$
+            </div>
+
+            <p><strong>Step 2: Calculate hydraulic fluid output power (\(P_{\text{hyd}}\))</strong></p>
+            <div class="formula-box">
+              $$P_{\text{hyd}} = \frac{P \cdot Q}{600} = \frac{210\text{ bar} \cdot 60\text{ L/min}}{600} = \frac{12,600}{600} = 21.00\text{ kW} \quad (28.16\text{ HP})$$
+            </div>
+
+            <p><strong>Step 3: Calculate required electric motor shaft power (\(P_{\text{shaft}}\))</strong></p>
+            <div class="formula-box">
+              $$P_{\text{shaft}} = \frac{P_{\text{hyd}}}{\eta_{\text{total}}} = \frac{21.00\text{ kW}}{0.874} = 24.03\text{ kW} \quad (32.22\text{ HP})$$
+            </div>
+            <p>The engineer selects the next standard commercial electric motor size: <strong>30 kW (40 HP)</strong>.</p>
+
+            <p><strong>Step 4: Calculate required pump displacement (\(V_g\))</strong></p>
+            <div class="formula-box">
+              $$V_g = \frac{Q \cdot 1000}{N \cdot \eta_v} = \frac{60 \cdot 1000}{1750 \cdot 0.95} = \frac{60000}{1662.5} = 36.09\text{ cc/rev}$$
+            </div>
+            <p>The engineer selects a standard <strong>45 cc/rev</strong> variable displacement pump derated to 36 cc/rev.</p>
+
+            <p><strong>Step 5: Compute required drive shaft input torque (\(T\))</strong></p>
+            <div class="formula-box">
+              $$T = \frac{V_g \cdot P}{20 \cdot \pi \cdot \eta_{hm}} = \frac{36.09 \cdot 210}{20 \cdot \pi \cdot 0.92} = \frac{7578.9}{57.805} = 131.1\text{ N}\cdot\text{m} \quad (96.7\text{ lb}\cdot\text{ft})$$
+            </div>
+          </div>
+
+          <h2>Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <h3>Why does electric motor power depend on overall pump efficiency?</h3>
+            <p>If overall efficiency (\(\eta_{\text{total}} = 0.80\)) is ignored, calculating power purely as \(P \cdot Q / 600\) underestimates required shaft power by 25%. A 20 kW hydraulic load with 80% pump efficiency actually demands 25 kW from the electric motor. Sizing the motor without efficiency losses causes motor overload trips, blown fuses, and premature winding insulation failure.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What happens to the energy lost to pump inefficiency?</h3>
+            <p>Every watt of energy lost due to volumetric leakage and hydromechanical friction transforms directly into <strong>heat within the hydraulic fluid</strong>. In a 30 kW system operating at 85% efficiency, 4.5 kW of continuous thermal energy enters the oil reservoir. If an air/oil heat exchanger is not sized to dissipate this parasitic heat, fluid temperatures will rapidly exceed 80&deg;C, destroying seals and degrading oil viscosity.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How do pressure-compensated variable displacement pumps save power?</h3>
+            <p>A fixed displacement pump constantly pumps its full rated flow (\(Q_{\text{max}}\)). When actuators are stationary, the entire flow dumps over the relief valve at full pressure, wasting 100% of motor power as boiling heat. In contrast, a pressure-compensated pump automatically destroke its swashplate to near-zero displacement (\(Q \to 0\)) when pressure reaches setpoint, holding full pressure while drawing only 5% to 10% standby motor power.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How does altitude affect hydraulic pump power and performance?</h3>
+            <p>While hydraulic pressure is generated mechanically, atmospheric pressure pushes oil from the open reservoir into the pump suction port. At high altitudes (> 2,000 meters / 6,500 ft), lower atmospheric pressure reduces net positive suction head (NPSH), causing severe pump cavitation. To prevent pump destruction at high elevations, reservoirs must be pressurized to 0.2 &ndash; 0.5 bar, or pump suction lines must be enlarged to lower fluid velocity below 0.8 m/s.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar" id="toolSidebar">
+        <!-- Dynamically rendered sidebar -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Engineering and mathematical tools grounded in international standards.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="mechanical.html">Mechanical</a></li>
+        <li><a href="ohms-law-calculator.html">Ohm's Law</a></li>
+        <li><a href="sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    const PUMP_PRESETS = {
+      axialPiston: { vol: 96, hm: 94 },
+      externalGear: { vol: 90, hm: 91 },
+      internalGear: { vol: 93, hm: 91 },
+      vanePump: { vol: 93, hm: 92 },
+      radialPiston: { vol: 97, hm: 95 }
+    };
+
+    const pumpCalcModeSelect = document.getElementById('pumpCalcMode');
+    const powerUnitsSelect = document.getElementById('powerUnits');
+    const pumpTypeSelect = document.getElementById('pumpType');
+    const pumpPressureInput = document.getElementById('pumpPressure');
+    const flowRateValInput = document.getElementById('flowRateVal');
+    const displacementValInput = document.getElementById('displacementVal');
+    const driveRpmSelect = document.getElementById('driveRpm');
+    const volEfficiencyInput = document.getElementById('volEfficiency');
+    const mechEfficiencyInput = document.getElementById('mechEfficiency');
+
+    const lblPumpPress = document.getElementById('lblPumpPress');
+    const lblFlowRate = document.getElementById('lblFlowRate');
+    const lblDisplacement = document.getElementById('lblDisplacement');
+    const grpFlowRate = document.getElementById('grpFlowRate');
+    const grpDisplacement = document.getElementById('grpDisplacement');
+
+    const pumpPowerResultBox = document.getElementById('pumpPowerResultBox');
+    const resMotorPower = document.getElementById('resMotorPower');
+    const resHydPower = document.getElementById('resHydPower');
+    const resDriveTorque = document.getElementById('resDriveTorque');
+    const resDisplacement = document.getElementById('resDisplacement');
+    const resActualFlow = document.getElementById('resActualFlow');
+    const resTotalEfficiency = document.getElementById('resTotalEfficiency');
+    const resHeatLoss = document.getElementById('resHeatLoss');
+    const resMotorRec = document.getElementById('resMotorRec');
+    const pumpPowerNotesBox = document.getElementById('pumpPowerNotesBox');
+
+    pumpTypeSelect.addEventListener('change', function() {
+      const type = this.value;
+      if (type !== 'custom') {
+        const p = PUMP_PRESETS[type] || { vol: 95, hm: 92 };
+        volEfficiencyInput.value = p.vol;
+        mechEfficiencyInput.value = p.hm;
+      }
+      calculatePumpPower();
+    });
+
+    pumpCalcModeSelect.addEventListener('change', function() {
+      if (this.value === 'fromFlow') {
+        grpFlowRate.style.display = 'block';
+        grpDisplacement.style.display = 'none';
+      } else {
+        grpFlowRate.style.display = 'none';
+        grpDisplacement.style.display = 'block';
+      }
+      calculatePumpPower();
+    });
+
+    powerUnitsSelect.addEventListener('change', function() {
+      const isMetric = this.value === 'metric';
+      if (isMetric) {
+        lblPumpPress.textContent = "Operating Working Pressure [bar]";
+        lblFlowRate.textContent = "Delivered Flow Rate (Q) [L/min]";
+        lblDisplacement.textContent = "Pump Displacement (Vg) [cc/rev]";
+        pumpPressureInput.value = 210;
+        flowRateValInput.value = 60;
+        displacementValInput.value = 45;
+      } else {
+        lblPumpPress.textContent = "Operating Working Pressure [psi]";
+        lblFlowRate.textContent = "Delivered Flow Rate (Q) [GPM]";
+        lblDisplacement.textContent = "Pump Displacement (Vg) [cu in/rev]";
+        pumpPressureInput.value = 3000;
+        flowRateValInput.value = 16;
+        displacementValInput.value = 2.75;
+      }
+      calculatePumpPower();
+    });
+
+    function calculatePumpPower() {
+      const mode = pumpCalcModeSelect.value;
+      const isMetric = powerUnitsSelect.value === 'metric';
+      const N = parseFloat(driveRpmSelect.value) || 1750;
+
+      const eta_v = (parseFloat(volEfficiencyInput.value) || 95) / 100;
+      const eta_hm = (parseFloat(mechEfficiencyInput.value) || 92) / 100;
+      const eta_total = eta_v * eta_hm;
+
+      let P = parseFloat(pumpPressureInput.value);
+      if (isNaN(P) || P <= 0) P = isMetric ? 210 : 3000;
+
+      let Q = 0; // L/min (metric) or GPM (imperial)
+      let Vg = 0; // cc/rev (metric) or cu in/rev (imperial)
+
+      if (mode === 'fromFlow') {
+        Q = parseFloat(flowRateValInput.value);
+        if (isNaN(Q) || Q <= 0) Q = isMetric ? 60 : 16;
+
+        if (isMetric) {
+          // Vg [cc/rev] = (Q [L/min] * 1000) / (N * eta_v)
+          Vg = (Q * 1000) / (N * eta_v);
+        } else {
+          // Vg [cu in/rev] = (Q [GPM] * 231) / (N * eta_v)
+          Vg = (Q * 231) / (N * eta_v);
+        }
+      } else {
+        Vg = parseFloat(displacementValInput.value);
+        if (isNaN(Vg) || Vg <= 0) Vg = isMetric ? 45 : 2.75;
+
+        if (isMetric) {
+          // Q [L/min] = (Vg [cc/rev] * N * eta_v) / 1000
+          Q = (Vg * N * eta_v) / 1000;
+        } else {
+          // Q [GPM] = (Vg [cu in/rev] * N * eta_v) / 231
+          Q = (Vg * N * eta_v) / 231;
+        }
+      }
+
+      // Hydraulic Power (P_hyd)
+      let P_hyd = 0;
+      let P_shaft = 0;
+      let T_shaft = 0;
+      let uPwr = isMetric ? 'kW' : 'HP';
+      let uTorque = isMetric ? 'N·m' : 'lb·ft';
+      let uFlow = isMetric ? 'L/min' : 'GPM';
+      let uDisp = isMetric ? 'cc/rev' : 'in³/rev';
+
+      if (isMetric) {
+        P_hyd = (P * Q) / 600; // kW
+        P_shaft = P_hyd / eta_total; // kW
+        // Torque [N*m] = (Vg [cc] * P [bar]) / (20 * pi * eta_hm)
+        T_shaft = (Vg * P) / (20 * Math.PI * eta_hm);
+      } else {
+        P_hyd = (P * Q) / 1714; // HP
+        P_shaft = P_hyd / eta_total; // HP
+        // Torque [lb*ft] = (Vg [in^3] * P [psi]) / (24 * pi * eta_hm)
+        T_shaft = (Vg * P) / (24 * Math.PI * eta_hm);
+      }
+
+      const heatLoss = P_shaft - P_hyd;
+
+      // Recommended standard electric motor rating
+      const STANDARD_MOTORS_KW = [0.75, 1.1, 1.5, 2.2, 3.0, 4.0, 5.5, 7.5, 11, 15, 18.5, 22, 30, 37, 45, 55, 75, 90, 110, 132, 160, 200];
+      const STANDARD_MOTORS_HP = [1, 1.5, 2, 3, 5, 7.5, 10, 15, 20, 25, 30, 40, 50, 60, 75, 100, 125, 150, 200, 250];
+
+      let recMotorStr = "";
+      if (isMetric) {
+        let matchKw = STANDARD_MOTORS_KW[STANDARD_MOTORS_KW.length - 1];
+        for (let kw of STANDARD_MOTORS_KW) {
+          if (kw >= P_shaft) {
+            matchKw = kw;
+            break;
+          }
+        }
+        recMotorStr = `${matchKw} kW (${Math.round(matchKw * 1.341)} HP) Standard Frame`;
+      } else {
+        let matchHp = STANDARD_MOTORS_HP[STANDARD_MOTORS_HP.length - 1];
+        for (let hp of STANDARD_MOTORS_HP) {
+          if (hp >= P_shaft) {
+            matchHp = hp;
+            break;
+          }
+        }
+        recMotorStr = `${matchHp} HP (${(matchHp * 0.7457).toFixed(1)} kW) NEMA Frame`;
+      }
+
+      resMotorPower.textContent = P_shaft.toFixed(2) + " " + uPwr;
+      resHydPower.textContent = P_hyd.toFixed(2) + " " + uPwr;
+      resDriveTorque.textContent = T_shaft.toFixed(1) + " " + uTorque;
+      resDisplacement.textContent = Vg.toFixed(1) + " " + uDisp;
+      resActualFlow.textContent = Q.toFixed(1) + " " + uFlow;
+      resTotalEfficiency.textContent = (eta_total * 100).toFixed(1) + "%";
+      resHeatLoss.textContent = heatLoss.toFixed(2) + " " + uPwr;
+      resMotorRec.textContent = recMotorStr;
+
+      let notes = `<strong>ISO 4409 Sizing Analysis:</strong> Pumping <strong>${Q.toFixed(1)} ${uFlow}</strong> at <strong>${P} ${isMetric ? 'bar' : 'psi'}</strong> demands <strong>${P_shaft.toFixed(1)} ${uPwr}</strong> at <strong>${T_shaft.toFixed(1)} ${uTorque}</strong> torque. Parasitic heat dissipation into oil is <strong>${heatLoss.toFixed(2)} ${uPwr}</strong>.`;
+      pumpPowerNotesBox.innerHTML = notes;
+
+      pumpPowerResultBox.style.display = 'block';
+    }
+
+    document.getElementById('calcPowerBtn').addEventListener('click', calculatePumpPower);
+    document.getElementById('resetPowerBtn').addEventListener('click', function() {
+      setTimeout(calculatePumpPower, 50);
+    });
+
+    window.addEventListener('DOMContentLoaded', calculatePumpPower);
+  </script>
+</body>
+</html>

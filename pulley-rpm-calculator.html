@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pulley RPM Calculator | Belt Velocity, Ratio &amp; Sheave Sizing</title>
+  <meta name="description" content="Calculate drive and driven pulley RPM, belt surface speed (m/s &amp; FPM), belt slip correction, speed ratio, and two-stage compound pulley drive trains.">
+  <link rel="canonical" href="https://calchub.cloud/pulley-rpm-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Pulley RPM Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Kinematic belt and pulley speed calculator evaluating rotational RPM, linear belt velocity, transmission ratio, and belt slip corrections per ISO 5296 and RMA standards.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the fundamental formula relating pulley RPM and diameters?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For two interconnected pulleys without slip, linear surface belt speeds are equal: v_1 = v_2. This yields the classic pulley equation: N_1 * D_1 = N_2 * D_2, where N is rotational speed in RPM and D is pitch diameter in millimeters or inches. Driven speed is calculated as N_2 = N_1 * (D_1 / D_2)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does belt slip alter calculated driven RPM?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Frictional belt drives (flat and V-belts) experience elastic creep and dynamic slip under torque load. Accounting for slip factor s (typically 0.5% to 2%): N_2 = N_1 * (D_1 / D_2) * (1 - s / 100). Synchronous or timing belts with positive tooth engagement exhibit 0% slip."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the recommended maximum surface belt speed for V-belts?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Per RMA/ISO standards, standard cast iron V-belt pulleys are balanced for surface speeds up to 30 m/s (approx. 6,000 ft/min). Exceeding this velocity generates extreme centrifugal forces that fling the belt outward from the sheave grooves, causing rapid slip, thermal destruction, and potential sheave burst."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is a compound pulley drive and how is its overall ratio computed?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A compound or two-stage pulley drive mounts two intermediate sheaves on a common countershaft to achieve large speed reductions or increases in a compact footprint. Overall speed ratio is the product of individual stage ratios: i_total = (D_2 / D_1) * (D_4 / D_3), with final driven speed N_final = N_driver / i_total."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="mechanical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html" class="active">Mechanical</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="engineering.html">Engineering</a> &rsaquo; 
+      <a href="mechanical.html">Mechanical</a> &rsaquo; 
+      <span>Pulley RPM Calculator</span>
+    </nav>
+
+    <header class="calc-header">
+      <div class="calc-badge">Belt Drives &amp; Kinematics</div>
+      <h1 class="calc-title">Pulley RPM Calculator</h1>
+      <p class="calc-tagline">Calculate rotational speeds (RPM), sheave pitch diameters, linear belt velocity, and speed ratio with belt slip correction per ISO and RMA guidelines.</p>
+    </header>
+
+    <div class="calc-grid">
+      <div class="calc-main">
+        <div class="tool-card">
+          <form id="rpmForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="solveTarget">Calculation Objective</label>
+                <select id="solveTarget" class="form-control">
+                  <option value="n2" selected>Solve for Driven Pulley Speed ($N_2$)</option>
+                  <option value="d2">Solve for Driven Pulley Diameter ($D_2$)</option>
+                  <option value="d1">Solve for Driver Pulley Diameter ($D_1$)</option>
+                  <option value="n1">Solve for Driver Motor Speed ($N_1$)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="unitSystem">Dimensional Units</label>
+                <select id="unitSystem" class="form-control">
+                  <option value="metric" selected>Metric (mm, m/s)</option>
+                  <option value="imperial">Imperial (inches, ft/min)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group" id="grpD1">
+                <label for="valD1">Driver Pulley Diameter ($D_1$)</label>
+                <input type="number" id="valD1" class="form-control" value="120" min="1" step="any" required>
+                <span class="hint" id="hintD1">Pitch diameter in millimeters</span>
+              </div>
+              <div class="form-group" id="grpN1">
+                <label for="valN1">Driver Rotational Speed ($N_1$ in RPM)</label>
+                <input type="number" id="valN1" class="form-control" value="1450" min="0.1" step="any" required>
+                <span class="hint">Standard 4-pole motor: 1450 RPM (50Hz) or 1750 RPM (60Hz)</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group" id="grpD2">
+                <label for="valD2">Driven Pulley Diameter ($D_2$)</label>
+                <input type="number" id="valD2" class="form-control" value="280" min="1" step="any" required>
+                <span class="hint" id="hintD2">Pitch diameter in millimeters</span>
+              </div>
+              <div class="form-group" id="grpN2">
+                <label for="valN2">Driven Rotational Speed ($N_2$ in RPM)</label>
+                <input type="number" id="valN2" class="form-control" value="621" min="0.1" step="any" disabled>
+                <span class="hint">Target or calculated driven shaft speed</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="beltType">Belt Architecture &amp; Slip Allowance ($s$)</label>
+                <select id="beltType" class="form-control">
+                  <option value="0.0">Timing / Synchronous Belt (0% Slip &ndash; Positive Drive)</option>
+                  <option value="1.5" selected>Standard Industrial V-Belt (1.5% Slip)</option>
+                  <option value="3.0">Flat Rubber / Leather Belt (3.0% Slip)</option>
+                  <option value="custom">Custom Slip Percentage</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="slipVal">Slip Percentage ($s$ in %)</label>
+                <input type="number" id="slipVal" class="form-control" value="1.5" min="0" max="15" step="0.1">
+                <span class="hint">Kinematic speed reduction due to belt elongation &amp; creep</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="calcRpmBtn">Calculate Pulley Kinematics</button>
+              <button type="reset" class="btn btn-secondary" id="resetRpmBtn">Reset</button>
+            </div>
+          </form>
+
+          <div id="rpmResultBox" class="results-container" style="display: none; margin-top: 1.5rem;">
+            <h3>Pulley &amp; Belt Kinematic Results</h3>
+            <div class="results-grid">
+              <div class="result-tile highlight">
+                <span class="result-label" id="resTargetLabel">Calculated Driven Speed ($N_2$)</span>
+                <span class="result-value" id="resTargetVal">-- RPM</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Transmission Speed Ratio ($i = D_2 / D_1$)</span>
+                <span class="result-value" id="resRatio">-- : 1</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Linear Belt Speed ($V$)</span>
+                <span class="result-value" id="resBeltSpeed">-- m/s</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Belt Speed in Imperial (FPM)</span>
+                <span class="result-value" id="resBeltFPM">-- ft/min</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Theoretical Speed (Zero Slip)</span>
+                <span class="result-value" id="resIdealRpm">-- RPM</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Drive Mode &amp; Speed Assessment</span>
+                <span class="result-value" id="resStatus">--</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Kinematic Principles of Belt and Pulley Power Transmissions</h2>
+          <p>
+            Belt and pulley drive systems represent one of the most reliable and cost-effective methods for transmitting mechanical power between parallel shafts. Widely utilized in HVAC air handlers, agricultural combines, machine tool spindles, automotive alternator drives, and centrifugal pump skids, belt drives accommodate shaft center distance flexibility, absorb torsional vibration transients, and safeguard machinery against catastrophic overload via controlled belt slippage.
+          </p>
+          <p>
+            The fundamental operating principle governing a belt drive is that the continuous flexible belt wrapping around two pulleys transmits peripheral force through friction or positive tooth engagement. Assuming an inextensible belt running without slip, the tangential linear surface velocities at the pitch circles of the driving and driven sheaves are identical:
+          </p>
+          <div class="formula-box">
+            $$v_1 = v_2 \implies \pi \cdot D_1 \cdot \left(\frac{N_1}{60}\right) = \pi \cdot D_2 \cdot \left(\frac{N_2}{60}\right)$$
+          </div>
+          <p>
+            Canceling the common factor $\frac{\pi}{60}$ yields the foundational kinematic law of two-pulley drives:
+          </p>
+          <div class="formula-box">
+            $$D_1 \cdot N_1 = D_2 \cdot N_2 \implies \frac{N_1}{N_2} = \frac{D_2}{D_1} = i$$
+          </div>
+          <p>
+            Where $D_1$ is the pitch diameter of the driving sheave, $N_1$ is the driver rotational speed in RPM, $D_2$ is the pitch diameter of the driven sheave, $N_2$ is the driven rotational speed, and $i$ is the transmission speed ratio.
+          </p>
+
+          <h2>Linear Belt Velocity Formulation &amp; Centrifugal Limits</h2>
+          <p>
+            The linear surface velocity of the belt ($V$) dictates both the power transmitting capacity of the drive and the magnitude of centrifugal tension operating within the belt carcass:
+          </p>
+
+          <h3>1. Metric SI Units</h3>
+          <p>
+            With pitch diameter $D$ in millimeters ($\text{mm}$) and rotational speed $N$ in $\text{RPM}$:
+          </p>
+          <div class="formula-box">
+            $$V (\text{m/s}) = \frac{\pi \cdot D (\text{mm}) \cdot N (\text{RPM})}{60 \times 1000} \approx \frac{D \cdot N}{19,098.6}$$
+          </div>
+
+          <h3>2. US Customary (Imperial) Units</h3>
+          <p>
+            With pitch diameter $D$ in inches ($\text{in}$) and rotational speed in $\text{RPM}$, belt velocity is expressed in feet per minute ($\text{FPM}$):
+          </p>
+          <div class="formula-box">
+            $$V (\text{ft/min}) = \frac{\pi \cdot D (\text{in}) \cdot N (\text{RPM})}{12} \approx 0.2618 \cdot D \cdot N$$
+          </div>
+
+          <p>
+            <strong>Centrifugal Speed Limits:</strong> Centrifugal tension in a running belt scales quadratically with linear speed ($F_c = m' \cdot V^2$, where $m'$ is mass per unit length). Per RMA (Rubber Manufacturers Association) and ISO standards, standard commercial cast-iron sheaves must not exceed $30\text{ m/s}$ ($6,000\text{ FPM}$) without precision dynamic balancing. For speeds exceeding $33\text{ m/s}$ ($6,500\text{ FPM}$), ductile iron or forged steel sheaves are mandatory to avoid catastrophic sheave rim fragmentation.
+          </p>
+
+          <h2>Belt Slip and Elastic Creep Correction</h2>
+          <p>
+            In friction-based belt drives (V-belts, wedge belts, and flat belts), the tension on the tight side ($T_1$) exceeds the tension on the slack side ($T_2$). As a belt segment transitions from the tight side to the slack side around a pulley, the localized elastic strain diminishes, causing micro-sliding against the sheave groove known as <em>elastic creep</em>. Under heavy continuous torque, slight dynamic gross slip also occurs.
+          </p>
+          <p>
+            To model actual operational speeds accurately, engineering practice incorporates a slip percentage factor ($s$):
+          </p>
+          <div class="formula-box">
+            $$N_2 = N_1 \cdot \left(\frac{D_1}{D_2}\right) \cdot \left(1 - \frac{s}{100}\right)$$
+          </div>
+          <p>
+            The table below illustrates representative slip factors across industrial belt types:
+          </p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Belt Architecture</th>
+                <th>Standard Slip Allowance ($s$)</th>
+                <th>Max Recommended Linear Speed</th>
+                <th>Typical Industrial Applications</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Timing / Synchronous (HTD, GT)</td>
+                <td>0.0% (Positive Drive)</td>
+                <td>40 &ndash; 50 m/s (8,000 &ndash; 10,000 FPM)</td>
+                <td>CNC positioning, engine camshafts, robotics</td>
+              </tr>
+              <tr>
+                <td>Wrapped Classical V-Belt (A, B, C)</td>
+                <td>1.5% &ndash; 2.5%</td>
+                <td>30 m/s (6,000 FPM)</td>
+                <td>General HVAC blowers, air compressors, pumps</td>
+              </tr>
+              <tr>
+                <td>Raw-Edge Cogged Wedge (SPZ, SPA, 3V, 5V)</td>
+                <td>0.8% &ndash; 1.5%</td>
+                <td>35 m/s (7,000 FPM)</td>
+                <td>Heavy industrial drives, crushers, high-speed fans</td>
+              </tr>
+              <tr>
+                <td>Micro-V / Poly-V Multi-Ribbed</td>
+                <td>1.0% &ndash; 1.8%</td>
+                <td>45 m/s (9,000 FPM)</td>
+                <td>Automotive serpentine accessory drives, treadmills</td>
+              </tr>
+              <tr>
+                <td>Flat Leather / Rubber Fabric Belt</td>
+                <td>2.5% &ndash; 4.0%</td>
+                <td>25 m/s (5,000 FPM)</td>
+                <td>Vintage machine tools, textile spinning frames</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Two-Stage Compound Pulley Drive Trains</h2>
+          <p>
+            When a machinery design requires a speed ratio exceeding $6:1$ or $8:1$, using a single pair of pulleys is often physically impractical due to excessive sheave diameter or minimal contact arc angle on the small sheave ($\theta < 120^\circ$). In such instances, engineers employ a <strong>two-stage compound drive</strong> incorporating an intermediate countershaft with two sheaves:
+          </p>
+          <div class="formula-box">
+            $$i_{total} = i_1 \times i_2 = \left(\frac{D_2}{D_1}\right) \times \left(\frac{D_4}{D_3}\right)$$
+            $$N_4 = \frac{N_1}{i_{total}} = N_1 \times \left(\frac{D_1}{D_2}\right) \times \left(\frac{D_3}{D_4}\right)$$
+          </div>
+          <p>
+            Where $D_1$ drives $D_2$ (on intermediate shaft), and $D_3$ (keyed to the same intermediate shaft, rotating at $N_2$) drives the final machine sheave $D_4$.
+          </p>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Case Study: HVAC Centrifugal Exhaust Blower Sizing</h3>
+            <p><strong>Design Scenario:</strong> A rooftop ventilation blower must operate at an exact shaft speed of $N_2 = 820\text{ RPM}$ to deliver $12,500\text{ CFM}$ against $2.5\text{ in. w.g.}$ static pressure. The prime mover is a 4-pole TEFC induction motor running at $N_1 = 1450\text{ RPM}$ ($50\text{ Hz}$). The driver pulley mounted on the motor shaft has a standard pitch diameter of $D_1 = 140\text{ mm}$. A cogged raw-edge wedge belt drive is selected ($s = 1.0\%$ slip). Determine the required driven pulley pitch diameter $D_2$, the transmission speed ratio, and verify that linear belt speed is within safe cast-iron operating limits.</p>
+            
+            <p><strong>Step 1: Calculate Required Driven Pulley Pitch Diameter ($D_2$)</strong></p>
+            <p>Rearranging the governing speed equation with slip correction:</p>
+            <div class="formula-box">
+              $$D_2 = D_1 \times \left(\frac{N_1}{N_2}\right) \times \left(1 - \frac{s}{100}\right) = 140\text{ mm} \times \left(\frac{1450}{820}\right) \times (1 - 0.01)$$
+              $$D_2 = 140 \times 1.7683 \times 0.99 = 140 \times 1.7506 \approx 245.08\text{ mm}$$
+            </div>
+            <p>
+              Selecting the nearest standard ISO sheave diameter: <strong>$D_2 = 250\text{ mm}$</strong> (or $240\text{ mm}$). If $D_2 = 250\text{ mm}$ is installed, actual blower speed will be:
+            </p>
+            <div class="formula-box">
+              $$N_{2,actual} = 1450 \times \left(\frac{140}{250}\right) \times 0.99 = 803.9\text{ RPM}$$
+            </div>
+
+            <p><strong>Step 2: Determine Transmission Speed Ratio</strong></p>
+            <div class="formula-box">
+              $$i = \frac{D_2}{D_1} = \frac{250\text{ mm}}{140\text{ mm}} = 1.786:1$$
+            </div>
+
+            <p><strong>Step 3: Calculate Linear Surface Belt Speed ($V$)</strong></p>
+            <div class="formula-box">
+              $$V = \frac{\pi \times 140\text{ mm} \times 1450\text{ RPM}}{60 \times 1000} = \frac{637,743}{60,000} \approx 10.63\text{ m/s}$$
+            </div>
+            <p>Converting to Imperial FPM:</p>
+            <div class="formula-box">
+              $$V = 10.63\text{ m/s} \times 196.85 \approx 2,092.5\text{ ft/min}$$
+            </div>
+            <p>
+              <strong>Engineering Conclusion:</strong> The linear belt velocity of $10.63\text{ m/s}$ ($2,093\text{ FPM}$) falls perfectly within the optimal sweet spot for industrial V-belts ($10 - 25\text{ m/s}$), ensuring maximum flexural fatigue lifespan and minimal centrifugal tension loss.
+            </p>
+          </div>
+
+          <h2>Center Distance Optimization and Arc of Contact Correction ($K_\theta$)</h2>
+          <p>
+            Achieving full rated power transmission without premature belt wear requires establishing an adequate center-to-center distance ($C$) between driving and driven pulley shafts. If the center distance is excessively short, the arc of belt wrap contact ($\theta$) on the smaller sheave shrinks below $180^\circ$, reducing friction grip and necessitating substantial power de-rating:
+          </p>
+          <div class="formula-box">
+            $$\theta_{small} = 180^\circ - 2 \cdot \arcsin\left(\frac{D_2 - D_1}{2 \cdot C}\right) \approx 180^\circ - \frac{57.3 \cdot (D_2 - D_1)}{C} \quad [^\circ]$$
+          </div>
+          <p>
+            Industrial drive design standards (such as ISO 5296 and Gates Industrial Technical Guides) establish the empirical rule for practical center distance limits:
+          </p>
+          <div class="formula-box">
+            $$0.55 \cdot (D_1 + D_2) + d_{belt} \le C \le 2.0 \cdot (D_1 + D_2)$$
+          </div>
+          <p>
+            When the calculated contact wrap angle $\theta$ on the small sheave drops below $180^\circ$, designers apply an Arc of Contact Correction Factor ($K_\theta$) to scale down the allowable kilowatt or horsepower rating per belt:
+          </p>
+          <ul>
+            <li>$\theta = 180^\circ \implies K_\theta = 1.00$ (Ideal full wrap capacity)</li>
+            <li>$\theta = 160^\circ \implies K_\theta = 0.95$ (5% de-rating)</li>
+            <li>$\theta = 140^\circ \implies K_\theta = 0.89$ (11% de-rating)</li>
+            <li>$\theta = 120^\circ \implies K_\theta = 0.82$ (18% de-rating &mdash; practical minimum limit)</li>
+          </ul>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar">
+        <div class="sidebar-card">
+          <h4>Related Mechanical Calculators</h4>
+          <ul class="sidebar-links">
+            <li><a href="pulley-mechanical-advantage-calculator.html">Pulley Mechanical Advantage</a></li>
+            <li><a href="conveyor-belt-speed-calculator.html">Conveyor Belt Speed</a></li>
+            <li><a href="power-to-torque-calculator.html">Power to Torque Calculator</a></li>
+            <li><a href="gear-module-calculator.html">Gear Module &amp; Pitch</a></li>
+            <li><a href="cutting-speed-calculator.html">Machining Cutting Speed</a></li>
+            <li><a href="feed-rate-calculator.html">CNC Feed Rate Calculator</a></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>High-precision professional engineering and scientific calculation engines.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Directories</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="mechanical.html">Mechanical Engineering</a></li>
+          <li><a href="engineering.html">Civil &amp; Structural</a></li>
+          <li><a href="sitemap.xml">XML Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 CalcHub. Standard Engineering Reference Systems.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calcBtn = document.getElementById('calcRpmBtn');
+      const resetBtn = document.getElementById('resetRpmBtn');
+      const resultBox = document.getElementById('rpmResultBox');
+      const solveTarget = document.getElementById('solveTarget');
+      const unitSystem = document.getElementById('unitSystem');
+      const beltType = document.getElementById('beltType');
+      const slipVal = document.getElementById('slipVal');
+
+      const valD1 = document.getElementById('valD1');
+      const valN1 = document.getElementById('valN1');
+      const valD2 = document.getElementById('valD2');
+      const valN2 = document.getElementById('valN2');
+
+      const hintD1 = document.getElementById('hintD1');
+      const hintD2 = document.getElementById('hintD2');
+
+      beltType.addEventListener('change', function() {
+        if (this.value !== 'custom') {
+          slipVal.value = this.value;
+        }
+      });
+
+      unitSystem.addEventListener('change', function() {
+        if (this.value === 'metric') {
+          hintD1.textContent = 'Pitch diameter in millimeters';
+          hintD2.textContent = 'Pitch diameter in millimeters';
+          if (parseFloat(valD1.value) < 20) valD1.value = (parseFloat(valD1.value) * 25.4).toFixed(0);
+          if (parseFloat(valD2.value) < 20) valD2.value = (parseFloat(valD2.value) * 25.4).toFixed(0);
+        } else {
+          hintD1.textContent = 'Pitch diameter in inches';
+          hintD2.textContent = 'Pitch diameter in inches';
+          if (parseFloat(valD1.value) > 20) valD1.value = (parseFloat(valD1.value) / 25.4).toFixed(2);
+          if (parseFloat(valD2.value) > 20) valD2.value = (parseFloat(valD2.value) / 25.4).toFixed(2);
+        }
+      });
+
+      solveTarget.addEventListener('change', function() {
+        valD1.disabled = false;
+        valN1.disabled = false;
+        valD2.disabled = false;
+        valN2.disabled = false;
+
+        if (this.value === 'n2') {
+          valN2.disabled = true;
+          document.getElementById('resTargetLabel').textContent = 'Calculated Driven Speed (N₂)';
+        } else if (this.value === 'd2') {
+          valD2.disabled = true;
+          document.getElementById('resTargetLabel').textContent = 'Calculated Driven Diameter (D₂)';
+        } else if (this.value === 'd1') {
+          valD1.disabled = true;
+          document.getElementById('resTargetLabel').textContent = 'Calculated Driver Diameter (D₁)';
+        } else if (this.value === 'n1') {
+          valN1.disabled = true;
+          document.getElementById('resTargetLabel').textContent = 'Calculated Driver Speed (N₁)';
+        }
+      });
+
+      function calculateRPM() {
+        const mode = solveTarget.value;
+        const isMetric = unitSystem.value === 'metric';
+        const slip = parseFloat(slipVal.value) || 0;
+        const slipFactor = 1.0 - (slip / 100.0);
+
+        let d1 = parseFloat(valD1.value);
+        let n1 = parseFloat(valN1.value);
+        let d2 = parseFloat(valD2.value);
+        let n2 = parseFloat(valN2.value);
+
+        let targetResult = 0;
+        let idealRpm = 0;
+
+        if (mode === 'n2') {
+          if (isNaN(d1) || d1 <= 0 || isNaN(n1) || n1 <= 0 || isNaN(d2) || d2 <= 0) {
+            alert('Please enter valid positive values for D1, N1, and D2.');
+            return;
+          }
+          idealRpm = n1 * (d1 / d2);
+          n2 = idealRpm * slipFactor;
+          targetResult = n2;
+          valN2.value = n2.toFixed(1);
+          document.getElementById('resTargetVal').textContent = n2.toFixed(1) + ' RPM';
+        } else if (mode === 'd2') {
+          if (isNaN(d1) || d1 <= 0 || isNaN(n1) || n1 <= 0 || isNaN(n2) || n2 <= 0) {
+            alert('Please enter valid positive values for D1, N1, and N2.');
+            return;
+          }
+          d2 = d1 * (n1 / n2) * slipFactor;
+          targetResult = d2;
+          valD2.value = d2.toFixed(1);
+          idealRpm = n1 * (d1 / (d1 * (n1 / n2)));
+          document.getElementById('resTargetVal').textContent = d2.toFixed(2) + (isMetric ? ' mm' : ' in');
+        } else if (mode === 'd1') {
+          if (isNaN(d2) || d2 <= 0 || isNaN(n1) || n1 <= 0 || isNaN(n2) || n2 <= 0) {
+            alert('Please enter valid positive values for D2, N1, and N2.');
+            return;
+          }
+          d1 = d2 * (n2 / (n1 * slipFactor));
+          targetResult = d1;
+          valD1.value = d1.toFixed(1);
+          document.getElementById('resTargetVal').textContent = d1.toFixed(2) + (isMetric ? ' mm' : ' in');
+        } else if (mode === 'n1') {
+          if (isNaN(d1) || d1 <= 0 || isNaN(d2) || d2 <= 0 || isNaN(n2) || n2 <= 0) {
+            alert('Please enter valid positive values for D1, D2, and N2.');
+            return;
+          }
+          n1 = n2 / ((d1 / d2) * slipFactor);
+          targetResult = n1;
+          valN1.value = n1.toFixed(1);
+          document.getElementById('resTargetVal').textContent = n1.toFixed(1) + ' RPM';
+        }
+
+        // Transmission ratio
+        const ratio = d2 / d1;
+        document.getElementById('resRatio').textContent = ratio.toFixed(2) + ' : 1' + (ratio > 1 ? ' (Speed Reduction)' : ' (Speed Increase)');
+
+        // Linear belt speed
+        let speed_mps = 0;
+        let speed_fpm = 0;
+        if (isMetric) {
+          speed_mps = (Math.PI * d1 * n1) / 60000.0;
+          speed_fpm = speed_mps * 196.85;
+        } else {
+          speed_fpm = (Math.PI * d1 * n1) / 12.0;
+          speed_mps = speed_fpm / 196.85;
+        }
+
+        document.getElementById('resBeltSpeed').textContent = speed_mps.toFixed(2) + ' m/s';
+        document.getElementById('resBeltFPM').textContent = speed_fpm.toLocaleString('en-US', {maximumFractionDigits: 0}) + ' FPM';
+
+        const zeroSlipDriven = n1 * (d1 / d2);
+        document.getElementById('resIdealRpm').textContent = zeroSlipDriven.toFixed(1) + ' RPM';
+
+        let statusText = 'Optimal Belt Velocity';
+        if (speed_mps < 5.0) {
+          statusText = 'Low Speed (Oversized Belt Torque Required)';
+        } else if (speed_mps > 30.0 && speed_mps <= 35.0) {
+          statusText = 'High Velocity - Verify Dynamic Balancing';
+        } else if (speed_mps > 35.0) {
+          statusText = 'EXCESSIVE VELOCITY - Requires Cast Steel Pulley';
+        }
+        document.getElementById('resStatus').textContent = statusText;
+
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      calcBtn.addEventListener('click', calculateRPM);
+      resetBtn.addEventListener('click', function() {
+        resultBox.style.display = 'none';
+      });
+
+      calculateRPM();
+    });
+  </script>
+</body>
+</html>

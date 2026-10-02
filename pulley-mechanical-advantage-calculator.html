@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pulley Mechanical Advantage Calculator | Block &amp; Tackle Sizing</title>
+  <meta name="description" content="Calculate ideal (IMA) and actual mechanical advantage (AMA), required pull effort, rope tension, line pull velocity, and reeving efficiency per DIN 15020 &amp; CMAA 70.">
+  <link rel="canonical" href="https://calchub.cloud/pulley-mechanical-advantage-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Pulley Mechanical Advantage Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Rigging and hoisting mechanical advantage engine computing ideal velocity ratio, sheave friction efficiency losses, lead-line pull force, and motor hoist power per CMAA 70.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How is Ideal Mechanical Advantage (IMA) determined for a pulley system?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The Ideal Mechanical Advantage (IMA) equals the exact count of rope or wire cable strands directly supporting the traveling moving block and suspended load. For example, a twofold purchase (two double sheaves) with the rope anchored to the fixed block has 4 supporting strands, yielding an IMA of 4:1."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between IMA and Actual Mechanical Advantage (AMA)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "IMA assumes zero frictional losses and massless ropes. In physical hoisting rigging, each sheave introduces bearing friction and wire rope bending hysteresis. Actual Mechanical Advantage (AMA) is the true measured ratio of load weight lifted to effort force applied: AMA = Load / Actual_Effort = IMA * eta_reeving."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does sheave bearing efficiency affect overall reeving system efficiency?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Per DIN 15020 and CMAA standards, total reeving efficiency decreases exponentially as sheave count increases: eta_total = (1 / n) * ((1 - eta_s^n) / (1 - eta_s)), where n is the number of falls and eta_s is individual sheave efficiency (typically 0.95 to 0.96 for bronze plain bushings and 0.98 to 0.99 for anti-friction roller bearings)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why does pulling in the direction of load movement change mechanical advantage?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "If the hauling line exits the moving block and pulls in the direction of load movement (hauling to advantage), the hauling line itself directly supports the load, increasing the mechanical advantage by 1 (e.g., from 3:1 to 4:1). If the line exits a fixed head block (hauling to disadvantage), it merely redirects the pull without increasing mechanical advantage."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="mechanical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html" class="active">Mechanical</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="engineering.html">Engineering</a> &rsaquo; 
+      <a href="mechanical.html">Mechanical</a> &rsaquo; 
+      <span>Pulley Mechanical Advantage Calculator</span>
+    </nav>
+
+    <header class="calc-header">
+      <div class="calc-badge">Rigging &amp; Lifting Mechanics</div>
+      <h1 class="calc-title">Pulley Mechanical Advantage Calculator</h1>
+      <p class="calc-tagline">Size block and tackle tackle systems: calculate ideal and actual mechanical advantage, lead-line pull force, rope travel distance, and sheave friction efficiency.</p>
+    </header>
+
+    <div class="calc-grid">
+      <div class="calc-main">
+        <div class="tool-card">
+          <form id="pmaForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="systemPreset">Rigging System Configuration</label>
+                <select id="systemPreset" class="form-control">
+                  <option value="1">1:1 - Single Fixed Pulley (Direction Change Only)</option>
+                  <option value="2" selected>2:1 - Single Movable Pulley (Gun Tackle to Disadvantage)</option>
+                  <option value="3">3:1 - Luff Tackle (One Double, One Single Sheave)</option>
+                  <option value="4">4:1 - Twofold Purchase (Two Double Sheave Blocks)</option>
+                  <option value="5">5:1 - Five-Part Line (Two Double, One Triple Sheave)</option>
+                  <option value="6">6:1 - Threefold Purchase (Two Triple Sheave Blocks)</option>
+                  <option value="custom">Custom Number of Supporting Rope Parts</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="partsOfLine">Supporting Rope Strands ($n$ / IMA)</label>
+                <input type="number" id="partsOfLine" class="form-control" value="2" min="1" max="24" step="1" required>
+                <span class="hint">Total number of rope falls supporting the moving load block</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="loadWeight">Suspended Load Weight / Force</label>
+                <div style="display: flex; gap: 0.5rem;">
+                  <input type="number" id="loadWeight" class="form-control" value="1200" min="1" step="any" required>
+                  <select id="loadUnit" class="form-control" style="width: 100px;">
+                    <option value="kg" selected>kg</option>
+                    <option value="n">N</option>
+                    <option value="kn">kN</option>
+                    <option value="lbf">lbf</option>
+                  </select>
+                </div>
+                <span class="hint">Includes payload plus hook block and rigging tackle weight</span>
+              </div>
+              <div class="form-group">
+                <label for="bearingType">Sheave Bearing &amp; Reeving Type</label>
+                <select id="bearingType" class="form-control">
+                  <option value="0.985" selected>Anti-Friction Rolling Element Bearings ($\eta_s \approx 98.5\%$)</option>
+                  <option value="0.960">Bronze Bushings &ndash; Well Lubricated ($\eta_s \approx 96.0\%$)</option>
+                  <option value="0.930">Plain Journal Bushings &ndash; Standard Shop ($\eta_s \approx 93.0\%$)</option>
+                  <option value="1.000">Ideal Frictionless Theoretical ($\eta_s = 100\%$)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="liftHeight">Vertical Lift Distance ($h$)</label>
+                <div style="display: flex; gap: 0.5rem;">
+                  <input type="number" id="liftHeight" class="form-control" value="10" min="0.1" step="any" required>
+                  <select id="distUnit" class="form-control" style="width: 100px;">
+                    <option value="m" selected>m</option>
+                    <option value="ft">ft</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="liftSpeed">Load Hoisting Velocity ($v_{load}$)</label>
+                <div style="display: flex; gap: 0.5rem;">
+                  <input type="number" id="liftSpeed" class="form-control" value="0.2" min="0.01" step="any">
+                  <select id="speedUnit" class="form-control" style="width: 100px;">
+                    <option value="mps" selected>m/s</option>
+                    <option value="fpm">FPM</option>
+                  </select>
+                </div>
+                <span class="hint">Standard industrial hoist speed: ~0.1 &ndash; 0.5 m/s</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="calcPmaBtn">Calculate Mechanical Advantage</button>
+              <button type="reset" class="btn btn-secondary" id="resetPmaBtn">Reset</button>
+            </div>
+          </form>
+
+          <div id="pmaResultBox" class="results-container" style="display: none; margin-top: 1.5rem;">
+            <h3>Block &amp; Tackle Performance Sizing</h3>
+            <div class="results-grid">
+              <div class="result-tile highlight">
+                <span class="result-label">Actual Pull Effort Required ($F_{effort}$)</span>
+                <span class="result-value" id="resEffortForce">-- N</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Actual Effort in Mass Equivalent</span>
+                <span class="result-value" id="resEffortMass">-- kg / lbf</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Ideal Mechanical Advantage (IMA)</span>
+                <span class="result-value" id="resIMA">-- : 1</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Actual Mechanical Advantage (AMA)</span>
+                <span class="result-value" id="resAMA">-- : 1</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Overall Reeving Efficiency ($\eta_{total}$)</span>
+                <span class="result-value" id="resEffPct">-- %</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Hauling Line Travel Distance ($s_{rope}$)</span>
+                <span class="result-value" id="resRopeTravel">-- m</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Hauling Line Speed ($v_{rope}$)</span>
+                <span class="result-value" id="resRopeSpeed">-- m/s</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Hoist Winch Drive Power ($P_{mech}$)</span>
+                <span class="result-value" id="resPowerReq">-- kW / HP</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Engineering Principles of Pulley Systems and Mechanical Advantage</h2>
+          <p>
+            A <strong>pulley</strong> (or sheave) is one of the classic simple machines designed to transmit force, redirect tensile lines, and amplify mechanical advantage in lifting and material handling systems. In architectural rigging, overhead bridge cranes, offshore marine winches, and mobile construction derricks, multi-sheave assemblies known as <strong>block and tackle</strong> arrangements allow modest winches or manual workers to lift loads weighing tens of metric tons.
+          </p>
+          <p>
+            Understanding the physics of pulley systems requires distinguishing between two fundamental metrics: <strong>Ideal Mechanical Advantage (IMA)</strong> (which evaluates theoretical force amplification ignoring friction) and <strong>Actual Mechanical Advantage (AMA)</strong> (which accounts for real-world bearing drag and rope bending stiffness per standards such as <strong>CMAA Specification 70</strong> and <strong>DIN 15020</strong>).
+          </p>
+
+          <h2>Ideal Mechanical Advantage (IMA) and Velocity Ratio</h2>
+          <p>
+            The Ideal Mechanical Advantage is governed solely by the geometric topology of the reeving system. By Newton's third law and static equilibrium of the moving block, the upward tension forces exerted by the rope strands supporting the traveling hook block must balance the downward gravitational weight of the payload:
+          </p>
+          <div class="formula-box">
+            $$\sum F_y = 0 \implies n \cdot T_{ideal} = W_{load} \implies IMA = \frac{W_{load}}{T_{ideal}} = n$$
+          </div>
+          <p>
+            Where $n$ is the number of distinct rope parts (strands) directly terminating at or passing through the traveling load block. By conservation of energy, mechanical work is conserved in an ideal system ($W = F \cdot d$). Consequently, reducing the input effort force by a factor of $n$ requires that the operator haul $n$ times the length of rope:
+          </p>
+          <div class="formula-box">
+            $$s_{rope} = n \cdot h_{lift}, \quad v_{rope} = n \cdot v_{load}$$
+          </div>
+          <p>
+            Where $h_{lift}$ is the vertical height traversed by the payload and $v_{load}$ is the hoisting speed.
+          </p>
+
+          <h2>Sheave Friction and Overall Reeving Efficiency ($\eta_{total}$)</h2>
+          <p>
+            In practical heavy-lift rigging, wire rope does not roll across sheaves without energy dissipation. Resistance arises from two primary mechanisms:
+          </p>
+          <ol>
+            <li><strong>Bearing Journal or Rolling Friction:</strong> Coulomb friction between the rotating sheave hub and its central pin or axle.</li>
+            <li><strong>Rope Flexural Hysteresis:</strong> Internal inter-strand friction and elastic bending resistance as the steel wire rope conforms to and straightens from the curved sheave circumference.</li>
+          </ol>
+          <p>
+            If individual sheave efficiency is denoted as $\eta_s$ (where $0 < \eta_s < 1.0$), each successive sheave in the reeving train experiences higher line tension. For a reeving system with $n$ parts of line hoisting a load, the cumulative reeving efficiency $\eta_{total}$ is formulated according to the classic DIN 15020 geometric series:
+          </p>
+          <div class="formula-box">
+            $$\eta_{total} = \frac{1}{n} \cdot \left(\frac{1 - \eta_s^n}{1 - \eta_s}\right) \cdot \eta_s$$
+          </div>
+          <p>
+            When an additional fixed deflection lead sheave is introduced between the head block and the winch drum to redirect the wire rope, its efficiency ($\eta_d$) multiplies the denominator, yielding the true line-pull effort ($F_{effort}$):
+          </p>
+          <div class="formula-box">
+            $$F_{effort} = \frac{W_{load}}{n \cdot \eta_{total}} = \frac{W_{load}}{AMA}$$
+          </div>
+
+          <h2>Standard Block and Tackle Configurations</h2>
+          <p>
+            The table below summarizes common rigging and crane reeving architectures, their ideal mechanical advantage, and typical system efficiency:
+          </p>
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Rigging Configuration</th>
+                <th>Sheaves in System</th>
+                <th>Parts of Line ($n$)</th>
+                <th>IMA ($F_{load}/F_{effort}$)</th>
+                <th>Typical Efficiency ($\eta_{total}$)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Single Fixed Pulley (Whip)</td>
+                <td>1 Fixed</td>
+                <td>1</td>
+                <td>1:1</td>
+                <td>98.0% (anti-friction)</td>
+              </tr>
+              <tr>
+                <td>Single Movable Pulley (Gun Tackle)</td>
+                <td>1 Movable, 1 Fixed</td>
+                <td>2</td>
+                <td>2:1</td>
+                <td>96.5% &ndash; 97.5%</td>
+              </tr>
+              <tr>
+                <td>Luff Tackle (Jigger)</td>
+                <td>1 Double, 1 Single</td>
+                <td>3</td>
+                <td>3:1</td>
+                <td>94.5% &ndash; 96.0%</td>
+              </tr>
+              <tr>
+                <td>Twofold Purchase (Standard Crane Hook)</td>
+                <td>2 Double Sheaves</td>
+                <td>4</td>
+                <td>4:1</td>
+                <td>92.5% &ndash; 95.0%</td>
+              </tr>
+              <tr>
+                <td>Threefold Purchase (Heavy Derrick)</td>
+                <td>2 Triple Sheaves</td>
+                <td>6</td>
+                <td>6:1</td>
+                <td>89.0% &ndash; 93.0%</td>
+              </tr>
+              <tr>
+                <td>Heavy Gantry Crane Block</td>
+                <td>Multiple Sheaves</td>
+                <td>8 to 16</td>
+                <td>8:1 to 16:1</td>
+                <td>82.0% &ndash; 88.0%</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Mechanical Hoist Power and Winch Sizing</h2>
+          <p>
+            When specifying electric or hydraulic winch drive motors, sizing is based on the actual lead-line pull force and the required hauling speed:
+          </p>
+          <div class="formula-box">
+            $$P_{mech} (\text{kW}) = \frac{F_{effort} (\text{kN}) \times v_{rope} (\text{m/s})}{\eta_{winch}} = \frac{W_{load} (\text{kN}) \times v_{load} (\text{m/s})}{\eta_{total} \times \eta_{winch}}$$
+          </div>
+          <p>
+            Notice that the theoretical power required to lift the load ($W_{load} \times v_{load}$) is independent of the mechanical advantage! A higher mechanical advantage allows a smaller, lighter winch motor producing less line pull, but the motor drum must rotate correspondingly faster to achieve the specified hook travel velocity.
+          </p>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Case Study: Overhead Bridge Crane Hook Block Sizing</h3>
+            <p><strong>Design Scenario:</strong> An industrial steel fabrication workshop operates an overhead bridge crane designed to hoist heavy structural weldments. The total suspended load (rated hook load plus bottom block weight) is $M = 15,000\text{ kg}$ ($W_{load} = 15,000 \times 9.80665 = 147.10\text{ kN}$). The hoist incorporates a 4-part line twofold purchase system ($n = 4$) equipped with precision tapered roller bearings on all sheaves ($\eta_s = 0.985$). The required vertical hook hoist velocity is $v_{load} = 0.15\text{ m/s}$ across a vertical lift height of $h = 12\text{ m}$. Calculate the reeving efficiency, actual lead-line rope tension, winch rope speed, and mechanical hoisting power.</p>
+            
+            <p><strong>Step 1: Calculate Overall Reeving Efficiency ($\eta_{total}$)</strong></p>
+            <div class="formula-box">
+              $$\eta_s^4 = (0.985)^4 \approx 0.9413$$
+              $$\eta_{total} = \frac{1}{4} \cdot \left(\frac{1 - 0.9413}{1 - 0.985}\right) \cdot 0.985 = \frac{1}{4} \cdot \left(\frac{0.0587}{0.015}\right) \cdot 0.985 = \frac{1}{4} \times 3.9133 \times 0.985 \approx 0.9637 \quad (96.37\%)$$
+            </div>
+
+            <p><strong>Step 2: Calculate Actual Lead-Line Pull Effort ($F_{effort}$)</strong></p>
+            <div class="formula-box">
+              $$F_{effort} = \frac{147.10\text{ kN}}{4 \times 0.9637} = \frac{147.10}{3.8548} \approx 38.16\text{ kN} \quad (\approx 3,891\text{ kgf})$$
+            </div>
+            <p>
+              Note that in an ideal frictionless system, effort would be $147.10 / 4 = 36.78\text{ kN}$. Bearing friction adds $1.38\text{ kN}$ of parasitic drag.
+            </p>
+
+            <p><strong>Step 3: Determine Winch Line Speed and Total Rope Spooled</strong></p>
+            <div class="formula-box">
+              $$v_{rope} = n \times v_{load} = 4 \times 0.15\text{ m/s} = 0.60\text{ m/s}$$
+              $$s_{rope} = n \times h_{lift} = 4 \times 12\text{ m} = 48\text{ m of wire rope}$$
+            </div>
+
+            <p><strong>Step 4: Compute Net Mechanical Drive Power Required at Drum</strong></p>
+            <div class="formula-box">
+              $$P_{mech} = F_{effort} \times v_{rope} = 38.16\text{ kN} \times 0.60\text{ m/s} = 22.90\text{ kW} \quad (\approx 30.7\text{ HP})$$
+            </div>
+            <p>
+              <strong>Engineering Conclusion:</strong> Selecting a standard <strong>$30\text{ kW}$</strong> electric hoist motor with a gear drive efficiency of $92\%$ delivers $30 \times 0.92 = 27.6\text{ kW}$, providing a comfortable $20\%$ reserve power margin against cold start friction and acceleration transients.
+            </p>
+          </div>
+
+          <h2>Wire Rope D:d Ratio and Fatigue Lifespan (ASME B30.5 &amp; ISO 4308)</h2>
+          <p>
+            In addition to kinematic mechanical advantage, crane hook block engineering requires rigorous sizing of the sheave pitch diameter ($D$) relative to the nominal wire rope diameter ($d$). This dimensionless geometric relationship is denoted as the <strong>$D/d$ ratio</strong>:
+          </p>
+          <div class="formula-box">
+            $$\text{Sheave Bending Ratio} = \frac{D_{pitch}}{d_{rope}}$$
+          </div>
+          <p>
+            When steel wire rope bends cyclically around a rotating sheave, individual outer wires undergo extreme alternating tensile and compressive bending stresses superimposed upon axial hoist tension. Severe reverse bends (S-bends where rope flexes in opposite directions around consecutive sheaves) accelerate inter-strand fretting fatigue by up to 250% compared to unidirectional bends. Per <strong>ISO 4308-1</strong> and <strong>ASME B30.5</strong>, mandatory minimum pitch diameter ratios are enforced:
+          </p>
+          <ul>
+            <li><strong>Running Hoist Sheaves:</strong> Minimum $D/d \ge 18:1$ for light service; $D/d \ge 24:1$ to $30:1$ for continuous heavy mill and foundry duty (FEM Class 3m/4m).</li>
+            <li><strong>Equalizer Sheaves:</strong> Minimum $D/d \ge 12:1$ to $16:1$ where rope oscillation is minimal.</li>
+            <li><strong>Winch Drum Pitch Diameter:</strong> Minimum $D_{drum}/d \ge 18:1$ to $22:1$ with smooth helical grooving.</li>
+          </ul>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar">
+        <div class="sidebar-card">
+          <h4>Related Mechanical Calculators</h4>
+          <ul class="sidebar-links">
+            <li><a href="pulley-rpm-calculator.html">Pulley RPM &amp; Belt Speed</a></li>
+            <li><a href="power-to-torque-calculator.html">Power to Torque Calculator</a></li>
+            <li><a href="hydraulic-cylinder-calculator.html">Hydraulic Cylinder Force</a></li>
+            <li><a href="conveyor-belt-speed-calculator.html">Conveyor Belt Speed</a></li>
+            <li><a href="flywheel-energy-calculator.html">Flywheel Energy Storage</a></li>
+            <li><a href="gear-module-calculator.html">Gear Module Calculator</a></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>High-precision professional engineering and scientific calculation engines.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Directories</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="mechanical.html">Mechanical Engineering</a></li>
+          <li><a href="engineering.html">Civil &amp; Structural</a></li>
+          <li><a href="sitemap.xml">XML Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 CalcHub. Standard Engineering Reference Systems.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calcBtn = document.getElementById('calcPmaBtn');
+      const resetBtn = document.getElementById('resetPmaBtn');
+      const resultBox = document.getElementById('pmaResultBox');
+      const systemPreset = document.getElementById('systemPreset');
+      const partsInput = document.getElementById('partsOfLine');
+
+      systemPreset.addEventListener('change', function() {
+        if (this.value !== 'custom') {
+          partsInput.value = this.value;
+        }
+      });
+
+      partsInput.addEventListener('input', function() {
+        const val = this.value;
+        let matched = false;
+        for (let i = 0; i < systemPreset.options.length; i++) {
+          if (systemPreset.options[i].value === val) {
+            systemPreset.selectedIndex = i;
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) {
+          systemPreset.value = 'custom';
+        }
+      });
+
+      function calculatePMA() {
+        const n = parseInt(partsInput.value, 10);
+        const loadVal = parseFloat(document.getElementById('loadWeight').value);
+        const loadU = document.getElementById('loadUnit').value;
+        const eta_s = parseFloat(document.getElementById('bearingType').value);
+        const h = parseFloat(document.getElementById('liftHeight').value) || 0;
+        const distU = document.getElementById('distUnit').value;
+        const v_load_input = parseFloat(document.getElementById('liftSpeed').value) || 0;
+        const speedU = document.getElementById('speedUnit').value;
+
+        if (isNaN(n) || n < 1 || isNaN(loadVal) || loadVal <= 0) {
+          alert('Please enter valid positive values for rope strands and load.');
+          return;
+        }
+
+        // Convert load to Newtons
+        let w_N = 0;
+        if (loadU === 'kg') w_N = loadVal * 9.80665;
+        else if (loadU === 'n') w_N = loadVal;
+        else if (loadU === 'kn') w_N = loadVal * 1000.0;
+        else if (loadU === 'lbf') w_N = loadVal * 4.44822;
+
+        // Convert speed to m/s
+        let v_mps = v_load_input;
+        if (speedU === 'fpm') v_mps = v_load_input * 0.00508;
+
+        // Calculate overall reeving efficiency eta_total per DIN 15020
+        let eta_total = 1.0;
+        if (eta_s < 0.9999) {
+          eta_total = (1.0 / n) * ((1.0 - Math.pow(eta_s, n)) / (1.0 - eta_s)) * eta_s;
+        }
+
+        // Ideal Mechanical Advantage
+        const ima = n;
+        // Actual Mechanical Advantage
+        const ama = ima * eta_total;
+
+        // Required effort force (N)
+        const f_effort_N = w_N / (n * eta_total);
+        const f_effort_kg = f_effort_N / 9.80665;
+        const f_effort_lbf = f_effort_N / 4.44822;
+
+        // Travel distance
+        const ropeTravel = n * h;
+        // Rope line speed
+        const ropeSpeed = n * v_mps;
+
+        // Mechanical power (kW)
+        const p_kW = (f_effort_N * ropeSpeed) / 1000.0;
+        const p_HP = p_kW * 1.34102;
+
+        // Format outputs
+        document.getElementById('resEffortForce').textContent = f_effort_N.toLocaleString('en-US', {maximumFractionDigits: 1}) + ' N (' + (f_effort_N / 1000.0).toFixed(2) + ' kN)';
+        document.getElementById('resEffortMass').textContent = f_effort_kg.toLocaleString('en-US', {maximumFractionDigits: 1}) + ' kg (' + f_effort_lbf.toLocaleString('en-US', {maximumFractionDigits: 1}) + ' lbf)';
+        document.getElementById('resIMA').textContent = ima + ':1';
+        document.getElementById('resAMA').textContent = ama.toFixed(2) + ':1';
+        document.getElementById('resEffPct').textContent = (eta_total * 100.0).toFixed(2) + ' %';
+        document.getElementById('resRopeTravel').textContent = ropeTravel.toFixed(1) + ' ' + distU;
+        document.getElementById('resRopeSpeed').textContent = ropeSpeed.toFixed(2) + ' m/s (' + (ropeSpeed / 0.00508).toFixed(0) + ' FPM)';
+        document.getElementById('resPowerReq').textContent = p_kW.toFixed(2) + ' kW (' + p_HP.toFixed(1) + ' HP)';
+
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      calcBtn.addEventListener('click', calculatePMA);
+      resetBtn.addEventListener('click', function() {
+        resultBox.style.display = 'none';
+      });
+
+      calculatePMA();
+    });
+  </script>
+</body>
+</html>
