@@ -144,6 +144,7 @@ CAT_MAP = {
             ("thermal-expansion-calculator.html", "Thermal Expansion & Pipe Stress", "🌡️", "Linear growth ΔL, volumetric ΔV & ASME loop leg", "ΔL = L0·α·ΔT | σ = E·α·ΔT | Lleg ≈ 0.043·√(D·ΔL)"),
             ("torque-converter.html", "Torque Converter Sizing (SAE J643)", "🚗", "Stall torque ratio, speed ratio & K-factor", "TR = T_turb/T_pump | SR = N_turb/N_pump | η = TR·SR"),
             ("torque-to-hp-calculator.html", "Torque to HP & BMEP Converter", "🏎️", "Brake horsepower, kilowatts & 4-stroke BMEP", "HP = (T·RPM) / 5252 | BMEP = (4π·T)/(Vd·100)"),
+            ("projectile-motion-calculator.html", "Projectile Motion Trajectory", "🚀", "Apex height, time of flight, range & impact velocity", "H = h0 + (v0·sinθ)²/(2g) | R = v0·cosθ·T"),
         ]
     },
     "civil.html": {
@@ -164,6 +165,13 @@ CAT_MAP = {
             ("excavation-calculator.html", "Excavation & Earthwork Haul (OSHA 1926)", "🚜", "Bank (BCY) vs loose (LCY) volume, swell factor & dump trucks", "V_loose = V_bank × (1 + Swell) | OSHA Type A, B, C slopes"),
             ("excavation-volume-calculator.html", "Excavation Volume (Prismoidal & End Area)", "📐", "Trapezoidal trench side slopes & prismoidal cut-and-fill", "V = (L/6)·(A1 + 4Am + A2) | Cp = (L/12)·(c1-c2)·(w1-w2)"),
             ("flooring-calculator.html", "Flooring Area & Box Estimator (NWFA)", "🪵", "Hardwood, LVP, tile carton counts, pattern waste & underlay", "Boxes = ⌈Area × (1+Waste) / Box Coverage⌉ | 1/4\" gap"),
+            ("footing-size-calculator.html", "Footing Size & Soil Bearing (ACI 318)", "🏛️", "Pad width B, contact pressure & two-way punching shear", "B = √(P/qa) | φVc = 0.33λ√f'c·b0·d ≥ Vu2"),
+            ("gravel-calculator.html", "Gravel & Aggregate Estimator (ASTM D448)", "🪨", "Tonnage, cubic meters/yards & 15% compaction allowance", "V_loose = V_net × (1 + Compaction) | Tons = V × ρ"),
+            ("paint-calculator.html", "Paint Gallon & Coverage (MPI Standards)", "🎨", "Wall & ceiling gallons, liters, primer & fenestrations", "Gallons = (Net Area × Coats) ÷ Spread Rate | WFT/DFT"),
+            ("rebar-weight-calculator.html", "Rebar Weight & Tonnage (ASTM A615)", "🔩", "Metric kg/m d²/162, US lb/ft #²/24 & BBS bundles", "m = d²/162.28 kg/m | w = #²/24 lb/ft | Lap splices"),
+            ("roof-pitch-calculator.html", "Roof Pitch & Rafter Length (IRC Ch. 9)", "🏠", "Pitch X:12, slope angle, area multiplier & rafter length", "Angle = arctan(Rise/Run) | M = √(1 + (X/12)²)"),
+            ("slab-concrete-calculator.html", "Slab Concrete Volume (ACI 360R)", "🏗️", "Slab-on-grade, thickened edge footings & saw-cut joints", "V = L·W·T + V_edge | Max Joint Spacing = 24·T"),
+            ("slope-calculator.html", "Slope & Grade Calculator (ADAAG 405)", "📐", "Rise/run gradient, % grade, angle & ADA ramp 1:12 compliance", "m = Rise/Run | Grade % = m·100 | ADA max 8.33%"),
         ]
     },
     "chemical.html": {

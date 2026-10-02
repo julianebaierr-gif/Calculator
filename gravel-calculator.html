@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gravel Calculator | Crushed Stone, Aggregate Tons &amp; Volume</title>
+  <meta name="description" content="Calculate crushed gravel, stone aggregate tonnage, cubic yards, cubic meters, compaction factors, and density per ASTM D448 for driveways and bases.">
+  <link rel="canonical" href="https://calchub.cloud/gravel-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Gravel Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates crushed stone aggregate tonnage, cubic yards, loose vs compacted volumes, and bulk densities per ASTM D448.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How much does a cubic yard of gravel weigh?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A standard cubic yard of crushed stone or gravel weighs between 2,500 and 2,900 lbs (1.25 to 1.45 US tons / 1.13 to 1.32 metric tonnes), depending on moisture and mineral composition (limestone, granite, or river gravel)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the compaction factor for crushed stone aggregate bases?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "When crushed stone (such as Crusher Run, DGA, or ABC stone) is mechanically compacted with a vibratory roller, its volume decreases by 15% to 20%. Therefore, civil specifications mandate multiplying in-place plan volume by 1.15 to 1.20 when ordering material."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How deep should gravel be installed for residential driveways and patios?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For residential vehicle driveways, civil guidelines specify a 4 to 6-inch (100 to 150 mm) compacted crushed stone base (#57 or Crusher Run) topped by a 2-inch (50 mm) wearing layer. For pedestrian walkways and patios, a 3 to 4-inch base is standard."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between #57 crushed stone and Crusher Run (Dense Graded Aggregate)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "ASTM #57 stone consists of clean, washed angular gravel (1/2 to 1 inch) without fine sand particles, providing excellent drainage. Crusher Run (DGA) contains graded crushed stone blended with stone dust fines, compacting into an impermeable, highly rigid sub-base."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="civil">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html" class="active">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="civil.html">Civil &amp; Construction</a> &rsaquo; 
+      <span>Gravel Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calculator-main">
+        <div class="calc-header">
+          <h1>Gravel Calculator</h1>
+          <p>Estimate crushed stone volume, metric tonnes, US tons, and compaction allowances per ASTM D448 aggregate gradations.</p>
+        </div>
+
+        <div class="calculator-card">
+          <form id="gravelForm" onsubmit="return false;">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="gravelLength">Area Length (meters):</label>
+                <input type="number" id="gravelLength" value="25.0" step="0.5" min="0.1" required>
+                <span class="hint">Driveway, path or foundation run</span>
+              </div>
+              <div class="form-group">
+                <label for="gravelWidth">Area Width (meters):</label>
+                <input type="number" id="gravelWidth" value="4.0" step="0.1" min="0.1" required>
+                <span class="hint">Cross-sectional width</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="gravelDepth">Finished Compacted Depth (mm):</label>
+                <input type="number" id="gravelDepth" value="150" step="10" min="20" required>
+                <span class="hint">Standard base: 100-150 mm (4-6 inches)</span>
+              </div>
+              <div class="form-group">
+                <label for="aggregateType">Gravel / Aggregate Type (ASTM D448):</label>
+                <select id="aggregateType">
+                  <option value="1600" selected>Crushed Limestone / Granite (1,600 kg/m³ / 2,700 lb/yd³)</option>
+                  <option value="1750">Dense Graded Aggregate (DGA / Crusher Run - 1,750 kg/m³)</option>
+                  <option value="1500">Clean Washed River Gravel (1,500 kg/m³ / 2,525 lb/yd³)</option>
+                  <option value="1400">Pea Gravel / Decorative Round (1,400 kg/m³ / 2,360 lb/yd³)</option>
+                  <option value="1300">Volcanic Scoria / Lightweight Aggregate (1,300 kg/m³)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="compactionWaste">Compaction &amp; Spillage Factor (%):</label>
+                <input type="number" id="compactionWaste" value="15" step="1" min="0" max="30" required>
+                <span class="hint">Recommended 15% for compacted road base, 5% for loose decorative</span>
+              </div>
+              <div class="form-group">
+                <label for="truckPayload">Dump Truck Payload (Metric Tonnes):</label>
+                <input type="number" id="truckPayload" value="15.0" step="1.0" min="1.0" required>
+                <span class="hint">Standard tandem dump truck: 12-16 tonnes</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="calcGravelBtn">Calculate Aggregate Quantities</button>
+              <button type="reset" class="btn btn-secondary" id="resetGravelBtn">Reset</button>
+            </div>
+          </form>
+
+          <div class="results-box" id="gravelResultBox" style="display:none; margin-top:25px;">
+            <h3>Aggregates Material Bill of Quantities</h3>
+            <div class="result-grid">
+              <div class="result-tile highlight">
+                <span class="result-label">Total Aggregate Weight</span>
+                <span class="result-value" id="resGravelTonnes">0.00</span>
+                <span class="result-unit">Metric Tonnes (~0 US tons)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Net In-Place Volume</span>
+                <span class="result-value" id="resNetVol">0.00</span>
+                <span class="result-unit">m³ (~0 cu yd)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Loose Volume to Purchase</span>
+                <span class="result-value" id="resLooseVol">0.00</span>
+                <span class="result-unit">m³ (incl. compaction &amp; waste)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Dump Truck Loads</span>
+                <span class="result-value" id="resGravelTrucks">0</span>
+                <span class="result-unit">Trips (based on payload)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Total Surface Coverage</span>
+                <span class="result-value" id="resSurfaceArea">0.0</span>
+                <span class="result-unit">m² (~0 sq ft)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Bulk Density Used</span>
+                <span class="result-value" id="resDensity">0</span>
+                <span class="result-unit">kg/m³ compacted bulk</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Gravel and Mineral Aggregate Engineering Fundamentals</h2>
+          <p>
+            Mineral aggregates—encompassing crushed stone, uncrushed alluvial gravel, crushed slag, and manufactured sands—constitute the structural foundation of modern civil infrastructure. Whether deployed as sub-base support under flexible asphalt highways, ballast beneath railway sleepers, drainage filter media behind retaining walls, or wearing surfaces on unpaved access roads, gravel performs vital load-distribution and moisture-management functions.
+          </p>
+          <p>
+            Under <strong>ASTM D448 (Standard Classification for Sizes of Aggregate for Road and Bridge Construction)</strong> and <strong>AASHTO M43</strong>, coarse aggregates are classified by nominal sieve sizes ranging from #1 ($3\frac{1}{2}\text{ to }1\frac{1}{2}\text{ inches}$) down to #89 ($\frac{3}{8}\text{ inch}$ down to #16 mesh). Particle shape (angularity versus sphericity) directly governs mechanical shear interlock and bearing capacity.
+          </p>
+
+          <h2>Geometric Formulation for In-Place Volume</h2>
+          <p>
+            To compute the in-place compacted volume ($V_{net}$) of an aggregate layer over a rectangular footprint of length $L$, width $W$, and uniform compacted depth $T$:
+          </p>
+          <div class="formula-box">
+            $$A_{surface} = L \times W$$
+            $$V_{net} = A_{surface} \times \left(\frac{T}{1000}\right) \quad (L, W \text{ in meters, } T \text{ in mm})$$
+          </div>
+          <p>
+            In Imperial units, with length and width in feet and thickness in inches:
+          </p>
+          <div class="formula-box">
+            $$V_{cu\_yd} = \frac{L_{ft} \times W_{ft} \times (T_{in} / 12)}{27}$$
+          </div>
+
+          <h2>Aggregate Compaction Factors &amp; Subgrade Surcharge</h2>
+          <p>
+            When crushed stone is delivered loose in a dump truck, it has a loose bulk density. When spread on subgrade and compacted using heavy vibratory smooth-drum rollers or plate compactors, the mechanical vibrations force fine stone particles into voids between larger angular rocks.
+          </p>
+          <p>
+            This volumetric densification results in a <strong>compaction reduction of $12\%$ to $20\%$</strong>. Furthermore, on soft clay or silty subgrades, an additional $3\%$ to $5\%$ of aggregate is pressed into the natural ground (subgrade intrusion) unless a separation geotextile fabric (non-woven needle-punched Class 1 geotextile) is installed.
+          </p>
+          <p>
+            To avoid severe material shortages on site, the purchased loose volume ($V_{loose}$) and total mass ($M$) must incorporate this compaction factor ($C_f$):
+          </p>
+          <div class="formula-box">
+            $$V_{loose} = V_{net} \times \left(1 + \frac{C_f}{100}\right)$$
+            $$M_{tonnes} = V_{loose} \times \left(\frac{\rho_{bulk}}{1000}\right) \quad (\rho_{bulk} \text{ in kg/m}^3)$$
+            $$M_{US\_tons} = M_{tonnes} \times 1.10231$$
+          </div>
+
+          <h2>Types of Construction Aggregate &amp; Sieve Gradings</h2>
+          <p>
+            Selecting the appropriate aggregate type is essential for structural performance:
+          </p>
+          <ul>
+            <li><strong>Dense Graded Aggregate (DGA / Crusher Run / ABC Stone):</strong> A graded blend of angular crushed stone (from $1\text{-inch}$ down to micro-fine stone dust). When compacted, the dust particles completely fill interstitial voids, creating a dense, rock-hard impervious layer ideal for vehicular sub-bases.</li>
+            <li><strong>#57 Crushed Stone ($1/2\text{ to }1\text{ inch}$):</strong> Clean washed, uniformly sized angular crushed limestone or granite without fines. Possesses high hydraulic conductivity, making it the premier choice for French drains, perimeter foundation footing drains, and driveway top dressing.</li>
+            <li><strong>Pea Gravel ($3/8\text{ inch}$):</strong> Smooth, rounded river gravel. Highly decorative and comfortable underfoot, used extensively in garden walkways, exposed aggregate concrete patios, and children's playground safety surfacing.</li>
+            <li><strong>Rip-Rap (Class 1 to Class 3, $4\text{ to }12\text{ inches}$):</strong> Heavy, angular blasted rock dumped along riverbanks, stormwater culvert outlets, and steep embankments for severe scour and soil erosion protection.</li>
+          </ul>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Aggregate Designation</th>
+                <th>Nominal Size</th>
+                <th>Bulk Density (kg/m³ / lb/yd³)</th>
+                <th>Compaction Loss</th>
+                <th>Primary Civil Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Dense Graded (DGA / ABC)</td>
+                <td>0 to 25 mm (0 to 1")</td>
+                <td>1,750 kg/m³ (2,950 lb/yd³)</td>
+                <td>15% – 20%</td>
+                <td>Driveway sub-base, asphalt base course</td>
+              </tr>
+              <tr>
+                <td>ASTM #57 Crushed Stone</td>
+                <td>12.5 to 25 mm (½ to 1")</td>
+                <td>1,600 kg/m³ (2,700 lb/yd³)</td>
+                <td>10% – 12%</td>
+                <td>Sub-surface drainage, concrete aggregate</td>
+              </tr>
+              <tr>
+                <td>ASTM #4 Crushed Rock</td>
+                <td>20 to 50 mm (¾ to 2")</td>
+                <td>1,550 kg/m³ (2,600 lb/yd³)</td>
+                <td>8% – 10%</td>
+                <td>Construction entrance tracking pads</td>
+              </tr>
+              <tr>
+                <td>Washed Pea Gravel</td>
+                <td>6 to 10 mm (¼ to ⅜")</td>
+                <td>1,400 kg/m³ (2,360 lb/yd³)</td>
+                <td>5% – 8%</td>
+                <td>Decorative paths, pipe bedding envelope</td>
+              </tr>
+              <tr>
+                <td>Crushed Recycled Concrete</td>
+                <td>0 to 40 mm (0 to 1½")</td>
+                <td>1,500 kg/m³ (2,525 lb/yd³)</td>
+                <td>12% – 15%</td>
+                <td>Sustainable road sub-base, parking lots</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>California Bearing Ratio (CBR) &amp; Flexible Pavement Base Structural Design</h2>
+          <p>
+            In highway and parking facility engineering, crushed aggregate gravel functions as the structural unbound base layer directly beneath hot-mix asphalt (HMA) or concrete pavements. The primary engineering performance metric is the <strong>California Bearing Ratio (CBR)</strong> per <strong>ASTM D1883</strong>, which evaluates the mechanical shear resistance of compacted aggregate relative to standard crushed California limestone (defined as $100\%$ CBR).
+          </p>
+          <p>
+            Under the <strong>AASHTO Guide for Design of Pavement Structures</strong>, the overall Pavement Structural Number ($SN$) is computed as:
+          </p>
+          <div class="formula-box">
+            $$SN = a_1 D_1 + a_2 D_2 m_2 + a_3 D_3 m_3$$
+          </div>
+          <p>
+            Where:
+          </p>
+          <ul>
+            <li>$a_2$: Structural layer coefficient of the crushed stone base (typically $a_2 = 0.14$ for high-quality crushed stone with $\text{CBR} \ge 80\%$, corresponding to a resilient modulus $M_R \approx 30,000\text{ psi} / 207\text{ MPa}$).</li>
+            <li>$D_2$: Compacted base thickness in inches.</li>
+            <li>$m_2$: Drainage coefficient (typically $1.0$ for well-drained stone bases).</li>
+          </ul>
+          <p>
+            <strong>Subgrade Geotextile Separation:</strong> On soft clay or silty subgrades with low in-situ strength ($\text{CBR} < 3\%$), dynamic heavy vehicular wheel pulses pump wet clay fines upward into the aggregate voids while forcing crushed stones downward. Installing a needle-punched non-woven geotextile separation fabric prevents subgrade migration, maintaining aggregate structural interlock and extending pavement fatigue life by up to $300\%$.
+          </p>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Case Study: Commercial Truck Loading Dock Access Road</h3>
+            <p><strong>Design Scenario:</strong> A logistics distribution center requires a heavy-duty crushed stone base course for a semi-trailer loading dock apron. The road measures $L = 60.0\text{ meters}$ in length and $W = 6.0\text{ meters}$ in width. The geotechnical pavement design mandates a compacted base thickness of $T = 200\text{ mm}$ ($0.20\text{ meters}$) of <strong>Dense Graded Aggregate (DGA / Crusher Run)</strong> with a compacted bulk density of $\rho = 1,750\text{ kg/m}^3$. A compaction densification and subgrade intrusion allowance of $18\%$ is specified. Delivery will be executed via tri-axle highway dump trucks with a certified legal payload capacity of $16.0\text{ metric tonnes}$. Calculate net in-place volume, gross loose volume to order, total mass in metric tonnes and US tons, and dump truck deliveries required.</p>
+            
+            <p><strong>Step 1: Compute Surface Area and Compacted Net Volume ($V_{net}$)</strong></p>
+            <div class="formula-box">
+              $$A_{surface} = 60.0\text{ m} \times 6.0\text{ m} = 360.0\text{ m}^2 \quad (\approx 3,875\text{ sq ft})$$
+              $$V_{net} = 360.0\text{ m}^2 \times 0.20\text{ m} = \mathbf{72.0\text{ m}^3} \quad (\approx 94.17\text{ cu yd})$$
+            </div>
+
+            <p><strong>Step 2: Determine Loose Volume to Purchase with 18% Compaction Allowance</strong></p>
+            <div class="formula-box">
+              $$V_{loose} = V_{net} \times (1 + 0.18) = 72.0\text{ m}^3 \times 1.18 = \mathbf{84.96\text{ m}^3} \quad (\approx 111.12\text{ cu yd})$$
+            </div>
+
+            <p><strong>Step 3: Evaluate Total Aggregate Mass</strong></p>
+            <div class="formula-box">
+              $$M_{tonnes} = 84.96\text{ m}^3 \times 1.75\text{ t/m}^3 = \mathbf{148.68\text{ Metric Tonnes}}$$
+              $$M_{US\_tons} = 148.68\text{ t} \times 1.10231 = \mathbf{163.89\text{ US Short Tons}}$$
+            </div>
+
+            <p><strong>Step 4: Determine Number of Dump Truck Deliveries</strong></p>
+            <div class="formula-box">
+              $$N_{trucks} = \left\lceil \frac{148.68\text{ tonnes}}{16.0\text{ tonnes/truck}} \right\rceil = \lceil 9.29 \rceil = \mathbf{10\text{ Dump Truck Loads}}$$
+            </div>
+            <p>
+              <strong>Procurement Summary:</strong> Order <strong>150 metric tonnes</strong> (or approximately <strong>112 cubic yards</strong>) of Dense Graded Aggregate across <strong>10 dump truck deliveries</strong> to guarantee a uniform, compliant $200\text{ mm}$ finished compacted road base.
+            </p>
+          </div>
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏗️</span>
+            <h3 class="widget-title">Related Civil & Construction</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="brick-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Brick & Masonry Calculator</a></li>
+            <li><a href="asphalt-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Asphalt Paving & Tonnage</a></li>
+            <li><a href="beam-deflection-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Deflection & Moments</a></li>
+            <li><a href="retaining-wall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Retaining Wall Stability</a></li>
+            <li><a href="concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Slab, Footing & Column</a></li>
+            <li><a href="rebar-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rebar Weight & Grid Spacing</a></li>
+            <li><a href="rainwater-downpipe-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rainwater Downpipe Sizing</a></li>
+            <li><a href="beam-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Bending Moment & Shear</a></li>
+            <li><a href="block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Block Masonry Estimator</a></li>
+            <li><a href="concrete-block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Block Calculator</a></li>
+            <li><a href="concrete-mix-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Mix Ratio</a></li>
+            <li><a href="drywall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Drywall Sheets, Mud & Tape</a></li>
+            <li><a href="excavation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation & Earthwork Haul</a></li>
+            <li><a href="excavation-volume-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation Volume Calculator</a></li>
+            <li><a href="flooring-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Flooring Area & Box Estimator</a></li>
+            <li><a href="footing-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Footing Size & Soil Bearing</a></li>
+            <li><a href="gravel-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Gravel & Aggregate Estimator</a></li>
+            <li><a href="paint-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Paint Gallon & Coverage</a></li>
+            <li><a href="rebar-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rebar Weight & Tonnage</a></li>
+            <li><a href="roof-pitch-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Roof Pitch & Rafter Length</a></li>
+            <li><a href="slab-concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Slab Concrete Volume</a></li>
+            <li><a href="slope-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Slope & Grade Calculator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="civil.html" class="sidebar-category-link">View All Civil & Construction Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>High-precision professional engineering and scientific calculation engines.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Directories</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="civil.html">Civil &amp; Construction</a></li>
+          <li><a href="mechanical.html">Mechanical Engineering</a></li>
+          <li><a href="engineering.html">Civil &amp; Structural</a></li>
+          <li><a href="sitemap.xml">XML Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 CalcHub. Standard Engineering Reference Systems.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calcBtn = document.getElementById('calcGravelBtn');
+      const resetBtn = document.getElementById('resetGravelBtn');
+      const resultBox = document.getElementById('gravelResultBox');
+
+      function calculateGravel() {
+        const L = parseFloat(document.getElementById('gravelLength').value);
+        const W = parseFloat(document.getElementById('gravelWidth').value);
+        const depthMm = parseFloat(document.getElementById('gravelDepth').value);
+        const density = parseFloat(document.getElementById('aggregateType').value);
+        const compWastePct = parseFloat(document.getElementById('compactionWaste').value) || 0;
+        const truckPay = parseFloat(document.getElementById('truckPayload').value);
+
+        if (isNaN(L) || L <= 0 || isNaN(W) || W <= 0 || isNaN(depthMm) || depthMm <= 0 || isNaN(truckPay) || truckPay <= 0) {
+          alert('Please enter valid positive dimensions, thickness, and truck payload.');
+          return;
+        }
+
+        const surfaceAreaM2 = L * W;
+        const depthM = depthMm / 1000.0;
+        const netVolM3 = surfaceAreaM2 * depthM;
+        const looseVolM3 = netVolM3 * (1.0 + compWastePct / 100.0);
+
+        const totalKg = looseVolM3 * density;
+        const totalTonnes = totalKg / 1000.0;
+        const totalUsTons = totalTonnes * 1.10231;
+
+        const netCuYd = netVolM3 * 1.30795;
+        const looseCuYd = looseVolM3 * 1.30795;
+        const surfaceSqFt = surfaceAreaM2 * 10.7639;
+
+        const truckLoads = Math.ceil(totalTonnes / truckPay);
+
+        document.getElementById('resGravelTonnes').textContent = totalTonnes.toFixed(2) + ` (~${totalUsTons.toFixed(1)} tons)`;
+        document.getElementById('resNetVol').textContent = netVolM3.toFixed(2) + ` (~${netCuYd.toFixed(1)} yd³)`;
+        document.getElementById('resLooseVol').textContent = looseVolM3.toFixed(2) + ` (~${looseCuYd.toFixed(1)} yd³)`;
+        document.getElementById('resGravelTrucks').textContent = truckLoads.toLocaleString();
+        document.getElementById('resSurfaceArea').textContent = surfaceAreaM2.toFixed(1) + ` (~${Math.round(surfaceSqFt).toLocaleString()} ft²)`;
+        document.getElementById('resDensity').textContent = density.toLocaleString();
+
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      calcBtn.addEventListener('click', calculateGravel);
+      resetBtn.addEventListener('click', function() {
+        resultBox.style.display = 'none';
+      });
+      calculateGravel();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rebar Weight Calculator | Steel Bar Mass per Meter &amp; Foot</title>
+  <meta name="description" content="Calculate reinforcing steel rebar weight per meter (d²/162) and per foot (d²/24), total tonnage, batch bundles, and ASTM A615 / BS 4449 bar sizes.">
+  <link rel="canonical" href="https://calchub.cloud/rebar-weight-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Rebar Weight Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates reinforcing steel deformed rebar linear mass, total tonnage, and bundle counts per ASTM A615 and ISO 6935.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the formula to calculate rebar weight per meter in metric units?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The standard metric formula for rebar linear mass is: Unit Weight (kg/m) = d² / 162.28, where d is the nominal diameter in millimeters. For example, a 16 mm bar weighs: (16 × 16) / 162.28 = 1.578 kg/m."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the formula to calculate rebar weight per foot in US Imperial units?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For US customary rebar sizes (#3 through #8), where the bar number represents eighths of an inch of diameter: Unit Weight (lb/ft) = (Bar Number)² / 24. For example, a #5 bar (5/8 inch) weighs: 5² / 24 = 25 / 24 ≈ 1.042 lb/ft."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is the d²/162 formula derived from steel density?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The volume of a 1-meter cylinder of diameter d mm is V = (π / 4) * (d / 1000)² * 1.0 m = 7.854 × 10⁻⁷ * d² m³. Multiplying by standard steel density (7,850 kg/m³) yields: Mass = 7.854 × 10⁻⁷ * d² * 7850 = 0.006165 * d² = d² / (1 / 0.006165) = d² / 162.28 kg/m."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What cutting and bending waste percentage should be added when ordering rebar?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Structural engineering practice budgets 5% to 8% scrap waste for regular straight runs, footings, and slabs, and 10% to 12% for complex shear walls, column stirrup ties, and continuous beam lap splices per ACI 318."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="civil">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html" class="active">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="civil.html">Civil &amp; Construction</a> &rsaquo; 
+      <span>Rebar Weight Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calculator-main">
+        <div class="calc-header">
+          <h1>Rebar Weight Calculator</h1>
+          <p>Compute reinforcing steel bar linear mass (kg/m &amp; lb/ft), total tonnage, and bundle procurement per ASTM A615 &amp; ISO 6935.</p>
+        </div>
+
+        <div class="calculator-card">
+          <form id="rebarForm" onsubmit="return false;">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="barStandard">Rebar Sizing Standard:</label>
+                <select id="barStandard">
+                  <option value="metric" selected>Metric System (ISO 6935 / BS 4449 - mm)</option>
+                  <option value="us">US Imperial (ASTM A615 - # Bar Numbers)</option>
+                </select>
+              </div>
+              <div class="form-group" id="grpMetricSize">
+                <label for="rebarDiaMm">Nominal Diameter (mm):</label>
+                <select id="rebarDiaMm">
+                  <option value="6">6 mm (0.222 kg/m) - Light Mesh &amp; Links</option>
+                  <option value="8">8 mm (0.395 kg/m) - Slab Temp &amp; Stirrups</option>
+                  <option value="10">10 mm (0.617 kg/m) - Footings &amp; Slabs</option>
+                  <option value="12" selected>12 mm (0.888 kg/m) - Main Slab / Beam Rebar</option>
+                  <option value="16">16 mm (1.578 kg/m) - Primary Beam &amp; Column</option>
+                  <option value="20">20 mm (2.466 kg/m) - Heavy Beams &amp; Columns</option>
+                  <option value="25">25 mm (3.853 kg/m) - Foundation Piles &amp; Girders</option>
+                  <option value="32">32 mm (6.313 kg/m) - Heavy Infrastructure &amp; Piers</option>
+                  <option value="40">40 mm (9.865 kg/m) - High-Rise Core Walls</option>
+                </select>
+              </div>
+              <div class="form-group" id="grpUsSize" style="display:none;">
+                <label for="rebarUsNo">US Bar Size (#):</label>
+                <select id="rebarUsNo">
+                  <option value="3">#3 (3/8" - 0.376 lb/ft)</option>
+                  <option value="4" selected>#4 (1/2" - 0.668 lb/ft)</option>
+                  <option value="5">#5 (5/8" - 1.043 lb/ft)</option>
+                  <option value="6">#6 (3/4" - 1.502 lb/ft)</option>
+                  <option value="7">#7 (7/8" - 2.044 lb/ft)</option>
+                  <option value="8">#8 (1" - 2.670 lb/ft)</option>
+                  <option value="9">#9 (1-1/8" - 3.400 lb/ft)</option>
+                  <option value="10">#10 (1-1/4" - 4.303 lb/ft)</option>
+                  <option value="11">#11 (1-3/8" - 5.313 lb/ft)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="barLength">Length per Cut Bar (meters / feet):</label>
+                <input type="number" id="barLength" value="12.0" step="0.5" min="0.1" required>
+                <span class="hint">Standard mill stock length is 12m (40 ft)</span>
+              </div>
+              <div class="form-group">
+                <label for="barQuantity">Total Number of Bars:</label>
+                <input type="number" id="barQuantity" value="85" step="1" min="1" required>
+                <span class="hint">Piece count from bar bending schedule (BBS)</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="scrapWaste">Cutting &amp; Lap Splice Waste (%):</label>
+                <input type="number" id="scrapWaste" value="8" step="1" min="0" max="25" required>
+                <span class="hint">Recommended 5% to 10% for lap splices and cut off-cuts</span>
+              </div>
+              <div class="form-group">
+                <label for="unitPrice">Steel Price per Tonne ($ / Ton):</label>
+                <input type="number" id="unitPrice" value="950" step="25" min="100">
+                <span class="hint">Optional market material rate</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="calcRebarBtn">Calculate Steel Mass</button>
+              <button type="reset" class="btn btn-secondary" id="resetRebarBtn">Reset</button>
+            </div>
+          </form>
+
+          <div class="results-box" id="rebarResultBox" style="display:none; margin-top:25px;">
+            <h3>Reinforcing Steel Takeoff Quantities</h3>
+            <div class="result-grid">
+              <div class="result-tile highlight">
+                <span class="result-label">Total Steel Tonnage</span>
+                <span class="result-value" id="resTonnage">0.000</span>
+                <span class="result-unit">Metric Tonnes (~0 US tons)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Total Reinforcing Mass</span>
+                <span class="result-value" id="resMassKg">0</span>
+                <span class="result-unit">kg (~0 lbs)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Theoretical Unit Mass</span>
+                <span class="result-value" id="resUnitWeight">0.000</span>
+                <span class="result-unit">kg/m (~0.000 lb/ft)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Total Linear Length</span>
+                <span class="result-value" id="resTotalLength">0.0</span>
+                <span class="result-unit">meters (~0 ft with waste)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Mill Stock 12m (40ft) Bars</span>
+                <span class="result-value" id="resMillBars">0</span>
+                <span class="result-unit">Full Length Commercial Bars</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Estimated Material Cost</span>
+                <span class="result-value" id="resCost">$0</span>
+                <span class="result-unit">USD (excluding freight)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Reinforcing Steel Technology &amp; Metallurgical Specifications</h2>
+          <p>
+            Reinforced concrete is a composite engineering system that exploits the immense compressive strength of hardened concrete and the high tensile yield capacity of deformed steel reinforcing bars (rebar). Because unreinforced plain concrete possesses a tensile strength of only approximately $8\%$ to $12\%$ of its compressive capacity ($f_{ct} \approx 0.62 \sqrt{f'_c}\text{ MPa}$), structural elements subjected to flexure, shear, and seismic torsion require steel reinforcement strategically embedded within tensile zones.
+          </p>
+          <p>
+            Modern construction employs thermo-mechanically treated (TMT) high-yield deformed bars governed by international manufacturing standards:
+          </p>
+          <ul>
+            <li><strong>ASTM A615:</strong> Standard specification for deformed and plain carbon-steel bars for concrete reinforcement, predominantly specified in Grade 60 ($F_y = 420\text{ MPa} / 60,000\text{ psi}$) and Grade 75 ($F_y = 520\text{ MPa}$).</li>
+            <li><strong>ASTM A706:</strong> Low-alloy weldable deformed steel with controlled carbon equivalents ($\text{CE} \le 0.55\%$), mandatory for seismic moment frames per ACI 318 Chapter 18.</li>
+            <li><strong>BS 4449 / EN 10080:</strong> European and British standard specifying Grade B500B and B500C high-ductility ribbed steel with a characteristic yield strength of $500\text{ MPa}$.</li>
+          </ul>
+
+          <h2>The Mathematical Derivation of Unit Rebar Mass</h2>
+          <p>
+            Civil engineers and steel estimators rely on simple empirical formulas for rapid site quantification. The metric formula $m = \frac{d^2}{162}$ is derived from the fundamental physical density of carbon steel ($\rho = 7,850\text{ kg/m}^3$):
+          </p>
+          <p>
+            Consider a solid cylindrical steel bar of nominal diameter $d$ (in millimeters) and unit length $L = 1.0\text{ meter}$:
+          </p>
+          <div class="formula-box">
+            $$V = \frac{\pi}{4} \times \left(\frac{d}{1000}\right)^2 \times 1.0\text{ m} = \frac{\pi}{4 \times 10^6} \cdot d^2 \text{ m}^3 \approx 7.85398 \times 10^{-7} \cdot d^2 \text{ m}^3$$
+            $$m = V \times \rho = 7.85398 \times 10^{-7} \cdot d^2 \times 7850\text{ kg/m}^3 \approx 0.00616538 \cdot d^2\text{ kg/m}$$
+            $$m = \frac{d^2}{1 / 0.00616538} = \frac{d^2}{162.196} \approx \frac{d^2}{\mathbf{162}}\text{ kg/m}$$
+          </div>
+          <p>
+            Similarly, in US Imperial units, where bar diameter $D$ is expressed in eighths of an inch ($d_{in} = \frac{\#}{8}$):
+          </p>
+          <div class="formula-box">
+            $$w = \frac{\#^2}{\mathbf{24}}\text{ lb/ft}$$
+          </div>
+
+          <h2>Total Tonnage Formulation &amp; Bar Bending Schedule (BBS)</h2>
+          <p>
+            In a structural Bar Bending Schedule (BBS), multiple cut lengths, bend hook shapes (standard $90^\circ$ and $135^\circ$ seismic hooks per ACI 318 Section 25.3), and lap splice lengths are consolidated:
+          </p>
+          <div class="formula-box">
+            $$L_{net} = N_{bars} \times L_{cut}$$
+            $$L_{gross} = L_{net} \times \left(1 + \frac{\text{Waste}_{\%}}{100}\right)$$
+            $$M_{total} = L_{gross} \times \left(\frac{d^2}{162.28}\right)\text{ kg}$$
+            $$\text{Metric Tonnes} = \frac{M_{total}}{1000} \quad \text{and} \quad \text{US Short Tons} = \frac{M_{total} \times 2.20462}{2000}$$
+          </div>
+
+          <h2>Tension Lap Splices &amp; Development Length Mechanics</h2>
+          <p>
+            Because commercial rebar is rolled in standard mill stock lengths (typically $12.0\text{ meters}$ in metric markets, or $40\text{ and }60\text{ feet}$ in US markets), continuous structural members require bars to be lapped or mechanically coupled.
+          </p>
+          <p>
+            Under <strong>ACI 318-19 Section 25.4</strong>, the tension development length ($l_d$) transferred through rib deformations and surrounding concrete bond stress is:
+          </p>
+          <div class="formula-box">
+            $$l_d = \left[ \frac{3}{40} \frac{F_y}{\lambda \sqrt{f'_c}} \frac{\psi_t \psi_e \psi_s \psi_g}{\left( \frac{c_b + K_{tr}}{d_b} \right)} \right] d_b$$
+          </div>
+          <p>
+            For standard Grade 60 bars in normal-weight $25\text{ MPa}$ ($3,500\text{ psi}$) concrete, Class B tension lap splices typically evaluate to $40\text{ to }50$ bar diameters ($l_{lap} \approx 48 d_b$). For example, a $20\text{ mm}$ deformed bar requires a minimum lap splice length of approximately $48 \times 20\text{ mm} = 960\text{ mm}$ ($\approx 1.0\text{ meter}$).
+          </p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Metric Bar Size (ISO)</th>
+                <th>Equivalent US Size</th>
+                <th>Nominal Area (mm²)</th>
+                <th>Nominal Area (sq in)</th>
+                <th>Unit Weight (kg/m)</th>
+                <th>Unit Weight (lb/ft)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>8 mm</td>
+                <td>#2.5 (approx)</td>
+                <td>50.3 mm²</td>
+                <td>0.078 in²</td>
+                <td>0.395 kg/m</td>
+                <td>0.265 lb/ft</td>
+              </tr>
+              <tr>
+                <td>10 mm</td>
+                <td>#3 (⅜")</td>
+                <td>78.5 mm²</td>
+                <td>0.110 in²</td>
+                <td>0.617 kg/m</td>
+                <td>0.414 lb/ft</td>
+              </tr>
+              <tr>
+                <td>12 mm</td>
+                <td>#4 (½")</td>
+                <td>113.1 mm²</td>
+                <td>0.200 in²</td>
+                <td>0.888 kg/m</td>
+                <td>0.597 lb/ft</td>
+              </tr>
+              <tr>
+                <td>16 mm</td>
+                <td>#5 (⅝")</td>
+                <td>201.1 mm²</td>
+                <td>0.310 in²</td>
+                <td>1.578 kg/m</td>
+                <td>1.060 lb/ft</td>
+              </tr>
+              <tr>
+                <td>20 mm</td>
+                <td>#6 (¾")</td>
+                <td>314.2 mm²</td>
+                <td>0.440 in²</td>
+                <td>2.466 kg/m</td>
+                <td>1.657 lb/ft</td>
+              </tr>
+              <tr>
+                <td>25 mm</td>
+                <td>#8 (1")</td>
+                <td>490.9 mm²</td>
+                <td>0.790 in²</td>
+                <td>3.853 kg/m</td>
+                <td>2.589 lb/ft</td>
+              </tr>
+              <tr>
+                <td>32 mm</td>
+                <td>#10 (1¼")</td>
+                <td>804.2 mm²</td>
+                <td>1.270 in²</td>
+                <td>6.313 kg/m</td>
+                <td>4.242 lb/ft</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Corrosion Protection, Epoxy Coating (ASTM A775) &amp; Galvanized Rebar (ASTM A767)</h2>
+          <p>
+            In aggressive marine environments, bridge decks exposed to winter deicing chloride salts, and wastewater treatment plants, bare carbon steel rebar is prone to severe electrochemical corrosion. Chloride ion ingress depassivates the protective alkaline oxide film, oxidizing metallic iron into hydrated iron oxide (rust) with an expansive volume increase of up to $600\%$. This causes internal tensile splitting stresses, concrete cover spalling, and sudden structural delamination.
+          </p>
+          <p>
+            To achieve extended 75- to 100-year design service lifespans under <strong>ACI 318 Chapter 19</strong>, specialized corrosion-resistant rebar specifications are mandated:
+          </p>
+          <ul>
+            <li><strong>Fusion-Bonded Epoxy-Coated Rebar (ASTM A775 / A934):</strong> Electrostatic application of thermosetting epoxy powder creates a $7\text{ to }12\text{ mil}$ ($175 - 300\text{ }\mu\text{m}$) protective dielectric barrier preventing electrical corrosion currents.</li>
+            <li><strong>Hot-Dip Galvanized Rebar (ASTM A767):</strong> Molten zinc immersion forms metallurgical zinc-iron alloy layers providing sacrificial galvanic protection even if physical scratches occur.</li>
+            <li><strong>Stainless Steel Rebar (ASTM A955):</strong> Austenitic Type 316LN or duplex Type 2205 stainless steel with critical chloride threshold values over ten times higher than conventional black carbon steel.</li>
+          </ul>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Case Study: Multi-Story Building Beam Rebar Procurement</h3>
+            <p><strong>Design Scenario:</strong> A structural engineering schedule for a commercial podium deck details the primary bottom flexural tensile reinforcement for 12 continuous transfer beams. Each beam requires 6 bottom continuous deformed reinforcing bars of diameter $d = 20\text{ mm}$ ($F_y = 500\text{ MPa}$ TMT steel). The overall clear span plus column embedment hook length per bar is $L_{cut} = 14.5\text{ meters}$. A standard cutting, end-hook, and lap splice waste allowance of $8\%$ is specified. Steel reinforcement is procured at a contract price of $\$950\text{ per metric tonne}$. Calculate the total net linear meters, gross procurement weight in metric tonnes and US short tons, number of standard $12\text{-meter}$ commercial stock bars required, and estimated material procurement expenditure.</p>
+            
+            <p><strong>Step 1: Compute Total Number of Cut Bars and Net Length</strong></p>
+            <div class="formula-box">
+              $$N_{total} = 12\text{ beams} \times 6\text{ bars/beam} = \mathbf{72\text{ bars}}$$
+              $$L_{net} = 72 \times 14.5\text{ m} = \mathbf{1,044.0\text{ linear meters}}$$
+            </div>
+
+            <p><strong>Step 2: Determine Gross Linear Length with 8% Scrap Waste</strong></p>
+            <div class="formula-box">
+              $$L_{gross} = 1,044.0\text{ m} \times (1 + 0.08) = 1,044.0 \times 1.08 = \mathbf{1,127.52\text{ linear meters}}$$
+            </div>
+
+            <p><strong>Step 3: Evaluate Unit Mass and Total Steel Weight ($d = 20\text{ mm}$)</strong></p>
+            <div class="formula-box">
+              $$m_{unit} = \frac{d^2}{162.28} = \frac{20^2}{162.28} = \frac{400}{162.28} \approx \mathbf{2.465\text{ kg/m}}$$
+              $$M_{total} = 1,127.52\text{ m} \times 2.465\text{ kg/m} = \mathbf{2,779.34\text{ kg}}$$
+              $$\text{Metric Tonnes} = \frac{2,779.34\text{ kg}}{1000} \approx \mathbf{2.779\text{ Tonnes}} \quad (\approx \mathbf{3.06\text{ US Short Tons}})$$
+            </div>
+
+            <p><strong>Step 4: Determine Commercial Mill Stock 12m Bars &amp; Budget</strong></p>
+            <div class="formula-box">
+              $$N_{12m\_bars} = \left\lceil \frac{1,127.52\text{ m}}{12.0\text{ m/bar}} \right\rceil = \lceil 93.96 \rceil = \mathbf{94\text{ Stock Bars of } 12\text{m}}$$
+              $$\text{Procurement Cost} = 2.779\text{ tonnes} \times \$950/\text{tonne} = \mathbf{\$2,640.05\text{ USD}}$$
+            </div>
+            <p>
+              <strong>Procurement Summary:</strong> The project manager must order <strong>94 commercial $12\text{m}$ stock bars</strong> of $20\text{ mm}$ TMT rebar ($2.78\text{ metric tonnes}$) with a purchase allocation of <strong>$\$2,640$</strong>.
+            </p>
+          </div>
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏗️</span>
+            <h3 class="widget-title">Related Civil & Construction</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="brick-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Brick & Masonry Calculator</a></li>
+            <li><a href="asphalt-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Asphalt Paving & Tonnage</a></li>
+            <li><a href="beam-deflection-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Deflection & Moments</a></li>
+            <li><a href="retaining-wall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Retaining Wall Stability</a></li>
+            <li><a href="concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Slab, Footing & Column</a></li>
+            <li><a href="rebar-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rebar Weight & Grid Spacing</a></li>
+            <li><a href="rainwater-downpipe-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rainwater Downpipe Sizing</a></li>
+            <li><a href="beam-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Bending Moment & Shear</a></li>
+            <li><a href="block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Block Masonry Estimator</a></li>
+            <li><a href="concrete-block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Block Calculator</a></li>
+            <li><a href="concrete-mix-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Mix Ratio</a></li>
+            <li><a href="drywall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Drywall Sheets, Mud & Tape</a></li>
+            <li><a href="excavation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation & Earthwork Haul</a></li>
+            <li><a href="excavation-volume-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation Volume Calculator</a></li>
+            <li><a href="flooring-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Flooring Area & Box Estimator</a></li>
+            <li><a href="footing-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Footing Size & Soil Bearing</a></li>
+            <li><a href="gravel-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Gravel & Aggregate Estimator</a></li>
+            <li><a href="paint-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Paint Gallon & Coverage</a></li>
+            <li><a href="rebar-weight-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Rebar Weight & Tonnage</a></li>
+            <li><a href="roof-pitch-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Roof Pitch & Rafter Length</a></li>
+            <li><a href="slab-concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Slab Concrete Volume</a></li>
+            <li><a href="slope-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Slope & Grade Calculator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="civil.html" class="sidebar-category-link">View All Civil & Construction Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>High-precision professional engineering and scientific calculation engines.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Directories</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="civil.html">Civil &amp; Construction</a></li>
+          <li><a href="mechanical.html">Mechanical Engineering</a></li>
+          <li><a href="engineering.html">Civil &amp; Structural</a></li>
+          <li><a href="sitemap.xml">XML Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 CalcHub. Standard Engineering Reference Systems.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calcBtn = document.getElementById('calcRebarBtn');
+      const resetBtn = document.getElementById('resetRebarBtn');
+      const resultBox = document.getElementById('rebarResultBox');
+      const stdSelect = document.getElementById('barStandard');
+      const grpMetric = document.getElementById('grpMetricSize');
+      const grpUs = document.getElementById('grpUsSize');
+
+      stdSelect.addEventListener('change', function() {
+        if (this.value === 'us') {
+          grpMetric.style.display = 'none';
+          grpUs.style.display = 'block';
+        } else {
+          grpMetric.style.display = 'block';
+          grpUs.style.display = 'none';
+        }
+      });
+
+      function calculateRebar() {
+        const isUs = (stdSelect.value === 'us');
+        const cutLen = parseFloat(document.getElementById('barLength').value);
+        const qty = parseInt(document.getElementById('barQuantity').value);
+        const wastePct = parseFloat(document.getElementById('scrapWaste').value) || 0;
+        const pricePerTon = parseFloat(document.getElementById('unitPrice').value) || 0;
+
+        if (isNaN(cutLen) || cutLen <= 0 || isNaN(qty) || qty <= 0) {
+          alert('Please enter valid positive numbers for bar length and quantity.');
+          return;
+        }
+
+        let unitWeightKgM = 0;
+        let unitWeightLbFt = 0;
+
+        if (isUs) {
+          const usNo = parseInt(document.getElementById('rebarUsNo').value);
+          // US weight: #3: 0.376, #4: 0.668, #5: 1.043, #6: 1.502, #7: 2.044, #8: 2.670, #9: 3.400, #10: 4.303, #11: 5.313 lb/ft
+          const usTable = {
+            3: 0.376, 4: 0.668, 5: 1.043, 6: 1.502, 7: 2.044, 8: 2.670, 9: 3.400, 10: 4.303, 11: 5.313
+          };
+          unitWeightLbFt = usTable[usNo] || 0.668;
+          unitWeightKgM = unitWeightLbFt * 1.48816; // 1 lb/ft = 1.48816 kg/m
+        } else {
+          const diaMm = parseFloat(document.getElementById('rebarDiaMm').value);
+          unitWeightKgM = (diaMm * diaMm) / 162.28;
+          unitWeightLbFt = unitWeightKgM * 0.671969;
+        }
+
+        const netLength = cutLen * qty;
+        const grossLength = netLength * (1.0 + wastePct / 100.0);
+        const totalMassKg = Math.round(grossLength * unitWeightKgM);
+        const totalMassLbs = Math.round(totalMassKg * 2.20462);
+        const tonnesMetric = totalMassKg / 1000.0;
+        const tonsUs = totalMassLbs / 2000.0;
+
+        const stockBarLen = isUs ? 40.0 : 12.0;
+        const fullStockBars = Math.ceil(grossLength / stockBarLen);
+        const estCost = Math.round(tonnesMetric * pricePerTon);
+
+        const lenFt = (grossLength * (isUs ? 1.0 : 3.28084)).toFixed(0);
+
+        document.getElementById('resTonnage').textContent = tonnesMetric.toFixed(3) + ` (~${tonsUs.toFixed(3)} US tons)`;
+        document.getElementById('resMassKg').textContent = totalMassKg.toLocaleString() + ` (~${totalMassLbs.toLocaleString()} lbs)`;
+        document.getElementById('resUnitWeight').textContent = unitWeightKgM.toFixed(3) + ` (~${unitWeightLbFt.toFixed(3)} lb/ft)`;
+        document.getElementById('resTotalLength').textContent = grossLength.toFixed(1) + ` m (~${lenFt} ft)`;
+        document.getElementById('resMillBars').textContent = fullStockBars.toLocaleString();
+        document.getElementById('resCost').textContent = '$' + estCost.toLocaleString();
+
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      calcBtn.addEventListener('click', calculateRebar);
+      resetBtn.addEventListener('click', function() {
+        resultBox.style.display = 'none';
+      });
+      calculateRebar();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Footing Size Calculator | Spread Footing &amp; Soil Bearing Sizer</title>
+  <meta name="description" content="Calculate concrete isolated spread footing dimensions, required plan area, ACI 318 two-way punching shear, and soil bearing capacity verification.">
+  <link rel="canonical" href="https://calchub.cloud/footing-size-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Footing Size Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates reinforced concrete isolated spread footing width, plan area, minimum structural depth, and two-way punching shear per ACI 318.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How is the required plan area of a spread footing calculated?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The required minimum plan area is computed by dividing total service vertical axial column load (Dead Load + Live Load + estimated self-weight of footing and soil surcharge) by allowable net soil bearing capacity: A_req = P_service / q_allow. For a square footing, the minimum width is B = sqrt(A_req)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between gross and net soil bearing capacity?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Gross bearing capacity represents the total pressure the subsoil can support at the foundation depth. Net allowable bearing capacity subtracts the weight of the soil overburden previously resting on the founding stratum: q_net = q_gross - (gamma_soil * D_f), allowing direct design using superimposed column loads."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does ACI 318 govern two-way punching shear in spread footings?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Punching shear is evaluated along a critical perimeter located at d/2 from the column face, where d is the effective depth of reinforcing steel. Concrete shear capacity without shear reinforcement is typically Vc = 4 * lambda * sqrt(f'c) * b0 * d (in psi) or 0.33 * lambda * sqrt(f'c) * b0 * d (in MPa)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the minimum recommended footing thickness per building codes?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Per ACI 318-19 Section 13.3.1.2, footings on soil must have a minimum effective depth above bottom reinforcement of not less than 6 inches (150 mm), with an overall minimum total thickness of 10 to 12 inches (250 to 300 mm) to provide required rebar clear cover (3 inches / 75 mm against earth)."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="civil">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html" class="active">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="civil.html">Civil &amp; Construction</a> &rsaquo; 
+      <span>Footing Size Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calculator-main">
+        <div class="calc-header">
+          <h1>Footing Size Calculator</h1>
+          <p>Dimension isolated spread footings, evaluate allowable soil bearing pressure, and verify ACI 318 two-way punching shear limits.</p>
+        </div>
+
+        <div class="calculator-card">
+          <form id="footingForm" onsubmit="return false;">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="deadLoad">Unfactored Dead Load, D (kN):</label>
+                <input type="number" id="deadLoad" value="450.0" step="10" min="0" required>
+                <span class="hint">Permanent column structural self-weight</span>
+              </div>
+              <div class="form-group">
+                <label for="liveLoad">Unfactored Live Load, L (kN):</label>
+                <input type="number" id="liveLoad" value="250.0" step="10" min="0" required>
+                <span class="hint">Occupancy and movable live loads</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="soilBearing">Allowable Soil Bearing Capacity, qₐ (kPa):</label>
+                <input type="number" id="soilBearing" value="200.0" step="10" min="50" max="1000" required>
+                <span class="hint">Net allowable bearing (e.g. 150-250 kPa for medium clay/sand)</span>
+              </div>
+              <div class="form-group">
+                <label for="footingSelfWeight">Footing Self-Weight Allowance (%):</label>
+                <input type="number" id="footingSelfWeight" value="10" step="1" min="5" max="20" required>
+                <span class="hint">Typically 8% to 12% of vertical column load</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="columnWidth">Column Cross-Section (mm):</label>
+                <input type="number" id="columnWidth" value="400" step="50" min="150" required>
+                <span class="hint">Square column side dimension c (mm)</span>
+              </div>
+              <div class="form-group">
+                <label for="concreteStrength">Concrete Compressive Strength, f'c (MPa):</label>
+                <select id="concreteStrength">
+                  <option value="20">20 MPa (C20/25 - Standard Footings)</option>
+                  <option value="25" selected>25 MPa (C25/30 - Standard Structural)</option>
+                  <option value="30">30 MPa (C30/37 - Heavy Foundations)</option>
+                  <option value="35">35 MPa (C35/45 - Commercial Grade)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="calcFootingBtn">Size Spread Footing</button>
+              <button type="reset" class="btn btn-secondary" id="resetFootingBtn">Reset</button>
+            </div>
+          </form>
+
+          <div class="results-box" id="footingResultBox" style="display:none; margin-top:25px;">
+            <h3>Structural Footing Dimensions &amp; Shear Evaluation</h3>
+            <div class="result-grid">
+              <div class="result-tile highlight">
+                <span class="result-label">Recommended Footing Width (B)</span>
+                <span class="result-value" id="resFootingWidth">0.00</span>
+                <span class="result-unit">meters (Square B &times; B)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Total Footing Plan Area</span>
+                <span class="result-value" id="resPlanArea">0.00</span>
+                <span class="result-unit">m² (square meters)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Minimum Effective Depth (d)</span>
+                <span class="result-value" id="resEffectiveDepth">0</span>
+                <span class="result-unit">mm (Punching Shear Limit)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Total Footing Thickness (H)</span>
+                <span class="result-value" id="resTotalDepth">0</span>
+                <span class="result-unit">mm (d + 75 mm cover)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Factored Soil Pressure (q_u)</span>
+                <span class="result-value" id="resFactoredPressure">0.0</span>
+                <span class="result-unit">kPa (1.2D + 1.6L ultimate)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Concrete Volume per Footing</span>
+                <span class="result-value" id="resConcreteVol">0.00</span>
+                <span class="result-unit">m³ (~0 cement bags)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Geotechnical Principles of Spread Footing Design</h2>
+          <p>
+            Shallow foundations transmit heavy superstructural loads—originating from multistory structural columns, shear walls, and bridge piers—safely into supporting soil or bedrock strata. An <strong>isolated spread footing</strong> (also termed a pad footing) is the most economical and widely deployed foundation system when competent bearing soils exist within shallow excavation depths ($1.0\text{ to }3.0\text{ meters}$).
+          </p>
+          <p>
+            Foundation design requires a coupled geotechnical-structural methodology governed by <strong>building codes (ACI 318, Eurocode 7, and IS 456)</strong>:
+          </p>
+          <ul>
+            <li><strong>Serviceability Limit State (Geotechnical Sizing):</strong> Footing plan dimensions ($B \times L$) are sized using unfactored service loads ($D + L$) to ensure the applied contact pressure does not exceed the allowable soil bearing capacity ($q_a$) or cause differential settlement exceeding $25\text{ mm}$ ($1.0\text{ inch}$).</li>
+            <li><strong>Strength Limit State (Structural Dimensioning):</strong> Footing thickness ($H$), effective depth ($d$), and steel reinforcement ($A_s$) are designed using factored ultimate load combinations ($U = 1.2 D + 1.6 L$ under ASCE 7 / ACI 318) to prevent catastrophic two-way punching shear and one-way flexural failure.</li>
+          </ul>
+
+          <h2>Service Sizing Formulation for Plan Area</h2>
+          <p>
+            Let $P_D$ and $P_L$ represent the unfactored dead and live axial column loads. Because the self-weight of the concrete footing ($W_f$) and the soil backfill surcharge ($W_s$) resting above it contribute to downward pressure, civil engineers budget an allowance of $8\%$ to $12\%$ of total vertical service load:
+          </p>
+          <div class="formula-box">
+            $$P_{service} = P_D + P_L$$
+            $$P_{total} = P_{service} \times (1 + \beta_{self}) \quad (\beta_{self} \approx 0.10)$$
+            $$A_{req} = \frac{P_{total}}{q_a}$$
+          </div>
+          <p>
+            For a standard square isolated footing of width $B$:
+          </p>
+          <div class="formula-box">
+            $$B = \sqrt{A_{req}} \implies B_{provided} = \lceil B \rceil \text{ rounded up to the nearest } 0.1\text{ meter}$$
+            $$A_{actual} = B_{provided}^2$$
+          </div>
+
+          <h2>Factored Ultimate Soil Contact Pressure ($q_u$)</h2>
+          <p>
+            Once the physical plan area $A_{actual}$ is fixed, structural design of the concrete pad proceeds using factored ultimate column loads:
+          </p>
+          <div class="formula-box">
+            $$P_u = 1.2 P_D + 1.6 P_L$$
+            $$q_u = \frac{P_u}{A_{actual}} = \frac{1.2 P_D + 1.6 P_L}{B_{provided}^2}$$
+          </div>
+          <p>
+            Notice that the self-weight of the footing is omitted when evaluating $q_u$ for shear and flexure, because footing mass exerts downward inertia that directly balances upward soil reaction, causing zero net bending stress in the slab.
+          </p>
+
+          <h2>ACI 318 Two-Way Punching Shear Mechanics</h2>
+          <p>
+            In reinforced concrete footings, <strong>two-way punching shear</strong> is universally the critical limit state dictating required slab depth. The concentrated column load attempts to punch a truncated pyramid-shaped concrete plug through the footing pad.
+          </p>
+          <p>
+            Per <strong>ACI 318-19 Section 22.6</strong>, the critical shear perimeter ($b_0$) is located at a distance of $d/2$ from the perimeter of the column face. For a square column with side dimension $c$:
+          </p>
+          <div class="formula-box">
+            $$b_0 = 4 \times (c + d)$$
+          </div>
+          <p>
+            The factored punching shear force ($V_{u2}$) acting on this critical perimeter is the upward soil pressure outside the tributary punching cone:
+          </p>
+          <div class="formula-box">
+            $$V_{u2} = q_u \times \left[ B_{provided}^2 - (c + d)^2 \right]$$
+          </div>
+          <p>
+            The nominal concrete punching shear strength ($V_c$) without shear reinforcement is governed by the minimum of three criteria:
+          </p>
+          <div class="formula-box">
+            $$V_c = \min \begin{cases} 
+            0.33 \lambda \sqrt{f'_c} \, b_0 d \\ 
+            0.17 \left(1 + \frac{2}{\beta}\right) \lambda \sqrt{f'_c} \, b_0 d \\ 
+            0.083 \left(\frac{\alpha_s d}{b_0} + 2\right) \lambda \sqrt{f'_c} \, b_0 d 
+            \end{cases} \quad (\text{SI units: MPa, mm, N})$$
+          </div>
+          <p>
+            Where $\beta = 1.0$ for square columns, $\alpha_s = 40$ for interior columns, and shear reduction factor is $\phi = 0.75$. Sizing effective depth $d$ such that $\phi V_c \ge V_{u2}$ eliminates the need for expensive, labor-intensive shear stirrups.
+          </p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Soil Classification</th>
+                <th>Standard Penetration Test (SPT N-Value)</th>
+                <th>Presumptive Bearing Capacity ($q_a$)</th>
+                <th>Typical Foundation Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Soft Silt / Cohesive Clay</td>
+                <td>N < 4</td>
+                <td>50 – 75 kPa (1,000 – 1,500 psf)</td>
+                <td>Deep piles or raft slab foundation</td>
+              </tr>
+              <tr>
+                <td>Firm Sandy Silt / Medium Clay</td>
+                <td>4 ≤ N ≤ 10</td>
+                <td>100 – 150 kPa (2,000 – 3,000 psf)</td>
+                <td>Wide spread pads or strip footings</td>
+              </tr>
+              <tr>
+                <td>Stiff Clay / Medium Dense Sand</td>
+                <td>10 ≤ N ≤ 30</td>
+                <td>200 – 300 kPa (4,000 – 6,000 psf)</td>
+                <td>Standard isolated spread footings</td>
+              </tr>
+              <tr>
+                <td>Very Dense Gravelly Sand / Hard Clay</td>
+                <td>30 ≤ N ≤ 50</td>
+                <td>350 – 500 kPa (7,000 – 10,000 psf)</td>
+                <td>Compact isolated spread pads</td>
+              </tr>
+              <tr>
+                <td>Sound Sedimentary / Crystalline Bedrock</td>
+                <td>N > 50 (Refusal)</td>
+                <td>1,000 – 4,000 kPa (20,000+ psf)</td>
+                <td>High-capacity rock bearing sockets</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Case Study: Sizing an Interior Column Spread Footing</h3>
+            <p><strong>Design Scenario:</strong> A five-story commercial office building has an interior reinforced concrete column ($c = 450\text{ mm} \times 450\text{ mm}$) carrying an unfactored axial dead load of $P_D = 600\text{ kN}$ and an unfactored occupancy live load of $P_L = 350\text{ kN}$. Geotechnical site boreholes establish an allowable net soil bearing capacity of $q_a = 220\text{ kPa}$ at a founding depth of $D_f = 1.8\text{ meters}$. Structural concrete compressive strength is $f'_c = 25\text{ MPa}$ ($25\text{ N/mm}^2$), and steel yield strength is $F_y = 420\text{ MPa}$. Determine the required square footing width ($B$), factored soil contact pressure ($q_u$), minimum effective depth ($d$) for punching shear, total pad thickness ($H$), and concrete batch volume.</p>
+            
+            <p><strong>Step 1: Compute Service Loads and Required Plan Area ($A_{req}$)</strong></p>
+            <div class="formula-box">
+              $$P_{service} = P_D + P_L = 600\text{ kN} + 350\text{ kN} = 950\text{ kN}$$
+              $$P_{total} = P_{service} \times 1.10 = 950\text{ kN} \times 1.10 = 1,045\text{ kN}$$
+              $$A_{req} = \frac{P_{total}}{q_a} = \frac{1,045\text{ kN}}{220\text{ kPa}} = 4.75\text{ m}^2$$
+              $$B = \sqrt{4.75} \approx 2.18\text{ m} \implies \text{Adopt } B = \mathbf{2.20\text{ meters}}$$
+              $$A_{actual} = (2.20\text{ m})^2 = 4.84\text{ m}^2$$
+            </div>
+
+            <p><strong>Step 2: Calculate Factored Ultimate Soil Pressure ($q_u$)</strong></p>
+            <div class="formula-box">
+              $$P_u = 1.2 P_D + 1.6 P_L = 1.2(600) + 1.6(350) = 720 + 560 = 1,280\text{ kN}$$
+              $$q_u = \frac{P_u}{A_{actual}} = \frac{1,280\text{ kN}}{4.84\text{ m}^2} = \mathbf{264.46\text{ kPa}} \quad (0.2645\text{ N/mm}^2)$$
+            </div>
+
+            <p><strong>Step 3: Evaluate Two-Way Punching Shear and Determine Effective Depth ($d$)</strong></p>
+            <p>Assuming an effective depth of $d = 400\text{ mm}$:</p>
+            <div class="formula-box">
+              $$b_0 = 4 \times (c + d) = 4 \times (450 + 400) = 3,400\text{ mm}$$
+              $$V_{u2} = q_u \times [B^2 - (c + d)^2] = 264.46 \times [4.84 - (0.85)^2] = 264.46 \times [4.84 - 0.7225] = \mathbf{1,088.9\text{ kN}}$$
+              $$\phi V_c = 0.75 \times 0.33 \times \sqrt{25} \times 3,400 \times 400 = 0.75 \times 0.33 \times 5 \times 1.36 \times 10^6 \approx \mathbf{1,683\text{ kN}}$$
+            </div>
+            <p>
+              Since $\phi V_c = 1,683\text{ kN} > V_{u2} = 1,088.9\text{ kN}$, $d = 400\text{ mm}$ provides ample punching shear capacity (safety margin $1.55$).
+            </p>
+
+            <p><strong>Step 4: Determine Overall Footing Thickness and Concrete Volume</strong></p>
+            <div class="formula-box">
+              $$H = d + \text{Clear Cover} + d_b = 400\text{ mm} + 75\text{ mm} + 20\text{ mm} \approx \mathbf{500\text{ mm}} \ (0.50\text{ m})$$
+              $$V_{concrete} = B^2 \times H = 2.20\text{ m} \times 2.20\text{ m} \times 0.50\text{ m} = \mathbf{2.42\text{ m}^3}$$
+            </div>
+            <p>
+              <strong>Engineering Conclusion:</strong> Sizing the footing pad at <strong>$2.20\text{ m} \times 2.20\text{ m} \times 0.50\text{ m}$</strong> ($2.42\text{ m}^3$ of $25\text{ MPa}$ concrete) completely satisfies both geotechnical bearing limits ($q_{max} \le 220\text{ kPa}$) and ACI 318 punching shear safety criteria.
+            </p>
+          </div>
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏗️</span>
+            <h3 class="widget-title">Related Civil & Construction</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="brick-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Brick & Masonry Calculator</a></li>
+            <li><a href="asphalt-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Asphalt Paving & Tonnage</a></li>
+            <li><a href="beam-deflection-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Deflection & Moments</a></li>
+            <li><a href="retaining-wall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Retaining Wall Stability</a></li>
+            <li><a href="concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Slab, Footing & Column</a></li>
+            <li><a href="rebar-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rebar Weight & Grid Spacing</a></li>
+            <li><a href="rainwater-downpipe-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rainwater Downpipe Sizing</a></li>
+            <li><a href="beam-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Bending Moment & Shear</a></li>
+            <li><a href="block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Block Masonry Estimator</a></li>
+            <li><a href="concrete-block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Block Calculator</a></li>
+            <li><a href="concrete-mix-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Mix Ratio</a></li>
+            <li><a href="drywall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Drywall Sheets, Mud & Tape</a></li>
+            <li><a href="excavation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation & Earthwork Haul</a></li>
+            <li><a href="excavation-volume-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation Volume Calculator</a></li>
+            <li><a href="flooring-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Flooring Area & Box Estimator</a></li>
+            <li><a href="footing-size-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Footing Size & Soil Bearing</a></li>
+            <li><a href="gravel-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Gravel & Aggregate Estimator</a></li>
+            <li><a href="paint-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Paint Gallon & Coverage</a></li>
+            <li><a href="rebar-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rebar Weight & Tonnage</a></li>
+            <li><a href="roof-pitch-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Roof Pitch & Rafter Length</a></li>
+            <li><a href="slab-concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Slab Concrete Volume</a></li>
+            <li><a href="slope-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Slope & Grade Calculator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="civil.html" class="sidebar-category-link">View All Civil & Construction Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>High-precision professional engineering and scientific calculation engines.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Directories</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="civil.html">Civil &amp; Construction</a></li>
+          <li><a href="mechanical.html">Mechanical Engineering</a></li>
+          <li><a href="engineering.html">Civil &amp; Structural</a></li>
+          <li><a href="sitemap.xml">XML Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 CalcHub. Standard Engineering Reference Systems.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calcBtn = document.getElementById('calcFootingBtn');
+      const resetBtn = document.getElementById('resetFootingBtn');
+      const resultBox = document.getElementById('footingResultBox');
+
+      function calculateFooting() {
+        const D = parseFloat(document.getElementById('deadLoad').value);
+        const L = parseFloat(document.getElementById('liveLoad').value);
+        const qa = parseFloat(document.getElementById('soilBearing').value);
+        const selfPct = parseFloat(document.getElementById('footingSelfWeight').value) || 10;
+        const c_mm = parseFloat(document.getElementById('columnWidth').value);
+        const fc = parseFloat(document.getElementById('concreteStrength').value);
+
+        if (isNaN(D) || D < 0 || isNaN(L) || L < 0 || isNaN(qa) || qa <= 0 || isNaN(c_mm) || c_mm <= 0) {
+          alert('Please enter valid positive values for loads, soil bearing, and column dimensions.');
+          return;
+        }
+
+        const P_service = D + L;
+        const P_total = P_service * (1.0 + selfPct / 100.0);
+        const A_req = P_total / qa;
+        let B = Math.sqrt(A_req);
+        B = Math.ceil(B * 10.0) / 10.0; // round up to nearest 0.1m
+        const A_actual = B * B;
+
+        const Pu = 1.2 * D + 1.6 * L;
+        const qu = Pu / A_actual; // kPa (kN/m2)
+
+        // Iterative punching shear depth d: phi*Vc >= Vu2
+        // SI: phi*0.33*sqrt(fc)*b0*d >= qu * [B^2 - (c+d)^2]
+        // where b0 = 4*(c+d)
+        let d = 250.0; // start at 250mm
+        const c_m = c_mm / 1000.0;
+        const phi = 0.75;
+        const sqrtFc = Math.sqrt(fc);
+
+        for (let iter = 0; iter < 100; iter++) {
+          const d_m = d / 1000.0;
+          const b0_mm = 4.0 * (c_mm + d);
+          const Vu2_kN = qu * (A_actual - Math.pow(c_m + d_m, 2));
+          // phi * Vc (in kN)
+          const phiVc_kN = (phi * 0.33 * sqrtFc * b0_mm * d) / 1000.0;
+
+          if (phiVc_kN >= Vu2_kN) {
+            break;
+          }
+          d += 10.0;
+        }
+
+        const H_mm = Math.ceil((d + 75.0 + 20.0) / 50.0) * 50.0; // round up to 50mm increment
+        const H_m = H_mm / 1000.0;
+        const concreteVol = B * B * H_m;
+
+        document.getElementById('resFootingWidth').textContent = B.toFixed(2);
+        document.getElementById('resPlanArea').textContent = A_actual.toFixed(2);
+        document.getElementById('resEffectiveDepth').textContent = Math.round(d);
+        document.getElementById('resTotalDepth').textContent = Math.round(H_mm);
+        document.getElementById('resFactoredPressure').textContent = qu.toFixed(1);
+        document.getElementById('resConcreteVol').textContent = concreteVol.toFixed(2);
+
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      calcBtn.addEventListener('click', calculateFooting);
+      resetBtn.addEventListener('click', function() {
+        resultBox.style.display = 'none';
+      });
+      calculateFooting();
+    });
+  </script>
+</body>
+</html>

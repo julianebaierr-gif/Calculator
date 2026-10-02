@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roof Pitch Calculator | Slope Angle, Rise &amp; Run, Rafter Length</title>
+  <meta name="description" content="Calculate roof pitch (X:12), slope angle in degrees, pitch multiplier factor, true rafter length, and roofing material compatibility per IBC &amp; IRC.">
+  <link rel="canonical" href="https://calchub.cloud/roof-pitch-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Roof Pitch Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates roof pitch ratio (X:12), slope angle in degrees, rafter length, and pitch multiplier per IRC Chapter 9.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What does a 6:12 roof pitch mean?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A 6:12 roof pitch means that the roof surface rises 6 inches vertically for every 12 inches (1 foot) of horizontal run. This corresponds to a slope angle of approximately 26.57 degrees and a pitch multiplier factor of 1.118."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the formula to convert roof pitch to degrees?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The angle in degrees is calculated using the arctangent function: Angle (degrees) = arctan(Rise / Run) * (180 / π). For example, for an 8:12 pitch: arctan(8 / 12) = arctan(0.6667) ≈ 33.69 degrees."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is a roof pitch multiplier factor?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The roof pitch multiplier is the secant of the roof angle: Multiplier = sqrt(1 + (Rise/Run)²) = sqrt(Rise² + 12²) / 12. Multiplying the horizontal flat footprint area of a house by this factor yields the true inclined surface area of the roof."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the minimum roof pitch for standard asphalt shingles?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Under International Residential Code (IRC R905.2.2), asphalt shingles require a minimum slope of 2:12 (9.46°). Slopes between 2:12 and 4:12 require double layers of underlayment, while standard single underlayment is permitted on 4:12 (18.43°) and steeper."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="civil">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html" class="active">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="civil.html">Civil &amp; Construction</a> &rsaquo; 
+      <span>Roof Pitch Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calculator-main">
+        <div class="calc-header">
+          <h1>Roof Pitch Calculator</h1>
+          <p>Compute roof pitch ratio (X:12), slope angle in degrees, pitch multiplier factor, and true rafter lengths per IRC Chapter 9.</p>
+        </div>
+
+        <div class="calculator-card">
+          <form id="pitchForm" onsubmit="return false;">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="inputMethod">Pitch Input Mode:</label>
+                <select id="inputMethod">
+                  <option value="riseRun" selected>Enter Vertical Rise &amp; Horizontal Run</option>
+                  <option value="pitchRatio">Select Standard Pitch (X : 12)</option>
+                  <option value="degrees">Enter Slope Angle (Degrees)</option>
+                </select>
+              </div>
+              <div class="form-group" id="grpPitchSelect" style="display:none;">
+                <label for="pitchSelect">Standard Pitch (X:12):</label>
+                <select id="pitchSelect">
+                  <option value="2">2:12 (9.46°) - Low Slope Commercial</option>
+                  <option value="3">3:12 (14.04°) - Low Slope Residential</option>
+                  <option value="4">4:12 (18.43°) - Standard Ranch Style</option>
+                  <option value="5">5:12 (22.62°) - Conventional Residential</option>
+                  <option value="6" selected>6:12 (26.57°) - Most Common Gable</option>
+                  <option value="7">7:12 (30.26°) - Moderate Slope</option>
+                  <option value="8">8:12 (33.69°) - Traditional Colonial</option>
+                  <option value="9">9:12 (36.87°) - Cape Cod Style</option>
+                  <option value="10">10:12 (39.81°) - Steep Pitch</option>
+                  <option value="12">12:12 (45.00°) - 45-Degree A-Frame</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row" id="rowRiseRun">
+              <div class="form-group">
+                <label for="roofRise">Vertical Rise (inches or mm):</label>
+                <input type="number" id="roofRise" value="6.0" step="0.25" min="0.1" required>
+                <span class="hint">Vertical height gain</span>
+              </div>
+              <div class="form-group">
+                <label for="roofRun">Horizontal Run (inches or mm):</label>
+                <input type="number" id="roofRun" value="12.0" step="0.5" min="1.0" required>
+                <span class="hint">Standard reference run: 12 inches</span>
+              </div>
+            </div>
+
+            <div class="form-row" id="rowDegrees" style="display:none;">
+              <div class="form-group">
+                <label for="roofAngleDeg">Roof Angle (degrees):</label>
+                <input type="number" id="roofAngleDeg" value="26.57" step="0.1" min="1" max="85">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="buildingSpan">Building Half-Span (Run in feet):</label>
+                <input type="number" id="buildingSpan" value="16.0" step="0.5" min="1" required>
+                <span class="hint">Distance from exterior wall plate to ridge centerline</span>
+              </div>
+              <div class="form-group">
+                <label for="eaveOverhang">Eave Overhang (inches):</label>
+                <input type="number" id="eaveOverhang" value="18" step="1" min="0" required>
+                <span class="hint">Horizontal tail overhang beyond wall</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="calcPitchBtn">Calculate Roof Pitch</button>
+              <button type="reset" class="btn btn-secondary" id="resetPitchBtn">Reset</button>
+            </div>
+          </form>
+
+          <div class="results-box" id="pitchResultBox" style="display:none; margin-top:25px;">
+            <h3>Roof Slope Geometry &amp; Rafter Lengths</h3>
+            <div class="result-grid">
+              <div class="result-tile highlight">
+                <span class="result-label">Pitch Ratio (X : 12)</span>
+                <span class="result-value" id="resPitchRatio">6.0 : 12</span>
+                <span class="result-unit">Inches of Rise per Foot</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Roof Slope Angle (&theta;)</span>
+                <span class="result-value" id="resAngleDeg">26.57°</span>
+                <span class="result-unit">Degrees from Horizontal</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Pitch Multiplier Factor</span>
+                <span class="result-value" id="resMultiplier">1.1180</span>
+                <span class="result-unit">Surface Area Multiplier</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">True Rafter Length</span>
+                <span class="result-value" id="resRafterLen">0.0 ft</span>
+                <span class="result-unit">Plate to Ridge (~0.0 m)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Rafter with Overhang</span>
+                <span class="result-value" id="resTotalRafter">0.0 ft</span>
+                <span class="result-unit">Total Lumber Cut Length</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Grade Percentage (%)</span>
+                <span class="result-value" id="resGradePct">50.0%</span>
+                <span class="result-unit">Slope Gradient (Rise/Run)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Roof Pitch Geometry &amp; Architectural Terminology</h2>
+          <p>
+            Roof pitch is the numerical measure of the steepness, incline, or slope of a roof structural plane. In architectural drafting, civil carpentry, and structural engineering, pitch dictates rain runoff velocity, snow load accumulation, wind uplift pressures, attic ventilation volume, and building envelope waterproofing requirements.
+          </p>
+          <p>
+            Across North America, roof slope is universally expressed as a ratio of <strong>inches of vertical rise per 12 inches (1 foot) of horizontal run</strong>, written as $X:12$ or $X/12$. In European and international practice, roof incline is specified either as an angle in degrees ($\theta$) or as a percentage gradient ($\%$).
+          </p>
+
+          <h2>Mathematical Formulation: Pitch, Angle &amp; Multiplier</h2>
+          <p>
+            Given a vertical rise ($\Delta y$) and horizontal run ($\Delta x$):
+          </p>
+          <div class="formula-box">
+            $$\text{Pitch Ratio } X = 12 \times \left(\frac{\Delta y}{\Delta x}\right)$$
+            $$\text{Slope Angle } \theta = \arctan\left(\frac{\Delta y}{\Delta x}\right) \times \left(\frac{180}{\pi}\right)$$
+            $$\text{Gradient Percentage } \% = \left(\frac{\Delta y}{\Delta x}\right) \times 100$$
+          </div>
+          <p>
+            The <strong>Roof Pitch Multiplier (Secant Factor)</strong> converts two-dimensional horizontal building footprint area into actual three-dimensional inclined roof plane area:
+          </p>
+          <div class="formula-box">
+            $$\text{Multiplier } M = \sec \theta = \frac{1}{\cos \theta} = \sqrt{1 + \left(\frac{X}{12}\right)^2} = \frac{\sqrt{X^2 + 144}}{12}$$
+            $$\text{True Incline Surface Area} = \text{Horizontal Plan Footprint Area} \times M$$
+          </div>
+
+          <h2>Rafter Length Calculations per Pythagoras</h2>
+          <p>
+            For a common gable rafter spanning from the exterior wall top-plate to the central ridge beam over a horizontal half-span $S$:
+          </p>
+          <div class="formula-box">
+            $$L_{span\_rafter} = S \times M = S \times \sqrt{1 + \left(\frac{X}{12}\right)^2}$$
+          </div>
+          <p>
+            When adding a horizontal eave overhang $O_{in}$ (in inches, $O_{ft} = O_{in} / 12$):
+          </p>
+          <div class="formula-box">
+            $$L_{overhang\_rafter} = O_{ft} \times M$$
+            $$L_{total\_rafter} = L_{span\_rafter} + L_{overhang\_rafter} = (S + O_{ft}) \times M$$
+          </div>
+
+          <h2>Roofing Material Suitability per IRC Chapter 9</h2>
+          <p>
+            Building codes enforce minimum pitch thresholds to prevent wind-driven rain penetration:
+          </p>
+          <ul>
+            <li><strong>Flat / Low-Slope Roofs ($< 2:12$ / $< 9.5^\circ$):</strong> Prohibited for asphalt shingles. Requires continuous sealed membrane roofing systems: EPDM rubber, TPO, PVC, or modified bitumen torch-down per IRC R905.9.</li>
+            <li><strong>Low-Pitch Shingle Roofs ($2:12 \le \text{Pitch} < 4:12$):</strong> Permitted for asphalt shingles <em>only</em> if installed over two complete layers of ASTM D226 Type I asphalt-saturated organic felt underlayment, or continuous ice-and-water peel-and-stick membrane per IRC R905.2.2.</li>
+            <li><strong>Conventional Slope ($4:12 \le \text{Pitch} \le 8:12$):</strong> The universal standard for residential gables, hips, and mansards. Standard single-ply synthetic underlayment with architectural dimensional shingles.</li>
+            <li><strong>Steep-Slope Roofs ($> 9:12$ / $> 37^\circ$):</strong> Rapid shedding of precipitation and heavy snow. Ideal for natural slate, cedar shakes, standing-seam copper, and clay Spanish barrel tiles. Requires specialized high-nailing patterns (6 nails per shingle) for wind resistance up to $130\text{ mph}$.</li>
+          </ul>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Pitch Ratio</th>
+                <th>Slope Angle (&theta;)</th>
+                <th>Pitch Multiplier</th>
+                <th>Grade %</th>
+                <th>Primary Building Style &amp; Suitability</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2:12</td>
+                <td>9.46°</td>
+                <td>1.0138</td>
+                <td>16.67%</td>
+                <td>Commercial flat transitions, low-slope metal seams</td>
+              </tr>
+              <tr>
+                <td>3:12</td>
+                <td>14.04°</td>
+                <td>1.0308</td>
+                <td>25.00%</td>
+                <td>Modern ranch extensions, double-felt shingles</td>
+              </tr>
+              <tr>
+                <td>4:12</td>
+                <td>18.43°</td>
+                <td>1.0541</td>
+                <td>33.33%</td>
+                <td>Standard ranch homes, single underlayment threshold</td>
+              </tr>
+              <tr>
+                <td>6:12</td>
+                <td>26.57°</td>
+                <td>1.1180</td>
+                <td>50.00%</td>
+                <td>Most popular residential gable &amp; hip pitch</td>
+              </tr>
+              <tr>
+                <td>8:12</td>
+                <td>33.69°</td>
+                <td>1.2019</td>
+                <td>66.67%</td>
+                <td>Classic Colonial, Cape Cod, enhanced attic storage</td>
+              </tr>
+              <tr>
+                <td>10:12</td>
+                <td>39.81°</td>
+                <td>1.3017</td>
+                <td>83.33%</td>
+                <td>Tudor architectural, dramatic snow shedding</td>
+              </tr>
+              <tr>
+                <td>12:12</td>
+                <td>45.00°</td>
+                <td>1.4142</td>
+                <td>100.00%</td>
+                <td>Symmetric A-frame, equilateral triangular gables</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Roof Truss Engineering, Wind Uplift Pressures &amp; Snow Load Reductions (ASCE 7)</h2>
+          <p>
+            Roof slope fundamentally alters the environmental aerodynamic and meteorological forces acting on a structural frame. Under <strong>ASCE 7 Minimum Design Loads and Associated Criteria for Buildings and Other Structures</strong>, roof pitch directly modulates both design wind pressures ($p = q_h G C_p$) and balanced ground snow load conversion factors ($C_s$).
+          </p>
+          <p>
+            <strong>Aerodynamic Wind Uplift Behavior:</strong>
+          </p>
+          <ul>
+            <li><strong>Low-Pitch Roofs ($\theta < 10^\circ$ / $< 2:12$):</strong> The entire roof surface acts as an aircraft wing airfoil subjected to severe net vertical suction (negative external pressure coefficient $C_p$ reaching $-0.9$ to $-1.3$ in perimeter and corner zones), demanding engineered hurricane metal ties at every rafter-to-wall plate connection.</li>
+            <li><strong>Medium-Pitch Roofs ($10^\circ \le \theta \le 30^\circ$ / $2:12\text{ to }7:12$):</strong> Windward roof planes transition between net uplift and positive downward wind pressure depending on building enclosure classification.</li>
+            <li><strong>Steep-Pitch Roofs ($\theta > 30^\circ$ / $> 7:12$):</strong> The windward slope experiences direct positive stagnation pressure acting downward, increasing vertical loads while sheltering the leeward plane in turbulent wake suction.</li>
+          </ul>
+          <p>
+            <strong>Snow Load Slope Factor ($C_s$):</strong> On heated structures with slippery standing seam metal surfaces, snow slides off spontaneously at steep angles. ASCE 7 permits reduction of roof snow load ($p_s = C_s p_f$) where the slope factor drops from $C_s = 1.0$ at $\theta = 15^\circ$ down to $C_s = 0$ (zero design snow load) at angles exceeding $70^\circ$.
+          </p>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Case Study: Framing a Residential 6:12 Gable Rafter</h3>
+            <p><strong>Design Scenario:</strong> A timber residential home has an exterior building clear span of $32.0\text{ feet}$ (giving a half-span run of $S = 16.0\text{ feet}$ to the central ridge board). The architectural plans specify a <strong>6:12 pitch</strong> with an exterior horizontal eave overhang of $O = 18\text{ inches}$ ($1.5\text{ feet}$). Calculate the slope angle in degrees, the roof pitch multiplier factor, the theoretical rafter line length from wall plate to ridge, the total lumber cut length including eave overhang, and total true roof area if the building is $40.0\text{ feet}$ long.</p>
+            
+            <p><strong>Step 1: Compute Slope Angle (&theta;) and Pitch Multiplier ($M$)</strong></p>
+            <div class="formula-box">
+              $$\theta = \arctan\left(\frac{6}{12}\right) = \arctan(0.50) \approx \mathbf{26.57^\circ}$$
+              $$M = \sqrt{1 + (6/12)^2} = \sqrt{1 + 0.25} = \sqrt{1.25} \approx \mathbf{1.11803}$$
+            </div>
+
+            <p><strong>Step 2: Calculate Line Rafter Length (Wall Plate to Ridge)</strong></p>
+            <div class="formula-box">
+              $$L_{span\_rafter} = S \times M = 16.0\text{ ft} \times 1.11803 = \mathbf{17.89\text{ feet}} \quad (17\text{ ft } 10\frac{11}{16}\text{ in} \approx 5.45\text{ m})$$
+            </div>
+
+            <p><strong>Step 3: Calculate Total Rafter Length Including Eave Overhang</strong></p>
+            <div class="formula-box">
+              $$S_{total} = S + O_{ft} = 16.0\text{ ft} + 1.5\text{ ft} = 17.5\text{ ft}$$
+              $$L_{total\_rafter} = 17.5\text{ ft} \times 1.11803 = \mathbf{19.57\text{ feet}} \quad (19\text{ ft } 6\frac{13}{16}\text{ in} \approx 5.96\text{ m})$$
+            </div>
+            <p>The framer will specify standard $20\text{-foot}$ $2\times 8$ or $2\times 10$ lumber for the rafters.</p>
+
+            <p><strong>Step 4: Compute True Inclined Roofing Shingle Area</strong></p>
+            <div class="formula-box">
+              $$A_{horizontal} = (32.0\text{ ft} + 2 \times 1.5\text{ ft}) \times (40.0\text{ ft} + 2 \times 1.0\text{ ft rake}) = 35.0\text{ ft} \times 42.0\text{ ft} = 1,470\text{ sq ft}$$
+              $$A_{true\_roof} = A_{horizontal} \times M = 1,470\text{ sq ft} \times 1.11803 = \mathbf{1,643.5\text{ sq ft}} \quad (\approx 16.44\text{ Roofing Squares})$$
+            </div>
+            <p>
+              <strong>Carpentry Summary:</strong> Rafter stock requires ordering <strong>$20\text{-foot}$ dimensional lumber</strong> to yield the $19.57\text{ ft}$ finished cut length, and ordering <strong>$17\text{ squares}$</strong> of architectural asphalt shingles.
+            </p>
+          </div>
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏗️</span>
+            <h3 class="widget-title">Related Civil & Construction</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="brick-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Brick & Masonry Calculator</a></li>
+            <li><a href="asphalt-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Asphalt Paving & Tonnage</a></li>
+            <li><a href="beam-deflection-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Deflection & Moments</a></li>
+            <li><a href="retaining-wall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Retaining Wall Stability</a></li>
+            <li><a href="concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Slab, Footing & Column</a></li>
+            <li><a href="rebar-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rebar Weight & Grid Spacing</a></li>
+            <li><a href="rainwater-downpipe-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rainwater Downpipe Sizing</a></li>
+            <li><a href="beam-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Bending Moment & Shear</a></li>
+            <li><a href="block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Block Masonry Estimator</a></li>
+            <li><a href="concrete-block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Block Calculator</a></li>
+            <li><a href="concrete-mix-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Mix Ratio</a></li>
+            <li><a href="drywall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Drywall Sheets, Mud & Tape</a></li>
+            <li><a href="excavation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation & Earthwork Haul</a></li>
+            <li><a href="excavation-volume-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation Volume Calculator</a></li>
+            <li><a href="flooring-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Flooring Area & Box Estimator</a></li>
+            <li><a href="footing-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Footing Size & Soil Bearing</a></li>
+            <li><a href="gravel-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Gravel & Aggregate Estimator</a></li>
+            <li><a href="paint-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Paint Gallon & Coverage</a></li>
+            <li><a href="rebar-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rebar Weight & Tonnage</a></li>
+            <li><a href="roof-pitch-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Roof Pitch & Rafter Length</a></li>
+            <li><a href="slab-concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Slab Concrete Volume</a></li>
+            <li><a href="slope-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Slope & Grade Calculator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="civil.html" class="sidebar-category-link">View All Civil & Construction Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>High-precision professional engineering and scientific calculation engines.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Directories</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="civil.html">Civil &amp; Construction</a></li>
+          <li><a href="mechanical.html">Mechanical Engineering</a></li>
+          <li><a href="engineering.html">Civil &amp; Structural</a></li>
+          <li><a href="sitemap.xml">XML Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 CalcHub. Standard Engineering Reference Systems.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calcBtn = document.getElementById('calcPitchBtn');
+      const resetBtn = document.getElementById('resetPitchBtn');
+      const resultBox = document.getElementById('pitchResultBox');
+      const methodSelect = document.getElementById('inputMethod');
+      const rowRiseRun = document.getElementById('rowRiseRun');
+      const grpPitch = document.getElementById('grpPitchSelect');
+      const rowDeg = document.getElementById('rowDegrees');
+
+      methodSelect.addEventListener('change', function() {
+        const val = this.value;
+        rowRiseRun.style.display = (val === 'riseRun') ? 'flex' : 'none';
+        grpPitch.style.display = (val === 'pitchRatio') ? 'block' : 'none';
+        rowDeg.style.display = (val === 'degrees') ? 'flex' : 'none';
+      });
+
+      function calculatePitch() {
+        const method = methodSelect.value;
+        const halfSpanFt = parseFloat(document.getElementById('buildingSpan').value);
+        const overhangIn = parseFloat(document.getElementById('eaveOverhang').value) || 0;
+
+        if (isNaN(halfSpanFt) || halfSpanFt <= 0) {
+          alert('Please enter a valid positive building span.');
+          return;
+        }
+
+        let rise = 6.0;
+        let run = 12.0;
+
+        if (method === 'riseRun') {
+          rise = parseFloat(document.getElementById('roofRise').value);
+          run = parseFloat(document.getElementById('roofRun').value);
+          if (isNaN(rise) || rise <= 0 || isNaN(run) || run <= 0) {
+            alert('Please enter valid positive numbers for rise and run.');
+            return;
+          }
+        } else if (method === 'pitchRatio') {
+          rise = parseFloat(document.getElementById('pitchSelect').value);
+          run = 12.0;
+        } else if (method === 'degrees') {
+          const deg = parseFloat(document.getElementById('roofAngleDeg').value);
+          if (isNaN(deg) || deg <= 0 || deg >= 90) {
+            alert('Please enter a valid angle between 1° and 89°.');
+            return;
+          }
+          const rad = deg * (Math.PI / 180.0);
+          run = 12.0;
+          rise = 12.0 * Math.tan(rad);
+        }
+
+        const pitchX = (rise / run) * 12.0;
+        const angleRad = Math.atan(rise / run);
+        const angleDeg = angleRad * (180.0 / Math.PI);
+        const multiplier = Math.sqrt(1.0 + Math.pow(rise / run, 2));
+        const gradePct = (rise / run) * 100.0;
+
+        const rafterSpanFt = halfSpanFt * multiplier;
+        const overhangFt = overhangIn / 12.0;
+        const rafterTotalFt = (halfSpanFt + overhangFt) * multiplier;
+
+        const rafterSpanM = (rafterSpanFt * 0.3048).toFixed(2);
+        const rafterTotalM = (rafterTotalFt * 0.3048).toFixed(2);
+
+        document.getElementById('resPitchRatio').textContent = pitchX.toFixed(2) + ' : 12';
+        document.getElementById('resAngleDeg').textContent = angleDeg.toFixed(2) + '°';
+        document.getElementById('resMultiplier').textContent = multiplier.toFixed(4);
+        document.getElementById('resRafterLen').textContent = rafterSpanFt.toFixed(2) + ` ft (~${rafterSpanM} m)`;
+        document.getElementById('resTotalRafter').textContent = rafterTotalFt.toFixed(2) + ` ft (~${rafterTotalM} m)`;
+        document.getElementById('resGradePct').textContent = gradePct.toFixed(1) + '%';
+
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      calcBtn.addEventListener('click', calculatePitch);
+      resetBtn.addEventListener('click', function() {
+        resultBox.style.display = 'none';
+        methodSelect.value = 'riseRun';
+        rowRiseRun.style.display = 'flex';
+        grpPitch.style.display = 'none';
+        rowDeg.style.display = 'none';
+      });
+      calculatePitch();
+    });
+  </script>
+</body>
+</html>

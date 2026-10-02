@@ -150,6 +150,7 @@ CATEGORIES = {
             ("thermal-expansion-calculator.html", "Thermal Expansion & Pipe Stress", "🌡️", "Linear growth ΔL, volumetric ΔV & ASME loop leg"),
             ("torque-converter.html", "Torque Converter Sizing (SAE J643)", "🚗", "Stall torque ratio, speed ratio & K-factor"),
             ("torque-to-hp-calculator.html", "Torque to HP & BMEP Converter", "🏎️", "Brake horsepower, kilowatts & 4-stroke BMEP"),
+            ("projectile-motion-calculator.html", "Projectile Motion Trajectory", "🚀", "Apex height, time of flight, range & impact velocity"),
         ]
     },
     "civil": {
@@ -172,6 +173,13 @@ CATEGORIES = {
             ("excavation-calculator.html", "Excavation & Earthwork Haul", "🚜", "OSHA 1926 bank vs loose cubic yards & haul fleet"),
             ("excavation-volume-calculator.html", "Excavation Volume Calculator", "📐", "Prismoidal formula & trapezoidal trench slopes"),
             ("flooring-calculator.html", "Flooring Area & Box Estimator", "🪵", "NWFA hardwood, LVP & tile carton boxes & underlay"),
+            ("footing-size-calculator.html", "Footing Size & Soil Bearing", "🏛️", "Pad width B, contact pressure & two-way punching shear"),
+            ("gravel-calculator.html", "Gravel & Aggregate Estimator", "🪨", "Tonnage, cubic meters/yards & compaction allowance"),
+            ("paint-calculator.html", "Paint Gallon & Coverage", "🎨", "Wall & ceiling gallons, liters, primer & fenestrations"),
+            ("rebar-weight-calculator.html", "Rebar Weight & Tonnage", "🔩", "Metric kg/m d²/162, US lb/ft #²/24 & BBS bundles"),
+            ("roof-pitch-calculator.html", "Roof Pitch & Rafter Length", "🏠", "Pitch X:12, slope angle, area multiplier & rafter length"),
+            ("slab-concrete-calculator.html", "Slab Concrete Volume", "🏗️", "Slab-on-grade, thickened edge footings & saw-cut joints"),
+            ("slope-calculator.html", "Slope & Grade Calculator", "📐", "Rise/run gradient, % grade, angle & ADA ramp 1:12 compliance"),
         ]
     },
     "chemical": {
@@ -247,9 +255,9 @@ def determine_tool_cat(filename):
         return "engineering"
     if any(k in f for k in ["solar", "charging", "pv-string", "ev-charging"]):
         return "solar"
-    if any(k in f for k in ["cooling", "pipe", "torque", "pump-head", "gear-ratio", "bolt-torque", "bearing-life", "belt-length", "conveyor-belt", "cutting-speed", "feed-rate", "flywheel", "gear-module", "heat-exchanger", "hvac", "hydraulic-cylinder", "hydraulic-pump", "power-to-torque", "psychrometric", "pulley", "pump-flow", "reynolds-number", "shaft-diameter", "spring-rate", "thermal-expansion", "torque-converter", "torque-to-hp"]):
+    if any(k in f for k in ["cooling", "pipe", "torque", "pump-head", "gear-ratio", "bolt-torque", "bearing-life", "belt-length", "conveyor-belt", "cutting-speed", "feed-rate", "flywheel", "gear-module", "heat-exchanger", "hvac", "hydraulic-cylinder", "hydraulic-pump", "power-to-torque", "psychrometric", "pulley", "pump-flow", "reynolds-number", "shaft-diameter", "spring-rate", "thermal-expansion", "torque-converter", "torque-to-hp", "projectile"]):
         return "mechanical"
-    if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt", "rainwater-downpipe", "block", "drywall", "excavation", "flooring"]):
+    if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt", "rainwater-downpipe", "block", "drywall", "excavation", "flooring", "footing", "gravel", "paint", "roof-pitch", "slab", "slope"]):
         return "civil"
     if any(k in f for k in ["chemical", "chlorine"]):
         return "chemical"

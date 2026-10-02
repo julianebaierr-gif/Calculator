@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projectile Motion Calculator | 2D Kinematics Trajectory Sizer</title>
+  <meta name="description" content="Calculate projectile motion trajectories: flight time, maximum apex height, horizontal range, and impact velocity per classical Newtonian kinematics.">
+  <link rel="canonical" href="https://calchub.cloud/projectile-motion-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Projectile Motion Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates 2D projectile kinematics: apex height, time of flight, horizontal range, impact velocity, and trajectory angles.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What angle gives the maximum horizontal range in projectile motion?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Over flat ground with equal launch and landing elevations (h0 = 0), a 45-degree launch angle achieves maximum horizontal range. When launched from an elevated cliff or platform (h0 > 0), the optimal launch angle for maximum range is slightly less than 45 degrees, governed by theta_opt = arcsin(1 / sqrt(2 + 2*g*h0 / v0^2))."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the formula for maximum trajectory height (apex)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The maximum vertical height reached above ground is: H_max = h0 + (v0 * sin(theta))^2 / (2 * g), where v0 is launch velocity, theta is launch angle, h0 is initial release height, and g is gravitational acceleration."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is the total time of flight calculated when launched from an elevation?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "By solving the quadratic vertical kinematic equation y(t) = h0 + v0*sin(theta)*t - 0.5*g*t^2 = 0, the positive root yields: t_flight = [v0*sin(theta) + sqrt((v0*sin(theta))^2 + 2*g*h0)] / g."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do horizontal and vertical velocity components behave in ideal projectile motion?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In the absence of aerodynamic drag, horizontal acceleration is zero (ax = 0), meaning horizontal velocity remains constant throughout flight: vx(t) = v0*cos(theta). Vertical velocity experiences constant downward gravitational acceleration (ay = -g), varying linearly as vy(t) = v0*sin(theta) - g*t."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="mechanical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html" class="active">Mechanical</a>
+        <a href="civil.html">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="mechanical.html">Mechanical &amp; Physics</a> &rsaquo; 
+      <span>Projectile Motion Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calculator-main">
+        <div class="calc-header">
+          <h1>Projectile Motion Calculator</h1>
+          <p>Compute 2D kinematic trajectories: apex height, time of flight, horizontal range, and impact velocity.</p>
+        </div>
+
+        <div class="calculator-card">
+          <form id="projectileForm" onsubmit="return false;">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="initialVelocity">Initial Launch Velocity, v₀ (m/s):</label>
+                <input type="number" id="initialVelocity" value="25.0" step="0.5" min="0.1" required>
+                <span class="hint">Muzzle or release speed</span>
+              </div>
+              <div class="form-group">
+                <label for="launchAngle">Launch Angle, &theta; (degrees):</label>
+                <input type="number" id="launchAngle" value="45.0" step="0.5" min="0" max="90" required>
+                <span class="hint">Angle relative to horizontal plane (0° to 90°)</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="initialHeight">Initial Release Height, h₀ (meters):</label>
+                <input type="number" id="initialHeight" value="2.0" step="0.1" min="0" required>
+                <span class="hint">Height above landing surface (0 for ground launch)</span>
+              </div>
+              <div class="form-group">
+                <label for="gravityAccel">Gravitational Environment, g (m/s²):</label>
+                <select id="gravityAccel">
+                  <option value="9.80665" selected>Earth Standard (9.81 m/s²)</option>
+                  <option value="1.62">Moon Surface (1.62 m/s²)</option>
+                  <option value="3.71">Mars Surface (3.71 m/s²)</option>
+                  <option value="24.79">Jupiter Cloud Top (24.79 m/s²)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="calcProjBtn">Calculate Trajectory</button>
+              <button type="reset" class="btn btn-secondary" id="resetProjBtn">Reset</button>
+            </div>
+          </form>
+
+          <div class="results-box" id="projectileResultBox" style="display:none; margin-top:25px;">
+            <h3>Kinematic Trajectory Flight Parameters</h3>
+            <div class="result-grid">
+              <div class="result-tile highlight">
+                <span class="result-label">Maximum Horizontal Range (R)</span>
+                <span class="result-value" id="resRange">0.00</span>
+                <span class="result-unit">meters (~0 ft)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Maximum Apex Height (H_max)</span>
+                <span class="result-value" id="resApexHeight">0.00</span>
+                <span class="result-unit">meters above datum</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Total Time of Flight (T)</span>
+                <span class="result-value" id="resFlightTime">0.00</span>
+                <span class="result-unit">seconds</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Final Impact Velocity (v_f)</span>
+                <span class="result-value" id="resImpactVel">0.00</span>
+                <span class="result-unit">m/s (~0 km/h)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Impact Angle (&theta;_f)</span>
+                <span class="result-value" id="resImpactAngle">0.0°</span>
+                <span class="result-unit">below horizontal</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Time to Reach Apex (t_apex)</span>
+                <span class="result-value" id="resTimeApex">0.00</span>
+                <span class="result-unit">seconds</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Classical Newtonian Projectile Kinematics in Two Dimensions</h2>
+          <p>
+            Projectile motion is the classical physics study of the curvilinear path followed by an unpowered object launched into a uniform gravitational field. First rigorously analyzed by Galileo Galilei in his 1638 treatise <em>Dialogues Concerning Two New Sciences</em>, projectile mechanics operates upon the fundamental principle of <strong>independence of orthogonal motion vectors</strong>: horizontal motion and vertical motion proceed simultaneously without cross-axial interference.
+          </p>
+          <p>
+            In an ideal Newtonian reference frame (neglecting atmospheric aerodynamic drag and Coriolis planetary forces), the equations of motion are decoupled into horizontal ($x$) and vertical ($y$) components:
+          </p>
+          <div class="formula-box">
+            $$a_x(t) = 0 \implies v_x(t) = v_0 \cos \theta = \text{constant}$$
+            $$a_y(t) = -g \implies v_y(t) = v_0 \sin \theta - g \cdot t$$
+          </div>
+
+          <h2>Parametric Equations of the Parabolic Trajectory</h2>
+          <p>
+            Integrating the velocity equations with respect to time $t$ yields the instantaneous position coordinates $(x(t), y(t))$ relative to release origin $(0, h_0)$:
+          </p>
+          <div class="formula-box">
+            $$x(t) = (v_0 \cos \theta) \cdot t$$
+            $$y(t) = h_0 + (v_0 \sin \theta) \cdot t - \frac{1}{2} g \cdot t^2$$
+          </div>
+          <p>
+            Eliminating time $t = \frac{x}{v_0 \cos \theta}$ between these parametric relations yields the explicit Cartesian equation of the trajectory path:
+          </p>
+          <div class="formula-box">
+            $$y(x) = h_0 + (\tan \theta) \cdot x - \left[ \frac{g}{2 v_0^2 \cos^2 \theta} \right] \cdot x^2$$
+          </div>
+          <p>
+            Because this equation takes the quadratic polynomial form $y = A x^2 + B x + C$ with negative leading coefficient $A < 0$, the spatial trajectory of any ideal projectile is an inverted parabola.
+          </p>
+
+          <h2>Apex Height and Time to Peak ($t_{apex}$)</h2>
+          <p>
+            At the exact apex of the flight path, the projectile momentarily ceases vertical ascent, meaning its instantaneous vertical velocity reaches zero:
+          </p>
+          <div class="formula-box">
+            $$v_y(t_{apex}) = v_0 \sin \theta - g \cdot t_{apex} = 0 \implies t_{apex} = \frac{v_0 \sin \theta}{g}$$
+          </div>
+          <p>
+            Substituting $t_{apex}$ into the vertical displacement equation gives the maximum height reached above the ground datum:
+          </p>
+          <div class="formula-box">
+            $$H_{max} = h_0 + \frac{(v_0 \sin \theta)^2}{2 g}$$
+          </div>
+
+          <h2>Total Time of Flight ($T$) and Horizontal Range ($R$)</h2>
+          <p>
+            The projectile impacts the ground surface when its vertical coordinate returns to zero ($y(T) = 0$):
+          </p>
+          <div class="formula-box">
+            $$0 = h_0 + (v_0 \sin \theta) \cdot T - \frac{1}{2} g \cdot T^2$$
+          </div>
+          <p>
+            Applying the quadratic formula and selecting the positive real root gives the exact total flight duration:
+          </p>
+          <div class="formula-box">
+            $$T = \frac{v_0 \sin \theta + \sqrt{(v_0 \sin \theta)^2 + 2 g h_0}}{g}$$
+          </div>
+          <p>
+            When launching from level ground ($h_0 = 0$), this simplifies to the symmetric flight duration $T = \frac{2 v_0 \sin \theta}{g}$.
+          </p>
+          <p>
+            The total horizontal distance covered (Range $R$) is the product of constant horizontal velocity and total flight duration:
+          </p>
+          <div class="formula-box">
+            $$R = (v_0 \cos \theta) \cdot T = \frac{v_0 \cos \theta}{g} \left[ v_0 \sin \theta + \sqrt{(v_0 \sin \theta)^2 + 2 g h_0} \right]$$
+          </div>
+          <p>
+            For level ground launches ($h_0 = 0$), trigonometric double-angle substitution ($2 \sin\theta \cos\theta = \sin 2\theta$) yields the famous classical range equation:
+          </p>
+          <div class="formula-box">
+            $$R_{level} = \frac{v_0^2 \sin(2\theta)}{g}$$
+          </div>
+
+          <h2>Impact Velocity Vector ($v_f$) and Terminal Angle ($\theta_f$)</h2>
+          <p>
+            Upon impact at time $t = T$, the velocity vector possesses orthogonal components:
+          </p>
+          <div class="formula-box">
+            $$v_{fx} = v_0 \cos \theta$$
+            $$v_{fy} = v_0 \sin \theta - g \cdot T$$
+            $$v_f = \sqrt{v_{fx}^2 + v_{fy}^2} = \sqrt{v_0^2 + 2 g h_0} \quad \text{(per Conservation of Mechanical Energy)}$$
+            $$\theta_f = \arctan \left( \frac{|v_{fy}|}{v_{fx}} \right)$$
+          </div>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Launch Scenario</th>
+                <th>Optimal Angle for Range ($\theta_{opt}$)</th>
+                <th>Flight Symmetry</th>
+                <th>Impact Speed vs Launch Speed</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Level Ground ($h_0 = 0$)</td>
+                <td>Exactly 45.0°</td>
+                <td>Perfect Parabolic Symmetry ($t_{up} = t_{down}$)</td>
+                <td>$v_f = v_0$ (Identical magnitude)</td>
+              </tr>
+              <tr>
+                <td>Elevated Platform ($h_0 > 0$)</td>
+                <td>$< 45.0^\circ$ ($\approx 35^\circ - 42^\circ$)</td>
+                <td>Asymmetric ($t_{down} > t_{up}$)</td>
+                <td>$v_f > v_0$ (Gain from potential energy)</td>
+              </tr>
+              <tr>
+                <td>Depressed Target ($h_0 < 0$)</td>
+                <td>$> 45.0^\circ$ ($\approx 48^\circ - 55^\circ$)</td>
+                <td>Truncated descent</td>
+                <td>$v_f < v_0$ (Loss to elevation gain)</td>
+              </tr>
+              <tr>
+                <td>Vertical Launch ($\theta = 90^\circ$)</td>
+                <td>N/A ($R = 0$)</td>
+                <td>Pure 1D vertical oscillation</td>
+                <td>$v_f = \sqrt{v_0^2 + 2 g h_0}$</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Atmospheric Aerodynamic Drag &amp; Terminal Velocity Influences</h2>
+          <p>
+            While elementary Newtonian kinematics presumes vacuum flight, real-world projectiles traversing Earth's atmosphere experience significant opposing aerodynamic drag forces proportional to instantaneous velocity squared ($v^2$).
+          </p>
+          <p>
+            The nonlinear hydrodynamic drag force is formulated per Rayleigh's equation:
+          </p>
+          <div class="formula-box">
+            $$F_D = \frac{1}{2} C_d \rho A v^2$$
+          </div>
+          <p>
+            Where $C_d$ is the drag coefficient (typically $0.47$ for smooth spheres), $\rho \approx 1.225\text{ kg/m}^3$ is sea-level air density, $A = \pi r^2$ is frontal cross-sectional area, and $v = \sqrt{v_x^2 + v_y^2}$ is instantaneous total speed.
+          </p>
+          <p>
+            Under quadratic air resistance, the equations of motion become coupled non-linear differential equations:
+          </p>
+          <div class="formula-box">
+            $$m \frac{d v_x}{dt} = - \frac{1}{2} C_d \rho A v v_x \quad \text{and} \quad m \frac{d v_y}{dt} = - m g - \frac{1}{2} C_d \rho A v v_y$$
+          </div>
+          <p>
+            Atmospheric drag breaks the ideal parabolic symmetry: the descending branch becomes markedly steeper than the launch trajectory, the peak apex shifts downrange, and falling projectiles approach a finite vertical <strong>terminal velocity</strong>:
+          </p>
+          <div class="formula-box">
+            $$v_t = \sqrt{\frac{2 m g}{C_d \rho A}}$$
+          </div>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Case Study: Water Monitor Fire Cannon Trajectory</h3>
+            <p><strong>Design Scenario:</strong> A marine firefighting tugboat uses a deck-mounted high-pressure monitor nozzle mounted $h_0 = 8.0\text{ meters}$ above sea level. The monitor discharges a solid water jet stream with an initial nozzle muzzle velocity of $v_0 = 40.0\text{ m/s}$ at an elevation angle of $\theta = 35.0^\circ$ above the horizontal. Assume standard Earth gravitational acceleration ($g = 9.80665\text{ m/s}^2$) and neglect aerodynamic water droplet breakup. Calculate the peak water stream apex height ($H_{max}$), total time of flight ($T$) until the water hits the sea surface, maximum horizontal reach ($R$), and final water impact velocity ($v_f$).</p>
+            
+            <p><strong>Step 1: Decompose Initial Velocity into Orthogonal Components</strong></p>
+            <div class="formula-box">
+              $$v_{0x} = v_0 \cos(35^\circ) = 40.0 \times 0.81915 = 32.766\text{ m/s}$$
+              $$v_{0y} = v_0 \sin(35^\circ) = 40.0 \times 0.57358 = 22.943\text{ m/s}$$
+            </div>
+
+            <p><strong>Step 2: Determine Peak Apex Height ($H_{max}$)</strong></p>
+            <div class="formula-box">
+              $$t_{apex} = \frac{v_{0y}}{g} = \frac{22.943\text{ m/s}}{9.80665\text{ m/s}^2} \approx \mathbf{2.339\text{ seconds}}$$
+              $$H_{max} = h_0 + \frac{v_{0y}^2}{2 g} = 8.0\text{ m} + \frac{(22.943)^2}{2 \times 9.80665} = 8.0 + 26.838 = \mathbf{34.84\text{ meters above sea level}}$$
+            </div>
+
+            <p><strong>Step 3: Calculate Total Flight Duration ($T$) to Sea Level</strong></p>
+            <div class="formula-box">
+              $$T = \frac{22.943 + \sqrt{(22.943)^2 + 2 \times 9.80665 \times 8.0}}{9.80665} = \frac{22.943 + \sqrt{526.38 + 156.91}}{9.80665}$$
+              $$T = \frac{22.943 + \sqrt{683.29}}{9.80665} = \frac{22.943 + 26.140}{9.80665} = \frac{49.083}{9.80665} \approx \mathbf{5.005\text{ seconds}}$$
+            </div>
+
+            <p><strong>Step 4: Compute Maximum Horizontal Stream Reach ($R$)</strong></p>
+            <div class="formula-box">
+              $$R = v_{0x} \times T = 32.766\text{ m/s} \times 5.005\text{ s} \approx \mathbf{164.0\text{ meters}} \quad (\approx 538.1\text{ feet})$$
+            </div>
+
+            <p><strong>Step 5: Evaluate Final Impact Velocity ($v_f$)</strong></p>
+            <div class="formula-box">
+              $$v_f = \sqrt{v_0^2 + 2 g h_0} = \sqrt{(40.0)^2 + 2 \times 9.80665 \times 8.0} = \sqrt{1600 + 156.91} = \sqrt{1756.91} \approx \mathbf{41.92\text{ m/s}} \quad (\approx 150.9\text{ km/h})$$
+            </div>
+            <p>
+              <strong>Engineering Conclusion:</strong> The water monitor delivers its stream to a maximum horizontal distance of <strong>$164.0\text{ meters}$</strong>, ascending to a clearance height of <strong>$34.84\text{ meters}$</strong>, and impacting burning vessels at an energetic velocity of <strong>$41.92\text{ m/s}$</strong>.
+            </p>
+          </div>
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚙️</span>
+            <h3 class="widget-title">Related Mechanical & HVAC</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bolt-torque-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Bolt Torque & Preload</a></li>
+            <li><a href="bearing-life-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Bearing Life (ISO 281)</a></li>
+            <li><a href="pump-head-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pump Head (TDH & Flow)</a></li>
+            <li><a href="gear-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Gear Ratio & Speed</a></li>
+            <li><a href="cooling-load-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cooling Load (HVAC) Sizing</a></li>
+            <li><a href="pipe-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pipe Sizing & Water Flow</a></li>
+            <li><a href="torque-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Torque & Shaft Power</a></li>
+            <li><a href="belt-length-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Belt Length (Open & Crossed Pulley)</a></li>
+            <li><a href="conveyor-belt-speed-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Conveyor Belt Speed & Tonnage</a></li>
+            <li><a href="cutting-speed-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cutting Speed & Spindle RPM</a></li>
+            <li><a href="feed-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> CNC Feed Rate & Chip Load</a></li>
+            <li><a href="flywheel-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Flywheel Kinetic Energy & Stress</a></li>
+            <li><a href="gear-module-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Gear Module & Pitch Geometry</a></li>
+            <li><a href="heat-exchanger-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heat Exchanger (LMTD & NTU Area)</a></li>
+            <li><a href="hvac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> HVAC Sizing & Cooling Tonnage</a></li>
+            <li><a href="hydraulic-cylinder-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Hydraulic Cylinder Sizing (ISO 6020)</a></li>
+            <li><a href="hydraulic-cylinder-force-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Hydraulic Cylinder Net Force (ISO 3320)</a></li>
+            <li><a href="hydraulic-cylinder-speed-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Hydraulic Cylinder Speed & Flow</a></li>
+            <li><a href="hydraulic-pump-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Hydraulic Pump Power (ISO 4409)</a></li>
+            <li><a href="power-to-torque-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Power to Torque & Shaft Sizing</a></li>
+            <li><a href="psychrometric-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Psychrometric & Moist Air (ASHRAE)</a></li>
+            <li><a href="pulley-mechanical-advantage-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pulley Mechanical Advantage (CMAA 70)</a></li>
+            <li><a href="pulley-rpm-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pulley RPM & Belt Speed (ISO 5296)</a></li>
+            <li><a href="pump-flow-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pump Flow Rate & Velocity</a></li>
+            <li><a href="reynolds-number-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Reynolds Number (Moody & Swamee-Jain)</a></li>
+            <li><a href="shaft-diameter-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Shaft Diameter (ASME B106.1M)</a></li>
+            <li><a href="spring-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Helical Spring Rate (SMI / ASTM A228)</a></li>
+            <li><a href="thermal-expansion-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Thermal Expansion & Pipe Stress</a></li>
+            <li><a href="torque-converter.html" class="sidebar-link-item"><span class="link-bullet">›</span> Torque Converter Sizing (SAE J643)</a></li>
+            <li><a href="torque-to-hp-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Torque to HP & BMEP Converter</a></li>
+            <li><a href="projectile-motion-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Projectile Motion Trajectory</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="mechanical.html" class="sidebar-category-link">View All Mechanical & HVAC Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>High-precision professional engineering and scientific calculation engines.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Directories</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="civil.html">Civil &amp; Construction</a></li>
+          <li><a href="mechanical.html">Mechanical Engineering</a></li>
+          <li><a href="engineering.html">Civil &amp; Structural</a></li>
+          <li><a href="sitemap.xml">XML Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 CalcHub. Standard Engineering Reference Systems.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calcBtn = document.getElementById('calcProjBtn');
+      const resetBtn = document.getElementById('resetProjBtn');
+      const resultBox = document.getElementById('projectileResultBox');
+
+      function calculateProjectile() {
+        const v0 = parseFloat(document.getElementById('initialVelocity').value);
+        const thetaDeg = parseFloat(document.getElementById('launchAngle').value);
+        const h0 = parseFloat(document.getElementById('initialHeight').value);
+        const g = parseFloat(document.getElementById('gravityAccel').value);
+
+        if (isNaN(v0) || v0 <= 0 || isNaN(thetaDeg) || thetaDeg < 0 || thetaDeg > 90 || isNaN(h0) || h0 < 0 || isNaN(g) || g <= 0) {
+          alert('Please enter valid positive values for velocity, angle (0-90°), and initial height.');
+          return;
+        }
+
+        const thetaRad = thetaDeg * (Math.PI / 180.0);
+        const v0x = v0 * Math.cos(thetaRad);
+        const v0y = v0 * Math.sin(thetaRad);
+
+        const t_apex = v0y / g;
+        const H_max = h0 + (Math.pow(v0y, 2) / (2.0 * g));
+
+        // Quadratic formula for flight time T: 0.5*g*T^2 - v0y*T - h0 = 0
+        const discriminant = Math.pow(v0y, 2) + 2.0 * g * h0;
+        const T = (v0y + Math.sqrt(discriminant)) / g;
+
+        const R = v0x * T;
+        const vfx = v0x;
+        const vfy = v0y - g * T; // negative value
+        const vf = Math.sqrt(vfx * vfx + vfy * vfy);
+        const impactAngleDeg = Math.atan2(Math.abs(vfy), vfx) * (180.0 / Math.PI);
+
+        const rangeFt = (R * 3.28084).toFixed(1);
+        const vfKmh = (vf * 3.6).toFixed(1);
+
+        document.getElementById('resRange').textContent = R.toFixed(2) + ` (~${rangeFt} ft)`;
+        document.getElementById('resApexHeight').textContent = H_max.toFixed(2);
+        document.getElementById('resFlightTime').textContent = T.toFixed(3);
+        document.getElementById('resImpactVel').textContent = vf.toFixed(2) + ` (~${vfKmh} km/h)`;
+        document.getElementById('resImpactAngle').textContent = impactAngleDeg.toFixed(1) + '°';
+        document.getElementById('resTimeApex').textContent = t_apex.toFixed(3);
+
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      calcBtn.addEventListener('click', calculateProjectile);
+      resetBtn.addEventListener('click', function() {
+        resultBox.style.display = 'none';
+      });
+      calculateProjectile();
+    });
+  </script>
+</body>
+</html>

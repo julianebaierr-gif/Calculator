@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slope Calculator | Incline Grade, Angle, Rise &amp; Run Sizer</title>
+  <meta name="description" content="Calculate terrain slope gradient (m), percentage grade (%), incline angle in degrees, 1:X ratio, and ADA ramp accessibility standards per ADAAG 405.">
+  <link rel="canonical" href="https://calchub.cloud/slope-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Slope Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates civil gradient slope, elevation percentage grade, incline angle in degrees, and ADA wheelchair ramp compliance.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the formula to calculate slope?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Slope (m) is the ratio of vertical change (rise) to horizontal change (run): m = Rise / Run = (y2 - y1) / (x2 - x1). Incline angle is theta = arctan(m), and percentage grade is Grade (%) = m * 100."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the ADA compliant slope requirement for wheelchair ramps?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Under the Americans with Disabilities Act Accessibility Guidelines (ADAAG Section 405), the maximum allowable slope for a wheelchair ramp is 1:12 (1 unit of vertical rise per 12 units of horizontal run, or 8.33% grade / 4.76 degrees)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do you convert percentage grade to degrees?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Divide the percentage grade by 100 to get decimal slope, then take the arctangent: Angle (degrees) = arctan(Grade / 100) * (180 / π). For example, a 10% grade equals: arctan(0.10) ≈ 5.71 degrees."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the minimum slope required for civil site drainage?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Under International Building Code (IBC Section 1804.4), ground immediately adjacent to building foundations must slope away at not less than 5% (1 unit vertical in 20 units horizontal) for a minimum distance of 10 feet (3.05 m) to prevent foundation water damage."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="civil">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html" class="active">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="civil.html">Civil &amp; Construction</a> &rsaquo; 
+      <span>Slope Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calculator-main">
+        <div class="calc-header">
+          <h1>Slope Calculator</h1>
+          <p>Compute terrain gradient, percentage grade (%), incline angle in degrees, and verify ADA accessibility compliance.</p>
+        </div>
+
+        <div class="calculator-card">
+          <form id="slopeForm" onsubmit="return false;">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="slopeMode">Input Calculation Mode:</label>
+                <select id="slopeMode">
+                  <option value="riseRun" selected>Vertical Rise &amp; Horizontal Run</option>
+                  <option value="twoPoints">Two Coordinates (x1, y1) &amp; (x2, y2)</option>
+                  <option value="gradePct">Percentage Grade (%)</option>
+                  <option value="angleDeg">Incline Angle (Degrees)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Rise & Run Inputs -->
+            <div class="form-row" id="rowRiseRun">
+              <div class="form-group">
+                <label for="vertRise">Vertical Elevation Change (Rise, &Delta;y):</label>
+                <input type="number" id="vertRise" value="1.5" step="0.1" required>
+                <span class="hint">Height gained or lost</span>
+              </div>
+              <div class="form-group">
+                <label for="horizRun">Horizontal Distance (Run, &Delta;x):</label>
+                <input type="number" id="horizRun" value="25.0" step="0.5" min="0.001" required>
+                <span class="hint">Horizontal baseline distance</span>
+              </div>
+            </div>
+
+            <!-- Coordinates Inputs -->
+            <div class="form-row" id="rowCoords" style="display:none;">
+              <div class="form-group">
+                <label for="coordX1">Point 1 (x₁, y₁):</label>
+                <div style="display:flex; gap:0.5rem;">
+                  <input type="number" id="coordX1" value="0.0" step="0.5" placeholder="x1">
+                  <input type="number" id="coordY1" value="0.0" step="0.5" placeholder="y1">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="coordX2">Point 2 (x₂, y₂):</label>
+                <div style="display:flex; gap:0.5rem;">
+                  <input type="number" id="coordX2" value="30.0" step="0.5" placeholder="x2">
+                  <input type="number" id="coordY2" value="2.4" step="0.5" placeholder="y2">
+                </div>
+              </div>
+            </div>
+
+            <!-- Percentage Grade Input -->
+            <div class="form-row" id="rowGrade" style="display:none;">
+              <div class="form-group">
+                <label for="inputGrade">Grade Percentage (%):</label>
+                <input type="number" id="inputGrade" value="6.0" step="0.1">
+              </div>
+              <div class="form-group">
+                <label for="distGrade">Horizontal Run Distance:</label>
+                <input type="number" id="distGrade" value="50.0" step="1.0" min="0.1">
+              </div>
+            </div>
+
+            <!-- Angle Input -->
+            <div class="form-row" id="rowAngle" style="display:none;">
+              <div class="form-group">
+                <label for="inputAngle">Slope Angle (Degrees):</label>
+                <input type="number" id="inputAngle" value="5.0" step="0.1" min="0" max="89.9">
+              </div>
+              <div class="form-group">
+                <label for="distAngle">Horizontal Run Distance:</label>
+                <input type="number" id="distAngle" value="50.0" step="1.0" min="0.1">
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="calcSlopeBtn">Calculate Slope Parameters</button>
+              <button type="reset" class="btn btn-secondary" id="resetSlopeBtn">Reset</button>
+            </div>
+          </form>
+
+          <div class="results-box" id="slopeResultBox" style="display:none; margin-top:25px;">
+            <h3>Terrain &amp; Engineering Gradient Properties</h3>
+            <div class="result-grid">
+              <div class="result-tile highlight">
+                <span class="result-label">Percentage Grade (%)</span>
+                <span class="result-value" id="resGradePct">0.00%</span>
+                <span class="result-unit">Vertical Rise per 100 Units</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Slope Angle (&theta;)</span>
+                <span class="result-value" id="resAngleDeg">0.00°</span>
+                <span class="result-unit">Degrees from Horizontal</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Gradient Ratio (1 : X)</span>
+                <span class="result-value" id="resRatio">1 : 0.0</span>
+                <span class="result-unit">Standard Civil Ratio</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Decimal Gradient (m)</span>
+                <span class="result-value" id="resDecimalM">0.0000</span>
+                <span class="result-unit">Rise / Run tangent</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Hypotenuse Slope Distance</span>
+                <span class="result-value" id="resHypotenuse">0.00</span>
+                <span class="result-unit">True Surface Distance</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">ADA Accessibility Compliance</span>
+                <span class="result-value" id="resAdaStatus">Compliant</span>
+                <span class="result-unit">ADAAG 405 (Max 8.33%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Slope Kinematics, Civil Gradients &amp; Topographic Surveying</h2>
+          <p>
+            Slope describes the direction and steepness of an inclined ground surface or geometric line. In civil site grading, transportation highway alignment, hydraulic stormwater channel design, and architectural accessibility engineering, precise slope evaluation governs earthwork cut-and-fill stability, gravity water drainage, and public safety.
+          </p>
+          <p>
+            In analytical mathematics and Cartesian coordinate surveying, the gradient slope ($m$) between two spatial points $(x_1, y_1)$ and $(x_2, y_2)$ is defined as the ratio of vertical altitude displacement ($\Delta y$) to horizontal baseline station distance ($\Delta x$):
+          </p>
+          <div class="formula-box">
+            $$m = \frac{\text{Rise}}{\text{Run}} = \frac{\Delta y}{\Delta x} = \frac{y_2 - y_1}{x_2 - x_1}$$
+          </div>
+
+          <h2>Conversions: Percentage Grade, Degrees, Radians &amp; Ratios</h2>
+          <p>
+            Depending upon the engineering discipline, slope is represented in four standard mathematical formats:
+          </p>
+          <ul>
+            <li><strong>Percentage Grade ($\%$):</strong> The standard civil highway and pipeline metric. It expresses vertical elevation gain per $100$ units of horizontal distance:
+              <div class="formula-box">$$\text{Grade } (\%) = m \times 100 = \left(\frac{\text{Rise}}{\text{Run}}\right) \times 100$$</div>
+            </li>
+            <li><strong>Angle of Incline ($\theta$):</strong> The trigonometric angle between the ground surface plane and the horizontal datum:
+              <div class="formula-box">$$\theta = \arctan(m) \times \left(\frac{180}{\pi}\right)$$</div>
+            </li>
+            <li><strong>Proportional Ratio ($1:X$ or $X:1$):</strong> In architectural ramp codes and geotechnical embankment slope stability, gradient is formatted as $1\text{ unit vertical to } X\text{ units horizontal}$:
+              <div class="formula-box">$$\text{Ratio } 1:X \implies X = \frac{\text{Run}}{\text{Rise}} = \frac{1}{m}$$</div>
+            </li>
+            <li><strong>True Slope Distance (Hypotenuse):</strong> The physical walking distance along the inclined terrain:
+              <div class="formula-box">$$D_{slope} = \sqrt{\Delta x^2 + \Delta y^2} = \text{Run} \times \sqrt{1 + m^2} = \frac{\text{Run}}{\cos \theta}$$</div>
+            </li>
+          </ul>
+
+          <h2>ADA Wheelchair Ramp Standards (ADAAG Section 405)</h2>
+          <p>
+            Civil infrastructure accessible to persons with physical disabilities must comply with the <strong>Americans with Disabilities Act Accessibility Guidelines (ADAAG Section 405)</strong>. Federal standards dictate strict slope limits:
+          </p>
+          <ul>
+            <li><strong>Maximum Ramp Slope:</strong> $1:12$ ($8.33\%$ grade or $4.76^\circ$). Every inch of vertical rise requires at least $12\text{ inches}$ ($1\text{ foot}$) of ramp run.</li>
+            <li><strong>Maximum Single Run Rise:</strong> $30\text{ inches}$ ($760\text{ mm}$). Any ramp with a total rise exceeding $30\text{ inches}$ must incorporate an intermediate level resting landing (minimum $60\text{ inches} \times 60\text{ inches}$).</li>
+            <li><strong>Cross-Slope Limits:</strong> The maximum allowable lateral cross-slope on any accessible walkway is $1:48$ ($2.08\%$) to prevent wheelchair drifting.</li>
+          </ul>
+
+          <h2>Hydraulic Stormwater Drainage Minimum Gradients</h2>
+          <p>
+            Water must drain by gravity away from building structures to prevent foundation undermining, basement flooding, and soil liquefaction. Building codes mandate minimum drainage slopes:
+          </p>
+          <ul>
+            <li><strong>Foundation Perimeter Grading (IBC 1804.4):</strong> Unpaved ground within $10\text{ feet}$ ($3.05\text{ m}$) of a foundation wall must slope downward at minimum $5\%$ ($1:20$ or $0.5\text{ ft}$ drop per $10\text{ ft}$). Where swales or property lot lines intervene, an impervious apron with minimum $2\%$ slope is allowed.</li>
+            <li><strong>Gravity Sewer &amp; Drainage Pipes (IPC Chapter 7):</strong> Underground drainage lines require minimum self-cleansing scouring velocity ($2.0\text{ ft/s}$ / $0.6\text{ m/s}$):
+              <div class="formula-box">
+                $$\le 2\text{-inch pipe}: \frac{1}{4}\text{ in/ft } (2.08\%) \quad \mid \quad 3\text{ to }6\text{-inch pipe}: \frac{1}{8}\text{ in/ft } (1.04\%)$$
+              </div>
+            </li>
+            <li><strong>Paved Concrete &amp; Asphalt Surfaces:</strong> Minimum $1.0\%$ to $1.5\%$ cross-slope to eliminate standing puddles and hydroplaning hazards.</li>
+          </ul>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Civil Application</th>
+                <th>Slope Ratio (V : H)</th>
+                <th>Percentage Grade (%)</th>
+                <th>Angle in Degrees (&theta;)</th>
+                <th>Code Authority / Standard</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Accessible Walkway (Normal)</td>
+                <td>1 : 20</td>
+                <td>5.00%</td>
+                <td>2.86°</td>
+                <td>ADAAG Section 403 (No handrails required)</td>
+              </tr>
+              <tr>
+                <td>ADA Wheelchair Ramp (Max)</td>
+                <td>1 : 12</td>
+                <td>8.33%</td>
+                <td>4.76°</td>
+                <td>ADAAG Section 405 (Handrails mandatory)</td>
+              </tr>
+              <tr>
+                <td>Residential Vehicle Driveway</td>
+                <td>1 : 8 to 1 : 6.7</td>
+                <td>12.0% – 15.0%</td>
+                <td>6.84° – 8.53°</td>
+                <td>Local Municipal Codes (Max 15-20%)</td>
+              </tr>
+              <tr>
+                <td>Highway Maximum Grade</td>
+                <td>1 : 16.7 to 1 : 14.3</td>
+                <td>6.0% – 7.0%</td>
+                <td>3.43° – 4.00°</td>
+                <td>AASHTO Interstate Highway Criteria</td>
+              </tr>
+              <tr>
+                <td>Cut Slope (OSHA Type B Soil)</td>
+                <td>1 : 1</td>
+                <td>100.0%</td>
+                <td>45.00°</td>
+                <td>OSHA 29 CFR 1926 Subpart P</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Geotechnical Embankment Slope Stability, Factor of Safety &amp; Critical Slip Surfaces</h2>
+          <p>
+            In geotechnical slope engineering, determining the mechanical stability of natural hillsides, roadway cuts, and engineered earthen embankments prevents catastrophic landslides. The primary measure of slope equilibrium is the <strong>Factor of Safety ($FS$)</strong>, defined as the ratio of available shear strength ($\tau_f$) to mobilized driving shear stress ($\tau_m$) along the critical slip failure surface:
+          </p>
+          <div class="formula-box">
+            $$FS = \frac{\tau_f}{\tau_m} = \frac{c' + (\sigma_n - u) \tan \phi'}{\tau_m}$$
+          </div>
+          <p>
+            Where $c'$ is effective soil cohesion, $\sigma_n$ is normal total stress, $u$ is pore water pressure, and $\phi'$ is the internal friction angle of the soil per the Mohr-Coulomb failure criterion.
+          </p>
+          <p>
+            <strong>Infinite Slope Analysis with Seepage:</strong> For a shallow translational slide in a granular soil slope of incline angle $\beta$ with steady-state seepage parallel to the slope:
+          </p>
+          <div class="formula-box">
+            $$FS = \left(1 - \frac{\gamma_w \cdot h}{\gamma_{sat} \cdot z}\right) \frac{\tan \phi'}{\tan \beta}$$
+          </div>
+          <p>
+            When pore water pressure builds to the ground surface ($h = z$), the buoyant reduction roughly halves the effective friction angle, reducing the safe slope angle to approximately half of the soil's natural internal friction angle ($\beta_{safe} \approx \frac{1}{2} \phi'$). Engineered benching, perforated horizontal drainage wicks, and retaining gabion baskets are standard stabilization countermeasures.
+          </p>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Case Study: Designing an Accessible Municipal Clinic Entrance Ramp</h3>
+            <p><strong>Design Scenario:</strong> A municipal community health clinic has a finished ground floor elevation set $H = 0.90\text{ meters}$ ($900\text{ mm}$ / $35.43\text{ inches}$) above the adjacent parking lot sidewalk. The architectural specification mandates a fully compliant <strong>ADA wheelchair accessible ramp</strong> designed at the maximum permissible slope ratio of $1:12$ ($8.33\%$ grade). Calculate the required total horizontal run ($\Delta x$), the slope angle in degrees ($\theta$), the physical travel length along the ramp deck (hypotenuse), verify the number of required intermediate rest landings (maximum $760\text{ mm}$ rise per run), and establish total ramp footprint dimensions.</p>
+            
+            <p><strong>Step 1: Compute Required Horizontal Run ($\Delta x$)</strong></p>
+            <div class="formula-box">
+              $$\Delta x = \Delta y \times 12 = 0.90\text{ m} \times 12 = \mathbf{10.80\text{ meters}} \quad (\approx 35.43\text{ feet})$$
+            </div>
+
+            <p><strong>Step 2: Calculate Slope Angle (&theta;) and Percentage Grade</strong></p>
+            <div class="formula-box">
+              $$m = \frac{1}{12} \approx 0.08333$$
+              $$\text{Grade } (\%) = 0.08333 \times 100 = \mathbf{8.33\%}$$
+              $$\theta = \arctan(1 / 12) = \arctan(0.08333) \approx \mathbf{4.76^\circ}$$
+            </div>
+
+            <p><strong>Step 3: Evaluate Travel Distance (Hypotenuse)</strong></p>
+            <div class="formula-box">
+              $$D_{slope} = \sqrt{\Delta x^2 + \Delta y^2} = \sqrt{(10.80)^2 + (0.90)^2} = \sqrt{116.64 + 0.81} = \sqrt{117.45} \approx \mathbf{10.84\text{ meters}}$$
+            </div>
+
+            <p><strong>Step 4: Check Intermediate Landing Requirement</strong></p>
+            <p>
+              Since the total rise of $900\text{ mm}$ exceeds the ADAAG threshold of $760\text{ mm}$ ($30\text{ inches}$), the ramp cannot be built in a single unbroken run. The civil designer splits the rise into two equal flights of $450\text{ mm}$ rise each ($5.40\text{ m}$ run per flight) separated by an intermediate level landing measuring $1.50\text{ m} \times 1.50\text{ m}$ ($5\text{ ft} \times 5\text{ ft}$).
+            </p>
+            <p>
+              <strong>Engineering Conclusion:</strong> The ADA entrance system requires two <strong>$5.40\text{-meter}$ sloped ramp segments</strong> ($8.33\%$ grade, $4.76^\circ$) plus one <strong>$1.50\text{-meter}$ level landing</strong>, giving a total structural run of <strong>$12.30\text{ meters}$</strong>.
+            </p>
+          </div>
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏗️</span>
+            <h3 class="widget-title">Related Civil & Construction</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="brick-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Brick & Masonry Calculator</a></li>
+            <li><a href="asphalt-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Asphalt Paving & Tonnage</a></li>
+            <li><a href="beam-deflection-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Deflection & Moments</a></li>
+            <li><a href="retaining-wall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Retaining Wall Stability</a></li>
+            <li><a href="concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Slab, Footing & Column</a></li>
+            <li><a href="rebar-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rebar Weight & Grid Spacing</a></li>
+            <li><a href="rainwater-downpipe-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rainwater Downpipe Sizing</a></li>
+            <li><a href="beam-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Bending Moment & Shear</a></li>
+            <li><a href="block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Block Masonry Estimator</a></li>
+            <li><a href="concrete-block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Block Calculator</a></li>
+            <li><a href="concrete-mix-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Mix Ratio</a></li>
+            <li><a href="drywall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Drywall Sheets, Mud & Tape</a></li>
+            <li><a href="excavation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation & Earthwork Haul</a></li>
+            <li><a href="excavation-volume-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation Volume Calculator</a></li>
+            <li><a href="flooring-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Flooring Area & Box Estimator</a></li>
+            <li><a href="footing-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Footing Size & Soil Bearing</a></li>
+            <li><a href="gravel-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Gravel & Aggregate Estimator</a></li>
+            <li><a href="paint-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Paint Gallon & Coverage</a></li>
+            <li><a href="rebar-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rebar Weight & Tonnage</a></li>
+            <li><a href="roof-pitch-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Roof Pitch & Rafter Length</a></li>
+            <li><a href="slab-concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Slab Concrete Volume</a></li>
+            <li><a href="slope-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Slope & Grade Calculator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="civil.html" class="sidebar-category-link">View All Civil & Construction Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>High-precision professional engineering and scientific calculation engines.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Directories</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="civil.html">Civil &amp; Construction</a></li>
+          <li><a href="mechanical.html">Mechanical Engineering</a></li>
+          <li><a href="engineering.html">Civil &amp; Structural</a></li>
+          <li><a href="sitemap.xml">XML Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 CalcHub. Standard Engineering Reference Systems.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calcBtn = document.getElementById('calcSlopeBtn');
+      const resetBtn = document.getElementById('resetSlopeBtn');
+      const resultBox = document.getElementById('slopeResultBox');
+      const modeSelect = document.getElementById('slopeMode');
+      const rowRiseRun = document.getElementById('rowRiseRun');
+      const rowCoords = document.getElementById('rowCoords');
+      const rowGrade = document.getElementById('rowGrade');
+      const rowAngle = document.getElementById('rowAngle');
+
+      modeSelect.addEventListener('change', function() {
+        const val = this.value;
+        rowRiseRun.style.display = (val === 'riseRun') ? 'flex' : 'none';
+        rowCoords.style.display = (val === 'twoPoints') ? 'flex' : 'none';
+        rowGrade.style.display = (val === 'gradePct') ? 'flex' : 'none';
+        rowAngle.style.display = (val === 'angleDeg') ? 'flex' : 'none';
+      });
+
+      function calculateSlope() {
+        const mode = modeSelect.value;
+        let rise = 0.0;
+        let run = 1.0;
+
+        if (mode === 'riseRun') {
+          rise = parseFloat(document.getElementById('vertRise').value);
+          run = parseFloat(document.getElementById('horizRun').value);
+          if (isNaN(rise) || isNaN(run) || run === 0) {
+            alert('Please enter valid numbers. Horizontal run cannot be zero.');
+            return;
+          }
+        } else if (mode === 'twoPoints') {
+          const x1 = parseFloat(document.getElementById('coordX1').value);
+          const y1 = parseFloat(document.getElementById('coordY1').value);
+          const x2 = parseFloat(document.getElementById('coordX2').value);
+          const y2 = parseFloat(document.getElementById('coordY2').value);
+          if (isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2) || (x2 - x1) === 0) {
+            alert('Please enter valid coordinates with x2 ≠ x1.');
+            return;
+          }
+          rise = y2 - y1;
+          run = x2 - x1;
+        } else if (mode === 'gradePct') {
+          const grade = parseFloat(document.getElementById('inputGrade').value);
+          run = parseFloat(document.getElementById('distGrade').value);
+          if (isNaN(grade) || isNaN(run) || run === 0) {
+            alert('Please enter a valid grade and distance.');
+            return;
+          }
+          rise = (grade / 100.0) * run;
+        } else if (mode === 'angleDeg') {
+          const angle = parseFloat(document.getElementById('inputAngle').value);
+          run = parseFloat(document.getElementById('distAngle').value);
+          if (isNaN(angle) || isNaN(run) || run === 0 || angle < 0 || angle >= 90) {
+            alert('Please enter a valid angle (0° to 89.9°) and distance.');
+            return;
+          }
+          const rad = angle * (Math.PI / 180.0);
+          rise = run * Math.tan(rad);
+        }
+
+        const m = rise / run;
+        const gradePct = Math.abs(m) * 100.0;
+        const angleRad = Math.atan(Math.abs(m));
+        const angleDeg = angleRad * (180.0 / Math.PI);
+        const ratioX = (Math.abs(m) > 0) ? (1.0 / Math.abs(m)) : 0;
+        const hypotenuse = Math.sqrt(rise * rise + run * run);
+
+        let adaStatus = 'Non-Compliant (>8.33%)';
+        if (gradePct <= 5.0) {
+          adaStatus = 'Compliant (Walkway ≤5%)';
+        } else if (gradePct <= 8.333) {
+          adaStatus = 'Compliant (Ramp ≤8.33%)';
+        }
+
+        document.getElementById('resGradePct').textContent = (m < 0 ? '-' : '') + gradePct.toFixed(2) + '%';
+        document.getElementById('resAngleDeg').textContent = angleDeg.toFixed(2) + '°';
+        document.getElementById('resRatio').textContent = (ratioX > 0) ? `1 : ${ratioX.toFixed(2)}` : 'Flat 0';
+        document.getElementById('resDecimalM').textContent = m.toFixed(4);
+        document.getElementById('resHypotenuse').textContent = hypotenuse.toFixed(2);
+        document.getElementById('resAdaStatus').textContent = adaStatus;
+
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      calcBtn.addEventListener('click', calculateSlope);
+      resetBtn.addEventListener('click', function() {
+        resultBox.style.display = 'none';
+        modeSelect.value = 'riseRun';
+        rowRiseRun.style.display = 'flex';
+        rowCoords.style.display = 'none';
+        rowGrade.style.display = 'none';
+        rowAngle.style.display = 'none';
+      });
+      calculateSlope();
+    });
+  </script>
+</body>
+</html>
