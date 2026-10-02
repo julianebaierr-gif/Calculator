@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conveyor Belt Speed Calculator | CEMA & ISO 5048 Material Flow Rate</title>
+  <meta name="description" content="Calculate industrial conveyor belt speed, drive pulley RPM, bulk material throughput (tons/hr), and required motor drive power per CEMA and ISO 5048 standards.">
+  <link rel="canonical" href="https://calchub.cloud/conveyor-belt-speed-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Conveyor Belt Speed Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Bulk materials handling calculation tool computing conveyor belt linear velocity, drive drum rotational RPM, mass throughput capacity, and required drive power per CEMA standards.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How is conveyor belt linear speed calculated from drive pulley RPM?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Belt linear speed is derived from drive pulley circumference: v = (pi * D_eff * N) / 60 in metric (m/s), or v = (pi * D_eff * N) / 12 in imperial (ft/min), where D_eff is the effective drive drum diameter including pulley lagging and belt carcass thickness, and N is rotational speed in revolutions per minute (RPM)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the relationship between conveyor belt speed and material throughput capacity?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Conveyor volumetric capacity is directly proportional to speed: Q_vol = A * v * 3600 (m^3/hr), where A is the cross-sectional surcharge load area determined by belt width, idler troughing angle (20, 35, or 45 degrees), and material angle of repose. Mass throughput is Q_mass = Q_vol * rho_bulk (metric tons per hour)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are maximum recommended belt speeds for various bulk materials?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Per CEMA standards: Fragile or dusty materials (grain, fine coal, sand) are typically limited to 1.5 - 2.5 m/s (300 - 500 ft/min) to prevent degradation and dust creation. Coarse ore, crushed rock, and gravel operate at 2.5 - 4.0 m/s (500 - 800 ft/min). Overland long-distance transport conveyors running iron ore or coal frequently operate at high speeds up to 6.0 - 8.5 m/s (1,200 - 1,700 ft/min)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does drive pulley lagging affect effective conveyor speed?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Rubber or ceramic pulley lagging increases the outer drum diameter by 10 mm to 25 mm (3/8 to 1 inch). Because linear speed is governed by the center line of the tensioned belt carcass: D_eff = D_shell + 2*t_lagging + t_belt. Neglecting lagging thickness underestimates actual belt velocity by 3% to 7%."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="mechanical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html" class="active">Mechanical</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="mechanical.html">Mechanical &amp; Machine Design</a> &rsaquo;
+      <span>Conveyor Belt Speed Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">CEMA 7th Edition &amp; ISO 5048 Bulk Material Standards</div>
+          <h1 class="calc-title">Conveyor Belt Speed Calculator</h1>
+          <p class="calc-tagline">Calculate industrial conveyor belt linear speed, drive drum rotational RPM, volumetric and mass throughput capacities, and required motor power.</p>
+        </header>
+
+        <div class="tool-card">
+          <form id="conveyorCalcForm">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="speedCalcMode">Calculation Mode</label>
+                <select id="speedCalcMode">
+                  <option value="rpmToSpeed" selected>Calculate Belt Speed from Drive Pulley RPM</option>
+                  <option value="speedToRpm">Calculate Required Drive RPM from Target Belt Speed</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="conveyorUnits">Engineering Units</label>
+                <select id="conveyorUnits">
+                  <option value="metric" selected>Metric (m/s, mm, t/h, kW)</option>
+                  <option value="imperial">Imperial (ft/min, in, STPH, HP)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="pulleyDiam" id="lblPulleyDiam">Drive Pulley Shell Diameter [mm]</label>
+                <input type="number" id="pulleyDiam" step="5" min="50" max="3000" value="500">
+              </div>
+
+              <div class="form-group">
+                <label for="laggingThick" id="lblLaggingThick">Pulley Lagging Thickness [mm]</label>
+                <input type="number" id="laggingThick" step="1" min="0" max="100" value="12">
+              </div>
+
+              <div class="form-group">
+                <label for="beltThick" id="lblBeltThick">Conveyor Belt Thickness [mm]</label>
+                <input type="number" id="beltThick" step="0.5" min="2" max="60" value="10">
+              </div>
+
+              <div class="form-group" id="grpPulleyRpm">
+                <label for="pulleyRpm">Drive Pulley Rotational Speed [RPM]</label>
+                <input type="number" id="pulleyRpm" step="1" min="1" max="1000" value="75">
+              </div>
+
+              <div class="form-group" id="grpTargetSpeed" style="display: none;">
+                <label for="targetSpeed" id="lblTargetSpeed">Target Linear Belt Speed [m/s]</label>
+                <input type="number" id="targetSpeed" step="0.1" min="0.1" max="15.0" value="2.0">
+              </div>
+
+              <div class="form-group">
+                <label for="beltWidth" id="lblBeltWidth">Belt Width [mm]</label>
+                <select id="beltWidth">
+                  <option value="500">500 mm (20 in)</option>
+                  <option value="650">650 mm (24 in)</option>
+                  <option value="800">800 mm (30 in)</option>
+                  <option value="1000" selected>1000 mm (36 in)</option>
+                  <option value="1200">1200 mm (42 in)</option>
+                  <option value="1400">1400 mm (48 in)</option>
+                  <option value="1600">1600 mm (54 in)</option>
+                  <option value="1800">1800 mm (60 in)</option>
+                  <option value="2000">2000 mm (72 in)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="troughAngle">Idler Troughing Angle</label>
+                <select id="troughAngle">
+                  <option value="20">20&deg; Standard Trough (Flat or Light Material)</option>
+                  <option value="35" selected>35&deg; Deep Trough (General Mining / Ore)</option>
+                  <option value="45">45&deg; High Capacity Deep Trough (Gravel / Grain)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="bulkDensity" id="lblBulkDensity">Bulk Material Density [t/m³]</label>
+                <input type="number" id="bulkDensity" step="0.05" min="0.2" max="5.0" value="1.6">
+              </div>
+            </div>
+
+            <div class="calc-actions">
+              <button type="button" id="calcConveyorBtn" class="btn btn-primary">Calculate Conveyor Dynamics</button>
+              <button type="reset" id="resetConveyorBtn" class="btn btn-secondary">Reset Defaults</button>
+            </div>
+          </form>
+
+          <div id="conveyorResultBox" class="results-container" style="display: none;">
+            <h3>Conveyor Velocity & Throughput Results</h3>
+            <div class="results-grid">
+              <div class="result-tile">
+                <span class="result-label" id="resSpeedPrimaryLabel">Linear Belt Speed</span>
+                <span id="resBeltSpeedVal" class="result-value">-- m/s</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label" id="resRpmSecondaryLabel">Drive Pulley Rotational Speed</span>
+                <span id="resDriveRpmVal" class="result-value">-- RPM</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Effective Drum Diameter (D_eff)</span>
+                <span id="resEffDiam" class="result-value">-- mm</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Volumetric Capacity</span>
+                <span id="resVolCapacity" class="result-value">-- m³/h</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Mass Throughput Rate</span>
+                <span id="resMassThroughput" class="result-value">-- t/h</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Surcharge Cross-Section Area</span>
+                <span id="resLoadArea" class="result-value">-- m²</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Material Category Speed Limit</span>
+                <span id="resSpeedRating" class="result-value">--</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Drive Motor Output Power Est.</span>
+                <span id="resEstPower" class="result-value">-- kW</span>
+              </div>
+            </div>
+            <div id="conveyorNotesBox" style="margin-top: 1rem; color: #1e40af; background: #eff6ff; border: 1px solid #bfdbfe; padding: 0.75rem; border-radius: 6px;"></div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Industrial Conveyor Belt Kinematics & Bulk Material Transport</h2>
+          <p>Continuous belt conveyors represent the backbone of bulk materials handling, moving millions of tons of coal, copper ore, aggregates, cement clinker, agricultural grains, and port cargo worldwide every hour. Governed by the <strong>Conveyor Equipment Manufacturers Association (CEMA)</strong> and the International Organization for Standardization under <strong>ISO 5048</strong>, sizing a conveyor requires harmonizing linear belt velocity, pulley mechanical geometry, material trajectory kinetics, and drive powertrain torque.</p>
+
+          <p>Operating a conveyor at improper belt speeds creates severe operational challenges. Excessive velocity causes severe particle degradation, fugitive dust clouds at transfer chutes, destructive material spillage, and rapid idler bearing failure. Conversely, running a belt too slowly necessitates wider, heavier belts and massive structural trusses to achieve the required tonnage, exponentially multiplying capital expenditure.</p>
+
+          <h2>Drive Pulley Rotational Speed to Linear Velocity Formulations</h2>
+          <p>The tangential linear velocity (\(v\)) of a conveyor belt is directly governed by the rotational frequency of the drive pulley drum and its effective pitch radius:</p>
+
+          <div class="formula-box">
+            $$v = \frac{\pi \cdot D_{\text{eff}} \cdot N}{60 \times 1000} \quad [\text{m/s}] \quad \Longleftrightarrow \quad v = \frac{\pi \cdot D_{\text{eff}} \cdot N}{12} \quad [\text{ft/min}]$$
+          </div>
+
+          <p>Where:</p>
+          <ul>
+            <li><strong>\(v\)</strong>: Linear belt travel speed, expressed in meters per second (\(\text{m/s}\)) or feet per minute (\(\text{ft/min}\)).</li>
+            <li><strong>\(N\)</strong>: Rotational speed of the drive pulley shaft, in revolutions per minute (\(\text{RPM}\)).</li>
+            <li><strong>\(D_{\text{eff}}\)</strong>: Effective diameter of the drive drum (mm or inches), measured to the neutral bending center line of the belt carcass.</li>
+          </ul>
+
+          <p>In precision engineering design, the bare steel pulley shell diameter (\(D_{\text{shell}}\)) must be modified to account for bonded rubber/ceramic lagging (\(t_{\text{lag}}\)) and the belt carcass thickness (\(t_{\text{belt}}\)):</p>
+
+          <div class="formula-box">
+            $$D_{\text{eff}} = D_{\text{shell}} + 2 \cdot t_{\text{lag}} + t_{\text{belt}}$$
+          </div>
+
+          <p>Overlooking lagging thickness (typically 12 mm to 20 mm) and heavy multi-ply textile or steel-cord belt thickness (10 mm to 25 mm) introduces an error of up to 8% in belt speed, gear reducer output calculations, and scale calibration.</p>
+
+          <h2>Volumetric Load Capacity & Surcharge Cross-Section Area</h2>
+          <p>Under continuous steady-state loading, the volumetric discharge capacity (\(Q_{\text{vol}}\)) traversing the conveyor is the product of the cross-sectional area of the material load (\(A\)) and linear belt velocity (\(v\)):</p>
+
+          <div class="formula-box">
+            $$Q_{\text{vol}} = 3600 \cdot A \cdot v \quad [\text{m}^3/\text{hr}] \quad \Longleftrightarrow \quad Q_{\text{vol}} = 60 \cdot A \cdot v \quad [\text{ft}^3/\text{hr}]$$
+          </div>
+
+          <p>The cross-sectional area (\(A\)) on a standard 3-roll troughed belt consists of two geometric zones per CEMA Chapter 4:</p>
+          <ol>
+            <li><strong>Trapezoidal Trough Area (\(A_{\text{trough}}\)):</strong> The material contained within the lower channel formed by the inclined side idlers (troughing angles \(\beta = 20^\circ, 35^\circ,\) or \(45^\circ\)).</li>
+            <li><strong>Circular Surcharge Area (\(A_{\text{surch}}\)):</strong> The heaped parabolic crown resting above the trapezoid, bounded by the material's dynamic angle of surcharge (\(\alpha\), typically 5&deg; to 15&deg; shallower than the static angle of repose due to conveyor vibration).</li>
+          </ol>
+
+          <div class="formula-box">
+            $$A_{\text{total}} = A_{\text{trough}} + A_{\text{surch}} \approx k_{\text{trough}} \cdot \left(0.9 \cdot W - 0.05\right)^2$$
+          </div>
+
+          <p>Where \(W\) is belt width in meters, and \(k_{\text{trough}}\) is an empirical shape coefficient (typically 0.11 for 20&deg; idlers, 0.135 for 35&deg; idlers, and 0.155 for 45&deg; idlers with a 20&deg; surcharge angle).</p>
+
+          <h2>Mass Throughput Capacity Calculations</h2>
+          <p>Multiplying volumetric flow by the material's bulk density (\(\rho_{\text{bulk}}\)) yields the commercial mass throughput rate (\(Q_{\text{mass}}\)):</p>
+
+          <div class="formula-box">
+            $$Q_{\text{mass}} = Q_{\text{vol}} \cdot \rho_{\text{bulk}} \quad [\text{metric tons/hour}] \quad \Longleftrightarrow \quad Q_{\text{STPH}} = \frac{Q_{\text{vol}} \cdot \rho_{\text{bulk}}}{2000} \quad [\text{short tons/hour}]$$
+          </div>
+
+          <h2>CEMA Recommended Maximum Conveyor Belt Speeds</h2>
+          <p>Allowable belt speeds depend on material abrasiveness, lump sizing, friability, windage, and belt width. As standardized in CEMA Table 4-1:</p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Bulk Material Characteristics</th>
+                <th>Typical Materials</th>
+                <th>Belt Width &lt; 800 mm</th>
+                <th>Belt Width 800 &ndash; 1400 mm</th>
+                <th>Belt Width &gt; 1400 mm</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Dusty, light, or fine grains</td>
+                <td>Flour, cement, grain, fly ash</td>
+                <td>1.5 &ndash; 2.0 m/s (300 fpm)</td>
+                <td>2.0 &ndash; 2.5 m/s (400 fpm)</td>
+                <td>2.5 &ndash; 3.0 m/s (500 fpm)</td>
+              </tr>
+              <tr>
+                <td>Moderately abrasive, mixed lumps</td>
+                <td>Bituminous coal, crushed limestone</td>
+                <td>2.0 &ndash; 2.5 m/s (450 fpm)</td>
+                <td>2.5 &ndash; 3.5 m/s (600 fpm)</td>
+                <td>3.5 &ndash; 4.5 m/s (800 fpm)</td>
+              </tr>
+              <tr>
+                <td>Heavy, sharp, abrasive crushed ore</td>
+                <td>Iron ore, granite, trap rock</td>
+                <td>1.8 &ndash; 2.2 m/s (400 fpm)</td>
+                <td>2.2 &ndash; 3.0 m/s (550 fpm)</td>
+                <td>3.0 &ndash; 4.0 m/s (750 fpm)</td>
+              </tr>
+              <tr>
+                <td>Overland long-distance transport</td>
+                <td>Run-of-mine coal, bauxite</td>
+                <td>N/A</td>
+                <td>4.0 &ndash; 6.0 m/s (1000 fpm)</td>
+                <td>6.0 &ndash; 8.5 m/s (1500 fpm)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Drive Motor Power Estimation per ISO 5048</h2>
+          <p>Total mechanical power required at the drive pulley shaft (\(P_{\text{shaft}}\)) overcomes primary friction resistance (\(F_H\)), secondary resistance (\(F_N\)), and lift resistance (\(F_{St}\)):</p>
+
+          <div class="formula-box">
+            $$P_{\text{shaft}} = \frac{T_e \cdot v}{1000} \quad [\text{kW}] \quad \Longleftrightarrow \quad P_{\text{motor}} = \frac{P_{\text{shaft}}}{\eta_{\text{drive}}}$$
+          </div>
+
+          <p>Where \(T_e\) represents effective belt tension (Newtons), \(v\) is belt speed (m/s), and \(\eta_{\text{drive}}\) is overall powertrain efficiency (typically 0.88 to 0.94 for helical bevel reducers and flexible couplings).</p>
+
+          <div class="worked-example-card">
+            <h3>Step-by-Step Worked Case Study: Crushed Copper Ore Feed Conveyor</h3>
+            <p><strong>Design Scenario:</strong> An engineer is sizing the drive pulley RPM and checking throughput capacity for a copper concentrator plant feed conveyor:</p>
+            <ul>
+              <li>Belt width: \(W = 1000\text{ mm}\) (36 inches).</li>
+              <li>Drive drum bare shell diameter: \(D_{\text{shell}} = 500\text{ mm}\).</li>
+              <li>Ceramic diamond lagging thickness: \(t_{\text{lag}} = 12\text{ mm}\).</li>
+              <li>Steel-cord belt thickness: \(t_{\text{belt}} = 14\text{ mm}\).</li>
+              <li>Drive shaft speed: \(N = 75\text{ RPM}\).</li>
+              <li>Idler troughing: 35&deg; 3-roll idlers (\(k_{\text{trough}} = 0.135\)).</li>
+              <li>Crushed copper ore bulk density: \(\rho = 1.65\text{ t/m}^3\).</li>
+            </ul>
+
+            <p><strong>Step 1: Compute effective pulley diameter (\(D_{\text{eff}}\))</strong></p>
+            <div class="formula-box">
+              $$D_{\text{eff}} = 500 + 2(12) + 14 = 500 + 24 + 14 = 538\text{ mm} = 0.538\text{ m}$$
+            </div>
+
+            <p><strong>Step 2: Calculate linear belt velocity (\(v\))</strong></p>
+            <div class="formula-box">
+              $$v = \frac{\pi \cdot 0.538 \cdot 75}{60} = \frac{126.76}{60} = 2.11\text{ m/s} \quad (415\text{ ft/min})$$
+            </div>
+
+            <p><strong>Step 3: Calculate surcharge load cross-sectional area (\(A\))</strong></p>
+            <div class="formula-box">
+              $$A \approx 0.135 \cdot (0.9 \cdot 1.0 - 0.05)^2 = 0.135 \cdot (0.85)^2 = 0.135 \cdot 0.7225 = 0.0975\text{ m}^2$$
+            </div>
+
+            <p><strong>Step 4: Determine volumetric capacity (\(Q_{\text{vol}}\))</strong></p>
+            <div class="formula-box">
+              $$Q_{\text{vol}} = 3600 \cdot 0.0975 \cdot 2.11 = 740.6\text{ m}^3/\text{hr}$$
+            </div>
+
+            <p><strong>Step 5: Determine mass throughput capacity (\(Q_{\text{mass}}\))</strong></p>
+            <div class="formula-box">
+              $$Q_{\text{mass}} = 740.6 \times 1.65\text{ t/m}^3 = 1222.0\text{ metric tons/hr}$$
+            </div>
+            <p><strong>Engineering Conclusion:</strong> Operating at 2.11 m/s, the conveyor easily delivers the targeted <strong>1,222 metric tons/hour</strong> while remaining well within the CEMA recommended maximum of 2.8 m/s for crushed abrasive ore on a 1000 mm belt.</p>
+          </div>
+
+          <h2>Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <h3>How do idler troughing angles affect conveyor load capacity?</h3>
+            <p>Deepening the idler troughing angle increases cross-sectional capacity without requiring a wider belt. Upgrading from standard 20&deg; idlers to 35&deg; idlers increases cross-sectional surcharge area by approximately 25% to 30%. Deep 45&deg; idlers provide up to 45% more capacity compared to 20&deg; idlers, but require highly flexible transverse belt constructions (such as high-transverse-flex nylon fabrics) to ensure proper trough contact and belt tracking when running empty.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Why does conveyor belt speed affect transfer chute wear?</h3>
+            <p>The kinetic energy of falling bulk material entering a transfer chute is proportional to the square of its discharge velocity (\(KE = \frac{1}{2}m v^2\)). High belt velocities impart high initial horizontal momentum to discharged rocks, causing severe impact against wear liners and violent turbulence in the loading skirtboard. Transfer chute geometry must be engineered using rock boxes, curved curved hoods, and curved spoon deflectors to match material exit velocity to the receiving belt speed.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What causes belt slip on the drive pulley and how can it be resolved?</h3>
+            <p>Belt slip occurs when the tension ratio (\(T_1 / T_2\)) exceeds the frictional traction limit \(e^{\mu \theta}\). Common causes include inadequate gravity take-up counterweight, worn-down smooth steel pulley surfaces, water/slurry ingress, or seized idler rolls. Slippage can be mitigated by installing high-friction ceramic lagging (\(\mu \approx 0.40\)), increasing pulley wrap angle using a snub pulley, or increasing counterweight take-up tension.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>When should variable frequency drives (VFDs) be used on conveyor systems?</h3>
+            <p>VFDs provide controlled acceleration ramps (S-curves) over 30 to 90 seconds, preventing destructive dynamic tension waves (stress shockwaves) from snapping belt splices during starting. VFDs also enable closed-loop belt speed modulation to match incoming surge hopper levels, maintaining a constant full cross-sectional bed profile at reduced speeds to dramatically minimize transfer point dust and reduce power consumption during low-production shifts.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar" id="toolSidebar">
+        <!-- Dynamically rendered sidebar -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Engineering and mathematical tools grounded in international standards.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="mechanical.html">Mechanical</a></li>
+        <li><a href="ohms-law-calculator.html">Ohm's Law</a></li>
+        <li><a href="sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    const speedCalcModeSelect = document.getElementById('speedCalcMode');
+    const conveyorUnitsSelect = document.getElementById('conveyorUnits');
+    const pulleyDiamInput = document.getElementById('pulleyDiam');
+    const laggingThickInput = document.getElementById('laggingThick');
+    const beltThickInput = document.getElementById('beltThick');
+    const pulleyRpmInput = document.getElementById('pulleyRpm');
+    const targetSpeedInput = document.getElementById('targetSpeed');
+    const beltWidthSelect = document.getElementById('beltWidth');
+    const troughAngleSelect = document.getElementById('troughAngle');
+    const bulkDensityInput = document.getElementById('bulkDensity');
+
+    const lblPulleyDiam = document.getElementById('lblPulleyDiam');
+    const lblLaggingThick = document.getElementById('lblLaggingThick');
+    const lblBeltThick = document.getElementById('lblBeltThick');
+    const lblTargetSpeed = document.getElementById('lblTargetSpeed');
+    const lblBeltWidth = document.getElementById('lblBeltWidth');
+    const lblBulkDensity = document.getElementById('lblBulkDensity');
+
+    const grpPulleyRpm = document.getElementById('grpPulleyRpm');
+    const grpTargetSpeed = document.getElementById('grpTargetSpeed');
+
+    const conveyorResultBox = document.getElementById('conveyorResultBox');
+    const resSpeedPrimaryLabel = document.getElementById('resSpeedPrimaryLabel');
+    const resRpmSecondaryLabel = document.getElementById('resRpmSecondaryLabel');
+    const resBeltSpeedVal = document.getElementById('resBeltSpeedVal');
+    const resDriveRpmVal = document.getElementById('resDriveRpmVal');
+    const resEffDiam = document.getElementById('resEffDiam');
+    const resVolCapacity = document.getElementById('resVolCapacity');
+    const resMassThroughput = document.getElementById('resMassThroughput');
+    const resLoadArea = document.getElementById('resLoadArea');
+    const resSpeedRating = document.getElementById('resSpeedRating');
+    const resEstPower = document.getElementById('resEstPower');
+    const conveyorNotesBox = document.getElementById('conveyorNotesBox');
+
+    speedCalcModeSelect.addEventListener('change', function() {
+      if (this.value === 'rpmToSpeed') {
+        grpPulleyRpm.style.display = 'block';
+        grpTargetSpeed.style.display = 'none';
+        resSpeedPrimaryLabel.textContent = "Linear Belt Speed";
+        resRpmSecondaryLabel.textContent = "Drive Pulley Rotational Speed";
+      } else {
+        grpPulleyRpm.style.display = 'none';
+        grpTargetSpeed.style.display = 'block';
+        resSpeedPrimaryLabel.textContent = "Required Drive Pulley RPM";
+        resRpmSecondaryLabel.textContent = "Specified Target Belt Speed";
+      }
+      calculateConveyor();
+    });
+
+    conveyorUnitsSelect.addEventListener('change', function() {
+      const isMetric = this.value === 'metric';
+      if (isMetric) {
+        lblPulleyDiam.textContent = "Drive Pulley Shell Diameter [mm]";
+        lblLaggingThick.textContent = "Pulley Lagging Thickness [mm]";
+        lblBeltThick.textContent = "Conveyor Belt Thickness [mm]";
+        lblTargetSpeed.textContent = "Target Linear Belt Speed [m/s]";
+        lblBulkDensity.textContent = "Bulk Material Density [t/m³]";
+        pulleyDiamInput.value = 500;
+        laggingThickInput.value = 12;
+        beltThickInput.value = 10;
+        targetSpeedInput.value = 2.0;
+        bulkDensityInput.value = 1.6;
+      } else {
+        lblPulleyDiam.textContent = "Drive Pulley Shell Diameter [in]";
+        lblLaggingThick.textContent = "Pulley Lagging Thickness [in]";
+        lblBeltThick.textContent = "Conveyor Belt Thickness [in]";
+        lblTargetSpeed.textContent = "Target Linear Belt Speed [ft/min]";
+        lblBulkDensity.textContent = "Bulk Material Density [lbs/ft³]";
+        pulleyDiamInput.value = 20.0;
+        laggingThickInput.value = 0.5;
+        beltThickInput.value = 0.4;
+        targetSpeedInput.value = 400;
+        bulkDensityInput.value = 100;
+      }
+      calculateConveyor();
+    });
+
+    function calculateConveyor() {
+      const mode = speedCalcModeSelect.value;
+      const isMetric = conveyorUnitsSelect.value === 'metric';
+      const uDim = isMetric ? 'mm' : 'in';
+      const uSpd = isMetric ? 'm/s' : 'ft/min';
+      const uCapVol = isMetric ? 'm³/h' : 'ft³/h';
+      const uCapMass = isMetric ? 't/h' : 'STPH';
+      const uArea = isMetric ? 'm²' : 'ft²';
+      const uPwr = isMetric ? 'kW' : 'HP';
+
+      let D_shell = parseFloat(pulleyDiamInput.value);
+      let t_lag = parseFloat(laggingThickInput.value);
+      let t_belt = parseFloat(beltThickInput.value);
+      if (isNaN(D_shell) || D_shell <= 0) D_shell = isMetric ? 500 : 20;
+      if (isNaN(t_lag) || t_lag < 0) t_lag = 0;
+      if (isNaN(t_belt) || t_belt < 0) t_belt = 0;
+
+      const D_eff = D_shell + 2 * t_lag + t_belt;
+
+      let v = 0; // m/s (metric) or ft/min (imperial)
+      let rpm = 0;
+
+      if (mode === 'rpmToSpeed') {
+        rpm = parseFloat(pulleyRpmInput.value);
+        if (isNaN(rpm) || rpm <= 0) rpm = 75;
+
+        if (isMetric) {
+          v = (Math.PI * (D_eff / 1000) * rpm) / 60; // m/s
+        } else {
+          v = (Math.PI * (D_eff / 12) * rpm); // ft/min
+        }
+        resBeltSpeedVal.textContent = v.toFixed(2) + " " + uSpd;
+        resDriveRpmVal.textContent = rpm.toFixed(1) + " RPM";
+      } else {
+        v = parseFloat(targetSpeedInput.value);
+        if (isNaN(v) || v <= 0) v = isMetric ? 2.0 : 400;
+
+        if (isMetric) {
+          rpm = (v * 60) / (Math.PI * (D_eff / 1000));
+        } else {
+          rpm = (v * 12) / (Math.PI * D_eff);
+        }
+        resBeltSpeedVal.textContent = rpm.toFixed(1) + " RPM";
+        resDriveRpmVal.textContent = v.toFixed(2) + " " + uSpd;
+      }
+
+      // Convert v to m/s for standardized area calculations
+      const v_mps = isMetric ? v : (v * 0.00508);
+
+      // Belt width in meters
+      const widthValMm = parseFloat(beltWidthSelect.value);
+      const widthMeters = widthValMm / 1000;
+
+      // Trough coefficient based on trough angle
+      const troughDeg = parseInt(troughAngleSelect.value, 10);
+      let k_trough = 0.135;
+      if (troughDeg === 20) k_trough = 0.110;
+      else if (troughDeg === 45) k_trough = 0.155;
+
+      // Effective load cross sectional area A (m^2)
+      const A_m2 = k_trough * Math.pow(Math.max(0.2, 0.9 * widthMeters - 0.05), 2);
+      const A_disp = isMetric ? A_m2 : (A_m2 * 10.7639);
+
+      // Volumetric capacity Q_vol
+      const Q_vol_m3h = 3600 * A_m2 * v_mps;
+      const Q_vol_disp = isMetric ? Q_vol_m3h : (Q_vol_m3h * 35.3147);
+
+      // Mass throughput Q_mass
+      let density = parseFloat(bulkDensityInput.value);
+      if (isNaN(density) || density <= 0) density = isMetric ? 1.6 : 100;
+
+      let Q_mass_th = 0;
+      if (isMetric) {
+        Q_mass_th = Q_vol_m3h * density; // t/h
+      } else {
+        // density in lbs/ft^3, Q_vol in ft^3/h -> lbs/h / 2000 = STPH
+        Q_mass_th = (Q_vol_disp * density) / 2000;
+      }
+
+      // Estimated drive power (rough CEMA approximation: ~0.025 kW per t/h per 100m horizontal)
+      // Assuming 100m conveyor baseline
+      const estKw = Math.max(2.2, Q_mass_th * 0.035 * (v_mps / 2.0));
+      const estPwrDisp = isMetric ? estKw : (estKw * 1.34102);
+
+      // Material speed rating check per CEMA
+      let speedStatus = "Normal Operating Speed";
+      let statusColor = "#166534";
+      if (v_mps > 4.5) {
+        speedStatus = "High Speed (Overland / Non-Dusty Material)";
+        statusColor = "#b45309";
+      } else if (v_mps < 1.0) {
+        speedStatus = "Low Speed (Feeder / Delicate Material)";
+      }
+
+      resEffDiam.textContent = D_eff.toFixed(1) + " " + uDim;
+      resVolCapacity.textContent = Q_vol_disp.toFixed(1) + " " + uCapVol;
+      resMassThroughput.textContent = Q_mass_th.toFixed(1) + " " + uCapMass;
+      resLoadArea.textContent = A_disp.toFixed(4) + " " + uArea;
+      resSpeedRating.textContent = speedStatus;
+      resSpeedRating.style.color = statusColor;
+      resEstPower.textContent = estPwrDisp.toFixed(1) + " " + uPwr;
+
+      conveyorNotesBox.innerHTML = `<strong>CEMA Capacity Analysis:</strong> At <strong>${v_mps.toFixed(2)} m/s</strong> on a ${widthValMm} mm belt with ${troughDeg}&deg; idlers, the conveyor achieves <strong>${Q_mass_th.toFixed(1)} ${uCapMass}</strong> throughput. Drive drum effective pitch diameter is <strong>${D_eff.toFixed(1)} ${uDim}</strong>.`;
+
+      conveyorResultBox.style.display = 'block';
+    }
+
+    document.getElementById('calcConveyorBtn').addEventListener('click', calculateConveyor);
+    document.getElementById('resetConveyorBtn').addEventListener('click', function() {
+      setTimeout(calculateConveyor, 50);
+    });
+
+    window.addEventListener('DOMContentLoaded', calculateConveyor);
+  </script>
+</body>
+</html>

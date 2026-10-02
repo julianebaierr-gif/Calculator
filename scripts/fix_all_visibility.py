@@ -121,6 +121,14 @@ CAT_MAP = {
             ("pump-head-calculator.html", "Pump Head (TDH & Flow)", "🌊", "Total dynamic head & motor BHP", "TDH = Static Head + Friction Head"),
             ("gear-ratio-calculator.html", "Gear Ratio & Speed", "⚙️", "Velocity reduction & torque ratio", "Ratio = Driven Teeth ÷ Driving Teeth"),
             ("torque-calculator.html", "Torque & Shaft Power", "⚙️", "Rotational torque N·m & kW/HP", "P = (2π × N × T) ÷ 60000"),
+            ("belt-length-calculator.html", "Belt Length (Open & Crossed Pulley)", "⚙️", "Pitch length, center distance & wrap angle", "L ≈ 2C + (π/2)(D+d) + (D-d)²/(4C) | ISO 5296"),
+            ("conveyor-belt-speed-calculator.html", "Conveyor Belt Speed & Tonnage", "🏭", "Linear velocity, drum RPM & CEMA capacity", "v = π·Deff·N / 60 | Q = 3600·A·v·ρ (t/h)"),
+            ("cutting-speed-calculator.html", "Cutting Speed & Spindle RPM", "⚙️", "Linear surface speed Vc & Taylor tool life", "Vc = π·D·N / 1000 | Vc·T^n = C (ISO 3685)"),
+            ("feed-rate-calculator.html", "CNC Feed Rate & Chip Load", "⚙️", "Table feed vf, radial chip thinning & MRR", "vf = fz · z · N | MRR = ap · ae · vf / 1000"),
+            ("flywheel-energy-calculator.html", "Flywheel Kinetic Energy & Stress", "🔄", "Stored energy, moment of inertia & hoop stress", "Ek = 0.5·I·ω² | σ_hoop = ρ·v² (ASME VIII)"),
+            ("gear-module-calculator.html", "Gear Module & Pitch Geometry", "⚙️", "Metric module m, diametral pitch DP & tip dia", "m = d / z | da = m(z+2) | a = m(z1+z2)/2"),
+            ("heat-exchanger-calculator.html", "Heat Exchanger (LMTD & NTU Area)", "🌡️", "Thermal duty, counter-flow LMTD & TEMA area", "Q = U·A·ΔTm | LMTD = (ΔT1 - ΔT2)/ln(ΔT1/ΔT2)"),
+            ("hvac-calculator.html", "HVAC Sizing & Cooling Tonnage", "❄️", "Sensible, latent dehumidification & supply CFM", "Qs = 1.08·CFM·ΔT | 1 Ton = 12,000 BTU/hr"),
         ]
     },
     "civil.html": {

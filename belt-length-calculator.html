@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Belt Length Calculator | Open & Crossed Two-Pulley V-Belt Length</title>
+  <meta name="description" content="Calculate two-pulley belt pitch lengths, center distances, and wrap angles for open and crossed belt drives per ISO 5296 and RMA IP-20 mechanical power transmission standards.">
+  <link rel="canonical" href="https://calchub.cloud/belt-length-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Belt Length Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Mechanical power transmission tool calculating pitch length, center distance, arc of contact, and speed ratio for open and crossed two-pulley V-belt and synchronous timing belt drives.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the formula for calculating open belt length for two pulleys?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The exact geometric formula for an open two-pulley belt drive is: L = 2*C*cos(phi) + (pi/2)*(D + d) + phi*(D - d), where phi = arcsin((D - d) / (2*C)). In standard mechanical design practice, the highly accurate standard approximation is: L approx 2*C + (pi/2)*(D + d) + (D - d)^2 / (4*C), where C is center distance, D is large pulley diameter, and d is small pulley diameter."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does belt length calculation differ for a crossed belt drive?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In a crossed belt drive (where the driven pulley rotates in the reverse direction), the belt crosses over itself. The standard formula becomes: L approx 2*C + (pi/2)*(D + d) + (D + d)^2 / (4*C). The arc of contact is identical on both pulleys: theta = 180 deg + 2*arcsin((D + d) / (2*C))."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why is the arc of contact (wrap angle) critical for V-belt drive capacity?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Frictional grip between the belt and pulley grooves obeys the belt friction equation (Euler-Eytelwein formula): T1/T2 = e^(mu*theta/sin(alpha/2)). When the wrap angle theta drops below 180 degrees (common when large pulley ratio differences exist at tight center distances), frictional traction decreases exponentially, requiring an arc-of-contact correction factor (C_theta) to derate allowable belt power."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the recommended center distance between two pulleys?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Per standard mechanical power transmission guidelines (RMA/ISO), the minimum center distance should satisfy: C_min = 0.55*(D + d) + T_belt, and ideally C >= D. The maximum center distance should typically not exceed: C_max = 2*(D + d), to prevent excessive belt vibration, catenary sag, and flapping."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="mechanical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html" class="active">Mechanical</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="mechanical.html">Mechanical &amp; Machine Design</a> &rsaquo;
+      <span>Belt Length Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">ISO 5296 &amp; RMA IP-20 Machine Design Standards</div>
+          <h1 class="calc-title">Belt Length Calculator</h1>
+          <p class="calc-tagline">Calculate theoretical pitch length, required center distance, arc of contact, and speed ratios for open and crossed two-pulley mechanical belt drives.</p>
+        </header>
+
+        <div class="tool-card">
+          <form id="beltCalcForm">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="calcMode">Calculation Mode</label>
+                <select id="calcMode">
+                  <option value="findLength" selected>Calculate Belt Length from Center Distance</option>
+                  <option value="findCenter">Calculate Center Distance from Standard Belt Length</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="driveType">Drive Configuration</label>
+                <select id="driveType">
+                  <option value="open" selected>Open Belt Drive (Same Direction)</option>
+                  <option value="crossed">Crossed Belt Drive (Reversed Rotation)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="units">Engineering Units</label>
+                <select id="units">
+                  <option value="metric" selected>Metric (mm, meters)</option>
+                  <option value="imperial">Imperial (inches, feet)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="diamLarge" id="lblDiamLarge">Large Pulley Diameter D [mm]</label>
+                <input type="number" id="diamLarge" step="0.5" min="10" max="5000" value="250">
+              </div>
+
+              <div class="form-group">
+                <label for="diamSmall" id="lblDiamSmall">Small Pulley Diameter d [mm]</label>
+                <input type="number" id="diamSmall" step="0.5" min="5" max="5000" value="125">
+              </div>
+
+              <div class="form-group" id="grpCenterDist">
+                <label for="centerDist" id="lblCenterDist">Center Distance C [mm]</label>
+                <input type="number" id="centerDist" step="1" min="10" max="10000" value="500">
+              </div>
+
+              <div class="form-group" id="grpBeltLength" style="display: none;">
+                <label for="givenBeltLength" id="lblGivenBeltLength">Nominal Belt Length L [mm]</label>
+                <input type="number" id="givenBeltLength" step="1" min="50" max="20000" value="1600">
+              </div>
+
+              <div class="form-group">
+                <label for="motorRpm">Drive Pulley Rotational Speed [RPM]</label>
+                <input type="number" id="motorRpm" step="10" min="1" max="20000" value="1750">
+              </div>
+            </div>
+
+            <div class="calc-actions">
+              <button type="button" id="calcBeltBtn" class="btn btn-primary">Calculate Belt Drive Parameters</button>
+              <button type="reset" id="resetBeltBtn" class="btn btn-secondary">Reset Defaults</button>
+            </div>
+          </form>
+
+          <div id="beltResultBox" class="results-container" style="display: none;">
+            <h3>Mechanical Belt Drive Engineering Results</h3>
+            <div class="results-grid">
+              <div class="result-tile">
+                <span class="result-label" id="resPrimaryLabel">Calculated Belt Pitch Length</span>
+                <span id="resPrimaryVal" class="result-value">-- mm</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label" id="resSecondaryLabel">Shaft Center Distance</span>
+                <span id="resSecondaryVal" class="result-value">-- mm</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Speed Transmission Ratio (i)</span>
+                <span id="resRatio" class="result-value">--</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Driven Pulley Speed</span>
+                <span id="resDrivenRpm" class="result-value">-- RPM</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Small Pulley Wrap Angle (&theta;)</span>
+                <span id="resWrapSmall" class="result-value">-- &deg;</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Large Pulley Wrap Angle (&theta;)</span>
+                <span id="resWrapLarge" class="result-value">-- &deg;</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Linear Belt Speed (v)</span>
+                <span id="resBeltSpeed" class="result-value">-- m/s</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Arc of Contact Factor (C_&theta;)</span>
+                <span id="resWrapFactor" class="result-value">--</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Center Distance Validation</span>
+                <span id="resDistStatus" class="result-value">--</span>
+              </div>
+            </div>
+            <div id="beltNotesBox" style="margin-top: 1rem; color: #1e40af; background: #eff6ff; border: 1px solid #bfdbfe; padding: 0.75rem; border-radius: 6px;"></div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Mechanical Principles of Two-Pulley Belt Transmission Systems</h2>
+          <p>Flexible belt drives represent one of the most widely utilized mechanical power transmission elements in industrial machinery, automotive engines, agricultural harvesters, and HVAC air handling equipment. By utilizing friction (in flat and V-belts) or positive tooth engagement (in synchronous timing belts), a belt drive smoothly transmits rotational torque between parallel shafts while providing critical vibration isolation, shock-load damping, and overload protection.</p>
+
+          <p>Proper belt dimensioning requires solving exact geometric tangency equations between two pitch circles. If a belt is sized too short, bearings endure severe static radial overloads, causing premature fatigue spalling and shaft deflection. If sized too long, the belt experiences excessive slack-side catenary flutter, pulley slippage, rapid tooth jumping (ratcheting), and localized thermal degradation.</p>
+
+          <h2>Open Belt Drive Mathematical Formulations</h2>
+          <p>In an open belt drive configuration, the belt encircles both pulleys without crossing, ensuring that both the driving and driven shafts rotate in identical directions. The belt consists of two tangent spans and two circular arcs contacting the pulley circumferences.</p>
+
+          <p>The exact trigonometric formulation for the total pitch length (\(L\)) of an open belt drive is:</p>
+
+          <div class="formula-box">
+            $$L = 2C \cos\phi + \frac{\pi}{2}(D + d) + \phi(D - d)$$
+          </div>
+
+          <p>Where the angle of inclination (\(\phi\)) between the centerline and the tangent line is given by:</p>
+
+          <div class="formula-box">
+            $$\phi = \arcsin\left(\frac{D - d}{2C}\right) \quad [\text{radians}]$$
+          </div>
+
+          <p>For standard mechanical design calculations, engineering standards (ISO 5296 and RMA IP-20) universally accept the classic truncated series expansion approximation:</p>
+
+          <div class="formula-box">
+            $$L \approx 2C + \frac{\pi}{2}(D + d) + \frac{(D - d)^2}{4C}$$
+          </div>
+
+          <p>Where the geometric parameters represent:</p>
+          <ul>
+            <li><strong>\(L\)</strong>: Total belt pitch length (mm or inches).</li>
+            <li><strong>\(C\)</strong>: Center-to-center shaft distance (mm or inches).</li>
+            <li><strong>\(D\)</strong>: Pitch diameter of the larger pulley (mm or inches).</li>
+            <li><strong>\(d\)</strong>: Pitch diameter of the smaller pulley (mm or inches).</li>
+          </ul>
+
+          <h2>Crossed Belt Drive Mathematical Formulations</h2>
+          <p>In a crossed belt drive, the belt crosses over midway between shafts, causing the driven pulley to rotate in the opposite direction from the driver. Because the tangent lines cross the shaft center axis, both pulleys share an identical, expanded arc of contact:</p>
+
+          <div class="formula-box">
+            $$L_{\text{crossed}} \approx 2C + \frac{\pi}{2}(D + d) + \frac{(D + d)^2}{4C}$$
+          </div>
+
+          <p>The angle of contact for crossed drives is symmetrical on both pulleys:</p>
+
+          <div class="formula-box">
+            $$\theta_{\text{crossed}} = 180^\circ + 2\arcsin\left(\frac{D + d}{2C}\right)$$
+          </div>
+
+          <p>While crossed drives provide a generous arc of contact (\(>180^\circ\)), internal friction and rubbing occur at the crossover point unless guide rollers or special quarter-turn configurations are implemented. Consequently, crossed drives are strictly restricted to low-speed flat belt systems and are never recommended for standard V-belts or timing belts.</p>
+
+          <h2>Center Distance Computation from Known Belt Length</h2>
+          <p>In equipment retrofits and production machine design, engineers often select a standardized, off-the-shelf belt catalog length (\(L\)) and must compute the precise nominal center distance (\(C\)) to position motor slide rails. Solving the open-belt quadratic equation yields:</p>
+
+          <div class="formula-box">
+            $$C = \frac{B + \sqrt{B^2 - 2(D - d)^2}}{4}$$
+          </div>
+
+          <p>Where the intermediate geometric constant \(B\) is defined as:</p>
+
+          <div class="formula-box">
+            $$B = L - \frac{\pi}{2}(D + d)$$
+          </div>
+
+          <h2>Arc of Contact (Wrap Angle) and Frictional Grip</h2>
+          <p>Frictional traction between a flexible belt and a smooth pulley groove is dictated by the fundamental <strong>Euler-Eytelwein equation</strong> (also known as the capstan formula):</p>
+
+          <div class="formula-box">
+            $$\frac{T_1}{T_2} = e^{\mu \cdot \theta / \sin(\alpha / 2)}$$
+          </div>
+
+          <p>Where \(T_1\) and \(T_2\) are the tight-side and slack-side tensions, \(\mu\) is the coefficient of friction, \(\theta\) is the wrap angle in radians, and \(\alpha\) is the included V-groove angle (typically 34&deg; to 38&deg;). For an open belt drive, the small pulley wrap angle (\(\theta_{\text{small}}\)) is always less than 180&deg;:</p>
+
+          <div class="formula-box">
+            $$\theta_{\text{small}} = 180^\circ - 2\arcsin\left(\frac{D - d}{2C}\right) \approx 180^\circ - 57.3^\circ \left(\frac{D - d}{C}\right)$$
+            $$\theta_{\text{large}} = 180^\circ + 2\arcsin\left(\frac{D - d}{2C}\right) \approx 180^\circ + 57.3^\circ \left(\frac{D - d}{C}\right)$$
+          </div>
+
+          <p>Whenever \(\theta_{\text{small}} < 180^\circ\), the drive cannot transmit full catalog horsepower. Power capacity must be derated by the arc of contact correction factor (\(C_\theta\)):</p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Small Pulley Wrap Angle (\(\theta_{\text{small}}\))</th>
+                <th>Arc Factor (\(C_\theta\)) (V-Belts)</th>
+                <th>Arc Factor (\(C_\theta\)) (Flat Belts)</th>
+                <th>Required Horsepower Multiplier</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>180&deg;</td>
+                <td>1.00</td>
+                <td>1.00</td>
+                <td>1.00 &times; (No derate)</td>
+              </tr>
+              <tr>
+                <td>170&deg;</td>
+                <td>0.98</td>
+                <td>0.96</td>
+                <td>1.02 &times; Design HP</td>
+              </tr>
+              <tr>
+                <td>160&deg;</td>
+                <td>0.95</td>
+                <td>0.91</td>
+                <td>1.05 &times; Design HP</td>
+              </tr>
+              <tr>
+                <td>150&deg;</td>
+                <td>0.92</td>
+                <td>0.86</td>
+                <td>1.09 &times; Design HP</td>
+              </tr>
+              <tr>
+                <td>140&deg;</td>
+                <td>0.89</td>
+                <td>0.81</td>
+                <td>1.12 &times; Design HP</td>
+              </tr>
+              <tr>
+                <td>130&deg;</td>
+                <td>0.86</td>
+                <td>0.75</td>
+                <td>1.16 &times; Design HP</td>
+              </tr>
+              <tr>
+                <td>120&deg;</td>
+                <td>0.82</td>
+                <td>0.69</td>
+                <td>1.22 &times; Design HP</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Linear Belt Speed & Centrifugal Force Limits</h2>
+          <p>Linear surface velocity (\(v\)) determines dynamic stress, cooling efficiency, and centrifugal tension throwing the belt outward from the pulley face:</p>
+
+          <div class="formula-box">
+            $$v = \frac{\pi \cdot d \cdot N}{60 \times 1000} \quad [\text{m/s}] \quad \Longleftrightarrow \quad v = \frac{\pi \cdot d \cdot N}{12} \quad [\text{ft/min}]$$
+          </div>
+
+          <p>Standard classical industrial V-belts (A, B, C sections) operate optimally between <strong>10 m/s and 25 m/s (2,000 to 5,000 ft/min)</strong>. At speeds exceeding 30 m/s (6,000 ft/min), centrifugal tension (\(T_c = m \cdot v^2\)) diminishes effective wedging grip so drastically that dynamic re-tensioning, precision dynamic balancing, and ductile iron or steel sheaves become mandatory.</p>
+
+          <div class="worked-example-card">
+            <h3>Step-by-Step Worked Case Study: Industrial Exhaust Blower Drive</h3>
+            <p><strong>Design Scenario:</strong> An engineer is designing a V-belt drive connecting a 4-pole electric motor (1,750 RPM) to an industrial ventilation centrifugal blower running at 875 RPM.</p>
+            <ul>
+              <li>Motor drive pulley diameter: \(d = 125\text{ mm}\).</li>
+              <li>Blower driven pulley diameter: \(D = 250\text{ mm}\).</li>
+              <li>Shaft center distance constraint: \(C = 500\text{ mm}\).</li>
+              <li>Drive type: Open belt drive.</li>
+            </ul>
+
+            <p><strong>Step 1: Calculate speed ratio and driven speed</strong></p>
+            <div class="formula-box">
+              $$i = \frac{D}{d} = \frac{250}{125} = 2.00$$
+              $$N_{\text{driven}} = \frac{N_{\text{motor}}}{i} = \frac{1750}{2.00} = 875\text{ RPM}$$
+            </div>
+
+            <p><strong>Step 2: Calculate approximate belt pitch length (\(L\))</strong></p>
+            <div class="formula-box">
+              $$L \approx 2(500) + \frac{\pi}{2}(250 + 125) + \frac{(250 - 125)^2}{4(500)}$$
+              $$L \approx 1000 + 1.5708 \times 375 + \frac{15625}{2000} = 1000 + 589.05 + 7.81 = 1596.86\text{ mm}$$
+            </div>
+            <p>The engineer selects the nearest standard ISO V-belt length: <strong>1,600 mm</strong> (or standard B61 / SPB1600).</p>
+
+            <p><strong>Step 3: Calculate small pulley arc of contact (\(\theta_{\text{small}}\))</strong></p>
+            <div class="formula-box">
+              $$\phi = \arcsin\left(\frac{250 - 125}{2 \times 500}\right) = \arcsin\left(\frac{125}{1000}\right) = \arcsin(0.125) = 7.18^\circ$$
+              $$\theta_{\text{small}} = 180^\circ - 2(7.18^\circ) = 165.64^\circ$$
+            </div>
+
+            <p><strong>Step 4: Determine linear belt speed (\(v\))</strong></p>
+            <div class="formula-box">
+              $$v = \frac{\pi \cdot 125 \cdot 1750}{60000} = \frac{687223}{60000} = 11.45\text{ m/s} \quad (2254\text{ ft/min})$$
+            </div>
+            <p><strong>Engineering Conclusion:</strong> Operating at 11.45 m/s, the belt operates within the optimal aerodynamic efficiency band. The wrap angle of 165.6&deg; yields an arc factor \(C_\theta \approx 0.965\), requiring a slight 3.6% design power margin.</p>
+          </div>
+
+          <h2>Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <h3>What is the difference between belt pitch length, inside length, and outside length?</h3>
+            <p>Pitch length (Lp or Lw) is the circumference measured along the neutral bending axis of the belt's internal tensile cords (aramid or polyester), where neither tension nor compression occurs during flexing. Inside length (Li) is measured along the inner bottom surface of the belt, while outside length (La) is measured along the outer top back. For classical V-belts: \(L_a \approx L_i + 50\text{ mm}\), and \(L_p \approx L_i + 30\text{ mm}\).</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How do I select the proper center distance for a new belt drive?</h3>
+            <p>As a rule of thumb, center distance should satisfy \(0.55(D + d) + t_{\text{belt}} \le C \le 2(D + d)\). A center distance that is too tight reduces the small pulley arc of contact below 120&deg;, severely limiting power capacity and inducing extreme flex fatigue. An overly long center distance causes belt whipping and necessitates heavy idler pulleys.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>When should an idler pulley be used on a belt drive?</h3>
+            <p>Idler pulleys are required when center distance is fixed without motor adjustment rails, when center distances are unusually long, or when an extreme pulley ratio causes the wrap angle on the small pulley to fall below 120&deg;. Idlers should always be positioned on the slack (loose) side of the drive. If an inside grooved idler is used, it should be placed near the large pulley; if an outside flat back-idler is used, it should be located near the small pulley to maximize wrap angle.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How does temperature affect industrial belt length and tension?</h3>
+            <p>Standard rubber polychloroprene and EPDM belts have negative thermal expansion characteristics when under tension (the Gough-Joule effect), meaning they contract and tighten slightly as operating temperature rises. However, ambient heat above 85&deg;C (185&deg;F) accelerates elastomer hardening, ozone cracking, and cord degradation, reducing fatigue life by approximately 50% for every 10&deg;C rise above rated limits.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar" id="toolSidebar">
+        <!-- Dynamically rendered sidebar -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Engineering and mathematical tools grounded in international standards.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="mechanical.html">Mechanical</a></li>
+        <li><a href="ohms-law-calculator.html">Ohm's Law</a></li>
+        <li><a href="sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    const calcModeSelect = document.getElementById('calcMode');
+    const driveTypeSelect = document.getElementById('driveType');
+    const unitsSelect = document.getElementById('units');
+    const diamLargeInput = document.getElementById('diamLarge');
+    const diamSmallInput = document.getElementById('diamSmall');
+    const centerDistInput = document.getElementById('centerDist');
+    const givenBeltLengthInput = document.getElementById('givenBeltLength');
+    const motorRpmInput = document.getElementById('motorRpm');
+
+    const lblDiamLarge = document.getElementById('lblDiamLarge');
+    const lblDiamSmall = document.getElementById('lblDiamSmall');
+    const lblCenterDist = document.getElementById('lblCenterDist');
+    const lblGivenBeltLength = document.getElementById('lblGivenBeltLength');
+    const grpCenterDist = document.getElementById('grpCenterDist');
+    const grpBeltLength = document.getElementById('grpBeltLength');
+
+    const beltResultBox = document.getElementById('beltResultBox');
+    const resPrimaryLabel = document.getElementById('resPrimaryLabel');
+    const resPrimaryVal = document.getElementById('resPrimaryVal');
+    const resSecondaryLabel = document.getElementById('resSecondaryLabel');
+    const resSecondaryVal = document.getElementById('resSecondaryVal');
+    const resRatio = document.getElementById('resRatio');
+    const resDrivenRpm = document.getElementById('resDrivenRpm');
+    const resWrapSmall = document.getElementById('resWrapSmall');
+    const resWrapLarge = document.getElementById('resWrapLarge');
+    const resBeltSpeed = document.getElementById('resBeltSpeed');
+    const resWrapFactor = document.getElementById('resWrapFactor');
+    const resDistStatus = document.getElementById('resDistStatus');
+    const beltNotesBox = document.getElementById('beltNotesBox');
+
+    calcModeSelect.addEventListener('change', function() {
+      if (this.value === 'findLength') {
+        grpCenterDist.style.display = 'block';
+        grpBeltLength.style.display = 'none';
+        resPrimaryLabel.textContent = "Calculated Belt Pitch Length";
+        resSecondaryLabel.textContent = "Shaft Center Distance";
+      } else {
+        grpCenterDist.style.display = 'none';
+        grpBeltLength.style.display = 'block';
+        resPrimaryLabel.textContent = "Required Shaft Center Distance";
+        resSecondaryLabel.textContent = "Catalog Belt Pitch Length";
+      }
+      calculateBeltDrive();
+    });
+
+    unitsSelect.addEventListener('change', function() {
+      const isMetric = this.value === 'metric';
+      const u = isMetric ? 'mm' : 'in';
+      lblDiamLarge.textContent = `Large Pulley Diameter D [${u}]`;
+      lblDiamSmall.textContent = `Small Pulley Diameter d [${u}]`;
+      lblCenterDist.textContent = `Center Distance C [${u}]`;
+      lblGivenBeltLength.textContent = `Nominal Belt Length L [${u}]`;
+
+      if (isMetric) {
+        diamLargeInput.value = 250;
+        diamSmallInput.value = 125;
+        centerDistInput.value = 500;
+        givenBeltLengthInput.value = 1600;
+      } else {
+        diamLargeInput.value = 10.0;
+        diamSmallInput.value = 5.0;
+        centerDistInput.value = 20.0;
+        givenBeltLengthInput.value = 64.0;
+      }
+      calculateBeltDrive();
+    });
+
+    function calculateBeltDrive() {
+      const mode = calcModeSelect.value;
+      const driveType = driveTypeSelect.value;
+      const isMetric = unitsSelect.value === 'metric';
+      const u = isMetric ? 'mm' : 'in';
+      const spdUnit = isMetric ? 'm/s' : 'ft/min';
+
+      let D = parseFloat(diamLargeInput.value);
+      let d = parseFloat(diamSmallInput.value);
+      let rpm = parseFloat(motorRpmInput.value);
+
+      if (isNaN(D) || D <= 0) D = isMetric ? 250 : 10;
+      if (isNaN(d) || d <= 0) d = isMetric ? 125 : 5;
+      if (d > D) {
+        // Swap so D is always larger
+        const temp = D;
+        D = d;
+        d = temp;
+      }
+      if (isNaN(rpm) || rpm <= 0) rpm = 1750;
+
+      const ratio = D / d;
+      const drivenRpm = rpm / ratio;
+
+      let C = 0;
+      let L = 0;
+      let phi = 0;
+      let wrapSmall = 180;
+      let wrapLarge = 180;
+
+      if (mode === 'findLength') {
+        C = parseFloat(centerDistInput.value);
+        if (isNaN(C) || C <= 0) C = isMetric ? 500 : 20;
+
+        if (driveType === 'open') {
+          // Check geometric possibility
+          if (2 * C < (D - d)) C = (D - d) / 2 + 1;
+          phi = Math.asin((D - d) / (2 * C));
+          L = 2 * C + (Math.PI / 2) * (D + d) + Math.pow(D - d, 2) / (4 * C);
+          wrapSmall = 180 - (2 * phi * 180 / Math.PI);
+          wrapLarge = 180 + (2 * phi * 180 / Math.PI);
+        } else {
+          // Crossed drive
+          if (2 * C < (D + d)) C = (D + d) / 2 + 1;
+          phi = Math.asin((D + d) / (2 * C));
+          L = 2 * C + (Math.PI / 2) * (D + d) + Math.pow(D + d, 2) / (4 * C);
+          wrapSmall = 180 + (2 * phi * 180 / Math.PI);
+          wrapLarge = wrapSmall;
+        }
+
+        resPrimaryVal.textContent = L.toFixed(2) + " " + u;
+        resSecondaryVal.textContent = C.toFixed(2) + " " + u;
+      } else {
+        // Find Center Distance from known Length
+        L = parseFloat(givenBeltLengthInput.value);
+        if (isNaN(L) || L <= 0) L = isMetric ? 1600 : 64;
+
+        if (driveType === 'open') {
+          const B = L - (Math.PI / 2) * (D + d);
+          const discriminant = Math.pow(B, 2) - 2 * Math.pow(D - d, 2);
+          if (discriminant >= 0) {
+            C = (B + Math.sqrt(discriminant)) / 4;
+            phi = Math.asin((D - d) / (2 * C));
+            wrapSmall = 180 - (2 * phi * 180 / Math.PI);
+            wrapLarge = 180 + (2 * phi * 180 / Math.PI);
+          } else {
+            C = 0.55 * (D + d);
+            wrapSmall = 140;
+            wrapLarge = 220;
+          }
+        } else {
+          const B = L - (Math.PI / 2) * (D + d);
+          const discriminant = Math.pow(B, 2) - 2 * Math.pow(D + d, 2);
+          if (discriminant >= 0) {
+            C = (B + Math.sqrt(discriminant)) / 4;
+            phi = Math.asin((D + d) / (2 * C));
+            wrapSmall = 180 + (2 * phi * 180 / Math.PI);
+            wrapLarge = wrapSmall;
+          } else {
+            C = 0.55 * (D + d);
+            wrapSmall = 200;
+            wrapLarge = 200;
+          }
+        }
+
+        resPrimaryVal.textContent = C.toFixed(2) + " " + u;
+        resSecondaryVal.textContent = L.toFixed(2) + " " + u;
+      }
+
+      // Linear speed (m/s or ft/min)
+      // d is pitch diameter of small pulley, rpm is motor speed on small pulley
+      let linearSpeed = 0;
+      if (isMetric) {
+        linearSpeed = (Math.PI * (d / 1000) * rpm) / 60; // m/s
+      } else {
+        linearSpeed = (Math.PI * (d / 12) * rpm); // ft/min
+      }
+
+      // Arc of contact factor (C_theta) approximation for V-belts
+      let arcFactor = 1.0;
+      if (wrapSmall < 180) {
+        arcFactor = 1.0 - (180 - wrapSmall) * 0.003;
+      }
+
+      // Center distance rule of thumb: 0.55*(D+d) <= C <= 2*(D+d)
+      const cMin = 0.55 * (D + d);
+      const cMax = 2.0 * (D + d);
+      let distStatus = "Optimal Engineering Range";
+      let statusColor = "#166534";
+
+      if (C < cMin) {
+        distStatus = "Too Tight (C < 0.55(D+d))";
+        statusColor = "#b45309";
+      } else if (C > cMax) {
+        distStatus = "Too Long (C > 2(D+d))";
+        statusColor = "#b45309";
+      }
+
+      resRatio.textContent = ratio.toFixed(2) + ":1";
+      resDrivenRpm.textContent = drivenRpm.toFixed(1) + " RPM";
+      resWrapSmall.textContent = wrapSmall.toFixed(1) + "°";
+      resWrapLarge.textContent = wrapLarge.toFixed(1) + "°";
+      resBeltSpeed.textContent = linearSpeed.toFixed(2) + " " + spdUnit;
+      resWrapFactor.textContent = arcFactor.toFixed(3);
+      resDistStatus.textContent = distStatus;
+      resDistStatus.style.color = statusColor;
+
+      let notes = `<strong>Design Analysis:</strong> Center distance of <strong>${C.toFixed(1)} ${u}</strong> provides a small pulley wrap angle of <strong>${wrapSmall.toFixed(1)}&deg;</strong>. `;
+      if (wrapSmall < 140) {
+        notes += `<span style="color:#b45309;">Warning: Wrap angle is below 140&deg;. Consider increasing center distance or adding an idler pulley to prevent belt slippage.</span>`;
+      } else {
+        notes += `Arc of contact factor is <strong>${arcFactor.toFixed(3)}</strong>, ensuring efficient frictional power transfer.`;
+      }
+      beltNotesBox.innerHTML = notes;
+
+      beltResultBox.style.display = 'block';
+    }
+
+    document.getElementById('calcBeltBtn').addEventListener('click', calculateBeltDrive);
+    document.getElementById('resetBeltBtn').addEventListener('click', function() {
+      setTimeout(calculateBeltDrive, 50);
+    });
+
+    window.addEventListener('DOMContentLoaded', calculateBeltDrive);
+  </script>
+</body>
+</html>

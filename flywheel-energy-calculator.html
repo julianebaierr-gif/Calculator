@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flywheel Energy Calculator | Rotational Kinetic Energy & Rim Stress</title>
+  <meta name="description" content="Calculate flywheel rotational kinetic energy, mass moment of inertia, coefficient of speed fluctuation, and centrifugal hoop stress per ASME and ISO mechanical engineering standards.">
+  <link rel="canonical" href="https://calchub.cloud/flywheel-energy-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Flywheel Energy Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Mechanical energy storage calculation engine determining flywheel kinetic energy E = 0.5*I*omega^2, fluctuation energy Delta_E, moment of inertia, and centrifugal hoop stress.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the formula for rotational kinetic energy of a flywheel?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The kinetic energy stored in a rotating flywheel is: E = 0.5 * I * omega^2, where I is the mass moment of inertia in kg*m^2 (or lb*ft^2) and omega is angular velocity in radians per second: omega = (2 * pi * N) / 60, with N representing rotational speed in RPM."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is the usable fluctuation energy (Delta E) calculated for punching presses or engines?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "During an operational cycle, a flywheel delivers energy by decelerating from maximum speed (omega_1) to minimum speed (omega_2). The usable energy release is: Delta_E = 0.5 * I * (omega_1^2 - omega_2^2) = I * omega_avg^2 * C_s, where C_s is the coefficient of speed fluctuation: C_s = (omega_1 - omega_2) / omega_avg."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is centrifugal hoop stress calculated in a rotating flywheel rim?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Centrifugal forces create tensile tangential stress (hoop stress) across the rim: sigma_hoop = rho * v^2 = rho * (omega * R)^2, where rho is material density (e.g., 7,200 kg/m^3 for gray cast iron, 7,850 kg/m^3 for steel) and v is linear rim velocity in m/s. Rim stress depends solely on material density and peripheral speed, independent of rim cross-sectional area."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are maximum safe peripheral rim speeds for flywheel materials?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Standard gray cast iron flywheels are strictly restricted to peripheral speeds below 30 - 35 m/s (6,000 - 7,000 ft/min) due to low tensile strength. Ductile/nodular iron flywheels can operate up to 50 m/s. Forged alloy steel rotors safely achieve 100 - 150 m/s. Advanced high-speed vacuum flywheel energy storage systems (FESS) utilizing carbon-fiber composite rotors achieve tip speeds exceeding 800 - 1,000 m/s."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="mechanical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html" class="active">Mechanical</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="mechanical.html">Mechanical &amp; Machine Design</a> &rsaquo;
+      <span>Flywheel Energy Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">ASME Mechanical Power &amp; FESS Standards</div>
+          <h1 class="calc-title">Flywheel Energy Calculator</h1>
+          <p class="calc-tagline">Calculate rotational kinetic energy storage, usable fluctuation energy, mass moment of inertia, centrifugal hoop stress, and burst velocity limits.</p>
+        </header>
+
+        <div class="tool-card">
+          <form id="flywheelCalcForm">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="rotorGeometry">Rotor Cross-Section Geometry</label>
+                <select id="rotorGeometry">
+                  <option value="solidDisc" selected>Solid Uniform Disc / Cylinder</option>
+                  <option value="hollowRim">Hollow Cylindrical Rim (Thick Rim)</option>
+                  <option value="thinRim">Thin Annular Rim (Rim with Thin Web)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="flywheelUnits">Engineering Units</label>
+                <select id="flywheelUnits">
+                  <option value="metric" selected>Metric (kg, mm, Joules, MPa)</option>
+                  <option value="imperial">Imperial (lbs, in, ft-lbf, PSI)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="materialPreset">Rotor Construction Material</label>
+                <select id="materialPreset">
+                  <option value="castIron" selected>Class 35 Gray Cast Iron (&rho; = 7200 kg/m³)</option>
+                  <option value="ductileIron">Ductile / Nodular Iron (&rho; = 7100 kg/m³)</option>
+                  <option value="structuralSteel">Structural Carbon Steel AISI 1045 (&rho; = 7850 kg/m³)</option>
+                  <option value="alloySteel">High-Strength 4340 Alloy Steel (&rho; = 7850 kg/m³)</option>
+                  <option value="carbonFiber">Carbon-Fiber Epoxy Composite (&rho; = 1600 kg/m³)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="outerDiam" id="lblOuterDiam">Outer Diameter (Do) [mm]</label>
+                <input type="number" id="outerDiam" step="10" min="50" max="10000" value="600">
+              </div>
+
+              <div class="form-group" id="grpHollowInner" style="display: none;">
+                <label for="innerDiam" id="lblInnerDiam">Inner Rim Diameter (Di) [mm]</label>
+                <input type="number" id="innerDiam" step="10" min="10" max="9500" value="450">
+              </div>
+
+              <div class="form-group">
+                <label for="rotorAxialWidth" id="lblRotorAxialWidth">Axial Width / Thickness (b) [mm]</label>
+                <input type="number" id="rotorAxialWidth" step="5" min="5" max="2000" value="100">
+              </div>
+
+              <div class="form-group">
+                <label for="maxRpm">Maximum Operating Speed (N1) [RPM]</label>
+                <input type="number" id="maxRpm" step="50" min="10" max="100000" value="1800">
+              </div>
+
+              <div class="form-group">
+                <label for="minRpm">Minimum Discharged Speed (N2) [RPM]</label>
+                <input type="number" id="minRpm" step="50" min="0" max="99000" value="1600">
+              </div>
+            </div>
+
+            <div class="calc-actions">
+              <button type="button" id="calcFlywheelBtn" class="btn btn-primary">Calculate Flywheel Dynamics</button>
+              <button type="reset" id="resetFlywheelBtn" class="btn btn-secondary">Reset Defaults</button>
+            </div>
+          </form>
+
+          <div id="flywheelResultBox" class="results-container" style="display: none;">
+            <h3>Flywheel Kinetic Energy & Stress Analysis</h3>
+            <div class="results-grid">
+              <div class="result-tile">
+                <span class="result-label">Total Stored Kinetic Energy (at N1)</span>
+                <span id="resTotalEnergy" class="result-value">-- kJ</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Usable Fluctuation Energy (&Delta;E)</span>
+                <span id="resUsableEnergy" class="result-value">-- kJ</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Mass Moment of Inertia (I)</span>
+                <span id="resMomentInertia" class="result-value">-- kg·m²</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Calculated Rotor Mass (m)</span>
+                <span id="resRotorMass" class="result-value">-- kg</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Centrifugal Hoop Stress (&sigma;_hoop)</span>
+                <span id="resHoopStress" class="result-value">-- MPa</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Linear Rim Tip Velocity (v_rim)</span>
+                <span id="resRimVelocity" class="result-value">-- m/s</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Speed Fluctuation Coefficient (Cs)</span>
+                <span id="resFluctCoeff" class="result-value">--</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Structural Safety Status</span>
+                <span id="resSafetyStatus" class="result-value">--</span>
+              </div>
+            </div>
+            <div id="flywheelNotesBox" style="margin-top: 1rem; color: #1e40af; background: #eff6ff; border: 1px solid #bfdbfe; padding: 0.75rem; border-radius: 6px;"></div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Mechanical Energy Storage & Flywheel Dynamics Principles</h2>
+          <p>A flywheel is a heavy, rotating mechanical wheel designed to store kinetic energy during periods where energy supply exceeds demand and discharge that energy during peak operational loads. From classical reciprocating internal combustion engines and heavy industrial stamping presses to modern grid-scale <strong>Flywheel Energy Storage Systems (FESS)</strong> supporting renewable microgrids, flywheels smooth cyclical torque ripples, dampen torsional resonance, and provide instantaneous, high-power bursts.</p>
+
+          <p>The mathematical sizing of a flywheel involves balancing two competing physical phenomena: maximizing the <strong>mass moment of inertia</strong> (\(I\)) to maximize stored kinetic energy while strictly restricting <strong>centrifugal hoop stress</strong> (\(\sigma_{\text{hoop}}\)) below the ultimate tensile strength of the rotor material to prevent catastrophic, explosive burst failure.</p>
+
+          <h2>Rotational Kinetic Energy Formulations</h2>
+          <p>The total kinetic energy (\(E_k\)) stored within a rotating body is governed by its mass moment of inertia and angular velocity:</p>
+
+          <div class="formula-box">
+            $$E_k = \frac{1}{2} I \omega^2 = \frac{1}{2} I \left(\frac{2\pi N}{60}\right)^2 \quad [\text{Joules or ft-lbf}]$$
+          </div>
+
+          <p>Where:</p>
+          <ul>
+            <li><strong>\(I\)</strong>: Mass moment of inertia about the axis of rotation (\(\text{kg}\cdot\text{m}^2\) or \(\text{lb}\cdot\text{ft}^2\)).</li>
+            <li><strong>\(\omega\)</strong>: Angular velocity in radians per second (\(\text{rad/s}\)).</li>
+            <li><strong>\(N\)</strong>: Rotational frequency in revolutions per minute (\(\text{RPM}\)).</li>
+          </ul>
+
+          <p>Crucially, because kinetic energy scales with the <em>square of rotational speed</em> (\(\omega^2\)), doubling the RPM quadruples the stored energy. This fundamental principle drives modern FESS designs toward ultra-high-speed composite rotors operating in vacuum enclosures on magnetic bearings.</p>
+
+          <h2>Usable Fluctuation Energy & Coefficient of Fluctuation</h2>
+          <p>In industrial production machinery (such as mechanical punch presses, shears, rock crushers, and diesel generators), the flywheel does not decelerate to a complete standstill during normal operation. Instead, it operates between a maximum speed (\(N_1\)) and a minimum speed (\(N_2\)). The <strong>usable fluctuation energy</strong> (\(\Delta E\)) extracted during this cycle is:</p>
+
+          <div class="formula-box">
+            $$\Delta E = \frac{1}{2} I (\omega_1^2 - \omega_2^2) = I \omega_{\text{avg}}^2 \cdot C_s$$
+          </div>
+
+          <p>Where the mean angular velocity (\(\omega_{\text{avg}}\)) and the <strong>coefficient of speed fluctuation</strong> (\(C_s\)) are defined as:</p>
+
+          <div class="formula-box">
+            $$\omega_{\text{avg}} = \frac{\omega_1 + \omega_2}{2} \quad \text{and} \quad C_s = \frac{\omega_1 - \omega_2}{\omega_{\text{avg}}}$$
+          </div>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Machine Application</th>
+                <th>Permissible Fluctuation (\(C_s\))</th>
+                <th>Operational Rationale</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>AC Electric Synchronous Generators</td>
+                <td>0.003 &ndash; 0.005 (0.3% &ndash; 0.5%)</td>
+                <td>Mandatory to preserve tight 50/60 Hz grid frequency stability.</td>
+              </tr>
+              <tr>
+                <td>Precision Machine Tools & Grinders</td>
+                <td>0.005 &ndash; 0.010 (0.5% &ndash; 1.0%)</td>
+                <td>Prevents chatter marks and preserves micro-inch surface finish.</td>
+              </tr>
+              <tr>
+                <td>Centrifugal Pumps & Blowers</td>
+                <td>0.030 &ndash; 0.050 (3.0% &ndash; 5.0%)</td>
+                <td>Tolerates moderate hydraulic head and pressure variations.</td>
+              </tr>
+              <tr>
+                <td>Heavy Punching & Stamping Presses</td>
+                <td>0.100 &ndash; 0.200 (10% &ndash; 20%)</td>
+                <td>Delivers massive energy bursts during brief stamping stroke.</td>
+              </tr>
+              <tr>
+                <td>Rock Jaw Crushers & Ball Mills</td>
+                <td>0.150 &ndash; 0.250 (15% &ndash; 25%)</td>
+                <td>Absorbs violent shock loads without stalling electric motor.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Mass Moment of Inertia for Common Flywheel Profiles</h2>
+          <p>The mass distribution relative to the rotational axis determines inertia. Sizing formulas vary by geometric configuration:</p>
+
+          <h3>1. Solid Uniform Disc / Cylinder</h3>
+          <div class="formula-box">
+            $$m = \rho \cdot \pi \left(\frac{D_o}{2}\right)^2 b \quad \implies \quad I = \frac{1}{2} m R_o^2 = \frac{1}{8} m D_o^2$$
+          </div>
+
+          <h3>2. Hollow Cylindrical Rim (Heavy Annular Ring)</h3>
+          <div class="formula-box">
+            $$m = \rho \cdot \pi \left( R_o^2 - R_i^2 \right) b \quad \implies \quad I = \frac{1}{2} m \left( R_o^2 + R_i^2 \right) = \frac{1}{8} m \left( D_o^2 + D_i^2 \right)$$
+          </div>
+          <p>Hollow rim configurations concentrate over 90% of mass at the outer perimeter, delivering substantially higher inertia per kilogram of material compared to solid discs.</p>
+
+          <h2>Centrifugal Rim Stress (Hoop Stress) & Burst Velocity</h2>
+          <p>Every element of a spinning rim experiences radical outward centrifugal acceleration (\(a_c = v^2 / R\)). This acceleration creates uniform tangential tensile stress (hoop stress) across the rim section:</p>
+
+          <div class="formula-box">
+            $$\sigma_{\text{hoop}} = \rho \cdot v_{\text{rim}}^2 = \rho \cdot \left(\omega \cdot R_o\right)^2 \quad [\text{Pascals or PSI}]$$
+          </div>
+
+          <p>This reveals a profound engineering reality: <strong>rim stress depends strictly on material density and peripheral linear velocity</strong>, completely independent of rim thickness or cross-sectional area. The maximum theoretical burst tip speed (\(v_{\text{burst}}\)) is:</p>
+
+          <div class="formula-box">
+            $$v_{\text{burst}} = \sqrt{\frac{\sigma_{\text{UTS}}}{\rho}}$$
+          </div>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Rotor Material</th>
+                <th>Density \(\rho\) (\(\text{kg/m}^3\))</th>
+                <th>Tensile Strength \(\sigma_u\) (MPa)</th>
+                <th>Safe Max Rim Speed (m/s)</th>
+                <th>Specific Energy (Wh/kg)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Class 35 Gray Cast Iron</td>
+                <td>7,200</td>
+                <td>240</td>
+                <td>30 &ndash; 35 m/s</td>
+                <td>~3 &ndash; 5 Wh/kg</td>
+              </tr>
+              <tr>
+                <td>Ductile Iron 80-55-06</td>
+                <td>7,100</td>
+                <td>550</td>
+                <td>45 &ndash; 55 m/s</td>
+                <td>~8 &ndash; 12 Wh/kg</td>
+              </tr>
+              <tr>
+                <td>Alloy Steel AISI 4340 (Q&T)</td>
+                <td>7,850</td>
+                <td>1,100</td>
+                <td>100 &ndash; 140 m/s</td>
+                <td>~25 &ndash; 40 Wh/kg</td>
+              </tr>
+              <tr>
+                <td>High-Modulus Carbon Fiber</td>
+                <td>1,600</td>
+                <td>2,400</td>
+                <td>600 &ndash; 900 m/s</td>
+                <td>~100 &ndash; 200 Wh/kg</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="worked-example-card">
+            <h3>Step-by-Step Worked Case Study: Stamping Press Flywheel Sizing</h3>
+            <p><strong>Design Scenario:</strong> An engineer is sizing a cast iron rim flywheel for a 50-ton mechanical punch press. The press cycle requires 18 kJ of energy during each 0.3-second stamping stroke, while the electric motor runs between 1,800 RPM and 1,600 RPM.</p>
+            <ul>
+              <li>Flywheel rim outer diameter: \(D_o = 600\text{ mm}\) (\(R_o = 0.30\text{ m}\)).</li>
+              <li>Rim inner diameter: \(D_i = 450\text{ mm}\) (\(R_i = 0.225\text{ m}\)).</li>
+              <li>Axial width: \(b = 100\text{ mm}\) (\(0.10\text{ m}\)).</li>
+              <li>Material: Class 35 Gray Cast Iron (\(\rho = 7,200\text{ kg/m}^3\), \(\sigma_u = 240\text{ MPa}\)).</li>
+              <li>Speeds: \(N_1 = 1,800\text{ RPM}\), \(N_2 = 1,600\text{ RPM}\).</li>
+            </ul>
+
+            <p><strong>Step 1: Compute rotor mass and moment of inertia</strong></p>
+            <div class="formula-box">
+              $$m = \rho \cdot \pi (R_o^2 - R_i^2) b = 7200 \cdot \pi (0.30^2 - 0.225^2) \cdot 0.10$$
+              $$m = 7200 \cdot \pi (0.09 - 0.0506) \cdot 0.10 = 7200 \cdot \pi \cdot 0.0394 \cdot 0.10 = 89.12\text{ kg}$$
+              $$I = \frac{1}{2} m (R_o^2 + R_i^2) = \frac{1}{2} (89.12) (0.09 + 0.0506) = 44.56 \times 0.1406 = 6.265\text{ kg}\cdot\text{m}^2$$
+            </div>
+
+            <p><strong>Step 2: Calculate angular velocities and stored kinetic energy</strong></p>
+            <div class="formula-box">
+              $$\omega_1 = \frac{2\pi \cdot 1800}{60} = 188.50\text{ rad/s}, \quad \omega_2 = \frac{2\pi \cdot 1600}{60} = 167.55\text{ rad/s}$$
+              $$E_{\text{total}} = \frac{1}{2} I \omega_1^2 = \frac{1}{2} (6.265) (188.50)^2 = 111,304\text{ J} = 111.3\text{ kJ}$$
+            </div>
+
+            <p><strong>Step 3: Calculate usable fluctuation energy (\(\Delta E\))</strong></p>
+            <div class="formula-box">
+              $$\Delta E = \frac{1}{2} (6.265) \left[ (188.50)^2 - (167.55)^2 \right] = 3.1325 \times [35532 - 28073] = 23,365\text{ J} = 23.37\text{ kJ}$$
+            </div>
+            <p>Because \(\Delta E = 23.4\text{ kJ}\) exceeds the required 18 kJ punch demand, the flywheel satisfies the energy requirement.</p>
+
+            <p><strong>Step 4: Check rim tip velocity and centrifugal hoop stress</strong></p>
+            <div class="formula-box">
+              $$v_{\text{rim}} = \omega_1 \cdot R_o = 188.50 \cdot 0.30 = 56.55\text{ m/s}$$
+              $$\sigma_{\text{hoop}} = \rho \cdot v_{\text{rim}}^2 = 7200 \cdot (56.55)^2 = 7200 \cdot 3197.9 = 23.02\text{ MPa}$$
+            </div>
+            <p><strong>Safety Evaluation:</strong> Gray cast iron has an ultimate strength of 240 MPa. The hoop stress of 23.0 MPa provides a generous safety factor of \(SF = 240 / 23.0 = 10.4\), guaranteeing secure fatigue life.</p>
+          </div>
+
+          <h2>Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <h3>Why are modern grid-scale flywheels built from carbon fiber rather than steel?</h3>
+            <p>In kinetic energy storage, specific energy (energy per unit mass, Wh/kg) is governed by the specific strength of the material (\(\sigma_u / \rho\)). Carbon-fiber composites have a very low density (1,600 kg/m³) combined with massive tensile strength (> 2,000 MPa), allowing tip speeds up to 1,000 m/s and delivering 5 to 10 times higher energy density per kilogram than forged alloy steels.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What causes flywheel burst failures and how are they contained?</h3>
+            <p>Flywheel burst failures occur when centrifugal hoop stresses exceed material tensile limits or when micro-cracks propagate under cyclic fatigue. In metallic flywheels, failure produces massive, razor-sharp fragmentation projectiles capable of breaching heavy factory walls. Modern FESS units house the rotor in sub-surface steel vacuum containment vessels lined with energy-absorbing honeycomb liners.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Why is dynamic balancing critical for high-speed flywheels?</h3>
+            <p>Any mass eccentricity (\(e\)) between the geometric center and center of mass creates a rotating centrifugal unbalance force: \(F_{\text{unbalance}} = m \cdot e \cdot \omega^2\). At high speeds, even a few grams of unbalance creates thousands of pounds of cyclic force on bearings, causing destructive resonant vibration and premature bearing seizure.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How do vacuum enclosures and magnetic bearings reduce flywheel standby losses?</h3>
+            <p>At high peripheral speeds (> 200 m/s), aerodynamic air friction (windage drag) generates extreme parasitic power loss and thermal buildup. Enclosing the flywheel rotor in a high-vacuum vessel (< 0.001 mbar) eliminates aerodynamic drag, while non-contact active magnetic bearings (AMB) eliminate mechanical contact friction, reducing standby self-discharge losses to less than 1% to 2% per hour.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar" id="toolSidebar">
+        <!-- Dynamically rendered sidebar -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Engineering and mathematical tools grounded in international standards.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="mechanical.html">Mechanical</a></li>
+        <li><a href="ohms-law-calculator.html">Ohm's Law</a></li>
+        <li><a href="sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    const DENSITIES_METRIC = {
+      castIron: 7200,
+      ductileIron: 7100,
+      structuralSteel: 7850,
+      alloySteel: 7850,
+      carbonFiber: 1600
+    };
+
+    const TENSILE_LIMITS_MPA = {
+      castIron: 240,
+      ductileIron: 550,
+      structuralSteel: 600,
+      alloySteel: 1100,
+      carbonFiber: 2200
+    };
+
+    const rotorGeometrySelect = document.getElementById('rotorGeometry');
+    const flywheelUnitsSelect = document.getElementById('flywheelUnits');
+    const materialPresetSelect = document.getElementById('materialPreset');
+    const outerDiamInput = document.getElementById('outerDiam');
+    const innerDiamInput = document.getElementById('innerDiam');
+    const rotorAxialWidthInput = document.getElementById('rotorAxialWidth');
+    const maxRpmInput = document.getElementById('maxRpm');
+    const minRpmInput = document.getElementById('minRpm');
+
+    const lblOuterDiam = document.getElementById('lblOuterDiam');
+    const lblInnerDiam = document.getElementById('lblInnerDiam');
+    const lblRotorAxialWidth = document.getElementById('lblRotorAxialWidth');
+    const grpHollowInner = document.getElementById('grpHollowInner');
+
+    const flywheelResultBox = document.getElementById('flywheelResultBox');
+    const resTotalEnergy = document.getElementById('resTotalEnergy');
+    const resUsableEnergy = document.getElementById('resUsableEnergy');
+    const resMomentInertia = document.getElementById('resMomentInertia');
+    const resRotorMass = document.getElementById('resRotorMass');
+    const resHoopStress = document.getElementById('resHoopStress');
+    const resRimVelocity = document.getElementById('resRimVelocity');
+    const resFluctCoeff = document.getElementById('resFluctCoeff');
+    const resSafetyStatus = document.getElementById('resSafetyStatus');
+    const flywheelNotesBox = document.getElementById('flywheelNotesBox');
+
+    rotorGeometrySelect.addEventListener('change', function() {
+      if (this.value === 'solidDisc') {
+        grpHollowInner.style.display = 'none';
+      } else {
+        grpHollowInner.style.display = 'block';
+      }
+      calculateFlywheel();
+    });
+
+    flywheelUnitsSelect.addEventListener('change', function() {
+      const isMetric = this.value === 'metric';
+      if (isMetric) {
+        lblOuterDiam.textContent = "Outer Diameter (Do) [mm]";
+        lblInnerDiam.textContent = "Inner Rim Diameter (Di) [mm]";
+        lblRotorAxialWidth.textContent = "Axial Width / Thickness (b) [mm]";
+        outerDiamInput.value = 600;
+        innerDiamInput.value = 450;
+        rotorAxialWidthInput.value = 100;
+      } else {
+        lblOuterDiam.textContent = "Outer Diameter (Do) [in]";
+        lblInnerDiam.textContent = "Inner Rim Diameter (Di) [in]";
+        lblRotorAxialWidth.textContent = "Axial Width / Thickness (b) [in]";
+        outerDiamInput.value = 24.0;
+        innerDiamInput.value = 18.0;
+        rotorAxialWidthInput.value = 4.0;
+      }
+      calculateFlywheel();
+    });
+
+    function calculateFlywheel() {
+      const geom = rotorGeometrySelect.value;
+      const isMetric = flywheelUnitsSelect.value === 'metric';
+      const matKey = materialPresetSelect.value;
+      const densityMetric = DENSITIES_METRIC[matKey] || 7200;
+      const maxTensileMpa = TENSILE_LIMITS_MPA[matKey] || 240;
+
+      let Do_raw = parseFloat(outerDiamInput.value);
+      let Di_raw = parseFloat(innerDiamInput.value);
+      let b_raw = parseFloat(rotorAxialWidthInput.value);
+      let N1 = parseFloat(maxRpmInput.value);
+      let N2 = parseFloat(minRpmInput.value);
+
+      if (isNaN(Do_raw) || Do_raw <= 0) Do_raw = isMetric ? 600 : 24;
+      if (isNaN(Di_raw) || Di_raw <= 0) Di_raw = isMetric ? 450 : 18;
+      if (isNaN(b_raw) || b_raw <= 0) b_raw = isMetric ? 100 : 4;
+      if (isNaN(N1) || N1 <= 0) N1 = 1800;
+      if (isNaN(N2) || N2 < 0) N2 = 1600;
+      if (N2 > N1) {
+        const tmp = N1; N1 = N2; N2 = tmp;
+      }
+
+      // Standardize to Metric meters
+      const Do_m = isMetric ? (Do_raw / 1000) : (Do_raw * 0.0254);
+      let Di_m = isMetric ? (Di_raw / 1000) : (Di_raw * 0.0254);
+      const b_m = isMetric ? (b_raw / 1000) : (b_raw * 0.0254);
+
+      if (geom === 'solidDisc') {
+        Di_m = 0;
+      } else {
+        if (Di_m >= Do_m) Di_m = Do_m * 0.75;
+      }
+
+      const Ro_m = Do_m / 2;
+      const Ri_m = Di_m / 2;
+
+      // Mass (kg)
+      let volume_m3 = Math.PI * (Math.pow(Ro_m, 2) - Math.pow(Ri_m, 2)) * b_m;
+      let mass_kg = volume_m3 * densityMetric;
+
+      // Moment of Inertia (kg*m^2)
+      let I_kgm2 = 0.5 * mass_kg * (Math.pow(Ro_m, 2) + Math.pow(Ri_m, 2));
+
+      // Angular velocities (rad/s)
+      const omega1 = (2 * Math.PI * N1) / 60;
+      const omega2 = (2 * Math.PI * N2) / 60;
+      const omegaAvg = (omega1 + omega2) / 2;
+
+      // Kinetic Energies (Joules)
+      const E_total_J = 0.5 * I_kgm2 * Math.pow(omega1, 2);
+      const E_usable_J = 0.5 * I_kgm2 * (Math.pow(omega1, 2) - Math.pow(omega2, 2));
+
+      // Speed Fluctuation Coefficient
+      const Cs = (omega1 - omega2) / (omegaAvg > 0 ? omegaAvg : 1);
+
+      // Linear Rim Speed (m/s)
+      const v_rim_mps = omega1 * Ro_m;
+
+      // Hoop Stress (sigma = rho * v^2)
+      const sigma_hoop_Pa = densityMetric * Math.pow(v_rim_mps, 2);
+      const sigma_hoop_Mpa = sigma_hoop_Pa / 1e6;
+
+      // Safety Factor
+      const sf = maxTensileMpa / sigma_hoop_Mpa;
+      let safetyStatus = `Safe (SF = ${sf.toFixed(1)})`;
+      let statusColor = "#166534";
+      if (sf < 2.0) {
+        safetyStatus = `Warning: High Stress (SF = ${sf.toFixed(2)})`;
+        statusColor = "#b45309";
+      }
+      if (sf < 1.0) {
+        safetyStatus = `CRITICAL DANGER: EXCEEDS BURST LIMIT`;
+        statusColor = "#dc2626";
+      }
+
+      // Display conversions
+      if (isMetric) {
+        resTotalEnergy.textContent = (E_total_J / 1000).toFixed(2) + " kJ";
+        resUsableEnergy.textContent = (E_usable_J / 1000).toFixed(2) + " kJ";
+        resMomentInertia.textContent = I_kgm2.toFixed(3) + " kg·m²";
+        resRotorMass.textContent = mass_kg.toFixed(1) + " kg";
+        resHoopStress.textContent = sigma_hoop_Mpa.toFixed(2) + " MPa";
+        resRimVelocity.textContent = v_rim_mps.toFixed(1) + " m/s";
+      } else {
+        // Imperial conversions
+        const E_total_ftlb = E_total_J * 0.737562;
+        const E_usable_ftlb = E_usable_J * 0.737562;
+        const I_lbft2 = I_kgm2 * 23.73036;
+        const mass_lbs = mass_kg * 2.20462;
+        const sigma_psi = sigma_hoop_Mpa * 145.038;
+        const v_rim_fpm = v_rim_mps * 196.85;
+
+        resTotalEnergy.textContent = (E_total_ftlb / 1000).toFixed(2) + " kft·lbf";
+        resUsableEnergy.textContent = (E_usable_ftlb / 1000).toFixed(2) + " kft·lbf";
+        resMomentInertia.textContent = I_lbft2.toFixed(2) + " lb·ft²";
+        resRotorMass.textContent = mass_lbs.toFixed(1) + " lbs";
+        resHoopStress.textContent = sigma_psi.toFixed(0) + " PSI";
+        resRimVelocity.textContent = v_rim_fpm.toFixed(0) + " ft/min";
+      }
+
+      resFluctCoeff.textContent = (Cs * 100).toFixed(2) + "% (Cs=" + Cs.toFixed(3) + ")";
+      resSafetyStatus.textContent = safetyStatus;
+      resSafetyStatus.style.color = statusColor;
+
+      let notes = `<strong>Stress & Kinetic Dynamics:</strong> Rotating at <strong>${N1} RPM</strong>, the rotor tip speed reaches <strong>${v_rim_mps.toFixed(1)} m/s</strong>, generating <strong>${sigma_hoop_Mpa.toFixed(1)} MPa</strong> of centrifugal hoop stress. Usable energy between ${N1} and ${N2} RPM is <strong>${(E_usable_J / 1000).toFixed(2)} kJ</strong>.`;
+      flywheelNotesBox.innerHTML = notes;
+
+      flywheelResultBox.style.display = 'block';
+    }
+
+    document.getElementById('calcFlywheelBtn').addEventListener('click', calculateFlywheel);
+    document.getElementById('resetFlywheelBtn').addEventListener('click', function() {
+      setTimeout(calculateFlywheel, 50);
+    });
+
+    window.addEventListener('DOMContentLoaded', calculateFlywheel);
+  </script>
+</body>
+</html>

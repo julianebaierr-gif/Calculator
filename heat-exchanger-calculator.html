@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heat Exchanger Calculator | LMTD, NTU Effectiveness & Surface Area</title>
+  <meta name="description" content="Calculate heat exchanger thermal duty, Logarithmic Mean Temperature Difference (LMTD), heat transfer surface area, and NTU effectiveness per TEMA and ASME standards.">
+  <link rel="canonical" href="https://calchub.cloud/heat-exchanger-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Heat Exchanger Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Thermal engineering calculation tool determining heat duty Q = U*A*Delta_Tm, Logarithmic Mean Temperature Difference (LMTD), surface area, and NTU effectiveness per TEMA standards.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the Logarithmic Mean Temperature Difference (LMTD) formula?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For a counter-current heat exchanger: Delta_T_1 = T_hot_in - T_cold_out and Delta_T_2 = T_hot_out - T_cold_in. The Log Mean Temperature Difference is: LMTD = (Delta_T_1 - Delta_T_2) / ln(Delta_T_1 / Delta_T_2). For shell-and-tube or cross-flow configurations, LMTD is multiplied by a geometry correction factor F (Delta_T_m = F * LMTD)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why is counter-flow more thermally efficient than parallel-flow?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In counter-current flow, the cold fluid exits near the entry temperature of the hot fluid, allowing the cold fluid outlet temperature to exceed the hot fluid outlet temperature (temperature cross). This maximizes the thermal driving gradient across the entire length of the exchanger, resulting in a higher LMTD and requiring significantly less heat transfer surface area."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is heat exchanger required surface area (A) calculated?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The fundamental heat exchanger design equation is: A = Q / (U * Delta_T_m), where Q is the thermal duty in Watts (or BTU/hr), U is the overall heat transfer coefficient in W/(m^2*K) (or BTU/(hr*ft^2*deg F)), and Delta_T_m is the effective mean temperature difference."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between the LMTD method and the NTU-Effectiveness method?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The LMTD method is ideal for design sizing problems where all four inlet and outlet fluid temperatures are known or specified, allowing direct calculation of required surface area A. The Number of Transfer Units (NTU) effectiveness method is used for rating existing heat exchangers where the physical area A is fixed and outlet temperatures must be predicted for given inlet conditions."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="mechanical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html" class="active">Mechanical</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="mechanical.html">Mechanical &amp; Machine Design</a> &rsaquo;
+      <span>Heat Exchanger Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">TEMA &amp; ASME Section VIII Thermal Standards</div>
+          <h1 class="calc-title">Heat Exchanger Calculator</h1>
+          <p class="calc-tagline">Calculate heat exchanger thermal duty (Q), Logarithmic Mean Temperature Difference (LMTD), required heat transfer surface area (A), and NTU thermal effectiveness.</p>
+        </header>
+
+        <div class="tool-card">
+          <form id="heCalcForm">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="flowArrangement">Flow Arrangement</label>
+                <select id="flowArrangement">
+                  <option value="counter" selected>Counter-Current Flow (Maximum LMTD)</option>
+                  <option value="parallel">Co-Current / Parallel Flow</option>
+                  <option value="shellTube">Shell & Tube (1 Shell Pass, 2+ Tube Passes)</option>
+                  <option value="crossFlow">Cross-Flow (Both Fluids Unmixed)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="heUnits">Engineering Units</label>
+                <select id="heUnits">
+                  <option value="metric" selected>Metric (°C, kW, kg/s, m², W/m²·K)</option>
+                  <option value="imperial">Imperial (°F, BTU/hr, lbs/hr, ft², BTU/hr·ft²·°F)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="hotIn" id="lblHotIn">Hot Fluid Inlet Temp (Th,in) [°C]</label>
+                <input type="number" id="hotIn" step="0.5" value="95.0">
+              </div>
+
+              <div class="form-group">
+                <label for="hotOut" id="lblHotOut">Hot Fluid Outlet Temp (Th,out) [°C]</label>
+                <input type="number" id="hotOut" step="0.5" value="65.0">
+              </div>
+
+              <div class="form-group">
+                <label for="coldIn" id="lblColdIn">Cold Fluid Inlet Temp (Tc,in) [°C]</label>
+                <input type="number" id="coldIn" step="0.5" value="20.0">
+              </div>
+
+              <div class="form-group">
+                <label for="coldOut" id="lblColdOut">Cold Fluid Outlet Temp (Tc,out) [°C]</label>
+                <input type="number" id="coldOut" step="0.5" value="45.0">
+              </div>
+
+              <div class="form-group">
+                <label for="hotMassFlow" id="lblHotMassFlow">Hot Fluid Mass Flow Rate (mh) [kg/s]</label>
+                <input type="number" id="hotMassFlow" step="0.1" min="0.01" max="1000" value="2.0">
+              </div>
+
+              <div class="form-group">
+                <label for="hotCp" id="lblHotCp">Hot Fluid Specific Heat (Cp,h) [kJ/kg·K]</label>
+                <input type="number" id="hotCp" step="0.05" min="0.5" max="10" value="4.18">
+              </div>
+
+              <div class="form-group">
+                <label for="overallU" id="lblOverallU">Overall Heat Transfer Coeff (U) [W/m²·K]</label>
+                <input type="number" id="overallU" step="10" min="5" max="15000" value="850">
+              </div>
+
+              <div class="form-group">
+                <label for="foulingFactor" id="lblFouling">Fouling Resistance Factor (Rf) [m²·K/W]</label>
+                <select id="foulingFactor">
+                  <option value="0" selected>Clean Tubes (Rf = 0.0000)</option>
+                  <option value="0.0001">Treated Cooling Water (Rf = 0.0001 m²·K/W)</option>
+                  <option value="0.0003">River / Raw Water (Rf = 0.0003 m²·K/W)</option>
+                  <option value="0.0002">Light Hydrocarbon / Fuel Oil (Rf = 0.0002 m²·K/W)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-actions">
+              <button type="button" id="calcHeBtn" class="btn btn-primary">Calculate Thermal Performance</button>
+              <button type="reset" id="resetHeBtn" class="btn btn-secondary">Reset Defaults</button>
+            </div>
+          </form>
+
+          <div id="heResultBox" class="results-container" style="display: none;">
+            <h3>Thermal Design & Heat Transfer Results</h3>
+            <div class="results-grid">
+              <div class="result-tile">
+                <span class="result-label">Thermal Heat Duty (Q)</span>
+                <span id="resHeatDuty" class="result-value">-- kW</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Required Surface Area (A)</span>
+                <span id="resSurfaceArea" class="result-value">-- m²</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Log Mean Temp Diff (LMTD)</span>
+                <span id="resLmtd" class="result-value">-- °C</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Configuration Correction Factor (F)</span>
+                <span id="resCorrF" class="result-value">--</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Effective Temp Difference (&Delta;Tm)</span>
+                <span id="resEffDeltaTm" class="result-value">-- °C</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Thermal Effectiveness (&epsilon;)</span>
+                <span id="resEffectiveness" class="result-value">-- %</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Number of Transfer Units (NTU)</span>
+                <span id="resNtu" class="result-value">--</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Derated Fouled Coeff (U_dirty)</span>
+                <span id="resUdirty" class="result-value">-- W/m²·K</span>
+              </div>
+            </div>
+            <div id="heNotesBox" style="margin-top: 1rem; color: #1e40af; background: #eff6ff; border: 1px solid #bfdbfe; padding: 0.75rem; border-radius: 6px;"></div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Thermal Process Engineering & Heat Exchanger Fundamentals</h2>
+          <p>Heat exchangers are thermodynamic devices engineered to transfer thermal energy between two or more fluid streams across a solid conduction boundary without intermixing. Operating in power stations, chemical refineries, district cooling plants, food pasteurization lines, and refrigeration chillers, heat exchangers are governed by the <strong>Tubular Exchanger Manufacturers Association (TEMA)</strong> and <strong>ASME Section VIII</strong> standards.</p>
+
+          <p>Proper sizing requires solving the combined effects of convective fluid boundary layers, conductive wall resistance, fluid fouling scale, and temperature profile convergence. Designing an exchanger with insufficient area fails to achieve process target temperatures, causing boiling instability or product ruination. Conversely, gross oversizing causes fluid velocity stagnation, accelerating fouling deposition, sedimentation, and tube corrosion.</p>
+
+          <h2>Thermal Heat Duty Formulation</h2>
+          <p>Under steady-state operation neglecting atmospheric heat leakage, the total thermal duty (\(Q\)) transferred from the hot stream to the cold stream is governed by the First Law of Thermodynamics:</p>
+
+          <div class="formula-box">
+            $$Q = \dot{m}_h c_{p,h} (T_{h,\text{in}} - T_{h,\text{out}}) = \dot{m}_c c_{p,c} (T_{c,\text{out}} - T_{c,\text{in}}) \quad [\text{kW or BTU/hr}]$$
+          </div>
+
+          <p>Where:</p>
+          <ul>
+            <li><strong>\(\dot{m}_h, \dot{m}_c\)</strong>: Mass flow rates of the hot and cold streams (\(\text{kg/s}\) or \(\text{lbs/hr}\)).</li>
+            <li><strong>\(c_{p,h}, c_{p,c}\)</strong>: Specific heat capacities at constant pressure (\(\text{kJ/kg}\cdot\text{K}\) or \(\text{BTU/lb}\cdot^\circ\text{F}\)).</li>
+            <li><strong>\(C_h = \dot{m}_h c_{p,h}\)</strong> and <strong>\(C_c = \dot{m}_c c_{p,c}\)</strong>: Fluid heat capacity rates (\(\text{kW/K}\)).</li>
+          </ul>
+
+          <h2>The Logarithmic Mean Temperature Difference (LMTD) Method</h2>
+          <p>Because fluid temperatures vary continuously along the tube bundle, arithmetic temperature differences (\(\Delta T_{\text{avg}} = (T_{h} - T_{c})\)) grossly overestimate heat transfer. The mathematically rigorous driving gradient is the <strong>Logarithmic Mean Temperature Difference (LMTD)</strong>:</p>
+
+          <div class="formula-box">
+            $$\text{LMTD} = \frac{\Delta T_1 - \Delta T_2}{\ln(\Delta T_1 / \Delta T_2)}$$
+          </div>
+
+          <h3>Counter-Current Flow Boundary Definitions</h3>
+          <p>In a counter-flow heat exchanger, the fluids enter at opposite ends and travel in reverse directions:</p>
+          <div class="formula-box">
+            $$\Delta T_1 = T_{h,\text{in}} - T_{c,\text{out}} \quad \text{and} \quad \Delta T_2 = T_{h,\text{out}} - T_{c,\text{in}}$$
+          </div>
+
+          <h3>Co-Current (Parallel) Flow Boundary Definitions</h3>
+          <p>In parallel flow, both fluids enter at the same end and travel in parallel:</p>
+          <div class="formula-box">
+            $$\Delta T_1 = T_{h,\text{in}} - T_{c,\text{in}} \quad \text{and} \quad \Delta T_2 = T_{h,\text{out}} - T_{c,\text{out}}$$
+          </div>
+          <p>Because counter-flow maintains an almost uniform temperature difference across the entire heat exchange length, its LMTD is consistently 20% to 50% higher than parallel flow, enabling a drastically smaller required heat transfer surface area.</p>
+
+          <h2>Shell & Tube LMTD Correction Factor (F)</h2>
+          <p>When fluid flow is not purely counter-current—as occurs in multi-pass shell-and-tube exchangers (TEMA E-shell with 2, 4, or 6 tube passes) and cross-flow radiators—the effective mean temperature difference (\(\Delta T_m\)) is derated by an empirical geometry correction factor (\(F \le 1.0\)):</p>
+
+          <div class="formula-box">
+            $$\Delta T_m = F \cdot \text{LMTD}_{\text{counter}}$$
+          </div>
+
+          <p>The correction factor \(F\) is calculated as a function of the heat capacity ratio (\(R\)) and thermal effectiveness (\(P\)):</p>
+
+          <div class="formula-box">
+            $$R = \frac{T_{h,\text{in}} - T_{h,\text{out}}}{T_{c,\text{out}} - T_{c,\text{in}}} = \frac{C_c}{C_h}, \quad P = \frac{T_{c,\text{out}} - T_{c,\text{in}}}{T_{h,\text{in}} - T_{c,\text{in}}}$$
+            $$F = \frac{\sqrt{R^2 + 1} \cdot \ln\left(\frac{1 - P}{1 - P \cdot R}\right)}{(R - 1) \cdot \ln\left(\frac{2 - P(R + 1 - \sqrt{R^2 + 1})}{2 - P(R + 1 + \sqrt{R^2 + 1})}\right)}$$
+          </div>
+          <p>TEMA standards recommend that exchangers never be operated at \(F < 0.75\), as the curve drops precipitously toward zero, making the exchanger unstable and susceptible to temperature pinching.</p>
+
+          <h2>Required Heat Transfer Surface Area & Overall U-Value</h2>
+          <p>The total outside surface area (\(A\)) required to transfer heat duty \(Q\) is:</p>
+
+          <div class="formula-box">
+            $$A = \frac{Q}{U_{\text{dirty}} \cdot \Delta T_m} \quad [\text{m}^2 \text{ or ft}^2]$$
+          </div>
+
+          <p>Where \(U_{\text{dirty}}\) incorporates both internal and external convective film coefficients (\(h_i, h_o\)), tube wall metal thermal conduction (\(k_{\text{metal}}\)), and fouling scale resistance factors (\(R_{fi}, R_{fo}\)):</p>
+
+          <div class="formula-box">
+            $$\frac{1}{U_{\text{dirty}}} = \frac{1}{U_{\text{clean}}} + R_f$$
+          </div>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Service & Fluid Combination</th>
+                <th>Clean Coeff \(U\) (\(\text{W/m}^2\cdot\text{K}\))</th>
+                <th>Typical Fouling \(R_f\) (\(\text{m}^2\cdot\text{K/W}\))</th>
+                <th>Design Coeff \(U_{\text{dirty}}\) (\(\text{W/m}^2\cdot\text{K}\))</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Water to Water (Plate & Frame)</td>
+                <td>3,000 &ndash; 7,000</td>
+                <td>0.00005 &ndash; 0.00010</td>
+                <td>2,000 &ndash; 4,500</td>
+              </tr>
+              <tr>
+                <td>Water to Water (Shell & Tube)</td>
+                <td>1,200 &ndash; 2,500</td>
+                <td>0.00015 &ndash; 0.00025</td>
+                <td>800 &ndash; 1,500</td>
+              </tr>
+              <tr>
+                <td>Steam Condenser (Water in Tubes)</td>
+                <td>2,000 &ndash; 4,000</td>
+                <td>0.00010 &ndash; 0.00020</td>
+                <td>1,500 &ndash; 2,800</td>
+              </tr>
+              <tr>
+                <td>Water to Lube Oil (Tubular Cooler)</td>
+                <td>250 &ndash; 500</td>
+                <td>0.00020 &ndash; 0.00035</td>
+                <td>180 &ndash; 350</td>
+              </tr>
+              <tr>
+                <td>Air to Water (Fin-Fan Radiator)</td>
+                <td>30 &ndash; 60</td>
+                <td>0.00020 &ndash; 0.00040</td>
+                <td>25 &ndash; 50</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="worked-example-card">
+            <h3>Step-by-Step Worked Case Study: District Heating Substation Water-Water Cooler</h3>
+            <p><strong>Design Scenario:</strong> An engineer is sizing a counter-flow shell-and-tube heat exchanger for a commercial building district heating substation:</p>
+            <ul>
+              <li>Hot district water: \(T_{h,\text{in}} = 95^\circ\text{C}\), \(T_{h,\text{out}} = 65^\circ\text{C}\).</li>
+              <li>Hot fluid mass flow: \(\dot{m}_h = 2.0\text{ kg/s}\), \(c_{p,h} = 4.18\text{ kJ/kg}\cdot\text{K}\).</li>
+              <li>Cold building loop: \(T_{c,\text{in}} = 20^\circ\text{C}\), \(T_{c,\text{out}} = 45^\circ\text{C}\).</li>
+              <li>Overall clean heat transfer coefficient: \(U_{\text{clean}} = 850\text{ W/m}^2\cdot\text{K}\).</li>
+              <li>Treated water fouling resistance: \(R_f = 0.0001\text{ m}^2\cdot\text{K/W}\).</li>
+            </ul>
+
+            <p><strong>Step 1: Compute thermal heat duty (\(Q\))</strong></p>
+            <div class="formula-box">
+              $$Q = \dot{m}_h c_{p,h} (T_{h,\text{in}} - T_{h,\text{out}}) = 2.0 \cdot 4.18 \cdot (95 - 65) = 8.36 \times 30 = 250.8\text{ kW}$$
+            </div>
+
+            <p><strong>Step 2: Determine Counter-Flow LMTD</strong></p>
+            <div class="formula-box">
+              $$\Delta T_1 = T_{h,\text{in}} - T_{c,\text{out}} = 95 - 45 = 50.0^\circ\text{C}$$
+              $$\Delta T_2 = T_{h,\text{out}} - T_{c,\text{in}} = 65 - 20 = 45.0^\circ\text{C}$$
+              $$\text{LMTD} = \frac{50.0 - 45.0}{\ln(50.0 / 45.0)} = \frac{5.0}{\ln(1.1111)} = \frac{5.0}{0.10536} = 47.46^\circ\text{C}$$
+            </div>
+
+            <p><strong>Step 3: Calculate derated fouled overall coefficient (\(U_{\text{dirty}}\))</strong></p>
+            <div class="formula-box">
+              $$\frac{1}{U_{\text{dirty}}} = \frac{1}{850} + 0.0001 = 0.001176 + 0.000100 = 0.001276 \implies U_{\text{dirty}} = 783.4\text{ W/m}^2\cdot\text{K}$$
+            </div>
+
+            <p><strong>Step 4: Compute required heat transfer surface area (\(A\))</strong></p>
+            <div class="formula-box">
+              $$A = \frac{Q}{U_{\text{dirty}} \cdot \text{LMTD}} = \frac{250,800\text{ W}}{783.4\text{ W/m}^2\cdot\text{K} \cdot 47.46\text{ K}} = \frac{250800}{37180.2} = 6.75\text{ m}^2$$
+            </div>
+            <p><strong>Engineering Conclusion:</strong> A counter-flow exchanger with <strong>\(6.75\text{ m}^2\)</strong> of surface area provides the required 251 kW heating duty with built-in fouling reserve.</p>
+          </div>
+
+          <h2>Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <h3>What is a temperature pinch point in heat exchanger design?</h3>
+            <p>A temperature pinch point occurs where the temperature difference between the hot and cold fluid streams approaches a minimal value (\(\Delta T_{\text{min}} \to 0\)). As the pinch point narrows, the LMTD approaches zero, causing the required surface area to approach infinity. In industrial process design, minimum approach temperatures are typically restricted to \(3^\circ\text{C}\) to \(5^\circ\text{C}\) for plate heat exchangers and \(5^\circ\text{C}\) to \(10^\circ\text{C}\) for shell-and-tube units.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Why are Plate and Frame heat exchangers more compact than Shell and Tube?</h3>
+            <p>Gasketed plate heat exchangers feature thin, pressed metal plates with corrugation chevrons that induce intense boundary-layer turbulence even at low Reynolds numbers (\(Re < 50\)). This produces heat transfer coefficients 3 to 5 times higher than smooth cylindrical tubes (\(U \approx 4,000 - 6,000\text{ W/m}^2\cdot\text{K}\)), requiring 70% less surface area and foot-print space.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How does baffle spacing affect shell-side heat transfer and pressure drop?</h3>
+            <p>Segmental baffles in shell-and-tube exchangers direct fluid across the tube bundle perpendicular to the tubes, generating high cross-flow velocities that boost heat transfer. However, closing baffle spacing increases shell-side pressure drop exponentially (\(\Delta P \propto v^2\)). TEMA standards require baffle spacing to be maintained between 20% and 100% of the inside shell diameter.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>When must the Effectiveness-NTU method be used instead of LMTD?</h3>
+            <p>The \(\varepsilon\)-NTU method is essential when evaluating an existing heat exchanger under new operating flow rates or inlet temperatures where the outlet temperatures are unknown. Solving for outlet temperatures using LMTD requires cumbersome, iterative numerical root-finding because LMTD depends directly on the unknown outlet temperatures. In contrast, the \(\varepsilon\)-NTU method calculates effectiveness directly from known heat capacity rates and area.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar" id="toolSidebar">
+        <!-- Dynamically rendered sidebar -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Engineering and mathematical tools grounded in international standards.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="mechanical.html">Mechanical</a></li>
+        <li><a href="ohms-law-calculator.html">Ohm's Law</a></li>
+        <li><a href="sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    const flowArrangementSelect = document.getElementById('flowArrangement');
+    const heUnitsSelect = document.getElementById('heUnits');
+    const hotInInput = document.getElementById('hotIn');
+    const hotOutInput = document.getElementById('hotOut');
+    const coldInInput = document.getElementById('coldIn');
+    const coldOutInput = document.getElementById('coldOut');
+    const hotMassFlowInput = document.getElementById('hotMassFlow');
+    const hotCpInput = document.getElementById('hotCp');
+    const overallUInput = document.getElementById('overallU');
+    const foulingFactorSelect = document.getElementById('foulingFactor');
+
+    const lblHotIn = document.getElementById('lblHotIn');
+    const lblHotOut = document.getElementById('lblHotOut');
+    const lblColdIn = document.getElementById('lblColdIn');
+    const lblColdOut = document.getElementById('lblColdOut');
+    const lblHotMassFlow = document.getElementById('lblHotMassFlow');
+    const lblHotCp = document.getElementById('lblHotCp');
+    const lblOverallU = document.getElementById('lblOverallU');
+    const lblFouling = document.getElementById('lblFouling');
+
+    const heResultBox = document.getElementById('heResultBox');
+    const resHeatDuty = document.getElementById('resHeatDuty');
+    const resSurfaceArea = document.getElementById('resSurfaceArea');
+    const resLmtd = document.getElementById('resLmtd');
+    const resCorrF = document.getElementById('resCorrF');
+    const resEffDeltaTm = document.getElementById('resEffDeltaTm');
+    const resEffectiveness = document.getElementById('resEffectiveness');
+    const resNtu = document.getElementById('resNtu');
+    const resUdirty = document.getElementById('resUdirty');
+    const heNotesBox = document.getElementById('heNotesBox');
+
+    heUnitsSelect.addEventListener('change', function() {
+      const isMetric = this.value === 'metric';
+      if (isMetric) {
+        lblHotIn.textContent = "Hot Fluid Inlet Temp (Th,in) [°C]";
+        lblHotOut.textContent = "Hot Fluid Outlet Temp (Th,out) [°C]";
+        lblColdIn.textContent = "Cold Fluid Inlet Temp (Tc,in) [°C]";
+        lblColdOut.textContent = "Cold Fluid Outlet Temp (Tc,out) [°C]";
+        lblHotMassFlow.textContent = "Hot Fluid Mass Flow Rate (mh) [kg/s]";
+        lblHotCp.textContent = "Hot Fluid Specific Heat (Cp,h) [kJ/kg·K]";
+        lblOverallU.textContent = "Overall Heat Transfer Coeff (U) [W/m²·K]";
+        lblFouling.textContent = "Fouling Resistance Factor (Rf) [m²·K/W]";
+        hotInInput.value = 95.0;
+        hotOutInput.value = 65.0;
+        coldInInput.value = 20.0;
+        coldOutInput.value = 45.0;
+        hotMassFlowInput.value = 2.0;
+        hotCpInput.value = 4.18;
+        overallUInput.value = 850;
+      } else {
+        lblHotIn.textContent = "Hot Fluid Inlet Temp (Th,in) [°F]";
+        lblHotOut.textContent = "Hot Fluid Outlet Temp (Th,out) [°F]";
+        lblColdIn.textContent = "Cold Fluid Inlet Temp (Tc,in) [°F]";
+        lblColdOut.textContent = "Cold Fluid Outlet Temp (Tc,out) [°F]";
+        lblHotMassFlow.textContent = "Hot Fluid Mass Flow Rate (mh) [lbs/hr]";
+        lblHotCp.textContent = "Hot Fluid Specific Heat (Cp,h) [BTU/lb·°F]";
+        lblOverallU.textContent = "Overall Heat Transfer Coeff (U) [BTU/hr·ft²·°F]";
+        lblFouling.textContent = "Fouling Resistance Factor (Rf) [hr·ft²·°F/BTU]";
+        hotInInput.value = 200.0;
+        hotOutInput.value = 150.0;
+        coldInInput.value = 70.0;
+        coldOutInput.value = 110.0;
+        hotMassFlowInput.value = 16000;
+        hotCpInput.value = 1.0;
+        overallUInput.value = 150;
+      }
+      calculateHeatExchanger();
+    });
+
+    function calculateHeatExchanger() {
+      const arrangement = flowArrangementSelect.value;
+      const isMetric = heUnitsSelect.value === 'metric';
+
+      let Th_in = parseFloat(hotInInput.value);
+      let Th_out = parseFloat(hotOutInput.value);
+      let Tc_in = parseFloat(coldInInput.value);
+      let Tc_out = parseFloat(coldOutInput.value);
+
+      let mh = parseFloat(hotMassFlowInput.value);
+      let Cph = parseFloat(hotCpInput.value);
+      let U_clean = parseFloat(overallUInput.value);
+      let Rf = parseFloat(foulingFactorSelect.value);
+
+      if (isNaN(Th_in)) Th_in = isMetric ? 95 : 200;
+      if (isNaN(Th_out)) Th_out = isMetric ? 65 : 150;
+      if (isNaN(Tc_in)) Tc_in = isMetric ? 20 : 70;
+      if (isNaN(Tc_out)) Tc_out = isMetric ? 45 : 110;
+      if (isNaN(mh) || mh <= 0) mh = isMetric ? 2.0 : 16000;
+      if (isNaN(Cph) || Cph <= 0) Cph = isMetric ? 4.18 : 1.0;
+      if (isNaN(U_clean) || U_clean <= 0) U_clean = isMetric ? 850 : 150;
+
+      // Thermal Duty Q
+      let Q_watts = 0;
+      let Q_disp = 0;
+      let uDuty = isMetric ? 'kW' : 'BTU/hr';
+
+      if (isMetric) {
+        // Q = mh * Cph * (Th_in - Th_out) [kW]
+        const Q_kw = mh * Cph * (Th_in - Th_out);
+        Q_watts = Q_kw * 1000;
+        Q_disp = Q_kw;
+      } else {
+        // Q = mh * Cph * (Th_in - Th_out) [BTU/hr]
+        const Q_btu = mh * Cph * (Th_in - Th_out);
+        Q_watts = Q_btu * 0.293071; // Watts
+        Q_disp = Q_btu;
+      }
+
+      // Temperature differences
+      let dT1 = 0;
+      let dT2 = 0;
+
+      if (arrangement === 'parallel') {
+        dT1 = Th_in - Tc_in;
+        dT2 = Th_out - Tc_out;
+      } else {
+        // Counter, Shell-and-tube, Crossflow reference counter LMTD
+        dT1 = Th_in - Tc_out;
+        dT2 = Th_out - Tc_in;
+      }
+
+      let lmtd = 0;
+      if (dT1 <= 0 || dT2 <= 0) {
+        lmtd = 1.0; // Temp cross error
+      } else if (Math.abs(dT1 - dT2) < 0.001) {
+        lmtd = dT1;
+      } else {
+        lmtd = (dT1 - dT2) / Math.log(dT1 / dT2);
+      }
+
+      // Correction Factor F
+      let F = 1.0;
+      if (arrangement === 'shellTube' || arrangement === 'crossFlow') {
+        const denomP = (Th_in - Tc_in);
+        const P = denomP !== 0 ? (Tc_out - Tc_in) / denomP : 0.5;
+        const denomR = (Tc_out - Tc_in);
+        const R = denomR !== 0 ? (Th_in - Th_out) / denomR : 1.0;
+
+        if (arrangement === 'shellTube') {
+          // 1 shell pass, 2 tube passes
+          const term1 = Math.sqrt(Math.pow(R, 2) + 1);
+          const top = term1 * Math.log(Math.max(0.001, (1 - P) / Math.max(0.001, 1 - P * R)));
+          const botNum = 2 - P * (R + 1 - term1);
+          const botDen = 2 - P * (R + 1 + term1);
+          if (botDen > 0 && botNum > 0) {
+            const bot = (R - 1) * Math.log(botNum / botDen);
+            if (bot !== 0) F = Math.min(1.0, Math.max(0.4, top / bot));
+          } else {
+            F = 0.85;
+          }
+        } else {
+          F = 0.90;
+        }
+      }
+
+      const effDeltaTm = F * lmtd;
+
+      // Fouled U
+      // 1/U_dirty = 1/U_clean + Rf
+      let U_dirty = U_clean;
+      if (isMetric) {
+        const invU = (1 / U_clean) + Rf;
+        U_dirty = 1 / invU;
+      } else {
+        // Imperial Rf approx Rf_metric * 5.678
+        const Rf_imp = Rf * 5.678;
+        const invU = (1 / U_clean) + Rf_imp;
+        U_dirty = 1 / invU;
+      }
+
+      // Surface Area
+      let area = 0;
+      let uArea = isMetric ? 'm²' : 'ft²';
+      if (isMetric) {
+        // A = Q_watts / (U_dirty * effDeltaTm)
+        area = Q_watts / (U_dirty * effDeltaTm);
+      } else {
+        // A = Q_btu / (U_dirty * effDeltaTm)
+        area = Q_disp / (U_dirty * effDeltaTm);
+      }
+
+      // Effectiveness epsilon = Q / Q_max
+      // Q_max = C_min * (Th_in - Tc_in)
+      const Ch = isMetric ? (mh * Cph * 1000) : (mh * Cph); // W/K or BTU/hr-F
+      // Assuming balanced or known cold flow
+      const Cc = (Th_in - Th_out) > 0 ? (Ch * (Th_in - Th_out)) / Math.max(1, (Tc_out - Tc_in)) : Ch;
+      const Cmin = Math.min(Ch, Cc);
+      const Qmax = Cmin * (Th_in - Tc_in);
+      const effectiveness = Math.min(100, Math.max(0, (isMetric ? Q_watts : Q_disp) / (Qmax > 0 ? Qmax : 1) * 100));
+
+      // NTU = U * A / Cmin
+      const NTU = (U_dirty * area) / (Cmin > 0 ? Cmin : 1);
+
+      resHeatDuty.textContent = Q_disp.toFixed(1) + " " + uDuty;
+      resSurfaceArea.textContent = Math.abs(area).toFixed(2) + " " + uArea;
+      resLmtd.textContent = lmtd.toFixed(2) + " " + (isMetric ? '°C' : '°F');
+      resCorrF.textContent = F.toFixed(3);
+      resEffDeltaTm.textContent = effDeltaTm.toFixed(2) + " " + (isMetric ? '°C' : '°F');
+      resEffectiveness.textContent = effectiveness.toFixed(1) + " %";
+      resNtu.textContent = NTU.toFixed(2);
+      resUdirty.textContent = U_dirty.toFixed(1) + (isMetric ? ' W/m²·K' : ' BTU/hr·ft²·°F');
+
+      let notes = `<strong>TEMA Thermal Analysis:</strong> Heat duty of <strong>${Q_disp.toFixed(1)} ${uDuty}</strong> requires <strong>${Math.abs(area).toFixed(2)} ${uArea}</strong> of surface area at an effective LMTD of <strong>${effDeltaTm.toFixed(1)} ${isMetric ? '°C' : '°F'}</strong>. `;
+      if (F < 0.75 && arrangement !== 'counter' && arrangement !== 'parallel') {
+        notes += `<span style="color:#b45309;">Warning: Configuration factor F (${F.toFixed(2)}) is below 0.75. Consider adding shell passes to prevent temperature pinch.</span>`;
+      } else {
+        notes += `Thermal effectiveness is <strong>${effectiveness.toFixed(1)}%</strong> (NTU = ${NTU.toFixed(2)}).`;
+      }
+      heNotesBox.innerHTML = notes;
+
+      heResultBox.style.display = 'block';
+    }
+
+    document.getElementById('calcHeBtn').addEventListener('click', calculateHeatExchanger);
+    document.getElementById('resetHeBtn').addEventListener('click', function() {
+      setTimeout(calculateHeatExchanger, 50);
+    });
+
+    window.addEventListener('DOMContentLoaded', calculateHeatExchanger);
+  </script>
+</body>
+</html>

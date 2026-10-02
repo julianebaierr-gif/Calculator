@@ -127,6 +127,14 @@ CATEGORIES = {
             ("cooling-load-calculator.html", "Cooling Load (HVAC) Sizing", "❄️", "Sensible & latent heat in BTU/hr"),
             ("pipe-sizing-calculator.html", "Pipe Sizing & Water Flow", "🚰", "Internal diameter & friction loss"),
             ("torque-calculator.html", "Torque & Shaft Power", "⚙️", "Rotational torque N·m & kW/HP"),
+            ("belt-length-calculator.html", "Belt Length (Open & Crossed Pulley)", "⚙️", "Pitch length, center distance & wrap angle"),
+            ("conveyor-belt-speed-calculator.html", "Conveyor Belt Speed & Tonnage", "🏭", "Linear velocity, drum RPM & CEMA capacity"),
+            ("cutting-speed-calculator.html", "Cutting Speed & Spindle RPM", "⚙️", "Linear surface speed Vc & Taylor tool life"),
+            ("feed-rate-calculator.html", "CNC Feed Rate & Chip Load", "⚙️", "Table feed vf, radial chip thinning & MRR"),
+            ("flywheel-energy-calculator.html", "Flywheel Kinetic Energy & Stress", "🔄", "Stored energy, moment of inertia & hoop stress"),
+            ("gear-module-calculator.html", "Gear Module & Pitch Geometry", "⚙️", "Metric module m, diametral pitch DP & tip dia"),
+            ("heat-exchanger-calculator.html", "Heat Exchanger (LMTD & NTU Area)", "🌡️", "Thermal duty, counter-flow LMTD & TEMA area"),
+            ("hvac-calculator.html", "HVAC Sizing & Cooling Tonnage", "❄️", "Sensible, latent dehumidification & supply CFM"),
         ]
     },
     "civil": {
@@ -215,7 +223,7 @@ def determine_tool_cat(filename):
         return "engineering"
     if any(k in f for k in ["solar", "charging", "pv-string", "ev-charging"]):
         return "solar"
-    if any(k in f for k in ["cooling", "pipe", "torque", "pump-head", "gear-ratio", "bolt-torque", "bearing-life"]):
+    if any(k in f for k in ["cooling", "pipe", "torque", "pump-head", "gear-ratio", "bolt-torque", "bearing-life", "belt-length", "conveyor-belt", "cutting-speed", "feed-rate", "flywheel", "gear-module", "heat-exchanger", "hvac"]):
         return "mechanical"
     if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt"]):
         return "civil"
