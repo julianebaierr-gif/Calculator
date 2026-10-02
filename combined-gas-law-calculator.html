@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Combined Gas Law Calculator | (P₁V₁)/T₁ = (P₂V₂)/T₂ Multi-State Sizer</title>
+  <meta name="description" content="Calculate pressure, volume, and absolute temperature changes for gases using the Combined Gas Law (P1V1/T1 = P2V2/T2), with Boyle, Charles, and Gay-Lussac states.">
+  <link rel="canonical" href="https://calchub.cloud/combined-gas-law-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Combined Gas Law Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Solves for any unknown thermodynamic variable across pressure, volume, and temperature transitions using the Combined Gas Law (P1*V1)/T1 = (P2*V2)/T2.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the Combined Gas Law formula and when is it applicable?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The Combined Gas Law combines Boyle's Law, Charles's Law, and Gay-Lussac's Law into a single thermodynamic equation: (P1 * V1) / T1 = (P2 * V2) / T2. It applies to any constant-mass ideal gas process where pressure, volume, and temperature vary simultaneously."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why must temperatures always be expressed in Kelvin or Rankine?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Gas laws describe molecular translational energy, which is zero only at Absolute Zero. Using relative scales like Celsius or Fahrenheit yields mathematically invalid negative numbers or divide-by-zero errors. Always convert temperatures to Kelvin (K = °C + 273.15) or Rankine (°R = °F + 459.67)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does the Combined Gas Law relate to individual gas laws?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Holding temperature constant (T1 = T2) reduces the formula to Boyle's Law: P1 * V1 = P2 * V2. Holding pressure constant (P1 = P2) yields Charles's Law: V1 / T1 = V2 / T2. Holding volume constant (V1 = V2) yields Gay-Lussac's Law: P1 / T1 = P2 / T2."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are Standard Temperature and Pressure (STP) versus Normal Temperature and Pressure (NTP)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "IUPAC defines STP as 0°C (273.15 K) and 1 bar (100 kPa or 0.987 atm), where one mole of ideal gas occupies 22.71 L. NIST and older engineering standards use 0°C and 1.0 atm (101.325 kPa), yielding 22.414 L/mol. NTP is defined as 20°C (293.15 K) and 1.0 atm, yielding 24.04 L/mol."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="chemical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="chemical.html">Chemical &amp; Water Treatment</a> &rsaquo; 
+      <span>Combined Gas Law Calculator</span>
+    </nav>
+
+    <h1 class="tool-title">Combined Gas Law Calculator (P₁V₁/T₁ = P₂V₂/T₂)</h1>
+    <p class="tool-subtitle">Simultaneous Pressure, Volume &amp; Temperature State Transformation Sizer</p>
+
+    <div class="calculator-layout">
+      <!-- Calculator Core Interface -->
+      <div class="calculator-card">
+        <div class="calc-form">
+          <div class="form-group">
+            <label for="solveVariable">Select Variable to Solve For</label>
+            <select id="solveVariable" class="form-control" onchange="updateCombinedInputs()">
+              <option value="v2" selected>Final Volume (V₂)</option>
+              <option value="p2">Final Pressure (P₂)</option>
+              <option value="t2">Final Temperature (T₂)</option>
+              <option value="v1">Initial Volume (V₁)</option>
+              <option value="p1">Initial Pressure (P₁)</option>
+              <option value="t1">Initial Temperature (T₁)</option>
+            </select>
+          </div>
+
+          <h4 style="margin:0.5rem 0;color:var(--text-main);border-bottom:1px solid var(--border-light);padding-bottom:0.25rem;">Initial State Parameters (State 1)</h4>
+
+          <!-- P1 -->
+          <div id="p1CmbGroup" class="grid-2-col">
+            <div class="form-group">
+              <label for="p1Input">Initial Absolute Pressure (P₁)</label>
+              <input type="number" id="p1Input" class="form-control" value="1.01325" step="0.01" min="0.0001">
+            </div>
+            <div class="form-group">
+              <label for="p1UnitSel">P₁ Pressure Unit</label>
+              <select id="p1UnitSel" class="form-control">
+                <option value="atm">Atmospheres (atm)</option>
+                <option value="bar" selected>Bar (bar absolute)</option>
+                <option value="kpa">Kilopascals (kPa)</option>
+                <option value="psi">Pounds/sq in (psia)</option>
+                <option value="pa">Pascals (Pa)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- V1 -->
+          <div id="v1CmbGroup" class="grid-2-col">
+            <div class="form-group">
+              <label for="v1Input">Initial Volume (V₁)</label>
+              <input type="number" id="v1Input" class="form-control" value="50.0" step="1.0" min="0.0001">
+            </div>
+            <div class="form-group">
+              <label for="v1UnitSel">V₁ Volume Unit</label>
+              <select id="v1UnitSel" class="form-control">
+                <option value="l" selected>Liters (L)</option>
+                <option value="m3">Cubic Meters (m³)</option>
+                <option value="cm3">Cubic Centimeters (cm³ / mL)</option>
+                <option value="ft3">Cubic Feet (ft³)</option>
+                <option value="gal">US Gallons (gal)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- T1 -->
+          <div id="t1CmbGroup" class="grid-2-col">
+            <div class="form-group">
+              <label for="t1Input">Initial Temperature (T₁)</label>
+              <input type="number" id="t1Input" class="form-control" value="20.0" step="1.0">
+            </div>
+            <div class="form-group">
+              <label for="t1UnitSel">T₁ Temperature Scale</label>
+              <select id="t1UnitSel" class="form-control">
+                <option value="c" selected>Celsius (°C)</option>
+                <option value="k">Kelvin (K)</option>
+                <option value="f">Fahrenheit (°F)</option>
+                <option value="r">Rankine (°R)</option>
+              </select>
+            </div>
+          </div>
+
+          <h4 style="margin:1rem 0 0.5rem;color:var(--text-main);border-bottom:1px solid var(--border-light);padding-bottom:0.25rem;">Final State Parameters (State 2)</h4>
+
+          <!-- P2 -->
+          <div id="p2CmbGroup" class="grid-2-col">
+            <div class="form-group">
+              <label for="p2Input">Final Absolute Pressure (P₂)</label>
+              <input type="number" id="p2Input" class="form-control" value="3.5" step="0.1" min="0.0001">
+            </div>
+            <div class="form-group">
+              <label for="p2UnitSel">P₂ Pressure Unit</label>
+              <select id="p2UnitSel" class="form-control">
+                <option value="atm">Atmospheres (atm)</option>
+                <option value="bar" selected>Bar (bar absolute)</option>
+                <option value="kpa">Kilopascals (kPa)</option>
+                <option value="psi">Pounds/sq in (psia)</option>
+                <option value="pa">Pascals (Pa)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- V2 -->
+          <div id="v2CmbGroup" class="grid-2-col" style="display:none;">
+            <div class="form-group">
+              <label for="v2Input">Final Volume (V₂)</label>
+              <input type="number" id="v2Input" class="form-control" value="25.0" step="1.0" min="0.0001">
+            </div>
+            <div class="form-group">
+              <label for="v2UnitSel">V₂ Volume Unit</label>
+              <select id="v2UnitSel" class="form-control">
+                <option value="l" selected>Liters (L)</option>
+                <option value="m3">Cubic Meters (m³)</option>
+                <option value="cm3">Cubic Centimeters (cm³ / mL)</option>
+                <option value="ft3">Cubic Feet (ft³)</option>
+                <option value="gal">US Gallons (gal)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- T2 -->
+          <div id="t2CmbGroup" class="grid-2-col">
+            <div class="form-group">
+              <label for="t2Input">Final Temperature (T₂)</label>
+              <input type="number" id="t2Input" class="form-control" value="85.0" step="1.0">
+            </div>
+            <div class="form-group">
+              <label for="t2UnitSel">T₂ Temperature Scale</label>
+              <select id="t2UnitSel" class="form-control">
+                <option value="c" selected>Celsius (°C)</option>
+                <option value="k">Kelvin (K)</option>
+                <option value="f">Fahrenheit (°F)</option>
+                <option value="r">Rankine (°R)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="gasIdCmb">Gas Molecular Identity</label>
+            <select id="gasIdCmb" class="form-control">
+              <option value="air" selected>Dry Atmospheric Air (MW = 28.97 g/mol)</option>
+              <option value="n2">Pure Nitrogen N₂ (MW = 28.01 g/mol)</option>
+              <option value="o2">Pure Oxygen O₂ (MW = 32.00 g/mol)</option>
+              <option value="co2">Carbon Dioxide CO₂ (MW = 44.01 g/mol)</option>
+              <option value="he">Helium He (MW = 4.003 g/mol)</option>
+              <option value="ch4">Methane CH₄ (MW = 16.04 g/mol)</option>
+              <option value="h2">Hydrogen H₂ (MW = 2.016 g/mol)</option>
+            </select>
+          </div>
+
+          <button type="button" class="btn btn-primary" onclick="calcCombinedGasLaw()">Solve Combined Gas Law</button>
+        </div>
+
+        <div id="combinedResults" class="results-box" style="display:none;margin-top:1.5rem;">
+          <h3 class="results-title">Combined Gas Law Solution &amp; Thermodynamic Diagnostics</h3>
+          <div class="result-grid">
+            <div class="result-card">
+              <div class="result-label" id="resCmbTargetLabel">Calculated Value</div>
+              <div class="result-value highlight" id="resCmbTargetVal">--</div>
+              <div class="result-subtext" id="resCmbTargetAlt">--</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Volume Ratio (V₂ / V₁)</div>
+              <div class="result-value" id="resCmbVolRatio">--</div>
+              <div class="result-subtext" id="resCmbVolRatioDesc">--</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Pressure Ratio (P₂ / P₁)</div>
+              <div class="result-value" id="resCmbPresRatio">--</div>
+              <div class="result-subtext" id="resCmbPresRatioDesc">--</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Gas Molar Quantity</div>
+              <div class="result-value highlight" id="resCmbMoles">--</div>
+              <div class="result-subtext" id="resCmbMass">--</div>
+            </div>
+          </div>
+
+          <div class="result-details" style="margin-top:1rem;padding:1rem;background:var(--card-bg);border-radius:6px;border:1px solid var(--border-light);">
+            <h4 style="margin-top:0;">Process Verification &amp; Standard State Comparisons</h4>
+            <ul style="margin-bottom:0;line-height:1.7;">
+              <li><strong>Thermodynamic State Constant:</strong> <span id="resCmbConstant">--</span></li>
+              <li><strong>Equivalent Volume at IUPAC STP (0°C, 1 bar):</strong> <span id="resCmbStpVol">--</span></li>
+              <li><strong>Equivalent Volume at NIST Normal (20°C, 1 atm):</strong> <span id="resCmbNtpVol">--</span></li>
+              <li><strong>Density Shift:</strong> <span id="resCmbDensityShift">--</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🧪</span>
+            <h3 class="widget-title">Related Chemical & Water Treatment</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="chlorine-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Chlorine Dosing Calculator</a></li>
+            <li><a href="chemical-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Chemical Dosing Rate Calculator</a></li>
+            <li><a href="pipe-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pipe Sizing & Water Flow</a></li>
+            <li><a href="cooling-load-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cooling Load (HVAC) Sizing</a></li>
+            <li><a href="alum-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Alum Dosing & Coagulation Feed</a></li>
+            <li><a href="boyles-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Boyle's Gas Law (P₁V₁=P₂V₂)</a></li>
+            <li><a href="calcium-hypochlorite-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calcium Hypochlorite (HTH 68%)</a></li>
+            <li><a href="caustic-soda-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Caustic Soda (NaOH) Dosing</a></li>
+            <li><a href="charles-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Charles's Law (V₁/T₁=V₂/T₂)</a></li>
+            <li><a href="chlorine-dioxide-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Chlorine Dioxide (ClO₂) Oxidation</a></li>
+            <li><a href="coagulant-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Coagulant Dosing (Jar Test Sizer)</a></li>
+            <li><a href="combined-gas-law-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Combined Gas Law (P₁V₁/T₁=P₂V₂/T₂)</a></li>
+            <li><a href="dilution-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Solution Dilution (C₁V₁ = C₂V₂)</a></li>
+            <li><a href="gay-lussac-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Gay-Lussac's Gas Law (P₁/T₁=P₂/T₂)</a></li>
+            <li><a href="half-life-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Radioactive Half-Life & Decay</a></li>
+            <li><a href="henderson-hasselbalch-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Henderson-Hasselbalch (pH Buffer)</a></li>
+            <li><a href="hydrazine-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Hydrazine Dosing (Boiler Deoxygenation)</a></li>
+            <li><a href="ideal-gas-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ideal Gas Law (PV = nRT)</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="chemical.html" class="sidebar-category-link">View All Chemical & Water Treatment Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Technical Educational Article Body (1000+ Words) -->
+    <article class="article-body">
+      <h2>Thermodynamic Derivation of the Combined Gas Law</h2>
+      <p>The Combined Gas Law represents the mathematical unification of the three classical empirical gas relations discovered between the mid-seventeenth and early nineteenth centuries: <strong>Boyle's Law</strong> (Robert Boyle, 1662: $P \propto 1/V$ at constant $T$), <strong>Charles's Law</strong> (Jacques Charles, 1787: $V \propto T$ at constant $P$), and <strong>Gay-Lussac's Law</strong> (Joseph Louis Gay-Lussac, 1802: $P \propto T$ at constant $V$). While each individual empirical law restricts two thermodynamic state variables to examine the interdependence of the remaining two, real-world aerospace, internal combustion, and chemical engineering systems involve simultaneous variations across pressure, volume, and temperature.</p>
+
+      <p>By considering a fixed mass of gas (constant moles $n$) undergoing an arbitrary transition from an initial thermodynamic equilibrium state $(P_1, V_1, T_1)$ to a final equilibrium state $(P_2, V_2, T_2)$, the process can be conceptualized as two sequential steps: an initial isothermal expansion to an intermediate pressure, followed by an isobaric heating to the final temperature. Combining these transformations yields the universal equation of state:</p>
+
+      <div class="formula-box">
+        $$\frac{P_1 V_1}{T_1} = \frac{P_2 V_2}{T_2} = n R = \text{constant}$$
+      </div>
+
+      <p>Where $R = 8.314462\text{ J/(mol}\cdot\text{K)}$ is the universal gas constant. This equation proves that the quantity $\frac{P V}{T}$ is an invariant property for any closed ideal gas system undergoing non-chemical transformation.</p>
+
+      <h2>Analytical Solutions for the Six State Variables</h2>
+      <p>Given any five known thermodynamic boundary conditions, the unknown sixth variable can be solved directly through algebraic rearrangement:</p>
+
+      <div class="formula-box">
+        $$V_2 = \frac{P_1 V_1 T_2}{P_2 T_1}, \quad P_2 = \frac{P_1 V_1 T_2}{V_2 T_1}, \quad T_2 = \frac{P_2 V_2 T_1}{P_1 V_1}$$
+      </div>
+      <div class="formula-box">
+        $$V_1 = \frac{P_2 V_2 T_1}{P_1 T_2}, \quad P_1 = \frac{P_2 V_2 T_1}{V_1 T_2}, \quad T_1 = \frac{P_1 V_1 T_2}{P_2 V_2}$$
+      </div>
+
+      <p>It is fundamentally critical that absolute units are utilized throughout. Gauge pressures (psig, bar-g) must be converted to absolute pressure ($P_{\text{abs}} = P_{\text{gauge}} + P_{\text{atm}}$), and temperatures must be converted to the thermodynamic Kelvin or Rankine scales ($T_{\text{abs}} = T_{^\circ\text{C}} + 273.15$ or $T_{\text{abs}} = T_{^\circ\text{F}} + 459.67$).</p>
+
+      <h2>Boundary Case Specializations</h2>
+      <p>The Combined Gas Law serves as the analytical parent equation for all classic two-variable gas relationships:</p>
+      <ul>
+        <li><strong>Isothermal Boundary ($T_1 = T_2$):</strong> The temperature terms cancel identically, yielding <strong>Boyle's Law</strong>:
+        $$P_1 V_1 = P_2 V_2$$
+        Applicable to slow, highly conductive gas expansion or compression where infinite heat sink contact maintains uniform temperature.</li>
+        <li><strong>Isobaric Boundary ($P_1 = P_2$):</strong> The pressure terms cancel identically, yielding <strong>Charles's Law</strong>:
+        $$\frac{V_1}{T_1} = \frac{V_2}{T_2}$$
+        Applicable to constant-pressure systems such as hot air balloons, weighted piston cylinders, and open-vented architectural spaces.</li>
+        <li><strong>Isochoric / Isometric Boundary ($V_1 = V_2$):</strong> The volume terms cancel identically, yielding <strong>Gay-Lussac's Law</strong> (Amontons's Law):
+        $$\frac{P_1}{T_1} = \frac{P_2}{T_2}$$
+        Applicable to rigid, unyielding enclosures such as autoclave chambers, scuba cylinders, and fire extinguisher tanks.</li>
+      </ul>
+
+      <h2>Standard State Conventions (STP vs. NTP vs. EPA Standard)</h2>
+      <p>Engineering gas volume measurements are meaningless without citing the reference pressure and temperature. Global standards organizations define differing standard states:</p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Standard Definition</th>
+              <th>Standard Pressure</th>
+              <th>Standard Temperature</th>
+              <th>Molar Volume (L/mol)</th>
+              <th>Primary Regulatory / Engineering Context</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>IUPAC Modern STP (Post-1982)</td>
+              <td>1.000 bar (100.0 kPa)</td>
+              <td>0.0°C (273.15 K)</td>
+              <td>22.711 L/mol</td>
+              <td>Modern Chemistry &amp; IUPAC Thermodynamic Tables</td>
+            </tr>
+            <tr>
+              <td>IUPAC Classical STP (Pre-1982)</td>
+              <td>1.000 atm (101.325 kPa)</td>
+              <td>0.0°C (273.15 K)</td>
+              <td>22.414 L/mol</td>
+              <td>Classical Physics &amp; Legacy Textbooks</td>
+            </tr>
+            <tr>
+              <td>NIST / ISO Normal (NTP)</td>
+              <td>1.000 atm (101.325 kPa)</td>
+              <td>20.0°C (293.15 K)</td>
+              <td>24.042 L/mol</td>
+              <td>Industrial Gas Compressors &amp; Flow Meters (Nm³/h)</td>
+            </tr>
+            <tr>
+              <td>US EPA Standard Conditions</td>
+              <td>1.000 atm (29.92 inHg)</td>
+              <td>20.0°C (68.0°F / 293.15 K)</td>
+              <td>24.042 L/mol</td>
+              <td>Air Emissions &amp; Stack Gas Testing (SCFM)</td>
+            </tr>
+            <tr>
+              <td>US Petroleum Standard (AGA)</td>
+              <td>14.73 psia (101.56 kPa)</td>
+              <td>60.0°F (15.56°C / 288.71 K)</td>
+              <td>23.681 L/mol (379.48 scf/lbmol)</td>
+              <td>Natural Gas Pipelines &amp; Custody Transfer (MMSCFD)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>To convert an operational volume ($V_{\text{actual}}$) measured at $(P_{\text{act}}, T_{\text{act}})$ to standard conditions ($V_{\text{std}}$):</p>
+      <div class="formula-box">
+        $$V_{\text{std}} = V_{\text{act}} \times \left(\frac{P_{\text{act}}}{P_{\text{std}}}\right) \times \left(\frac{T_{\text{std}}}{T_{\text{act}}}\right)$$
+      </div>
+
+      <h2>Practical Worked Case Study: Weather Balloon Stratospheric Ascent</h2>
+      <div class="worked-example-card">
+        <h3>Engineering Design Example: Radiosonde High-Altitude Balloon Expansion</h3>
+        <p><strong>Scenario:</strong> A scientific latex weather sounding balloon is launched from sea level where surface barometric pressure is $P_1 = 1.013\text{ bar}$ ($101.3\text{ kPa}$), ambient temperature is $T_1 = 22.0^\circ\text{C}$ ($295.15\text{ K}$), and initial helium inflation volume is $V_1 = 5.00\text{ m}^3$ ($5,000\text{ Liters}$). The balloon ascends into the stratosphere to an altitude of $25,000\text{ meters}$, where atmospheric pressure drops precipitously to $P_2 = 0.025\text{ bar}$ ($2.5\text{ kPa}$) and ambient temperature plummets to $T_2 = -55.0^\circ\text{C}$ ($218.15\text{ K}$). Assume ideal helium gas behavior ($MW = 4.003\text{ g/mol}$).</p>
+
+        <p><strong>Step 1: Convert Temperatures to Absolute Kelvin:</strong></p>
+        $$T_1 = 22.0 + 273.15 = 295.15\text{ K}$$
+        $$T_2 = -55.0 + 273.15 = 218.15\text{ K}$$
+
+        <p><strong>Step 2: Solve for Final Stratospheric Volume (V₂) via Combined Gas Law:</strong></p>
+        $$V_2 = \frac{P_1 V_1 T_2}{P_2 T_1} = \frac{1.013\text{ bar} \times 5.00\text{ m}^3 \times 218.15\text{ K}}{0.025\text{ bar} \times 295.15\text{ K}} = \frac{1,104.93}{7.37875} = 149.75\text{ m}^3$$
+        <p>Volume expansion ratio:</p>
+        $$r_v = \frac{V_2}{V_1} = \frac{149.75}{5.00} = 29.95 : 1\text{ (A 30-fold volumetric increase)}$$
+
+        <p><strong>Step 3: Competing Effects Analysis:</strong></p>
+        <p>The massive pressure drop ($1.013 \to 0.025\text{ bar}$) alone would drive a 40.52-fold volume expansion ($\frac{P_1}{P_2} = 40.52$). However, intense thermal cooling ($295.15 \to 218.15\text{ K}$) causes an isobaric contraction factor of $0.739$ ($\frac{T_2}{T_1} = 0.739$). The Combined Gas Law synthesizes these competing physical mechanisms into the exact resultant volume: $40.52 \times 0.739 = 29.95$.</p>
+
+        <p><strong>Step 4: Helium Mass and Density Shift:</strong></p>
+        <p>Total contained helium moles:</p>
+        $$n = \frac{P_1 V_1}{R T_1} = \frac{101,300\text{ Pa} \times 5.00\text{ m}^3}{8.3145 \times 295.15\text{ K}} = 206.4\text{ moles}$$
+        $$m_{\text{He}} = 206.4\text{ mol} \times 0.004003\text{ kg/mol} = 0.826\text{ kg (1.82 lbs)}$$
+        <p>Initial sea level density: $\rho_1 = \frac{0.826}{5.00} = 0.165\text{ kg/m}^3$.</p>
+        <p>Stratospheric burst density: $\rho_2 = \frac{0.826}{149.75} = 0.00552\text{ kg/m}^3$.</p>
+      </div>
+
+      <h2>Engineering Applications and Real-Gas Limits</h2>
+      <p>Deploying the Combined Gas Law requires understanding its practical engineering boundaries:</p>
+      <ul>
+        <li><strong>Internal Combustion Engine Compression Stroke:</strong> In a Diesel engine, the air charge is compressed from $(P_1 = 1\text{ bar}, V_1 = 500\text{ cm}^3, T_1 = 300\text{ K})$ down to clearance volume $V_2 = 25\text{ cm}^3$ ($20:1$ compression ratio). However, because compression occurs within milliseconds, heat cannot escape through the cylinder walls; the process is <strong>isentropic/adiabatic</strong> ($P V^\gamma = \text{const}$ with $\gamma = 1.4$), raising final temperature to over $900\text{ K}$ and auto-igniting injected fuel.</li>
+        <li><strong>Compressibility Factor ($Z$) at High Pressures:</strong> At extreme pressures ($P &gt; 50\text{ bar}$) or temperatures near gas liquefaction points, intermolecular attractions and finite molecular volumes violate ideal gas assumptions. Engineers modify the law by applying compressibility factors:
+        $$\frac{P_1 V_1}{Z_1 T_1} = \frac{P_2 V_2}{Z_2 T_2}$$
+        </li>
+      </ul>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">
+            <span class="logo-icon">&pi;</span>
+            <span class="logo-text">Calc<strong>Hub</strong></span>
+          </div>
+          <p class="footer-about">High-precision chemical, thermodynamic, and mechanical calculation tools conforming to ASME, ISO, and NIST physical standards.</p>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Engineering Disciplines</h4>
+          <ul class="footer-links">
+            <li><a href="chemical.html">Chemical &amp; Water Treatment</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+            <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+            <li><a href="civil.html">Civil &amp; Construction</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Standard References</h4>
+          <ul class="footer-links">
+            <li><a href="https://webbook.nist.gov" target="_blank" rel="noopener">NIST Chemistry WebBook</a></li>
+            <li><a href="https://www.iupac.org" target="_blank" rel="noopener">IUPAC Gold Book Standards</a></li>
+            <li><a href="https://www.asme.org" target="_blank" rel="noopener">ASME Boiler &amp; Pressure Vessel</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Free, open, client-side engineering tools.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const GAS_MW_MAP = {
+      air: 28.97,
+      n2: 28.01,
+      o2: 32.00,
+      co2: 44.01,
+      he: 4.003,
+      ch4: 16.04,
+      h2: 2.016
+    };
+
+    function updateCombinedInputs() {
+      const v = document.getElementById("solveVariable").value;
+      document.getElementById("p1CmbGroup").style.display = v === "p1" ? "none" : "grid";
+      document.getElementById("v1CmbGroup").style.display = v === "v1" ? "none" : "grid";
+      document.getElementById("t1CmbGroup").style.display = v === "t1" ? "none" : "grid";
+      document.getElementById("p2CmbGroup").style.display = v === "p2" ? "none" : "grid";
+      document.getElementById("v2CmbGroup").style.display = v === "v2" ? "none" : "grid";
+      document.getElementById("t2CmbGroup").style.display = v === "t2" ? "none" : "grid";
+    }
+
+    function toPa(val, unit) {
+      if (unit === "atm") return val * 101325;
+      if (unit === "bar") return val * 100000;
+      if (unit === "kpa") return val * 1000;
+      if (unit === "psi") return val * 6894.757;
+      return val;
+    }
+
+    function fromPa(pa, unit) {
+      if (unit === "atm") return pa / 101325;
+      if (unit === "bar") return pa / 100000;
+      if (unit === "kpa") return pa / 1000;
+      if (unit === "psi") return pa / 6894.757;
+      return pa;
+    }
+
+    function toM3Cmb(val, unit) {
+      if (unit === "l") return val * 0.001;
+      if (unit === "cm3") return val * 0.000001;
+      if (unit === "ft3") return val * 0.0283168;
+      if (unit === "gal") return val * 0.00378541;
+      return val;
+    }
+
+    function fromM3Cmb(m3, unit) {
+      if (unit === "l") return m3 * 1000;
+      if (unit === "cm3") return m3 * 1000000;
+      if (unit === "ft3") return m3 / 0.0283168;
+      if (unit === "gal") return m3 / 0.00378541;
+      return m3;
+    }
+
+    function toKCmb(val, scale) {
+      if (scale === "c") return val + 273.15;
+      if (scale === "k") return val;
+      if (scale === "f") return (val - 32) * (5 / 9) + 273.15;
+      if (scale === "r") return val * (5 / 9);
+      return val;
+    }
+
+    function fromKCmb(k, scale) {
+      if (scale === "c") return k - 273.15;
+      if (scale === "k") return k;
+      if (scale === "f") return (k - 273.15) * (9 / 5) + 32;
+      if (scale === "r") return k * (9 / 5);
+      return k;
+    }
+
+    function calcCombinedGasLaw() {
+      const target = document.getElementById("solveVariable").value;
+      const gasKey = document.getElementById("gasIdCmb").value;
+      const mw = GAS_MW_MAP[gasKey];
+
+      let p1_pa = 0, v1_m3 = 0, t1_k = 0;
+      let p2_pa = 0, v2_m3 = 0, t2_k = 0;
+
+      if (target !== "p1") {
+        p1_pa = toPa(parseFloat(document.getElementById("p1Input").value) || 0, document.getElementById("p1UnitSel").value);
+      }
+      if (target !== "v1") {
+        v1_m3 = toM3Cmb(parseFloat(document.getElementById("v1Input").value) || 0, document.getElementById("v1UnitSel").value);
+      }
+      if (target !== "t1") {
+        t1_k = toKCmb(parseFloat(document.getElementById("t1Input").value) || 0, document.getElementById("t1UnitSel").value);
+      }
+      if (target !== "p2") {
+        p2_pa = toPa(parseFloat(document.getElementById("p2Input").value) || 0, document.getElementById("p2UnitSel").value);
+      }
+      if (target !== "v2") {
+        v2_m3 = toM3Cmb(parseFloat(document.getElementById("v2Input").value) || 0, document.getElementById("v2UnitSel").value);
+      }
+      if (target !== "t2") {
+        t2_k = toKCmb(parseFloat(document.getElementById("t2Input").value) || 0, document.getElementById("t2UnitSel").value);
+      }
+
+      let resLabel = "";
+      let resVal = "";
+      let resAlt = "";
+
+      // (P1 * V1) / T1 = (P2 * V2) / T2
+      if (target === "v2") {
+        if (p2_pa <= 0 || t1_k <= 0) { alert("P2 and T1 must be positive non-zero values."); return; }
+        v2_m3 = (p1_pa * v1_m3 * t2_k) / (p2_pa * t1_k);
+        const u = document.getElementById("v1UnitSel").value;
+        resLabel = "Final Volume (V₂)";
+        resVal = fromM3Cmb(v2_m3, u).toFixed(4) + " " + u.toUpperCase();
+        resAlt = (v2_m3 * 1000).toFixed(2) + " L (" + v2_m3.toFixed(4) + " m³)";
+      } else if (target === "p2") {
+        if (v2_m3 <= 0 || t1_k <= 0) { alert("V2 and T1 must be positive non-zero values."); return; }
+        p2_pa = (p1_pa * v1_m3 * t2_k) / (v2_m3 * t1_k);
+        const u = document.getElementById("p1UnitSel").value;
+        resLabel = "Final Absolute Pressure (P₂)";
+        resVal = fromPa(p2_pa, u).toFixed(4) + " " + u.toUpperCase();
+        resAlt = (p2_pa / 100000).toFixed(3) + " bar (" + (p2_pa / 6894.757).toFixed(2) + " psia)";
+      } else if (target === "t2") {
+        if (p1_pa <= 0 || v1_m3 <= 0) { alert("P1 and V1 must be positive non-zero values."); return; }
+        t2_k = (p2_pa * v2_m3 * t1_k) / (p1_pa * v1_m3);
+        const s = document.getElementById("t1UnitSel").value;
+        resLabel = "Final Temperature (T₂)";
+        resVal = fromKCmb(t2_k, s).toFixed(2) + " °" + s.toUpperCase();
+        resAlt = t2_k.toFixed(2) + " K (" + (t2_k - 273.15).toFixed(2) + " °C)";
+      } else if (target === "v1") {
+        if (p1_pa <= 0 || t2_k <= 0) { alert("P1 and T2 must be positive non-zero values."); return; }
+        v1_m3 = (p2_pa * v2_m3 * t1_k) / (p1_pa * t2_k);
+        const u = document.getElementById("v2UnitSel").value;
+        resLabel = "Initial Volume (V₁)";
+        resVal = fromM3Cmb(v1_m3, u).toFixed(4) + " " + u.toUpperCase();
+        resAlt = (v1_m3 * 1000).toFixed(2) + " L (" + v1_m3.toFixed(4) + " m³)";
+      } else if (target === "p1") {
+        if (v1_m3 <= 0 || t2_k <= 0) { alert("V1 and T2 must be positive non-zero values."); return; }
+        p1_pa = (p2_pa * v2_m3 * t1_k) / (v1_m3 * t2_k);
+        const u = document.getElementById("p2UnitSel").value;
+        resLabel = "Initial Absolute Pressure (P₁)";
+        resVal = fromPa(p1_pa, u).toFixed(4) + " " + u.toUpperCase();
+        resAlt = (p1_pa / 100000).toFixed(3) + " bar (" + (p1_pa / 6894.757).toFixed(2) + " psia)";
+      } else if (target === "t1") {
+        if (p2_pa <= 0 || v2_m3 <= 0) { alert("P2 and V2 must be positive non-zero values."); return; }
+        t1_k = (p1_pa * v1_m3 * t2_k) / (p2_pa * v2_m3);
+        const s = document.getElementById("t2UnitSel").value;
+        resLabel = "Initial Temperature (T₁)";
+        resVal = fromKCmb(t1_k, s).toFixed(2) + " °" + s.toUpperCase();
+        resAlt = t1_k.toFixed(2) + " K (" + (t1_k - 273.15).toFixed(2) + " °C)";
+      }
+
+      // Calculations
+      const R = 8.314462;
+      const moles = (p1_pa * v1_m3) / (R * t1_k);
+      const massKg = (moles * mw) / 1000;
+      const massLb = massKg * 2.20462;
+
+      const volRatio = v2_m3 / v1_m3;
+      const presRatio = p2_pa / p1_pa;
+      const cmbConstant = (p1_pa * v1_m3) / t1_k; // J/K
+
+      // Equivalent STP and NTP
+      // Modern STP: P_stp = 100,000 Pa, T_stp = 273.15 K
+      const v_stp_m3 = (cmbConstant * 273.15) / 100000;
+      // NIST NTP: P_ntp = 101,325 Pa, T_ntp = 293.15 K
+      const v_ntp_m3 = (cmbConstant * 293.15) / 101325;
+
+      const rho1 = massKg / v1_m3;
+      const rho2 = massKg / v2_m3;
+
+      document.getElementById("resCmbTargetLabel").textContent = resLabel;
+      document.getElementById("resCmbTargetVal").textContent = resVal;
+      document.getElementById("resCmbTargetAlt").textContent = resAlt;
+
+      document.getElementById("resCmbVolRatio").textContent = volRatio.toFixed(3) + " : 1";
+      document.getElementById("resCmbVolRatioDesc").textContent = volRatio >= 1.0 ? "Net volumetric expansion (" + (((volRatio - 1)) * 100).toFixed(1) + "% increase)" : "Net volumetric compression (" + (((1 - volRatio)) * 100).toFixed(1) + "% reduction)";
+
+      document.getElementById("resCmbPresRatio").textContent = presRatio.toFixed(3) + " : 1";
+      document.getElementById("resCmbPresRatioDesc").textContent = presRatio >= 1.0 ? "Pressure increases (" + ((presRatio - 1) * 100).toFixed(1) + "%)" : "Pressure drops (" + ((1 - presRatio) * 100).toFixed(1) + "%)";
+
+      document.getElementById("resCmbMoles").textContent = moles.toFixed(2) + " mol";
+      document.getElementById("resCmbMass").textContent = massKg.toFixed(3) + " kg (" + massLb.toFixed(2) + " lbs) of " + gasKey.toUpperCase();
+
+      document.getElementById("resCmbConstant").textContent = (cmbConstant).toFixed(4) + " J/K (P·V/T state invariant = n·R)";
+      document.getElementById("resCmbStpVol").textContent = (v_stp_m3 * 1000).toFixed(2) + " L (" + v_stp_m3.toFixed(4) + " m³ at 0°C, 1 bar)";
+      document.getElementById("resCmbNtpVol").textContent = (v_ntp_m3 * 1000).toFixed(2) + " L (" + v_ntp_m3.toFixed(4) + " m³ at 20°C, 1 atm)";
+      document.getElementById("resCmbDensityShift").textContent = "ρ₁ = " + rho1.toFixed(3) + " kg/m³  ➜  ρ₂ = " + rho2.toFixed(3) + " kg/m³ (" + (((rho2 - rho1) / rho1) * 100).toFixed(1) + "% change)";
+
+      document.getElementById("combinedResults").style.display = "block";
+    }
+  </script>
+</body>
+</html>

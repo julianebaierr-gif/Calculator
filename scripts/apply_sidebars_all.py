@@ -199,6 +199,14 @@ CATEGORIES = {
             ("caustic-soda-dosing-calculator.html", "Caustic Soda (NaOH) Dosing", "🧪", "50% & 25% NaOH feed, alkalinity boost & LCR corrosion"),
             ("charles-law-calculator.html", "Charles's Law (V₁/T₁=V₂/T₂)", "🌡️", "Isobaric thermal gas expansion, Kelvin scale & boundary work"),
             ("chlorine-dioxide-dosing-calculator.html", "Chlorine Dioxide (ClO₂) Oxidation", "🔬", "Precursor NaClO₂ feed, Fe/Mn removal & EPA chlorite cap"),
+            ("coagulant-dosing-calculator.html", "Coagulant Dosing (Jar Test Sizer)", "🧪", "Alum, FeCl₃ & ACH feed rates, dry kg/day & pump sizing"),
+            ("combined-gas-law-calculator.html", "Combined Gas Law (P₁V₁/T₁=P₂V₂/T₂)", "🎈", "Simultaneous pressure, volume & temperature transitions"),
+            ("dilution-calculator.html", "Solution Dilution (C₁V₁ = C₂V₂)", "🧪", "Serial dilution, stock aliquots, solvent volume & buffer mix"),
+            ("gay-lussac-law-calculator.html", "Gay-Lussac's Gas Law (P₁/T₁=P₂/T₂)", "🌡️", "Isochoric rigid vessel pressure & thermal burst safety"),
+            ("half-life-calculator.html", "Radioactive Half-Life & Decay", "☢️", "Exponential nuclear kinetics, remaining mass & activity"),
+            ("henderson-hasselbalch-calculator.html", "Henderson-Hasselbalch (pH Buffer)", "🧪", "Acid-base conjugate ratio, pKa & Van Slyke buffer beta"),
+            ("hydrazine-dosing-calculator.html", "Hydrazine Dosing (Boiler Deoxygenation)", "💧", "ASME / EPRI AVT(R) dissolved O₂ scavenger & pump sizing"),
+            ("ideal-gas-law-calculator.html", "Ideal Gas Law (PV = nRT)", "🎈", "Universal gas state equation, density & compressibility Z"),
         ]
     },
     "fire": {
@@ -267,7 +275,7 @@ def determine_tool_cat(filename):
         return "mechanical"
     if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt", "rainwater-downpipe", "block", "drywall", "excavation", "flooring", "footing", "gravel", "paint", "roof-pitch", "slab", "slope", "soil", "tile"]):
         return "civil"
-    if any(k in f for k in ["chemical", "chlorine", "alum", "boyle", "calcium-hypochlorite", "caustic", "charles", "chlorine-dioxide"]):
+    if any(k in f for k in ["chemical", "chlorine", "alum", "boyle", "calcium-hypochlorite", "caustic", "charles", "chlorine-dioxide", "coagulant", "combined-gas", "dilution", "gay-lussac", "half-life", "henderson", "hydrazine", "ideal-gas"]):
         return "chemical"
     if any(k in f for k in ["sprinkler", "smoke", "fire-alarm", "hydrant", "fire-pump", "nac", "strobe"]):
         return "fire"

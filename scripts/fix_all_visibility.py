@@ -187,6 +187,14 @@ CAT_MAP = {
             ("caustic-soda-dosing-calculator.html", "Caustic Soda (NaOH) Dosing", "🧪", "50% & 25% NaOH feed, alkalinity boost & LCR corrosion", "1.0 mg/L NaOH = +1.251 mg/L Alkalinity as CaCO₃"),
             ("charles-law-calculator.html", "Charles's Law (V₁/T₁=V₂/T₂)", "🌡️", "Isobaric thermal gas expansion, Kelvin scale & boundary work", "V₁/T₁ = V₂/T₂ | W = P·ΔV = nR·ΔT"),
             ("chlorine-dioxide-dosing-calculator.html", "Chlorine Dioxide (ClO₂) Oxidation", "🔬", "Precursor NaClO₂ feed, Fe/Mn removal & EPA chlorite cap", "2 NaClO₂ + Cl₂ ➔ 2 ClO₂ + 2 NaCl | DBP cap 0.8 mg/L"),
+            ("coagulant-dosing-calculator.html", "Coagulant Dosing (Jar Test Sizer)", "🧪", "Alum, FeCl₃ & ACH feed rates, dry kg/day & pump sizing", "Feed (kg/day) = (Q · Dose · 24) / 1000 | Stock LPH"),
+            ("combined-gas-law-calculator.html", "Combined Gas Law (P₁V₁/T₁=P₂V₂/T₂)", "🎈", "Simultaneous pressure, volume & temperature transitions", "(P₁·V₁)/T₁ = (P₂·V₂)/T₂ | Polytropic PV^n = C"),
+            ("dilution-calculator.html", "Solution Dilution (C₁V₁ = C₂V₂)", "🧪", "Serial dilution, stock aliquots, solvent volume & buffer mix", "C₁·V₁ = C₂·V₂ | V_diluent = V₂ - V₁"),
+            ("gay-lussac-law-calculator.html", "Gay-Lussac's Gas Law (P₁/T₁=P₂/T₂)", "🌡️", "Isochoric rigid vessel pressure & thermal burst safety", "P₁/T₁ = P₂/T₂ | ΔP = (nR/V)·ΔT | ASME pressure relief"),
+            ("half-life-calculator.html", "Radioactive Half-Life & Decay", "☢️", "Exponential nuclear kinetics, remaining mass & activity", "N(t) = N₀ · (1/2)^(t / t½) = N₀ · e^(-λt)"),
+            ("henderson-hasselbalch-calculator.html", "Henderson-Hasselbalch (pH Buffer)", "🧪", "Acid-base conjugate ratio, pKa & Van Slyke buffer beta", "pH = pK_a + log([A⁻]/[HA]) | β = 2.303·C·α·(1-α)"),
+            ("hydrazine-dosing-calculator.html", "Hydrazine Dosing (Boiler Deoxygenation)", "💧", "ASME / EPRI AVT(R) dissolved O₂ scavenger & pump sizing", "N₂H₄ + O₂ ➔ N₂ + 2H₂O | 1:1 mass ratio | 35% hydrate"),
+            ("ideal-gas-law-calculator.html", "Ideal Gas Law (PV = nRT)", "🎈", "Universal gas state equation, density & compressibility Z", "PV = nRT = (m/M)RT | ρ = PM / RT | v_rms speed"),
         ]
     },
     "fire-safety.html": {

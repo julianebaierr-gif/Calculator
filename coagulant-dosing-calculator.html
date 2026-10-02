@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coagulant Dosing Calculator | Ferric, Alum &amp; PAC Water Treatment Sizer</title>
+  <meta name="description" content="Calculate coagulant feed rates for water treatment: Alum, Ferric Chloride, Ferric Sulfate, and Polyaluminum Chloride (PAC), jar test calibration, and alkalinity.">
+  <link rel="canonical" href="https://calchub.cloud/coagulant-dosing-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Coagulant Dosing Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates primary coagulant feed rates for Alum, Ferric Chloride, Ferric Sulfate, and Polyaluminum Chloride (PAC), metering pump stroke calibration, and alkalinity consumption.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How does Ferric Chloride compare to Alum in water treatment coagulation?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Ferric chloride (FeCl3) forms denser, heavier iron hydroxide flocs that settle faster than aluminum hydroxide flocs. Ferric operates across a broader pH spectrum (4.0 to 11.0) compared to alum (5.8 to 7.2), but it consumes nearly double the alkalinity per mg/L (0.925 mg/L as CaCO3 vs 0.505 mg/L for alum) and requires highly corrosion-resistant wetted materials."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is Polyaluminum Chloride (PAC) and why does it consume less alkalinity?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Polyaluminum Chloride (PAC) consists of pre-polymerized aluminum hydroxychloride complexes [Aln(OH)mCl(3n-m)]. Because PAC has been partially neutralized with hydroxyl ions during manufacturing (possessing a 'basicity' typically between 50% and 75%), it consumes significantly less raw water alkalinity (0.15 to 0.30 mg/L as CaCO3) and produces lower finished water pH depression."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do you translate jar test results to full-scale plant chemical pump feed rates?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A jar test establishes the optimum coagulant concentration (mg/L or ppm). For plant feed: Feed Rate (lb/day dry) = Plant Flow (MGD) * Target Dose (mg/L) * 8.34 lb/gal. The volumetric liquid feed rate is GPD = (lb/day dry) / (active lbs coagulant per gallon of commercial solution). Drawdown calibration is Rate (mL/min) = GPD * 2.6288."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is chemical sludge generation estimated from coagulant addition?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Total dry chemical sludge includes precipitated metal hydroxide flocs plus removed suspended solids: Sludge (lb/day) = Flow (MGD) * [Coagulant Constant * Dose (mg/L) + Removed TSS (mg/L)] * 8.34. The coagulant constant is 0.263 for Alum, 0.66 for Ferric Chloride, and 0.54 for Ferric Sulfate."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="chemical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="chemical.html">Chemical &amp; Water Treatment</a> &rsaquo; 
+      <span>Coagulant Dosing Calculator</span>
+    </nav>
+
+    <h1 class="tool-title">Universal Coagulant Dosing &amp; Feed Calculator</h1>
+    <p class="tool-subtitle">Ferric Chloride, Alum, Ferric Sulfate &amp; PAC Feed Sizing, Pump Calibration &amp; Alkalinity Stoichiometry</p>
+
+    <div class="calculator-layout">
+      <!-- Calculator Core Interface -->
+      <div class="calculator-card">
+        <div class="calc-form">
+          <div class="form-group">
+            <label for="coagulantType">Coagulant Chemical Selection</label>
+            <select id="coagulantType" class="form-control" onchange="updateCoagulantPreset()">
+              <option value="ferric_cl" selected>Ferric Chloride (FeCl₃ 38% liquid, SG = 1.42, 4.49 lb dry/gal)</option>
+              <option value="alum_liquid">Liquid Alum (Al₂(SO₄)₃ 48.5% dry basis, SG = 1.33, 5.38 lb dry/gal)</option>
+              <option value="ferric_so4">Ferric Sulfate (Fe₂(SO₄)₃ 50% liquid, SG = 1.55, 6.46 lb dry/gal)</option>
+              <option value="pac_liquid">Polyaluminum Chloride (PAC 30% liquid, SG = 1.25, 3.13 lb dry/gal, 70% basicity)</option>
+              <option value="alum_dry">Dry Granular Alum (Al₂(SO₄)₃·14H₂O 100% active basis)</option>
+              <option value="custom">Custom Liquid Coagulant (Specific Gravity &amp; Strength)</option>
+            </select>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="plantFlowUnit">Plant Water Flow Units</label>
+              <select id="plantFlowUnit" class="form-control" onchange="toggleFlowUnitLabels()">
+                <option value="mgd" selected>MGD (Million Gallons per Day)</option>
+                <option value="gpm">GPM (Gallons per Minute)</option>
+                <option value="m3h">m³/hour (Cubic Meters per Hour)</option>
+                <option value="m3d">m³/day (Cubic Meters per Day)</option>
+                <option value="lps">Liters per Second (L/s)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="plantFlowVal" id="flowValLabel">Plant Influent Flow Rate (MGD)</label>
+              <input type="number" id="plantFlowVal" class="form-control" value="10.0" step="0.5" min="0.01">
+            </div>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="targetCoagDose">Optimum Jar Test Dosage (mg/L or ppm dry)</label>
+              <input type="number" id="targetCoagDose" class="form-control" value="28.0" step="0.5" min="0.1">
+              <span class="field-hint">Dry chemical basis determined from jar testing</span>
+            </div>
+            <div class="form-group">
+              <label for="rawWaterAlkalinity">Raw Water Alkalinity (mg/L as CaCO₃)</label>
+              <input type="number" id="rawWaterAlkalinity" class="form-control" value="65" step="1" min="0">
+              <span class="field-hint">Total bicarbonate buffer prior to chemical feed</span>
+            </div>
+          </div>
+
+          <div id="customCoagGrid" class="grid-2-col" style="display:none;">
+            <div class="form-group">
+              <label for="coagSG">Solution Specific Gravity (SG)</label>
+              <input type="number" id="coagSG" class="form-control" value="1.42" step="0.01" min="1.0">
+            </div>
+            <div class="form-group">
+              <label for="coagStrength">Chemical Concentration (% by wt dry)</label>
+              <input type="number" id="coagStrength" class="form-control" value="38.0" step="0.5" min="1" max="100">
+            </div>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="numCoagPumps">Duty Chemical Metering Pumps</label>
+              <input type="number" id="numCoagPumps" class="form-control" value="2" step="1" min="1" max="6">
+            </div>
+            <div class="form-group">
+              <label for="rawTurbidityTss">Raw Suspended Solids / Turbidity (mg/L or NTU)</label>
+              <input type="number" id="rawTurbidityTss" class="form-control" value="30" step="1" min="0">
+              <span class="field-hint">Used for chemical sludge solids generation modeling</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="bulkCoagCost">Bulk Coagulant Solution Price ($ / Gallon)</label>
+            <input type="number" id="bulkCoagCost" class="form-control" value="3.15" step="0.05" min="0">
+          </div>
+
+          <button type="button" class="btn btn-primary" onclick="calcCoagulantDosing()">Calculate Coagulant Feed &amp; Stoichiometry</button>
+        </div>
+
+        <div id="coagResults" class="results-box" style="display:none;margin-top:1.5rem;">
+          <h3 class="results-title">Coagulant Feed Sizing &amp; Process Diagnostics</h3>
+          <div class="result-grid">
+            <div class="result-card">
+              <div class="result-label">Pure Active Chemical Demand</div>
+              <div class="result-value highlight" id="resDryMass">--</div>
+              <div class="result-subtext" id="resDryMassAlt">--</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Feed Rate (Per Duty Pump)</div>
+              <div class="result-value highlight" id="resPumpDrawdown">--</div>
+              <div class="result-subtext" id="resPumpDrawdownAlt">--</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Daily Commercial Liquid Feed</div>
+              <div class="result-value" id="resLiquidDay">--</div>
+              <div class="result-subtext" id="resLiquidDayAlt">--</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Residual Alkalinity</div>
+              <div class="result-value" id="resResidAlk">--</div>
+              <div class="result-subtext" id="resAlkStatus">--</div>
+            </div>
+          </div>
+
+          <div class="result-details" style="margin-top:1rem;padding:1rem;background:var(--card-bg);border-radius:6px;border:1px solid var(--border-light);">
+            <h4 style="margin-top:0;">Chemical Reactions &amp; Sludge Mass Sizing</h4>
+            <ul style="margin-bottom:0;line-height:1.7;">
+              <li><strong>Alkalinity Consumed:</strong> <span id="resConsumedAlk">--</span></li>
+              <li><strong>Supplemental Neutralization Buffer:</strong> <span id="resBufferNeed">--</span></li>
+              <li><strong>Dry Coagulant Sludge Production:</strong> <span id="resSludgeTotal">--</span></li>
+              <li><strong>Monthly Bulk Chemical Storage:</strong> <span id="resStorageMonth">--</span></li>
+              <li><strong>Estimated Chemical Expenditure:</strong> <span id="resTotalCost" style="font-weight:700;color:var(--primary);">--</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🧪</span>
+            <h3 class="widget-title">Related Chemical & Water Treatment</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="chlorine-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Chlorine Dosing Calculator</a></li>
+            <li><a href="chemical-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Chemical Dosing Rate Calculator</a></li>
+            <li><a href="pipe-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pipe Sizing & Water Flow</a></li>
+            <li><a href="cooling-load-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cooling Load (HVAC) Sizing</a></li>
+            <li><a href="alum-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Alum Dosing & Coagulation Feed</a></li>
+            <li><a href="boyles-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Boyle's Gas Law (P₁V₁=P₂V₂)</a></li>
+            <li><a href="calcium-hypochlorite-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calcium Hypochlorite (HTH 68%)</a></li>
+            <li><a href="caustic-soda-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Caustic Soda (NaOH) Dosing</a></li>
+            <li><a href="charles-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Charles's Law (V₁/T₁=V₂/T₂)</a></li>
+            <li><a href="chlorine-dioxide-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Chlorine Dioxide (ClO₂) Oxidation</a></li>
+            <li><a href="coagulant-dosing-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Coagulant Dosing (Jar Test Sizer)</a></li>
+            <li><a href="combined-gas-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Combined Gas Law (P₁V₁/T₁=P₂V₂/T₂)</a></li>
+            <li><a href="dilution-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Solution Dilution (C₁V₁ = C₂V₂)</a></li>
+            <li><a href="gay-lussac-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Gay-Lussac's Gas Law (P₁/T₁=P₂/T₂)</a></li>
+            <li><a href="half-life-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Radioactive Half-Life & Decay</a></li>
+            <li><a href="henderson-hasselbalch-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Henderson-Hasselbalch (pH Buffer)</a></li>
+            <li><a href="hydrazine-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Hydrazine Dosing (Boiler Deoxygenation)</a></li>
+            <li><a href="ideal-gas-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ideal Gas Law (PV = nRT)</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="chemical.html" class="sidebar-category-link">View All Chemical & Water Treatment Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Technical Educational Article Body (1000+ Words) -->
+    <article class="article-body">
+      <h2>Comparative Fundamentals of Modern Coagulant Chemistry</h2>
+      <p>Coagulation is the core physicochemical process deployed in municipal surface water clarification, direct filtration, and industrial wastewater treatment. Raw waters carry natural colloidal particles—including clay silts, bacteria, viruses, silica, and natural organic matter (NOM)—possessing negative surface electrostatic charges. Mutual electrostatic repulsion keeps these sub-micron colloids in stable suspension indefinitely.</p>
+
+      <p>Primary coagulants are multivalent metal salts that destabilize colloidal suspensions via two competing or simultaneous mechanisms: <strong>electrical double-layer compression / charge neutralization</strong> (operating at acidic to neutral pH with positively charged metal hydrolysis monomers) and <strong>sweep floc enmeshment</strong> (occurring when metal hydroxide precipitates exceed saturation limits and physically sweep suspended impurities out of the water column). Selecting between traditional aluminum-based coagulants and iron-based ferric coagulants represents a fundamental process design decision governed by raw water turbidity, water temperature, NOM color content, and natural alkalinity buffer capacity.</p>
+
+      <h2>Hydrolysis and Chemical Speciation Across Coagulant Classes</h2>
+      <p>Each commercial coagulant class exhibits distinct hydrolysis kinetics, pH operating windows, and stoichiometric impacts:</p>
+
+      <ul>
+        <li><strong>Aluminum Sulfate (Alum):</strong> $\text{Al}_2(\text{SO}_4)_3 \cdot 14\text{H}_2\text{O}$ hydrolyzes into amorphous aluminum hydroxide ($\text{Al(OH)}_3\downarrow$). It functions within an optimum pH window of $5.8\text{ to }7.2$. In cold water ($&lt; 4^\circ\text{C}$), alum hydrolysis kinetics slow dramatically, leading to pin-point floc and dissolved aluminum carryover violating EPA drinking water secondary maximum contaminant levels ($0.05\text{ to }0.20\text{ mg/L}$).</li>
+        <li><strong>Ferric Chloride ($\text{FeCl}_3$):</strong> An aggressive iron coagulant operating across an expansive pH window of $4.0\text{ to }11.0$. Because iron hydroxide ($\text{Fe(OH)}_3$) has a solubility product constant ($K_{sp} \approx 10^{-38}$) twelve orders of magnitude lower than aluminum hydroxide ($K_{sp} \approx 10^{-26}$), ferric forms heavier, denser, faster-settling flocs even in ice-cold waters. However, it is intensely corrosive, requiring PVDF, FRP, or lined titanium wetted materials.</li>
+        <li><strong>Ferric Sulfate ($\text{Fe}_2(\text{SO}_4)_3$):</strong> Frequently chosen over ferric chloride to eliminate chloride ion corrosion stress in stainless steel equipment and avoid elevating the chloride-to-sulfate mass ratio (CSMR), which can trigger galvanic lead leaching in distribution networks.</li>
+        <li><strong>Polyaluminum Chloride (PAC):</strong> Pre-hydrolyzed polymeric aluminum complexes containing pre-formed tridecameric Keggin polycations ($\text{Al}_{13}\text{O}_4(\text{OH})_{24}^{7+}$). Manufactured with basicities ranging from 50% to 75%, PAC requires far less bicarbonate alkalinity from raw water, functions effectively in cold water, and generates significantly lower sludge volumes.</li>
+      </ul>
+
+      <h2>Governing Mathematical Formulas for Chemical Metering</h2>
+      <p>The daily pure chemical mass requirement ($W_{\text{dry}}$) is calculated using the standard waterworks relation:</p>
+
+      <div class="formula-box">
+        $$W_{\text{dry}} \, (\text{lb/day}) = Q \, (\text{MGD}) \times C_{\text{dose}} \, (\text{mg/L}) \times 8.34 \, \left(\frac{\text{lb/Mgal}}{\text{mg/L}}\right)$$
+      </div>
+
+      <p>In metric SI engineering units:</p>
+      <div class="formula-box">
+        $$W_{\text{dry}} \, (\text{kg/day}) = \frac{Q \, (\text{m}^3/\text{day}) \times C_{\text{dose}} \, (\text{g/m}^3)}{1,000}$$
+      </div>
+
+      <p>Because commercial chemical deliveries are billed as liquid bulk tanker loads, the solution concentration ($C_{\text{liquid}}$) is determined from specific gravity ($SG$) and dry chemical weight fraction ($w$):</p>
+
+      <div class="formula-box">
+        $$C_{\text{liquid}} = 8.34 \times SG \times w \quad (\text{lb dry chemical per gallon of solution})$$
+      </div>
+
+      <p>The total commercial liquid feed rate ($Q_{\text{liquid}}$) and pump calibration drawdown rate ($q_{\text{drawdown}}$) are:</p>
+
+      <div class="formula-box">
+        $$Q_{\text{liquid}} \, (\text{GPD}) = \frac{W_{\text{dry}} \, (\text{lb/day})}{C_{\text{liquid}} \, (\text{lb/gal})}, \quad q_{\text{drawdown}} \, (\text{mL/min per pump}) = \frac{Q_{\text{liquid}} \, (\text{GPD}) \times 2.6288}{N_{\text{duty pumps}}}$$
+      </div>
+
+      <h2>Stoichiometric Alkalinity Consumption Comparison</h2>
+      <p>Metal coagulant hydrolysis releases free hydronium ions ($\text{H}^+$), reacting with natural bicarbonate alkalinity ($\text{HCO}_3^-$) to generate dissolved carbon dioxide ($\text{CO}_2$). Stoichiometric consumption varies drastically across coagulants:</p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Coagulant Formulation</th>
+              <th>Formula Weight (g/mol)</th>
+              <th>Stoichiometric Reaction</th>
+              <th>Alkalinity Consumed (mg/L as CaCO₃ per mg/L dry coagulant)</th>
+              <th>Effective Coagulation pH Window</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Ferric Chloride (FeCl₃)</td>
+              <td>162.2</td>
+              <td>$$\text{FeCl}_3 + 3\text{HCO}_3^- \to \text{Fe(OH)}_3\downarrow + 3\text{Cl}^- + 3\text{CO}_2$$</td>
+              <td><strong>0.925 mg/L</strong> (Heavy acidifier)</td>
+              <td>4.0 &ndash; 11.0 (Very wide)</td>
+            </tr>
+            <tr>
+              <td>Alum [Al₂(SO₄)₃·14H₂O]</td>
+              <td>594.4</td>
+              <td>$$\text{Al}_2(\text{SO}_4)_3 + 6\text{HCO}_3^- \to 2\text{Al(OH)}_3\downarrow + 3\text{SO}_4^{2-} + 6\text{CO}_2$$</td>
+              <td><strong>0.505 mg/L</strong></td>
+              <td>5.8 &ndash; 7.2 (Narrow)</td>
+            </tr>
+            <tr>
+              <td>Ferric Sulfate [Fe₂(SO₄)₃]</td>
+              <td>399.9</td>
+              <td>$$\text{Fe}_2(\text{SO}_4)_3 + 6\text{HCO}_3^- \to 2\text{Fe(OH)}_3\downarrow + 3\text{SO}_4^{2-} + 6\text{CO}_2$$</td>
+              <td><strong>0.751 mg/L</strong></td>
+              <td>4.5 &ndash; 10.5</td>
+            </tr>
+            <tr>
+              <td>Polyaluminum Chloride (70% Basic PAC)</td>
+              <td>Polymeric</td>
+              <td>Pre-neutralized Keggin Al₁₃ structure</td>
+              <td><strong>0.15 &ndash; 0.25 mg/L</strong> (Minimal drop)</td>
+              <td>5.0 &ndash; 8.5 (Stable)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>If residual alkalinity drops below $30\text{ mg/L as CaCO}_3$, coagulation efficiency deteriorates and finished water entering distribution becomes aggressively corrosive. In such scenarios, supplemental lime ($\text{Ca(OH)}_2$) or caustic soda ($\text{NaOH}$) must be co-fed to stabilize pH.</p>
+
+      <h2>Dry Chemical Sludge Solids Generation Modeling</h2>
+      <p>Clarifier underflow sludge mass consists of precipitated metal hydroxides combined with removed suspended raw water solids:</p>
+
+      <div class="formula-box">
+        $$W_{\text{sludge}} \, (\text{lb/day dry}) = Q \, (\text{MGD}) \times \left(k_{\text{metal}} \times C_{\text{dose}} + 1.0 \times \text{TSS}_{\text{removed}}\right) \times 8.34$$
+      </div>
+      <p>Where $k_{\text{metal}}$ represents the stoichiometric dry precipitate multiplier: $0.263$ for commercial alum, $0.660$ for ferric chloride ($\text{MW}_{\text{Fe(OH)}_3}/\text{MW}_{\text{FeCl}_3} = 106.9/162.2$), $0.535$ for ferric sulfate, and $0.350$ for polyaluminum chloride.</p>
+
+      <h2>Practical Worked Case Study: 15 MGD Clarification Plant Ferric Dosing</h2>
+      <div class="worked-example-card">
+        <h3>Engineering Design Example: High Organic Color River Water Coagulation</h3>
+        <p><strong>Treatment Context:</strong> A conventional municipal water treatment plant clarifies $15.0\text{ MGD}$ of surface river water characterized by high humic color ($45\text{ Pt-Co}$) and cold seasonal temperatures ($3.5^\circ\text{C}$). Due to poor alum performance in cold water, the plant utilizes commercial $38\%\text{ liquid ferric chloride}$ ($SG = 1.42$, containing $4.49\text{ lb dry FeCl}_3/\text{gal}$). Jar testing establishes an optimum dry coagulant dose of $35.0\text{ mg/L}$. Raw water alkalinity is $58.0\text{ mg/L as CaCO}_3$, and raw turbidity is $25\text{ NTU}$ (92% removal). Two duty diaphragm metering pumps share chemical injection.</p>
+
+        <p><strong>Step 1: Calculate Daily Pure Chemical Mass:</strong></p>
+        $$W_{\text{dry}} = 15.0\text{ MGD} \times 35.0\text{ mg/L} \times 8.34 = 4,378.5\text{ lb/day dry FeCl}_3\text{ (1,986.0 kg/day)}$$
+
+        <p><strong>Step 2: Determine Commercial Liquid Volumetric Delivery:</strong></p>
+        $$Q_{\text{liquid}} = \frac{4,378.5\text{ lb/day}}{4.49\text{ lb dry/gal}} = 975.17\text{ gal/day}$$
+        $$\text{Hourly Feed Rate} = \frac{975.17\text{ GPD}}{24\text{ hours}} = 40.63\text{ GPH}$$
+
+        <p><strong>Step 3: Diaphragm Metering Pump Calibration Rate:</strong></p>
+        <p>Dividing across two duty pumps ($487.58\text{ GPD per pump}$):</p>
+        $$\text{Pump Drawdown Rate} = 487.58\text{ GPD} \times 2.6288 = 1,281.8\text{ mL/min per pump}$$
+
+        <p><strong>Step 4: Stoichiometric Alkalinity Depletion Verification:</strong></p>
+        $$\text{Alkalinity Consumed} = 35.0\text{ mg/L} \times 0.925 = 32.38\text{ mg/L as CaCO}_3$$
+        $$\text{Residual Alkalinity} = 58.0 - 32.38 = 25.62\text{ mg/L as CaCO}_3$$
+        <p>Because residual alkalinity drops below the critical $30.0\text{ mg/L}$ floor, supplemental caustic soda feed ($50\%\text{ NaOH}$) is mandated to boost finished buffer by $10\text{ mg/L}$ ($8.0\text{ mg/L 100% NaOH}$ = $1,000\text{ lb/day pure NaOH}$).</p>
+
+        <p><strong>Step 5: Daily Coagulation Sludge Solids Generation:</strong></p>
+        $$W_{\text{sludge}} = 15.0 \times \left(0.66 \times 35.0 + 25 \times 0.92\right) \times 8.34 = 15.0 \times (23.10 + 23.00) \times 8.34 = 5,767.1\text{ lb/day dry solids}$$
+      </div>
+
+      <h2>Operational Best Practices and Rapid Mixing Criteria</h2>
+      <p>Successful chemical coagulation depends critically on hydrodynamics and chemical dosing sequencing:</p>
+      <ul>
+        <li><strong>Camp-Stein Velocity Gradient ($G$):</strong> Destabilization via charge neutralization requires flash mixing at $G &gt; 700\text{ to }1,000\text{ s}^{-1}$ within $0.5\text{ to }2.0\text{ seconds}$ of coagulant injection. In-line static mixers or high-speed mechanical turbine impellers ensure instantaneous dispersion before metal hydroxide polymers precipitate prematurely.</li>
+        <li><strong>Flocculation Tapering:</strong> Slow mixing stages should be compartmentalized into three sequential basins with tapered mixing intensity ($G = 60\text{ s}^{-1} \to 40\text{ s}^{-1} \to 20\text{ s}^{-1}$) to promote floc growth without shearing fragile colloidal bridges.</li>
+        <li><strong>Feed Line Scaling &amp; Flushing:</strong> Ferric chloride hydrolyzes upon contact with water, precipitating iron stains and crystalline deposits. Chemical metering skids must include an automated demineralized water flushing manifold that purges injection quill nozzles whenever the plant trips offline.</li>
+      </ul>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">
+            <span class="logo-icon">&pi;</span>
+            <span class="logo-text">Calc<strong>Hub</strong></span>
+          </div>
+          <p class="footer-about">High-precision water treatment, chemical dosing, and environmental engineering calculation tools conforming to AWWA and EPA standards.</p>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Engineering Disciplines</h4>
+          <ul class="footer-links">
+            <li><a href="chemical.html">Chemical &amp; Water Treatment</a></li>
+            <li><a href="civil.html">Civil &amp; Construction</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+            <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Standard References</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.awwa.org" target="_blank" rel="noopener">AWWA Coagulant Standards</a></li>
+            <li><a href="https://www.epa.gov" target="_blank" rel="noopener">EPA Surface Water Treatment Rules</a></li>
+            <li><a href="https://www.wef.org" target="_blank" rel="noopener">Water Environment Federation</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Free, open, client-side engineering tools.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const COAG_PRESETS = {
+      ferric_cl: { sg: 1.42, strength: 38.0, alkFactor: 0.925, sludgeFactor: 0.660, name: "Ferric Chloride (FeCl₃)" },
+      alum_liquid: { sg: 1.33, strength: 48.5, alkFactor: 0.505, sludgeFactor: 0.263, name: "Liquid Alum (Al₂(SO₄)₃)" },
+      ferric_so4: { sg: 1.55, strength: 50.0, alkFactor: 0.751, sludgeFactor: 0.535, name: "Ferric Sulfate (Fe₂(SO₄)₃)" },
+      pac_liquid: { sg: 1.25, strength: 30.0, alkFactor: 0.200, sludgeFactor: 0.350, name: "Polyaluminum Chloride (PAC)" },
+      alum_dry: { sg: 1.00, strength: 100.0, alkFactor: 0.505, sludgeFactor: 0.263, name: "Dry Granular Alum" },
+      custom: { sg: 1.42, strength: 38.0, alkFactor: 0.700, sludgeFactor: 0.500, name: "Custom Coagulant" }
+    };
+
+    function updateCoagulantPreset() {
+      const type = document.getElementById("coagulantType").value;
+      document.getElementById("customCoagGrid").style.display = (type === "custom") ? "grid" : "none";
+    }
+
+    function toggleFlowUnitLabels() {
+      const u = document.getElementById("plantFlowUnit").value;
+      const lbl = document.getElementById("flowValLabel");
+      if (u === "mgd") lbl.textContent = "Plant Influent Flow Rate (MGD)";
+      else if (u === "gpm") lbl.textContent = "Plant Influent Flow Rate (GPM)";
+      else if (u === "m3h") lbl.textContent = "Plant Influent Flow Rate (m³/hour)";
+      else if (u === "m3d") lbl.textContent = "Plant Influent Flow Rate (m³/day)";
+      else if (u === "lps") lbl.textContent = "Plant Influent Flow Rate (L/s)";
+    }
+
+    function calcCoagulantDosing() {
+      const u = document.getElementById("plantFlowUnit").value;
+      const flowIn = parseFloat(document.getElementById("plantFlowVal").value) || 0;
+      const dose = parseFloat(document.getElementById("targetCoagDose").value) || 0;
+      const rawAlk = parseFloat(document.getElementById("rawWaterAlkalinity").value) || 0;
+      const coagKey = document.getElementById("coagulantType").value;
+      const pumps = parseInt(document.getElementById("numCoagPumps").value) || 1;
+      const tss = parseFloat(document.getElementById("rawTurbidityTss").value) || 0;
+      const bulkCost = parseFloat(document.getElementById("bulkCoagCost").value) || 0;
+
+      if (flowIn <= 0 || dose <= 0) {
+        alert("Please enter positive values for water flow rate and coagulant dose.");
+        return;
+      }
+
+      // Convert flow to MGD and m3/day
+      let flowMGD = 0;
+      let flowM3D = 0;
+      if (u === "mgd") {
+        flowMGD = flowIn;
+        flowM3D = flowMGD * 3785.41;
+      } else if (u === "gpm") {
+        flowMGD = (flowIn * 1440) / 1000000;
+        flowM3D = flowMGD * 3785.41;
+      } else if (u === "m3h") {
+        flowM3D = flowIn * 24;
+        flowMGD = flowM3D / 3785.41;
+      } else if (u === "m3d") {
+        flowM3D = flowIn;
+        flowMGD = flowM3D / 3785.41;
+      } else if (u === "lps") {
+        flowM3D = (flowIn * 86400) / 1000;
+        flowMGD = flowM3D / 3785.41;
+      }
+
+      // Coagulant properties
+      let p = COAG_PRESETS[coagKey];
+      let sg = p.sg;
+      let strength = p.strength;
+      let alkFactor = p.alkFactor;
+      let sludgeFactor = p.sludgeFactor;
+
+      if (coagKey === "custom") {
+        sg = parseFloat(document.getElementById("coagSG").value) || 1.42;
+        strength = parseFloat(document.getElementById("coagStrength").value) || 38.0;
+      }
+
+      const isDry = coagKey === "alum_dry";
+      const dryLbsDay = flowMGD * dose * 8.34;
+      const dryKgDay = (flowM3D * dose) / 1000;
+
+      const activeLbPerGal = isDry ? 1.0 : (8.34 * sg * (strength / 100));
+      const liquidGPD = isDry ? 0 : dryLbsDay / activeLbPerGal;
+      const liquidGPH = liquidGPD / 24;
+      const liquidLPD = liquidGPD * 3.78541;
+
+      // Pump drawdown
+      const gpdPerPump = liquidGPD / pumps;
+      const mlMinPerPump = gpdPerPump * 2.6288;
+      const lphPerPump = (gpdPerPump * 3.78541) / 24;
+
+      // Alkalinity
+      const alkConsumed = dose * alkFactor;
+      const residAlk = rawAlk - alkConsumed;
+
+      // Sludge (lb/day)
+      const drySludgeLbs = flowMGD * (sludgeFactor * dose + tss * 0.90) * 8.34;
+      const drySludgeKg = drySludgeLbs * 0.453592;
+
+      const dailyCost = isDry ? (dryLbsDay * (bulkCost / 5.38)) : (liquidGPD * bulkCost);
+
+      // Populate UI
+      document.getElementById("resDryMass").textContent = dryLbsDay.toFixed(1) + " lbs/day";
+      document.getElementById("resDryMassAlt").textContent = dryKgDay.toFixed(1) + " kg/day dry pure chemical basis";
+
+      if (isDry) {
+        document.getElementById("resPumpDrawdown").textContent = (dryLbsDay / (pumps * 24)).toFixed(2) + " lbs/hr";
+        document.getElementById("resPumpDrawdownAlt").textContent = "Dry chemical feeder rate per hopper";
+        document.getElementById("resLiquidDay").textContent = "N/A (Dry Solid)";
+        document.getElementById("resLiquidDayAlt").textContent = dryLbsDay.toFixed(1) + " lbs granular chemical / day";
+      } else {
+        document.getElementById("resPumpDrawdown").textContent = mlMinPerPump.toFixed(1) + " mL/min";
+        document.getElementById("resPumpDrawdownAlt").textContent = lphPerPump.toFixed(2) + " L/h (" + (liquidGPH / pumps).toFixed(2) + " GPH per pump)";
+        document.getElementById("resLiquidDay").textContent = liquidGPH.toFixed(2) + " GPH";
+        document.getElementById("resLiquidDayAlt").textContent = liquidGPD.toFixed(1) + " GPD (" + liquidLPD.toFixed(1) + " L/day)";
+      }
+
+      document.getElementById("resResidAlk").textContent = residAlk.toFixed(1) + " mg/L";
+      const alkStatus = document.getElementById("resAlkStatus");
+      if (residAlk >= 30) {
+        alkStatus.textContent = "Adequate buffer (Residual ≥ 30 mg/L as CaCO₃)";
+        alkStatus.style.color = "var(--success, #16a34a)";
+      } else if (residAlk > 0) {
+        alkStatus.textContent = "Warning: Marginal buffer (< 30 mg/L). Risk of pH drop.";
+        alkStatus.style.color = "#ca8a04";
+      } else {
+        alkStatus.textContent = "CRITICAL: Complete alkalinity depletion! Severe pH collapse.";
+        alkStatus.style.color = "#dc2626";
+      }
+
+      document.getElementById("resConsumedAlk").textContent = alkConsumed.toFixed(1) + " mg/L as CaCO₃ (" + ((alkConsumed / (rawAlk || 1)) * 100).toFixed(0) + "% of raw buffer)";
+
+      if (residAlk < 30) {
+        const deficit = 30 - residAlk;
+        const causticNeeded = deficit * 0.80 * flowMGD * 8.34;
+        document.getElementById("resBufferNeed").textContent = "Required: " + causticNeeded.toFixed(1) + " lbs/day 100% NaOH (or " + (causticNeeded / 6.38).toFixed(1) + " GPD 50% caustic) to maintain 30 mg/L residual";
+      } else {
+        document.getElementById("resBufferNeed").textContent = "None required. Natural raw alkalinity buffer is sufficient.";
+      }
+
+      document.getElementById("resSludgeTotal").textContent = drySludgeLbs.toFixed(1) + " lbs/day dry solids (" + drySludgeKg.toFixed(1) + " kg/day)";
+      document.getElementById("resStorageMonth").textContent = (liquidGPD * 30).toLocaleString(undefined, {maximumFractionDigits: 0}) + " gal/month bulk storage (" + ((liquidGPD * 30 * sg * 8.34) / 2000).toFixed(1) + " tons)";
+      document.getElementById("resTotalCost").textContent = "$" + dailyCost.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " / day ($" + (dailyCost * 30).toLocaleString(undefined, {maximumFractionDigits: 0}) + " / month)";
+
+      document.getElementById("coagResults").style.display = "block";
+    }
+  </script>
+</body>
+</html>
