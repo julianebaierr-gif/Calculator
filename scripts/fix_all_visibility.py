@@ -35,6 +35,13 @@ CAT_MAP = {
             ("salary-calculator.html", "Salary & Paycheck", "💼", "Hourly, monthly & annual pay", "Annual = Hourly × Hours × 52"),
             ("discount-calculator.html", "Discount & Sale", "🏷️", "Net savings, coupons & sales tax", "Price × (1 - d₁) × (1 + tax)"),
             ("tip-calculator.html", "Tip & Bill Splitter", "🍽️", "Dining gratuity & party bill split", "Tip = Subtotal × Tip%"),
+            ("amortization-schedule-calculator.html", "Loan Amortization Schedule", "📅", "Monthly principal vs interest & extra payment savings", "M = P·[r(1+r)ⁿ] / [(1+r)ⁿ - 1] | Direct principal reduction"),
+            ("apr-apy-calculator.html", "APR to APY Compounding Converter", "📈", "Nominal rate to effective annual percentage yield", "APY = (1 + r/n)ⁿ - 1 | Continuous APY = eʳ - 1"),
+            ("break-even-calculator.html", "Break-Even Point (Units & Sales)", "⚖️", "Fixed costs, contribution margin & margin of safety", "Q_BE = FC / (P - V) | R_BE = FC / CMR"),
+            ("capital-gains-calculator.html", "Capital Gains Tax (Short & Long)", "🏛️", "0%, 15%, 20% brackets, NIIT 3.8% & net take-home", "Gain = Proceeds - Cost Basis | NIIT on MAGI > $200k"),
+            ("cd-calculator.html", "Certificate of Deposit (CD) Yield", "🏦", "Compound interest, APY & early withdrawal penalty", "A = P(1 + r/n)ⁿᵗ | EWP = P · r · (Penalty Mo / 12)"),
+            ("credit-card-payoff-calculator.html", "Credit Card Payoff (Debt Freedom)", "💳", "Minimum payment trap vs fixed accelerated payoff", "DPR = APR/365 | Logarithmic payoff months"),
+            ("debt-to-income-calculator.html", "Debt-to-Income (DTI) Ratios", "🏡", "Front-end housing & back-end total debt Fannie Mae sizer", "DTI_front = PITI/Income | DTI_back = (PITI+Debts)/Income"),
         ]
     },
     "math.html": {
@@ -224,6 +231,7 @@ CAT_MAP = {
             ("simple-pendulum-calculator.html", "Simple Pendulum (Period & Gravity)", "🕰️", "Oscillation period T, frequency, seconds pendulum & Borda correction", "T = 2π√(L/g) | T ≈ T₀(1 + θ₀²/16)"),
             ("snells-law-calculator.html", "Snell's Law (Refraction & TIR)", "🔍", "Refraction angle, critical angle for total internal reflection & fiber", "n₁·sin(θ₁) = n₂·sin(θ₂) | θ_c = arcsin(n₂/n₁)"),
             ("specific-heat-calculator.html", "Specific Heat (Heat Transfer Q)", "🔥", "Sensible heat Q = mcΔT, calorimetry equilibrium & heating time", "Q = m·c·ΔT | T_eq = (m₁c₁T₁ + m₂c₂T₂)/(m₁c₁ + m₂c₂)"),
+            ("acceleration-converter.html", "Acceleration Converter", "🚀", "m/s², g₀, ft/s², Gal & automotive 0-60 mph metrics", "a = Δv/Δt | 1 g₀ = 9.80665 m/s² = 32.174 ft/s²"),
         ]
     },
     "fire-safety.html": {

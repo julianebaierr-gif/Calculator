@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan Amortization Schedule Calculator | Principal, Interest & Extra Payments</title>
+  <meta name="description" content="Calculate loan amortization schedules with monthly principal and interest breakdown, extra payments, early payoff timeline, and total interest savings.">
+  <link rel="canonical" href="https://calchub.cloud/amortization-schedule-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Loan Amortization Schedule Calculator",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates complete loan amortization schedules, fixed monthly payments, interest vs principal breakdown, and interest savings from extra monthly prepayments.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How is a fixed monthly loan payment calculated?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The fixed monthly payment M is calculated using the standard annuity formula: M = P × [r(1+r)^n] / [(1+r)^n - 1], where P is principal borrowed, r is monthly interest rate (annual APR divided by 12), and n is total number of monthly payments."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why is the interest portion so high at the beginning of an amortization schedule?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Because monthly interest is calculated directly against the remaining outstanding balance: Interest = Balance × r. Early in the loan term, the principal balance is at its maximum, meaning the bulk of each payment covers accrued interest. As principal is gradually retired, the monthly interest shrinks."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do extra principal payments shorten the loan term?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Extra principal payments bypass interest calculations and apply 100% directly to the loan principal. This immediately reduces the remaining balance, thereby decreasing future monthly interest compounding and retiring the debt months or years ahead of schedule."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between a 15-year and a 30-year fixed mortgage?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A 15-year mortgage requires higher monthly payments because principal is amortized over half the time, but charges a lower interest rate and drastically reduces total lifetime interest paid—often saving 60% or more in cumulative financing charges."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="logo">CalcHub</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="finance.html" class="active">Financial</a>
+        <a href="engineering.html">Electrical</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html">Civil</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <div class="content-wrapper">
+      <div class="calculator-container">
+        <h1>Loan Amortization Schedule Calculator</h1>
+        <p class="lead-text">Generate a comprehensive loan amortization schedule. Model fixed monthly payments, interest vs. principal progression, and accelerate debt payoff with extra monthly principal contributions.</p>
+
+        <div class="calc-card">
+          <div class="calc-form">
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="loanAmount">Loan Amount (Principal $)</label>
+                <input type="number" id="loanAmount" value="300000" min="1000" step="1000" class="form-control">
+              </div>
+              <div class="form-group col-half">
+                <label for="interestRate">Annual Interest Rate (APR %)</label>
+                <input type="number" id="interestRate" value="6.5" min="0.1" max="30" step="0.05" class="form-control">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="loanTermYears">Loan Term</label>
+                <select id="loanTermYears" class="form-control">
+                  <option value="30" selected>30 Years (360 Months)</option>
+                  <option value="25">25 Years (300 Months)</option>
+                  <option value="20">20 Years (240 Months)</option>
+                  <option value="15">15 Years (180 Months)</option>
+                  <option value="10">10 Years (120 Months)</option>
+                  <option value="5">5 Years (60 Months)</option>
+                </select>
+              </div>
+              <div class="form-group col-half">
+                <label for="extraPayment">Extra Monthly Payment ($)</label>
+                <input type="number" id="extraPayment" value="200" min="0" step="25" class="form-control">
+              </div>
+            </div>
+
+            <div class="btn-group">
+              <button type="button" id="calcBtn" class="btn btn-primary">Calculate Amortization</button>
+              <button type="button" id="resetBtn" class="btn btn-secondary">Reset Defaults</button>
+            </div>
+          </div>
+
+          <div class="results-panel" id="resultsPanel">
+            <h2>Payment & Payoff Summary</h2>
+            <div class="result-hero">
+              <span class="hero-label">Standard Monthly Payment (P&I)</span>
+              <span class="hero-value" id="resMonthlyPayment">$1,896.20</span>
+            </div>
+
+            <div class="results-grid">
+              <div class="result-item">
+                <span class="sub-label">Total Monthly Commitment</span>
+                <span class="sub-value" id="resTotalMonthly">$2,096.20</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Total Interest (Standard)</span>
+                <span class="sub-value" id="resStandardInterest">$382,633</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Total Interest (With Extra)</span>
+                <span class="sub-value" id="resActualInterest">$279,152</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Lifetime Interest Saved</span>
+                <span class="sub-value highlight" id="resInterestSaved">$103,481</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Actual Payoff Time</span>
+                <span class="sub-value" id="resPayoffTime">22 yrs 4 mos</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Time Saved Ahead of Schedule</span>
+                <span class="sub-value highlight" id="resTimeSaved">7 yrs 8 mos</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+              <h3>Annual Amortization Preview</h3>
+              <div style="overflow-x: auto;">
+                <table class="data-table" id="scheduleTable">
+                  <thead>
+                    <tr>
+                      <th>Year</th>
+                      <th>Total Paid</th>
+                      <th>Principal Paid</th>
+                      <th>Interest Paid</th>
+                      <th>Ending Balance</th>
+                    </tr>
+                  </thead>
+                  <tbody id="scheduleBody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comprehensive Financial Engineering Article (1,300+ Words) -->
+        <article class="article-body">
+          <h2>1. The Financial Mathematics of Loan Amortization</h2>
+          <p>Amortization is the process of spreading an interest-bearing debt into a series of periodic equal installments over a designated maturity term. While the total monthly payment remains constant in a fixed-rate loan, the internal composition of each installment alters dramatically month by month.</p>
+          <p>The standard fixed-rate monthly installment \(M\) is derived from the ordinary annuity present value formula, equating borrowed capital \(P\) to the discounted sum of all future payments:</p>
+          <div class="math-block">
+            $$P = \sum_{k=1}^{n} rac{M}{(1+r)^k} = M \left[ rac{1 - (1+r)^{-n}}{r} 
+ight]$$
+          </div>
+          <p>Solving algebraically for \(M\) yields the standard mortgage amortization formula:</p>
+          <div class="math-block">
+            $$M = P \cdot rac{r(1+r)^n}{(1+r)^n - 1}$$
+          </div>
+          <p>Where:</p>
+          <ul>
+            <li>\(P\) is the original principal loan balance.</li>
+            <li>\(r\) is the monthly periodic interest rate, calculated as annual nominal APR divided by 12 (\(r = 	ext{APR} / 12\)).</li>
+            <li>\(n\) is the total number of compounding monthly payments (\(n = 	ext{Years} 	imes 12\)).</li>
+          </ul>
+
+          <h2>2. Recursive Month-by-Month Amortization Mechanics</h2>
+          <p>For any arbitrary payment period \(k \in [1, n]\), the interest obligation \(I_k\) is determined exclusively by the unamortized beginning balance of that period \(B_{k-1}\):</p>
+          <div class="math-block">
+            $$I_k = B_{k-1} \cdot r$$
+          </div>
+          <p>Because the contractual total installment \(M\) is fixed, the portion allocated toward principal reduction \(P_k\) is simply the remainder:</p>
+          <div class="math-block">
+            $$P_k = M - I_k = M - (B_{k-1} \cdot r)$$
+          </div>
+          <p>The ending balance for period \(k\) updates recursively:</p>
+          <div class="math-block">
+            $$B_k = B_{k-1} - P_k = B_{k-1}(1+r) - M$$
+          </div>
+          <p>In the initial years of a long-term loan (such as a 30-year residential mortgage), the initial principal balance \(B_{k-1}\) is extraordinarily large. Consequently, \(I_k\) consumes between 70% and 85% of the total monthly payment. Over time, as each principal reduction lowers \(B_{k-1}\), future interest charges decline exponentially, forcing an ever-increasing proportion of subsequent payments into equity building.</p>
+
+          <h2>3. The Accelerated Amortization Multiplier: Impact of Extra Payments</h2>
+          <p>Borrowers who contribute extra capital above their contractual installment \(M\) trigger a profound asymmetric financial benefit. Unlike standard payments that are split between interest and principal, <strong>every dollar of extra payment applies 100% directly to reducing the outstanding principal balance</strong>:</p>
+          <div class="math-block">
+            $$B_k = B_{k-1} - (P_k + P_{	ext{extra}})$$
+          </div>
+          <p>By shrinking the principal balance prematurely, the borrower destroys the baseline upon which all subsequent months of compound interest would have been assessed. The financial return on an extra principal payment is strictly equivalent to an after-tax, risk-free guaranteed yield matching the loan's APR.</p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Loan Scenario ($300,000 at 6.5% APR)</th>
+                <th>Monthly Payment</th>
+                <th>Extra / Month</th>
+                <th>Total Interest Paid</th>
+                <th>Interest Saved</th>
+                <th>Time to Payoff</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Baseline 30-Year Fixed</strong></td>
+                <td>$1,896.20</td>
+                <td>$0</td>
+                <td>$382,633</td>
+                <td>$0</td>
+                <td>360 months (30.0 yrs)</td>
+              </tr>
+              <tr>
+                <td><strong>+$100 / Month Principal</strong></td>
+                <td>$1,996.20</td>
+                <td>$100</td>
+                <td>$320,184</td>
+                <td>$62,449</td>
+                <td>308 months (25.7 yrs)</td>
+              </tr>
+              <tr>
+                <td><strong>+$200 / Month Principal</strong></td>
+                <td>$2,096.20</td>
+                <td>$200</td>
+                <td>$279,152</td>
+                <td>$103,481</td>
+                <td>268 months (22.3 yrs)</td>
+              </tr>
+              <tr>
+                <td><strong>+$500 / Month Principal</strong></td>
+                <td>$2,396.20</td>
+                <td>$500</td>
+                <td>$199,411</td>
+                <td>$183,222</td>
+                <td>200 months (16.7 yrs)</td>
+              </tr>
+              <tr>
+                <td><strong>Bi-Weekly Payment Schedule</strong></td>
+                <td>$948.10 / 2 wks</td>
+                <td>~1 extra pmt/yr</td>
+                <td>$311,940</td>
+                <td>$70,693</td>
+                <td>299 months (24.9 yrs)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="worked-example-card">
+            <h3>Worked Financial Case Study: The 15-Year vs. 30-Year Mortgage Arbitrage</h3>
+            <p><strong>Scenario:</strong> A homebuyer is financing a $400,000 mortgage. They are comparing a 30-year fixed mortgage at 6.75% APR against a 15-year fixed mortgage offering a lower preferential rate of 6.00% APR.</p>
+            <p><strong>Option A: 30-Year Fixed at 6.75% APR (\(r = 0.0675 / 12 = 0.005625, n = 360\))</strong></p>
+            <div class="math-block">
+              $$M_{30} = 400,000 \cdot rac{0.005625(1.005625)^{360}}{(1.005625)^{360} - 1} = \$2,594.30	ext{ / month}$$
+            </div>
+            <p>Total Payments = \(\$2,594.30 	imes 360 = \$933,948\). Total Cumulative Interest = \(\$533,948\).</p>
+            <p><strong>Option B: 15-Year Fixed at 6.00% APR (\(r = 0.0600 / 12 = 0.005000, n = 180\))</strong></p>
+            <div class="math-block">
+              $$M_{15} = 400,000 \cdot rac{0.005000(1.005000)^{180}}{(1.005000)^{180} - 1} = \$3,375.43	ext{ / month}$$
+            </div>
+            <p>Total Payments = \(\$3,375.43 	imes 180 = \$607,577\). Total Cumulative Interest = \(\$207,577\).</p>
+            <p><strong>Financial Analysis:</strong> The 15-year mortgage requires an additional monthly cash outlay of \(\$781.13\) (+30.1%), but eliminates 15 full years of debt and <strong>saves an astounding $326,371 in cumulative financing interest</strong>.</p>
+          </div>
+
+          <h2>4. Regulatory Compliance and the Truth in Lending Act (Regulation Z)</h2>
+          <p>Under United States federal law (Truth in Lending Act, 15 U.S.C. 1601 and Consumer Financial Protection Bureau Regulation Z), lenders are legally obligated to disclose the comprehensive Annual Percentage Rate (APR) alongside the pure amortization schedule. The APR incorporates not merely the nominal promissory note rate, but all prepaid finance charges, including origination points, underwriting fees, private mortgage insurance (PMI), and mandatory escrow prepaids.</p>
+          <p>Furthermore, residential mortgages commonly bundle escrow components to form <strong>PITI</strong> (Principal, Interest, Property Taxes, and Homeowners Insurance). While Principal and Interest follow the exact deterministic mathematical schedule generated above, Taxes and Hazard Insurance are variable escrow reserves subject to annual servicer rebalancing under RESPA (Real Estate Settlement Procedures Act).</p>
+
+          <h2>5. Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <h3>Can I pay off my mortgage early without a penalty?</h3>
+            <p>Most modern conforming residential mortgages (Fannie Mae, Freddie Mac, FHA, and VA loans) strictly prohibit prepayment penalties under Dodd-Frank Wall Street Reform Act rules. However, commercial loans, subprime mortgages, and specialized hard money loans often include yield maintenance clauses or step-down prepayment penalties (e.g., 5-4-3-2-1% structures) during the initial 3 to 5 years.</p>
+          </div>
+          <div class="faq-item">
+            <h3>How does recasting a mortgage differ from refinancing?</h3>
+            <p>Mortgage recasting involves making a significant lump-sum principal payment (usually $5,000 to $10,000+) while retaining the existing promissory note, loan maturity date, and interest rate. The loan servicer re-amortizes the remaining smaller principal over the remaining term, lowering future monthly payment amounts without requiring closing costs or credit underwriting.</p>
+          </div>
+          <div class="faq-item">
+            <h3>Does bi-weekly mortgage payment actually save money?</h3>
+            <p>Yes. By paying half of your regular monthly payment every two weeks, you make 26 half-payments per year, which equates to 13 full monthly payments annually instead of 12. That single extra monthly payment per year trims roughly 4 to 6 years off a standard 30-year mortgage and saves tens of thousands in interest.</p>
+          </div>
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏦</span>
+            <h3 class="widget-title">Related Finance & Investment</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="rule-of-72-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rule of 72 Doubling Time</a></li>
+            <li><a href="car-loan-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Car Loan Financing</a></li>
+            <li><a href="roi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ROI & Annualized CAGR</a></li>
+            <li><a href="loan-emi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan EMI Calculator</a></li>
+            <li><a href="mortgage-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Mortgage & PITI</a></li>
+            <li><a href="compound-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Compound Interest</a></li>
+            <li><a href="simple-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Simple Interest</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck</a></li>
+            <li><a href="discount-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Discount & Sale</a></li>
+            <li><a href="tip-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Tip & Bill Splitter</a></li>
+            <li><a href="amortization-schedule-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Loan Amortization Schedule</a></li>
+            <li><a href="apr-apy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> APR to APY Compounding Converter</a></li>
+            <li><a href="break-even-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Break-Even Point (Units & Sales)</a></li>
+            <li><a href="capital-gains-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capital Gains Tax (Short & Long)</a></li>
+            <li><a href="cd-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Certificate of Deposit (CD) Yield</a></li>
+            <li><a href="credit-card-payoff-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Credit Card Payoff (Debt Freedom)</a></li>
+            <li><a href="debt-to-income-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Debt-to-Income (DTI) Ratios</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="finance.html" class="sidebar-category-link">View All Finance & Investment Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, science, and technical calculation tools.</p>
+    </div>
+  </footer>
+
+  <script>
+    function calculateAmortization() {
+      const P = parseFloat(document.getElementById('loanAmount').value) || 0;
+      const annualRate = parseFloat(document.getElementById('interestRate').value) || 0;
+      const years = parseInt(document.getElementById('loanTermYears').value) || 30;
+      const extraPmt = parseFloat(document.getElementById('extraPayment').value) || 0;
+
+      if (P <= 0 || annualRate <= 0) return;
+
+      const r = (annualRate / 100) / 12;
+      const n = years * 12;
+
+      // Base Monthly Payment Formula
+      const factor = Math.pow(1 + r, n);
+      const M = P * (r * factor) / (factor - 1);
+
+      // Baseline Calculation (No extra payment)
+      let baseTotalInterest = (M * n) - P;
+
+      // Actual Simulation with Extra Payment
+      let balance = P;
+      let actualTotalInterest = 0;
+      let monthsElapsed = 0;
+      let yearlyData = [];
+      let currentYearPaid = 0;
+      let currentYearPrincipal = 0;
+      let currentYearInterest = 0;
+
+      while (balance > 0.01 && monthsElapsed < 1200) {
+        monthsElapsed++;
+        let interestMonth = balance * r;
+        let principalMonth = (M - interestMonth) + extraPmt;
+
+        if (principalMonth > balance) {
+          principalMonth = balance;
+        }
+
+        balance -= principalMonth;
+        actualTotalInterest += interestMonth;
+
+        currentYearPaid += (principalMonth + interestMonth);
+        currentYearPrincipal += principalMonth;
+        currentYearInterest += interestMonth;
+
+        if (monthsElapsed % 12 === 0 || balance <= 0.01) {
+          yearlyData.push({
+            year: Math.ceil(monthsElapsed / 12),
+            totalPaid: currentYearPaid,
+            principal: currentYearPrincipal,
+            interest: currentYearInterest,
+            endingBalance: Math.max(0, balance)
+          });
+          currentYearPaid = 0;
+          currentYearPrincipal = 0;
+          currentYearInterest = 0;
+        }
+      }
+
+      // Render Results
+      const fmt = (v) => '$' + Math.round(v).toLocaleString('en-US');
+      const fmtDec = (v) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      document.getElementById('resMonthlyPayment').textContent = fmtDec(M);
+      document.getElementById('resTotalMonthly').textContent = fmtDec(M + extraPmt);
+      document.getElementById('resStandardInterest').textContent = fmt(baseTotalInterest);
+      document.getElementById('resActualInterest').textContent = fmt(actualTotalInterest);
+
+      const interestSaved = Math.max(0, baseTotalInterest - actualTotalInterest);
+      document.getElementById('resInterestSaved').textContent = fmt(interestSaved);
+
+      const actualYears = Math.floor(monthsElapsed / 12);
+      const actualMonths = monthsElapsed % 12;
+      document.getElementById('resPayoffTime').textContent = actualYears + ' yrs ' + actualMonths + ' mos';
+
+      const monthsSaved = Math.max(0, n - monthsElapsed);
+      const savedYears = Math.floor(monthsSaved / 12);
+      const savedMonths = monthsSaved % 12;
+      document.getElementById('resTimeSaved').textContent = savedYears + ' yrs ' + savedMonths + ' mos';
+
+      // Render Schedule Table (up to first 10 years or all)
+      const tbody = document.getElementById('scheduleBody');
+      tbody.innerHTML = '';
+      const displayYears = yearlyData.slice(0, 10);
+      displayYears.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>Year ${row.year}</td>
+          <td>${fmt(row.totalPaid)}</td>
+          <td>${fmt(row.principal)}</td>
+          <td>${fmt(row.interest)}</td>
+          <td>${fmt(row.endingBalance)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      if (yearlyData.length > 10) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="5" style="text-align:center;font-style:italic;color:var(--text-muted);">+ ${yearlyData.length - 10} more years through full payoff</td>`;
+        tbody.appendChild(tr);
+      }
+    }
+
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', calculateAmortization);
+      el.addEventListener('change', calculateAmortization);
+    });
+
+    document.getElementById('calcBtn').addEventListener('click', calculateAmortization);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('loanAmount').value = '300000';
+      document.getElementById('interestRate').value = '6.5';
+      document.getElementById('loanTermYears').value = '30';
+      document.getElementById('extraPayment').value = '0';
+      calculateAmortization();
+    });
+
+    window.addEventListener('DOMContentLoaded', calculateAmortization);
+  </script>
+</body>
+</html>

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Break-Even Calculator | Units, Revenue & Contribution Margin Sizer</title>
+  <meta name="description" content="Calculate break-even point in units and sales dollars, contribution margin ratio, margin of safety, and target profit sales volumes.">
+  <link rel="canonical" href="https://calchub.cloud/break-even-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Break-Even Calculator",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates commercial break-even units, break-even sales revenue, unit contribution margin, contribution margin ratio, and margin of safety.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the formula to calculate break-even point in units?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The break-even point in units is calculated as: Q_BE = Fixed Costs / (Selling Price per Unit - Variable Cost per Unit). The denominator (Selling Price - Variable Cost) represents the unit Contribution Margin."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is the Contribution Margin Ratio (CMR) derived?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The Contribution Margin Ratio is the fraction of each sales dollar remaining after variable expenses are covered: CMR = (Unit Selling Price - Unit Variable Cost) / Unit Selling Price. Dividing total fixed costs by CMR gives the break-even sales revenue in currency."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the Margin of Safety (MOS) in business analysis?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The Margin of Safety measures the percentage or dollar cushion between actual (or projected) sales volume and the break-even threshold: MOS% = [(Current Sales - Break-Even Sales) / Current Sales] × 100%. It reveals how much revenue can fall before the company incurs a net loss."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How can a company calculate the sales volume required to achieve a target profit?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "To achieve a specific target profit, add the profit target to the total fixed costs before dividing by unit contribution margin: Required Units = (Fixed Costs + Target Profit) / Unit Contribution Margin."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="logo">CalcHub</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="finance.html" class="active">Financial</a>
+        <a href="engineering.html">Electrical</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html">Civil</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <div class="content-wrapper">
+      <div class="calculator-container">
+        <h1>Break-Even Point Calculator</h1>
+        <p class="lead-text">Determine the exact sales volume and revenue required to cover all operating overhead. Model unit contribution margins, margin of safety, and target profitability thresholds.</p>
+
+        <div class="calc-card">
+          <div class="calc-form">
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="fixedCosts">Total Fixed Overhead Costs ($)</label>
+                <input type="number" id="fixedCosts" value="50000" min="0" step="1000" class="form-control">
+              </div>
+              <div class="form-group col-half">
+                <label for="unitPrice">Selling Price per Unit ($)</label>
+                <input type="number" id="unitPrice" value="120" min="0.01" step="1" class="form-control">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="variableCost">Variable Cost per Unit ($)</label>
+                <input type="number" id="variableCost" value="45" min="0" step="1" class="form-control">
+              </div>
+              <div class="form-group col-half">
+                <label for="projectedUnits">Expected Sales Volume (Units)</label>
+                <input type="number" id="projectedUnits" value="1000" min="0" step="50" class="form-control">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-full">
+                <label for="targetProfit">Target Operating Profit ($ optional)</label>
+                <input type="number" id="targetProfit" value="25000" min="0" step="1000" class="form-control">
+              </div>
+            </div>
+
+            <div class="btn-group">
+              <button type="button" id="calcBtn" class="btn btn-primary">Calculate Break-Even</button>
+              <button type="button" id="resetBtn" class="btn btn-secondary">Reset Defaults</button>
+            </div>
+          </div>
+
+          <div class="results-panel" id="resultsPanel">
+            <h2>Break-Even & Profitability Metrics</h2>
+            <div class="result-hero">
+              <span class="hero-label">Break-Even Units Required</span>
+              <span class="hero-value" id="resBeUnits">667 Units</span>
+            </div>
+
+            <div class="results-grid">
+              <div class="result-item">
+                <span class="sub-label">Break-Even Sales Revenue</span>
+                <span class="sub-value" id="resBeRevenue">$80,000</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Unit Contribution Margin</span>
+                <span class="sub-value" id="resUnitCm">$75.00 / unit</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Contribution Margin Ratio</span>
+                <span class="sub-value highlight" id="resCmRatio">62.5%</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Margin of Safety (Units & %)</span>
+                <span class="sub-value highlight" id="resMos">333 units (33.3%)</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Net Operating Profit (at Vol.)</span>
+                <span class="sub-value" id="resNetProfit">$25,000</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Units for Target Profit</span>
+                <span class="sub-value" id="resTargetUnits">1,000 Units ($120k)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comprehensive Managerial Accounting Article (1,250+ Words) -->
+        <article class="article-body">
+          <h2>1. Principles of Cost-Volume-Profit (CVP) Analysis</h2>
+          <p>Break-even analysis is an indispensable cornerstone of managerial accounting, corporate budgeting, and venture capital underwriting. It enables executives, financial analysts, and entrepreneurs to determine the exact operational threshold where total revenue equals total operational expenditures, resulting in an operating income of exactly zero dollars:</p>
+          <div class="math-block">
+            $$\text{Operating Income} = \text{Total Revenue (TR)} - \text{Total Costs (TC)} = 0$$
+          </div>
+          <p>The mathematical model relies upon the behavioral bifurcation of enterprise expenditures into two distinct categories:</p>
+          <ul>
+            <li><strong>Fixed Costs (\(FC\)):</strong> Expenses that remain invariant with respect to sales or production volume over the relevant operating horizon. These include commercial lease payments, depreciation of fixed equipment, core administrative salaries, software licensing, and general liability insurance.</li>
+            <li><strong>Variable Costs (\(VC\)):</strong> Direct operational outlays that fluctuate in direct proportion to product output. These encompass direct raw materials, manufacturing labor, packaging supplies, freight delivery, and sales commissions.</li>
+          </ul>
+
+          <h2>2. Algebraic Derivations: Unit Volume and Sales Revenue Break-Even</h2>
+          <p>Let \(P\) denote the unit selling price, \(V\) the variable cost per unit, and \(Q\) the volume of units manufactured and sold. Total Revenue (\(TR\)) and Total Cost (\(TC\)) are expressed as linear functions of quantity \(Q\):</p>
+          <div class="math-block">
+            $$TR = P \cdot Q$$
+          </div>
+          <div class="math-block">
+            $$TC = FC + (V \cdot Q)$$
+          </div>
+          <p>Setting \(TR = TC\) to establish the zero-profit equilibrium:</p>
+          <div class="math-block">
+            $$P \cdot Q_{BE} = FC + V \cdot Q_{BE} \implies Q_{BE}(P - V) = FC$$
+          </div>
+          <p>The term \((P - V)\) represents the <strong>Unit Contribution Margin (\(CM\))</strong>—the incremental dollar amount that each unit sold contributes toward liquidating fixed overhead costs. Solving for \(Q_{BE}\) gives the fundamental break-even equation:</p>
+          <div class="math-block">
+            $$Q_{BE} = \frac{FC}{P - V} = \frac{FC}{CM}$$
+          </div>
+
+          <h3>Break-Even in Dollar Sales Revenue</h3>
+          <p>For multi-product enterprises or service firms where measuring physical units is impractical, break-even is computed directly in sales currency. Defining the <strong>Contribution Margin Ratio (\(CMR\))</strong> as the percentage of each dollar retained after variable expenses:</p>
+          <div class="math-block">
+            $$CMR = \frac{P - V}{P} = 1 - \frac{V}{P}$$
+          </div>
+          <p>Multiplying both sides of the unit break-even equation by \(P\):</p>
+          <div class="math-block">
+            $$R_{BE} = P \cdot Q_{BE} = \frac{FC}{(P - V) / P} = \frac{FC}{CMR}$$
+          </div>
+
+          <h2>3. Target Operating Profit and the Margin of Safety</h2>
+          <p>Businesses operate to generate risk-adjusted returns rather than merely breaking even. To calculate the volume \(Q_{\text{target}}\) required to generate an arbitrary target operating profit \(\pi_{\text{target}}\):</p>
+          <div class="math-block">
+            $$TR - TC = \pi_{\text{target}} \implies P \cdot Q - [FC + V \cdot Q] = \pi_{\text{target}}$$
+          </div>
+          <div class="math-block">
+            $$Q_{\text{target}} = \frac{FC + \pi_{\text{target}}}{P - V} = \frac{FC + \pi_{\text{target}}}{CM}$$
+          </div>
+
+          <h3>The Margin of Safety (MOS) Metric</h3>
+          <p>The <strong>Margin of Safety (MOS)</strong> gauges the risk profile of an enterprise. It quantifies how far current or projected sales volume can decline before the business crosses below the break-even line into operating losses:</p>
+          <div class="math-block">
+            $$\text{MOS}_{\text{units}} = Q_{\text{actual}} - Q_{BE}$$
+          </div>
+          <div class="math-block">
+            $$\text{MOS}_{\text{dollars}} = R_{\text{actual}} - R_{BE}$$
+          </div>
+          <div class="math-block">
+            $$\text{MOS}_{\%} = \left( \frac{R_{\text{actual}} - R_{BE}}{R_{\text{actual}}} \right) \times 100\%$$
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Production Volume (\(Q\))</th>
+                <th>Total Revenue</th>
+                <th>Variable Cost</th>
+                <th>Fixed Cost</th>
+                <th>Total Cost</th>
+                <th>Operating Profit / (Loss)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>\(0\) units</td>
+                <td>$0</td>
+                <td>$0</td>
+                <td>$50,000</td>
+                <td>$50,000</td>
+                <td><span style="color:var(--danger-color, #dc2626);">($50,000) Loss</span></td>
+              </tr>
+              <tr>
+                <td>\(300\) units</td>
+                <td>$36,000</td>
+                <td>$13,500</td>
+                <td>$50,000</td>
+                <td>$63,500</td>
+                <td><span style="color:var(--danger-color, #dc2626);">($27,500) Loss</span></td>
+              </tr>
+              <tr>
+                <td><strong>667 units (Break-Even)</strong></td>
+                <td><strong>$80,000</strong></td>
+                <td><strong>$30,000</strong></td>
+                <td><strong>$50,000</strong></td>
+                <td><strong>$80,000</strong></td>
+                <td><strong>$0.00 (Zero Profit)</strong></td>
+              </tr>
+              <tr>
+                <td>\(800\) units</td>
+                <td>$96,000</td>
+                <td>$36,000</td>
+                <td>$50,000</td>
+                <td>$86,000</td>
+                <td>+$10,000 Profit</td>
+              </tr>
+              <tr>
+                <td>\(1,000\) units</td>
+                <td>$120,000</td>
+                <td>$45,000</td>
+                <td>$50,000</td>
+                <td>$95,000</td>
+                <td>+$25,000 Profit</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="worked-example-card">
+            <h3>Worked Business Case: Industrial Manufacturing Expansion</h3>
+            <p><strong>Scenario:</strong> An electronics fabrication facility manufactures industrial IoT sensor hubs. The company incurs $180,000 in monthly fixed facility overhead. Each hub retails for $350. Direct materials and labor total $140 per unit. Management requires an operating profit of $63,000 per month.</p>
+            <p><strong>Step 1: Calculate Unit Contribution Margin (\(CM\)) and Ratio (\(CMR\))</strong></p>
+            <div class="math-block">
+              $$CM = P - V = \$350 - \$140 = \$210\text{ per sensor}$$
+            </div>
+            <div class="math-block">
+              $$CMR = \frac{\$210}{\$350} = 0.60\text{ (or }60.0\%\text{)}$$
+            </div>
+            <p><strong>Step 2: Determine Pure Break-Even Thresholds</strong></p>
+            <div class="math-block">
+              $$Q_{BE} = \frac{\$180,000}{\$210} = 857.14 \implies 858\text{ units}$$
+            </div>
+            <div class="math-block">
+              $$R_{BE} = \frac{\$180,000}{0.60} = \$300,000\text{ in monthly sales revenue}$$
+            </div>
+            <p><strong>Step 3: Solve for Target Profit Volume (\(\pi = \$63,000\))</strong></p>
+            <div class="math-block">
+              $$Q_{\text{target}} = \frac{\$180,000 + \$63,000}{\$210} = \frac{\$243,000}{\$210} = 1,157.14 \implies 1,158\text{ units}$$
+            </div>
+            <p><strong>Conclusion:</strong> The plant must produce and ship 858 units ($300k sales) simply to avoid insolvency, and 1,158 units ($405k sales) to meet its strategic profit mandate.</p>
+          </div>
+
+          <h2>4. Degree of Operating Leverage (DOL) and Cost Structure Risk</h2>
+          <p>The proportion of fixed versus variable costs within a firm's operational structure dictates its <strong>Degree of Operating Leverage (DOL)</strong>. High-fixed-cost businesses (such as software firms, semiconductor foundries, and airlines) carry elevated break-even thresholds, but enjoy explosive profit surges once break-even is surpassed because variable costs are negligible:</p>
+          <div class="math-block">
+            $$\text{DOL} = \frac{Q(P - V)}{Q(P - V) - FC} = \frac{\text{Total Contribution Margin}}{\text{Operating Profit}}$$
+          </div>
+          <p>A higher DOL magnifies percentage changes in operating earnings relative to percentage swings in sales volume, creating higher financial volatility during macroeconomic downturns. For instance, a firm with a DOL of 4.0 will see a 40% operating income contraction from merely a 10% dip in customer demand.</p>
+
+          <h2>5. Multi-Product Sales Mix and Weighted Contribution Analysis</h2>
+          <p>Most commercial organizations produce multiple product stock keeping units (SKUs) sharing common fixed plant and administrative facilities. Under these enterprise conditions, calculating break-even requires computing the <strong>Weighted-Average Contribution Margin (WACM)</strong> based on each product line's historical or planned revenue share \(w_i\):</p>
+          <div class="math-block">
+            $$\text{WACM} = \sum_{i=1}^{m} w_i \cdot (P_i - V_i) = w_1(CM_1) + w_2(CM_2) + \dots + w_m(CM_m)$$
+          </div>
+          <p>Composite enterprise break-even unit volume across all product lines is therefore:</p>
+          <div class="math-block">
+            $$Q_{BE,\text{composite}} = \frac{FC}{\text{WACM}}$$
+          </div>
+          <p>If consumer demand shifts toward lower-margin SKUs, the composite break-even threshold surges even if total unit sales remain stable—a critical vulnerability known as unfavorable sales-mix variance.</p>
+
+          <h2>5. Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <h3>How do price discounts affect the break-even point?</h3>
+            <p>Price discounts compress the unit contribution margin (\(P - V\)), causing the break-even unit requirement to expand non-linearly. For example, if a product selling for $100 with $60 variable costs (\(CM = \$40\)) is discounted by 10% to $90 (\(CM = \$30\)), break-even volume surges by \(33.3\%\) simply to maintain identical overhead coverage.</p>
+          </div>
+          <div class="faq-item">
+            <h3>What are the primary limitations of linear break-even analysis?</h3>
+            <p>Classical CVP models assume constant unit selling prices and constant unit variable costs. In practice, volume discounts (economies of scale), overtime wage premiums, capacity step-costs, and multi-tier pricing curves introduce non-linear complexities into real-world production environments.</p>
+          </div>
+          <div class="faq-item">
+            <h3>How is multi-product break-even calculated?</h3>
+            <p>In multi-product companies, break-even is calculated using the <em>sales-mix weighted contribution margin ratio</em>: \(CMR_{\text{weighted}} = \sum (CMR_i \times w_i)\), where \(w_i\) represents the revenue percentage of each respective product line.</p>
+          </div>
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏦</span>
+            <h3 class="widget-title">Related Finance & Investment</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="rule-of-72-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rule of 72 Doubling Time</a></li>
+            <li><a href="car-loan-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Car Loan Financing</a></li>
+            <li><a href="roi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ROI & Annualized CAGR</a></li>
+            <li><a href="loan-emi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan EMI Calculator</a></li>
+            <li><a href="mortgage-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Mortgage & PITI</a></li>
+            <li><a href="compound-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Compound Interest</a></li>
+            <li><a href="simple-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Simple Interest</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck</a></li>
+            <li><a href="discount-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Discount & Sale</a></li>
+            <li><a href="tip-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Tip & Bill Splitter</a></li>
+            <li><a href="amortization-schedule-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan Amortization Schedule</a></li>
+            <li><a href="apr-apy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> APR to APY Compounding Converter</a></li>
+            <li><a href="break-even-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Break-Even Point (Units & Sales)</a></li>
+            <li><a href="capital-gains-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capital Gains Tax (Short & Long)</a></li>
+            <li><a href="cd-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Certificate of Deposit (CD) Yield</a></li>
+            <li><a href="credit-card-payoff-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Credit Card Payoff (Debt Freedom)</a></li>
+            <li><a href="debt-to-income-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Debt-to-Income (DTI) Ratios</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="finance.html" class="sidebar-category-link">View All Finance & Investment Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, science, and technical calculation tools.</p>
+    </div>
+  </footer>
+
+  <script>
+    function calculate() {
+      const fc = parseFloat(document.getElementById('fixedCosts').value) || 0;
+      const price = parseFloat(document.getElementById('unitPrice').value) || 0;
+      const vc = parseFloat(document.getElementById('variableCost').value) || 0;
+      const projUnits = parseFloat(document.getElementById('projectedUnits').value) || 0;
+      const targetProfit = parseFloat(document.getElementById('targetProfit').value) || 0;
+
+      if (price <= vc || price <= 0) {
+        document.getElementById('resBeUnits').textContent = 'Error: Price <= VC';
+        document.getElementById('resBeRevenue').textContent = 'N/A';
+        return;
+      }
+
+      const cm = price - vc;
+      const cmr = cm / price;
+      const beUnits = fc / cm;
+      const beRevenue = fc / cmr;
+
+      // Projected Performance
+      const projRevenue = projUnits * price;
+      const totalCostAtProj = fc + (projUnits * vc);
+      const netProfit = projRevenue - totalCostAtProj;
+      const mosUnits = projUnits - beUnits;
+      const mosPct = projUnits > 0 ? (mosUnits / projUnits) * 100 : 0;
+
+      // Target Profit
+      const targetUnits = (fc + targetProfit) / cm;
+      const targetRevenue = targetUnits * price;
+
+      // Formatter
+      const fmtCur = (v) => '$' + Math.round(v).toLocaleString('en-US');
+      const fmtDec = (v) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      document.getElementById('resBeUnits').textContent = Math.ceil(beUnits).toLocaleString('en-US') + ' Units';
+      document.getElementById('resBeRevenue').textContent = fmtCur(beRevenue);
+      document.getElementById('resUnitCm').textContent = fmtDec(cm) + ' / unit';
+      document.getElementById('resCmRatio').textContent = (cmr * 100).toFixed(1) + '%';
+
+      if (mosUnits >= 0) {
+        document.getElementById('resMos').textContent = Math.round(mosUnits).toLocaleString('en-US') + ' units (' + mosPct.toFixed(1) + '%)';
+        document.getElementById('resMos').style.color = 'var(--primary-color, #2563eb)';
+      } else {
+        document.getElementById('resMos').textContent = Math.round(mosUnits).toLocaleString('en-US') + ' units (Deficit)';
+        document.getElementById('resMos').style.color = 'var(--danger-color, #dc2626)';
+      }
+
+      document.getElementById('resNetProfit').textContent = fmtCur(netProfit);
+      if (netProfit < 0) {
+        document.getElementById('resNetProfit').style.color = 'var(--danger-color, #dc2626)';
+      } else {
+        document.getElementById('resNetProfit').style.color = 'var(--text-main, #1e293b)';
+      }
+
+      document.getElementById('resTargetUnits').textContent = Math.ceil(targetUnits).toLocaleString('en-US') + ' Units (' + fmtCur(targetRevenue) + ')';
+    }
+
+    document.querySelectorAll('input').forEach(el => {
+      el.addEventListener('input', calculate);
+    });
+
+    document.getElementById('calcBtn').addEventListener('click', calculate);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('fixedCosts').value = '50000';
+      document.getElementById('unitPrice').value = '120';
+      document.getElementById('variableCost').value = '45';
+      document.getElementById('projectedUnits').value = '1000';
+      document.getElementById('targetProfit').value = '25000';
+      calculate();
+    });
+
+    window.addEventListener('DOMContentLoaded', calculate);
+  </script>
+</body>
+</html>

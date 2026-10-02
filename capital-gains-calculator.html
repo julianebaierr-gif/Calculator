@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capital Gains Tax Calculator | Short-Term vs Long-Term Investment Gains</title>
+  <meta name="description" content="Calculate short-term and long-term capital gains tax, cost basis adjustments, Net Investment Income Tax (NIIT 3.8%), and after-tax net investment proceeds.">
+  <link rel="canonical" href="https://calchub.cloud/capital-gains-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Capital Gains Tax Calculator",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates capital gains tax liabilities on stocks, crypto, and real estate, comparing short-term ordinary income rates against preferential long-term brackets.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the holding period threshold separating short-term and long-term capital gains?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Under US Internal Revenue Code (IRC), an asset held for exactly one year or less is subject to Short-Term Capital Gains, taxed at ordinary federal marginal income tax rates (up to 37%). Assets held for more than one full year qualify for preferential Long-Term Capital Gains rates (0%, 15%, or 20%)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is the adjusted cost basis calculated when selling securities or property?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Adjusted basis equals initial purchase price plus acquisition costs (broker commissions, closing fees, title insurance) plus capital improvements (for real estate), minus non-dividend return of capital and prior depreciation deductions."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the Net Investment Income Tax (NIIT 3.8%) and who is liable?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The Net Investment Income Tax is a 3.8% surtax established under IRC Section 1411. It applies to net investment gains for single filers with modified adjusted gross income (MAGI) over $200,000 and married couples filing jointly over $250,000."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does tax-loss harvesting offset capital gains?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Capital losses are first used to offset capital gains dollar-for-dollar (short-term against short-term, long-term against long-term). If net losses remain, up to $3,000 per tax year can offset ordinary taxable income, with excess losses carried forward indefinitely into future years."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="logo">CalcHub</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="finance.html" class="active">Financial</a>
+        <a href="engineering.html">Electrical</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html">Civil</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <div class="content-wrapper">
+      <div class="calculator-container">
+        <h1>Capital Gains Tax Calculator</h1>
+        <p class="lead-text">Calculate federal capital gains tax liability on equity, mutual fund, crypto, and asset sales. Compare short-term ordinary tax rates versus long-term brackets with Medicare NIIT surtaxes.</p>
+
+        <div class="calc-card">
+          <div class="calc-form">
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="purchasePrice">Cost Basis / Purchase Price ($)</label>
+                <input type="number" id="purchasePrice" value="25000" min="0" step="500" class="form-control">
+              </div>
+              <div class="form-group col-half">
+                <label for="salePrice">Gross Sale Proceeds ($)</label>
+                <input type="number" id="salePrice" value="65000" min="0" step="500" class="form-control">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-third">
+                <label for="holdingPeriod">Holding Period</label>
+                <select id="holdingPeriod" class="form-control">
+                  <option value="long" selected>Long-Term (&gt; 1 Year)</option>
+                  <option value="short">Short-Term (&le; 1 Year)</option>
+                </select>
+              </div>
+              <div class="form-group col-third">
+                <label for="filingStatus">Filing Status</label>
+                <select id="filingStatus" class="form-control">
+                  <option value="single" selected>Single Filer</option>
+                  <option value="married">Married Filing Jointly</option>
+                  <option value="head">Head of Household</option>
+                </select>
+              </div>
+              <div class="form-group col-third">
+                <label for="annualIncome">Other Taxable Income ($)</label>
+                <input type="number" id="annualIncome" value="95000" min="0" step="5000" class="form-control">
+              </div>
+            </div>
+
+            <div class="btn-group">
+              <button type="button" id="calcBtn" class="btn btn-primary">Calculate Capital Gains Tax</button>
+              <button type="button" id="resetBtn" class="btn btn-secondary">Reset Defaults</button>
+            </div>
+          </div>
+
+          <div class="results-panel" id="resultsPanel">
+            <h2>Tax & Proceeds Summary</h2>
+            <div class="result-hero">
+              <span class="hero-label">Estimated Federal Tax Liability</span>
+              <span class="hero-value" id="resTaxDue">$6,000</span>
+            </div>
+
+            <div class="results-grid">
+              <div class="result-item">
+                <span class="sub-label">Net Capital Realized Gain</span>
+                <span class="sub-value highlight" id="resGain">$40,000</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Return on Investment (ROI)</span>
+                <span class="sub-value" id="resRoi">+160.0%</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Effective Federal Tax Rate</span>
+                <span class="sub-value" id="resEffRate">15.0%</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Base Capital Gains Tax</span>
+                <span class="sub-value" id="resBaseTax">$6,000</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Net Investment Income Tax (NIIT 3.8%)</span>
+                <span class="sub-value" id="resNiit">$0</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Net After-Tax Take-Home Proceeds</span>
+                <span class="sub-value highlight" id="resNetProceeds">$59,000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comprehensive Tax Finance Article (1,300+ Words) -->
+        <article class="article-body">
+          <h2>1. The Taxation Architecture of Capital Assets</h2>
+          <p>Under Title 26 of the United States Code (the Internal Revenue Code, IRC), almost everything an individual owns and uses for personal or investment purposes constitutes a <strong>capital asset</strong>. When an investor disposes of securities, equities, cryptocurrency, exchange-traded funds, mutual funds, or real estate for a price exceeding the asset's acquisition value, a taxable <strong>capital gain</strong> is realized.</p>
+          <p>The mathematical computation begins by defining the <strong>Capital Realized Gain or Loss (\(G\))</strong>:</p>
+          <div class="math-block">
+            $$G = \text{Gross Realized Proceeds} - \text{Adjusted Cost Basis}$$
+          </div>
+          <p>Where:</p>
+          <ul>
+            <li><strong>Gross Realized Proceeds:</strong> Total monetary and fair market value consideration received from the buyer, net of direct transactional transfer expenses (such as brokerage commissions, legal fees, exchange fees, and documentary stamps).</li>
+            <li><strong>Adjusted Cost Basis:</strong> The historical purchase price augmented by capitalized acquisition costs, dividend reinvestment units, and physical capital improvements (for real estate), reduced by non-taxable returns of capital and prior MACRS/straight-line depreciation deductions.</li>
+          </ul>
+
+          <h2>2. Short-Term vs. Long-Term Holding Period Classifications</h2>
+          <p>The United States tax code enforces a strict dichotomy based on holding duration:</p>
+          <h3>A. Short-Term Capital Gains (Holding Period \(\le 12\text{ Months}\))</h3>
+          <p>Securities held for 365 days or fewer are categorized as short-term. They receive zero tax sheltering and are taxed at ordinary individual marginal income tax rates across the 7 federal brackets: <strong>10%, 12%, 22%, 24%, 32%, 35%, and 37%</strong>.</p>
+
+          <h3>B. Long-Term Capital Gains (Holding Period \(> 12\text{ Months}\))</h3>
+          <p>Assets held for at least one year and one day enjoy statutory preferential capital gains brackets designed to incentivize long-term entrepreneurial risk and corporate capital formation: <strong>0%, 15%, or 20%</strong> depending on total taxable income.</p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Filing Status</th>
+                <th>0% Long-Term Bracket</th>
+                <th>15% Long-Term Bracket</th>
+                <th>20% Long-Term Bracket</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Single Filer</strong></td>
+                <td>Up to $47,025</td>
+                <td>$47,026 &ndash; $518,900</td>
+                <td>Over $518,900</td>
+              </tr>
+              <tr>
+                <td><strong>Married Filing Jointly</strong></td>
+                <td>Up to $94,050</td>
+                <td>$94,051 &ndash; $583,750</td>
+                <td>Over $583,750</td>
+              </tr>
+              <tr>
+                <td><strong>Head of Household</strong></td>
+                <td>Up to $63,000</td>
+                <td>$63,001 &ndash; $551,350</td>
+                <td>Over $551,350</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>3. Surtaxes: The Net Investment Income Tax (NIIT 3.8%)</h2>
+          <p>Enacted under the Affordable Care Act and codified in IRC Section 1411, high-earning individuals are subject to an additional <strong>3.8% Net Investment Income Tax (NIIT)</strong> on investment gains, dividends, royalties, and passive rents. The surtax applies to the lesser of:</p>
+          <div class="math-block">
+            $$\text{NIIT Liability} = 0.038 \times \min\left( \text{Net Investment Income}, \max(0, \text{MAGI} - \text{Threshold}) \right)$$
+          </div>
+          <p>Statutory Modified Adjusted Gross Income (MAGI) thresholds are unindexed for inflation:</p>
+          <ul>
+            <li><strong>Single / Head of Household:</strong> $200,000</li>
+            <li><strong>Married Filing Jointly:</strong> $250,000</li>
+            <li><strong>Married Filing Separately:</strong> $125,000</li>
+          </ul>
+          <p>When an investor's overall income plus capital gains pushes them into the top federal bracket, the combined top marginal federal capital gains tax rate reaches <strong>23.8%</strong> (20% base + 3.8% NIIT), excluding state and municipal taxes.</p>
+
+          <div class="worked-example-card">
+            <h3>Worked Tax Case Study: Growth Stock Sale Arbitrage</h3>
+            <p><strong>Scenario:</strong> An investor filing Single earns $110,000 in ordinary salary. They purchased 500 shares of a technology ETF for $50,000. Exactly 18 months later, the shares are liquidated for $130,000.</p>
+            <p><strong>Step 1: Compute Realized Capital Gain</strong></p>
+            <div class="math-block">
+              $$G = \$130,000 - \$50,000 = \$80,000\text{ (Long-Term)}$$
+            </div>
+            <p><strong>Step 2: Determine Total Combined Income</strong></p>
+            <div class="math-block">
+              $$\text{Total Income} = \$110,000\text{ (salary)} + \$80,000\text{ (gain)} = \$190,000$$
+            </div>
+            <p><strong>Step 3: Apply Long-Term Capital Gains Tax Brackets</strong></p>
+            <p>Since the entire $190,000 falls comfortably within the Single 15% bracket ($47,026 to $518,900), the base federal capital gains tax is:</p>
+            <div class="math-block">
+              $$\text{Tax}_{\text{base}} = \$80,000 \times 0.15 = \$12,000$$
+            </div>
+            <p><strong>Step 4: Check NIIT Threshold</strong></p>
+            <p>Total MAGI is $190,000, which remains below the $200,000 Single statutory threshold. Therefore, \(\text{NIIT} = \$0\).</p>
+            <p><strong>Comparative Analysis:</strong> Had the investor sold the position at 11 months (short-term), the $80,000 would have been taxed at ordinary rates (a blend of 24% and 32%), generating approximately <strong>$19,600</strong> in taxes. By waiting past the 1-year mark, the investor saved <strong>$7,600 in cash taxes</strong>.</p>
+          </div>
+
+          <h2>4. Tax-Loss Harvesting Rules and Wash-Sale Restrictions</h2>
+          <p>Astute portfolio managers minimize tax liabilities via <strong>tax-loss harvesting</strong>—deliberately realizing losses on depreciated assets to offset taxable realized gains elsewhere in the portfolio:</p>
+          <ul>
+            <li><strong>Offset Mechanics:</strong> Short-term losses offset short-term gains, while long-term losses offset long-term gains. Any remaining net loss in one category then offsets net gains in the opposing category.</li>
+            <li><strong>Ordinary Income Deduction Cap:</strong> If net total capital losses exceed total capital gains for the calendar year, a maximum of <strong>$3,000</strong> ($1,500 if married filing separately) can be deducted against ordinary taxable wages. Unused losses carry forward indefinitely to future tax years.</li>
+            <li><strong>The 30-Day Wash-Sale Rule (IRC § 1091):</strong> Prevents taxpayers from claiming a tax loss if they acquire "substantially identical" stock or securities within a 61-day window (30 days before through 30 days after the date of the loss-generating sale). Disallowed losses are appended back to the cost basis of the newly acquired replacement security.</li>
+          </ul>
+
+          <h2>5. Special Exclusions: Real Estate Section 121 and Section 1031</h2>
+          <p>Residential real estate investors benefit from major statutory shelters not available to equities:</p>
+          <ul>
+            <li><strong>Section 121 Primary Residence Exclusion:</strong> Taxpayers can exclude up to <strong>$250,000</strong> of capital gains ($500,000 for married couples filing jointly) from the sale of their primary home if they owned and occupied the residence for at least two of the five years preceding the sale date.</li>
+            <li><strong>Section 1031 Like-Kind Exchange:</strong> Commercial real estate and rental property owners can indefinitely defer 100% of capital gains and depreciation recapture taxes by rolling all gross sale proceeds into a replacement like-kind investment property within 180 calendar days.</li>
+          </ul>
+
+          <h2>6. Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <h3>Are cryptocurrencies taxed as capital assets or currency?</h3>
+            <p>Under IRS Notice 2014-21, virtual currencies (such as Bitcoin and Ethereum) are legally classified as property. Every crypto-to-crypto trade, token swap, or purchase of goods using crypto triggers a taxable capital gains realization event based on the token's cost basis.</p>
+          </div>
+          <div class="faq-item">
+            <h3>Do state taxes apply to capital gains?</h3>
+            <p>Yes. Most US states tax capital gains as ordinary state income (ranging from 0% in states like Texas and Florida to over 13% in California). Only a minority of states offer preferential rates for long-term gains.</p>
+          </div>
+          <div class="faq-item">
+            <h3>How do inherited assets receive a "step-up" in basis?</h3>
+            <p>Under IRC Section 1014, when a beneficiary inherits capital assets upon the owner's death, the cost basis is automatically "stepped up" to the fair market value on the date of death, permanently extinguishing all unrealized capital gains accumulated during the decedent's lifetime.</p>
+          </div>
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏦</span>
+            <h3 class="widget-title">Related Finance & Investment</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="rule-of-72-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rule of 72 Doubling Time</a></li>
+            <li><a href="car-loan-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Car Loan Financing</a></li>
+            <li><a href="roi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ROI & Annualized CAGR</a></li>
+            <li><a href="loan-emi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan EMI Calculator</a></li>
+            <li><a href="mortgage-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Mortgage & PITI</a></li>
+            <li><a href="compound-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Compound Interest</a></li>
+            <li><a href="simple-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Simple Interest</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck</a></li>
+            <li><a href="discount-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Discount & Sale</a></li>
+            <li><a href="tip-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Tip & Bill Splitter</a></li>
+            <li><a href="amortization-schedule-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan Amortization Schedule</a></li>
+            <li><a href="apr-apy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> APR to APY Compounding Converter</a></li>
+            <li><a href="break-even-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Break-Even Point (Units & Sales)</a></li>
+            <li><a href="capital-gains-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Capital Gains Tax (Short & Long)</a></li>
+            <li><a href="cd-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Certificate of Deposit (CD) Yield</a></li>
+            <li><a href="credit-card-payoff-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Credit Card Payoff (Debt Freedom)</a></li>
+            <li><a href="debt-to-income-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Debt-to-Income (DTI) Ratios</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="finance.html" class="sidebar-category-link">View All Finance & Investment Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, science, and technical calculation tools.</p>
+    </div>
+  </footer>
+
+  <script>
+    function calculate() {
+      const basis = parseFloat(document.getElementById('purchasePrice').value) || 0;
+      const proceeds = parseFloat(document.getElementById('salePrice').value) || 0;
+      const period = document.getElementById('holdingPeriod').value;
+      const status = document.getElementById('filingStatus').value;
+      const income = parseFloat(document.getElementById('annualIncome').value) || 0;
+
+      const gain = proceeds - basis;
+      const roi = basis > 0 ? (gain / basis) * 100 : 0;
+
+      if (gain <= 0) {
+        document.getElementById('resGain').textContent = '$' + Math.round(gain).toLocaleString('en-US');
+        document.getElementById('resRoi').textContent = roi.toFixed(1) + '%';
+        document.getElementById('resTaxDue').textContent = '$0';
+        document.getElementById('resEffRate').textContent = '0.0%';
+        document.getElementById('resBaseTax').textContent = '$0';
+        document.getElementById('resNiit').textContent = '$0';
+        document.getElementById('resNetProceeds').textContent = '$' + Math.round(proceeds).toLocaleString('en-US');
+        return;
+      }
+
+      // Total MAGI approx
+      const totalIncome = income + gain;
+
+      let baseTax = 0;
+      if (period === 'long') {
+        // Long-term brackets (2024 approximation)
+        let b0 = 47025, b15 = 518900;
+        if (status === 'married') {
+          b0 = 94050; b15 = 583750;
+        } else if (status === 'head') {
+          b0 = 63000; b15 = 551350;
+        }
+
+        if (totalIncome <= b0) {
+          baseTax = 0;
+        } else if (totalIncome <= b15) {
+          // If previous income was below b0, some portion might be 0%
+          const taxableAt15 = Math.min(gain, totalIncome - b0);
+          baseTax = taxableAt15 * 0.15;
+        } else {
+          // Crosses into 20%
+          const portionIn20 = Math.min(gain, totalIncome - b15);
+          const portionIn15 = gain - portionIn20;
+          baseTax = (portionIn15 * 0.15) + (portionIn20 * 0.20);
+        }
+      } else {
+        // Short-term: ordinary marginal rate approximation (simplified progressive)
+        // Assume marginal bracket on the gain
+        let rate = 0.22;
+        if (totalIncome > 243725) rate = 0.35;
+        else if (totalIncome > 100525) rate = 0.24;
+        else if (totalIncome > 47150) rate = 0.22;
+        else rate = 0.12;
+        baseTax = gain * rate;
+      }
+
+      // NIIT 3.8%
+      let niitThreshold = 200000;
+      if (status === 'married') niitThreshold = 250000;
+
+      let niitTax = 0;
+      if (totalIncome > niitThreshold) {
+        const excessMagi = totalIncome - niitThreshold;
+        const subjectToNiit = Math.min(gain, excessMagi);
+        niitTax = subjectToNiit * 0.038;
+      }
+
+      const totalTax = baseTax + niitTax;
+      const netProceeds = proceeds - totalTax;
+      const effRate = gain > 0 ? (totalTax / gain) * 100 : 0;
+
+      const fmt = (v) => '$' + Math.round(v).toLocaleString('en-US');
+
+      document.getElementById('resGain').textContent = fmt(gain);
+      document.getElementById('resRoi').textContent = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%';
+      document.getElementById('resTaxDue').textContent = fmt(totalTax);
+      document.getElementById('resEffRate').textContent = effRate.toFixed(1) + '%';
+      document.getElementById('resBaseTax').textContent = fmt(baseTax);
+      document.getElementById('resNiit').textContent = fmt(niitTax);
+      document.getElementById('resNetProceeds').textContent = fmt(netProceeds);
+    }
+
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', calculate);
+      el.addEventListener('change', calculate);
+    });
+
+    document.getElementById('calcBtn').addEventListener('click', calculate);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('purchasePrice').value = '25000';
+      document.getElementById('salePrice').value = '65000';
+      document.getElementById('holdingPeriod').value = 'long';
+      document.getElementById('filingStatus').value = 'single';
+      document.getElementById('annualIncome').value = '95000';
+      calculate();
+    });
+
+    window.addEventListener('DOMContentLoaded', calculate);
+  </script>
+</body>
+</html>

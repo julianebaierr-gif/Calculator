@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APR to APY Calculator | Nominal to Effective Compounding Rate Converter</title>
+  <meta name="description" content="Convert APR to APY and APY to APR across daily, monthly, quarterly, and continuous compounding frequencies. Model true borrowing costs and deposit yields.">
+  <link rel="canonical" href="https://calchub.cloud/apr-apy-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "APR to APY Calculator",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Converts nominal Annual Percentage Rate (APR) to effective Annual Percentage Yield (APY) and vice-versa across discrete and continuous compounding periods.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the mathematical difference between APR and APY?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "APR (Annual Percentage Rate) is a simple annualized nominal interest rate that ignores intraday compounding. APY (Annual Percentage Yield), also known as the Effective Annual Rate (EAR), accounts for the exponential effect of compound interest earned or paid across intra-year periods."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the formula to convert nominal APR to effective APY?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The standard compounding formula is APY = (1 + r / n)^n - 1, where r is the nominal annual APR expressed as a decimal and n is the number of compounding periods per calendar year (e.g., n = 12 for monthly, n = 365 for daily)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why do credit cards disclose APR instead of APY?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Under the Truth in Lending Act (Regulation Z), lenders are legally required to market debt using APR because nominal rates look lower to borrowers than effective compounding yields. Conversely, bank savings accounts market APY under Truth in Savings (Regulation DD) because APY appears higher."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does continuous compounding alter APY calculations?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "When compounding periods approach infinity (n -> ∞), the discrete compounding equation converges to the natural exponential base: APY = e^r - 1. This represents the theoretical upper mathematical bound of compound interest for a given nominal rate."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="logo">CalcHub</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="finance.html" class="active">Financial</a>
+        <a href="engineering.html">Electrical</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html">Civil</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <div class="content-wrapper">
+      <div class="calculator-container">
+        <h1>APR to APY Calculator</h1>
+        <p class="lead-text">Convert seamlessly between nominal Annual Percentage Rate (APR) and effective Annual Percentage Yield (APY) across daily, monthly, quarterly, semi-annual, and continuous compounding schedules.</p>
+
+        <div class="calc-card">
+          <div class="calc-form">
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="conversionMode">Conversion Mode</label>
+                <select id="conversionMode" class="form-control">
+                  <option value="apr_to_apy" selected>APR &rarr; APY (Nominal to Effective)</option>
+                  <option value="apy_to_apr">APY &rarr; APR (Effective to Nominal)</option>
+                </select>
+              </div>
+              <div class="form-group col-half">
+                <label for="rateInput" id="rateInputLabel">Nominal APR (%)</label>
+                <input type="number" id="rateInput" value="6.00" min="0.01" max="100" step="0.01" class="form-control">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="compoundFreq">Compounding Frequency</label>
+                <select id="compoundFreq" class="form-control">
+                  <option value="365" selected>Daily (n = 365)</option>
+                  <option value="12">Monthly (n = 12)</option>
+                  <option value="4">Quarterly (n = 4)</option>
+                  <option value="2">Semi-Annually (n = 2)</option>
+                  <option value="1">Annually (n = 1)</option>
+                  <option value="continuous">Continuous Compounding (n &rarr; &infin;)</option>
+                </select>
+              </div>
+              <div class="form-group col-half">
+                <label for="benchmarkPrincipal">Benchmark Principal ($)</label>
+                <input type="number" id="benchmarkPrincipal" value="10000" min="100" step="500" class="form-control">
+              </div>
+            </div>
+
+            <div class="btn-group">
+              <button type="button" id="calcBtn" class="btn btn-primary">Convert Rate</button>
+              <button type="button" id="resetBtn" class="btn btn-secondary">Reset to 6.00%</button>
+            </div>
+          </div>
+
+          <div class="results-panel" id="resultsPanel">
+            <h2>Yield & Rate Results</h2>
+            <div class="result-hero">
+              <span class="hero-label" id="heroLabel">Effective Annual Percentage Yield (APY)</span>
+              <span class="hero-value" id="heroValue">6.183%</span>
+            </div>
+
+            <div class="results-grid">
+              <div class="result-item">
+                <span class="sub-label">Nominal APR</span>
+                <span class="sub-value" id="resApr">6.000%</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Effective APY</span>
+                <span class="sub-value highlight" id="resApy">6.183%</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Periodic Rate / Period</span>
+                <span class="sub-value" id="resPeriodic">0.0164% / day</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">1-Year Benchmark Growth</span>
+                <span class="sub-value" id="res1Yr">$10,618.31</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">1-Year Total Earnings</span>
+                <span class="sub-value highlight" id="resEarnings">$618.31</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Compounding Boost</span>
+                <span class="sub-value" id="resBoost">+$18.31 vs simple</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comprehensive Financial Mathematics Article (1,250+ Words) -->
+        <article class="article-body">
+          <h2>1. The Theoretical Foundations: Nominal vs. Effective Interest Rates</h2>
+          <p>In quantitative finance and banking law, the terms <strong>Annual Percentage Rate (APR)</strong> and <strong>Annual Percentage Yield (APY)</strong> describe two fundamentally distinct methods of quantifying the cost of borrowing capital or the return on deposited wealth. Confusing the two metrics often leads consumers to significantly underestimate borrowing expenses on credit facilities or overestimate yields on deposit vehicles.</p>
+          <p>The <strong>Annual Percentage Rate (APR)</strong> represents a <em>nominal interest rate</em>. It measures the annualized simple interest charged or earned over a 365-day calendar year without considering the compounding phenomenon—where interest earned or charged in earlier sub-periods is added to the principal to generate subsequent interest.</p>
+          <p>Conversely, the <strong>Annual Percentage Yield (APY)</strong>—frequently termed the <strong>Effective Annual Rate (EAR)</strong> in corporate financial theory—captures the full mathematical reality of compound interest. APY reflects the actual percentage by which a principal sum expands over the course of exactly one year when intra-year compounding frequencies are factored in.</p>
+
+          <h2>2. Mathematical Derivations of Compounding Formulas</h2>
+          <p>Consider an initial principal deposit \(P\) invested at a nominal annual interest rate \(r\) (expressed as a decimal, where \(r = \text{APR} / 100\)). If compounding occurs \(n\) times per year, the periodic interest rate applied at the conclusion of each sub-period is:</p>
+          <div class="math-block">
+            $$i_{\text{periodic}} = \frac{r}{n}$$
+          </div>
+          <p>At the end of the first period, the principal grows to \(P_1 = P(1 + \frac{r}{n})\). At the end of the second period, interest is assessed on \(P_1\), producing \(P_2 = P_1(1 + \frac{r}{n}) = P(1 + \frac{r}{n})^2\). Extending this geometric progression across all \(n\) compounding cycles in one complete year yields the ending balance \(P_n\):</p>
+          <div class="math-block">
+            $$P_n = P \left( 1 + \frac{r}{n} \right)^n$$
+          </div>
+          <p>The effective annual growth rate is the ratio of total net interest earned over the original principal:</p>
+          <div class="math-block">
+            $$\text{APY} = \frac{P_n - P}{P} = \left( 1 + \frac{r}{n} \right)^n - 1$$
+          </div>
+
+          <h3>Inverse Transformation: Solving for Nominal APR from Effective APY</h3>
+          <p>When an investor or risk analyst knows the target APY and wishes to determine the required nominal APR under a known compounding frequency \(n\), we invert the exponential relation algebraically:</p>
+          <div class="math-block">
+            $$1 + \text{APY} = \left( 1 + \frac{r}{n} \right)^n \implies (1 + \text{APY})^{1/n} = 1 + \frac{r}{n}$$
+          </div>
+          <div class="math-block">
+            $$\text{APR} = r = n \left[ (1 + \text{APY})^{1/n} - 1 \right]$$
+          </div>
+
+          <h3>Continuous Compounding: The Euler Limit (\(n \to \infty\))</h3>
+          <p>In theoretical financial modeling, high-frequency quantitative trading, and derivative pricing (such as the Black-Scholes-Merton option pricing framework), compounding occurs instantaneously. Applying the fundamental calculus definition of Euler's number \(e = \lim_{x \to \infty} (1 + 1/x)^x\):</p>
+          <div class="math-block">
+            $$\lim_{n \to \infty} \left( 1 + \frac{r}{n} \right)^n = e^r$$
+          </div>
+          <p>Therefore, under continuous compounding, the effective APY reaches its theoretical mathematical asymptote:</p>
+          <div class="math-block">
+            $$\text{APY}_{\text{continuous}} = e^r - 1$$
+          </div>
+          <p>And conversely, solving for continuous APR:</p>
+          <div class="math-block">
+            $$\text{APR}_{\text{continuous}} = \ln(1 + \text{APY})$$
+          </div>
+
+          <h2>3. Impact of Compounding Frequencies on Capital Accumulation</h2>
+          <p>As the compounding frequency \(n\) increases from annual to daily or continuous, the effective yield rises due to the acceleration of reinvested earnings. However, the marginal increase exhibits diminishing returns:</p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Compounding Frequency</th>
+                <th>Periods (\(n\))</th>
+                <th>Nominal APR</th>
+                <th>Effective APY</th>
+                <th>1-Year Value ($100k)</th>
+                <th>Marginal Gain vs Annual</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Annual</strong></td>
+                <td>\(1\)</td>
+                <td>8.000%</td>
+                <td>8.0000%</td>
+                <td>$108,000.00</td>
+                <td>$0.00 (Baseline)</td>
+              </tr>
+              <tr>
+                <td><strong>Semi-Annual</strong></td>
+                <td>\(2\)</td>
+                <td>8.000%</td>
+                <td>8.1600%</td>
+                <td>$108,160.00</td>
+                <td>+$160.00</td>
+              </tr>
+              <tr>
+                <td><strong>Quarterly</strong></td>
+                <td>\(4\)</td>
+                <td>8.000%</td>
+                <td>8.2432%</td>
+                <td>$108,243.22</td>
+                <td>+$243.22</td>
+              </tr>
+              <tr>
+                <td><strong>Monthly</strong></td>
+                <td>\(12\)</td>
+                <td>8.000%</td>
+                <td>8.2999%</td>
+                <td>$108,299.95</td>
+                <td>+$299.95</td>
+              </tr>
+              <tr>
+                <td><strong>Bi-Weekly</strong></td>
+                <td>\(26\)</td>
+                <td>8.000%</td>
+                <td>8.3142%</td>
+                <td>$108,314.16</td>
+                <td>+$314.16</td>
+              </tr>
+              <tr>
+                <td><strong>Daily (365 days)</strong></td>
+                <td>\(365\)</td>
+                <td>8.000%</td>
+                <td>8.3278%</td>
+                <td>$108,327.76</td>
+                <td>+$327.76</td>
+              </tr>
+              <tr>
+                <td><strong>Continuous (\(n \to \infty\))</strong></td>
+                <td>\(\infty\)</td>
+                <td>8.000%</td>
+                <td>8.3287%</td>
+                <td>$108,328.71</td>
+                <td>+$328.71</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="worked-example-card">
+            <h3>Worked Practical Case Study: Credit Card Revolving Debt Compounding</h3>
+            <p><strong>Scenario:</strong> A consumer maintains an average daily revolving balance of $15,000 on a credit card carrying a stated nominal purchase APR of 24.99%. Interest compounds on a daily billing cycle (\(n = 365\)).</p>
+            <p><strong>Step 1: Compute the Daily Periodic Rate (DPR)</strong></p>
+            <div class="math-block">
+              $$\text{DPR} = \frac{0.2499}{365} = 0.000684658\text{ (or }0.068466\%\text{ per day)}$$
+            </div>
+            <p><strong>Step 2: Calculate the true Effective APY</strong></p>
+            <div class="math-block">
+              $$\text{APY} = \left( 1 + 0.000684658 \right)^{365} - 1 = (1.000684658)^{365} - 1 = 1.28359 - 1 = 28.359\%$$
+            </div>
+            <p><strong>Step 3: Analyze Financial Impact on Outstanding Balance</strong></p>
+            <p>If no monthly payments were made and no late fees were assessed, the balance after 12 months would grow to:</p>
+            <div class="math-block">
+              $$\text{Balance}_{1\,\text{year}} = \$15,000 \times 1.28359 = \$19,253.85$$
+            </div>
+            <p><strong>Conclusion:</strong> While the consumer contract states 24.99% APR, the true effective annualized borrowing cost is <strong>28.36%</strong>. Daily compounding extracts an extra <strong>$505.35</strong> in financing charges beyond simple interest, vividly illustrating why credit card issuers favor daily compounding protocols.</p>
+          </div>
+
+          <h2>4. Regulatory Mandates: Truth in Lending vs. Truth in Savings</h2>
+          <p>In the United States and global banking jurisdictions, rate disclosures are strictly governed to prevent deceptive marketing practices:</p>
+          <ul>
+            <li><strong>Truth in Lending Act (TILA / CFPB Regulation Z):</strong> Governs consumer credit, mortgages, auto loans, and credit cards. Creditors must prominently state the <strong>APR</strong>. Because APR omits intra-year compounding, the disclosed percentage is always lower than the true economic cost of borrowing, which lenders favor.</li>
+            <li><strong>Truth in Savings Act (TISA / CFPB Regulation DD):</strong> Governs depository institutions including checking, high-yield savings accounts (HYSA), and Certificates of Deposit (CDs). Financial institutions are legally compelled to advertise the <strong>APY</strong>. Because APY reflects compounding, the advertised yield appears higher and more attractive to prospective savers.</li>
+          </ul>
+
+          <h2>5. Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <h3>Can APR ever be higher than APY?</h3>
+            <p>In standard financial mathematics where interest rates are positive and compounding frequency is at least annual (\(n \ge 1\)), APY is always greater than or equal to APR. They are identical only when compounding occurs exactly once per year (\(n = 1\)).</p>
+          </div>
+          <div class="faq-item">
+            <h3>How do lenders calculate loan APR when upfront fees are involved?</h3>
+            <p>For mortgages and personal loans, the advertised loan APR is higher than the simple interest rate because the Truth in Lending Act requires rolling mandatory closing costs, underwriting fees, and discount points into the total finance charge, amortized over the loan term.</p>
+          </div>
+          <div class="faq-item">
+            <h3>What is the 360-day vs. 365-day compounding rule in commercial banking?</h3>
+            <p>Some commercial banks and money-market lenders utilize the "Banker's Rule" (or 360-day convention), dividing the annual nominal rate by 360 to determine the daily rate, but multiplying by the actual 365 days elapsed. This subtle practice increases the effective yield by approximately 1.39% in the lender's favor.</p>
+          </div>
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏦</span>
+            <h3 class="widget-title">Related Finance & Investment</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="rule-of-72-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rule of 72 Doubling Time</a></li>
+            <li><a href="car-loan-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Car Loan Financing</a></li>
+            <li><a href="roi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ROI & Annualized CAGR</a></li>
+            <li><a href="loan-emi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan EMI Calculator</a></li>
+            <li><a href="mortgage-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Mortgage & PITI</a></li>
+            <li><a href="compound-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Compound Interest</a></li>
+            <li><a href="simple-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Simple Interest</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck</a></li>
+            <li><a href="discount-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Discount & Sale</a></li>
+            <li><a href="tip-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Tip & Bill Splitter</a></li>
+            <li><a href="amortization-schedule-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan Amortization Schedule</a></li>
+            <li><a href="apr-apy-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> APR to APY Compounding Converter</a></li>
+            <li><a href="break-even-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Break-Even Point (Units & Sales)</a></li>
+            <li><a href="capital-gains-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capital Gains Tax (Short & Long)</a></li>
+            <li><a href="cd-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Certificate of Deposit (CD) Yield</a></li>
+            <li><a href="credit-card-payoff-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Credit Card Payoff (Debt Freedom)</a></li>
+            <li><a href="debt-to-income-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Debt-to-Income (DTI) Ratios</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="finance.html" class="sidebar-category-link">View All Finance & Investment Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, science, and technical calculation tools.</p>
+    </div>
+  </footer>
+
+  <script>
+    function calculate() {
+      const mode = document.getElementById('conversionMode').value;
+      const rateVal = parseFloat(document.getElementById('rateInput').value) || 0;
+      const freq = document.getElementById('compoundFreq').value;
+      const principal = parseFloat(document.getElementById('benchmarkPrincipal').value) || 10000;
+
+      let apr = 0;
+      let apy = 0;
+
+      if (mode === 'apr_to_apy') {
+        apr = rateVal;
+        const r = apr / 100;
+
+        if (freq === 'continuous') {
+          apy = (Math.exp(r) - 1) * 100;
+        } else {
+          const n = parseFloat(freq);
+          apy = (Math.pow(1 + r / n, n) - 1) * 100;
+        }
+      } else {
+        // APY to APR
+        apy = rateVal;
+        const e = apy / 100;
+
+        if (freq === 'continuous') {
+          apr = Math.log(1 + e) * 100;
+        } else {
+          const n = parseFloat(freq);
+          apr = n * (Math.pow(1 + e, 1 / n) - 1) * 100;
+        }
+      }
+
+      // Benchmark Growth
+      const effectiveDecimal = apy / 100;
+      const endingBalance = principal * (1 + effectiveDecimal);
+      const totalEarnings = endingBalance - principal;
+      const simpleEarnings = principal * (apr / 100);
+      const compBoost = totalEarnings - simpleEarnings;
+
+      // Formatting
+      const fmtPct = (v) => v.toFixed(3) + '%';
+      const fmtCurrency = (v) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      if (mode === 'apr_to_apy') {
+        document.getElementById('heroLabel').textContent = 'Effective Annual Percentage Yield (APY)';
+        document.getElementById('heroValue').textContent = fmtPct(apy);
+      } else {
+        document.getElementById('heroLabel').textContent = 'Nominal Annual Percentage Rate (APR)';
+        document.getElementById('heroValue').textContent = fmtPct(apr);
+      }
+
+      document.getElementById('resApr').textContent = fmtPct(apr);
+      document.getElementById('resApy').textContent = fmtPct(apy);
+
+      // Periodic rate
+      if (freq === 'continuous') {
+        document.getElementById('resPeriodic').textContent = 'Instantaneous (e^r)';
+      } else {
+        const n = parseFloat(freq);
+        const pRate = (apr / n);
+        let periodName = 'day';
+        if (n === 12) periodName = 'month';
+        else if (n === 4) periodName = 'quarter';
+        else if (n === 2) periodName = 'half-yr';
+        else if (n === 1) periodName = 'year';
+        document.getElementById('resPeriodic').textContent = pRate.toFixed(4) + '% / ' + periodName;
+      }
+
+      document.getElementById('res1Yr').textContent = fmtCurrency(endingBalance);
+      document.getElementById('resEarnings').textContent = fmtCurrency(totalEarnings);
+      document.getElementById('resBoost').textContent = (compBoost >= 0 ? '+' : '') + fmtCurrency(compBoost) + ' vs simple';
+    }
+
+    document.getElementById('conversionMode').addEventListener('change', () => {
+      const mode = document.getElementById('conversionMode').value;
+      if (mode === 'apr_to_apy') {
+        document.getElementById('rateInputLabel').textContent = 'Nominal APR (%)';
+      } else {
+        document.getElementById('rateInputLabel').textContent = 'Effective APY (%)';
+      }
+      calculate();
+    });
+
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', calculate);
+      el.addEventListener('change', calculate);
+    });
+
+    document.getElementById('calcBtn').addEventListener('click', calculate);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('conversionMode').value = 'apr_to_apy';
+      document.getElementById('rateInputLabel').textContent = 'Nominal APR (%)';
+      document.getElementById('rateInput').value = '6.00';
+      document.getElementById('compoundFreq').value = '365';
+      document.getElementById('benchmarkPrincipal').value = '10000';
+      calculate();
+    });
+
+    window.addEventListener('DOMContentLoaded', calculate);
+  </script>
+</body>
+</html>

@@ -34,6 +34,13 @@ CATEGORIES = {
             ("salary-calculator.html", "Salary & Paycheck", "💼", "Hourly, monthly & annual pay"),
             ("discount-calculator.html", "Discount & Sale", "🏷️", "Net savings, coupons & sales tax"),
             ("tip-calculator.html", "Tip & Bill Splitter", "🍽️", "Dining gratuity & party bill split"),
+            ("amortization-schedule-calculator.html", "Loan Amortization Schedule", "📅", "Monthly principal vs interest & extra payment savings"),
+            ("apr-apy-calculator.html", "APR to APY Compounding Converter", "📈", "Nominal rate to effective annual percentage yield"),
+            ("break-even-calculator.html", "Break-Even Point (Units & Sales)", "⚖️", "Fixed costs, contribution margin & margin of safety"),
+            ("capital-gains-calculator.html", "Capital Gains Tax (Short & Long)", "🏛️", "0%, 15%, 20% brackets, NIIT 3.8% & net take-home"),
+            ("cd-calculator.html", "Certificate of Deposit (CD) Yield", "🏦", "Compound interest, APY & early withdrawal penalty"),
+            ("credit-card-payoff-calculator.html", "Credit Card Payoff (Debt Freedom)", "💳", "Minimum payment trap vs fixed accelerated payoff"),
+            ("debt-to-income-calculator.html", "Debt-to-Income (DTI) Ratios", "🏡", "Front-end housing & back-end total debt Fannie Mae sizer"),
         ]
     },
     "math": {
@@ -238,6 +245,7 @@ CATEGORIES = {
             ("simple-pendulum-calculator.html", "Simple Pendulum", "🕰️", "Oscillation period, frequency & seconds pendulum"),
             ("snells-law-calculator.html", "Snell's Law (Refraction)", "🔍", "Refraction angle, critical angle & optical fiber TIR"),
             ("specific-heat-calculator.html", "Specific Heat Capacity", "🔥", "Sensible heat Q = mcΔT & thermal equilibrium"),
+            ("acceleration-converter.html", "Acceleration Converter", "🚀", "m/s², g₀, ft/s², Gal & automotive 0-60 mph metrics"),
         ]
     },
     "fire": {
@@ -296,7 +304,7 @@ def determine_tool_cat(filename):
     f = filename.lower()
     if any(k in f for k in ["bmi", "calorie", "body-fat", "ideal-weight", "water-intake", "bmr", "macro"]):
         return "health"
-    if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72"]):
+    if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72", "amortization", "apr-apy", "break-even", "capital-gains", "cd-calculator", "credit-card", "debt-to-income"]):
         return "finance"
     if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity", "power-factor", "parallel-resistor", "battery-life", "555-timer", "led-resistor", "capacitive-reactance", "inductive-reactance", "op-amp-gain", "three-phase-power", "adc-dac", "antenna-length", "battery-short-circuit", "bjt-transistor", "breaker-size", "decibel", "earth-pit", "electrical-power", "microstrip", "busbar", "fault-current", "filter", "generator", "heatsink", "copper-cable", "earthing", "kw-to-cable", "single-phase", "three-phase", "wire-gauge"]):
         return "engineering"
@@ -387,6 +395,12 @@ def update_all_sidebars():
         elif '<aside class="calc-sidebar"' in content:
             calc_regex = re.compile(r'<aside class="calc-sidebar"[^>]*>.*?</aside>', re.DOTALL | re.IGNORECASE)
             content = calc_regex.sub(lambda m: new_sidebar, content)
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(content)
+            updated_count += 1
+        elif '<aside class="sidebar"' in content:
+            s_regex = re.compile(r'<aside class="sidebar"[^>]*>.*?</aside>', re.DOTALL | re.IGNORECASE)
+            content = s_regex.sub(lambda m: new_sidebar, content)
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write(content)
             updated_count += 1

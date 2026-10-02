@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceleration Converter | m/s², g-force, ft/s², Gal & knot/s</title>
+  <meta name="description" content="Convert acceleration units between meters per second squared (m/s²), standard g-force (g₀), feet per second squared (ft/s²), Gal, mGal, and automotive 0-60 mph metrics.">
+  <link rel="canonical" href="https://calchub.cloud/acceleration-converter.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Acceleration Converter",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Converts acceleration across SI, Imperial, Gravitational, CGS, and specialized automotive and aerospace units with standard ISO 80000-3 physical constants.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is standard gravity (g₀) and how is it defined internationally?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Standard gravity (symbol g₀ or gn) is an internationally agreed standard nominal acceleration of an object in a vacuum near the surface of the Earth. It was established by the 3rd General Conference on Weights and Measures (CGPM) in 1901 as exactly 9.80665 m/s² (approximately 32.17405 ft/s²)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is a Gal and where is this unit used in engineering and geophysics?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The Gal (named after Galileo Galilei) is the CGS (centimeter-gram-second) unit of acceleration, defined as exactly 1 cm/s² or 0.01 m/s². In geophysics and gravimetry, variations in Earth's gravitational field are commonly expressed in milligals (1 mGal = 10⁻³ Gal = 10⁻⁵ m/s²)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is acceleration calculated from 0 to 60 mph vehicle times?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Assuming uniform linear acceleration, average acceleration is a = Δv / Δt. Converting 60 mph to metric gives 26.8224 m/s. Therefore, a vehicle reaching 60 mph in 3.0 seconds experiences an average acceleration of a = 26.8224 / 3.0 = 8.9408 m/s² (0.9117 g₀)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does Relative Centrifugal Force (RCF) convert into g-force?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Relative Centrifugal Force (RCF) measures centrifugal acceleration in laboratory centrifuges as a multiple of g-force: RCF = (r × ω²) / g₀ = 1.118 × 10⁻⁵ × r × N², where r is rotor radius in centimeters and N is rotational speed in revolutions per minute (RPM)."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="logo">CalcHub</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="physics.html" class="active">Physics</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="engineering.html">Electrical</a>
+        <a href="civil.html">Civil</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <div class="content-wrapper">
+      <div class="calculator-container">
+        <h1>Acceleration Converter</h1>
+        <p class="lead-text">Convert acceleration values across SI, imperial, gravitational, and CGS units including meters per second squared (\(	ext{m/s}^2\)), standard g-force (\(g_0\)), feet per second squared (\(	ext{ft/s}^2\)), and Galileos (\(	ext{Gal}\)).</p>
+
+        <div class="calc-card">
+          <div class="calc-form">
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="accInput">Acceleration Magnitude</label>
+                <input type="number" id="accInput" value="9.80665" step="any" class="form-control">
+              </div>
+              <div class="form-group col-half">
+                <label for="unitFrom">Input Unit</label>
+                <select id="unitFrom" class="form-control">
+                  <option value="mps2">Meters per second squared (m/s²)</option>
+                  <option value="g" selected>Standard Earth Gravity (g₀)</option>
+                  <option value="ftps2">Feet per second squared (ft/s²)</option>
+                  <option value="inps2">Inches per second squared (in/s²)</option>
+                  <option value="gal">Galileo (Gal = cm/s²)</option>
+                  <option value="mgal">Milligal (mGal)</option>
+                  <option value="kmhps">Kilometers per hour per sec (km/h/s)</option>
+                  <option value="mphps">Miles per hour per sec (mph/s)</option>
+                  <option value="knotps">Knots per second (kn/s)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="btn-group">
+              <button type="button" id="calcBtn" class="btn btn-primary">Convert Acceleration</button>
+              <button type="button" id="resetBtn" class="btn btn-secondary">Reset to 1 g₀</button>
+            </div>
+          </div>
+
+          <div class="results-panel" id="resultsPanel">
+            <h2>Equivalent Acceleration Values</h2>
+            <div class="result-hero">
+              <span class="hero-label">Base SI Acceleration</span>
+              <span class="hero-value" id="resMps2">9.80665 m/s²</span>
+            </div>
+
+            <div class="results-grid">
+              <div class="result-item">
+                <span class="sub-label">Standard Gravity (g₀)</span>
+                <span class="sub-value" id="resG">1.00000 g₀</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Imperial (ft/s²)</span>
+                <span class="sub-value" id="resFtps2">32.1740 ft/s²</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Inches per Second²</span>
+                <span class="sub-value" id="resInps2">386.089 in/s²</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">CGS Gal (cm/s²)</span>
+                <span class="sub-value" id="resGal">980.665 Gal</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Geophysical Milligal</span>
+                <span class="sub-value" id="resMgal">980,665 mGal</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Automotive (0-60 mph equiv.)</span>
+                <span class="sub-value" id="resAuto">2.74 sec (0-60 mph)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rigorous Engineering Article (1,200+ Words) -->
+        <article class="article-body">
+          <h2>1. Kinematics and the Fundamental Nature of Acceleration</h2>
+          <p>In classical Newtonian mechanics, acceleration describes the instantaneous time rate of change of linear or angular velocity. Defined as the first derivative of velocity with respect to time and the second derivative of positional displacement:</p>
+          <div class="math-block">
+            $$ec{a}(t) = \lim_{\Delta t 	o 0} rac{\Delta ec{v}}{\Delta t} = rac{dec{v}}{dt} = rac{d^2ec{r}}{dt^2}$$
+          </div>
+          <p>Because velocity is a vector quantity possessing both magnitude (speed) and directional orientation, acceleration occurs whenever a body speeds up, slows down (deceleration or negative acceleration), or alters its trajectory in space (centripetal or radial acceleration). The International System of Units (SI) defines the coherent derived unit of acceleration as the <strong>meter per second squared (\(	ext{m/s}^2\))</strong>.</p>
+          <p>In structural engineering, aerospace dynamics, automotive homologation, and geophysics, acceleration is routinely expressed in non-SI units. Converting reliably between these engineering standards requires a rigorous understanding of the underlying physical invariants, gravitational anomalies, and coordinate transformation scales.</p>
+
+          <h2>2. International Conversion Standards and Physical Constants</h2>
+          <p>Every engineering conversion factor for acceleration is mathematically anchored to the SI base definition \(	ext{m/s}^2\). The table below outlines the exact definitions governed by the Bureau International des Poids et Mesures (BIPM) and ISO 80000-3:</p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Acceleration Unit</th>
+                <th>Standard Symbol</th>
+                <th>Exact Factor in SI (\(	ext{m/s}^2\))</th>
+                <th>Engineering Application Domain</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Meter per second²</strong></td>
+                <td>\(	ext{m/s}^2\)</td>
+                <td>\(1.000000\)</td>
+                <td>SI Base Coherent Standard, Physics, Robotics</td>
+              </tr>
+              <tr>
+                <td><strong>Standard Earth Gravity</strong></td>
+                <td>\(g_0\) (or \(g_n\))</td>
+                <td>\(9.806650\)</td>
+                <td>Aerospace G-load, Structural Seismic Codes, Human Biometrics</td>
+              </tr>
+              <tr>
+                <td><strong>Foot per second²</strong></td>
+                <td>\(	ext{ft/s}^2\)</td>
+                <td>\(0.304800\)</td>
+                <td>US Customary & Imperial Civil/Aeronautical Engineering</td>
+              </tr>
+              <tr>
+                <td><strong>Inch per second²</strong></td>
+                <td>\(	ext{in/s}^2\)</td>
+                <td>\(0.025400\)</td>
+                <td>Precision Machinery, Machine Tool Spindles, Vibration Metrology</td>
+              </tr>
+              <tr>
+                <td><strong>Galileo (Gal)</strong></td>
+                <td>\(	ext{Gal}\)</td>
+                <td>\(0.010000\)</td>
+                <td>CGS Geophysics, Geodetic Gravimetry, Seismology</td>
+              </tr>
+              <tr>
+                <td><strong>Milligal</strong></td>
+                <td>\(	ext{mGal}\)</td>
+                <td>\(0.000010\)</td>
+                <td>Subsurface Mineral/Oil Borehole Anomaly Mapping</td>
+              </tr>
+              <tr>
+                <td><strong>Kilometer per hour per sec</strong></td>
+                <td>\(	ext{km/(h}\cdot	ext{s)}\)</td>
+                <td>\(rac{1}{3.6} pprox 0.277778\)</td>
+                <td>Railway Braking, Transit Fleet Dynamics</td>
+              </tr>
+              <tr>
+                <td><strong>Mile per hour per sec</strong></td>
+                <td>\(	ext{mph/s}\)</td>
+                <td>\(0.447040\)</td>
+                <td>Automotive Performance & Highway Ramp Acceleration</td>
+              </tr>
+              <tr>
+                <td><strong>Knot per second</strong></td>
+                <td>\(	ext{kn/s}\)</td>
+                <td>\(rac{1852}{3600} pprox 0.514444\)</td>
+                <td>Maritime Navigation, Naval Hydrodynamics</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>3. Gravitational Acceleration (\(g_0\)) vs. Local Gravity</h2>
+          <p>A common engineering misconception is treating the standard gravity constant \(g_0 = 9.80665	ext{ m/s}^2\) as the actual local acceleration measured anywhere on Earth's surface. In reality, \(g_0\) is an internationally stipulated contractual constant established in 1901 by the 3rd CGPM. Real-world local gravitational acceleration \(g(\phi, h)\) varies depending on geographic latitude \(\phi\) and ellipsoidal elevation above mean sea level \(h\), governed by the World Geodetic System (WGS 84) Somigliana equation:</p>
+          <div class="math-block">
+            $$g(\phi) = g_e rac{1 + k \sin^2\phi}{\sqrt{1 - e^2 \sin^2\phi}}$$
+          </div>
+          <p>Where:</p>
+          <ul>
+            <li>\(g_e = 9.780327	ext{ m/s}^2\) is the equatorial surface gravitational acceleration.</li>
+            <li>\(k = 0.00193185\) is the normal gravity formula constant.</li>
+            <li>\(e^2 = 0.00669438\) is the first square eccentricity of the reference geoid.</li>
+          </ul>
+          <p>Because the Earth is an oblate spheroid flattened at the poles and bulged at the equator, combined with the outward centrifugal relief of planetary diurnal rotation, local gravitational acceleration spans from approximately \(9.7803	ext{ m/s}^2\) at the equator to \(9.8322	ext{ m/s}^2\) at the poles. The standard nominal value \(9.80665	ext{ m/s}^2\) represents an idealized mid-latitude reference near \(45^\circ\) latitude.</p>
+
+          <h2>4. Biomedical and Aerospace G-Tolerance Limits</h2>
+          <p>In aerospace flight physiology, acceleration is universally measured in g-multiples. Human physiological response depends profoundly on the directional axis relative to the human spinal column:</p>
+          <ul>
+            <li><strong>Positive Vertical Acceleration (\(+G_z\)):</strong> Blood pools into the lower abdomen and extremities, starving the cerebral cortex and retina of oxygen. An untrained human typically experiences gray-out at \(3.5	ext{ to }4.0	ext{ g}\), black-out at \(4.5	ext{ to }5.0	ext{ g}\), and G-induced Loss of Consciousness (G-LOC) beyond \(5.5	ext{ g}\) sustained for several seconds. Fighter pilots wearing anti-G suits and performing the Anti-G Straining Maneuver (AGSM) can sustain \(9.0	ext{ g}\) (\(pprox 88.26	ext{ m/s}^2\)).</li>
+            <li><strong>Negative Vertical Acceleration (\(-G_z\)):</strong> Forces blood toward the head, inducing retinal vascular engorgement ("red-out") and severe cerebral vascular risk at merely \(-2.0	ext{ to }-3.0	ext{ g}\).</li>
+            <li><strong>Transverse Acceleration (\(+G_x\)):</strong> Chest-to-back ("eyeballs in") orientation utilized in crewed orbital space launches (e.g., Saturn V, Falcon 9, Soyuz). Human tolerance exceeds \(15	ext{ g}\) for short durations because hydrostatic blood column displacement between heart and brain is minimized.</li>
+          </ul>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Example: High-Speed Electric Vehicle Launch</h3>
+            <p><strong>Scenario:</strong> A modern tri-motor electric vehicle accelerates from \(0	ext{ to }60	ext{ mph}\) in exactly \(1.98	ext{ seconds}\) on a prepped drag strip. Determine the average acceleration in \(	ext{m/s}^2\), imperial \(	ext{ft/s}^2\), and standard g-force (\(g_0\)).</p>
+            <p><strong>Step 1: Convert velocity to SI units</strong></p>
+            <div class="math-block">
+              $$v_1 = 60	ext{ mph} 	imes 0.447040	ext{ m/s per mph} = 26.8224	ext{ m/s}$$
+            </div>
+            <p><strong>Step 2: Calculate average acceleration in SI units</strong></p>
+            <div class="math-block">
+              $$a = rac{\Delta v}{\Delta t} = rac{26.8224	ext{ m/s} - 0}{1.98	ext{ s}} = 13.5467	ext{ m/s}^2$$
+            </div>
+            <p><strong>Step 3: Convert to standard g-force (\(g_0\))</strong></p>
+            <div class="math-block">
+              $$a_{g} = rac{13.5467	ext{ m/s}^2}{9.80665	ext{ m/s}^2/g_0} = 1.3814	ext{ g}_0$$
+            </div>
+            <p><strong>Step 4: Convert to imperial feet per second squared</strong></p>
+            <div class="math-block">
+              $$a_{	ext{imperial}} = rac{13.5467	ext{ m/s}^2}{0.3048	ext{ m/ft}} = 44.4445	ext{ ft/s}^2$$
+            </div>
+            <p><strong>Conclusion:</strong> The vehicle sustains an extraordinary average longitudinal acceleration of \(1.38	ext{ g}\), demonstrating tire friction traction coefficients exceeding unity made possible by modern compound interlocking and downforce.</p>
+          </div>
+
+          <h2>5. Centrifugal Acceleration and Laboratory Centrifuge RCF</h2>
+          <p>In biotechnology, biochemistry, and clinical medicine, sedimentation rates are governed by centrifugal acceleration rather than Earth's static gravity. Rotor speeds are expressed in revolutions per minute (\(N\) in RPM), but protocols mandate reporting <strong>Relative Centrifugal Force (RCF)</strong> in \(g\):</p>
+          <div class="math-block">
+            $$	ext{RCF} = rac{r \omega^2}{g_0} = rac{r \left(rac{2\pi N}{60}
+ight)^2}{9.80665} = 1.118 	imes 10^{-5} \cdot r \cdot N^2$$
+          </div>
+          <p>Where \(r\) is the rotational radius in centimeters. For example, a microcentrifuge spinning at \(14,000	ext{ RPM}\) with a rotor radius of \(8.5	ext{ cm}\) generates:</p>
+          <div class="math-block">
+            $$	ext{RCF} = 1.118 	imes 10^{-5} 	imes 8.5 	imes (14,000)^2 = 18,626	ext{ g} pprox 182,660	ext{ m/s}^2$$
+          </div>
+
+          <h2>6. Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <h3>How do you convert acceleration from m/s² to ft/s²?</h3>
+            <p>Divide the value in \(	ext{m/s}^2\) by exactly \(0.3048\) (or multiply by \(3.28084\)). For example, standard Earth gravity \(9.80665	ext{ m/s}^2 \div 0.3048 = 32.17405	ext{ ft/s}^2\).</p>
+          </div>
+          <div class="faq-item">
+            <h3>Why is the Galileo (Gal) unit used in earth science?</h3>
+            <p>Because the Gal (\(1	ext{ cm/s}^2 = 10^{-2}	ext{ m/s}^2\)) aligns with the CGS system historically used in geophysics. Earth's total gravitational field is roughly \(980	ext{ Gal}\). Sensitive subsurface gravimeters measure anomalies down to microgals (\(1\,\mu	ext{Gal} = 10^{-8}	ext{ m/s}^2\)), capable of identifying subterranean cavities, aquifers, and ore deposits.</p>
+          </div>
+          <div class="faq-item">
+            <h3>What is the difference between linear acceleration and angular acceleration?</h3>
+            <p>Linear acceleration (\(a\)) measures the time rate of change of linear translational velocity along a path (\(	ext{m/s}^2\)). Angular acceleration (\(lpha\)) measures the rate of change of rotational speed (\(	ext{rad/s}^2\)). They are coupled at radial distance \(r\) by tangential acceleration \(a_t = r \cdot lpha\).</p>
+          </div>
+        </article>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🔬</span>
+            <h3 class="widget-title">Related Physics & Applied Mechanics</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="acceleration-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Acceleration (SUVAT)</a></li>
+            <li><a href="angular-velocity-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Angular Velocity</a></li>
+            <li><a href="centripetal-force-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Centripetal Force</a></li>
+            <li><a href="doppler-effect-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Doppler Effect</a></li>
+            <li><a href="escape-velocity-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Escape Velocity</a></li>
+            <li><a href="free-fall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Free Fall Calculator</a></li>
+            <li><a href="friction-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Friction (Static & Kinetic)</a></li>
+            <li><a href="gravitational-force-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Gravitational Force</a></li>
+            <li><a href="hookes-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Hooke's Law (Springs)</a></li>
+            <li><a href="kinetic-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Kinetic Energy</a></li>
+            <li><a href="photon-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Photon Energy</a></li>
+            <li><a href="simple-pendulum-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Simple Pendulum</a></li>
+            <li><a href="snells-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Snell's Law (Refraction)</a></li>
+            <li><a href="specific-heat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Specific Heat Capacity</a></li>
+            <li><a href="acceleration-converter.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Acceleration Converter</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="physics.html" class="sidebar-category-link">View All Physics & Applied Mechanics Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, science, and technical calculation tools.</p>
+    </div>
+  </footer>
+
+  <script>
+    const G0 = 9.80665;
+    const FT_PER_M = 1 / 0.3048;
+    const IN_PER_M = 1 / 0.0254;
+
+    const toSI = {
+      mps2: v => v,
+      g: v => v * G0,
+      ftps2: v => v * 0.3048,
+      inps2: v => v * 0.0254,
+      gal: v => v * 0.01,
+      mgal: v => v * 0.00001,
+      kmhps: v => v / 3.6,
+      mphps: v => v * 0.44704,
+      knotps: v => v * (1852 / 3600)
+    };
+
+    function calculate() {
+      const val = parseFloat(document.getElementById('accInput').value);
+      const unit = document.getElementById('unitFrom').value;
+      if (isNaN(val)) return;
+
+      const mps2 = toSI[unit](val);
+      const g = mps2 / G0;
+      const ftps2 = mps2 * FT_PER_M;
+      const inps2 = mps2 * IN_PER_M;
+      const gal = mps2 * 100;
+      const mgal = mps2 * 100000;
+
+      document.getElementById('resMps2').textContent = mps2.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 6 }) + ' m/s²';
+      document.getElementById('resG').textContent = g.toLocaleString('en-US', { minimumFractionDigits: 5, maximumFractionDigits: 5 }) + ' g₀';
+      document.getElementById('resFtps2').textContent = ftps2.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 }) + ' ft/s²';
+      document.getElementById('resInps2').textContent = inps2.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + ' in/s²';
+      document.getElementById('resGal').textContent = gal.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 4 }) + ' Gal';
+      document.getElementById('resMgal').textContent = mgal.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 2 }) + ' mGal';
+
+      // Automotive 0-60 mph estimate (26.8224 m/s / a)
+      if (mps2 > 0.01) {
+        const sec060 = 26.8224 / mps2;
+        document.getElementById('resAuto').textContent = sec060.toFixed(2) + ' sec (0-60 mph)';
+      } else {
+        document.getElementById('resAuto').textContent = 'N/A';
+      }
+    }
+
+    document.getElementById('accInput').addEventListener('input', calculate);
+    document.getElementById('unitFrom').addEventListener('change', calculate);
+    document.getElementById('calcBtn').addEventListener('click', calculate);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('accInput').value = '1';
+      document.getElementById('unitFrom').value = 'g';
+      calculate();
+    });
+
+    window.addEventListener('DOMContentLoaded', calculate);
+  </script>
+</body>
+</html>
