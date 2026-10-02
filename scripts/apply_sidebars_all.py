@@ -180,6 +180,8 @@ CATEGORIES = {
             ("roof-pitch-calculator.html", "Roof Pitch & Rafter Length", "🏠", "Pitch X:12, slope angle, area multiplier & rafter length"),
             ("slab-concrete-calculator.html", "Slab Concrete Volume", "🏗️", "Slab-on-grade, thickened edge footings & saw-cut joints"),
             ("slope-calculator.html", "Slope & Grade Calculator", "📐", "Rise/run gradient, % grade, angle & ADA ramp 1:12 compliance"),
+            ("soil-gravel-calculator.html", "Soil & Gravel Volume & Tonnage", "🪨", "Proctor density compaction, loose LCY haulage & quarry tons"),
+            ("tile-calculator.html", "Tile, Grout & Mortar Sizer", "🔲", "Floor/wall cartons, TCNA joint grout weight & thinset notch"),
         ]
     },
     "chemical": {
@@ -191,6 +193,12 @@ CATEGORIES = {
             ("chemical-dosing-calculator.html", "Chemical Dosing Rate Calculator", "🧪", "Pump flow LPH & mg/L ppm feed"),
             ("pipe-sizing-calculator.html", "Pipe Sizing & Water Flow", "🚰", "Internal diameter & friction loss"),
             ("cooling-load-calculator.html", "Cooling Load (HVAC) Sizing", "❄️", "Sensible & latent heat in BTU/hr"),
+            ("alum-dosing-calculator.html", "Alum Dosing & Coagulation Feed", "🧪", "AWWA B403 liquid/dry alum feed, pump mL/min & alkalinity"),
+            ("boyles-law-calculator.html", "Boyle's Gas Law (P₁V₁=P₂V₂)", "🎈", "Isothermal gas expansion, compression work & compressibility Z"),
+            ("calcium-hypochlorite-dosing-calculator.html", "Calcium Hypochlorite (HTH 68%)", "💧", "AWWA C651 water main shock, 65-70% tablets & CT credit"),
+            ("caustic-soda-dosing-calculator.html", "Caustic Soda (NaOH) Dosing", "🧪", "50% & 25% NaOH feed, alkalinity boost & LCR corrosion"),
+            ("charles-law-calculator.html", "Charles's Law (V₁/T₁=V₂/T₂)", "🌡️", "Isobaric thermal gas expansion, Kelvin scale & boundary work"),
+            ("chlorine-dioxide-dosing-calculator.html", "Chlorine Dioxide (ClO₂) Oxidation", "🔬", "Precursor NaClO₂ feed, Fe/Mn removal & EPA chlorite cap"),
         ]
     },
     "fire": {
@@ -257,9 +265,9 @@ def determine_tool_cat(filename):
         return "solar"
     if any(k in f for k in ["cooling", "pipe", "torque", "pump-head", "gear-ratio", "bolt-torque", "bearing-life", "belt-length", "conveyor-belt", "cutting-speed", "feed-rate", "flywheel", "gear-module", "heat-exchanger", "hvac", "hydraulic-cylinder", "hydraulic-pump", "power-to-torque", "psychrometric", "pulley", "pump-flow", "reynolds-number", "shaft-diameter", "spring-rate", "thermal-expansion", "torque-converter", "torque-to-hp", "projectile"]):
         return "mechanical"
-    if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt", "rainwater-downpipe", "block", "drywall", "excavation", "flooring", "footing", "gravel", "paint", "roof-pitch", "slab", "slope"]):
+    if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt", "rainwater-downpipe", "block", "drywall", "excavation", "flooring", "footing", "gravel", "paint", "roof-pitch", "slab", "slope", "soil", "tile"]):
         return "civil"
-    if any(k in f for k in ["chemical", "chlorine"]):
+    if any(k in f for k in ["chemical", "chlorine", "alum", "boyle", "calcium-hypochlorite", "caustic", "charles", "chlorine-dioxide"]):
         return "chemical"
     if any(k in f for k in ["sprinkler", "smoke", "fire-alarm", "hydrant", "fire-pump", "nac", "strobe"]):
         return "fire"

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alum Dosing Calculator | Water Treatment Coagulation &amp; Feed Rate</title>
+  <meta name="description" content="Calculate liquid and dry aluminum sulfate (alum) dosing rates, chemical feed pump output in mL/min and GPH, alkalinity consumption, and sludge production.">
+  <link rel="canonical" href="https://calchub.cloud/alum-dosing-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Alum Dosing Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates dry and commercial liquid aluminum sulfate coagulant feed rates, metering pump stroke calibration, stoichiometric alkalinity destruction, and coagulation solids per AWWA standards.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How is dry alum feed rate calculated from raw water flow and dosage?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The dry chemical feed rate in pounds per day is determined by the standard waterworks formula: Feed Rate (lb/day) = Flow (MGD) * Target Dose (mg/L) * 8.34 lb/gal. In metric units, Mass Rate (kg/day) = Flow (m3/day) * Target Dose (g/m3) / 1,000."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do you convert dry alum dosage to commercial liquid alum pump feed rate?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Commercial liquid alum typically has a specific gravity of 1.33 and contains approximately 48.5% dry aluminum sulfate by weight, yielding about 5.4 lbs of dry alum per gallon of solution. The liquid feed rate in gallons per day is: GPD = (Pounds Dry Alum per Day) / (5.4 lbs dry alum/gal). To calibrate a diaphragm metering pump, convert GPD to mL/min by multiplying by 2.6288."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How much natural alkalinity does alum coagulation consume?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Stoichiometrically, each 1.0 mg/L of commercial dry alum (Al2(SO4)3 * 14H2O) added consumes approximately 0.505 mg/L of natural alkalinity as calcium carbonate (CaCO3). If raw water alkalinity falls below 30-45 mg/L as CaCO3, the pH will plunge below the optimum sweep floc range (pH 5.8-7.2), requiring supplemental dosing of hydrated lime or caustic soda."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the optimal pH window for aluminum sulfate coagulation?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The optimum pH range for sweep floc coagulation with alum is 5.8 to 7.2. Below pH 5.5, aluminum remains partially dissolved as trivalent Al3+ and hydrated cations, leading to elevated residual aluminum in finished water. Above pH 7.8, the amphoteric aluminate ion Al(OH)4- forms, which increases solubility and causes turbidity carryover."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="chemical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="chemical.html">Chemical &amp; Water Treatment</a> &rsaquo; 
+      <span>Alum Dosing Calculator</span>
+    </nav>
+
+    <h1 class="tool-title">Alum Dosing &amp; Coagulation Feed Calculator</h1>
+    <p class="tool-subtitle">Water Works Coagulant Feed Sizing, Pump Calibration (mL/min, GPH) &amp; Alkalinity Stoichiometry</p>
+
+    <div class="calculator-layout">
+      <!-- Calculator Core Interface -->
+      <div class="calculator-card">
+        <div class="calc-form">
+          <div class="form-group">
+            <label for="alumForm">Alum Chemical Product Form</label>
+            <select id="alumForm" class="form-control" onchange="toggleAlumForm()">
+              <option value="liquid" selected>Commercial Liquid Alum (48.5% dry basis, SG = 1.33, ~5.4 lb dry/gal)</option>
+              <option value="dry">Dry Granular Alum (Al₂(SO₄)₃·14H₂O, 100% active basis)</option>
+              <option value="custom">Custom Liquid Solution (Specific Gravity &amp; Concentration)</option>
+            </select>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="flowUnit">Raw Water Flow Units</label>
+              <select id="flowUnit" class="form-control" onchange="toggleFlowUnits()">
+                <option value="mgd" selected>MGD (Million Gallons per Day)</option>
+                <option value="gpm">GPM (Gallons per Minute)</option>
+                <option value="m3h">m³/h (Cubic Meters per Hour)</option>
+                <option value="m3d">m³/day (Cubic Meters per Day)</option>
+                <option value="lps">L/s (Liters per Second)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="rawFlow" id="flowLabel">Raw Water Plant Flow (MGD)</label>
+              <input type="number" id="rawFlow" class="form-control" value="6.0" step="0.1" min="0.01">
+            </div>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="targetDose">Jar Test Coagulant Dose (mg/L or ppm dry)</label>
+              <input type="number" id="targetDose" class="form-control" value="25.0" step="0.5" min="0.1">
+              <span class="field-hint">Optimized dosage from jar testing (typically 10&ndash;60 mg/L)</span>
+            </div>
+            <div class="form-group">
+              <label for="rawAlkalinity">Raw Water Alkalinity (mg/L as CaCO₃)</label>
+              <input type="number" id="rawAlkalinity" class="form-control" value="55" step="1" min="0">
+              <span class="field-hint">Total alkalinity before coagulant addition</span>
+            </div>
+          </div>
+
+          <div id="customAlumParams" class="grid-2-col" style="display:none;">
+            <div class="form-group">
+              <label for="liquidSG">Solution Specific Gravity (SG)</label>
+              <input type="number" id="liquidSG" class="form-control" value="1.33" step="0.01" min="1.0">
+            </div>
+            <div class="form-group">
+              <label for="solStrength">Solution Strength (% dry alum by wt)</label>
+              <input type="number" id="solStrength" class="form-control" value="48.5" step="0.5" min="1" max="100">
+            </div>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="pumpTubes">Chemical Feed Pump Count</label>
+              <input type="number" id="pumpTubes" class="form-control" value="1" step="1" min="1" max="6">
+            </div>
+            <div class="form-group">
+              <label for="rawTSS">Raw Water Suspended Solids / Turbidity (NTU/mg/L)</label>
+              <input type="number" id="rawTSS" class="form-control" value="20" step="1" min="0">
+              <span class="field-hint">Used for coagulant sludge production modeling</span>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary" onclick="calcAlumDosing()">Calculate Coagulant Feed &amp; Stoichiometry</button>
+        </div>
+
+        <div id="alumResults" class="results-box" style="display:none;margin-top:1.5rem;">
+          <h3 class="results-title">Coagulant Feed Sizing &amp; Dosing Summary</h3>
+          <div class="result-grid">
+            <div class="result-card">
+              <div class="result-label">Dry Alum Mass Rate</div>
+              <div class="result-value highlight" id="resDryMass">--</div>
+              <div class="result-subtext" id="resDryMassAlt">--</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Liquid Feed Rate (Per Pump)</div>
+              <div class="result-value highlight" id="resPumpCalibration">--</div>
+              <div class="result-subtext" id="resPumpCalibrationAlt">--</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Commercial Liquid Volume</div>
+              <div class="result-value" id="resLiquidVol">--</div>
+              <div class="result-subtext" id="resLiquidVolDay">--</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Residual Alkalinity</div>
+              <div class="result-value" id="resResidAlk">--</div>
+              <div class="result-subtext" id="resAlkStatus">--</div>
+            </div>
+          </div>
+
+          <div class="result-details" style="margin-top:1rem;padding:1rem;background:var(--card-bg);border-radius:6px;border:1px solid var(--border-light);">
+            <h4 style="margin-top:0;">Chemical Consumption &amp; Sludge Diagnostics</h4>
+            <ul style="margin-bottom:0;line-height:1.7;">
+              <li><strong>Alkalinity Consumed:</strong> <span id="resConsumedAlk">--</span></li>
+              <li><strong>Supplemental Lime/Caustic Need:</strong> <span id="resSupplNeed">--</span></li>
+              <li><strong>Estimated Dry Sludge Production:</strong> <span id="resDrySludge">--</span></li>
+              <li><strong>Daily Bulk Chemical Storage Usage:</strong> <span id="resStorageUsage">--</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🧪</span>
+            <h3 class="widget-title">Related Chemical & Water Treatment</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="chlorine-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Chlorine Dosing Calculator</a></li>
+            <li><a href="chemical-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Chemical Dosing Rate Calculator</a></li>
+            <li><a href="pipe-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pipe Sizing & Water Flow</a></li>
+            <li><a href="cooling-load-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cooling Load (HVAC) Sizing</a></li>
+            <li><a href="alum-dosing-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Alum Dosing & Coagulation Feed</a></li>
+            <li><a href="boyles-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Boyle's Gas Law (P₁V₁=P₂V₂)</a></li>
+            <li><a href="calcium-hypochlorite-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calcium Hypochlorite (HTH 68%)</a></li>
+            <li><a href="caustic-soda-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Caustic Soda (NaOH) Dosing</a></li>
+            <li><a href="charles-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Charles's Law (V₁/T₁=V₂/T₂)</a></li>
+            <li><a href="chlorine-dioxide-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Chlorine Dioxide (ClO₂) Oxidation</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="chemical.html" class="sidebar-category-link">View All Chemical & Water Treatment Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Technical Educational Article Body (1000+ Words) -->
+    <article class="article-body">
+      <h2>Principles of Coagulation Chemistry Using Aluminum Sulfate</h2>
+      <p>Coagulation and flocculation represent the primary physicochemical barrier in surface water and wastewater clarification facilities. Natural raw waters contain suspended colloidal solids, clay minerals, microorganisms, and natural organic matter (NOM) that carry negative surface electrostatic charges (&zeta;-potential typically between &minus;15 mV and &minus;30 mV). Mutual electrical repulsion prevents these microscopic particles from aggregating, maintaining a permanent colloidal suspension.</p>
+
+      <p>Aluminum sulfate—commonly referred to in municipal water engineering as <strong>alum</strong> with empirical formula $\text{Al}_2(\text{SO}_4)_3 \cdot 14\text{H}_2\text{O}$ (molecular weight approximately $594.4\text{ g/mol}$)—acts as a multi-functional trivalent coagulant. When introduced into raw water, aluminum ions undergo instantaneous hydration and hydrolysis, generating a dynamic distribution of monomeric, polymeric, and amorphous precipitate species governed by pH, temperature, and mixing energy.</p>
+
+      <h2>Two Primary Coagulation Mechanisms: Charge Neutralization vs. Sweep Floc</h2>
+      <p>Depending on the coagulant dosage and aqueous pH regime, alum functions through two fundamental pathways:</p>
+      <ul>
+        <li><strong>Charge Neutralization / Adsorption (Lower Dose, pH 4.5 &ndash; 5.5):</strong> At acidic pH, positively charged hydrolyzed aluminum monomers and polymers (such as $\text{AlOH}^{2+}$, $\text{Al}_2(\text{OH})_2^{4+}$, and the tridecameric Keggin ion $\text{Al}_{13}\text{O}_4(\text{OH})_{24}^{7+}$) adsorb onto negatively charged colloidal surfaces, compressing the electrical double layer and collapsing the zeta potential toward zero. Under-dosing leaves particles negatively charged; over-dosing causes charge reversal and restabilization.</li>
+        <li><strong>Sweep Floc Coagulation (Higher Dose, pH 5.8 &ndash; 7.2):</strong> At municipal operating pH and typical dosages (&gt;15 mg/L), alum rapidly supersaturates with respect to amorphous aluminum hydroxide precipitate:
+        $$\text{Al}_2(\text{SO}_4)_3 \cdot 14\text{H}_2\text{O} + 6\text{HCO}_3^- \longrightarrow 2\text{Al(OH)}_3\downarrow + 3\text{SO}_4^{2-} + 6\text{CO}_2 + 14\text{H}_2\text{O}$$
+        The resulting sticky, volumetric $\text{Al(OH)}_3$ gel sweeps through the water column, physically entrapping suspended silts, algae, and colloidal color compounds as it settles.</li>
+      </ul>
+
+      <h2>Governing Mathematical Formulas for Alum Feed Systems</h2>
+      <p>The calculation framework translates raw water volumetric flow rates ($Q$) and jar-tested target chemical dosages ($C_{\text{dose}}$) into physical pump feed rates and storage consumption.</p>
+
+      <p>The daily dry chemical demand in US standard waterworks units is:</p>
+      <div class="formula-box">
+        $$\text{Feed Rate}_{\text{dry}} \, (\text{lb/day}) = Q \, (\text{MGD}) \times C_{\text{dose}} \, (\text{mg/L}) \times 8.34 \, \left(\frac{\text{lb/Mgal}}{\text{mg/L}}\right)$$
+      </div>
+
+      <p>In metric SI engineering units:</p>
+      <div class="formula-box">
+        $$\text{Feed Rate}_{\text{dry}} \, (\text{kg/day}) = \frac{Q \, (\text{m}^3/\text{day}) \times C_{\text{dose}} \, (\text{g/m}^3)}{1,000}$$
+      </div>
+
+      <p>Because commercial water utilities almost universally handle liquid alum delivered in bulk tankers, the liquid volumetric feed rate ($Q_{\text{liquid}}$) must account for solution specific gravity ($SG$) and dry chemical weight fraction ($w$):</p>
+      <div class="formula-box">
+        $$\text{Concentration}_{\text{liquid}} = 8.34 \times SG \times w \quad (\text{lb dry alum per gallon of solution})$$
+      </div>
+      <p>For standard AWWA B403 commercial liquid alum ($SG = 1.33, w = 0.485$):</p>
+      <div class="formula-box">
+        $$\text{Concentration}_{\text{liquid}} = 8.34 \times 1.33 \times 0.485 \approx 5.38 \, \text{lb dry alum/gal (or } 645 \, \text{g dry/L)}$$
+      </div>
+
+      <p>The liquid volumetric feed rate delivered by the metering pumps is therefore:</p>
+      <div class="formula-box">
+        $$Q_{\text{liquid}} \, (\text{gal/day}) = \frac{\text{Feed Rate}_{\text{dry}} \, (\text{lb/day})}{5.38 \, \text{lb/gal}}, \quad Q_{\text{liquid}} \, (\text{GPH}) = \frac{Q_{\text{liquid}} \, (\text{gal/day})}{24}$$
+      </div>
+
+      <p>For chemical pump stroke calibration using a graduated draw-down calibration cylinder (graduated in milliliters), the instantaneous volumetric rate is:</p>
+      <div class="formula-box">
+        $$\text{Pump Drawdown Rate} \, (\text{mL/min}) = \frac{Q_{\text{liquid}} \, (\text{gal/day}) \times 3,785.41 \, \text{mL/gal}}{1,440 \, \text{min/day}} = Q_{\text{liquid}} \, (\text{GPD}) \times 2.6288$$
+      </div>
+
+      <h2>Stoichiometric Alkalinity Consumption and pH Control</h2>
+      <p>Every mole of aluminum sulfate reacts stoichiometrically with six moles of bicarbonate alkalinity ($\text{HCO}_3^-$). Evaluating the molar ratio reveals the exact chemical consumption:</p>
+      <div class="formula-box">
+        $$\text{Ratio} = \frac{3 \times \text{MW}_{\text{CaCO}_3}}{\text{MW}_{\text{Alum}}} = \frac{3 \times 100.09}{594.4} = 0.505 \, \frac{\text{mg/L alkalinity as CaCO}_3}{\text{mg/L dry alum}}$$
+      </div>
+      <p>Thus, each $1.0\text{ mg/L}$ of dry alum dosed removes $0.505\text{ mg/L}$ of alkalinity. If raw water alkalinity is insufficient, the pH drops precipitously, destabilizing floc and causing elevated dissolved aluminum residuals (&gt;0.20 mg/L) that violate the EPA Secondary Maximum Contaminant Level (SMCL). In such conditions, supplemental alkalinity must be fed:</p>
+      <ul>
+        <li><strong>Hydrated Lime ($\text{Ca(OH)}_2$, 74.09 g/mol):</strong> $1.0\text{ mg/L}$ dry alum requires $0.374\text{ mg/L}$ pure $\text{Ca(OH)}_2$ for neutral balance.</li>
+        <li><strong>Caustic Soda ($\text{NaOH}$, 40.00 g/mol):</strong> $1.0\text{ mg/L}$ dry alum requires $0.404\text{ mg/L}$ $100\%\text{ NaOH}$ ($0.808\text{ mg/L}$ of $50\%\text{ NaOH}$).</li>
+        <li><strong>Soda Ash ($\text{Na}_2\text{CO}_3$, 105.99 g/mol):</strong> $1.0\text{ mg/L}$ dry alum requires $0.535\text{ mg/L}$ soda ash.</li>
+      </ul>
+
+      <h2>Coagulant Sludge Production Modeling</h2>
+      <p>Alum sludge generated in sedimentation basins and backwash holding lagoons consists of both precipitated aluminum hydroxide flocs and removed raw water suspended solids:</p>
+      <div class="formula-box">
+        $$W_{\text{sludge, dry}} \, (\text{lb/day}) = Q \, (\text{MGD}) \times \left(0.263 \times C_{\text{dose}} + 1.0 \times \text{TSS}_{\text{removed}}\right) \times 8.34$$
+      </div>
+      <p>Where $0.263$ represents the stoichiometric ratio of dry $\text{Al(OH)}_3$ solids generated per unit mass of commercial alum $(\frac{2 \times 78.0}{594.4} \approx 0.263)$.</p>
+
+      <h2>Alum Dosing Benchmark Table Across Raw Water Quality Regimes</h2>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Water Quality Regime</th>
+              <th>Raw Turbidity (NTU)</th>
+              <th>TOC / True Color (mg/L / Pt-Co)</th>
+              <th>Typical Alum Dose (mg/L)</th>
+              <th>Alkalinity Consumed (mg/L CaCO₃)</th>
+              <th>Recommended Coagulation pH</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Low Turbidity, Low Color (Protected Aquifer/Lake)</td>
+              <td>0.5 &ndash; 3.0</td>
+              <td>&lt; 2.0 / &lt; 5</td>
+              <td>8 &ndash; 15</td>
+              <td>4.0 &ndash; 7.6</td>
+              <td>6.8 &ndash; 7.2</td>
+            </tr>
+            <tr>
+              <td>Moderate Surface Water (Typical Reservoir)</td>
+              <td>5.0 &ndash; 25</td>
+              <td>2.5 &ndash; 6.0 / 10 &ndash; 25</td>
+              <td>18 &ndash; 35</td>
+              <td>9.1 &ndash; 17.7</td>
+              <td>6.4 &ndash; 6.9</td>
+            </tr>
+            <tr>
+              <td>Storm Runoff / River Flash Flood</td>
+              <td>50 &ndash; 250</td>
+              <td>6.0 &ndash; 15 / 30 &ndash; 80</td>
+              <td>40 &ndash; 75</td>
+              <td>20.2 &ndash; 37.9</td>
+              <td>6.0 &ndash; 6.5</td>
+            </tr>
+            <tr>
+              <td>High Organic Carbon / Humic Swamp Water</td>
+              <td>2.0 &ndash; 10</td>
+              <td>8.0 &ndash; 25 / 50 &ndash; 150</td>
+              <td>35 &ndash; 65 (Enhanced Coagulation)</td>
+              <td>17.7 &ndash; 32.8</td>
+              <td>5.5 &ndash; 6.2</td>
+            </tr>
+            <tr>
+              <td>Cold Winter Water (&lt; 4°C / 39°F)</td>
+              <td>2.0 &ndash; 15</td>
+              <td>3.0 &ndash; 8.0 / 15 &ndash; 30</td>
+              <td>25 &ndash; 45 (+ Polymer Aid)</td>
+              <td>12.6 &ndash; 22.7</td>
+              <td>6.5 &ndash; 7.0</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Practical Worked Case Study: 10 MGD Municipal Clarification Facility</h2>
+      <div class="worked-example-card">
+        <h3>Engineering Design Example: River Intake Flash Runoff Event</h3>
+        <p><strong>Treatment Plant Context:</strong> A conventional surface water treatment facility treats an intake flow of $10.0\text{ MGD}$. A sudden upstream rain event increases river turbidity to $45\text{ NTU}$ and total organic carbon to $5.5\text{ mg/L}$. Raw water total alkalinity is measured at $50.0\text{ mg/L as CaCO}_3$. Jar tests establish an optimum dry alum dosage of $32.0\text{ mg/L}$. The plant utilizes commercial liquid alum with specific gravity $1.33$ and $48.5\%$ concentration ($5.38\text{ lb dry alum/gal}$). Two chemical metering pumps operate in parallel duty.</p>
+
+        <p><strong>Step 1: Calculate Daily Dry Chemical Mass:</strong></p>
+        $$\text{Mass Rate}_{\text{dry}} = 10.0\text{ MGD} \times 32.0\text{ mg/L} \times 8.34 = 2,668.8\text{ lb/day dry alum (1,210.5 kg/day)}$$
+
+        <p><strong>Step 2: Determine Commercial Liquid Volumetric Delivery:</strong></p>
+        $$Q_{\text{liquid}} = \frac{2,668.8\text{ lb/day}}{5.38\text{ lb/gal}} = 496.06\text{ gal/day}$$
+        $$\text{Hourly Feed Rate} = \frac{496.06\text{ GPD}}{24\text{ hours}} = 20.67\text{ GPH}$$
+
+        <p><strong>Step 3: Diaphragm Metering Pump Calibration Rate:</strong></p>
+        <p>For two duty metering pumps splitting the load evenly:</p>
+        $$\text{Flow per Pump} = \frac{496.06\text{ GPD}}{2} = 248.03\text{ GPD (10.33 GPH)}$$
+        $$\text{Calibration Drawdown per Pump} = 248.03 \times 2.6288 = 652.0\text{ mL/min}$$
+
+        <p><strong>Step 4: Stoichiometric Alkalinity Destruction &amp; Residual Verification:</strong></p>
+        $$\text{Alkalinity Consumed} = 32.0\text{ mg/L} \times 0.505 = 16.16\text{ mg/L as CaCO}_3$$
+        $$\text{Residual Alkalinity} = 50.0 - 16.16 = 33.84\text{ mg/L as CaCO}_3$$
+        <p>Because residual alkalinity remains above the critical $30\text{ mg/L}$ floor, finished water pH remains stable without mandatory supplemental lime feed, though pre-lime readiness is advised if river alkalinity drops further.</p>
+
+        <p><strong>Step 5: Coagulation Sludge Solids Generation:</strong></p>
+        <p>Assuming 95% turbidity/TSS removal ($45 \times 0.95 = 42.75\text{ mg/L}$):</p>
+        $$W_{\text{sludge}} = 10.0 \times \left(0.263 \times 32.0 + 42.75\right) \times 8.34 = 10.0 \times (8.416 + 42.75) \times 8.34 = 4,267.2\text{ lb/day dry solids}$$
+      </div>
+
+      <h2>Operational Guidelines and Storage Specifications</h2>
+      <p>Handling and applying liquid aluminum sulfate requires careful engineering design:</p>
+      <ul>
+        <li><strong>Crystallization Temperature:</strong> Commercial liquid alum has a freezing point of roughly &minus;13&deg;C (8&deg;F) to &minus;15&deg;C (5&deg;F). In northern climates, outdoor chemical bulk storage tanks require heat tracing and insulation to prevent viscous crystallization in pipe headers.</li>
+        <li><strong>Corrosion Resistance Materials:</strong> Alum solutions have an acidic pH between 2.1 and 2.7. All wetted piping, metering heads, valves, and tank linings must be constructed from non-metallic materials (HDPE, cross-linked polyethylene XLPE, PVDF, PTFE, or FRP) or high-grade alloys (Hastelloy C, Carpenter 20). Standard 304 or 316 stainless steels suffer rapid pitting and chloride-induced stress corrosion.</li>
+        <li><strong>Rapid Flash Mixing:</strong> Coagulant hydrolysis occurs within microseconds (10 to 100 milliseconds). Rapid mixing units (in-line static mixers or high-speed mechanical flash mixers with velocity gradients $G &gt; 700\text{ s}^{-1}$) are mandatory at the point of chemical injection to ensure uniform micro-floc formation prior to slow flocculation ($G = 20\text{ to }70\text{ s}^{-1}$).</li>
+      </ul>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">
+            <span class="logo-icon">&pi;</span>
+            <span class="logo-text">Calc<strong>Hub</strong></span>
+          </div>
+          <p class="footer-about">High-precision chemical, environmental, and water works calculation tools conforming to AWWA, EPA, and Ten State Standards.</p>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Engineering Disciplines</h4>
+          <ul class="footer-links">
+            <li><a href="chemical.html">Chemical &amp; Water Treatment</a></li>
+            <li><a href="civil.html">Civil &amp; Construction</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+            <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Standard References</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.awwa.org" target="_blank" rel="noopener">AWWA B403 (Liquid Alum)</a></li>
+            <li><a href="https://www.epa.gov" target="_blank" rel="noopener">US EPA Surface Water Rules</a></li>
+            <li><a href="https://www.wef.org" target="_blank" rel="noopener">Water Environment Federation</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Free, open, client-side engineering tools.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleAlumForm() {
+      const f = document.getElementById("alumForm").value;
+      document.getElementById("customAlumParams").style.display = (f === "custom") ? "grid" : "none";
+    }
+
+    function toggleFlowUnits() {
+      const u = document.getElementById("flowUnit").value;
+      const lbl = document.getElementById("flowLabel");
+      if (u === "mgd") lbl.textContent = "Raw Water Plant Flow (MGD)";
+      else if (u === "gpm") lbl.textContent = "Raw Water Plant Flow (GPM)";
+      else if (u === "m3h") lbl.textContent = "Raw Water Plant Flow (m³/h)";
+      else if (u === "m3d") lbl.textContent = "Raw Water Plant Flow (m³/day)";
+      else if (u === "lps") lbl.textContent = "Raw Water Plant Flow (L/s)";
+    }
+
+    function calcAlumDosing() {
+      const u = document.getElementById("flowUnit").value;
+      const rawFlowInput = parseFloat(document.getElementById("rawFlow").value) || 0;
+      const dose = parseFloat(document.getElementById("targetDose").value) || 0;
+      const rawAlk = parseFloat(document.getElementById("rawAlkalinity").value) || 0;
+      const form = document.getElementById("alumForm").value;
+      const pumps = parseInt(document.getElementById("pumpTubes").value) || 1;
+      const rawTss = parseFloat(document.getElementById("rawTSS").value) || 0;
+
+      if (rawFlowInput <= 0 || dose <= 0) {
+        alert("Please enter valid positive values for flow and coagulant dosage.");
+        return;
+      }
+
+      // Convert raw flow to MGD and m3/day
+      let flowMGD = 0;
+      let flowM3D = 0;
+      if (u === "mgd") {
+        flowMGD = rawFlowInput;
+        flowM3D = flowMGD * 3785.41;
+      } else if (u === "gpm") {
+        flowMGD = (rawFlowInput * 1440) / 1000000;
+        flowM3D = flowMGD * 3785.41;
+      } else if (u === "m3h") {
+        flowM3D = rawFlowInput * 24;
+        flowMGD = flowM3D / 3785.41;
+      } else if (u === "m3d") {
+        flowM3D = rawFlowInput;
+        flowMGD = flowM3D / 3785.41;
+      } else if (u === "lps") {
+        flowM3D = (rawFlowInput * 86400) / 1000;
+        flowMGD = flowM3D / 3785.41;
+      }
+
+      // Dry alum mass
+      const dryLbsPerDay = flowMGD * dose * 8.34;
+      const dryKgPerDay = (flowM3D * dose) / 1000;
+
+      // Solution parameters
+      let sg = 1.33;
+      let strength = 0.485;
+      if (form === "dry") {
+        sg = 1.0;
+        strength = 1.0;
+      } else if (form === "custom") {
+        sg = parseFloat(document.getElementById("liquidSG").value) || 1.33;
+        strength = (parseFloat(document.getElementById("solStrength").value) || 48.5) / 100;
+      }
+
+      const dryLbsPerGal = 8.34 * sg * strength;
+      const liquidGalPerDay = form === "dry" ? 0 : dryLbsPerDay / dryLbsPerGal;
+      const liquidGPH = liquidGalPerDay / 24;
+      const liquidLitersPerDay = liquidGalPerDay * 3.78541;
+
+      // Pump calibration mL/min per pump
+      const gpdPerPump = liquidGalPerDay / pumps;
+      const mlPerMinPerPump = gpdPerPump * 2.6288;
+      const lphPerPump = (gpdPerPump * 3.78541) / 24;
+
+      // Alkalinity
+      const alkConsumed = dose * 0.505;
+      const residAlk = rawAlk - alkConsumed;
+
+      // Sludge (lb/day)
+      const drySludgeLbs = flowMGD * (dose * 0.263 + rawTss * 0.95) * 8.34;
+      const drySludgeKg = drySludgeLbs * 0.453592;
+
+      // UI Population
+      document.getElementById("resDryMass").textContent = dryLbsPerDay.toFixed(1) + " lbs/day";
+      document.getElementById("resDryMassAlt").textContent = dryKgPerDay.toFixed(1) + " kg/day dry alum";
+
+      if (form === "dry") {
+        document.getElementById("resPumpCalibration").textContent = (dryLbsPerDay / (pumps * 24)).toFixed(2) + " lbs/hr";
+        document.getElementById("resPumpCalibrationAlt").textContent = "Dry feeder speed per hopper";
+        document.getElementById("resLiquidVol").textContent = "N/A (Dry Feeder)";
+        document.getElementById("resLiquidVolDay").textContent = dryLbsPerDay.toFixed(1) + " lbs dry chemical/day";
+      } else {
+        document.getElementById("resPumpCalibration").textContent = mlPerMinPerPump.toFixed(1) + " mL/min";
+        document.getElementById("resPumpCalibrationAlt").textContent = lphPerPump.toFixed(2) + " L/h (" + (liquidGPH / pumps).toFixed(2) + " GPH per pump)";
+        document.getElementById("resLiquidVol").textContent = liquidGPH.toFixed(2) + " GPH";
+        document.getElementById("resLiquidVolDay").textContent = liquidGalPerDay.toFixed(1) + " GPD (" + liquidLitersPerDay.toFixed(1) + " L/day)";
+      }
+
+      document.getElementById("resResidAlk").textContent = residAlk.toFixed(1) + " mg/L";
+      const alkStatus = document.getElementById("resAlkStatus");
+      if (residAlk >= 30) {
+        alkStatus.textContent = "Adequate buffer (Residual >= 30 mg/L)";
+        alkStatus.style.color = "var(--success, #16a34a)";
+      } else if (residAlk > 0) {
+        alkStatus.textContent = "Warning: Marginal buffer (< 30 mg/L). pH drop risk.";
+        alkStatus.style.color = "#ca8a04";
+      } else {
+        alkStatus.textContent = "CRITICAL: Total alkalinity depletion! Immediate caustic/lime feed required.";
+        alkStatus.style.color = "#dc2626";
+      }
+
+      document.getElementById("resConsumedAlk").textContent = alkConsumed.toFixed(1) + " mg/L as CaCO₃ (" + ((alkConsumed / (rawAlk || 1)) * 100).toFixed(0) + "% of raw alkalinity)";
+
+      if (residAlk < 30) {
+        const deficit = 30 - residAlk;
+        const limeNeeded = deficit * 0.74 * flowMGD * 8.34;
+        const causticNeeded = deficit * 0.80 * flowMGD * 8.34;
+        document.getElementById("resSupplNeed").textContent = "Required: " + limeNeeded.toFixed(1) + " lbs/day Lime or " + causticNeeded.toFixed(1) + " lbs/day 100% NaOH to maintain 30 mg/L residual";
+      } else {
+        document.getElementById("resSupplNeed").textContent = "None required. Natural raw buffer maintains stable floc pH.";
+      }
+
+      document.getElementById("resDrySludge").textContent = drySludgeLbs.toFixed(1) + " lbs/day dry solids (" + drySludgeKg.toFixed(1) + " kg/day)";
+      document.getElementById("resStorageUsage").textContent = (liquidGalPerDay * 30).toLocaleString(undefined, {maximumFractionDigits: 0}) + " gal/month liquid storage volume (~" + ((liquidGalPerDay * 30 * 11.1) / 2000).toFixed(1) + " tons)";
+
+      document.getElementById("alumResults").style.display = "block";
+    }
+  </script>
+</body>
+</html>

@@ -172,6 +172,8 @@ CAT_MAP = {
             ("roof-pitch-calculator.html", "Roof Pitch & Rafter Length (IRC Ch. 9)", "🏠", "Pitch X:12, slope angle, area multiplier & rafter length", "Angle = arctan(Rise/Run) | M = √(1 + (X/12)²)"),
             ("slab-concrete-calculator.html", "Slab Concrete Volume (ACI 360R)", "🏗️", "Slab-on-grade, thickened edge footings & saw-cut joints", "V = L·W·T + V_edge | Max Joint Spacing = 24·T"),
             ("slope-calculator.html", "Slope & Grade Calculator (ADAAG 405)", "📐", "Rise/run gradient, % grade, angle & ADA ramp 1:12 compliance", "m = Rise/Run | Grade % = m·100 | ADA max 8.33%"),
+            ("soil-gravel-calculator.html", "Soil & Gravel Volume & Tonnage", "🪨", "Proctor density compaction, loose LCY haulage & quarry tons", "V_loose = V_compacted·(1 + C_f) | Mass = V·ρ"),
+            ("tile-calculator.html", "Tile, Grout & Mortar Sizer (TCNA)", "🔲", "Floor/wall cartons, TCNA joint grout weight & thinset notch", "Grout = [(L+W)·Jw·Jd·ρ] / (L·W) · Area · 1.10"),
         ]
     },
     "chemical.html": {
@@ -179,6 +181,12 @@ CAT_MAP = {
         "tools": [
             ("chlorine-dosing-calculator.html", "Chlorine Dosing Calculator", "💧", "AWWA C651 water disinfection & bleach", "Feed (lbs) = Vol (MGal) × Dose (mg/L) × 8.34"),
             ("chemical-dosing-calculator.html", "Chemical Dosing Rate Calculator", "🧪", "Pump flow LPH & mg/L ppm feed", "Feed Rate (LPH) = (Q × D) ÷ (S × SG × 10000)"),
+            ("alum-dosing-calculator.html", "Alum Dosing & Coagulation Feed", "🧪", "AWWA B403 liquid/dry alum feed, pump mL/min & alkalinity", "Feed (lb/day) = Q (MGD) · Dose (mg/L) · 8.34"),
+            ("boyles-law-calculator.html", "Boyle's Gas Law (P₁V₁=P₂V₂)", "🎈", "Isothermal gas expansion, compression work & compressibility Z", "P₁V₁ = P₂V₂ | W = -P₁V₁·ln(V₂/V₁)"),
+            ("calcium-hypochlorite-dosing-calculator.html", "Calcium Hypochlorite (HTH 68%)", "💧", "AWWA C651 water main shock, 65-70% tablets & CT credit", "Mass = (Vol · Dose · 8.34) / Purity | HOCl speciation"),
+            ("caustic-soda-dosing-calculator.html", "Caustic Soda (NaOH) Dosing", "🧪", "50% & 25% NaOH feed, alkalinity boost & LCR corrosion", "1.0 mg/L NaOH = +1.251 mg/L Alkalinity as CaCO₃"),
+            ("charles-law-calculator.html", "Charles's Law (V₁/T₁=V₂/T₂)", "🌡️", "Isobaric thermal gas expansion, Kelvin scale & boundary work", "V₁/T₁ = V₂/T₂ | W = P·ΔV = nR·ΔT"),
+            ("chlorine-dioxide-dosing-calculator.html", "Chlorine Dioxide (ClO₂) Oxidation", "🔬", "Precursor NaClO₂ feed, Fe/Mn removal & EPA chlorite cap", "2 NaClO₂ + Cl₂ ➔ 2 ClO₂ + 2 NaCl | DBP cap 0.8 mg/L"),
         ]
     },
     "fire-safety.html": {

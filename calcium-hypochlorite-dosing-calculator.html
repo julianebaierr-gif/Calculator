@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calcium Hypochlorite Dosing Calculator | HTH Granular &amp; Tablet Sizer</title>
+  <meta name="description" content="Calculate calcium hypochlorite (HTH 65-70%) chemical mass, tablet counts, batch slug and shock chlorination dosages per AWWA C651, C652, and EPA standards.">
+  <link rel="canonical" href="https://calchub.cloud/calcium-hypochlorite-dosing-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Calcium Hypochlorite Dosing Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates dry calcium hypochlorite granular and tablet quantities for continuous water disinfection, pipeline shock chlorination, and storage tank sanitization per AWWA guidelines.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What percentage of available chlorine is contained in commercial calcium hypochlorite?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Commercial high-test hypochlorite (HTH) granular or tablet products typically contain between 65% and 70% available chlorine by weight (nominally 68%). Standard calcium hypochlorite has the chemical formula Ca(OCl)2 with a molecular weight of 142.98 g/mol."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is calcium hypochlorite mass calculated for a water volume and target dosage?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The required dry chemical mass is determined by dividing the pure chlorine demand by the available chlorine fraction: Mass (lbs) = [Volume (Million Gallons) * Target Dose (mg/L) * 8.34 lb/gal] / (% Available Chlorine / 100). In metric units: Mass (kg) = [Volume (m3) * Target Dose (g/m3)] / [1,000 * (% Available Chlorine / 100)]."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the standard AWWA C651 disinfection dosage options for new water mains?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "AWWA C651 recognizes three methods: 1) Continuous Feed Method: 25 mg/L free chlorine maintained for 24 hours with minimum 10 mg/L residual remaining. 2) Slug Method: 100 mg/L free chlorine moved slowly through the pipe with minimum 3-hour contact time. 3) Tablet/Granular Method: Granules or 5g tablets pre-placed in pipe joints during construction, filled to yield >= 25 mg/L after 24 hours."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does water pH affect the biocidal efficacy of hypochlorite solutions?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "When calcium hypochlorite dissolves, it forms hypochlorous acid (HOCl) and hypochlorite ions (OCl-). HOCl is 80 to 100 times more potent as a disinfectant than OCl-. At pH 6.5, roughly 90% exists as HOCl; at pH 7.5, it is 50% HOCl; and at pH 8.5, only 10% remains as HOCl, requiring higher contact times (CT) to achieve equivalent pathogen inactivation."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="chemical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="chemical.html">Chemical &amp; Water Treatment</a> &rsaquo; 
+      <span>Calcium Hypochlorite Dosing Calculator</span>
+    </nav>
+
+    <h1 class="tool-title">Calcium Hypochlorite (HTH) Dosing Calculator</h1>
+    <p class="tool-subtitle">Dry Granular &amp; Tablet Sizing, AWWA C651 Pipeline Shock &amp; Storage Tank Disinfection</p>
+
+    <div class="calculator-layout">
+      <!-- Calculator Core Interface -->
+      <div class="calculator-card">
+        <div class="calc-form">
+          <div class="form-group">
+            <label for="appMode">Disinfection Application Type</label>
+            <select id="appMode" class="form-control" onchange="updateDosePreset()">
+              <option value="water_main_cont" selected>AWWA C651 Water Main Continuous Feed (25 mg/L, 24-hr hold)</option>
+              <option value="water_main_slug">AWWA C651 Water Main Slug Method (100 mg/L, 3-hr contact)</option>
+              <option value="tank_spray">AWWA C652 Water Storage Tank Spray Method (200 mg/L)</option>
+              <option value="tank_fill">AWWA C652 Storage Tank Full Fill Method (10 mg/L, 24-hr)</option>
+              <option value="well_shock">Emergency Well Casing Shock Chlorination (50&ndash;200 mg/L)</option>
+              <option value="potable_cont">Continuous Potable Water Supply Chlorination (1.5&ndash;3.0 mg/L)</option>
+              <option value="custom">Custom Target Free Chlorine Dose</option>
+            </select>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="calcMode">Volume Basis</label>
+              <select id="calcMode" class="form-control" onchange="toggleVolInputs()">
+                <option value="direct_gal" selected>Direct Water Volume (Gallons)</option>
+                <option value="direct_m3">Direct Water Volume (Cubic Meters / Liters)</option>
+                <option value="pipe_dims">Pipeline Dimensions (Diameter &amp; Length)</option>
+                <option value="flow_mgd">Continuous Flow Stream (MGD / GPM)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="hthPurity">Commercial HTH Available Chlorine (%)</label>
+              <select id="hthPurity" class="form-control">
+                <option value="65">65% Available Chlorine (Standard Granular)</option>
+                <option value="68" selected>68% Available Chlorine (Commercial Premium HTH)</option>
+                <option value="70">70% Available Chlorine (High-Grade Briquettes/Tablets)</option>
+                <option value="60">60% Available Chlorine (Commercial Blend)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Direct Volume Inputs -->
+          <div id="directGalGroup" class="form-group">
+            <label for="volGallons">Total Water Volume to Disinfect (Gallons)</label>
+            <input type="number" id="volGallons" class="form-control" value="50000" step="1000" min="1">
+          </div>
+
+          <div id="directM3Group" class="form-group" style="display:none;">
+            <label for="volM3">Total Water Volume to Disinfect (m³)</label>
+            <input type="number" id="volM3" class="form-control" value="190" step="5" min="0.1">
+          </div>
+
+          <!-- Pipeline Inputs -->
+          <div id="pipeGroup" class="grid-2-col" style="display:none;">
+            <div class="form-group">
+              <label for="pipeDia">Internal Pipe Diameter (Inches)</label>
+              <input type="number" id="pipeDia" class="form-control" value="12" step="1" min="1">
+            </div>
+            <div class="form-group">
+              <label for="pipeLen">Total Pipeline Length (Feet)</label>
+              <input type="number" id="pipeLen" class="form-control" value="2000" step="50" min="1">
+            </div>
+          </div>
+
+          <!-- Flow Inputs -->
+          <div id="flowGroup" class="grid-2-col" style="display:none;">
+            <div class="form-group">
+              <label for="contFlowVal">Continuous Water Flow Rate</label>
+              <input type="number" id="contFlowVal" class="form-control" value="1.0" step="0.1" min="0.01">
+            </div>
+            <div class="form-group">
+              <label for="contFlowUnit">Flow Rate Units</label>
+              <select id="contFlowUnit" class="form-control">
+                <option value="mgd" selected>MGD (Million Gallons / Day)</option>
+                <option value="gpm">GPM (Gallons / Minute)</option>
+                <option value="m3h">m³/hour</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="targetPpm">Target Free Available Chlorine (mg/L or ppm)</label>
+              <input type="number" id="targetPpm" class="form-control" value="25.0" step="0.5" min="0.1">
+            </div>
+            <div class="form-group">
+              <label for="waterPh">Estimated Water pH</label>
+              <input type="number" id="waterPh" class="form-control" value="7.4" step="0.1" min="4.0" max="11.0">
+              <span class="field-hint">Governs HOCl vs OCl⁻ biocidal speciation</span>
+            </div>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="tabletWeight">Tablet Size Option (grams per tablet)</label>
+              <select id="tabletWeight" class="form-control">
+                <option value="5" selected>5 gram Tablets (Standard AWWA C651 pre-placement)</option>
+                <option value="20">20 gram Briquettes / Tablets</option>
+                <option value="200">200 gram (7 oz) Slow-Dissolve Puck / Stick</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="hthCostPerLb">Granular HTH Price ($ / lb)</label>
+              <input type="number" id="hthCostPerLb" class="form-control" value="3.25" step="0.10" min="0">
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary" onclick="calcCalciumHypo()">Calculate Hypochlorite Chemical Quantities</button>
+        </div>
+
+        <div id="hypoResults" class="results-box" style="display:none;margin-top:1.5rem;">
+          <h3 class="results-title">Calcium Hypochlorite Dosage Breakdown</h3>
+          <div class="result-grid">
+            <div class="result-card">
+              <div class="result-label">Pure Chlorine Equivalent Demand</div>
+              <div class="result-value" id="resPureCl2">--</div>
+              <div class="result-subtext" id="resPureCl2Alt">--</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Required Dry HTH Mass</div>
+              <div class="result-value highlight" id="resDryHth">--</div>
+              <div class="result-subtext" id="resDryHthAlt">--</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Tablet Equivalent Count</div>
+              <div class="result-value highlight" id="resTabletCount">--</div>
+              <div class="result-subtext" id="resTabletDesc">--</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Active HOCl Fraction</div>
+              <div class="result-value" id="resHoclFrac">--</div>
+              <div class="result-subtext" id="resHoclDesc">Potent biocidal speciation</div>
+            </div>
+          </div>
+
+          <div class="result-details" style="margin-top:1rem;padding:1rem;background:var(--card-bg);border-radius:6px;border:1px solid var(--border-light);">
+            <h4 style="margin-top:0;">Volume &amp; Disinfection Analytics</h4>
+            <ul style="margin-bottom:0;line-height:1.7;">
+              <li><strong>Total Water Volume:</strong> <span id="resTotalVol">--</span></li>
+              <li><strong>Standard Packaging Requirement:</strong> <span id="resPackaging">--</span></li>
+              <li><strong>Estimated Chemical Cost:</strong> <span id="resTotalCost" style="font-weight:700;color:var(--primary);">--</span></li>
+              <li><strong>EPA CT Inactivation Metric:</strong> <span id="resCtMetric">--</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🧪</span>
+            <h3 class="widget-title">Related Chemical & Water Treatment</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="chlorine-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Chlorine Dosing Calculator</a></li>
+            <li><a href="chemical-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Chemical Dosing Rate Calculator</a></li>
+            <li><a href="pipe-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pipe Sizing & Water Flow</a></li>
+            <li><a href="cooling-load-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cooling Load (HVAC) Sizing</a></li>
+            <li><a href="alum-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Alum Dosing & Coagulation Feed</a></li>
+            <li><a href="boyles-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Boyle's Gas Law (P₁V₁=P₂V₂)</a></li>
+            <li><a href="calcium-hypochlorite-dosing-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Calcium Hypochlorite (HTH 68%)</a></li>
+            <li><a href="caustic-soda-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Caustic Soda (NaOH) Dosing</a></li>
+            <li><a href="charles-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Charles's Law (V₁/T₁=V₂/T₂)</a></li>
+            <li><a href="chlorine-dioxide-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Chlorine Dioxide (ClO₂) Oxidation</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="chemical.html" class="sidebar-category-link">View All Chemical & Water Treatment Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Technical Educational Article Body (1000+ Words) -->
+    <article class="article-body">
+      <h2>Physical Chemistry and Industrial Specifications of Calcium Hypochlorite</h2>
+      <p>Calcium hypochlorite—commercially recognized in municipal water engineering as <strong>high-test hypochlorite (HTH)</strong>—is a dry, white crystalline solid with the chemical formula $\text{Ca(OCl)}_2$ and a formula weight of $142.98\text{ g/mol}$. Unlike liquid sodium hypochlorite ($\text{NaOCl}$, commercial bleach), which decomposes rapidly under warm ambient temperatures (losing up to 50% of its active chlorine strength within 60 to 90 days), solid calcium hypochlorite remains exceptionally stable in moisture-tight containers, retaining roughly 65% to 70% available chlorine content over multi-year storage periods.</p>
+
+      <p>Because of its dense chlorine potency ($1.0\text{ lb}$ of $68\%\text{ HTH}$ provides equivalent oxidizing power to $0.68\text{ lb}$ of compressed liquefied elemental chlorine gas $\text{Cl}_2$ or roughly $5.5\text{ lbs}$ of standard $12.5\%\text{ NaOCl}$ liquid), calcium hypochlorite serves as the universal standard chemical for remote wellhead disinfection, emergency disaster relief sanitization, municipal water storage reservoir rehabilitation, and AWWA C651 disinfection of newly constructed water distribution mains.</p>
+
+      <h2>Aqueous Dissociation Chemistry and pH-Dependent Speciation</h2>
+      <p>When dry calcium hypochlorite granules or compressed briquettes dissolve in aqueous solution, complete dissociation occurs:</p>
+
+      <div class="formula-box">
+        $$\text{Ca(OCl)}_2\text{ (s)} + 2\text{H}_2\text{O} \longrightarrow \text{Ca}^{2+} + 2\text{HOCl} + 2\text{OH}^-$$
+      </div>
+
+      <p>The resulting hypochlorous acid ($\text{HOCl}$) establishes an immediate thermodynamic proton exchange equilibrium with the hypochlorite anion ($\text{OCl}^-$):</p>
+
+      <div class="formula-box">
+        $$\text{HOCl} \rightleftharpoons \text{H}^+ + \text{OCl}^- \quad (pK_a = 7.54 \text{ at } 25^\circ\text{C})$$
+      </div>
+
+      <p>This equilibrium is critical for disinfection efficacy because uncharged hypochlorous acid ($\text{HOCl}$) penetrates neutral bacterial cell membranes and viral capsids approximately <strong>80 to 100 times faster</strong> than the negatively charged hypochlorite ion ($\text{OCl}^-$), which suffers electrostatic repulsion by the negatively charged bacterial peptidoglycan wall. The fractional distribution of active $\text{HOCl}$ is governed rigorously by aqueous pH:</p>
+
+      <div class="formula-box">
+        $$\alpha_{\text{HOCl}} = \frac{[\text{HOCl}]}{[\text{HOCl}] + [\text{OCl}^-]} = \frac{1}{1 + 10^{\text{pH} - pK_a}} = \frac{1}{1 + 10^{\text{pH} - 7.54}}$$
+      </div>
+
+      <p>At $\text{pH } 6.5$, over $91\%$ of free available chlorine exists in the potent $\text{HOCl}$ state. At neutral $\text{pH } 7.54$, the solution is evenly split ($50\% \text{ HOCl} : 50\% \text{ OCl}^-$). By $\text{pH } 8.5$, only $9.9\%$ remains as $\text{HOCl}$, requiring significantly elevated disinfectant contact times ($CT$) to achieve regulatory compliance under the EPA Surface Water Treatment Rule.</p>
+
+      <h2>Mathematical Formulas for Hypochlorite Dosage and Mass Sizing</h2>
+      <p>The standard dosage equation relates volumetric water demand ($V$), target free chlorine concentration ($C_{\text{FAC}}$, in mg/L or ppm), and commercial chemical purity ($P_{\text{HTH}}$, expressed as a decimal fraction):</p>
+
+      <p>In US Customary units for a batch volume of water:</p>
+      <div class="formula-box">
+        $$W_{\text{pure Cl}_2} \, (\text{lb}) = \frac{V \, (\text{gallons})}{1,000,000} \times C_{\text{FAC}} \, (\text{mg/L}) \times 8.34 \, \left(\frac{\text{lb/Mgal}}{\text{mg/L}}\right)$$
+        $$W_{\text{HTH}} \, (\text{lb}) = \frac{W_{\text{pure Cl}_2}}{P_{\text{HTH}}}$$
+      </div>
+
+      <p>In metric SI units:</p>
+      <div class="formula-box">
+        $$W_{\text{HTH}} \, (\text{kg}) = \frac{V \, (\text{m}^3) \times C_{\text{FAC}} \, (\text{g/m}^3)}{1,000 \times P_{\text{HTH}}}$$
+      </div>
+
+      <p>For pipeline disinfection where water volume must be calculated from internal pipe geometry:</p>
+      <div class="formula-box">
+        $$V_{\text{pipe}} \, (\text{gallons}) = \frac{\pi \times (D_{\text{in}} / 12)^2}{4} \times L_{\text{ft}} \times 7.48052 \approx 0.0408 \times D_{\text{in}}^2 \times L_{\text{ft}}$$
+      </div>
+
+      <p>When pre-placing tablets in pipeline joints during construction per AWWA C651 Section 4.4.2, the number of 5-gram tablets ($N_{\text{tabs}}$) required per pipe section (typically $18\text{ or }20\text{ ft}$ lengths) is:</p>
+      <div class="formula-box">
+        $$N_{\text{tabs}} = \left\lceil \frac{W_{\text{HTH}} \, (\text{grams})}{5.0 \, \text{g/tab}} \right\rceil = \left\lceil \frac{W_{\text{HTH}} \, (\text{lb}) \times 453.592}{5.0} \right\rceil$$
+      </div>
+
+      <h2>AWWA Disinfection Standards Comparison Table</h2>
+      <p>The American Water Works Association (AWWA) establishes mandatory minimum disinfection dosages, holding durations, and residual testing criteria across distribution infrastructure:</p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Standard Specification</th>
+              <th>Infrastructure Type</th>
+              <th>Disinfection Method</th>
+              <th>Initial Target Chlorine (mg/L)</th>
+              <th>Minimum Contact Time</th>
+              <th>Minimum Final Residual (mg/L)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>AWWA C651 Sec 4.4.3</td>
+              <td>New Water Mains</td>
+              <td>Continuous Feed</td>
+              <td>25.0 &ndash; 50.0</td>
+              <td>24 Hours</td>
+              <td>&ge; 10.0 mg/L</td>
+            </tr>
+            <tr>
+              <td>AWWA C651 Sec 4.4.4</td>
+              <td>New Water Mains</td>
+              <td>Slug Method</td>
+              <td>100.0</td>
+              <td>3 Hours</td>
+              <td>&ge; 50.0 mg/L</td>
+            </tr>
+            <tr>
+              <td>AWWA C651 Sec 4.4.2</td>
+              <td>Small Pipes (&le; 24")</td>
+              <td>Tablet Pre-placement</td>
+              <td>&ge; 25.0</td>
+              <td>24 Hours</td>
+              <td>&ge; 10.0 mg/L</td>
+            </tr>
+            <tr>
+              <td>AWWA C652 Method 1</td>
+              <td>Finished Water Reservoirs</td>
+              <td>Complete Fill</td>
+              <td>10.0</td>
+              <td>24 Hours (or 6h @ 50 mg/L)</td>
+              <td>&ge; 2.0 mg/L</td>
+            </tr>
+            <tr>
+              <td>AWWA C652 Method 2</td>
+              <td>Finished Water Reservoirs</td>
+              <td>Surface Spray / Wash</td>
+              <td>200.0</td>
+              <td>30 Minutes Contact</td>
+              <td>Periodic Rinse Verification</td>
+            </tr>
+            <tr>
+              <td>AWWA C654 Sec 4.2</td>
+              <td>Deep Drinking Wells</td>
+              <td>Casing Shock Slug</td>
+              <td>50.0 &ndash; 100.0</td>
+              <td>12 &ndash; 24 Hours</td>
+              <td>&ge; 10.0 mg/L before pump to waste</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Practical Worked Case Study: Disinfection of 2,400 Feet of 16-Inch Water Main</h2>
+      <div class="worked-example-card">
+        <h3>Engineering Design Example: AWWA C651 Pipeline Commissioning</h3>
+        <p><strong>Project Scope:</strong> A newly installed transmission main consisting of $2,400\text{ linear feet}$ of $16\text{-inch}$ nominal ductile iron pipe (internal diameter $D = 16.0\text{ inches}$) must be disinfected using the AWWA C651 Continuous Feed Method. Specifications dictate a minimum initial free chlorine concentration of $30.0\text{ mg/L}$ held for 24 hours. The contractor utilizes commercial $68\%\text{ available chlorine HTH}$ granular material dissolved into a concentrated stock solution pumped via a portable chemical injection pump. Stock hypochlorite is packaged in $50\text{-lb}$ plastic pails at $\$165.00$ per pail.</p>
+
+        <p><strong>Step 1: Compute Internal Pipeline Water Volume:</strong></p>
+        $$V_{\text{pipe}} = 0.0408 \times (16.0)^2 \times 2,400\text{ ft} = 0.0408 \times 256 \times 2,400 = 25,067.5\text{ gallons}$$
+        <p>In million gallons: $V = 0.02507\text{ Mgal}$ (or $94.89\text{ m}^3$).</p>
+
+        <p><strong>Step 2: Determine Pure Elemental Chlorine Equivalent Demand:</strong></p>
+        $$W_{\text{Cl}_2} = 0.025068\text{ Mgal} \times 30.0\text{ mg/L} \times 8.34 = 6.272\text{ lbs pure }\text{Cl}_2\text{ equivalent (2.845 kg)}$$
+
+        <p><strong>Step 3: Calculate Required Mass of 68% Calcium Hypochlorite:</strong></p>
+        $$W_{\text{HTH}} = \frac{6.272\text{ lbs}}{0.68} = 9.224\text{ lbs of 68% HTH (4.184 kg)}$$
+
+        <p><strong>Step 4: Alternative Joint Tablet Pre-Placement Check:</strong></p>
+        <p>If pre-placing 5-gram tablets inside pipe joints during installation ($2,400\text{ ft} / 20\text{ ft joints} = 120\text{ pipe joints}$):</p>
+        $$N_{\text{total tablets}} = \left\lceil \frac{9.224\text{ lbs} \times 453.592\text{ g/lb}}{5.0\text{ g/tab}} \right\rceil = \lceil 836.7 \rceil = 837\text{ tablets}$$
+        $$\text{Tablets per 20-ft Pipe Joint} = \frac{837}{120} \approx 7\text{ tablets per joint glued with food-grade adhesive}$$
+
+        <p><strong>Step 5: Chemical Procurement &amp; Cost Estimation:</strong></p>
+        <p>Required dry weight is $9.22\text{ lbs}$. One standard $50\text{-lb}$ pail provides sufficient material for over 5 complete line fills or subsequent hydrostatic re-testing, incurring $\$165.00$ in chemical cost ($\$30.43$ prorated chemical usage).</p>
+      </div>
+
+      <h2>Safe Handling, Storage, and Neutralization Precautions</h2>
+      <p>Calcium hypochlorite is classified under OSHA and NFPA 400 as a <strong>Class 3 Oxidizer</strong>. Safe operational protocols include:</p>
+      <ul>
+        <li><strong>Thermal Decomposition and Fire Hazard:</strong> Unlike table salt or lime, calcium hypochlorite undergoes violent exothermic self-sustained thermal decomposition if exposed to heat ($&gt; 55^\circ\text{C} / 130^\circ\text{F}$), sparks, or small amounts of moisture in an unvented drum. It releases toxic, asphyxiating chlorine gas ($\text{Cl}_2$) and oxygen, which accelerates nearby fires. Store only in cool, well-ventilated dedicated chemical magazines.</li>
+        <li><strong>Organic Incompatibility:</strong> Contact between calcium hypochlorite and trace hydrocarbons (grease, engine oil, diesel, brake fluid, glycol antifreeze) triggers spontaneous combustion and violent deflagration. Never use dirty scoops or petroleum-greased tools when dispensing HTH.</li>
+        <li><strong>Dechlorination Before Environmental Discharge:</strong> Water containing high chlorine residuals ($&gt; 0.2\text{ mg/L}$) cannot be discharged into storm sewers, ditches, or receiving streams per Clean Water Act NPDES permits due to extreme toxicity to aquatic life. Neutralize all chlorinated wash water using chemical dechlorination agents:
+        $$\text{Sodium Thiosulfate: } 1.0\text{ lb } \text{Cl}_2 \text{ requires } 1.1\text{ to } 1.4\text{ lbs } \text{Na}_2\text{S}_2\text{O}_3$$
+        $$\text{Sodium Bisulfite: } 1.0\text{ lb } \text{Cl}_2 \text{ requires } 1.46\text{ lbs } \text{NaHSO}_3$$
+        $$\text{Ascorbic Acid (Vitamin C): } 1.0\text{ lb } \text{Cl}_2 \text{ requires } 2.48\text{ lbs } \text{C}_6\text{H}_8\text{O}_6$$
+        </li>
+      </ul>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">
+            <span class="logo-icon">&pi;</span>
+            <span class="logo-text">Calc<strong>Hub</strong></span>
+          </div>
+          <p class="footer-about">High-precision chemical dosing, water treatment, and pipeline sanitization tools conforming to AWWA, EPA, and Ten State Standards.</p>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Engineering Disciplines</h4>
+          <ul class="footer-links">
+            <li><a href="chemical.html">Chemical &amp; Water Treatment</a></li>
+            <li><a href="civil.html">Civil &amp; Construction</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+            <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Standard References</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.awwa.org" target="_blank" rel="noopener">AWWA C651 (Water Mains)</a></li>
+            <li><a href="https://www.awwa.org" target="_blank" rel="noopener">AWWA C652 (Storage Tanks)</a></li>
+            <li><a href="https://www.epa.gov" target="_blank" rel="noopener">EPA Drinking Water Standards</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Free, open, client-side engineering tools.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function updateDosePreset() {
+      const mode = document.getElementById("appMode").value;
+      const target = document.getElementById("targetPpm");
+      if (mode === "water_main_cont") target.value = 25.0;
+      else if (mode === "water_main_slug") target.value = 100.0;
+      else if (mode === "tank_spray") target.value = 200.0;
+      else if (mode === "tank_fill") target.value = 10.0;
+      else if (mode === "well_shock") target.value = 100.0;
+      else if (mode === "potable_cont") target.value = 2.0;
+    }
+
+    function toggleVolInputs() {
+      const mode = document.getElementById("calcMode").value;
+      document.getElementById("directGalGroup").style.display = mode === "direct_gal" ? "block" : "none";
+      document.getElementById("directM3Group").style.display = mode === "direct_m3" ? "block" : "none";
+      document.getElementById("pipeGroup").style.display = mode === "pipe_dims" ? "grid" : "none";
+      document.getElementById("flowGroup").style.display = mode === "flow_mgd" ? "grid" : "none";
+    }
+
+    function calcCalciumHypo() {
+      const mode = document.getElementById("calcMode").value;
+      const targetPpm = parseFloat(document.getElementById("targetPpm").value) || 0;
+      const purityPct = parseFloat(document.getElementById("hthPurity").value) || 68;
+      const purityFrac = purityPct / 100;
+      const ph = parseFloat(document.getElementById("waterPh").value) || 7.4;
+      const tabWtGrams = parseFloat(document.getElementById("tabletWeight").value) || 5;
+      const costPerLb = parseFloat(document.getElementById("hthCostPerLb").value) || 3.25;
+
+      if (targetPpm <= 0) {
+        alert("Please enter a positive target chlorine dosage.");
+        return;
+      }
+
+      let totalGal = 0;
+      let totalM3 = 0;
+
+      if (mode === "direct_gal") {
+        totalGal = parseFloat(document.getElementById("volGallons").value) || 0;
+        totalM3 = totalGal * 0.00378541;
+      } else if (mode === "direct_m3") {
+        totalM3 = parseFloat(document.getElementById("volM3").value) || 0;
+        totalGal = totalM3 * 264.172;
+      } else if (mode === "pipe_dims") {
+        const dia = parseFloat(document.getElementById("pipeDia").value) || 0;
+        const len = parseFloat(document.getElementById("pipeLen").value) || 0;
+        totalGal = 0.0408 * Math.pow(dia, 2) * len;
+        totalM3 = totalGal * 0.00378541;
+      } else if (mode === "flow_mgd") {
+        const flowVal = parseFloat(document.getElementById("contFlowVal").value) || 0;
+        const flowU = document.getElementById("contFlowUnit").value;
+        if (flowU === "mgd") totalGal = flowVal * 1000000;
+        else if (flowU === "gpm") totalGal = flowVal * 1440;
+        else if (flowU === "m3h") totalGal = flowVal * 24 * 264.172;
+        totalM3 = totalGal * 0.00378541;
+      }
+
+      if (totalGal <= 0) {
+        alert("Water volume or flow rate must be greater than zero.");
+        return;
+      }
+
+      // Calculations
+      const pureCl2Lbs = (totalGal / 1000000) * targetPpm * 8.34;
+      const pureCl2Kg = pureCl2Lbs * 0.453592;
+
+      const dryHthLbs = pureCl2Lbs / purityFrac;
+      const dryHthKg = dryHthLbs * 0.453592;
+
+      const dryHthGrams = dryHthKg * 1000;
+      const totalTablets = Math.ceil(dryHthGrams / tabWtGrams);
+
+      // Speciation HOCl vs OCl- at 25C (pKa = 7.54)
+      const hoclFraction = 1.0 / (1.0 + Math.pow(10, ph - 7.54));
+      const hoclPct = hoclFraction * 100;
+
+      const totalCost = dryHthLbs * costPerLb;
+      const standardPails = (dryHthLbs / 50).toFixed(1);
+
+      // UI update
+      document.getElementById("resPureCl2").textContent = pureCl2Lbs.toFixed(2) + " lbs";
+      document.getElementById("resPureCl2Alt").textContent = pureCl2Kg.toFixed(2) + " kg active Cl₂ equivalent";
+
+      document.getElementById("resDryHth").textContent = dryHthLbs.toFixed(2) + " lbs";
+      document.getElementById("resDryHthAlt").textContent = dryHthKg.toFixed(2) + " kg of " + purityPct + "% HTH";
+
+      document.getElementById("resTabletCount").textContent = totalTablets.toLocaleString() + " tablets";
+      document.getElementById("resTabletDesc").textContent = "@ " + tabWtGrams + "g each (" + (dryHthGrams / 1000).toFixed(2) + " kg total)";
+
+      document.getElementById("resHoclFrac").textContent = hoclPct.toFixed(1) + "% HOCl";
+      document.getElementById("resHoclDesc").textContent = (100 - hoclPct).toFixed(1) + "% OCl⁻ at pH " + ph.toFixed(1);
+
+      document.getElementById("resTotalVol").textContent = totalGal.toLocaleString(undefined, {maximumFractionDigits: 0}) + " Gallons (" + totalM3.toLocaleString(undefined, {maximumFractionDigits: 1}) + " m³)";
+      document.getElementById("resPackaging").textContent = dryHthLbs > 50 ? standardPails + " x 50-lb drums/pails" : (dryHthLbs > 5 ? (dryHthLbs / 5).toFixed(1) + " x 5-lb bottles" : dryHthLbs.toFixed(2) + " lbs bulk loose powder");
+      document.getElementById("resTotalCost").textContent = "$" + totalCost.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+      let ctVal = 0;
+      let ctContext = "";
+      if (document.getElementById("appMode").value === "water_main_cont") {
+        ctVal = targetPpm * 24 * 60; // mg/L * min
+        ctContext = "AWWA 24h continuous: " + ctVal.toLocaleString() + " mg·min/L (Massive safety margin)";
+      } else if (document.getElementById("appMode").value === "water_main_slug") {
+        ctVal = targetPpm * 3 * 60;
+        ctContext = "AWWA 3h slug: " + ctVal.toLocaleString() + " mg·min/L";
+      } else {
+        ctContext = targetPpm.toFixed(1) + " mg/L free chlorine available residual";
+      }
+      document.getElementById("resCtMetric").textContent = ctContext;
+
+      document.getElementById("hypoResults").style.display = "block";
+    }
+  </script>
+</body>
+</html>

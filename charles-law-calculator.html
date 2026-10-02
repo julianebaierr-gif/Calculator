@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Charles's Law Calculator | V₁/T₁ = V₂/T₂ Isobaric Thermal Expansion Sizer</title>
+  <meta name="description" content="Calculate gas volume and absolute temperature changes at constant pressure using Charles's Law (V1/T1 = V2/T2), isobaric boundary work, and thermal expansion.">
+  <link rel="canonical" href="https://calchub.cloud/charles-law-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Charles's Law Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Computes isobaric thermal gas expansion and contraction using Charles's Law V1/T1 = V2/T2, thermodynamic boundary work P*DeltaV, and absolute temperature scales.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is Charles's Law and what thermodynamic variable must remain constant?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Charles's Law (also known as the Law of Volumes) states that the volume of a given mass of an ideal gas is directly proportional to its absolute thermodynamic temperature, provided the system pressure and gas quantity remain constant: V1 / T1 = V2 / T2 = k."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why MUST temperatures always be converted to Kelvin or Rankine in Charles's Law?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Celsius and Fahrenheit are relative scales with arbitrary zero points. Gas thermal kinetic energy is directly proportional to absolute thermodynamic temperature measured from Absolute Zero (0 K = -273.15°C or 0°R = -459.67°F). Calculating with Celsius or Fahrenheit yields mathematically invalid results and potential division-by-zero errors."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is isobaric mechanical boundary work calculated during thermal gas expansion?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Because pressure P remains strictly constant during an isobaric process, the mechanical boundary work done by or on the expanding gas simplifies to: W = P * (V2 - V1) = n * R * (T2 - T1). When a gas is heated and expands (V2 > V1), it performs positive work against the surrounding atmosphere or piston face."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How did Charles's Law lead to the discovery of Absolute Zero?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "By plotting gas volume versus Celsius temperature for various gases at constant pressure, 18th-century scientists observed that every linear isobaric extrapolation intersected the zero-volume axis at exactly -273.15°C. This universal intercept established the physical existence of Absolute Zero, the thermodynamic limit where all classical molecular translation ceases."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="chemical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="chemical.html">Chemical &amp; Water Treatment</a> &rsaquo; 
+      <span>Charles's Law Calculator</span>
+    </nav>
+
+    <h1 class="tool-title">Charles's Law Calculator (V₁/T₁ = V₂/T₂)</h1>
+    <p class="tool-subtitle">Isobaric Thermal Gas Expansion, Absolute Temperature Sizing &amp; Boundary Work</p>
+
+    <div class="calculator-layout">
+      <!-- Calculator Core Interface -->
+      <div class="calculator-card">
+        <div class="calc-form">
+          <div class="form-group">
+            <label for="charlesTarget">Variable to Solve For</label>
+            <select id="charlesTarget" class="form-control" onchange="updateCharlesInputs()">
+              <option value="v2" selected>Final Volume (V₂)</option>
+              <option value="t2">Final Temperature (T₂)</option>
+              <option value="v1">Initial Volume (V₁)</option>
+              <option value="t1">Initial Temperature (T₁)</option>
+            </select>
+          </div>
+
+          <!-- V1 Input -->
+          <div id="v1CharlesGroup" class="grid-2-col">
+            <div class="form-group">
+              <label for="v1Val">Initial Volume (V₁)</label>
+              <input type="number" id="v1Val" class="form-control" value="50.0" step="1.0" min="0.0001">
+            </div>
+            <div class="form-group">
+              <label for="v1Unit">V₁ Volume Unit</label>
+              <select id="v1Unit" class="form-control">
+                <option value="l" selected>Liters (L)</option>
+                <option value="m3">Cubic Meters (m³)</option>
+                <option value="cm3">Cubic Centimeters (cm³ / mL)</option>
+                <option value="ft3">Cubic Feet (ft³)</option>
+                <option value="gal">US Gallons (gal)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- T1 Input -->
+          <div id="t1CharlesGroup" class="grid-2-col">
+            <div class="form-group">
+              <label for="t1Val">Initial Temperature (T₁)</label>
+              <input type="number" id="t1Val" class="form-control" value="20.0" step="1.0">
+            </div>
+            <div class="form-group">
+              <label for="t1Unit">T₁ Temperature Scale</label>
+              <select id="t1Unit" class="form-control">
+                <option value="c" selected>Celsius (°C)</option>
+                <option value="k">Kelvin (K)</option>
+                <option value="f">Fahrenheit (°F)</option>
+                <option value="r">Rankine (°R)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- V2 Input -->
+          <div id="v2CharlesGroup" class="grid-2-col" style="display:none;">
+            <div class="form-group">
+              <label for="v2Val">Final Volume (V₂)</label>
+              <input type="number" id="v2Val" class="form-control" value="60.0" step="1.0" min="0.0001">
+            </div>
+            <div class="form-group">
+              <label for="v2Unit">V₂ Volume Unit</label>
+              <select id="v2Unit" class="form-control">
+                <option value="l" selected>Liters (L)</option>
+                <option value="m3">Cubic Meters (m³)</option>
+                <option value="cm3">Cubic Centimeters (cm³ / mL)</option>
+                <option value="ft3">Cubic Feet (ft³)</option>
+                <option value="gal">US Gallons (gal)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- T2 Input -->
+          <div id="t2CharlesGroup" class="grid-2-col">
+            <div class="form-group">
+              <label for="t2Val">Final Temperature (T₂)</label>
+              <input type="number" id="t2Val" class="form-control" value="80.0" step="1.0">
+            </div>
+            <div class="form-group">
+              <label for="t2Unit">T₂ Temperature Scale</label>
+              <select id="t2Unit" class="form-control">
+                <option value="c" selected>Celsius (°C)</option>
+                <option value="k">Kelvin (K)</option>
+                <option value="f">Fahrenheit (°F)</option>
+                <option value="r">Rankine (°R)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="sysPressure">Constant System Pressure</label>
+              <input type="number" id="sysPressure" class="form-control" value="1.01325" step="0.01" min="0.001">
+            </div>
+            <div class="form-group">
+              <label for="sysPresUnit">Pressure Unit</label>
+              <select id="sysPresUnit" class="form-control">
+                <option value="bar" selected>Bar (absolute)</option>
+                <option value="atm">Atmospheres (atm)</option>
+                <option value="kpa">Kilopascals (kPa)</option>
+                <option value="psi">Pounds/sq in (psia)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="charlesGas">Gas Molecular Identity</label>
+            <select id="charlesGas" class="form-control">
+              <option value="air" selected>Dry Air (MW = 28.97 g/mol, Cp = 1.005 kJ/kg·K)</option>
+              <option value="n2">Pure Nitrogen N₂ (MW = 28.01 g/mol, Cp = 1.040 kJ/kg·K)</option>
+              <option value="o2">Pure Oxygen O₂ (MW = 32.00 g/mol, Cp = 0.918 kJ/kg·K)</option>
+              <option value="co2">Carbon Dioxide CO₂ (MW = 44.01 g/mol, Cp = 0.846 kJ/kg·K)</option>
+              <option value="he">Helium He (MW = 4.003 g/mol, Cp = 5.193 kJ/kg·K)</option>
+              <option value="h2">Hydrogen H₂ (MW = 2.016 g/mol, Cp = 14.30 kJ/kg·K)</option>
+            </select>
+          </div>
+
+          <button type="button" class="btn btn-primary" onclick="calcCharlesLaw()">Solve Charles's Law Equation</button>
+        </div>
+
+        <div id="charlesResults" class="results-box" style="display:none;margin-top:1.5rem;">
+          <h3 class="results-title">Isobaric Thermal Expansion Diagnostics</h3>
+          <div class="result-grid">
+            <div class="result-card">
+              <div class="result-label" id="resCharlesTargetLabel">Calculated Value</div>
+              <div class="result-value highlight" id="resCharlesTargetVal">--</div>
+              <div class="result-subtext" id="resCharlesTargetAlt">--</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Volumetric Thermal Expansion</div>
+              <div class="result-value" id="resDeltaV">--</div>
+              <div class="result-subtext" id="resDeltaVDesc">--</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Boundary Mechanical Work (P·ΔV)</div>
+              <div class="result-value highlight" id="resWorkIsobaric">--</div>
+              <div class="result-subtext" id="resWorkIsobaricDesc">--</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Charles Constant (k = V/T)</div>
+              <div class="result-value" id="resCharlesK">--</div>
+              <div class="result-subtext">Liters / Kelvin ratio</div>
+            </div>
+          </div>
+
+          <div class="result-details" style="margin-top:1rem;padding:1rem;background:var(--card-bg);border-radius:6px;border:1px solid var(--border-light);">
+            <h4 style="margin-top:0;">Thermodynamics &amp; Heat Transfer</h4>
+            <ul style="margin-bottom:0;line-height:1.7;">
+              <li><strong>Absolute Temperatures:</strong> <span id="resAbsTemps">--</span></li>
+              <li><strong>Total Gas Moles &amp; Mass:</strong> <span id="resGasQuant">--</span></li>
+              <li><strong>Enthalpy Thermal Transfer (ΔH = m·Cp·ΔT):</strong> <span id="resEnthalpy">--</span></li>
+              <li><strong>Density Shift:</strong> <span id="resDensityShift">--</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🧪</span>
+            <h3 class="widget-title">Related Chemical & Water Treatment</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="chlorine-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Chlorine Dosing Calculator</a></li>
+            <li><a href="chemical-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Chemical Dosing Rate Calculator</a></li>
+            <li><a href="pipe-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pipe Sizing & Water Flow</a></li>
+            <li><a href="cooling-load-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cooling Load (HVAC) Sizing</a></li>
+            <li><a href="alum-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Alum Dosing & Coagulation Feed</a></li>
+            <li><a href="boyles-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Boyle's Gas Law (P₁V₁=P₂V₂)</a></li>
+            <li><a href="calcium-hypochlorite-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calcium Hypochlorite (HTH 68%)</a></li>
+            <li><a href="caustic-soda-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Caustic Soda (NaOH) Dosing</a></li>
+            <li><a href="charles-law-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Charles's Law (V₁/T₁=V₂/T₂)</a></li>
+            <li><a href="chlorine-dioxide-dosing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Chlorine Dioxide (ClO₂) Oxidation</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="chemical.html" class="sidebar-category-link">View All Chemical & Water Treatment Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Technical Educational Article Body (1000+ Words) -->
+    <article class="article-body">
+      <h2>Thermodynamic Foundations of Charles's Law</h2>
+      <p>Charles's Law (frequently designated as the Law of Volumes) establishes the foundational thermodynamic relationship governing isobaric (constant pressure) thermal expansion of gaseous matter. Formulated conceptually by French inventor and aeronaut Jacques Alexandre César Charles in 1787—who constructed the first hydrogen-filled gas balloon—and formalized mathematically by Joseph Louis Gay-Lussac in 1802, the law describes how gases respond volumetrically to variations in internal thermal energy.</p>
+
+      <p>Under the kinetic molecular theory of ideal gases, macroscopic temperature represents a direct statistical measure of the average translational kinetic energy of molecular entities ($\bar{E}_k = \frac{3}{2} k_B T$). When heat is transferred into a gaseous enclosure at constant pressure, molecular velocities and collision momentum increase. To prevent internal pressure from exceeding the ambient external constraint, the physical boundaries of the container must dilate, increasing the volume and inter-molecular separation distance in exact linear proportionality to the absolute thermodynamic temperature.</p>
+
+      <h2>Mathematical Formulation and the Absolute Temperature Scale</h2>
+      <p>The mathematical postulate of Charles's Law is stated as:</p>
+
+      <div class="formula-box">
+        $$\frac{V}{T} = k \quad \implies \quad \frac{V_1}{T_1} = \frac{V_2}{T_2} \quad (P = \text{constant}, \, n = \text{constant})$$
+      </div>
+
+      <p>Where:</p>
+      <ul>
+        <li>$V_1, V_2$ = Initial and final gas volumes (expressed in identical units such as liters, $\text{m}^3$, or $\text{ft}^3$).</li>
+        <li>$T_1, T_2$ = Initial and final temperatures expressed <strong>strictly on an absolute thermodynamic scale</strong> (Kelvin or Rankine).</li>
+        <li>$k = \frac{n R}{P}$ = The isobaric Charles proportionality constant.</li>
+      </ul>
+
+      <p>Rearranging the equation yields four explicit algebraic solutions for any single unknown parameter:</p>
+
+      <div class="formula-box">
+        $$V_2 = V_1 \left(\frac{T_2}{T_1}\right), \quad T_2 = T_1 \left(\frac{V_2}{V_1}\right), \quad V_1 = V_2 \left(\frac{T_1}{T_2}\right), \quad T_1 = T_2 \left(\frac{V_1}{V_2}\right)$$
+      </div>
+
+      <p>Conversion to the absolute Kelvin scale ($K$) from Celsius ($^\circ\text{C}$) or to Rankine ($^\circ\text{R}$) from Fahrenheit ($^\circ\text{F}$) is mathematically non-negotiable:</p>
+      <div class="formula-box">
+        $$T_{\text{Kelvin}} = T_{^\circ\text{C}} + 273.15, \quad T_{\text{Rankine}} = T_{^\circ\text{F}} + 459.67$$
+      </div>
+
+      <h2>Isobaric Boundary Work and Enthalpy Changes</h2>
+      <p>Because an isobaric system involves movable control surfaces (such as a weighted piston, an elastic bladder, or an open atmospheric ventilation column), thermal expansion forces the gas to perform mechanical boundary work against external pressure ($P$). The work done during expansion is determined by integrating $dW = P \, dV$:</p>
+
+      <div class="formula-box">
+        $$W_{\text{isobaric}} = \int_{V_1}^{V_2} P \, dV = P \cdot (V_2 - V_1) = P \cdot \Delta V$$
+      </div>
+
+      <p>By substituting the Ideal Gas Law ($P V_1 = n R T_1$ and $P V_2 = n R T_2$), boundary work can also be evaluated purely from molar thermal differential:</p>
+      <div class="formula-box">
+        $$W_{\text{isobaric}} = n R (T_2 - T_1) = n R \Delta T$$
+      </div>
+
+      <p>The total heat energy ($Q$) required to drive an isobaric temperature shift reflects the change in system enthalpy ($\Delta H$), encompassing both internal energy gain ($\Delta U = n C_v \Delta T$) and boundary displacement work ($W = n R \Delta T$):</p>
+      <div class="formula-box">
+        $$Q_p = \Delta H = m \cdot c_p \cdot \Delta T = n \cdot C_{p,\text{molar}} \cdot \Delta T$$
+      </div>
+      <p>Where $C_p = C_v + R$ represents the constant-pressure molar heat capacity, reflecting Mayer's thermodynamic relation for ideal gases.</p>
+
+      <h2>Physical Properties and Heat Capacities of Common Industrial Gases</h2>
+      <p>The table below summarizes molecular parameters, specific heat capacities ($c_p$), and thermal expansion characteristics across representative gases at $25^\circ\text{C}$ and $1.0\text{ atm}$:</p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Gas Species</th>
+              <th>Molar Mass (g/mol)</th>
+              <th>Specific Heat c_p (kJ/kg·K)</th>
+              <th>Molar Heat C_p (J/mol·K)</th>
+              <th>Isobaric Expansion Coeff β (1/K @ 20°C)</th>
+              <th>Ratio of Specific Heats (γ = Cp/Cv)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Dry Atmospheric Air</td>
+              <td>28.97</td>
+              <td>1.005</td>
+              <td>29.12</td>
+              <td>0.003411 (1/293.15)</td>
+              <td>1.400</td>
+            </tr>
+            <tr>
+              <td>Nitrogen (N₂)</td>
+              <td>28.01</td>
+              <td>1.040</td>
+              <td>29.13</td>
+              <td>0.003411</td>
+              <td>1.404</td>
+            </tr>
+            <tr>
+              <td>Oxygen (O₂)</td>
+              <td>32.00</td>
+              <td>0.918</td>
+              <td>29.38</td>
+              <td>0.003411</td>
+              <td>1.395</td>
+            </tr>
+            <tr>
+              <td>Carbon Dioxide (CO₂)</td>
+              <td>44.01</td>
+              <td>0.846</td>
+              <td>37.23</td>
+              <td>0.003415</td>
+              <td>1.289</td>
+            </tr>
+            <tr>
+              <td>Helium (He, Monatomic)</td>
+              <td>4.003</td>
+              <td>5.193</td>
+              <td>20.78</td>
+              <td>0.003411</td>
+              <td>1.667</td>
+            </tr>
+            <tr>
+              <td>Hydrogen (H₂)</td>
+              <td>2.016</td>
+              <td>14.304</td>
+              <td>28.84</td>
+              <td>0.003411</td>
+              <td>1.405</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Practical Worked Case Study: Atmospheric Solar Heating of an Air Dome</h2>
+      <div class="worked-example-card">
+        <h3>Engineering Design Example: Fabric Storage Dome Thermal Diurnal Cycle</h3>
+        <p><strong>Scenario:</strong> A flexible, constant-pressure fabric pneumatic storage enclosure contains $V_1 = 2,500.0\text{ m}^3$ of atmospheric air at a cool morning ambient temperature of $T_1 = 10.0^\circ\text{C}$ ($283.15\text{ K}$). Throughout the day, intense solar radiation elevates the internal air temperature to a peak afternoon value of $T_2 = 45.0^\circ\text{C}$ ($318.15\text{ K}$). Atmospheric barometric pressure remains constant at sea level: $P = 1.01325\text{ bar}$ ($101,325\text{ Pa}$). Assume dry air behavior ($MW = 28.97\text{ g/mol}, c_p = 1.005\text{ kJ/kg}\cdot\text{K}$).</p>
+
+        <p><strong>Step 1: Calculate Absolute Thermodynamic Temperatures:</strong></p>
+        $$T_1 = 10.0 + 273.15 = 283.15\text{ K}$$
+        $$T_2 = 45.0 + 273.15 = 318.15\text{ K}$$
+
+        <p><strong>Step 2: Determine Final Expanded Volume (V₂) via Charles's Law:</strong></p>
+        $$V_2 = V_1 \times \left(\frac{T_2}{T_1}\right) = 2,500.0\text{ m}^3 \times \left(\frac{318.15\text{ K}}{283.15\text{ K}}\right) = 2,500.0 \times 1.12361 = 2,809.02\text{ m}^3$$
+        <p>Net volumetric expansion:</p>
+        $$\Delta V = V_2 - V_1 = 2,809.02 - 2,500.0 = 309.02\text{ m}^3\text{ (+12.36% volume expansion)}$$
+
+        <p><strong>Step 3: Compute Initial Moles and Contained Mass:</strong></p>
+        $$n = \frac{P V_1}{R T_1} = \frac{101,325\text{ Pa} \times 2,500.0\text{ m}^3}{8.3145\text{ J/(mol}\cdot\text{K)} \times 283.15\text{ K}} = \frac{253,312,500}{2,354.25} = 107,598\text{ moles}$$
+        $$m_{\text{air}} = 107,598\text{ mol} \times 0.02897\text{ kg/mol} = 3,117.1\text{ kg (6,872.0 lbs)}$$
+
+        <p><strong>Step 4: Calculate Mechanical Isobaric Boundary Work (P·ΔV):</strong></p>
+        $$W_{\text{isobaric}} = P \cdot \Delta V = 101,325\text{ N/m}^2 \times 309.02\text{ m}^3 = 31,311,452\text{ Joules} = 31.31\text{ MJ (8.70 kWh)}$$
+        <p>The expanding gas performs $31.31\text{ MJ}$ of physical work against the surrounding atmosphere.</p>
+
+        <p><strong>Step 5: Enthalpy Energy Transferred:</strong></p>
+        $$\Delta H = m \cdot c_p \cdot \Delta T = 3,117.1\text{ kg} \times 1.005\text{ kJ/kg}\cdot\text{K} \times (45.0 - 10.0)\text{ K} = 109,644\text{ kJ} \approx 109.64\text{ MJ}$$
+      </div>
+
+      <h2>Engineering Applications and Real-World Relevance</h2>
+      <p>Charles's Law dictates vital design and safety parameters across modern industrial operations:</p>
+      <ul>
+        <li><strong>Aerostat and Hot Air Ballooning:</strong> As air inside a balloon envelope is heated from $20^\circ\text{C}$ to $100^\circ\text{C}$, Charles's Law dictates a $27\%$ volumetric expansion. Because the envelope has an open mouth at the bottom maintaining atmospheric pressure, excess air spills out, decreasing the internal density ($\rho = \frac{P \cdot MW}{R T}$) and creating the buoyant Archimedean lift force ($F_{\text{buoyant}} = (\rho_{\text{ambient}} - \rho_{\text{hot}}) \cdot V_{\text{envelope}} \cdot g$).</li>
+        <li><strong>Thermal Relief Valves in Piping Systems:</strong> When cryogenic fluids (LNG, liquid nitrogen) or liquefied gases are trapped between closed isolation valves in outdoor piping, ambient warming drives rapid thermal expansion. Without ASME Section VIII thermal pressure relief valves (TRVs), trapped fluid rapidly pressurizes beyond the yield point, causing catastrophic flange blowouts.</li>
+        <li><strong>HVAC Ductwork Air Balancing:</strong> In centralized heating systems, warm air supplied at $55^\circ\text{C}$ ($131^\circ\text{F}$) occupies greater specific volume than ambient return air at $20^\circ\text{C}$ ($68^\circ\text{F}$). HVAC design engineers adjust volumetric flow rates (CFM) to account for Charles expansion and maintain balanced building pressurization.</li>
+      </ul>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">
+            <span class="logo-icon">&pi;</span>
+            <span class="logo-text">Calc<strong>Hub</strong></span>
+          </div>
+          <p class="footer-about">High-precision chemical, thermodynamic, and mechanical calculation tools conforming to ASME, ISO, and NIST physical standards.</p>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Engineering Disciplines</h4>
+          <ul class="footer-links">
+            <li><a href="chemical.html">Chemical &amp; Water Treatment</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+            <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+            <li><a href="civil.html">Civil &amp; Construction</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Standard References</h4>
+          <ul class="footer-links">
+            <li><a href="https://webbook.nist.gov" target="_blank" rel="noopener">NIST Chemistry WebBook</a></li>
+            <li><a href="https://www.asme.org" target="_blank" rel="noopener">ASME Boiler &amp; Pressure Vessel</a></li>
+            <li><a href="https://www.iupac.org" target="_blank" rel="noopener">IUPAC Physical Chemistry</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Free, open, client-side engineering tools.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const CHARLES_GAS_PROPS = {
+      air: { mw: 28.97, cp: 1.005 },
+      n2: { mw: 28.01, cp: 1.040 },
+      o2: { mw: 32.00, cp: 0.918 },
+      co2: { mw: 44.01, cp: 0.846 },
+      he: { mw: 4.003, cp: 5.193 },
+      h2: { mw: 2.016, cp: 14.304 }
+    };
+
+    function updateCharlesInputs() {
+      const target = document.getElementById("charlesTarget").value;
+      document.getElementById("v1CharlesGroup").style.display = target === "v1" ? "none" : "grid";
+      document.getElementById("t1CharlesGroup").style.display = target === "t1" ? "none" : "grid";
+      document.getElementById("v2CharlesGroup").style.display = target === "v2" ? "none" : "grid";
+      document.getElementById("t2CharlesGroup").style.display = target === "t2" ? "none" : "grid";
+    }
+
+    function toKelvin(val, scale) {
+      if (scale === "c") return val + 273.15;
+      if (scale === "k") return val;
+      if (scale === "f") return (val - 32) * (5 / 9) + 273.15;
+      if (scale === "r") return val * (5 / 9);
+      return val;
+    }
+
+    function fromKelvin(k, scale) {
+      if (scale === "c") return k - 273.15;
+      if (scale === "k") return k;
+      if (scale === "f") return (k - 273.15) * (9 / 5) + 32;
+      if (scale === "r") return k * (9 / 5);
+      return k;
+    }
+
+    function toM3(val, unit) {
+      if (unit === "l") return val * 0.001;
+      if (unit === "cm3") return val * 0.000001;
+      if (unit === "ft3") return val * 0.0283168;
+      if (unit === "gal") return val * 0.00378541;
+      return val;
+    }
+
+    function fromM3(m3, unit) {
+      if (unit === "l") return m3 * 1000;
+      if (unit === "cm3") return m3 * 1000000;
+      if (unit === "ft3") return m3 / 0.0283168;
+      if (unit === "gal") return m3 / 0.00378541;
+      return m3;
+    }
+
+    function toPascalsIsobaric(val, unit) {
+      if (unit === "bar") return val * 100000;
+      if (unit === "atm") return val * 101325;
+      if (unit === "kpa") return val * 1000;
+      if (unit === "psi") return val * 6894.757;
+      return val;
+    }
+
+    function calcCharlesLaw() {
+      const target = document.getElementById("charlesTarget").value;
+      const gasKey = document.getElementById("charlesGas").value;
+      const props = CHARLES_GAS_PROPS[gasKey];
+      const pVal = parseFloat(document.getElementById("sysPressure").value) || 1.01325;
+      const pUnit = document.getElementById("sysPresUnit").value;
+      const p_pa = toPascalsIsobaric(pVal, pUnit);
+
+      let v1_m3 = 0, t1_k = 0, v2_m3 = 0, t2_k = 0;
+
+      if (target !== "v1") {
+        const v = parseFloat(document.getElementById("v1Val").value) || 0;
+        const u = document.getElementById("v1Unit").value;
+        v1_m3 = toM3(v, u);
+      }
+      if (target !== "t1") {
+        const t = parseFloat(document.getElementById("t1Val").value) || 0;
+        const s = document.getElementById("t1Unit").value;
+        t1_k = toKelvin(t, s);
+      }
+      if (target !== "v2") {
+        const v = parseFloat(document.getElementById("v2Val").value) || 0;
+        const u = document.getElementById("v2Unit").value;
+        v2_m3 = toM3(v, u);
+      }
+      if (target !== "t2") {
+        const t = parseFloat(document.getElementById("t2Val").value) || 0;
+        const s = document.getElementById("t2Unit").value;
+        t2_k = toKelvin(t, s);
+      }
+
+      let resultText = "";
+      let resultAltText = "";
+      let targetLabel = "";
+
+      if (target === "v2") {
+        if (t1_k <= 0) { alert("T1 must be above Absolute Zero (> 0 K)"); return; }
+        v2_m3 = v1_m3 * (t2_k / t1_k);
+        const outUnit = document.getElementById("v1Unit").value;
+        const v2_disp = fromM3(v2_m3, outUnit);
+        targetLabel = "Final Volume (V₂)";
+        resultText = v2_disp.toFixed(4) + " " + outUnit.toUpperCase();
+        resultAltText = (v2_m3 * 1000).toFixed(2) + " L (" + v2_m3.toFixed(4) + " m³)";
+      } else if (target === "t2") {
+        if (v1_m3 <= 0) { alert("V1 must be positive"); return; }
+        t2_k = t1_k * (v2_m3 / v1_m3);
+        const outScale = document.getElementById("t1Unit").value;
+        const t2_disp = fromKelvin(t2_k, outScale);
+        targetLabel = "Final Temperature (T₂)";
+        resultText = t2_disp.toFixed(2) + " °" + outScale.toUpperCase();
+        resultAltText = t2_k.toFixed(2) + " K (" + (t2_k - 273.15).toFixed(2) + " °C)";
+      } else if (target === "v1") {
+        if (t2_k <= 0) { alert("T2 must be above Absolute Zero (> 0 K)"); return; }
+        v1_m3 = v2_m3 * (t1_k / t2_k);
+        const outUnit = document.getElementById("v2Unit").value;
+        const v1_disp = fromM3(v1_m3, outUnit);
+        targetLabel = "Initial Volume (V₁)";
+        resultText = v1_disp.toFixed(4) + " " + outUnit.toUpperCase();
+        resultAltText = (v1_m3 * 1000).toFixed(2) + " L (" + v1_m3.toFixed(4) + " m³)";
+      } else if (target === "t1") {
+        if (v2_m3 <= 0) { alert("V2 must be positive"); return; }
+        t1_k = t2_k * (v1_m3 / v2_m3);
+        const outScale = document.getElementById("t2Unit").value;
+        const t1_disp = fromKelvin(t1_k, outScale);
+        targetLabel = "Initial Temperature (T₁)";
+        resultText = t1_disp.toFixed(2) + " °" + outScale.toUpperCase();
+        resultAltText = t1_k.toFixed(2) + " K (" + (t1_k - 273.15).toFixed(2) + " °C)";
+      }
+
+      // Charles constant k = V / T (liters / K)
+      const charlesK = (v1_m3 * 1000) / t1_k;
+
+      // Delta V
+      const deltaV_m3 = v2_m3 - v1_m3;
+      const deltaV_liters = deltaV_m3 * 1000;
+      const pctChange = ((v2_m3 - v1_m3) / v1_m3) * 100;
+
+      // Isobaric Work W = P * deltaV (Joules)
+      const workJoules = p_pa * deltaV_m3;
+      const workKJ = workJoules / 1000;
+
+      // Moles & Mass
+      const R = 8.314462;
+      const moles = (p_pa * v1_m3) / (R * t1_k);
+      const massKg = (moles * props.mw) / 1000;
+
+      // Enthalpy deltaH = m * cp * deltaT (kJ)
+      const deltaT = t2_k - t1_k;
+      const deltaH_kJ = massKg * props.cp * deltaT;
+
+      // Density shift (kg/m3)
+      const rho1 = massKg / v1_m3;
+      const rho2 = massKg / v2_m3;
+
+      document.getElementById("resCharlesTargetLabel").textContent = targetLabel;
+      document.getElementById("resCharlesTargetVal").textContent = resultText;
+      document.getElementById("resCharlesTargetAlt").textContent = resultAltText;
+
+      document.getElementById("resDeltaV").textContent = (deltaV_liters >= 0 ? "+" : "") + deltaV_liters.toFixed(2) + " L";
+      document.getElementById("resDeltaVDesc").textContent = (pctChange >= 0 ? "+" : "") + pctChange.toFixed(2) + "% volume shift (" + deltaV_m3.toFixed(4) + " m³)";
+
+      document.getElementById("resWorkIsobaric").textContent = Math.abs(workKJ).toFixed(2) + " kJ";
+      document.getElementById("resWorkIsobaricDesc").textContent = workJoules >= 0 ? "Work done BY gas expanding on atmosphere" : "Work done ON gas during cooling contraction";
+
+      document.getElementById("resCharlesK").textContent = charlesK.toFixed(4) + " L/K";
+
+      document.getElementById("resAbsTemps").textContent = "T₁ = " + t1_k.toFixed(2) + " K (" + (t1_k - 273.15).toFixed(1) + "°C)  ➜  T₂ = " + t2_k.toFixed(2) + " K (" + (t2_k - 273.15).toFixed(1) + "°C)";
+      document.getElementById("resGasQuant").textContent = moles.toFixed(2) + " moles (" + massKg.toFixed(3) + " kg / " + (massKg * 2.20462).toFixed(2) + " lbs of " + gasKey.toUpperCase() + ")";
+      document.getElementById("resEnthalpy").textContent = (deltaH_kJ >= 0 ? "+" : "") + deltaH_kJ.toFixed(2) + " kJ (" + (deltaH_kJ >= 0 ? "Heat added into gas" : "Heat rejected from gas") + ")";
+      document.getElementById("resDensityShift").textContent = "ρ₁ = " + rho1.toFixed(3) + " kg/m³  ➜  ρ₂ = " + rho2.toFixed(3) + " kg/m³ (" + (((rho2 - rho1) / rho1) * 100).toFixed(1) + "% density change)";
+
+      document.getElementById("charlesResults").style.display = "block";
+    }
+  </script>
+</body>
+</html>
