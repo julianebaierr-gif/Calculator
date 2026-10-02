@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thermal Expansion Calculator | Linear, Volumetric &amp; Pipe Stress</title>
+  <meta name="description" content="Calculate linear (&Delta;L), volumetric (&Delta;V), and thermal expansion stress for metals, piping, concrete, and plastics per ASME B31.3 &amp; ASTM E228.">
+  <link rel="canonical" href="https://calchub.cloud/thermal-expansion-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Thermal Expansion Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Thermo-mechanical expansion engine computing linear Delta L = alpha * L * Delta T, volumetric Delta V, constrained compressive stress, and expansion loop sizing per ASME B31.3.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the formula for linear thermal expansion?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The change in length (Delta L) due to temperature change is calculated as: Delta L = L_0 * alpha * Delta T, where L_0 is initial length, alpha is the material coefficient of linear thermal expansion (typically expressed in 10^-6 / deg C or 10^-6 / deg F), and Delta T = T_final - T_initial."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the relationship between linear (alpha) and volumetric (beta) thermal expansion?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For isotropic solid materials expanding uniformly in all three spatial dimensions, the volumetric expansion coefficient beta is approximately three times the linear coefficient: beta approx 3 * alpha. Area expansion is approximately two times the linear coefficient: gamma approx 2 * alpha."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is thermal stress calculated when thermal expansion is completely restrained?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "When a structural member or piping run is clamped rigidly between immovable anchors, thermal strain (epsilon_th = alpha * Delta T) cannot expand physically. By Hooke's Law, this generates immense internal compressive stress: sigma_th = E * alpha * Delta T, where E is Young's modulus of elasticity."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does ASME B31.3 recommend absorbing thermal growth in process piping?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Rather than allowing rigid thermal stress to buckle pipe supports or tear nozzle flanges from pumps and boilers, piping engineers install flexible expansion loops (U-bends), directional Z-bends, or bellows expansion joints that flex elastically to absorb the computed Delta L growth."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="mechanical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html" class="active">Mechanical</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="engineering.html">Engineering</a> &rsaquo; 
+      <a href="mechanical.html">Mechanical</a> &rsaquo; 
+      <span>Thermal Expansion Calculator</span>
+    </nav>
+
+    <header class="calc-header">
+      <div class="calc-badge">Thermal Mechanics &amp; Piping</div>
+      <h1 class="calc-title">Thermal Expansion Calculator</h1>
+      <p class="calc-tagline">Calculate linear and volumetric thermal expansion, constrained compressive stress, and piping expansion loop sizing per ASME B31.3 and ASTM E228.</p>
+    </header>
+
+    <div class="calc-grid">
+      <div class="calc-main">
+        <div class="tool-card">
+          <form id="thermalForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="materialPreset">Material Selection (Thermal Coefficient $\alpha$)</label>
+                <select id="materialPreset" class="form-control">
+                  <option value="12.0" selected>Structural Carbon Steel (α = 12.0 × 10⁻⁶ /°C, E = 200 GPa)</option>
+                  <option value="17.3">Stainless Steel 304 / 316 (α = 17.3 × 10⁻⁶ /°C, E = 193 GPa)</option>
+                  <option value="23.1">Aluminum 6061-T6 (α = 23.1 × 10⁻⁶ /°C, E = 69 GPa)</option>
+                  <option value="16.5">Copper C11000 (α = 16.5 × 10⁻⁶ /°C, E = 117 GPa)</option>
+                  <option value="18.7">Brass C36000 (α = 18.7 × 10⁻⁶ /°C, E = 100 GPa)</option>
+                  <option value="10.8">Cast Iron Gray (α = 10.8 × 10⁻⁶ /°C, E = 110 GPa)</option>
+                  <option value="10.0">Structural Concrete (α = 10.0 × 10⁻⁶ /°C, E = 30 GPa)</option>
+                  <option value="54.0">PVC Pipe (Rigid) (α = 54.0 × 10⁻⁶ /°C, E = 3 GPa)</option>
+                  <option value="1.2">Invar 36 (Low Expansion Alloy) (α = 1.2 × 10⁻⁶ /°C, E = 148 GPa)</option>
+                  <option value="custom">Custom Thermal Expansion Coefficient</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="alphaCoeff">Expansion Coefficient ($\alpha$ in $10^{-6}\text{ /}^\circ\text{C}$)</label>
+                <input type="number" id="alphaCoeff" class="form-control" value="12.0" min="0.01" step="any" required>
+                <span class="hint">Linear thermal expansion per unit temperature change</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="initLength">Initial Length ($L_0$ in meters)</label>
+                <input type="number" id="initLength" class="form-control" value="25.0" min="0.01" step="any" required>
+                <span class="hint">Total length of pipeline, structural beam, or rail track</span>
+              </div>
+              <div class="form-group">
+                <label for="elasticModulus">Young's Modulus of Elasticity ($E$ in GPa)</label>
+                <input type="number" id="elasticModulus" class="form-control" value="200" min="1" step="1" required>
+                <span class="hint">Used to evaluate constrained thermal stress ($\sigma = E \cdot \alpha \cdot \Delta T$)</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="tempInitial">Initial Installation Temperature ($T_{initial}$)</label>
+                <input type="number" id="tempInitial" class="form-control" value="20" step="any" required>
+                <span class="hint">Ambient construction temperature (e.g. 20&deg;C)</span>
+              </div>
+              <div class="form-group">
+                <label for="tempFinal">Maximum Operating Temperature ($T_{final}$)</label>
+                <input type="number" id="tempFinal" class="form-control" value="120" step="any" required>
+                <span class="hint">Peak fluid or environmental temperature (e.g. steam line = 120&deg;C)</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="crossSection">Conduit / Beam Cross-Section Area ($A_{cross}$ in mm²)</label>
+                <input type="number" id="crossSection" class="form-control" value="2165" min="1" step="any">
+                <span class="hint">E.g., 4-inch Sch 40 pipe wall area ≈ 2,165 mm² (optional for force)</span>
+              </div>
+              <div class="form-group">
+                <label for="pipeOuterDia">Pipe Outer Diameter for Loop Sizing ($D_{outer}$ in mm)</label>
+                <input type="number" id="pipeOuterDia" class="form-control" value="114.3" min="1" step="any">
+                <span class="hint">E.g., 4-inch pipe OD = 114.3 mm</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="calcThermalBtn">Calculate Thermal Growth &amp; Stress</button>
+              <button type="reset" class="btn btn-secondary" id="resetThermalBtn">Reset</button>
+            </div>
+          </form>
+
+          <div id="thermalResultBox" class="results-container" style="display: none; margin-top: 1.5rem;">
+            <h3>Thermal Expansion &amp; Stress Sizing</h3>
+            <div class="results-grid">
+              <div class="result-tile highlight">
+                <span class="result-label">Linear Thermal Elongation ($\Delta L$)</span>
+                <span class="result-value" id="resDeltaL">-- mm</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Total Expanded Length ($L_{final}$)</span>
+                <span class="result-value" id="resFinalLength">-- m</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Temperature Differential ($\Delta T$)</span>
+                <span class="result-value" id="resDeltaT">-- &deg;C</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Fully Constrained Thermal Stress ($\sigma_{th}$)</span>
+                <span class="result-value" id="resThermalStress">-- MPa</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Restraining Anchor Force ($F_{anchor}$)</span>
+                <span class="result-value" id="resAnchorForce">-- kN</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Recommended Expansion U-Loop Leg ($L_{leg}$)</span>
+                <span class="result-value" id="resLoopLength">-- m</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Thermodynamic Fundamentals of Thermal Expansion</h2>
+          <p>
+            All matter expands when subjected to elevated temperatures and contracts when cooled. At the atomic lattice scale, increasing thermal kinetic energy intensifies the vibrational amplitude of constituent atoms within their intermolecular potential energy wells. Because atomic bonding potential energy curves (such as the Lennard-Jones potential) are inherently asymmetric (anharmonic), atoms vibrate with larger separation distances at higher thermal energy states, manifesting macroscopically as <strong>thermal expansion</strong>.
+          </p>
+          <p>
+            In mechanical piping networks (ASME B31.1 / ASME B31.3), civil structural engineering (continuous welded rail track, concrete bridge spans), and machine tool design, failure to accommodate thermal expansion can generate millions of Newtons of destructive anchor forces, leading to pipeline buckling, flange joint leakage, structural shear, and fatigue rupture.
+          </p>
+
+          <h2>Linear Thermal Expansion Formulation ($\Delta L$)</h2>
+          <p>
+            For moderate temperature differentials where the material coefficient remains essentially constant, linear thermal expansion is directly proportional to initial length ($L_0$) and temperature increase ($\Delta T$):
+          </p>
+          <div class="formula-box">
+            $$\Delta L = L_0 \cdot \alpha \cdot \Delta T = L_0 \cdot \alpha \cdot (T_{final} - T_{initial})$$
+          </div>
+          <p>
+            Where:
+          </p>
+          <ul>
+            <li>$\Delta L$ is the axial dimensional elongation in meters or millimeters.</li>
+            <li>$L_0$ is the initial original length of the structural member.</li>
+            <li>$\alpha$ is the Coefficient of Linear Thermal Expansion ($\text{CLTE}$), conventionally expressed in units of $10^{-6}\text{ /}^\circ\text{C}$ or $\mu\text{m/(m}\cdot\text{K)}$.</li>
+            <li>$\Delta T$ is the positive or negative temperature swing ($^\circ\text{C}$ or $\text{K}$).</li>
+          </ul>
+
+          <h2>Volumetric ($\beta$) and Superficial ($\gamma$) Expansion</h2>
+          <p>
+            In three-dimensional solid bodies and liquid reservoirs, thermal growth occurs across all spatial coordinates. For isotropic materials:
+          </p>
+          <div class="formula-box">
+            $$\text{Area Expansion: } \Delta A \approx 2 \cdot \alpha \cdot A_0 \cdot \Delta T$$
+            $$\text{Volumetric Expansion: } \Delta V = V_0 \cdot \beta \cdot \Delta T \approx 3 \cdot \alpha \cdot V_0 \cdot \Delta T$$
+          </div>
+          <p>
+            Where $\beta \approx 3\alpha$ is the coefficient of volumetric thermal expansion. In closed liquid systems (such as domestic hydronic heating loops or transformer oil tanks), liquid volumetric expansion far exceeds the volumetric expansion of the enclosing steel vessel ($\beta_{water} \approx 207 \times 10^{-6} \gg \beta_{steel} \approx 36 \times 10^{-6}$), necessitating pre-charged diaphragm expansion vessels to prevent hydrostatic over-pressurization.
+          </p>
+
+          <h2>Constrained Thermal Stress ($\sigma_{th}$) and Restraining Anchor Force</h2>
+          <p>
+            When a thermal pipe run or continuous welded railway track is completely restrained against axial growth by rigid end anchors or tie clamps, thermal strain ($\epsilon_{th} = \alpha \cdot \Delta T$) is entirely transformed into internal mechanical elastic compressive strain. By Hooke's Law:
+          </p>
+          <div class="formula-box">
+            $$\sigma_{th} = E \cdot \epsilon_{th} = E \cdot \alpha \cdot \Delta T \quad [\text{MPa}]$$
+          </div>
+          <p>
+            Where $E$ is Young's modulus of elasticity in $\text{MPa}$ ($1\text{ GPa} = 1,000\text{ MPa}$). Remarkably, <strong>thermal stress is entirely independent of length</strong>! A $1\text{ meter}$ pipe and a $1,000\text{ meter}$ pipe subjected to the same temperature increase generate identical internal stress if both are rigidly restrained.
+          </p>
+          <p>
+            The total axial thrust force ($F_{anchor}$) exerted by the expanding member against restraining end anchors is:
+          </p>
+          <div class="formula-box">
+            $$F_{anchor} = \sigma_{th} \cdot A_{cross} = E \cdot \alpha \cdot \Delta T \cdot A_{cross} \quad [\text{N}]$$
+          </div>
+
+          <h2>ASME B31.3 Piping Expansion Loop Sizing (The Kellogg Formula)</h2>
+          <p>
+            To avoid massive anchor thrust forces and dangerous thermal stresses, piping systems incorporate flexible structural expansion U-loops. The required minimum leg length of an expansion U-loop ($L_{leg}$) is evaluated per the classic Kellogg formulation:
+          </p>
+          <div class="formula-box">
+            $$L_{leg} = \sqrt{\frac{3 \cdot E \cdot D_{outer} \cdot \Delta L}{S_A}} \approx 0.043 \cdot \sqrt{D_{outer} (\text{mm}) \cdot \Delta L (\text{mm})} \quad [\text{m}]$$
+          </div>
+          <p>
+            Where $D_{outer}$ is the outside pipe diameter and $S_A$ is the allowable displacement stress range per ASME B31.3.
+          </p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Engineering Material</th>
+                <th>CLTE $\alpha$ ($10^{-6}$ / &deg;C)</th>
+                <th>Elastic Modulus $E$ (GPa)</th>
+                <th>Thermal Stress per 50&deg;C Rise ($\sigma_{th}$)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Invar 36 (Ni-Fe Alloy)</td>
+                <td>1.2</td>
+                <td>148</td>
+                <td>8.88 MPa (Ultra-low expansion)</td>
+              </tr>
+              <tr>
+                <td>Structural Concrete</td>
+                <td>10.0</td>
+                <td>30</td>
+                <td>15.0 MPa (Matches rebar steel closely)</td>
+              </tr>
+              <tr>
+                <td>Carbon Steel (ASTM A106 / A36)</td>
+                <td>12.0</td>
+                <td>200</td>
+                <td>120.0 MPa (High compressive stress)</td>
+              </tr>
+              <tr>
+                <td>Copper (ASTM B88 Tube)</td>
+                <td>16.5</td>
+                <td>117</td>
+                <td>96.5 MPa</td>
+              </tr>
+              <tr>
+                <td>Stainless Steel (AISI 304 / 316)</td>
+                <td>17.3</td>
+                <td>193</td>
+                <td>166.9 MPa (Very high thermal growth)</td>
+              </tr>
+              <tr>
+                <td>Aluminum (6061-T6 Alloy)</td>
+                <td>23.1</td>
+                <td>69</td>
+                <td>79.7 MPa (Nearly double steel growth)</td>
+              </tr>
+              <tr>
+                <td>Polyvinyl Chloride (PVC)</td>
+                <td>54.0</td>
+                <td>3.0</td>
+                <td>8.1 MPa (Large growth, low stiffness)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Case Study: Industrial High-Pressure Steam Piping Run</h3>
+            <p><strong>Design Scenario:</strong> An industrial chemical plant installs an outdoor carbon steel steam pipeline (ASTM A106 Grade B, $\alpha = 12.0 \times 10^{-6}\text{ /}^\circ\text{C}$, $E = 200\text{ GPa}$). The nominal pipe size is NPS 4-inch Schedule 40 ($D_{outer} = 114.3\text{ mm}$, pipe wall cross-sectional area $A_{cross} = 2,165\text{ mm}^2$). The straight run between fixed building anchors spans $L_0 = 40.0\text{ m}$. The pipe is installed at Winter ambient conditions ($T_{initial} = 5.0^\circ\text{C}$) and carries saturated steam at $T_{final} = 175.0^\circ\text{C}$ ($\Delta T = 170.0^\circ\text{C}$). Calculate the unrestrained thermal expansion ($\Delta L$), evaluate the theoretical anchor force if rigidly locked, and size a flexible expansion U-loop.</p>
+            
+            <p><strong>Step 1: Calculate Unrestrained Thermal Elongation ($\Delta L$)</strong></p>
+            <div class="formula-box">
+              $$\Delta L = L_0 \times \alpha \times \Delta T = 40.0\text{ m} \times (12.0 \times 10^{-6}\text{ /}^\circ\text{C}) \times 170.0^\circ\text{C}$$
+              $$\Delta L = 40.0 \times 0.00204 = 0.0816\text{ m} = 81.60\text{ mm}$$
+            </div>
+            <p>
+              The $40\text{ meter}$ pipe run expands by over $81.6\text{ mm}$ (approx. $3.21\text{ inches}$).
+            </p>
+
+            <p><strong>Step 2: Calculate Constrained Thermal Stress and Anchor Thrust Force</strong></p>
+            <div class="formula-box">
+              $$\sigma_{th} = E \times \alpha \times \Delta T = 200,000\text{ MPa} \times (12.0 \times 10^{-6}) \times 170 = 408.0\text{ MPa}$$
+              $$F_{anchor} = \sigma_{th} \times A_{cross} = 408.0\text{ N/mm}^2 \times 2,165\text{ mm}^2 = 883,320\text{ N} \approx 883.3\text{ kN} \quad (\approx 90.0\text{ metric tons!})$$
+            </div>
+            <p>
+              An unyielding anchor would experience an immense $883\text{ kN}$ thrust, far exceeding the yield strength of the steel ($S_y = 240\text{ MPa}$) and crushing the pipe wall.
+            </p>
+
+            <p><strong>Step 3: Size the Flexible ASME B31.3 Expansion U-Loop Leg</strong></p>
+            <div class="formula-box">
+              $$L_{leg} \approx 0.043 \times \sqrt{D_{outer} (\text{mm}) \times \Delta L (\text{mm})} = 0.043 \times \sqrt{114.3 \times 81.60}$$
+              $$L_{leg} = 0.043 \times \sqrt{9,326.88} = 0.043 \times 96.57 \approx 4.15\text{ meters}$$
+            </div>
+            <p>
+              <strong>Engineering Conclusion:</strong> Installing a symmetrical expansion U-loop with perpendicular legs of $L_{leg} = 4.2\text{ meters}$ absorbs the entire $81.6\text{ mm}$ thermal growth via elastic cantilever bending, reducing anchor loads to benign levels ($< 5\text{ kN}$) and ensuring full compliance with ASME B31.3.
+            </p>
+          </div>
+
+          <h2>Continuous Welded Rail (CWR) and Civil Thermal Neutral Temperature ($T_N$)</h2>
+          <p>
+            Modern civil high-speed railway networks eliminate bolted fishplate rail expansion gaps to provide a smooth, low-maintenance ride. Instead, rails are flash-butt welded into continuous strings spanning multiple kilometers (Continuous Welded Rail, CWR). Because the steel rails cannot expand or contract longitudinally, severe thermal stresses develop:
+          </p>
+          <div class="formula-box">
+            $$F_{rail} = A_{rail} \cdot E \cdot \alpha \cdot (T_{rail} - T_N) \quad [\text{N}]$$
+          </div>
+          <p>
+            To manage seasonal extremes, railway track engineers prestress and anchor the rail at a carefully calibrated <strong>Rail Neutral Temperature ($T_N$)</strong>, typically chosen between $27^\circ\text{C}$ and $35^\circ\text{C}$ ($80^\circ\text{F} - 95^\circ\text{F}$). When direct summer solar radiation drives steel rail head temperatures to $60^\circ\text{C}$ ($140^\circ\text{F}$, $\Delta T = +28^\circ\text{C}$), a heavy UIC 60 rail ($A = 7,670\text{ mm}^2$) develops over $515\text{ kN}$ of longitudinal compressive force. If ballast shoulder resistance is inadequate, this force precipitates sudden lateral "sun kink" track buckling, causing derailments. Conversely, extreme winter cold creates massive tensile forces that can snap rails in brittle fracture.
+          </p>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar">
+        <div class="sidebar-card">
+          <h4>Related Thermal &amp; Piping Calculators</h4>
+          <ul class="sidebar-links">
+            <li><a href="heat-exchanger-calculator.html">Heat Exchanger LMTD</a></li>
+            <li><a href="pipe-sizing-calculator.html">Pipe Sizing &amp; Velocity</a></li>
+            <li><a href="pump-flow-calculator.html">Pump Flow &amp; Pipe Velocity</a></li>
+            <li><a href="shaft-diameter-calculator.html">Shaft Diameter Sizing</a></li>
+            <li><a href="spring-rate-calculator.html">Spring Rate Calculator</a></li>
+            <li><a href="cooling-load-calculator.html">Cooling Load Calculator</a></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>High-precision professional engineering and scientific calculation engines.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Directories</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="mechanical.html">Mechanical Engineering</a></li>
+          <li><a href="engineering.html">Civil &amp; Structural</a></li>
+          <li><a href="sitemap.xml">XML Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 CalcHub. Standard Engineering Reference Systems.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calcBtn = document.getElementById('calcThermalBtn');
+      const resetBtn = document.getElementById('resetThermalBtn');
+      const resultBox = document.getElementById('thermalResultBox');
+
+      const materialPreset = document.getElementById('materialPreset');
+      const alphaCoeff = document.getElementById('alphaCoeff');
+      const elasticModulus = document.getElementById('elasticModulus');
+
+      const matData = {
+        '12.0': { alpha: 12.0, e: 200 },
+        '17.3': { alpha: 17.3, e: 193 },
+        '23.1': { alpha: 23.1, e: 69 },
+        '16.5': { alpha: 16.5, e: 117 },
+        '18.7': { alpha: 18.7, e: 100 },
+        '10.8': { alpha: 10.8, e: 110 },
+        '10.0': { alpha: 10.0, e: 30 },
+        '54.0': { alpha: 54.0, e: 3 },
+        '1.2': { alpha: 1.2, e: 148 }
+      };
+
+      materialPreset.addEventListener('change', function() {
+        if (this.value !== 'custom' && matData[this.value]) {
+          alphaCoeff.value = matData[this.value].alpha;
+          elasticModulus.value = matData[this.value].e;
+        }
+      });
+
+      function calculateThermal() {
+        const alpha_val = parseFloat(alphaCoeff.value);
+        const L0 = parseFloat(document.getElementById('initLength').value);
+        const E_GPa = parseFloat(elasticModulus.value);
+        const T_init = parseFloat(document.getElementById('tempInitial').value);
+        const T_final = parseFloat(document.getElementById('tempFinal').value);
+        const A_cross = parseFloat(document.getElementById('crossSection').value) || 0;
+        const D_out = parseFloat(document.getElementById('pipeOuterDia').value) || 0;
+
+        if (isNaN(alpha_val) || alpha_val <= 0 || isNaN(L0) || L0 <= 0 || isNaN(E_GPa) || E_GPa <= 0) {
+          alert('Please enter valid positive values for material coefficient, length, and modulus.');
+          return;
+        }
+
+        const deltaT = T_final - T_init;
+        const alpha_scientific = alpha_val * 1e-6;
+
+        // Linear elongation Delta L = L0 * alpha * Delta T [meters]
+        const deltaL_m = L0 * alpha_scientific * deltaT;
+        const deltaL_mm = deltaL_m * 1000.0;
+        const finalLength_m = L0 + deltaL_m;
+
+        // Fully constrained thermal stress sigma = E * alpha * Delta T [MPa]
+        const E_MPa = E_GPa * 1000.0;
+        const sigma_th = E_MPa * alpha_scientific * Math.abs(deltaT);
+
+        // Restraining anchor force [kN]
+        const f_anchor_kN = (sigma_th * A_cross) / 1000.0;
+
+        // Expansion loop sizing (Kellogg formula)
+        let loopLeg_m = 0;
+        if (D_out > 0 && Math.abs(deltaL_mm) > 0) {
+          loopLeg_m = 0.043 * Math.sqrt(D_out * Math.abs(deltaL_mm));
+        }
+
+        // Render outputs
+        document.getElementById('resDeltaL').textContent = deltaL_mm.toFixed(2) + ' mm (' + (deltaL_mm / 25.4).toFixed(3) + ' in)';
+        document.getElementById('resFinalLength').textContent = finalLength_m.toFixed(4) + ' m';
+        document.getElementById('resDeltaT').textContent = (deltaT >= 0 ? '+' : '') + deltaT.toFixed(1) + ' °C (' + (deltaT * 1.8).toFixed(1) + ' °F)';
+        document.getElementById('resThermalStress').textContent = sigma_th.toFixed(1) + ' MPa (' + (sigma_th * 145.038).toFixed(0) + ' psi)';
+        document.getElementById('resAnchorForce').textContent = A_cross > 0 ? (f_anchor_kN.toFixed(1) + ' kN (' + (f_anchor_kN * 0.10197).toFixed(1) + ' tonnes-force)') : 'N/A (Specify Area)';
+        document.getElementById('resLoopLength').textContent = loopLeg_m > 0 ? (loopLeg_m.toFixed(2) + ' m leg per ASME B31.3') : 'N/A';
+
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      calcBtn.addEventListener('click', calculateThermal);
+      resetBtn.addEventListener('click', function() {
+        resultBox.style.display = 'none';
+      });
+
+      calculateThermal();
+    });
+  </script>
+</body>
+</html>

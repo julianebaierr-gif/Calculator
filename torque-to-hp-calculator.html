@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Torque to HP Calculator | Horsepower, Kilowatts &amp; BMEP</title>
+  <meta name="description" content="Convert torque (N·m, lb·ft, in·lb) and RPM to horsepower (HP / bhp) and kilowatts (kW). Includes brake mean effective pressure (BMEP) engine sizing.">
+  <link rel="canonical" href="https://calchub.cloud/torque-to-hp-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Torque to HP Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Rotational mechanical power converter calculating Horsepower HP = (Torque * RPM) / 5252, Kilowatts P = (T * RPM) / 9548.8, and 4-stroke engine BMEP.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the formula to calculate horsepower from torque and RPM?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In US imperial units: HP = (Torque [lb-ft] * RPM) / 5252.113. If torque is given in pound-inches: HP = (Torque [in-lb] * RPM) / 63,025. In metric SI units: Power [kW] = (Torque [N-m] * RPM) / 9548.8, which converts to mechanical HP as HP = kW * 1.34102."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why do horsepower and torque curves always cross at 5252 RPM?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "One mechanical horsepower is defined as 33,000 foot-pounds of work per minute. Dividing 33,000 by 2 * pi radians per revolution yields exactly 5,252.113. When an engine rotates at 5,252 RPM, RPM and the 5252 constant cancel out completely, making horsepower and torque (in lb-ft) numerically equal on any dyno graph."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is Brake Mean Effective Pressure (BMEP)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "BMEP is the theoretical average cylinder pressure exerted on pistons during the power stroke that produces the measured brake torque: BMEP [bar] = (4 * pi * Torque [N-m]) / (Displacement [Liters] * 100). BMEP serves as an engine-independent benchmark of volumetric efficiency and combustion design."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between mechanical HP, metric HP (PS), and electrical kW?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "1 mechanical horsepower (Imperial HP / bhp) = 745.69987 Watts. 1 metric horsepower (PS / cv / pk) is based on 75 kg-m/s = 735.49875 Watts (approximately 0.9863 Imperial HP). 1 Kilowatt (kW) = 1,000 Watts = 1.34102 Imperial HP = 1.35962 Metric PS."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="mechanical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html" class="active">Mechanical</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="engineering.html">Engineering</a> &rsaquo; 
+      <a href="mechanical.html">Mechanical</a> &rsaquo; 
+      <span>Torque to HP Calculator</span>
+    </nav>
+
+    <header class="calc-header">
+      <div class="calc-badge">Engine Dynamics &amp; Dyno Sizing</div>
+      <h1 class="calc-title">Torque to HP Calculator</h1>
+      <p class="calc-tagline">Convert rotational torque and RPM to brake horsepower (HP / bhp), metric PS, kilowatts (kW), and evaluate engine brake mean effective pressure (BMEP).</p>
+    </header>
+
+    <div class="calc-grid">
+      <div class="calc-main">
+        <div class="tool-card">
+          <form id="t2hpForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="torqueUnit">Torque Input Unit</label>
+                <select id="torqueUnit" class="form-control">
+                  <option value="ftlb" selected>Foot-Pounds (lb&middot;ft / ft&middot;lbf)</option>
+                  <option value="nm">Newton-Meters (N&middot;m)</option>
+                  <option value="inlb">Inch-Pounds (in&middot;lb)</option>
+                  <option value="kgm">Kilogram-Meters (kg&middot;m)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="torqueValue">Torque Magnitude ($T$)</label>
+                <input type="number" id="torqueValue" class="form-control" value="380" min="0.01" step="any" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="engineSpeed">Rotational Speed ($N$ in RPM)</label>
+                <input type="number" id="engineSpeed" class="form-control" value="5500" min="1" step="any" required>
+                <span class="hint">Crossover speed where HP = Torque (lb-ft) is exactly 5,252 RPM</span>
+              </div>
+              <div class="form-group">
+                <label for="engineDisplacement">Engine Displacement (Optional for BMEP)</label>
+                <div style="display: flex; gap: 0.5rem;">
+                  <input type="number" id="engineDisplacement" class="form-control" value="3.0" min="0" step="any">
+                  <select id="dispUnit" class="form-control" style="width: 100px;">
+                    <option value="l" selected>Liters</option>
+                    <option value="ci">CID (in³)</option>
+                    <option value="cc">cc (cm³)</option>
+                  </select>
+                </div>
+                <span class="hint">4-stroke engine displacement for BMEP analysis</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="calcHpBtn">Convert Torque to Horsepower</button>
+              <button type="reset" class="btn btn-secondary" id="resetHpBtn">Reset</button>
+            </div>
+          </form>
+
+          <div id="t2hpResultBox" class="results-container" style="display: none; margin-top: 1.5rem;">
+            <h3>Calculated Power &amp; Performance Output</h3>
+            <div class="results-grid">
+              <div class="result-tile highlight">
+                <span class="result-label">Brake Horsepower (HP / bhp)</span>
+                <span class="result-value" id="resHP">-- HP</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Metric Horsepower (PS / cv)</span>
+                <span class="result-value" id="resPS">-- PS</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Mechanical Power in Kilowatts</span>
+                <span class="result-value" id="resKW">-- kW</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Standard Torque in Newton-Meters</span>
+                <span class="result-value" id="resNm">-- N·m</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Standard Torque in Foot-Pounds</span>
+                <span class="result-value" id="resFtLb">-- lb·ft</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Brake Mean Effective Pressure (BMEP)</span>
+                <span class="result-value" id="resBMEP">-- bar / psi</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Specific Power Density</span>
+                <span class="result-value" id="resPowerDensity">-- HP/L</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Physics of Rotary Power: Torque vs. Horsepower</h2>
+          <p>
+            In internal combustion engine dynamometry, electric motor testing, and vehicular performance analysis, the relationship between <strong>torque</strong> and <strong>horsepower</strong> is frequently misunderstood. Automotive enthusiasts often quote the aphorism: <em>"Torque is how hard you hit the wall; horsepower is how fast you hit the wall."</em> While evocative, the physical truth is grounded in classical Newtonian mechanics:
+          </p>
+          <ul>
+            <li><strong>Torque ($T$):</strong> A static or dynamic twisting moment (rotational force vector cross-product $\vec{\tau} = \vec{r} \times \vec{F}$), measured in foot-pounds ($\text{lb}\cdot\text{ft}$) or Newton-meters ($\text{N}\cdot\text{m}$). Torque describes the engine's instantaneous capacity to perform work.</li>
+            <li><strong>Horsepower ($HP$ or $P$):</strong> The time rate of doing rotational work ($P = \frac{dW}{dt} = T \cdot \omega$). Power depends simultaneously on torque and how many times per second that twisting moment is repeated (rotational velocity).</li>
+          </ul>
+          <p>
+            On a chassis or engine dynamometer, power is never measured directly. The dyno absorption brake measures instantaneous reaction torque and shaft RPM; horsepower is strictly a <strong>calculated mathematical derivative</strong> of those two measured physical quantities.
+          </p>
+
+          <h2>The Derivation of the 5252 Imperial Constant</h2>
+          <p>
+            In the 18th century, Scottish engineer James Watt sought to market his new condensing steam engines to Cornish coal mine operators who used draught pit ponies to haul water buckets from mine shafts. To establish an equivalence, Watt conducted experiments with brewery dray horses turning an $8\text{-foot}$ radius capstan. Watt observed that an average draft horse could exert a steady pulling force of $180\text{ pounds}$ while walking a $24\text{-foot}$ circumference track $2.4\text{ times per minute}$.
+          </p>
+          <p>
+            Calculating the mechanical work performed:
+          </p>
+          <div class="formula-box">
+            $$\text{Work per minute} = 180\text{ lbf} \times (2.4 \times 2\pi \times 12\text{ ft}) \approx 32,572\text{ ft}\cdot\text{lbf/min}$$
+          </div>
+          <p>
+            Watt rounded this figure upward by approximately 1.3% to establish the legendary engineering benchmark:
+          </p>
+          <div class="formula-box">
+            $$1\text{ Horsepower} = 33,000\text{ foot-pounds of work per minute} = 550\text{ ft}\cdot\text{lbf/second}$$
+          </div>
+          <p>
+            When rotational speed is expressed in revolutions per minute ($N$ in $\text{RPM}$), each revolution sweeps through an angular displacement of $2\pi$ radians. The linear work distance traveled per minute at radius $r$ is $2\pi \cdot r \cdot N$. Substituting this into the horsepower definition:
+          </p>
+          <div class="formula-box">
+            $$HP = \frac{\text{Force} \times \text{Distance per minute}}{33,000} = \frac{F \times (2\pi \cdot r \cdot N)}{33,000} = \frac{(F \cdot r) \times 2\pi \cdot N}{33,000}$$
+          </div>
+          <p>
+            Recognizing that $F \cdot r = \text{Torque } (T \text{ in lb}\cdot\text{ft})$:
+          </p>
+          <div class="formula-box">
+            $$HP = \frac{T \times 2\pi \times N}{33,000} = \frac{T \times N}{\frac{33,000}{2\pi}} = \frac{T (\text{lb}\cdot\text{ft}) \times N (\text{RPM})}{5252.113}$$
+          </div>
+          <p>
+            <strong>The 5252 Crossover Phenomenon:</strong> Whenever an engine operates at exactly $5252.113\text{ RPM}$, the speed term in the numerator cancels the denominator constant perfectly ($5252 / 5252 = 1.0$), making numerical horsepower exactly equal to torque in pound-feet ($HP = T$). Below $5252\text{ RPM}$, torque in lb-ft is always numerically greater than horsepower; above $5252\text{ RPM}$, horsepower is always numerically greater than torque.
+          </p>
+
+          <h2>Metric SI Formulation (Kilowatts &amp; Newton-Meters)</h2>
+          <p>
+            In the International System of Units (SI), mechanical power is quantified in Watts ($\text{W}$) or Kilowatts ($\text{kW}$), where $1\text{ Watt} = 1\text{ Joule/second} = 1\text{ N}\cdot\text{m/s}$. Given torque $T$ in $\text{N}\cdot\text{m}$ and speed $N$ in $\text{RPM}$:
+          </p>
+          <div class="formula-box">
+            $$P (\text{kW}) = \frac{T (\text{N}\cdot\text{m}) \times \omega (\text{rad/s})}{1000} = \frac{T \times \left(\frac{2\pi \cdot N}{60}\right)}{1000} = \frac{T (\text{N}\cdot\text{m}) \times N (\text{RPM})}{9548.8}$$
+          </div>
+          <p>
+            To convert between metric Kilowatts and mechanical Imperial Horsepower:
+          </p>
+          <div class="formula-box">
+            $$HP = P (\text{kW}) \times 1.341022, \quad P (\text{kW}) = HP \times 0.74569987$$
+            $$1\text{ Metric PS (Pferdest&auml;rke)} = P (\text{kW}) \times 1.35962 = 0.98632\text{ Imperial HP}$$
+          </div>
+
+          <h2>Brake Mean Effective Pressure (BMEP) as an Engine Benchmark</h2>
+          <p>
+            Comparing raw horsepower or torque between an $8.0\text{-liter}$ heavy truck V8 and a $2.0\text{-liter}$ turbocharged inline-4 gives little insight into combustion efficiency. Automotive engine developers utilize <strong>Brake Mean Effective Pressure (BMEP)</strong>&mdash;a theoretical constant pressure that, if applied uniformly to each piston throughout the power expansion stroke, would produce the measured brake torque output:
+          </p>
+          <div class="formula-box">
+            $$\text{BMEP (bar)} = \frac{4\pi \cdot T (\text{N}\cdot\text{m})}{V_d (\text{Liters}) \times 100} \approx \frac{0.12566 \cdot T (\text{N}\cdot\text{m})}{V_d (\text{Liters})}$$
+          </div>
+          <p>
+            Where $V_d$ is total engine displacement in liters. Representative BMEP ranges across internal combustion architectures include:
+          </p>
+          <ul>
+            <li>Naturally Aspirated 4-Stroke Gasoline: $9.0\text{ to } 12.0\text{ bar}$ ($130\text{ to } 175\text{ psi}$)</li>
+            <li>High-Performance Naturally Aspirated (BMW M, Porsche GT3): $13.0\text{ to } 15.0\text{ bar}$ ($190\text{ to } 218\text{ psi}$)</li>
+            <li>Production Turbocharged Gasoline: $16.0\text{ to } 24.0\text{ bar}$ ($230\text{ to } 350\text{ psi}$)</li>
+            <li>Heavy-Duty Commercial Turbo Diesel: $18.0\text{ to } 26.0\text{ bar}$ ($260\text{ to } 375\text{ psi}$)</li>
+            <li>Formula 1 Hybrid Turbo V6: $> 30.0\text{ bar}$ ($> 435\text{ psi}$)</li>
+          </ul>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Case Study: High-Performance Turbocharged Sports Sedan Dyno Run</h3>
+            <p><strong>Design Scenario:</strong> A $3.0\text{-liter}$ turbocharged inline-6 performance engine is evaluated on an all-wheel-drive hub chassis dynamometer. At peak power engine speed of $N = 6,200\text{ RPM}$, the dynamometer measures a wheel torque output of $T = 425\text{ lb}\cdot\text{ft}$ ($576.22\text{ N}\cdot\text{m}$). Calculate the brake horsepower, metric horsepower (PS), mechanical kilowatts, and evaluate the Brake Mean Effective Pressure (BMEP) to verify combustion efficiency.</p>
+            
+            <p><strong>Step 1: Calculate Brake Horsepower (HP)</strong></p>
+            <div class="formula-box">
+              $$HP = \frac{425\text{ lb}\cdot\text{ft} \times 6,200\text{ RPM}}{5252.113} = \frac{2,635,000}{5252.113} \approx 501.70\text{ HP}$$
+            </div>
+            <p>
+              Because operating speed ($6,200\text{ RPM}$) is above the $5252$ crossover point, horsepower ($501.7\text{ HP}$) is numerically higher than torque ($425\text{ lb}\cdot\text{ft}$).
+            </p>
+
+            <p><strong>Step 2: Convert to Kilowatts and Metric PS</strong></p>
+            <div class="formula-box">
+              $$P (\text{kW}) = \frac{501.70\text{ HP}}{1.341022} = 374.12\text{ kW}$$
+              $$\text{Metric PS} = 374.12\text{ kW} \times 1.35962 \approx 508.66\text{ PS}$$
+            </div>
+
+            <p><strong>Step 3: Calculate Brake Mean Effective Pressure (BMEP)</strong></p>
+            <div class="formula-box">
+              $$\text{BMEP} = \frac{4\pi \times 576.22\text{ N}\cdot\text{m}}{3.0\text{ Liters} \times 100} = \frac{7,241.0}{300} = 24.14\text{ bar} \quad (\approx 350.1\text{ psi})$$
+            </div>
+
+            <p><strong>Step 4: Determine Specific Power Output per Liter</strong></p>
+            <div class="formula-box">
+              $$\text{Specific Output} = \frac{501.70\text{ HP}}{3.0\text{ L}} = 167.23\text{ HP/Liter}$$
+            </div>
+            <p>
+              <strong>Engineering Conclusion:</strong> Operating at $24.14\text{ bar}$ BMEP and $167.2\text{ HP/Liter}$ confirms that the engine's forced-induction turbochargers and variable valve timing are delivering exceptional volumetric efficiency and combustion chamber peak cylinder pressures without encountering pre-ignition knock.
+            </p>
+          </div>
+
+          <h2>Electric Motor vs. Internal Combustion Torque-Power Envelopes</h2>
+          <p>
+            When transitioning between internal combustion engines (ICE) and electric vehicle (EV) powertrains, engineers must account for fundamentally divergent torque-speed characteristics:
+          </p>
+          <ul>
+            <li><strong>Internal Combustion Engines:</strong> Produce zero torque at 0 RPM, requiring a friction clutch or slipping torque converter to launch. Torque rises to a mid-RPM peak before breathing limitations cause it to fall, while horsepower continues rising toward redline. Multi-speed gearboxes (6 to 10 ratios) are mandatory to keep the engine operating near its narrow power peak.</li>
+            <li><strong>Electric Traction Motors (PMSM / AC Induction):</strong> Develop maximum rated torque instantly at 0 RPM. From 0 RPM up to <strong>Base Speed</strong>, the motor operates in the <em>Constant Torque Region</em> where power scales linearly ($P \propto N$). Above base speed, the inverter clamps voltage and enters the <em>Field Weakening (Constant Power) Region</em> where available torque falls inversely with speed ($T \propto 1/N$) while nameplate horsepower remains constant. This wide constant-power bandwidth enables single-speed reduction transmissions with extreme launch acceleration and smooth high-speed cruising.</li>
+          </ul>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar">
+        <div class="sidebar-card">
+          <h4>Related Driveline &amp; Motor Calculators</h4>
+          <ul class="sidebar-links">
+            <li><a href="power-to-torque-calculator.html">Power to Torque Calculator</a></li>
+            <li><a href="torque-converter.html">Torque Converter Calculator</a></li>
+            <li><a href="torque-calculator.html">Torque &amp; Shaft Power</a></li>
+            <li><a href="gear-ratio-calculator.html">Gear Ratio &amp; Speed</a></li>
+            <li><a href="flywheel-energy-calculator.html">Flywheel Energy Storage</a></li>
+            <li><a href="shaft-diameter-calculator.html">Shaft Diameter Sizing</a></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>High-precision professional engineering and scientific calculation engines.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Directories</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="mechanical.html">Mechanical Engineering</a></li>
+          <li><a href="engineering.html">Civil &amp; Structural</a></li>
+          <li><a href="sitemap.xml">XML Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 CalcHub. Standard Engineering Reference Systems.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calcBtn = document.getElementById('calcHpBtn');
+      const resetBtn = document.getElementById('resetHpBtn');
+      const resultBox = document.getElementById('t2hpResultBox');
+
+      function calculateHP() {
+        const tUnit = document.getElementById('torqueUnit').value;
+        const tVal = parseFloat(document.getElementById('torqueValue').value);
+        const rpm = parseFloat(document.getElementById('engineSpeed').value);
+        const dispVal = parseFloat(document.getElementById('engineDisplacement').value) || 0;
+        const dispU = document.getElementById('dispUnit').value;
+
+        if (isNaN(tVal) || tVal <= 0 || isNaN(rpm) || rpm <= 0) {
+          alert('Please enter valid positive values for torque and RPM.');
+          return;
+        }
+
+        // Convert torque to lb-ft and N-m
+        let t_ftlb = 0;
+        let t_nm = 0;
+
+        if (tUnit === 'ftlb') {
+          t_ftlb = tVal;
+          t_nm = tVal * 1.3558179483314;
+        } else if (tUnit === 'nm') {
+          t_nm = tVal;
+          t_ftlb = tVal / 1.3558179483314;
+        } else if (tUnit === 'inlb') {
+          t_ftlb = tVal / 12.0;
+          t_nm = t_ftlb * 1.3558179483314;
+        } else if (tUnit === 'kgm') {
+          t_nm = tVal * 9.80665;
+          t_ftlb = t_nm / 1.3558179483314;
+        }
+
+        // Horsepower HP = (Torque_ftlb * RPM) / 5252.113
+        const hp = (t_ftlb * rpm) / 5252.113;
+        // Kilowatts kW = (Torque_nm * RPM) / 9548.8
+        const kw = (t_nm * rpm) / 9548.8;
+        // Metric PS
+        const ps = kw * 1.35962;
+
+        // BMEP calculation
+        let bmep_bar = 0;
+        let bmep_psi = 0;
+        let powerDensity = 0;
+
+        if (dispVal > 0) {
+          let dispLiters = dispVal;
+          if (dispU === 'ci') dispLiters = dispVal * 0.0163871;
+          else if (dispU === 'cc') dispLiters = dispVal / 1000.0;
+
+          if (dispLiters > 0) {
+            bmep_bar = (4.0 * Math.PI * t_nm) / (dispLiters * 100.0);
+            bmep_psi = bmep_bar * 14.5038;
+            powerDensity = hp / dispLiters;
+          }
+        }
+
+        // Render outputs
+        document.getElementById('resHP').textContent = hp.toFixed(1) + ' HP (' + hp.toLocaleString('en-US', {maximumFractionDigits: 1}) + ' bhp)';
+        document.getElementById('resPS').textContent = ps.toFixed(1) + ' PS (cv)';
+        document.getElementById('resKW').textContent = kw.toFixed(1) + ' kW';
+        document.getElementById('resNm').textContent = t_nm.toFixed(1) + ' N·m';
+        document.getElementById('resFtLb').textContent = t_ftlb.toFixed(1) + ' lb·ft';
+        document.getElementById('resBMEP').textContent = bmep_bar > 0 ? (bmep_bar.toFixed(2) + ' bar (' + bmep_psi.toFixed(1) + ' psi)') : 'N/A (Specify Displacement)';
+        document.getElementById('resPowerDensity').textContent = powerDensity > 0 ? (powerDensity.toFixed(1) + ' HP/L') : 'N/A';
+
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      calcBtn.addEventListener('click', calculateHP);
+      resetBtn.addEventListener('click', function() {
+        resultBox.style.display = 'none';
+      });
+
+      calculateHP();
+    });
+  </script>
+</body>
+</html>

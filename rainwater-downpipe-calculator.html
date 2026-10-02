@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rainwater Downpipe Calculator | Roof Drainage &amp; Pipe Sizing</title>
+  <meta name="description" content="Calculate rainwater downpipe size, effective roof catchment area, design rainfall runoff (L/s), and gutter outlet capacity per BS EN 12056-3 &amp; AS/NZS 3500.">
+  <link rel="canonical" href="https://calchub.cloud/rainwater-downpipe-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Rainwater Downpipe Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Roof drainage and vertical rainwater leader sizing calculator evaluating effective catchment area, design storm runoff, and downpipe capacity per BS EN 12056-3.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How is effective roof catchment area calculated for pitched roofs?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Per BS EN 12056-3 and AS/NZS 3500, wind-driven rain hits roof slopes at an angle. The effective catchment area (A_e) accounts for horizontal plan projection plus vertical elevation: A_e = L * (W + H / 2), where L is roof gutter length, W is horizontal plan span from eaves to ridge, and H is vertical rise height from eaves to ridge."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the formula for design rainwater runoff flow rate (Q)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The design rainwater runoff flow rate is computed as: Q = (r * A_e * C) / 3600, where Q is flow in liters per second (L/s), r is design rainfall intensity in mm/hr (typically a 1-in-50 or 1-in-100 year storm event), A_e is effective catchment area in square meters (m^2), and C is runoff discharge coefficient (typically 0.95 to 1.0 for impermeable metal, slate, and tile roofs)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why are vertical rainwater downpipes not sized for 100% full-bore hydraulic flow?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In conventional gravity drainage, water enters downpipes around the perimeter, forming an annular sheet clinging to the pipe walls with a continuous central air core. Sizing pipes to operate at a filling ratio f <= 0.25 to 0.33 prevents sub-atmospheric pressure surges, noise, and sudden violent siphonage that could collapse eaves gutters."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How many downpipes are required for a large commercial roof?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The minimum number of downpipes is calculated as: N_pipes = ceil(Q_total / Q_pipe_capacity). However, architectural plumbing guidelines also enforce maximum downpipe spacing (typically no more than 15 meters or 50 feet apart along a continuous eaves gutter) to prevent gutter overtopping during peak cloudbursts."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="civil">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html" class="active">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="civil.html">Civil &amp; Construction</a> &rsaquo; 
+      <span>Rainwater Downpipe Calculator</span>
+    </nav>
+
+    <header class="calc-header">
+      <div class="calc-badge">Roof Drainage &amp; Plumbing</div>
+      <h1 class="calc-title">Rainwater Downpipe Calculator</h1>
+      <p class="calc-tagline">Size roof rainwater downpipes (leaders), calculate wind-driven effective catchment area, and determine design storm runoff per BS EN 12056-3.</p>
+    </header>
+
+    <div class="calc-grid">
+      <div class="calc-main">
+        <div class="tool-card">
+          <form id="downpipeForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="roofLength">Gutter Length ($L$ in meters)</label>
+                <input type="number" id="roofLength" class="form-control" value="20" min="0.5" step="any" required>
+                <span class="hint">Longitudinal length of the eaves line</span>
+              </div>
+              <div class="form-group">
+                <label for="roofWidth">Eaves-to-Ridge Horizontal Span ($W$ in meters)</label>
+                <input type="number" id="roofWidth" class="form-control" value="8" min="0.5" step="any" required>
+                <span class="hint">Horizontal plan projection of the roof slope</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="roofHeight">Vertical Rise from Eaves to Ridge ($H$ in meters)</label>
+                <input type="number" id="roofHeight" class="form-control" value="3" min="0" step="any" required>
+                <span class="hint">Vertical height (set 0 for flat roofs)</span>
+              </div>
+              <div class="form-group">
+                <label for="rainIntensity">Design Storm Rainfall Intensity ($r$)</label>
+                <div style="display: flex; gap: 0.5rem;">
+                  <input type="number" id="rainIntensity" class="form-control" value="75" min="10" step="1" required>
+                  <select id="rainPreset" class="form-control" style="width: 140px;">
+                    <option value="50">50 mm/h (UK/Eur standard)</option>
+                    <option value="75" selected>75 mm/h (Heavy storm)</option>
+                    <option value="100">100 mm/h (Severe storm)</option>
+                    <option value="150">150 mm/h (Tropical monsoon)</option>
+                  </select>
+                </div>
+                <span class="hint">Design storm rainfall rate per local meteorological data</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="downpipeSize">Selected Downpipe Internal Diameter ($D$)</label>
+                <select id="downpipeSize" class="form-control">
+                  <option value="68">68 mm (~2.7 in) - Residential Round PVC/Zinc</option>
+                  <option value="82" selected>82 mm (~3.2 in) - Standard Domestic / Commercial</option>
+                  <option value="100">100 mm (~4.0 in) - Heavy Commercial / Industrial</option>
+                  <option value="150">150 mm (~6.0 in) - Large Warehouse / Industrial Hub</option>
+                  <option value="200">200 mm (~8.0 in) - Major Logistics Terminal</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="runoffCoeff">Roof Surface Discharge Coefficient ($C$)</label>
+                <select id="runoffCoeff" class="form-control">
+                  <option value="1.0" selected>1.00 - Impermeable Metal Sheeting / Glazed Tile</option>
+                  <option value="0.95">0.95 - Standard Concrete Tile / Slate Shingles</option>
+                  <option value="0.90">0.90 - Asphalt Shingle / Bitumen Roofing Felt</option>
+                  <option value="0.50">0.50 - Extensive Green Roof (Sedum Retaining)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="calcDownpipeBtn">Calculate Downpipe &amp; Catchment Sizing</button>
+              <button type="reset" class="btn btn-secondary" id="resetDownpipeBtn">Reset</button>
+            </div>
+          </form>
+
+          <div id="downpipeResultBox" class="results-container" style="display: none; margin-top: 1.5rem;">
+            <h3>Calculated Drainage &amp; Downpipe Sizing</h3>
+            <div class="results-grid">
+              <div class="result-tile highlight">
+                <span class="result-label">Total Design Rainwater Runoff ($Q_{design}$)</span>
+                <span class="result-value" id="resDesignFlow">-- L/s</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Effective Catchment Area ($A_e$)</span>
+                <span class="result-value" id="resEffectiveArea">-- m²</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Single Downpipe Capacity ($Q_{cap}$)</span>
+                <span class="result-value" id="resPipeCap">-- L/s</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Minimum Downpipes Required ($N_{pipes}$)</span>
+                <span class="result-value" id="resPipesReq">-- Pipes</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Max Spacing Between Downpipes</span>
+                <span class="result-value" id="resSpacing">-- m</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Drainage System Sizing Assessment</span>
+                <span class="result-value" id="resStatus">--</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Principles of Roof Rainwater Drainage (BS EN 12056-3)</h2>
+          <p>
+            Effective architectural rainwater drainage protects building structures from catastrophic water ingress, structural roof overload, and facade staining. In accordance with <strong>BS EN 12056-3</strong> (<em>Gravity drainage systems inside buildings &ndash; Roof drainage, layout and calculation</em>) and regional standards like <strong>AS/NZS 3500.3</strong>, rainwater downpipes (also referred to as rainwater leaders or conductors) must be sized to convey design storm rainfall runoff safely away from eaves gutters without risk of backflow or overflowing.
+          </p>
+          <p>
+            Designing roof drainage involves three interconnected technical stages:
+          </p>
+          <ol>
+            <li>Evaluating the <strong>effective catchment area ($A_e$)</strong> accounting for wind-driven rainfall pitch factors.</li>
+            <li>Determining peak design storm runoff flow rate ($Q$) based on localized rainfall intensity ($r$).</li>
+            <li>Sizing vertical downpipes and gutter outlets based on gravity annular-flow hydraulic discharge limits.</li>
+          </ol>
+
+          <h2>Effective Roof Catchment Area Formulation ($A_e$)</h2>
+          <p>
+            Rain rarely falls strictly vertically; during severe thunderstorms and squall lines, prevailing wind drives raindrops at angles ranging from $25^\circ$ to $45^\circ$ from vertical. Consequently, a pitched roof slope intercepts significantly more rainwater than its simple flat horizontal footprint. Under the formulation of BS EN 12056-3 Clause 4.2.2:
+          </p>
+          <div class="formula-box">
+            $$A_e = L \cdot \left(W + \frac{H}{2}\right) \quad [\text{m}^2]$$
+          </div>
+          <p>
+            Where:
+          </p>
+          <ul>
+            <li>$L$ is the length of the eaves gutter line in meters ($\text{m}$).</li>
+            <li>$W$ is the horizontal distance (plan projection) from eaves to ridge in meters ($\text{m}$).</li>
+            <li>$H$ is the vertical elevation rise from eaves to ridge in meters ($\text{m}$).</li>
+          </ul>
+          <p>
+            For a flat roof ($H = 0$), the formula simplifies to true plan area: $A_e = L \times W$. If an abutting vertical masonry parapet wall drains onto the roof, 50% of the vertical wall face area ($0.5 \times L_{wall} \times H_{wall}$) must be added to $A_e$.
+          </p>
+
+          <h2>Design Storm Runoff Flow Rate ($Q$)</h2>
+          <p>
+            The design rainwater runoff flow rate delivered from the catchment into the eaves gutter is evaluated using the classic Rational-type hydrological formulation:
+          </p>
+          <div class="formula-box">
+            $$Q = \frac{r \cdot A_e \cdot C}{3600} \quad [\text{L/s}]$$
+          </div>
+          <p>
+            Where:
+          </p>
+          <ul>
+            <li>$r$ is the design rainfall intensity in millimeters per hour ($\text{mm/h}$), typically chosen from national meteorological return-period curves (e.g., a 2-minute peak storm event with a 1-in-50 year return frequency).</li>
+            <li>$A_e$ is the effective catchment area in square meters ($\text{m}^2$).</li>
+            <li>$C$ is the dimensionless runoff discharge coefficient, reflecting roof impermeability and surface water retention ($C = 1.0$ for metal and smooth tiles, $C \approx 0.50$ for green living roofs).</li>
+            <li>$3600$ converts hours to seconds and millimeters over square meters ($1\text{ mm} \times 1\text{ m}^2 = 1\text{ Liter}$) to liters per second ($\text{L/s}$).</li>
+          </ul>
+
+          <h2>Vertical Downpipe Hydraulic Capacities (Annular Flow Mechanics)</h2>
+          <p>
+            Unlike pressurized water distribution pipes, conventional building downpipes operate under gravity non-siphonic conditions. Water enters the top of the downpipe through a gutter outlet nozzle. As water accelerates downward under gravity, surface tension and boundary drag cause the fluid to adhere to the interior pipe circumference, forming an <strong>annular falling film</strong> enclosing a continuous central core of air.
+          </p>
+          <p>
+            To prevent erratic air choking, acoustic hammering, and self-siphonage that can rapidly collapse thin-gauge gutters, BS EN 12056-3 caps the allowable water-to-pipe cross-sectional filling ratio at:
+          </p>
+          <div class="formula-box">
+            $$f = \frac{A_{water}}{A_{pipe}} \le 0.25 \text{ to } 0.33$$
+          </div>
+          <p>
+            Under these annular gravity flow conditions with a standard sharp-edged or bellmouth gutter outlet, empirical downpipe discharge capacities are standardized as:
+          </p>
+          <div class="formula-box">
+            $$Q_{max} \approx 0.0000188 \cdot D_{int}^{2.625} \quad [\text{L/s}]$$
+          </div>
+          <p>
+            Where $D_{int}$ is internal diameter in millimeters. The reference table below details standard commercial rainwater pipe capacities:
+          </p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Nominal Pipe Diameter</th>
+                <th>Internal Bore ($D_{int}$)</th>
+                <th>Hydraulic Flow Capacity ($Q_{cap}$)</th>
+                <th>Max Catchment Served ($r = 75\text{ mm/h}$)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>68 mm Round PVC / Zinc</td>
+                <td>65 mm</td>
+                <td>2.35 L/s</td>
+                <td>112.8 m² effective area</td>
+              </tr>
+              <tr>
+                <td>82 mm Round PVC / Cast Iron</td>
+                <td>78 mm</td>
+                <td>3.85 L/s</td>
+                <td>184.8 m² effective area</td>
+              </tr>
+              <tr>
+                <td>100 mm (4-inch) Round PVC / AL</td>
+                <td>96 mm</td>
+                <td>6.70 L/s</td>
+                <td>321.6 m² effective area</td>
+              </tr>
+              <tr>
+                <td>150 mm (6-inch) Heavy Industrial</td>
+                <td>146 mm</td>
+                <td>19.80 L/s</td>
+                <td>950.4 m² effective area</td>
+              </tr>
+              <tr>
+                <td>200 mm (8-inch) Logistics Hub</td>
+                <td>194 mm</td>
+                <td>41.50 L/s</td>
+                <td>1,992.0 m² effective area</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="worked-example-card">
+            <h3>Worked Engineering Case Study: Commercial Distribution Warehouse Roof</h3>
+            <p><strong>Design Scenario:</strong> A logistics distribution center features a dual-pitch portal frame roof. Each roof slope has an eaves gutter length of $L = 60.0\text{ m}$, a horizontal plan span of $W = 18.0\text{ m}$, and a ridge height of $H = 4.0\text{ m}$. The roofing material is profiled trapezoidal pre-painted metal cladding ($C = 1.0$). Local meteorological data for a 1-in-50 year storm specifies a design rainfall intensity of $r = 75\text{ mm/h}$. The project specification considers standard $100\text{ mm}$ round PVC downpipes (rated hydraulic capacity $Q_{cap} = 6.70\text{ L/s}$). Determine the effective catchment area, peak runoff flow rate, and minimum number and maximum spacing of downpipes.</p>
+            
+            <p><strong>Step 1: Calculate Effective Catchment Area ($A_e$)</strong></p>
+            <div class="formula-box">
+              $$A_e = L \times \left(W + \frac{H}{2}\right) = 60.0\text{ m} \times \left(18.0 + \frac{4.0}{2}\right) = 60.0 \times 20.0 = 1,200.0\text{ m}^2$$
+            </div>
+
+            <p><strong>Step 2: Calculate Peak Storm Rainwater Runoff ($Q$)</strong></p>
+            <div class="formula-box">
+              $$Q = \frac{75\text{ mm/h} \times 1,200.0\text{ m}^2 \times 1.0}{3600} = \frac{90,000}{3600} = 25.00\text{ L/s}$$
+            </div>
+
+            <p><strong>Step 3: Determine Minimum Number of Downpipes ($N_{pipes}$)</strong></p>
+            <div class="formula-box">
+              $$N_{pipes} \ge \frac{Q_{total}}{Q_{cap}} = \frac{25.00\text{ L/s}}{6.70\text{ L/s}} \approx 3.73 \implies \text{Round up to } 4\text{ Downpipes}$$
+            </div>
+
+            <p><strong>Step 4: Check Downpipe Spacing Along Gutter Line</strong></p>
+            <div class="formula-box">
+              $$\text{Downpipe Spacing} = \frac{L}{N_{pipes}} = \frac{60.0\text{ m}}{4} = 15.0\text{ m}$$
+            </div>
+            <p>
+              <strong>Engineering Conclusion:</strong> Installing <strong>4 downpipes of 100 mm diameter</strong> spaced at $15.0\text{ m}$ intervals perfectly satisfies both the hydraulic capacity requirement ($4 \times 6.70 = 26.8\text{ L/s} > 25.0\text{ L/s}$) and the maximum $15\text{ m}$ spacing guideline of BS EN 12056-3, guaranteeing that eaves gutters will not overflow during a severe $75\text{ mm/h}$ design cloudburst.
+            </p>
+          </div>
+
+          <h2>Siphonic Roof Drainage vs. Conventional Gravity Systems (BS 8490 &amp; ASME A112.6.9)</h2>
+          <p>
+            In modern large-scale industrial distribution hubs, airport terminals, and sports stadiums, conventional gravity downpipes operating under annular flow ($f \le 0.33$) can require dozens of vertical leaders piercing through valuable interior floor space. To overcome this spatial penalty, structural engineers frequently design <strong>siphonic roof drainage systems</strong> governed by <strong>BS 8490</strong> and <strong>ASME A112.6.9</strong>.
+          </p>
+          <p>
+            A siphonic system uses specialized roof drain outlets equipped with anti-vortex air baffle plates. During intense design cloudbursts, the water level over the outlet submerges the baffle, sealing the inlet against air entry. The vertical downpipe rapidly primes, creating a continuous water column that drops through the full building height ($H_{total}$):
+          </p>
+          <div class="formula-box">
+            $$Q_{siphonic} = A \cdot v = A \cdot \sqrt{\frac{2g \cdot H_{total}}{\sum K_{loss}}}$$
+          </div>
+          <p>
+            Because the entire vertical pipe runs at a 100% water filling ratio ($f = 1.0$) under negative gauge pressure (sub-atmospheric suction), linear water velocities reach $4.0\text{ to } 8.0\text{ m/s}$. Consequently, a single $75\text{ mm}$ or $100\text{ mm}$ siphonic pipe can discharge the equivalent flow volume that would require three $150\text{ mm}$ conventional gravity downpipes. Furthermore, siphonic collection manifolds can run horizontally across ceiling trusses with zero slope, eliminating subterranean trenching under warehouse floor slabs.
+          </p>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar">
+        <div class="sidebar-card">
+          <h4>Related Civil &amp; Hydraulic Calculators</h4>
+          <ul class="sidebar-links">
+            <li><a href="pump-flow-calculator.html">Pump Flow &amp; Pipe Velocity</a></li>
+            <li><a href="concrete-calculator.html">Concrete Volume Calculator</a></li>
+            <li><a href="rebar-calculator.html">Rebar Weight &amp; Grid Sizing</a></li>
+            <li><a href="retaining-wall-calculator.html">Retaining Wall Sizing</a></li>
+            <li><a href="pipe-sizing-calculator.html">Pipe Sizing Calculator</a></li>
+            <li><a href="brick-calculator.html">Brick Masonry Calculator</a></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>High-precision professional engineering and scientific calculation engines.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Directories</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="civil.html">Civil &amp; Construction</a></li>
+          <li><a href="mechanical.html">Mechanical Engineering</a></li>
+          <li><a href="sitemap.xml">XML Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 CalcHub. Standard Engineering Reference Systems.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calcBtn = document.getElementById('calcDownpipeBtn');
+      const resetBtn = document.getElementById('resetDownpipeBtn');
+      const resultBox = document.getElementById('downpipeResultBox');
+      const rainPreset = document.getElementById('rainPreset');
+      const rainIntensity = document.getElementById('rainIntensity');
+
+      rainPreset.addEventListener('change', function() {
+        rainIntensity.value = this.value;
+      });
+
+      function calculateDownpipe() {
+        const l = parseFloat(document.getElementById('roofLength').value);
+        const w = parseFloat(document.getElementById('roofWidth').value);
+        const h = parseFloat(document.getElementById('roofHeight').value) || 0;
+        const r = parseFloat(rainIntensity.value);
+        const pipeDia = parseInt(document.getElementById('downpipeSize').value, 10);
+        const coeff = parseFloat(document.getElementById('runoffCoeff').value);
+
+        if (isNaN(l) || l <= 0 || isNaN(w) || w <= 0 || isNaN(r) || r <= 0) {
+          alert('Please enter valid positive dimensions and rainfall intensity.');
+          return;
+        }
+
+        // 1. Effective catchment area Ae = L * (W + H / 2)
+        const ae = l * (w + (h / 2.0));
+
+        // 2. Design runoff flow rate Q = (r * Ae * C) / 3600 [L/s]
+        const q_design = (r * ae * coeff) / 3600.0;
+
+        // 3. Downpipe flow capacity per BS EN 12056 empirical capacities
+        let q_cap = 3.85;
+        if (pipeDia === 68) q_cap = 2.35;
+        else if (pipeDia === 82) q_cap = 3.85;
+        else if (pipeDia === 100) q_cap = 6.70;
+        else if (pipeDia === 150) q_cap = 19.80;
+        else if (pipeDia === 200) q_cap = 41.50;
+
+        // 4. Minimum pipes required
+        const pipesReq = Math.max(1, Math.ceil(q_design / q_cap));
+
+        // 5. Average spacing
+        const spacing = l / pipesReq;
+
+        // 6. Status check
+        let statusMsg = 'Optimal Drainage Design (Capacity Exceeds Peak Runoff)';
+        if (spacing > 18.0) {
+          statusMsg = 'Warning: Downpipe spacing exceeds 18m. Consider adding extra downpipes to prevent gutter overtopping.';
+        } else if (pipesReq === 1 && q_design > q_cap * 0.9) {
+          statusMsg = 'Close to capacity threshold (>90%). Recommend adding a secondary leader.';
+        }
+
+        document.getElementById('resDesignFlow').textContent = q_design.toFixed(2) + ' L/s (' + (q_design * 60.0).toFixed(0) + ' L/min)';
+        document.getElementById('resEffectiveArea').textContent = ae.toFixed(1) + ' m² (' + (ae * 10.7639).toFixed(0) + ' sq ft)';
+        document.getElementById('resPipeCap').textContent = q_cap.toFixed(2) + ' L/s per downpipe';
+        document.getElementById('resPipesReq').textContent = pipesReq + (pipesReq === 1 ? ' Downpipe' : ' Downpipes');
+        document.getElementById('resSpacing').textContent = spacing.toFixed(1) + ' m (' + (spacing * 3.28084).toFixed(1) + ' ft)';
+        document.getElementById('resStatus').textContent = statusMsg;
+
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      calcBtn.addEventListener('click', calculateDownpipe);
+      resetBtn.addEventListener('click', function() {
+        resultBox.style.display = 'none';
+      });
+
+      calculateDownpipe();
+    });
+  </script>
+</body>
+</html>

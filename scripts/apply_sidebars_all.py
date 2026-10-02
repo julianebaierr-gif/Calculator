@@ -143,6 +143,13 @@ CATEGORIES = {
             ("psychrometric-calculator.html", "Psychrometric & Moist Air (ASHRAE)", "🌡️", "Dew point, humidity ratio W, wet bulb & enthalpy"),
             ("pulley-mechanical-advantage-calculator.html", "Pulley Mechanical Advantage (CMAA 70)", "🏗️", "Block & tackle IMA, AMA & reeving friction"),
             ("pulley-rpm-calculator.html", "Pulley RPM & Belt Speed (ISO 5296)", "⚙️", "Rotational speed, ratio, belt velocity & slip"),
+            ("pump-flow-calculator.html", "Pump Flow Rate & Velocity", "🌊", "Pipe bore velocity, m³/h, GPM & VFD scaling"),
+            ("reynolds-number-calculator.html", "Reynolds Number (Moody & Swamee-Jain)", "🧪", "Laminar, transition & turbulent flow regime"),
+            ("shaft-diameter-calculator.html", "Shaft Diameter (ASME B106.1M)", "⚙️", "Combined torsion, bending moment & keyway de-rate"),
+            ("spring-rate-calculator.html", "Helical Spring Rate (SMI / ASTM A228)", "🌀", "Spring constant k, Wahl stress factor & solid height"),
+            ("thermal-expansion-calculator.html", "Thermal Expansion & Pipe Stress", "🌡️", "Linear growth ΔL, volumetric ΔV & ASME loop leg"),
+            ("torque-converter.html", "Torque Converter Sizing (SAE J643)", "🚗", "Stall torque ratio, speed ratio & K-factor"),
+            ("torque-to-hp-calculator.html", "Torque to HP & BMEP Converter", "🏎️", "Brake horsepower, kilowatts & 4-stroke BMEP"),
         ]
     },
     "civil": {
@@ -156,6 +163,7 @@ CATEGORIES = {
             ("retaining-wall-calculator.html", "Retaining Wall Stability", "🧱", "Rankine earth pressure & overturning"),
             ("concrete-calculator.html", "Concrete Slab, Footing & Column", "🏗️", "Wet concrete m³ & cement bags"),
             ("rebar-calculator.html", "Rebar Weight & Grid Spacing", "🔩", "Cut bar counts & linear mass kg/lbs"),
+            ("rainwater-downpipe-calculator.html", "Rainwater Downpipe Sizing", "🌧️", "BS EN 12056 roof catchment & leader sizing"),
         ]
     },
     "chemical": {
@@ -231,9 +239,9 @@ def determine_tool_cat(filename):
         return "engineering"
     if any(k in f for k in ["solar", "charging", "pv-string", "ev-charging"]):
         return "solar"
-    if any(k in f for k in ["cooling", "pipe", "torque", "pump-head", "gear-ratio", "bolt-torque", "bearing-life", "belt-length", "conveyor-belt", "cutting-speed", "feed-rate", "flywheel", "gear-module", "heat-exchanger", "hvac", "hydraulic-cylinder", "hydraulic-pump", "power-to-torque", "psychrometric", "pulley"]):
+    if any(k in f for k in ["cooling", "pipe", "torque", "pump-head", "gear-ratio", "bolt-torque", "bearing-life", "belt-length", "conveyor-belt", "cutting-speed", "feed-rate", "flywheel", "gear-module", "heat-exchanger", "hvac", "hydraulic-cylinder", "hydraulic-pump", "power-to-torque", "psychrometric", "pulley", "pump-flow", "reynolds-number", "shaft-diameter", "spring-rate", "thermal-expansion", "torque-converter", "torque-to-hp"]):
         return "mechanical"
-    if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt"]):
+    if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt", "rainwater-downpipe"]):
         return "civil"
     if any(k in f for k in ["chemical", "chlorine"]):
         return "chemical"

@@ -137,6 +137,13 @@ CAT_MAP = {
             ("psychrometric-calculator.html", "Psychrometric & Moist Air (ASHRAE)", "🌡️", "Dew point, humidity ratio W, wet bulb & enthalpy", "W = 0.62198·Pw / (Patm - Pw) | h = 1.006·T + W·(2501+1.86T)"),
             ("pulley-mechanical-advantage-calculator.html", "Pulley Mechanical Advantage (CMAA 70)", "🏗️", "Block & tackle IMA, AMA & reeving friction", "IMA = n | AMA = n·η_total | η_total = (1-η^n)/(n(1-η))"),
             ("pulley-rpm-calculator.html", "Pulley RPM & Belt Speed (ISO 5296)", "⚙️", "Rotational speed, ratio, belt velocity & slip", "N1·D1 = N2·D2 | N2 = N1·(D1/D2)·(1 - s/100)"),
+            ("pump-flow-calculator.html", "Pump Flow Rate & Velocity", "🌊", "Pipe bore velocity, m³/h, GPM & VFD scaling", "Q = A·v | D = √(4Q / πv) | Q1/Q2 = N1/N2"),
+            ("reynolds-number-calculator.html", "Reynolds Number (Moody & Swamee-Jain)", "🧪", "Laminar, transition & turbulent flow regime", "Re = (ρ·v·D)/μ | f = 0.25 / [log10(ε/3.7D + 5.74/Re^0.9)]²"),
+            ("shaft-diameter-calculator.html", "Shaft Diameter (ASME B106.1M)", "⚙️", "Combined torsion, bending moment & keyway de-rate", "d = ∛[ (16/πτ)·√((Km·M)² + (Kt·T)²) ] | τ_kw = 0.75·τ"),
+            ("spring-rate-calculator.html", "Helical Spring Rate (SMI / ASTM A228)", "🌀", "Spring constant k, Wahl stress factor & solid height", "k = (G·d⁴)/(8·D³·na) | Kw = (4C-1)/(4C-4) + 0.615/C"),
+            ("thermal-expansion-calculator.html", "Thermal Expansion & Pipe Stress", "🌡️", "Linear growth ΔL, volumetric ΔV & ASME loop leg", "ΔL = L0·α·ΔT | σ = E·α·ΔT | Lleg ≈ 0.043·√(D·ΔL)"),
+            ("torque-converter.html", "Torque Converter Sizing (SAE J643)", "🚗", "Stall torque ratio, speed ratio & K-factor", "TR = T_turb/T_pump | SR = N_turb/N_pump | η = TR·SR"),
+            ("torque-to-hp-calculator.html", "Torque to HP & BMEP Converter", "🏎️", "Brake horsepower, kilowatts & 4-stroke BMEP", "HP = (T·RPM) / 5252 | BMEP = (4π·T)/(Vd·100)"),
         ]
     },
     "civil.html": {
@@ -148,6 +155,7 @@ CAT_MAP = {
             ("asphalt-calculator.html", "Asphalt Paving & Tonnage", "🛣️", "HMA road tonnage & base course", "Tons = Volume × Density ÷ 2,000 lbs"),
             ("beam-deflection-calculator.html", "Beam Deflection & Moments", "📐", "AISC 360 deflection & moment", "δmax = 5wL⁴ / 384EI"),
             ("retaining-wall-calculator.html", "Retaining Wall Stability", "🧱", "Rankine earth pressure & overturning", "Pa = 0.5 × γ × H² × Ka"),
+            ("rainwater-downpipe-calculator.html", "Rainwater Downpipe Sizing (BS EN 12056)", "🌧️", "Roof catchment area, storm runoff L/s & leader diameter", "Ae = L·(W + H/2) | Q = (r·Ae·C)/3600 | Annular flow"),
         ]
     },
     "chemical.html": {
