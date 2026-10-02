@@ -93,6 +93,11 @@ CAT_MAP = {
             ("cable-sizing-installation-method-e.html", "Cable Sizing Method E (Cable Tray)", "🔌", "Perforated tray & ladder rack in free air", "Iz = I0 · Ca · Cg | 360° natural ventilation"),
             ("cable-sizing-calculator-nec.html", "Cable Sizing (NEC Table 310.16)", "🔌", "125% continuous load & conduit fill derate", "MCA = 1.25·I_cont + I_noncont | NEC 110.14(C)"),
             ("copper-cable-sizing-calculator.html", "Copper Cable Sizing (100% IACS)", "🔌", "Pure ETP Cu ampacity & I²R loss cost", "R_T = R_20·[1 + α(T-20)] | P_loss = 3·I²R"),
+            ("earthing-cable-size-calculator.html", "Earthing & Grounding Cable Size", "⚡", "IEC 60364-5-54 adiabatic equation & k-factor", "S = √(I²·t) / k | BS 7671 Table 54.7"),
+            ("kw-to-cable-size-calculator.html", "kW to Cable Size (1-Phase & 3-Phase)", "🔌", "Active kW to full-load current & mV/A/m", "I = kW×1000 / (√3·V·PF) | 125% continuous load"),
+            ("single-phase-cable-sizing-calculator.html", "Single Phase Cable Sizing (230V/120V)", "🔌", "2-wire loop drop & radial/ring circuit", "ΔV = 2·I·L·R | 3% lighting & 5% power limit"),
+            ("three-phase-cable-sizing-calculator.html", "Three Phase Cable Sizing (400V/480V)", "⚡", "Line-to-line balanced vector drop & method E", "ΔV = √3·I·L·(R·cosφ + X·sinφ) | IEC 60364-5-52"),
+            ("wire-gauge-calculator.html", "Wire Gauge (AWG to mm² Metric)", "📏", "ASTM B258 logarithmic AWG scale & circular mils", "d_n = 0.005 × 92^((36-n)/39) in | kcmil conversion"),
         ]
     },
     "solar-energy.html": {
@@ -144,6 +149,9 @@ CAT_MAP = {
             ("smoke-detector-spacing-calculator.html", "Smoke Detector Spacing & Layout", "🚨", "NFPA 72 ceiling height derating", "S = 30ft Baseline with Derating Factor"),
             ("fire-sprinkler-calculator.html", "Fire Sprinkler Hydraulics", "💦", "NFPA 13 head flow Q=K√P & demand", "Q = K × √P (K-Factor 5.6 & 8.0)"),
             ("fire-pump-sizing-calculator.html", "Fire Pump Sizing (NFPA 20)", "🚒", "Rated flow, net head, churn & motor BHP", "BHP = (Q × H × SG) / (3960 × η)"),
+            ("nac-voltage-drop-calculator.html", "NAC Voltage Drop (NFPA 72 & UL 864)", "🚨", "Point-to-point & lump-sum 16V EOL limit", "V_end = V_batt - Σ(I_seg · R_seg) ≥ 16.0V"),
+            ("fire-sprinkler-hydraulic-calculator.html", "Fire Sprinkler Hydraulic (NFPA 13)", "💦", "Hazen-Williams friction & head Q=K√P", "p = 4.52·Q^1.85 / (C^1.85·d^4.87) | Q = K√P"),
+            ("strobe-candela-calculator.html", "Strobe Candela (NFPA 72 Chapter 18)", "🚨", "Wall & ceiling candela sizing & UL 1971", "Iv per NFPA 72 Table 18.5.5.4.1 | 0.0375 ft-c boundary"),
         ]
     },
     "programmer.html": {

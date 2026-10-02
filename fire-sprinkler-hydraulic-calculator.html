@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fire Sprinkler Hydraulic Calculator | NFPA 13 Flow & Pressure Loss</title>
+  <meta name="description" content="Calculate fire sprinkler hydraulic discharge and pipe friction loss using NFPA 13 standards and the Hazen-Williams equation. Computes head discharge (Q=K√P), friction loss, velocity, and elevation pressure head.">
+  <link rel="canonical" href="https://calchub.cloud/fire-sprinkler-hydraulic-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Fire Sprinkler Hydraulic Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "NFPA 13 compliant hydraulic calculation engine solving sprinkler head flow Q = K*sqrt(P), Hazen-Williams pipe friction loss, equivalent fitting lengths, and static elevation pressure head.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the Hazen-Williams formula used in NFPA 13 fire sprinkler hydraulic calculations?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "NFPA 13 mandates the Hazen-Williams formula for determining friction loss in water-based fire suppression piping: p = 4.52 * Q^1.85 / (C^1.85 * d^4.87), where p is the frictional pressure gradient in psi per foot of pipe, Q is discharge flow in gallons per minute (gpm), C is the pipe roughness coefficient (e.g., 120 for black steel, 150 for CPVC/copper), and d is the actual internal diameter of the pipe in inches."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is the discharge flow rate (Q) of a fire sprinkler head determined?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sprinkler head flow follows the orifice discharge relationship: Q = K * sqrt(P), where Q is the flow rate in gpm, K is the manufacturer discharge coefficient (K-factor, e.g., 5.6 for standard 1/2-inch orifice, 8.0 for 3/4-inch large orifice), and P is the operating water pressure at the head in pounds per square inch (psi). Conversely, the minimum required pressure is P = (Q / K)^2."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What Hazen-Williams C-factor should be used for fire sprinkler piping?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Per NFPA 13 Table 27.2.4.8.1: Wet black steel pipe uses C = 120; dry steel pipe and preaction systems use C = 100 to account for accelerated internal oxidation; galvanized steel wet pipe uses C = 120; copper tubing and chlorinated polyvinyl chloride (CPVC) use C = 150; and cement-lined ductile iron underground pipe uses C = 140."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does elevation change affect fire sprinkler system hydraulic calculations?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Water exerts a hydrostatic head pressure of 0.433 psi per foot of vertical elevation (1 psi = 2.31 feet of head). For upward piping risers feeding elevated sprinklers, an elevation penalty of 0.433 psi/ft must be added to the required supply pressure. Conversely, downhill piping runs gain 0.433 psi/ft of static pressure."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="fire">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo"><span class="logo-icon">&pi;</span><span class="logo-text">Calc<strong>Hub</strong></span></a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="fire-safety.html" class="active">Fire Safety</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; <a href="fire-safety.html">Fire Safety</a> &rsaquo; <span>Fire Sprinkler Hydraulic Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">NFPA 13 Standards &amp; Fluid Mechanics</div>
+          <h1 class="calc-title">Fire Sprinkler Hydraulic Calculator</h1>
+          <p class="calc-tagline">Calculate sprinkler head discharge rates, Hazen-Williams friction loss gradients, equivalent fitting lengths, and total source pressure demands in accordance with NFPA 13 fire protection engineering standards.</p>
+        </header>
+
+        <div class="tool-card">
+          <form id="sprinklerCalcForm">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="kFactor">Sprinkler Orifice K-Factor</label>
+                <select id="kFactor">
+                  <option value="5.6" selected>K = 5.6 (1/2" Standard Orifice)</option>
+                  <option value="8.0">K = 8.0 (3/4" Large Orifice)</option>
+                  <option value="11.2">K = 11.2 (17/32" Extra Large Orifice - ELO)</option>
+                  <option value="14.0">K = 14.0 (3/4" Early Suppression Fast Response - ESFR)</option>
+                  <option value="16.8">K = 16.8 (3/4" Storage / Control Mode Specific App)</option>
+                  <option value="22.4">K = 22.4 (1" High Density ESFR)</option>
+                  <option value="25.2">K = 25.2 (1" Storage ESFR)</option>
+                  <option value="custom">Custom K-Factor...</option>
+                </select>
+              </div>
+
+              <div class="form-group" id="customKGroup" style="display: none;">
+                <label for="customK">Custom K-Factor [gpm / &radic;psi]</label>
+                <input type="number" id="customK" step="0.1" min="1.0" max="50.0" value="5.6">
+              </div>
+
+              <div class="form-group">
+                <label for="flowMode">Flow Calculation Basis</label>
+                <select id="flowMode">
+                  <option value="headPress" selected>Specify Head Operating Pressure (psi)</option>
+                  <option value="headFlow">Specify Required Discharge Flow per Head (gpm)</option>
+                </select>
+              </div>
+
+              <div class="form-group" id="headPressGroup">
+                <label for="headPress">Remote Head Pressure [psi] (Min 7.0 psi NFPA 13)</label>
+                <input type="number" id="headPress" step="0.5" min="7.0" max="175.0" value="7.0">
+              </div>
+
+              <div class="form-group" id="headFlowGroup" style="display: none;">
+                <label for="headFlow">Required Discharge per Head [gpm]</label>
+                <input type="number" id="headFlow" step="0.5" min="5.0" max="250.0" value="14.8">
+              </div>
+
+              <div class="form-group">
+                <label for="numHeads">Active Sprinklers on Branch Line</label>
+                <input type="number" id="numHeads" min="1" max="50" step="1" value="4">
+              </div>
+
+              <div class="form-group">
+                <label for="pipeSize">Nominal Pipe Size (Schedule 40 Steel)</label>
+                <select id="pipeSize">
+                  <option value="1.049">1" (Actual ID: 1.049 in)</option>
+                  <option value="1.380">1-1/4" (Actual ID: 1.380 in)</option>
+                  <option value="1.610" selected>1-1/2" (Actual ID: 1.610 in)</option>
+                  <option value="2.067">2" (Actual ID: 2.067 in)</option>
+                  <option value="2.469">2-1/2" (Actual ID: 2.469 in)</option>
+                  <option value="3.068">3" (Actual ID: 3.068 in)</option>
+                  <option value="4.026">4" (Actual ID: 4.026 in)</option>
+                  <option value="6.065">6" (Actual ID: 6.065 in)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="pipeLength">Physical Pipe Length [feet]</label>
+                <input type="number" id="pipeLength" step="1" min="1" max="1000" value="60">
+              </div>
+
+              <div class="form-group">
+                <label for="cFactor">Pipe Material Hazen-Williams C-Factor</label>
+                <select id="cFactor">
+                  <option value="120" selected>C = 120 (Wet Black Steel Pipe)</option>
+                  <option value="100">C = 100 (Dry Pipe / Preaction Steel Systems)</option>
+                  <option value="150">C = 150 (CPVC Plastic / Type K/L Copper Tubing)</option>
+                  <option value="140">C = 140 (Cement-Lined Ductile Iron Underground)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="numElbows">Standard 90&deg; Screwed/Flanged Elbows</label>
+                <input type="number" id="numElbows" min="0" max="20" step="1" value="2">
+              </div>
+
+              <div class="form-group">
+                <label for="numTees">Tees (Flow Turned Through Branch)</label>
+                <input type="number" id="numTees" min="0" max="20" step="1" value="1">
+              </div>
+
+              <div class="form-group">
+                <label for="elevChange">Elevation Change &Delta;h [feet] (+ Up, - Down)</label>
+                <input type="number" id="elevChange" step="0.5" min="-100" max="200" value="12">
+              </div>
+            </div>
+
+            <div class="calc-actions">
+              <button type="button" id="calcBtn" class="btn btn-primary">Calculate Hydraulic Demand</button>
+              <button type="reset" id="resetBtn" class="btn btn-secondary">Reset Defaults</button>
+            </div>
+          </form>
+
+          <div id="sprinklerResultBox" class="results-container" style="display: none;">
+            <h3>Hydraulic Analysis & Friction Demand Results</h3>
+            <div class="results-grid">
+              <div class="result-tile">
+                <span class="result-label">Total Required Source Pressure</span>
+                <span id="resTotalPress" class="result-value">-- psi</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Flow per Sprinkler Head</span>
+                <span id="resHeadFlow" class="result-value">-- gpm</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Operating Head Pressure (Remote)</span>
+                <span id="resHeadPress" class="result-value">-- psi</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Total System Discharge Flow</span>
+                <span id="resTotalFlow" class="result-value">-- gpm</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Total Equivalent Pipe Length</span>
+                <span id="resEquivLength" class="result-value">-- ft</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Pipe Friction Loss (&Delta;P_friction)</span>
+                <span id="resFrictionLoss" class="result-value">-- psi</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Friction Gradient (psi / ft)</span>
+                <span id="resGradient" class="result-value">-- psi/ft</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Water Velocity in Pipe</span>
+                <span id="resVelocity" class="result-value">-- ft/s</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Elevation Static Head (&Delta;P_elev)</span>
+                <span id="resElevHead" class="result-value">-- psi</span>
+              </div>
+            </div>
+            <div id="velocityWarning" style="display: none; margin-top: 1rem; color: #b45309; background: #fffbeb; border: 1px solid #fde68a; padding: 0.75rem; border-radius: 6px;"></div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Fundamental Hydraulics of Fire Sprinkler Systems</h2>
+          <p>Fire sprinkler system hydraulic calculations form the engineering foundation of life safety design across commercial, industrial, institutional, and residential buildings. Governed strictly by the National Fire Protection Association under <strong>NFPA 13</strong> (<em>Standard for the Installation of Sprinkler Systems</em>), hydraulic sizing dictates the precise balance between available water supply pressure, volumetric discharge capacity, pipe diameter constraints, and internal friction losses.</p>
+
+          <p>Historical pipe schedule methods—which relied on prescriptive tables matching head counts to pipe nominal diameters—have been largely superseded in modern building codes by rigorous, computerized hydraulic calculations. Hydraulic calculation proves whether a municipal water main, fire pump, or elevated storage reservoir can simultaneously deliver the minimum operating pressure at the hydraulically most remote sprinkler head while pushing hundreds of gallons per minute through interconnected branch lines, cross mains, risers, backflow preventers, and underground yard piping.</p>
+
+          <h2>The Hazen-Williams Friction Loss Equation & Fluid Mechanics</h2>
+          <p>Unlike civil engineering open-channel flows or chemical process pipelines operating across turbulent transition zones where the Darcy-Weisbach equation dominates, fire protection engineering universally adopts the empirical <strong>Hazen-Williams formula</strong>. This equation specifically models water flow through pressurized circular conduits between 40&deg;F and 75&deg;F (4&deg;C to 24&deg;C):</p>
+
+          <div class="formula-box">
+            $$p = \frac{4.52 \cdot Q^{1.85}}{C^{1.85} \cdot d^{4.87}}$$
+          </div>
+
+          <p>Where the hydraulic parameters are defined per NFPA 13 Section 27.2.2.1 as follows:</p>
+          <ul>
+            <li><strong>\(p\)</strong>: Frictional pressure loss per unit length of pipe, expressed in pounds per square inch per linear foot (\(\text{psi/ft}\)).</li>
+            <li><strong>\(Q\)</strong>: Volumetric water discharge flow traversing the conduit, expressed in gallons per minute (\(\text{gpm}\)).</li>
+            <li><strong>\(C\)</strong>: Hazen-Williams pipe roughness coefficient (dimensionless), reflecting internal boundary roughness and long-term corrosion resistance.</li>
+            <li><strong>\(d\)</strong>: True internal pipe diameter (inside diameter, ID), expressed in inches (\(\text{in}\)). Note that nominal pipe sizes differ substantially from internal diameters (e.g., a 2-inch Schedule 40 steel pipe exhibits an ID of 2.067 inches).</li>
+          </ul>
+
+          <p>To calculate the cumulative friction loss (\(\Delta P_f\)) across a pipeline run containing valves, tees, and elbows, the unit friction gradient \(p\) is multiplied by the total equivalent length (\(L_{\text{equiv}}\)):</p>
+
+          <div class="formula-box">
+            $$\Delta P_f = p \cdot L_{\text{equiv}} = p \cdot \left( L_{\text{physical}} + \sum L_{\text{fittings}} \right)$$
+          </div>
+
+          <h2>Sprinkler Orifice Discharge: The K-Factor Equation</h2>
+          <p>Every automatic fire sprinkler head acts as a calibrated hydraulic nozzle with a precision-machined discharge orifice. Water discharging across the deflector plate satisfies the classical Torricelli orifice flow relationship, parameterized via the sprinkler discharge coefficient, universally designated as the <strong>K-factor</strong>:</p>
+
+          <div class="formula-box">
+            $$Q = K \cdot \sqrt{P} \quad \Longleftrightarrow \quad P = \left( \frac{Q}{K} \right)^2$$
+          </div>
+
+          <p>Where \(Q\) represents discharge flow in gallons per minute (\(\text{gpm}\)), \(P\) is the operating gauge pressure at the sprinkler inlet in pounds per square inch (\(\text{psi}\)), and \(K\) is the manufacturer rated orifice coefficient (\(\text{gpm}/\sqrt{\text{psi}}\)).</p>
+
+          <p>NFPA 13 establishes minimum operating thresholds to guarantee effective droplet atomization and droplet momentum capable of penetrating vigorous fire thermal updrafts:</p>
+          <ul>
+            <li><strong>Absolute Minimum Pressure:</strong> NFPA 13 Section 27.2.4.1 dictates that no standard spray sprinkler head shall operate at a pressure below <strong>7.0 psi (0.5 bar)</strong>, which yields a minimum discharge of 14.8 gpm for a standard \(K=5.6\) head.</li>
+            <li><strong>Extended Coverage and Storage Sprinklers:</strong> High-density control mode specific application (CMSA) and early suppression fast response (ESFR) sprinkler heads typically mandate minimum starting pressures between <strong>25 psi and 75 psi</strong> depending on ceiling height, storage commodity classification, and listing parameters.</li>
+          </ul>
+
+          <h2>Equivalent Lengths of Fittings, Valves, and Devices</h2>
+          <p>Fluid accelerating, dividing, and turning through elbows, tees, control valves, and strainers experiences substantial turbulent eddy dissipation and localized wall shear stress. NFPA 13 Table 27.2.3.1.1 standardizes these localized geometric disruptions by converting every individual fitting into an <em>equivalent length of straight pipe</em> of the same nominal diameter:</p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Nominal Pipe Size</th>
+                <th>Standard 90&deg; Elbow (ft)</th>
+                <th>45&deg; Elbow (ft)</th>
+                <th>Tee (Turn into Branch) (ft)</th>
+                <th>Gate Valve (ft)</th>
+                <th>Butterfly Valve (ft)</th>
+                <th>Swing Check Valve (ft)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1" (25 mm)</td>
+                <td>2</td>
+                <td>1</td>
+                <td>5</td>
+                <td>0</td>
+                <td>6</td>
+                <td>5</td>
+              </tr>
+              <tr>
+                <td>1-1/4" (32 mm)</td>
+                <td>3</td>
+                <td>1</td>
+                <td>6</td>
+                <td>0</td>
+                <td>7</td>
+                <td>7</td>
+              </tr>
+              <tr>
+                <td>1-1/2" (40 mm)</td>
+                <td>4</td>
+                <td>2</td>
+                <td>8</td>
+                <td>0</td>
+                <td>10</td>
+                <td>9</td>
+              </tr>
+              <tr>
+                <td>2" (50 mm)</td>
+                <td>5</td>
+                <td>2</td>
+                <td>10</td>
+                <td>1</td>
+                <td>12</td>
+                <td>11</td>
+              </tr>
+              <tr>
+                <td>2-1/2" (65 mm)</td>
+                <td>6</td>
+                <td>3</td>
+                <td>12</td>
+                <td>1</td>
+                <td>15</td>
+                <td>14</td>
+              </tr>
+              <tr>
+                <td>3" (80 mm)</td>
+                <td>7</td>
+                <td>3</td>
+                <td>15</td>
+                <td>1</td>
+                <td>19</td>
+                <td>16</td>
+              </tr>
+              <tr>
+                <td>4" (100 mm)</td>
+                <td>10</td>
+                <td>4</td>
+                <td>20</td>
+                <td>2</td>
+                <td>21</td>
+                <td>22</td>
+              </tr>
+              <tr>
+                <td>6" (150 mm)</td>
+                <td>14</td>
+                <td>6</td>
+                <td>30</td>
+                <td>3</td>
+                <td>36</td>
+                <td>32</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Hazen-Williams Roughness Coefficients (C-Factors)</h2>
+          <p>The \(C\)-factor dictates pipe carrying efficiency. A higher \(C\)-factor denotes a smoother internal lumen, producing significantly lower friction losses. As specified in NFPA 13 Table 27.2.4.8.1:</p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Piping Material</th>
+                <th>Hazen-Williams C-Factor</th>
+                <th>Primary Application and Code Constraints</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Black Steel (Wet System)</td>
+                <td>120</td>
+                <td>Standard wet pipe commercial/industrial distribution systems.</td>
+              </tr>
+              <tr>
+                <td>Black Steel (Dry / Preaction)</td>
+                <td>100</td>
+                <td>Dry systems subjected to cyclic oxygen and moisture, accelerating internal tuberculation.</td>
+              </tr>
+              <tr>
+                <td>Galvanized Steel (Wet System)</td>
+                <td>120</td>
+                <td>Wet installations requiring atmospheric corrosion defense.</td>
+              </tr>
+              <tr>
+                <td>Galvanized Steel (Dry System)</td>
+                <td>100</td>
+                <td>Dry and preaction systems (restricted by recent NFPA 13 editions due to pinhole leaks).</td>
+              </tr>
+              <tr>
+                <td>Copper Tube (Type K, L, M)</td>
+                <td>150</td>
+                <td>Residential, institutional, and healthcare wet pipe distribution.</td>
+              </tr>
+              <tr>
+                <td>Chlorinated Polyvinyl Chloride (CPVC)</td>
+                <td>150</td>
+                <td>Light Hazard occupancies and NFPA 13R/13D residential systems.</td>
+              </tr>
+              <tr>
+                <td>Cement-Lined Ductile Iron</td>
+                <td>140</td>
+                <td>Underground fire service supply mains and yard loops.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Fluid Velocity Limits & Static Elevation Head</h2>
+          <p>Water velocity inside fire sprinkler piping must be monitored during hydraulic design to prevent severe pipe erosion, excessive pressure surges (water hammer), and destructive acoustic vibration. The mean linear fluid velocity is computed from volumetric discharge and pipe geometry:</p>
+
+          <div class="formula-box">
+            $$v = \frac{0.408 \cdot Q}{d^2}$$
+          </div>
+
+          <p>Where \(v\) is in feet per second (\(\text{ft/s}\)), \(Q\) is in \(\text{gpm}\), and \(d\) is inside diameter in inches. While NFPA 13 does not enforce an arbitrary upper velocity ceiling for standard tree systems, professional engineering practice and insurer standards (FM Global Datasheet 2-0) strongly advise restricting branch line velocities below <strong>20 ft/s (6.1 m/s)</strong> and main/feed riser velocities below <strong>15 ft/s (4.6 m/s)</strong> to mitigate cavitation and water hammer.</p>
+
+          <p>Furthermore, vertical elevation differences between water sources, pumps, and elevated heads create static hydrostatic pressure variations governed by water density:</p>
+
+          <div class="formula-box">
+            $$\Delta P_{\text{elev}} = 0.4335 \cdot \Delta h$$
+          </div>
+
+          <p>Where \(\Delta h\) is the vertical elevation rise in feet. Pumping water upward incurs an unavoidable static pressure penalty of <strong>0.433 psi per foot of rise</strong> (or 43.35 psi per 100 feet). When analyzing multi-story buildings, this static head requirement frequently constitutes over 40% of the total fire pump discharge pressure requirement.</p>
+
+          <div class="worked-example-card">
+            <h3>Step-by-Step Worked Case Study: Light Hazard Office Branch Line</h3>
+            <p><strong>Design Scenario:</strong> An engineer is sizing a 1-1/2" Schedule 40 black steel wet branch line feeding 4 hydraulically remote \(K=5.6\) standard spray sprinklers in a modern commercial office building (Light Hazard, design density \(0.10\text{ gpm/ft}^2\)).</p>
+            <ul>
+              <li>Physical pipe run length: \(L = 60\text{ ft}\).</li>
+              <li>Fittings: Two 90&deg; standard elbows and one tee (flow turned through branch).</li>
+              <li>Pipe: 1-1/2" Schedule 40 black steel (\(d = 1.610\text{ in}\), \(C = 120\)).</li>
+              <li>Remote sprinkler head minimum operating pressure: \(P_{\text{head}} = 7.0\text{ psi}\).</li>
+              <li>Elevation rise from cross main to sprinkler heads: \(\Delta h = 12\text{ ft}\).</li>
+            </ul>
+
+            <p><strong>Step 1: Calculate remote head discharge flow rate (\(Q_{\text{head}}\))</strong></p>
+            <div class="formula-box">
+              $$Q_{\text{head}} = K \cdot \sqrt{P} = 5.6 \cdot \sqrt{7.0} = 5.6 \cdot 2.6458 = 14.82\text{ gpm}$$
+            </div>
+
+            <p><strong>Step 2: Total cumulative flow traversing branch line (\(Q_{\text{total}}\))</strong></p>
+            <div class="formula-box">
+              $$Q_{\text{total}} = 4 \times 14.82\text{ gpm} = 59.28\text{ gpm}$$
+            </div>
+
+            <p><strong>Step 3: Determine total equivalent length (\(L_{\text{total}}\))</strong></p>
+            <p>From NFPA 13 Table 27.2.3.1.1 for 1-1/2" fittings:</p>
+            <ul>
+              <li>Two 90&deg; elbows: \(2 \times 4\text{ ft} = 8\text{ ft}\)</li>
+              <li>One tee (turn into branch): \(1 \times 8\text{ ft} = 8\text{ ft}\)</li>
+              <li>Total Equivalent Length: \(L_{\text{total}} = 60\text{ ft} + 8\text{ ft} + 8\text{ ft} = 76.0\text{ ft}\)</li>
+            </ul>
+
+            <p><strong>Step 4: Compute Hazen-Williams friction gradient (\(p\))</strong></p>
+            <div class="formula-box">
+              $$p = \frac{4.52 \cdot (59.28)^{1.85}}{(120)^{1.85} \cdot (1.610)^{4.87}} = \frac{4.52 \cdot 1899.41}{7060.78 \cdot 10.124} = \frac{8585.33}{71483.3} = 0.1201\text{ psi/ft}$$
+            </div>
+
+            <p><strong>Step 5: Compute total friction loss (\(\Delta P_f\)) and fluid velocity (\(v\))</strong></p>
+            <div class="formula-box">
+              $$\Delta P_f = p \cdot L_{\text{total}} = 0.1201\text{ psi/ft} \cdot 76.0\text{ ft} = 9.13\text{ psi}$$
+              $$v = \frac{0.408 \cdot 59.28}{(1.610)^2} = \frac{24.186}{2.592} = 9.33\text{ ft/s}$$
+            </div>
+            <p>The velocity of 9.33 ft/s is well within the acceptable 20 ft/s threshold for branch lines.</p>
+
+            <p><strong>Step 6: Compute elevation static pressure penalty (\(\Delta P_{\text{elev}}\))</strong></p>
+            <div class="formula-box">
+              $$\Delta P_{\text{elev}} = 0.433 \cdot 12\text{ ft} = 5.20\text{ psi}$$
+            </div>
+
+            <p><strong>Step 7: Total required hydraulic pressure at branch supply inlet (\(P_{\text{total}}\))</strong></p>
+            <div class="formula-box">
+              $$P_{\text{total}} = P_{\text{head}} + \Delta P_f + \Delta P_{\text{elev}} = 7.0 + 9.13 + 5.20 = 21.33\text{ psi}$$
+            </div>
+            <p><strong>Engineering Conclusion:</strong> The branch supply connection must supply at least <strong>59.3 gpm at 21.4 psi</strong> to satisfy NFPA 13 minimum discharge criteria.</p>
+          </div>
+
+          <h2>Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <h3>What is the difference between Pipe Schedule systems and Hydraulically Calculated systems?</h3>
+            <p>Pipe schedule systems determine pipe sizes purely based on pre-established historical lookup tables that specify the maximum number of sprinkler heads permitted on a given pipe size (e.g., 2 heads on 1", 3 heads on 1-1/4", 5 heads on 1-1/2"). In contrast, hydraulically calculated systems use fluid mechanics, Hazen-Williams friction equations, actual water supply flow test curves, and K-factors to optimize pipe diameters, frequently resulting in smaller pipe sizes, reduced structural loads, and substantial material cost savings.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Why does dry pipe steel have a lower Hazen-Williams C-factor (100) than wet pipe (120)?</h3>
+            <p>Dry pipe and preaction systems contain pressurized air or nitrogen during standby. When condensation collects or during quarterly trip tests, moisture combines with atmospheric oxygen, accelerating internal oxidation, pitting, and ferric tuberculation. NFPA 13 mandates a conservative \(C = 100\) to account for this long-term surface degradation, which increases internal pipe roughness and hydraulic resistance.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How do ESFR sprinklers differ hydraulically from standard spray sprinklers?</h3>
+            <p>Early Suppression Fast Response (ESFR) sprinklers feature massive discharge orifices (\(K=14.0\) to \(K=25.2\)) and operate at high pressures (typically 25 to 75 psi). Rather than merely controlling a warehouse storage fire by wetting surrounding goods until firefighters arrive, ESFR heads discharge high-momentum, large-droplet water streams that penetrate severe convective fire plumes directly to extinguish high-piled palletized and rack storage fires without requiring in-rack sprinklers.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What is velocity pressure and when must it be included in fire sprinkler hydraulic calculations?</h3>
+            <p>Velocity pressure (\(P_v = 0.001123 \cdot Q^2 / d^4\)) represents the kinetic energy of water moving through the conduit. NFPA 13 allows velocity pressure to be neglected in standard branch line and cross main calculations (treating normal static pressure as total pressure), which provides an inherent conservative safety factor. However, velocity pressure must be accounted for when performing complex computerized network loops, grid systems, or velocity head recovery analyses.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar" id="toolSidebar">
+        <!-- Dynamically injected category links -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Engineering and mathematical tools grounded in international standards.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="fire-safety.html">Fire Safety</a></li>
+        <li><a href="ohms-law-calculator.html">Ohm's Law</a></li>
+        <li><a href="sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // Fitting equivalent lengths lookup table (NFPA 13 Table 27.2.3.1.1)
+    // Mapping nominal sizes to equivalent lengths for: [elbow90, teeBranch]
+    const FITTING_TABLE = {
+      "1.049": { elbow: 2, tee: 5 },
+      "1.380": { elbow: 3, tee: 6 },
+      "1.610": { elbow: 4, tee: 8 },
+      "2.067": { elbow: 5, tee: 10 },
+      "2.469": { elbow: 6, tee: 12 },
+      "3.068": { elbow: 7, tee: 15 },
+      "4.026": { elbow: 10, tee: 20 },
+      "6.065": { elbow: 14, tee: 30 }
+    };
+
+    const kFactorSelect = document.getElementById('kFactor');
+    const customKGroup = document.getElementById('customKGroup');
+    const customKInput = document.getElementById('customK');
+    const flowModeSelect = document.getElementById('flowMode');
+    const headPressGroup = document.getElementById('headPressGroup');
+    const headFlowGroup = document.getElementById('headFlowGroup');
+    const headPressInput = document.getElementById('headPress');
+    const headFlowInput = document.getElementById('headFlow');
+    const numHeadsInput = document.getElementById('numHeads');
+    const pipeSizeSelect = document.getElementById('pipeSize');
+    const pipeLengthInput = document.getElementById('pipeLength');
+    const cFactorSelect = document.getElementById('cFactor');
+    const numElbowsInput = document.getElementById('numElbows');
+    const numTeesInput = document.getElementById('numTees');
+    const elevChangeInput = document.getElementById('elevChange');
+
+    const sprinklerResultBox = document.getElementById('sprinklerResultBox');
+    const resTotalPress = document.getElementById('resTotalPress');
+    const resHeadFlow = document.getElementById('resHeadFlow');
+    const resHeadPress = document.getElementById('resHeadPress');
+    const resTotalFlow = document.getElementById('resTotalFlow');
+    const resEquivLength = document.getElementById('resEquivLength');
+    const resFrictionLoss = document.getElementById('resFrictionLoss');
+    const resGradient = document.getElementById('resGradient');
+    const resVelocity = document.getElementById('resVelocity');
+    const resElevHead = document.getElementById('resElevHead');
+    const velocityWarning = document.getElementById('velocityWarning');
+
+    kFactorSelect.addEventListener('change', function() {
+      if (this.value === 'custom') {
+        customKGroup.style.display = 'block';
+      } else {
+        customKGroup.style.display = 'none';
+      }
+      calculateHydraulics();
+    });
+
+    flowModeSelect.addEventListener('change', function() {
+      if (this.value === 'headPress') {
+        headPressGroup.style.display = 'block';
+        headFlowGroup.style.display = 'none';
+      } else {
+        headPressGroup.style.display = 'none';
+        headFlowGroup.style.display = 'block';
+      }
+      calculateHydraulics();
+    });
+
+    function calculateHydraulics() {
+      let K = (kFactorSelect.value === 'custom') ? parseFloat(customKInput.value) : parseFloat(kFactorSelect.value);
+      if (isNaN(K) || K <= 0) K = 5.6;
+
+      const flowMode = flowModeSelect.value;
+      let P_head = 7.0;
+      let Q_head = 14.8;
+
+      if (flowMode === 'headPress') {
+        P_head = parseFloat(headPressInput.value);
+        if (isNaN(P_head) || P_head <= 0) P_head = 7.0;
+        Q_head = K * Math.sqrt(P_head);
+      } else {
+        Q_head = parseFloat(headFlowInput.value);
+        if (isNaN(Q_head) || Q_head <= 0) Q_head = 14.8;
+        P_head = Math.pow(Q_head / K, 2);
+      }
+
+      let numHeads = parseInt(numHeadsInput.value, 10);
+      if (isNaN(numHeads) || numHeads < 1) numHeads = 1;
+
+      const Q_total = numHeads * Q_head;
+
+      const d = parseFloat(pipeSizeSelect.value);
+      let physicalLength = parseFloat(pipeLengthInput.value);
+      if (isNaN(physicalLength) || physicalLength < 0) physicalLength = 0;
+
+      const C = parseFloat(cFactorSelect.value);
+
+      let elbows = parseInt(numElbowsInput.value, 10);
+      if (isNaN(elbows) || elbows < 0) elbows = 0;
+
+      let tees = parseInt(numTeesInput.value, 10);
+      if (isNaN(tees) || tees < 0) tees = 0;
+
+      const fittingKey = pipeSizeSelect.value;
+      const fittingData = FITTING_TABLE[fittingKey] || { elbow: 4, tee: 8 };
+      const eqFittings = (elbows * fittingData.elbow) + (tees * fittingData.tee);
+      const L_equiv = physicalLength + eqFittings;
+
+      // Hazen-Williams friction gradient (psi per ft)
+      // p = 4.52 * Q^1.85 / (C^1.85 * d^4.87)
+      const numerator = 4.52 * Math.pow(Q_total, 1.85);
+      const denominator = Math.pow(C, 1.85) * Math.pow(d, 4.87);
+      const p_gradient = numerator / denominator;
+      const P_friction = p_gradient * L_equiv;
+
+      // Water Velocity: v = 0.408 * Q / d^2 (ft/s)
+      const velocity = (0.408 * Q_total) / Math.pow(d, 2);
+
+      // Elevation head: deltaP = 0.433 * deltaH
+      let elevChange = parseFloat(elevChangeInput.value);
+      if (isNaN(elevChange)) elevChange = 0;
+      const P_elev = 0.433 * elevChange;
+
+      // Total required pressure at supply
+      const P_total = Math.max(0, P_head + P_friction + P_elev);
+
+      resTotalPress.textContent = P_total.toFixed(2) + " psi";
+      resHeadFlow.textContent = Q_head.toFixed(2) + " gpm";
+      resHeadPress.textContent = P_head.toFixed(2) + " psi";
+      resTotalFlow.textContent = Q_total.toFixed(2) + " gpm";
+      resEquivLength.textContent = L_equiv.toFixed(1) + " ft (incl. " + eqFittings + " ft fittings)";
+      resFrictionLoss.textContent = P_friction.toFixed(2) + " psi";
+      resGradient.textContent = p_gradient.toFixed(4) + " psi/ft";
+      resVelocity.textContent = velocity.toFixed(2) + " ft/s";
+      resElevHead.textContent = (P_elev >= 0 ? "+" : "") + P_elev.toFixed(2) + " psi (" + elevChange + " ft)";
+
+      if (velocity > 20.0) {
+        velocityWarning.style.display = 'block';
+        velocityWarning.innerHTML = `<strong>High Velocity Warning:</strong> Water velocity of <strong>${velocity.toFixed(1)} ft/s</strong> exceeds the standard NFPA/FM recommendation of 20 ft/s for branch lines. Consider stepping up to a larger nominal pipe diameter to avoid internal pipe erosion and destructive water hammer.`;
+      } else {
+        velocityWarning.style.display = 'none';
+      }
+
+      sprinklerResultBox.style.display = 'block';
+    }
+
+    document.getElementById('calcBtn').addEventListener('click', calculateHydraulics);
+    document.getElementById('resetBtn').addEventListener('click', function() {
+      setTimeout(calculateHydraulics, 50);
+    });
+
+    // Auto-calculate on initial load
+    window.addEventListener('DOMContentLoaded', calculateHydraulics);
+  </script>
+</body>
+</html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Earthing Cable Size Calculator | Grounding Conductor Adiabatic Sizing</title>
+  <meta name="description" content="Calculate electrical earthing cable sizes (circuit protective conductor CPC and grounding electrode conductor GEC) compliant with IEC 60364-5-54, BS 7671, and NEC Table 250.66/250.122.">
+  <link rel="canonical" href="https://calchub.cloud/earthing-cable-size-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Earthing Cable Size Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Professional grounding and earthing cable sizing engine calculating minimum adiabatic cross-sectional area per IEC 60364-5-54 and code minimums per BS 7671 and NEC.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the adiabatic equation for sizing earthing conductors?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The adiabatic equation S = sqrt(I^2 * t) / k (codified in IEC 60364-5-54 and BS 7671 Regulation 543.1.3) calculates the minimum cross-sectional area S (mm²) of a protective conductor required to survive short-circuit ground fault currents without exceeding thermal limits of its insulation. I is prospective RMS fault current, t is fault clearance time in seconds, and k is the thermodynamic material constant."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the standard k-factors for copper, aluminum, and steel earthing conductors?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Per IEC 60364-5-54: Copper with 70°C PVC insulation has k = 115 (or k = 143 for 90°C XLPE; k = 176 for bare copper in free air). Aluminum with PVC insulation has k = 76 (or k = 94 for XLPE; k = 116 for bare aluminum). Galvanized steel conductors have k = 46 to 58 depending on insulation type."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between a CPC and a Grounding Electrode Conductor (GEC)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A Circuit Protective Conductor (CPC, or Equipment Grounding Conductor EGC) runs alongside circuit phase and neutral conductors to bond exposed metal frames back to the distribution board to trip protective devices during ground faults. A Grounding Electrode Conductor (GEC) connects the main earthing terminal (MET) or service panel neutral bus directly to earth ground electrodes (earth rods, foundation rebar, buried grounding mesh)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "When can table selection (BS 7671 Table 54.7) be used instead of the adiabatic equation?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Table 54.7 provides conservative prescriptive sizing based on phase conductor size: if phase S <= 16 mm², earthing conductor S_e = S; if 16 mm² < S <= 35 mm², S_e = 16 mm²; if S > 35 mm², S_e = S / 2. While simple, the adiabatic equation often permits significantly smaller, fully compliant earthing conductors when protective devices operate rapidly (under 0.4 seconds)."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="engineering">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="fire-safety.html">Fire Safety</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="engineering.html">Electrical &amp; Power Systems</a> &rsaquo;
+      <span>Earthing Cable Size Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">IEC 60364-5-54 &amp; BS 7671 Regulation 543</div>
+          <h1 class="calc-title">Earthing Cable Size Calculator</h1>
+          <p class="calc-tagline">Calculate protective earthing conductor cross-section (CPC, GEC, and bonding conductors) using the adiabatic equation and international code tables.</p>
+        </header>
+
+        <!-- Tool Card -->
+        <div class="tool-card">
+          <form id="earthForm" onsubmit="return false;">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="earthConductorMetal" class="form-label">Earthing Conductor Metal</label>
+                <select id="earthConductorMetal" class="form-control" onchange="calculateEarthCable()">
+                  <option value="copper" selected>Electrolytic Copper (Cu)</option>
+                  <option value="aluminum">Electrical Grade Aluminum (Al)</option>
+                  <option value="steel">Galvanized Structural Steel (Fe)</option>
+                </select>
+                <small class="form-hint">Metallurgy of protective conductor</small>
+              </div>
+
+              <div class="form-group">
+                <label for="earthInsulation" class="form-label">Conductor Enclosure &amp; Insulation</label>
+                <select id="earthInsulation" class="form-control" onchange="calculateEarthCable()">
+                  <option value="pvc" selected>PVC Insulated (70°C Continuous / 160°C Fault)</option>
+                  <option value="xlpe">XLPE / EPR Insulated (90°C Continuous / 250°C Fault)</option>
+                  <option value="bare_cable">Bare Conductor Bundled in Multicore Cable</option>
+                  <option value="bare_free">Bare Conductor in Free Air / Ground</option>
+                </select>
+                <small class="form-hint">Governs thermodynamic factor k</small>
+              </div>
+
+              <div class="form-group">
+                <label for="faultCurrentKa" class="form-label">Prospective Earth Fault Current ($I_f$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="faultCurrentKa" class="form-control" value="6.5" min="0.1" max="100" step="0.5" oninput="calculateEarthCable()">
+                  <span class="unit-badge">kA</span>
+                </div>
+                <small class="form-hint">Symmetrical phase-to-earth fault current</small>
+              </div>
+
+              <div class="form-group">
+                <label for="disconnectionTime" class="form-label">Disconnection Time ($t$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="disconnectionTime" class="form-control" value="0.1" min="0.01" max="5.0" step="0.02" oninput="calculateEarthCable()">
+                  <span class="unit-badge">sec</span>
+                </div>
+                <small class="form-hint">Breaker / fuse clearance speed (e.g. 0.1s for MCB)</small>
+              </div>
+
+              <div class="form-group">
+                <label for="phaseConductorSize" class="form-label">Associated Phase Conductor Size</label>
+                <select id="phaseConductorSize" class="form-control" onchange="calculateEarthCable()">
+                  <option value="1.5">1.5 mm²</option>
+                  <option value="2.5">2.5 mm²</option>
+                  <option value="4.0">4.0 mm²</option>
+                  <option value="6.0">6.0 mm²</option>
+                  <option value="10.0">10 mm²</option>
+                  <option value="16.0">16 mm²</option>
+                  <option value="25.0">25 mm²</option>
+                  <option value="35.0" selected>35 mm²</option>
+                  <option value="50.0">50 mm²</option>
+                  <option value="70.0">70 mm²</option>
+                  <option value="95.0">95 mm²</option>
+                  <option value="120.0">120 mm²</option>
+                  <option value="150.0">150 mm²</option>
+                  <option value="185.0">185 mm²</option>
+                  <option value="240.0">240 mm²</option>
+                </select>
+                <small class="form-hint">For BS 7671 Table 54.7 comparison</small>
+              </div>
+
+              <div class="form-group">
+                <label for="circuitBreakerRating" class="form-label">Upstream Protective Device ($I_n$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="circuitBreakerRating" class="form-control" value="100" min="6" max="2500" step="10" oninput="calculateEarthCable()">
+                  <span class="unit-badge">Amps</span>
+                </div>
+                <small class="form-hint">For NEC Table 250.122 cross-check</small>
+              </div>
+            </div>
+
+            <button type="button" id="calcEarthBtn" class="btn btn-primary btn-block" onclick="calculateEarthCable()">Dimension Earthing Conductor</button>
+          </form>
+
+          <div id="earthResultBox" class="results-container" style="margin-top:20px;">
+            <h3>Earthing Conductor Dimensioning Output</h3>
+            <div class="results-grid">
+              <div class="result-tile">
+                <span class="result-label">Recommended Earthing Cable Size</span>
+                <span id="earthSizeOut" class="result-value">-- mm²</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Minimum Adiabatic Cross-Section ($S_{ad}$)</span>
+                <span id="adiabaticOut" class="result-value">-- mm²</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Thermodynamic Material Factor ($k$)</span>
+                <span id="kFactorOut" class="result-value">--</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Table 54.7 Prescriptive Size ($S_e$)</span>
+                <span id="tableSizeOut" class="result-value">-- mm²</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">NEC Table 250.122 Minimum (EGC)</span>
+                <span id="necSizeOut" class="result-value">-- AWG</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Thermal Short-Circuit Feasibility</span>
+                <span id="earthStatusOut" class="result-value">--</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Engineering Analysis: Earthing &amp; Grounding Conductor Sizing</h2>
+          
+          <p>The electrical earthing (or grounding) system is the most critical life-safety element of any electrical installation. In low-voltage power networks, earthing conductors fulfill two non-negotiable functions: (1) ensuring rapid automatic disconnection of supply (ADS) by providing a low-impedance return path for phase-to-earth fault currents, and (2) clamping touch and step voltages ($U_t$) on exposed metallic enclosures to safe levels ($< 50\text{V AC}$ per IEC 60364-4-41) to prevent fatal electrocution.</p>
+
+          <p>Dimensioning earthing conductors&mdash;whether circuit protective conductors (CPC), main equipotential bonding conductors, or grounding electrode conductors (GEC)&mdash;is governed by international codes including <strong>IEC 60364-5-54 (Selection and erection of electrical equipment &mdash; Earthing arrangements and protective conductors)</strong>, the UK <strong>BS 7671 (IET Wiring Regulations Regulation 543)</strong>, and the US <strong>NFPA 70 National Electrical Code (NEC Article 250)</strong>.</p>
+
+          <div class="formula-box">
+            <h3>The Fundamental Adiabatic Thermal Equation: IEC 60364-5-54</h3>
+            <p>During an earth fault, the short-circuit current ($I_f$) dissipates immense joule heat into the protective conductor. Because protective overcurrent devices (circuit breakers, MCCBs, and fuses) clear faults rapidly (typically between $0.02\text{ to } 0.4\text{ seconds}$, and strictly under $5\text{ seconds}$), zero heat escapes into the surrounding ambient air or conduit walls. The process is strictly <strong>adiabatic</strong>.</p>
+            <p>Under IEC 60364-5-54 Clause 543.1.2 and BS 7671 Regulation 543.1.3, the minimum cross-sectional area $S$ of a protective conductor is calculated from:</p>
+            <p>$$S = \frac{\sqrt{I_f^2 \cdot t}}{k} = \frac{I_f \sqrt{t}}{k}$$</p>
+            <p>Where:</p>
+            <ul>
+              <li>$S$ = Minimum cross-sectional area of the earthing conductor in square millimeters ($\text{mm}^2$).</li>
+              <li>$I_f$ = Prospective root-mean-square (RMS) phase-to-earth fault current passing through the protective device in Amperes ($\text{A}$).</li>
+              <li>$t$ = Operating disconnect time of the protective device in seconds ($\text{s}$).</li>
+              <li>$k$ = Thermodynamic material constant taking into account electrical resistivity, temperature coefficient of resistance, volumetric heat capacity, and permissible initial and final temperatures of the conductor material and its insulation.</li>
+            </ul>
+          </div>
+
+          <h3>Thermodynamic $k$-Factor Values for Common Conductors</h3>
+          <p>The material constant $k$ is derived from the thermodynamic physical properties of the conductor metal and the thermal boundary limits of its insulation matrix:</p>
+          <p>$$k = \sqrt{\frac{Q_c \cdot (\beta + 20)}{\rho_{20}} \ln\left(\frac{\beta + \theta_f}{\beta + \theta_i}\right)}$$</p>
+          <p>Where $Q_c$ is volumetric heat capacity, $\beta$ is reciprocal of temperature coefficient at $0^\circ\text{C}$ ($234.5$ for copper, $228$ for aluminum, $202$ for steel), $\rho_{20}$ is electrical resistivity at $20^\circ\text{C}$, $\theta_i$ is initial operating temperature, and $\theta_f$ is maximum permissible short-circuit final temperature.</p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Conductor Material</th>
+                <th>Insulation Type</th>
+                <th>Initial Temp ($\theta_i$)</th>
+                <th>Final Fault Temp ($\theta_f$)</th>
+                <th>$k$-Factor (IEC 60364-5-54)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Copper (Cu)</strong></td>
+                <td>70°C PVC Insulated</td>
+                <td>$70^\circ\text{C}$</td>
+                <td>$160^\circ\text{C}$</td>
+                <td><strong>$k = 115$</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Copper (Cu)</strong></td>
+                <td>90°C XLPE / EPR Insulated</td>
+                <td>$90^\circ\text{C}$</td>
+                <td>$250^\circ\text{C}$</td>
+                <td><strong>$k = 143$</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Copper (Cu)</strong></td>
+                <td>Bare (Bundled in Cable)</td>
+                <td>$70^\circ\text{C}$</td>
+                <td>$160^\circ\text{C}$</td>
+                <td><strong>$k = 143$</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Copper (Cu)</strong></td>
+                <td>Bare in Free Air / Trench</td>
+                <td>$30^\circ\text{C}$</td>
+                <td>$200^\circ\text{C}$</td>
+                <td><strong>$k = 176$</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Aluminum (Al)</strong></td>
+                <td>70°C PVC Insulated</td>
+                <td>$70^\circ\text{C}$</td>
+                <td>$160^\circ\text{C}$</td>
+                <td><strong>$k = 76$</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Aluminum (Al)</strong></td>
+                <td>90°C XLPE / EPR Insulated</td>
+                <td>$90^\circ\text{C}$</td>
+                <td>$250^\circ\text{C}$</td>
+                <td><strong>$k = 94$</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Aluminum (Al)</strong></td>
+                <td>Bare in Free Air</td>
+                <td>$30^\circ\text{C}$</td>
+                <td>$200^\circ\text{C}$</td>
+                <td><strong>$k = 116$</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Galvanized Steel</strong></td>
+                <td>Steel Wire Armour (SWA)</td>
+                <td>$60^\circ\text{C}$</td>
+                <td>$160^\circ\text{C}$</td>
+                <td><strong>$k = 51$</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Galvanized Steel</strong></td>
+                <td>Bare Earth Tape / Rod</td>
+                <td>$30^\circ\text{C}$</td>
+                <td>$200^\circ\text{C}$</td>
+                <td><strong>$k = 58$</strong></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="formula-box">
+            <h3>Prescriptive Sizing: BS 7671 Table 54.7 &amp; NEC Table 250.122</h3>
+            <p>If prospective fault current and clearance times are not calculated mathematically, national codes permit prescriptive rule-of-thumb sizing based on associated phase conductors:</p>
+            <p><strong>BS 7671 Table 54.7 Method (When phase and earth metals are identical):</strong></p>
+            <ul>
+              <li>If $S_{phase} \le 16\text{ mm}^2 \implies S_{earth} = S_{phase}$</li>
+              <li>If $16\text{ mm}^2 < S_{phase} \le 35\text{ mm}^2 \implies S_{earth} = 16\text{ mm}^2$</li>
+              <li>If $S_{phase} > 35\text{ mm}^2 \implies S_{earth} = \frac{S_{phase}}{2}$</li>
+            </ul>
+            <p><strong>NEC Table 250.122 (Equipment Grounding Conductor based on Breaker Rating):</strong></p>
+            <ul>
+              <li>15A Breaker $\implies$ #14 AWG Copper ($2.08\text{ mm}^2$)</li>
+              <li>20A Breaker $\implies$ #12 AWG Copper ($3.31\text{ mm}^2$)</li>
+              <li>30A Breaker $\implies$ #10 AWG Copper ($5.26\text{ mm}^2$)</li>
+              <li>60A Breaker $\implies$ #10 AWG Copper ($5.26\text{ mm}^2$)</li>
+              <li>100A Breaker $\implies$ #8 AWG Copper ($8.37\text{ mm}^2$)</li>
+              <li>200A Breaker $\implies$ #6 AWG Copper ($13.3\text{ mm}^2$)</li>
+              <li>400A Breaker $\implies$ #3 AWG Copper ($26.7\text{ mm}^2$)</li>
+              <li>600A Breaker $\implies$ #1 AWG Copper ($42.4\text{ mm}^2$)</li>
+            </ul>
+          </div>
+
+          <div class="worked-example-card">
+            <h3>Practical Worked Engineering Example: Industrial Sub-Distribution Feeder Earthing</h3>
+            <p><strong>Design Scenario:</strong> Size the Circuit Protective Conductor (CPC) for a three-phase distribution subpanel fed from a main switchboard. Phase conductors are $35\text{ mm}^2$ copper. The circuit is protected by a $100\text{ A}$ Type C MCB. Symmetrical earth fault calculation indicates a prospective earth fault current $I_f = 6{,}500\text{ A}$ ($6.5\text{ kA}$). The MCB's instantaneous electromagnetic magnetic trip clears the fault within $t = 0.08\text{ seconds}$. The earthing conductor selected is a single-core copper cable with $70^\circ\text{C}$ PVC insulation ($k = 115$).</p>
+
+            <p><strong>Step 1: Calculate Minimum Cross-Section via Adiabatic Equation</strong></p>
+            <p>$$S = \frac{I_f \sqrt{t}}{k} = \frac{6500 \times \sqrt{0.08}}{115} = \frac{6500 \times 0.2828}{115} = \frac{1838.48}{115} = 15.99\text{ mm}^2$$</p>
+            <p>The calculated adiabatic minimum is $15.99\text{ mm}^2$. The next standard commercial cable size is <strong>$16\text{ mm}^2$</strong>.</p>
+
+            <p><strong>Step 2: Compare with BS 7671 Table 54.7 Prescriptive Sizing</strong></p>
+            <p>For $S_{phase} = 35\text{ mm}^2$, Table 54.7 specifies:</p>
+            <p>$$S_{earth} = 16\text{ mm}^2$$</p>
+            <p>The adiabatic calculation and Table 54.7 converge on the exact same size ($16\text{ mm}^2$).</p>
+
+            <p><strong>Step 3: Verification of Thermal Feasibility &amp; Let-Through Energy ($I^2 t$)</strong></p>
+            <p>Fault energy let-through: $I^2 t = (6500)^2 \times 0.08 = 3{,}380{,}000\text{ A}^2\text{s}$.</p>
+            <p>Maximum thermal withstand of $16\text{ mm}^2$ copper PVC:</p>
+            <p>$$k^2 S^2 = (115)^2 \times (16)^2 = 13{,}225 \times 256 = 3{,}385{,}600\text{ A}^2\text{s}$$</p>
+            <p>Since $k^2 S^2 (3{,}385{,}600) \ge I^2 t (3{,}380{,}000)$, the $16\text{ mm}^2$ copper conductor will safely absorb the fault energy without exceeding $160^\circ\text{C}$.</p>
+          </div>
+
+          <h2>Frequently Asked Questions (Earthing Cable Sizing)</h2>
+          <div class="faq-item">
+            <h3>Can the steel wire armour (SWA) of a cable be used as the sole earthing conductor?</h3>
+            <p>Yes, provided the cross-sectional area of the steel wire armour satisfies the adiabatic equation $S \ge \frac{\sqrt{I^2 t}}{k}$ with $k = 51$ for steel armour. Because steel has higher electrical resistivity than copper, SWA must have roughly twice the cross-sectional area of a copper CPC to provide equivalent fault-handling capacity. Most modern 3-core and 4-core XLPE SWA cables up to $95\text{ mm}^2$ easily qualify.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What is the minimum size for a main equipotential bonding conductor?</h3>
+            <p>Under BS 7671 Regulation 544.1.1, main bonding conductors connecting incoming metal gas, water, and structural steel services to the Main Earthing Terminal (MET) must not be less than half the required cross-sectional area of the earthing conductor of the installation, with a minimum of $6\text{ mm}^2$ and need not exceed $25\text{ mm}^2$ for copper.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Why does aluminum have lower k-factor than copper?</h3>
+            <p>Electrical grade aluminum has a lower volumetric heat capacity ($Q_c \approx 2.42 \times 10^6\text{ J}/(\text{m}^3\cdot\text{K})$ vs $3.42 \times 10^6$ for copper) and higher electrical resistivity ($\rho \approx 2.82 \times 10^{-8}\ \Omega\cdot\text{m}$ vs $1.72 \times 10^{-8}$ for copper). Consequently, aluminum heats up significantly faster during short-circuit faults, yielding lower $k$-factors ($76$ vs $115$ for PVC) and requiring larger cross-sections.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Does the adiabatic equation apply to long-duration earth faults (> 5 seconds)?</h3>
+            <p>No. If the protective device takes longer than 5 seconds to clear an earth fault (such as on high-impedance TT systems without RCD protection), heat begins conducting out through the insulation into the surrounding medium. In such cases, non-adiabatic continuous thermal equilibrium equations or standard table selections must be employed.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar" id="toolSidebar">
+        <!-- Dynamically rendered sidebar -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Engineering and mathematical tools grounded in international standards.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="engineering.html">Engineering</a></li>
+        <li><a href="ohms-law-calculator.html">Ohm's Law</a></li>
+        <li><a href="sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    const standardMetricEarthSizes = [1.5, 2.5, 4.0, 6.0, 10.0, 16.0, 25.0, 35.0, 50.0, 70.0, 95.0, 120.0, 150.0, 185.0, 240.0];
+
+    // k-factor matrix per IEC 60364-5-54
+    const kMatrix = {
+      "copper": { "pvc": 115, "xlpe": 143, "bare_cable": 143, "bare_free": 176 },
+      "aluminum": { "pvc": 76, "xlpe": 94, "bare_cable": 94, "bare_free": 116 },
+      "steel": { "pvc": 46, "xlpe": 54, "bare_cable": 51, "bare_free": 58 }
+    };
+
+    function calculateEarthCable() {
+      const metal = document.getElementById("earthConductorMetal").value;
+      const insulation = document.getElementById("earthInsulation").value;
+      const faultKa = parseFloat(document.getElementById("faultCurrentKa").value) || 1;
+      const faultTime = parseFloat(document.getElementById("disconnectionTime").value) || 0.1;
+      const phaseSize = parseFloat(document.getElementById("phaseConductorSize").value) || 16;
+      const breakerRating = parseFloat(document.getElementById("circuitBreakerRating").value) || 100;
+
+      const faultAmps = faultKa * 1000;
+      const k = kMatrix[metal][insulation] || 115;
+
+      // Adiabatic calculation S = (I * sqrt(t)) / k
+      const sAdiabatic = (faultAmps * Math.sqrt(faultTime)) / k;
+
+      // Table 54.7 Prescriptive Sizing
+      let sTable = 16.0;
+      if (phaseSize <= 16.0) {
+        sTable = phaseSize;
+      } else if (phaseSize <= 35.0) {
+        sTable = 16.0;
+      } else {
+        sTable = phaseSize / 2;
+      }
+
+      // NEC 250.122 Minimum estimation
+      let necAwg = "#14 AWG";
+      if (breakerRating > 15 && breakerRating <= 20) necAwg = "#12 AWG (3.3 mm²)";
+      else if (breakerRating > 20 && breakerRating <= 60) necAwg = "#10 AWG (5.3 mm²)";
+      else if (breakerRating > 60 && breakerRating <= 100) necAwg = "#8 AWG (8.4 mm²)";
+      else if (breakerRating > 100 && breakerRating <= 200) necAwg = "#6 AWG (13.3 mm²)";
+      else if (breakerRating > 200 && breakerRating <= 300) necAwg = "#4 AWG (21.2 mm²)";
+      else if (breakerRating > 300 && breakerRating <= 400) necAwg = "#3 AWG (26.7 mm²)";
+      else if (breakerRating > 400 && breakerRating <= 500) necAwg = "#2 AWG (33.6 mm²)";
+      else if (breakerRating > 500 && breakerRating <= 600) necAwg = "#1 AWG (42.4 mm²)";
+      else if (breakerRating > 600) necAwg = "#1/0 to #4/0 AWG";
+
+      // Select standard size >= sAdiabatic
+      let recommendedSize = null;
+      for (let i = 0; i < standardMetricEarthSizes.length; i++) {
+        if (standardMetricEarthSizes[i] >= sAdiabatic) {
+          recommendedSize = standardMetricEarthSizes[i];
+          break;
+        }
+      }
+
+      document.getElementById("adiabaticOut").innerText = sAdiabatic.toFixed(2) + " mm²";
+      document.getElementById("kFactorOut").innerText = k + " A·s^(1/2)/mm²";
+      document.getElementById("tableSizeOut").innerText = sTable + " mm²";
+      document.getElementById("necSizeOut").innerText = necAwg;
+
+      const statusEl = document.getElementById("earthStatusOut");
+
+      if (recommendedSize) {
+        document.getElementById("earthSizeOut").innerText = recommendedSize + " mm² " + metal.toUpperCase();
+        statusEl.innerText = "Feasible: Conductor Withstands Fault Energy Let-Through (I²t)";
+        statusEl.style.color = "#10b981";
+      } else {
+        document.getElementById("earthSizeOut").innerText = "> 240 mm² (Parallel Conductors Req.)";
+        statusEl.innerText = "Exceeds standard single conductor thermal limit; check protective clearance speed";
+        statusEl.style.color = "#ef4444";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      calculateEarthCable();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>kW to Cable Size Calculator | Kilowatt Load to Electrical Wire Sizing</title>
+  <meta name="description" content="Convert electrical kilowatts (kW) into exact low-voltage cable sizes. Computes full-load amps, 3-phase and 1-phase voltage drop, power factor, and thermal derating.">
+  <link rel="canonical" href="https://calchub.cloud/kw-to-cable-size-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "kW to Cable Size Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Convert kilowatt (kW) connected load to exact electrical cable size and copper cross-section for single-phase and three-phase systems.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How is electrical load current calculated from kilowatts (kW)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For a three-phase system: I = (P_kW * 1000) / (sqrt(3) * V_LL * cos(theta) * eta), where V_LL is line-to-line voltage, cos(theta) is power factor, and eta is motor efficiency. For a single-phase system: I = (P_kW * 1000) / (V_LN * cos(theta) * eta)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why must motor efficiency and power factor be included when sizing cable from kW?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Motor nameplates specify mechanical shaft power in kW, not electrical input power. Because motors have internal electrical and magnetic losses (efficiency eta approx 85% to 95%) and draw reactive magnetizing current (power factor cos(theta) approx 0.80 to 0.88), the actual electrical line current is significantly higher than a pure resistive kW calculation would indicate."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the continuous load safety factor for kW cable sizing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Under NEC 210.19 and IEC 60364-5-52, continuous loads (operating for 3 hours or more) require protective devices and conductors to be sized for 125% of the calculated full-load current (I_design = 1.25 * I_FLA)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does cable length impact kW-to-cable sizing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Even if a conductor meets thermal current capacity for a given kW rating, long distances introduce electrical resistance that causes voltage drop. International standards recommend limiting voltage drop to 3% for lighting and 4% to 5% for general motor/power loads, which frequently requires upsizing the conductor beyond its thermal rating."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="engineering">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="fire-safety.html">Fire Safety</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="engineering.html">Electrical &amp; Power Systems</a> &rsaquo;
+      <span>kW to Cable Size Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">IEC 60364 &amp; NEC Standard Conversion</div>
+          <h1 class="calc-title">kW to Cable Size Calculator</h1>
+          <p class="calc-tagline">Convert electrical kilowatt (kW) ratings into exact conductor cross-sections ($mm^2$ &amp; AWG) with voltage drop and thermal derating.</p>
+        </header>
+
+        <!-- Tool Card -->
+        <div class="tool-card">
+          <form id="kwForm" onsubmit="return false;">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="powerKw" class="form-label">Connected Active Power ($P$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="powerKw" class="form-control" value="30" min="0.1" step="1" oninput="calculateKwCable()">
+                  <span class="unit-badge">kW</span>
+                </div>
+                <small class="form-hint">Load rating in kilowatts</small>
+              </div>
+
+              <div class="form-group">
+                <label for="kwSupplySystem" class="form-label">Supply Voltage &amp; Phase</label>
+                <select id="kwSupplySystem" class="form-control" onchange="calculateKwCable()">
+                  <option value="400_3p" selected>Three-Phase 400V AC (50/60 Hz)</option>
+                  <option value="230_1p">Single-Phase 230V AC (50/60 Hz)</option>
+                  <option value="480_3p">Three-Phase 480V AC (North American)</option>
+                  <option value="208_3p">Three-Phase 208V AC</option>
+                  <option value="120_1p">Single-Phase 120V AC</option>
+                </select>
+                <small class="form-hint">Operating system voltage</small>
+              </div>
+
+              <div class="form-group">
+                <label for="kwPowerFactor" class="form-label">Power Factor ($\cos\varphi$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="kwPowerFactor" class="form-control" value="0.85" min="0.5" max="1.0" step="0.05" oninput="calculateKwCable()">
+                  <span class="unit-badge">$\cos\varphi$</span>
+                </div>
+                <small class="form-hint">1.0 for resistive; 0.8–0.88 for induction motors</small>
+              </div>
+
+              <div class="form-group">
+                <label for="kwEfficiency" class="form-label">Equipment Efficiency ($\eta$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="kwEfficiency" class="form-control" value="90" min="50" max="100" step="1" oninput="calculateKwCable()">
+                  <span class="unit-badge">%</span>
+                </div>
+                <small class="form-hint">100% for heaters; 88%–94% for industrial motors</small>
+              </div>
+
+              <div class="form-group">
+                <label for="kwConductorMetal" class="form-label">Conductor Metal</label>
+                <select id="kwConductorMetal" class="form-control" onchange="calculateKwCable()">
+                  <option value="copper" selected>Annealed Copper (Cu)</option>
+                  <option value="aluminum">Electrical Aluminum (Al)</option>
+                </select>
+                <small class="form-hint">Cable core material</small>
+              </div>
+
+              <div class="form-group">
+                <label for="kwInsulation" class="form-label">Cable Insulation</label>
+                <select id="kwInsulation" class="form-control" onchange="calculateKwCable()">
+                  <option value="xlpe" selected>XLPE / 90°C Thermosetting</option>
+                  <option value="pvc">PVC / 70°C Thermoplastic</option>
+                </select>
+                <small class="form-hint">Maximum conductor core temperature</small>
+              </div>
+
+              <div class="form-group">
+                <label for="kwRouteLength" class="form-label">One-Way Run Length ($L$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="kwRouteLength" class="form-control" value="50" min="1" step="5" oninput="calculateKwCable()">
+                  <span class="unit-badge">metres</span>
+                </div>
+                <small class="form-hint">Distance from switchboard to load</small>
+              </div>
+
+              <div class="form-group">
+                <label for="kwAmbientTemp" class="form-label">Ambient Temperature</label>
+                <div class="input-with-unit">
+                  <input type="number" id="kwAmbientTemp" class="form-control" value="35" min="10" max="65" step="1" oninput="calculateKwCable()">
+                  <span class="unit-badge">°C</span>
+                </div>
+                <small class="form-hint">Baseline is 30°C in air</small>
+              </div>
+
+              <div class="form-group">
+                <label for="kwMaxVd" class="form-label">Max Allowable Voltage Drop</label>
+                <div class="input-with-unit">
+                  <input type="number" id="kwMaxVd" class="form-control" value="4.0" min="1.0" max="10.0" step="0.5" oninput="calculateKwCable()">
+                  <span class="unit-badge">%</span>
+                </div>
+                <small class="form-hint">Standard threshold (typically 3%–5%)</small>
+              </div>
+            </div>
+
+            <button type="button" id="calcKwBtn" class="btn btn-primary btn-block" onclick="calculateKwCable()">Size Cable from kW</button>
+          </form>
+
+          <div id="kwResultBox" class="results-container" style="margin-top:20px;">
+            <h3>kW Cable Conversion Results</h3>
+            <div class="results-grid">
+              <div class="result-tile">
+                <span class="result-label">Recommended Cable Cross-Section</span>
+                <span id="kwCableSizeOut" class="result-value">-- mm²</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Calculated Full-Load Current ($I_{FLA}$)</span>
+                <span id="kwCurrentOut" class="result-value">-- A</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Continuous Design Current ($1.25 \times I$)</span>
+                <span id="kwDesignCurrentOut" class="result-value">-- A</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Derated Cable Ampacity ($I_z$)</span>
+                <span id="kwIzOut" class="result-value">-- A</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Line Voltage Drop ($\Delta V$)</span>
+                <span id="kwVdOut" class="result-value">-- V (-- %)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Standard Circuit Breaker Size</span>
+                <span id="kwBreakerOut" class="result-value">-- A</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Engineering Guide: Converting Kilowatts (kW) to Cable Cross-Section</h2>
+          
+          <p>Converting electrical active power in kilowatts ($kW$) into an accurately sized electrical cable is one of the most frequent tasks performed by electrical consulting engineers, contractors, and industrial technicians. Whether dimensioning a feeder for a $45\text{ kW}$ induction motor, a $150\text{ kW}$ commercial HVAC chiller, or a $22\text{ kW}$ electric vehicle fast charger, sizing cannot be completed by simple kW-to-area lookup tables. Doing so ignores the thermodynamic physics of line impedance, thermal dissipation, power factor, and voltage degradation.</p>
+
+          <div class="formula-box">
+            <h3>Derivation of Full-Load Running Current from Active Power</h3>
+            <p>Kilowatts ($kW$) measure real electrical power performing mechanical or thermal work. To size conductors, this power must first be converted into root-mean-square (RMS) line current in Amperes ($A$):</p>
+            <p><strong>For Three-Phase Balanced Circuits:</strong></p>
+            <p>$$I = \frac{P_{kW} \times 1000}{\sqrt{3} \times V_{LL} \times \cos\varphi \times \eta}$$</p>
+            <p><strong>For Single-Phase Circuits:</strong></p>
+            <p>$$I = \frac{P_{kW} \times 1000}{V_{LN} \times \cos\varphi \times \eta}$$</p>
+            <p>Where:</p>
+            <ul>
+              <li>$P_{kW}$ = Nameplate electrical or shaft power in kilowatts ($kW$).</li>
+              <li>$V_{LL}$ = Line-to-line RMS voltage (e.g. $400\text{V}$ or $480\text{V}$).</li>
+              <li>$V_{LN}$ = Line-to-neutral RMS voltage (e.g. $230\text{V}$ or $120\text{V}$).</li>
+              <li>$\cos\varphi$ = Operating electrical load power factor ($\cos\theta$). Pure resistive heating has $\cos\varphi = 1.0$; induction motors typically operate between $0.80$ and $0.88$ lagging.</li>
+              <li>$\eta$ = Fractional mechanical efficiency ($0.50$ to $1.0$). For motors, nameplate kW represents output shaft power, meaning electrical input is $P_{in} = P_{shaft} / \eta$.</li>
+            </ul>
+          </div>
+
+          <h3>The Continuous Load Safety Factor: 125% Rule</h3>
+          <p>Under both <strong>NEC Article 215.2 / 210.19</strong> and <strong>IEC 60364-5-52</strong>, when an electrical load is continuous (operating for 3 hours or more without interruption), the design current ($I_b$) is scaled up by a factor of $1.25$:</p>
+          <p>$$I_{design} = 1.25 \times I_{FLA}$$</p>
+          <p>This $25\%$ safety buffer prevents nuisance thermal tripping of circuit breakers and ensures conductors operate within safe long-term temperature boundaries.</p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Motor / Load Rating (kW)</th>
+                <th>Three-Phase 400V FLA (0.85 PF, 90% Eff)</th>
+                <th>Design Current ($1.25\times$)</th>
+                <th>Recommended Copper Size (XLPE)</th>
+                <th>Standard Breaker Rating</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>3.0 kW</strong></td>
+                <td>5.66 A</td>
+                <td>7.08 A</td>
+                <td><strong>1.5 mm²</strong></td>
+                <td>10 A Breaker</td>
+              </tr>
+              <tr>
+                <td><strong>5.5 kW</strong></td>
+                <td>10.38 A</td>
+                <td>12.98 A</td>
+                <td><strong>2.5 mm²</strong></td>
+                <td>16 A Breaker</td>
+              </tr>
+              <tr>
+                <td><strong>7.5 kW</strong></td>
+                <td>14.16 A</td>
+                <td>17.70 A</td>
+                <td><strong>4.0 mm²</strong></td>
+                <td>20 A Breaker</td>
+              </tr>
+              <tr>
+                <td><strong>11.0 kW</strong></td>
+                <td>20.76 A</td>
+                <td>25.95 A</td>
+                <td><strong>6.0 mm²</strong></td>
+                <td>32 A Breaker</td>
+              </tr>
+              <tr>
+                <td><strong>15.0 kW</strong></td>
+                <td>28.31 A</td>
+                <td>35.39 A</td>
+                <td><strong>10.0 mm²</strong></td>
+                <td>40 A Breaker</td>
+              </tr>
+              <tr>
+                <td><strong>22.0 kW</strong></td>
+                <td>41.52 A</td>
+                <td>51.90 A</td>
+                <td><strong>16.0 mm²</strong></td>
+                <td>63 A Breaker</td>
+              </tr>
+              <tr>
+                <td><strong>30.0 kW</strong></td>
+                <td>56.63 A</td>
+                <td>70.78 A</td>
+                <td><strong>25.0 mm²</strong></td>
+                <td>80 A Breaker</td>
+              </tr>
+              <tr>
+                <td><strong>45.0 kW</strong></td>
+                <td>84.94 A</td>
+                <td>106.18 A</td>
+                <td><strong>35.0 mm²</strong></td>
+                <td>125 A Breaker</td>
+              </tr>
+              <tr>
+                <td><strong>75.0 kW</strong></td>
+                <td>141.57 A</td>
+                <td>176.96 A</td>
+                <td><strong>70.0 mm²</strong></td>
+                <td>200 A Breaker</td>
+              </tr>
+              <tr>
+                <td><strong>110.0 kW</strong></td>
+                <td>207.63 A</td>
+                <td>259.54 A</td>
+                <td><strong>120.0 mm²</strong></td>
+                <td>300 A Breaker</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="formula-box">
+            <h3>Voltage Drop Limitation on Sizing</h3>
+            <p>Even when a cable satisfies continuous thermal ampacity, conductor resistance $R$ over long route distances $L$ induces line voltage drop:</p>
+            <p>$$\text{Three-Phase: } \Delta V = \sqrt{3} \times I \times L \times (R \cos\varphi + X \sin\varphi)$$</p>
+            <p>$$\Delta V\% = \frac{\Delta V}{V_{nominal}} \times 100\%$$</p>
+            <p>If $\Delta V\%$ exceeds statutory limits ($3\%$ for lighting, $4\%$ to $5\%$ for general industrial power per IEC 60364-5-52 Annex G), the conductor cross-section must be stepped up to the next standard gauge, regardless of thermal capacity.</p>
+          </div>
+
+          <div class="worked-example-card">
+            <h3>Practical Worked Engineering Example: 30 kW Industrial Compressor Feeder</h3>
+            <p><strong>Design Scenario:</strong> Size a three-phase, 400V, 50 Hz feeder cable powering a $30\text{ kW}$ rotary screw air compressor. The compressor motor operates with a power factor of $\cos\varphi = 0.85$ and a full-load mechanical efficiency of $\eta = 90\%$. The feeder is routed $50\text{ meters}$ along a cable ladder in a factory where ambient temperature peaks at $35^\circ\text{C}$. Multi-core copper cable with XLPE ($90^\circ\text{C}$) insulation is specified. Maximum permissible voltage drop is $4.0\%$.</p>
+
+            <p><strong>Step 1: Calculate Full-Load Operating Current ($I_{FLA}$)</strong></p>
+            <p>$$I_{FLA} = \frac{30 \times 1000}{\sqrt{3} \times 400 \times 0.85 \times 0.90} = \frac{30{,}000}{1.732 \times 400 \times 0.765} = \frac{30{,}000}{529.99} = 56.60\text{ Amperes}$$</p>
+
+            <p><strong>Step 2: Apply Continuous Load Factor ($1.25\times$)</strong></p>
+            <p>$$I_{design} = 1.25 \times 56.60\text{ A} = 70.75\text{ Amperes}$$</p>
+            <p>A standard $80\text{ A}$ circuit breaker is selected ($I_n = 80\text{ A}$).</p>
+
+            <p><strong>Step 3: Thermal Ampacity Sizing with Ambient Derating</strong></p>
+            <p>At $35^\circ\text{C}$ ambient, XLPE derating factor $C_a = \sqrt{\frac{90 - 35}{90 - 30}} = 0.957$.</p>
+            <p>Required tabulated rating:</p>
+            <p>$$I_0 \ge \frac{I_n}{C_a} = \frac{80\text{ A}}{0.957} = 83.59\text{ A}$$</p>
+            <p>From IEC 60364-5-52 Table B.52.4 (Method E, XLPE Copper):</p>
+            <ul>
+              <li>$10\text{ mm}^2 \implies I_0 = 80\text{ A}$ (Insufficient: $80 < 83.59$)</li>
+              <li>$16\text{ mm}^2 \implies I_0 = 110\text{ A}$ (Compliant: $110 \ge 83.59\text{ A}$)</li>
+            </ul>
+
+            <p><strong>Step 4: Verification of Voltage Drop ($\Delta V$) on $16\text{ mm}^2$</strong></p>
+            <p>For $16\text{ mm}^2$ copper XLPE, $(mV/A/m) \approx 2.4\text{ mV/A/m}$:</p>
+            <p>$$\Delta V = \frac{2.4 \times 56.60\text{ A} \times 50\text{ m}}{1000} = 6.79\text{ Volts}$$</p>
+            <p>$$\Delta V\% = \frac{6.79\text{ V}}{400\text{ V}} \times 100 = 1.70\%$$</p>
+            <p>Since $1.70\% \le 4.0\%$, the $16\text{ mm}^2$ XLPE copper cable satisfies all thermal, mechanical, and voltage drop requirements.</p>
+          </div>
+
+          <h2>Frequently Asked Questions (kW to Cable Sizing)</h2>
+          <div class="faq-item">
+            <h3>Why does single-phase require much larger cable than three-phase for the same kW?</h3>
+            <p>In a single-phase 230V system, all power travels through a single line and neutral pair ($P = V \cdot I$). In a 400V three-phase system, power divides across three separate phase conductors at a higher line-to-line voltage ($P = \sqrt{3} \cdot V_{LL} \cdot I$). A $10\text{ kW}$ load draws $43.5\text{ A}$ on single-phase 230V, requiring $10\text{ mm}^2$ cable, but only $14.4\text{ A}$ on 400V three-phase, requiring only $2.5\text{ mm}^2$ cable!</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How do VFDs (Variable Frequency Drives) affect kW cable sizing?</h3>
+            <p>Variable frequency drives generate high-frequency pulse-width modulated (PWM) voltage spikes ($dV/dt$) and high-frequency harmonic ground currents. While the continuous fundamental current corresponds to motor kW, shielded symmetrical VFD cables with XLPE insulation and foil/braid shields must be specified to prevent reflected wave insulation breakdown and EMI interference.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Can I use aluminum cable instead of copper for motor feeders?</h3>
+            <p>Yes, but aluminum requires approximately $1.64\times$ greater cross-sectional area to achieve identical electrical resistance. For example, a $45\text{ kW}$ load that utilizes $35\text{ mm}^2$ copper typically requires $70\text{ mm}^2$ aluminum cable, and terminations must utilize dual-rated AL7CU or AL9CU mechanical compression lugs.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What is the difference between kVA and kW in cable sizing?</h3>
+            <p>Kilowatts ($kW$) represent real active power doing work, while kilovolt-amperes ($kVA$) represent apparent total power ($kVA = kW / \cos\varphi$). Cables must carry the total vector sum of active and reactive current; therefore, cables are always dimensioned based on the total apparent power ($kVA$) or calculated line amperes ($I$), rather than active kilowatts alone.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar" id="toolSidebar">
+        <!-- Dynamically rendered sidebar -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Engineering and mathematical tools grounded in international standards.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="engineering.html">Engineering</a></li>
+        <li><a href="ohms-law-calculator.html">Ohm's Law</a></li>
+        <li><a href="sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // Standard IEC Copper Ratings (Method C/E approx values)
+    const kwCableTable = [
+      { size: 1.5,  c_xlpe: 23,  c_pvc: 19.5, mv_3p: 25.0, mv_1p: 29.0 },
+      { size: 2.5,  c_xlpe: 31,  c_pvc: 26.0, mv_3p: 15.0, mv_1p: 18.0 },
+      { size: 4.0,  c_xlpe: 42,  c_pvc: 35.0, mv_3p: 9.5,  mv_1p: 11.0 },
+      { size: 6.0,  c_xlpe: 54,  c_pvc: 46.0, mv_3p: 6.4,  mv_1p: 7.3 },
+      { size: 10.0, c_xlpe: 75,  c_pvc: 63.0, mv_3p: 3.8,  mv_1p: 4.4 },
+      { size: 16.0, c_xlpe: 100, c_pvc: 85.0, mv_3p: 2.4,  mv_1p: 2.8 },
+      { size: 25.0, c_xlpe: 127, c_pvc: 112,  mv_3p: 1.50, mv_1p: 1.75 },
+      { size: 35.0, c_xlpe: 158, c_pvc: 138,  mv_3p: 1.10, mv_1p: 1.25 },
+      { size: 50.0, c_xlpe: 192, c_pvc: 168,  mv_3p: 0.80, mv_1p: 0.93 },
+      { size: 70.0, c_xlpe: 246, c_pvc: 213,  mv_3p: 0.55, mv_1p: 0.63 },
+      { size: 95.0, c_xlpe: 298, c_pvc: 258,  mv_3p: 0.40, mv_1p: 0.46 },
+      { size: 120,  c_xlpe: 346, c_pvc: 299,  mv_3p: 0.31, mv_1p: 0.36 },
+      { size: 150,  c_xlpe: 399, c_pvc: 344,  mv_3p: 0.25, mv_1p: 0.29 },
+      { size: 185,  c_xlpe: 456, c_pvc: 392,  mv_3p: 0.20, mv_1p: 0.23 },
+      { size: 240,  c_xlpe: 538, c_pvc: 461,  mv_3p: 0.155, mv_1p: 0.18 }
+    ];
+
+    const standardBreakersList = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630];
+
+    function calculateKwCable() {
+      const pKw = parseFloat(document.getElementById("powerKw").value) || 1;
+      const supply = document.getElementById("kwSupplySystem").value;
+      const pf = parseFloat(document.getElementById("kwPowerFactor").value) || 0.85;
+      const effPct = parseFloat(document.getElementById("kwEfficiency").value) || 90;
+      const metal = document.getElementById("kwConductorMetal").value;
+      const insulation = document.getElementById("kwInsulation").value;
+      const length = parseFloat(document.getElementById("kwRouteLength").value) || 1;
+      const ambTemp = parseFloat(document.getElementById("kwAmbientTemp").value) || 30;
+      const maxVd = parseFloat(document.getElementById("kwMaxVd").value) || 4.0;
+
+      const eff = effPct / 100;
+      let vNom = 400;
+      let is3ph = true;
+
+      if (supply === "400_3p") { vNom = 400; is3ph = true; }
+      else if (supply === "230_1p") { vNom = 230; is3ph = false; }
+      else if (supply === "480_3p") { vNom = 480; is3ph = true; }
+      else if (supply === "208_3p") { vNom = 208; is3ph = true; }
+      else if (supply === "120_1p") { vNom = 120; is3ph = false; }
+
+      // Full Load Current
+      let ifla = 0;
+      if (is3ph) {
+        ifla = (pKw * 1000) / (Math.sqrt(3) * vNom * pf * eff);
+      } else {
+        ifla = (pKw * 1000) / (vNom * pf * eff);
+      }
+
+      const idesign = ifla * 1.25;
+
+      // Select standard breaker >= idesign
+      let ocpd = standardBreakersList[standardBreakersList.length - 1];
+      for (let i = 0; i < standardBreakersList.length; i++) {
+        if (standardBreakersList[i] >= idesign) {
+          ocpd = standardBreakersList[i];
+          break;
+        }
+      }
+
+      // Temperature correction factor
+      let ca = 1.0;
+      if (insulation === "xlpe") {
+        ca = Math.sqrt(Math.max(0.1, (90 - ambTemp) / (90 - 30)));
+      } else {
+        ca = Math.sqrt(Math.max(0.1, (70 - ambTemp) / (70 - 30)));
+      }
+
+      const condMult = (metal === "aluminum") ? 0.78 : 1.0;
+
+      let selected = null;
+
+      for (let i = 0; i < kwCableTable.length; i++) {
+        const row = kwCableTable[i];
+        let baseRating = (insulation === "xlpe") ? row.c_xlpe : row.c_pvc;
+        baseRating *= condMult;
+        const iz = baseRating * ca;
+
+        if (iz < ocpd) continue;
+
+        let mv = is3ph ? row.mv_3p : row.mv_1p;
+        if (metal === "aluminum") mv *= 1.64;
+
+        const deltaV = (mv * ifla * length) / 1000;
+        const vdPct = (deltaV / vNom) * 100;
+
+        if (vdPct <= maxVd) {
+          selected = {
+            size: row.size,
+            iz: iz,
+            deltaV: deltaV,
+            vdPct: vdPct
+          };
+          break;
+        }
+      }
+
+      document.getElementById("kwCurrentOut").innerText = ifla.toFixed(1) + " A";
+      document.getElementById("kwDesignCurrentOut").innerText = idesign.toFixed(1) + " A (1.25× Continuous)";
+      document.getElementById("kwBreakerOut").innerText = ocpd + " A Standard Breaker";
+
+      if (selected) {
+        document.getElementById("kwCableSizeOut").innerText = selected.size + " mm² (" + metal.toUpperCase() + ")";
+        document.getElementById("kwIzOut").innerText = selected.iz.toFixed(1) + " A";
+        document.getElementById("kwVdOut").innerText = selected.deltaV.toFixed(2) + " V (" + selected.vdPct.toFixed(2) + "%)";
+      } else {
+        document.getElementById("kwCableSizeOut").innerText = "> 240 mm² (Parallel Conductors Req.)";
+        document.getElementById("kwIzOut").innerText = "--";
+        document.getElementById("kwVdOut").innerText = "Exceeds Drop Limit";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      calculateKwCable();
+    });
+  </script>
+</body>
+</html>

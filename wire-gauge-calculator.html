@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wire Gauge Calculator | AWG to mm² Conversion, Resistance & Ampacity</title>
+  <meta name="description" content="Calculate American Wire Gauge (AWG) wire diameter, cross-sectional area (mm² and circular mils), electrical resistance (Ohms/kft and Ohms/km), and voltage drop.">
+  <link rel="canonical" href="https://calchub.cloud/wire-gauge-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Wire Gauge Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Comprehensive American Wire Gauge (AWG) and metric wire cross-section calculator computing exact geometric diameter, circular mils, resistance, and maximum ampacity.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How is American Wire Gauge (AWG) mathematically defined?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The American Wire Gauge (AWG / Brown & Sharpe) system is a logarithmic progression standardized in 1857. It defines #36 AWG as exactly 0.0050 inches (0.127 mm) diameter and #0000 (4/0) AWG as exactly 0.4600 inches (11.684 mm) diameter. The ratio between consecutive gauge diameters is constant: 92^(1/39) approx 1.122932."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are circular mils and how do they relate to square millimeters?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A circular mil (cmil) is the area of a circle with a diameter of 1 mil (0.001 inch). One circular mil equals (pi / 4) * 10^-6 square inches, or approximately 0.0005067 mm². Circular mils simplify wire sizing because the area of any round conductor equals its diameter in mils squared: Area_cmil = (d_mils)^2."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the handy mental rules of thumb for the AWG wire scale?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Three fundamental AWG geometric rules: (1) An increase of 3 gauge numbers doubles wire resistance and halves cross-sectional area (e.g. #10 AWG has double the resistance of #7 AWG). (2) An increase of 6 gauge numbers halves wire diameter. (3) An increase of 10 gauge numbers multiplies resistance tenfold and divides area by 10."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between chassis wiring ampacity and power transmission ampacity?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Chassis wiring ratings apply to short, single unbundled conductors exposed in open equipment enclosures where convective cooling is excellent. Power transmission ampacity (such as NEC Table 310.16) applies to long continuous runs inside conduits or multiconductor cables where heat accumulation is restricted, requiring significantly lower current limits."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="engineering">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="fire-safety.html">Fire Safety</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="engineering.html">Electrical &amp; Power Systems</a> &rsaquo;
+      <span>Wire Gauge Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">ASTM B258 &amp; IEC 60228 Standard Metrology</div>
+          <h1 class="calc-title">Wire Gauge Calculator</h1>
+          <p class="calc-tagline">Calculate American Wire Gauge (AWG) dimensions, circular mils, metric $mm^2$, DC line resistance, and allowable ampacity.</p>
+        </header>
+
+        <!-- Tool Card -->
+        <div class="tool-card">
+          <form id="gaugeForm" onsubmit="return false;">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="gaugeSelect" class="form-label">American Wire Gauge (AWG)</label>
+                <select id="gaugeSelect" class="form-control" onchange="calculateGauge()">
+                  <option value="-3">4/0 AWG (0000 AWG - Heavy Feeder)</option>
+                  <option value="-2">3/0 AWG (000 AWG - 200A Service)</option>
+                  <option value="-1">2/0 AWG (00 AWG - 175A Service)</option>
+                  <option value="0">1/0 AWG (0 AWG - 150A Service)</option>
+                  <option value="1">1 AWG (130A Sub-main)</option>
+                  <option value="2">2 AWG (115A Sub-main)</option>
+                  <option value="3">3 AWG (100A Service)</option>
+                  <option value="4">4 AWG (85A Sub-panel)</option>
+                  <option value="6">6 AWG (65A Range / EV / Hot Tub)</option>
+                  <option value="8">8 AWG (50A Cooker / Central AC)</option>
+                  <option value="10">10 AWG (30A Dryer / Water Heater)</option>
+                  <option value="12" selected>12 AWG (20A Standard Receptacle)</option>
+                  <option value="14">14 AWG (15A Standard Residential Lighting)</option>
+                  <option value="16">16 AWG (10A Extension Cord / Alarm)</option>
+                  <option value="18">18 AWG (7A Low Voltage / Thermostat)</option>
+                  <option value="20">20 AWG (5A Electronic Interconnect)</option>
+                  <option value="22">22 AWG (Hookup Wire / Telecommunications)</option>
+                  <option value="24">24 AWG (Ethernet Cat5/6 / Data Cable)</option>
+                  <option value="26">26 AWG (Patch Cords / Ribbon Cable)</option>
+                  <option value="28">28 AWG (USB Data Lines)</option>
+                  <option value="30">30 AWG (Wire Wrap / Micro-electronics)</option>
+                </select>
+                <small class="form-hint">Standard ASTM B258 wire size</small>
+              </div>
+
+              <div class="form-group">
+                <label for="gaugeConductorMetal" class="form-label">Conductor Metallurgy</label>
+                <select id="gaugeConductorMetal" class="form-control" onchange="calculateGauge()">
+                  <option value="copper" selected>Electrolytic Copper (100% IACS)</option>
+                  <option value="aluminum">Aluminum Alloy (61% IACS)</option>
+                </select>
+                <small class="form-hint">Conductor material resistivity</small>
+              </div>
+
+              <div class="form-group">
+                <label for="wireLengthFt" class="form-label">Circuit Wire Length</label>
+                <div class="input-with-unit">
+                  <input type="number" id="wireLengthFt" class="form-control" value="100" min="1" step="10" oninput="calculateGauge()">
+                  <span class="unit-badge">feet</span>
+                </div>
+                <small class="form-hint">One-way distance</small>
+              </div>
+
+              <div class="form-group">
+                <label for="gaugeTestCurrent" class="form-label">Operating Load Current</label>
+                <div class="input-with-unit">
+                  <input type="number" id="gaugeTestCurrent" class="form-control" value="16" min="0.1" step="1" oninput="calculateGauge()">
+                  <span class="unit-badge">Amps</span>
+                </div>
+                <small class="form-hint">For voltage drop calculation</small>
+              </div>
+            </div>
+
+            <button type="button" id="calcGaugeBtn" class="btn btn-primary btn-block" onclick="calculateGauge()">Evaluate Wire Dimensions</button>
+          </form>
+
+          <div id="gaugeResultBox" class="results-container" style="margin-top:20px;">
+            <h3>AWG Metrology &amp; Physical Properties</h3>
+            <div class="results-grid">
+              <div class="result-tile">
+                <span class="result-label">Diameter (Inches &amp; mm)</span>
+                <span id="gaugeDiameterOut" class="result-value">-- in (-- mm)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Cross-Sectional Area</span>
+                <span id="gaugeAreaOut" class="result-value">-- mm² (-- cmil)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">DC Resistance per 1000 ft</span>
+                <span id="gaugeResKftOut" class="result-value">-- &Omega;/kft</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Total Wire Resistance (for length)</span>
+                <span id="gaugeTotalResOut" class="result-value">-- &Omega;</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Voltage Drop at Load Current</span>
+                <span id="gaugeVdOut" class="result-value">-- Volts (2-wire)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">NEC 75°C Conduit Ampacity</span>
+                <span id="gaugeAmpacityOut" class="result-value">-- A</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Engineering Principles: American Wire Gauge (AWG) Metrology</h2>
+          
+          <p>The <strong>American Wire Gauge (AWG)</strong> system, also historically known as the <em>Brown &amp; Sharpe (B&amp;S) wire gauge</em>, is the standardized logarithmic wire dimensioning scale utilized throughout North America and global electronics manufacturing. Standardized in 1857 by J.R. Brown, the AWG system provides a mathematically rigorous geometric progression defining the physical diameter, cross-sectional area, electrical resistance, and mass of solid non-ferrous round conductors.</p>
+
+          <div class="formula-box">
+            <h3>Mathematical Formulation of the AWG Scale (ASTM B258)</h3>
+            <p>The AWG scale is anchored at two reference benchmark points:</p>
+            <ul>
+              <li><strong>#36 AWG:</strong> Defined exactly as $0.0050\text{ inches}$ ($5.0\text{ mils}$ or $0.127\text{ mm}$) in diameter.</li>
+              <li><strong>#0000 (4/0) AWG:</strong> Defined exactly as $0.4600\text{ inches}$ ($460.0\text{ mils}$ or $11.684\text{ mm}$) in diameter.</li>
+            </ul>
+            <p>The gauge range spans exactly 39 intervening diameter steps between gauge #36 and gauge 4/0 (where 0 = 0, 2/0 = -1, 3/0 = -2, 4/0 = -3). The ratio between any two consecutive gauge diameters is constant:</p>
+            <p>$$\text{Ratio } r = \sqrt[39]{\frac{0.4600}{0.0050}} = \sqrt[39]{92} \approx 1.1229322$$</p>
+            <p>For any gauge number $n$, the conductor diameter in inches and millimeters is calculated from:</p>
+            <p>$$d_n = 0.005 \times 92^{\frac{36 - n}{39}} \quad [\text{inches}]$$</p>
+            <p>$$d_n = 0.127 \times 92^{\frac{36 - n}{39}} \quad [\text{millimeters}]$$</p>
+          </div>
+
+          <h3>Circular Mils and Cross-Sectional Area</h3>
+          <p>In electrical engineering, wire area is expressed in both metric square millimeters ($\text{mm}^2$) and North American <strong>circular mils (cmil)</strong>. A circular mil represents the area of a circle having a diameter of one mil ($0.001\text{ inch}$):</p>
+          <p>$$A_{cmil} = (d_{mils})^2 = (d_{inches} \times 1000)^2$$</p>
+          <p>$$A_{mm^2} = \frac{\pi}{4} \cdot d_{mm}^2 = A_{cmil} \times 0.000506707$$</p>
+          <p>For large conductors exceeding 4/0 AWG ($211{,}600\text{ cmil}$), gauge numbers are abandoned in favor of thousand circular mils (<strong>kcmil</strong> or <strong>MCM</strong>), such as 250 kcmil, 350 kcmil, and 500 kcmil.</p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>AWG Size</th>
+                <th>Diameter (inches)</th>
+                <th>Diameter (mm)</th>
+                <th>Area (Circular Mils)</th>
+                <th>Area (mm²)</th>
+                <th>Copper DC Resistance at 20°C (Ω/kft)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>4/0 AWG</strong></td>
+                <td>0.4600 in</td>
+                <td>11.684 mm</td>
+                <td>211,600 cmil</td>
+                <td>107.2 mm²</td>
+                <td>$0.0490\ \Omega/\text{kft}$</td>
+              </tr>
+              <tr>
+                <td><strong>2/0 AWG</strong></td>
+                <td>0.3648 in</td>
+                <td>9.266 mm</td>
+                <td>133,100 cmil</td>
+                <td>67.43 mm²</td>
+                <td>$0.0779\ \Omega/\text{kft}$</td>
+              </tr>
+              <tr>
+                <td><strong>1/0 AWG</strong></td>
+                <td>0.3249 in</td>
+                <td>8.251 mm</td>
+                <td>105,600 cmil</td>
+                <td>53.49 mm²</td>
+                <td>$0.0983\ \Omega/\text{kft}$</td>
+              </tr>
+              <tr>
+                <td><strong>2 AWG</strong></td>
+                <td>0.2576 in</td>
+                <td>6.544 mm</td>
+                <td>66,360 cmil</td>
+                <td>33.62 mm²</td>
+                <td>$0.1563\ \Omega/\text{kft}$</td>
+              </tr>
+              <tr>
+                <td><strong>4 AWG</strong></td>
+                <td>0.2043 in</td>
+                <td>5.189 mm</td>
+                <td>41,740 cmil</td>
+                <td>21.15 mm²</td>
+                <td>$0.2485\ \Omega/\text{kft}$</td>
+              </tr>
+              <tr>
+                <td><strong>6 AWG</strong></td>
+                <td>0.1620 in</td>
+                <td>4.115 mm</td>
+                <td>26,240 cmil</td>
+                <td>13.30 mm²</td>
+                <td>$0.3951\ \Omega/\text{kft}$</td>
+              </tr>
+              <tr>
+                <td><strong>8 AWG</strong></td>
+                <td>0.1285 in</td>
+                <td>3.264 mm</td>
+                <td>16,510 cmil</td>
+                <td>8.367 mm²</td>
+                <td>$0.6282\ \Omega/\text{kft}$</td>
+              </tr>
+              <tr>
+                <td><strong>10 AWG</strong></td>
+                <td>0.1019 in</td>
+                <td>2.588 mm</td>
+                <td>10,380 cmil</td>
+                <td>5.261 mm²</td>
+                <td>$0.9989\ \Omega/\text{kft}$</td>
+              </tr>
+              <tr>
+                <td><strong>12 AWG</strong></td>
+                <td>0.0808 in</td>
+                <td>2.053 mm</td>
+                <td>6,530 cmil</td>
+                <td>3.309 mm²</td>
+                <td>$1.588\ \Omega/\text{kft}$</td>
+              </tr>
+              <tr>
+                <td><strong>14 AWG</strong></td>
+                <td>0.0641 in</td>
+                <td>1.628 mm</td>
+                <td>4,110 cmil</td>
+                <td>2.081 mm²</td>
+                <td>$2.525\ \Omega/\text{kft}$</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="formula-box">
+            <h3>Three Golden Rules of AWG Mental Arithmetic</h3>
+            <p>Because the ratio $r \approx 1.1229322$, its mathematical powers yield practical mental approximations utilized by electrical engineers in the field:</p>
+            <ul>
+              <li><strong>The Rule of 3 (Halving Area / Doubling Resistance):</strong> Since $(1.12293)^3 \approx 1.414 \approx \sqrt{2}$, stepping up 3 gauge numbers (e.g. from #10 to #13 AWG) halves the cross-sectional area and <strong>doubles electrical resistance</strong> ($R_{n+3} \approx 2 \cdot R_n$). Conversely, dropping 3 gauge numbers doubles the copper volume.</li>
+              <li><strong>The Rule of 6 (Doubling Diameter):</strong> Since $(1.12293)^6 \approx 2.005 \approx 2.0$, a change of 6 gauge numbers doubles or halves the wire diameter ($d_{n+6} \approx \frac{1}{2} d_n$).</li>
+              <li><strong>The Rule of 10 (Decade Scaling):</strong> Since $(1.12293)^{10} \approx 3.162 \approx \sqrt{10}$, stepping up 10 gauge numbers divides the cross-sectional area by exactly 10 and <strong>multiplies line resistance by 10</strong>. For example, #20 AWG has approximately 10 times the resistance of #10 AWG ($10.15\ \Omega/\text{kft}$ vs $1.00\ \Omega/\text{kft}$).</li>
+            </ul>
+          </div>
+
+          <div class="worked-example-card">
+            <h3>Practical Worked Engineering Example: #12 AWG Branch Circuit Resistance &amp; Voltage Drop</h3>
+            <p><strong>Design Scenario:</strong> An electrician installs a $120\text{V}$ single-phase residential 20A branch circuit utilizing #12 AWG solid copper wire ($n = 12$). The one-way run length to a kitchen microwave outlet is $100\text{ feet}$. Operating load current is $16\text{ Amperes}$ continuous. Determine the exact conductor cross-sectional area, round-trip resistance at $20^\circ\text{C}$, and line voltage drop.</p>
+
+            <p><strong>Step 1: Calculate Geometric Diameter</strong></p>
+            <p>$$d_{12} = 0.005 \times 92^{\frac{36 - 12}{39}} = 0.005 \times 92^{\frac{24}{39}} = 0.005 \times 92^{0.61538} = 0.005 \times 16.1618 = 0.0808\text{ inches}$$</p>
+            <p>In millimeters: $0.0808 \times 25.4 = 2.053\text{ mm}$.</p>
+
+            <p><strong>Step 2: Calculate Area in Circular Mils and mm²</strong></p>
+            <p>$$A_{cmil} = (80.809\text{ mils})^2 = 6{,}530\text{ Circular Mils}$$</p>
+            <p>$$A_{mm^2} = \frac{\pi}{4} \times (2.053\text{ mm})^2 = 3.309\text{ mm}^2$$</p>
+
+            <p><strong>Step 3: Calculate Circuit Resistance for 100 ft (Two-Wire Loop)</strong></p>
+            <p>Standard #12 AWG copper resistance per $1000\text{ ft}$ is $R_{kft} \approx 1.588\ \Omega/\text{kft}$.</p>
+            <p>Total round-trip loop distance is $2 \times 100\text{ ft} = 200\text{ ft}$.</p>
+            <p>$$R_{loop} = \frac{200\text{ ft}}{1000\text{ ft}} \times 1.588\ \Omega = 0.3176\ \Omega$$</p>
+
+            <p><strong>Step 4: Calculate Voltage Drop</strong></p>
+            <p>$$\Delta V = I \times R_{loop} = 16\text{ A} \times 0.3176\ \Omega = 5.08\text{ Volts}$$</p>
+            <p>$$\Delta V\% = \frac{5.08\text{ V}}{120\text{ V}} \times 100 = 4.23\%$$</p>
+            <p>Because $4.23\% > 3.0\%$ NEC recommended branch circuit drop, the engineer upsizes the run to <strong>#10 AWG</strong> ($R_{kft} = 0.999\ \Omega/\text{kft} \implies \Delta V = 3.20\text{V} = 2.66\%$).</p>
+          </div>
+
+          <h2>Frequently Asked Questions (Wire Gauge Metrology)</h2>
+          <div class="faq-item">
+            <h3>Why does gauge number decrease as wire diameter increases?</h3>
+            <p>The AWG scale originated from historical wire drawing manufacturing processes. A metal wire was drawn through a series of successively smaller conical dies. A #1 AWG wire passed through a single drawing die; a #14 AWG wire was drawn through 14 progressive dies; a #36 AWG wire required 36 successive passes to draw it down to a thin strand. Thus, higher gauge numbers represent more drawing steps and thinner wires.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How does stranded wire differ from solid wire of the same AWG?</h3>
+            <p>A stranded conductor of a given AWG (e.g. 7-strand or 19-strand #12 AWG) contains the exact same total metallic cross-sectional copper area as a solid #12 AWG wire. However, because round strands do not pack with 100% density (leaving microscopic air gaps between strands), the overall outer diameter of stranded wire is approximately $5\%$ to $10\%$ larger than solid wire.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What is the difference between AWG and the SWG (Standard Wire Gauge)?</h3>
+            <p>AWG (American Wire Gauge) is defined mathematically by a continuous logarithmic equation ($r = \sqrt[39]{92}$). The British Standard Wire Gauge (SWG / Imperial Standard Wire Gauge), established in 1883, is a discrete empirical scale based on Birmingham wire tables. SWG diameters differ by several mils from AWG for identical gauge numbers (e.g. #14 SWG is 0.080 in / 2.03 mm, whereas #14 AWG is 0.064 in / 1.63 mm).</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How does skin effect alter resistance in high-frequency wire applications?</h3>
+            <p>At radio frequencies, alternating magnetic flux forces current to flow only along the conductor surface (skin depth $\delta = \sqrt{\rho / (\pi f \mu)}$). At 1 MHz in copper, the skin depth is only $0.066\text{ mm}$ ($2.6\text{ mils}$). Thick solid wire becomes highly inefficient because the center core carries zero current. High-frequency RF circuits therefore employ stranded <em>Litz wire</em> composed of individually insulated thin strands twisted in woven patterns.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar" id="toolSidebar">
+        <!-- Dynamically rendered sidebar -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Engineering and mathematical tools grounded in international standards.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="engineering.html">Engineering</a></li>
+        <li><a href="ohms-law-calculator.html">Ohm's Law</a></li>
+        <li><a href="sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // Standard NEC 75C Ampacities for AWG
+    const awgAmpacities75 = {
+      "-3": 260, "-2": 225, "-1": 195, "0": 170,
+      "1": 145, "2": 130, "3": 115, "4": 95,
+      "6": 75, "8": 55, "10": 40, "12": 30,
+      "14": 25, "16": 18, "18": 14, "20": 11,
+      "22": 7, "24": 3.5, "26": 2.2, "28": 1.4, "30": 0.86
+    };
+
+    function calculateGauge() {
+      const n = parseInt(document.getElementById("gaugeSelect").value);
+      const metal = document.getElementById("gaugeConductorMetal").value;
+      const lengthFt = parseFloat(document.getElementById("wireLengthFt").value) || 100;
+      const current = parseFloat(document.getElementById("gaugeTestCurrent").value) || 10;
+
+      // ASTM B258 diameter equation
+      // d = 0.005 * 92^((36 - n) / 39) inches
+      const dInches = 0.005 * Math.pow(92, (36 - n) / 39);
+      const dMm = dInches * 25.4;
+      const dMils = dInches * 1000;
+
+      // Area
+      const areaCmil = dMils * dMils;
+      const areaMm2 = (Math.PI / 4) * dMm * dMm;
+
+      // DC Resistance per 1000 ft at 20C
+      // Copper: rho = 10.371 Ohms * cmil / ft
+      // Aluminum: rho = 17.0 Ohms * cmil / ft
+      const rhoCmilFt = (metal === "aluminum") ? 17.0 : 10.371;
+      const rPerKft = (rhoCmilFt * 1000) / areaCmil;
+
+      // Total loop resistance for lengthFt (2-wire circuit)
+      const rSingleWire = (rPerKft * lengthFt) / 1000;
+      const rLoop = 2 * rSingleWire;
+      const deltaV = current * rLoop;
+
+      // Ampacity
+      const ampacity = awgAmpacities75[n.toString()] || 15;
+      const alAmpacity = (metal === "aluminum") ? (ampacity * 0.78) : ampacity;
+
+      document.getElementById("gaugeDiameterOut").innerText = dInches.toFixed(4) + " in (" + dMm.toFixed(3) + " mm)";
+      document.getElementById("gaugeAreaOut").innerText = areaMm2.toFixed(3) + " mm² (" + Math.round(areaCmil).toLocaleString() + " cmil)";
+      document.getElementById("gaugeResKftOut").innerText = rPerKft.toFixed(4) + " \u03A9/kft";
+      document.getElementById("gaugeTotalResOut").innerText = rSingleWire.toFixed(4) + " \u03A9 (Single) / " + rLoop.toFixed(4) + " \u03A9 (Loop)";
+      document.getElementById("gaugeVdOut").innerText = deltaV.toFixed(2) + " V (2-wire drop)";
+      document.getElementById("gaugeAmpacityOut").innerText = Math.round(alAmpacity) + " A (75°C Conductor Rating)";
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      calculateGauge();
+    });
+  </script>
+</body>
+</html>

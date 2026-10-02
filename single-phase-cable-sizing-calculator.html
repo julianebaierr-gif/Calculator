@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Single Phase Cable Sizing Calculator | 230V & 120V Electrical Wire Sizing</title>
+  <meta name="description" content="Calculate single-phase low-voltage electrical cable size (mm² & AWG) for 230V, 120V, and 240V circuits. Computes continuous current, 2-wire loop voltage drop, and installation deratings per IEC 60364 and NEC.">
+  <link rel="canonical" href="https://calchub.cloud/single-phase-cable-sizing-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Single Phase Cable Sizing Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Single-phase electrical cable dimensioning engine calculating live-neutral 2-wire loop voltage drop, continuous thermal ampacity, and breaker coordination.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Why is voltage drop doubled in a single-phase circuit?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In a single-phase 2-wire AC circuit, current travels out to the load along the active phase conductor and returns through the neutral conductor. Because both conductors have identical resistance R, the total loop resistance is 2 * R. In contrast, balanced three-phase circuits share a common neutral carrying zero fundamental current, resulting in a voltage drop multiplier of sqrt(3) approx 1.732 instead of 2.0."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does power factor affect single-phase cable sizing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For a given real power P (in watts), current is inversely proportional to power factor: I = P / (V * cos(theta)). An inductive load operating at a poor power factor of 0.70 draws 42.8% more current than a unity power factor load (1.0), requiring significantly larger conductors to prevent thermal overload."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are standard single-phase residential cable sizes?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In international metric practice (BS 7671/IEC): 1.5 mm² is standard for lighting (6A–10A), 2.5 mm² for standard socket ring/radial circuits (16A–20A), 4.0 mm² and 6.0 mm² for heavy appliances (32A cookers/showers), and 10 mm² to 16 mm² for sub-mains (40A–63A). In North America: #14 AWG (15A), #12 AWG (20A), #10 AWG (30A), and #8 AWG (40A–50A)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are maximum allowable single-phase voltage drop limits?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Under IEC 60364-5-52 and BS 7671: maximum 3% (6.9V on 230V) for lighting circuits, and maximum 5% (11.5V on 230V) for general power circuits. Under NEC recommendations: maximum 3% on branch circuits, and 5% total from service panel to the furthest outlet."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="engineering">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="fire-safety.html">Fire Safety</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="engineering.html">Electrical &amp; Power Systems</a> &rsaquo;
+      <span>Single Phase Cable Sizing Calculator</span>
+    </nav>
+
+    <div class="calculator-layout">
+      <div class="calc-main">
+        <header class="calc-header">
+          <div class="calc-badge">IEC 60364 &amp; NEC Single-Phase Dimensioning</div>
+          <h1 class="calc-title">Single Phase Cable Sizing Calculator</h1>
+          <p class="calc-tagline">Calculate copper and aluminum wire sizes for 230V, 120V, and 240V single-phase electrical branch circuits and sub-mains.</p>
+        </header>
+
+        <!-- Tool Card -->
+        <div class="tool-card">
+          <form id="singlePhaseForm" onsubmit="return false;">
+            <div class="calc-grid">
+              <div class="form-group">
+                <label for="spVoltage" class="form-label">Single-Phase Voltage</label>
+                <select id="spVoltage" class="form-control" onchange="calculateSinglePhase()">
+                  <option value="230" selected>230V AC (UK / Europe / International Standard)</option>
+                  <option value="120">120V AC (North American Standard Wall Socket)</option>
+                  <option value="240">240V AC (North American Split-Phase Dryer/EV)</option>
+                  <option value="277">277V AC (North American Commercial Lighting)</option>
+                </select>
+                <small class="form-hint">Nominal line-to-neutral or line-to-line</small>
+              </div>
+
+              <div class="form-group">
+                <label for="spLoadCurrent" class="form-label">Load Operating Current ($I_b$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="spLoadCurrent" class="form-control" value="25" min="0.5" max="500" step="1" oninput="calculateSinglePhase()">
+                  <span class="unit-badge">Amps</span>
+                </div>
+                <small class="form-hint">Design operating current</small>
+              </div>
+
+              <div class="form-group">
+                <label for="spBreakerIn" class="form-label">Protective Device Rating ($I_n$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="spBreakerIn" class="form-control" value="32" min="6" max="630" step="1" oninput="calculateSinglePhase()">
+                  <span class="unit-badge">Amps</span>
+                </div>
+                <small class="form-hint">Circuit breaker / fuse rating (Ib &le; In &le; Iz)</small>
+              </div>
+
+              <div class="form-group">
+                <label for="spConductor" class="form-label">Conductor Metallurgy</label>
+                <select id="spConductor" class="form-control" onchange="calculateSinglePhase()">
+                  <option value="copper" selected>Annealed Copper (Cu)</option>
+                  <option value="aluminum">Electrical Aluminum (Al)</option>
+                </select>
+                <small class="form-hint">Core conductor material</small>
+              </div>
+
+              <div class="form-group">
+                <label for="spInsulation" class="form-label">Insulation Thermal Class</label>
+                <select id="spInsulation" class="form-control" onchange="calculateSinglePhase()">
+                  <option value="pvc" selected>PVC / 70°C Thermoplastic</option>
+                  <option value="xlpe">XLPE / 90°C Thermosetting</option>
+                </select>
+                <small class="form-hint">Continuous operating limit</small>
+              </div>
+
+              <div class="form-group">
+                <label for="spInstallMethod" class="form-label">Installation Reference Method</label>
+                <select id="spInstallMethod" class="form-control" onchange="calculateSinglePhase()">
+                  <option value="C" selected>Method C: Clipped direct to masonry surface</option>
+                  <option value="A">Method A: In conduit in thermally insulated wall</option>
+                  <option value="B">Method B: In conduit on wooden/masonry wall</option>
+                  <option value="E">Method E: In free air on perforated cable tray</option>
+                </select>
+                <small class="form-hint">Governs thermal dissipation</small>
+              </div>
+
+              <div class="form-group">
+                <label for="spRouteLength" class="form-label">One-Way Circuit Length ($L$)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="spRouteLength" class="form-control" value="30" min="1" step="2" oninput="calculateSinglePhase()">
+                  <span class="unit-badge">metres</span>
+                </div>
+                <small class="form-hint">Distance from panelboard to load</small>
+              </div>
+
+              <div class="form-group">
+                <label for="spAmbientTemp" class="form-label">Ambient Temperature</label>
+                <div class="input-with-unit">
+                  <input type="number" id="spAmbientTemp" class="form-control" value="30" min="10" max="65" step="1" oninput="calculateSinglePhase()">
+                  <span class="unit-badge">°C</span>
+                </div>
+                <small class="form-hint">Surrounding air temperature</small>
+              </div>
+
+              <div class="form-group">
+                <label for="spMaxVd" class="form-label">Max Allowable Voltage Drop</label>
+                <div class="input-with-unit">
+                  <input type="number" id="spMaxVd" class="form-control" value="4.0" min="1.0" max="10.0" step="0.5" oninput="calculateSinglePhase()">
+                  <span class="unit-badge">%</span>
+                </div>
+                <small class="form-hint">Standard threshold (3% lighting, 5% power)</small>
+              </div>
+            </div>
+
+            <button type="button" id="calcSpBtn" class="btn btn-primary btn-block" onclick="calculateSinglePhase()">Calculate Single-Phase Cable</button>
+          </form>
+
+          <div id="spResultBox" class="results-container" style="margin-top:20px;">
+            <h3>Single-Phase Sizing Results</h3>
+            <div class="results-grid">
+              <div class="result-tile">
+                <span class="result-label">Recommended Conductor Area</span>
+                <span id="spCableSizeOut" class="result-value">-- mm²</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Derated Current Capacity ($I_z$)</span>
+                <span id="spIzOut" class="result-value">-- A</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Two-Wire Loop Voltage Drop ($\Delta V$)</span>
+                <span id="spVdOut" class="result-value">-- V (-- %)</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Circuit Loop Resistance ($R_{loop}$)</span>
+                <span id="spLoopResOut" class="result-value">-- &Omega;</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Power Lost in Cable ($I^2 R$)</span>
+                <span id="spPowerLossOut" class="result-value">-- Watts</span>
+              </div>
+              <div class="result-tile">
+                <span class="result-label">Overcurrent Protection Verification</span>
+                <span id="spStatusOut" class="result-value">--</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>Engineering Principles of Single-Phase Low-Voltage Cable Sizing</h2>
+          
+          <p>Single-phase alternating current (AC) power distribution is the most widespread electrical infrastructure in the modern world, powering homes, commercial offices, municipal facilities, and retail centers. While conceptually straightforward compared to three-phase networks, single-phase circuits present unique thermodynamic and electrical impedance challenges. Because the entire return current must flow through the neutral conductor, single-phase circuits suffer from <strong>double the loop resistance</strong> per unit distance compared to equivalent balanced polyphase configurations.</p>
+
+          <p>Sizing single-phase cables accurately requires adhering to statutory requirements codified in <strong>IEC 60364-5-52</strong>, the UK <strong>BS 7671 (IET Wiring Regulations)</strong>, and <strong>NFPA 70 National Electrical Code (NEC Article 310 &amp; 210)</strong>.</p>
+
+          <div class="formula-box">
+            <h3>The Fundamental Overcurrent Coordination Rule</h3>
+            <p>Every single-phase branch circuit or sub-feeder must satisfy the core overcurrent protective coordination inequality:</p>
+            <p>$$I_b \le I_n \le I_z$$</p>
+            <p>Where:</p>
+            <ul>
+              <li>$I_b$ = Operating design load current in Amperes.</li>
+              <li>$I_n$ = Nominal trip rating of the protective circuit breaker or fuse (e.g. 16A, 20A, 32A, 40A, 50A, 63A).</li>
+              <li>$I_z$ = Effective continuous current-carrying capacity of the derated installed cable ($I_z = I_0 \times C_a \times C_g$).</li>
+            </ul>
+          </div>
+
+          <h3>Single-Phase Two-Wire Loop Voltage Drop Formulation</h3>
+          <p>In a single-phase two-wire circuit (Active and Neutral), current $I$ leaves the distribution board via the phase conductor, travels distance $L$, passes through the load, and returns across the exact same distance $L$ via the neutral conductor. The total circuit conductor length is therefore $2 \times L$.</p>
+          
+          <p>The voltage drop across the circuit is governed by the vector projection of complex line impedance ($Z = R + jX$):</p>
+          
+          <p>$$\Delta V_{1\phi} = 2 \times I \times L \times (R \cos\varphi + X \sin\varphi)$$</p>
+          <p>$$\Delta V\% = \frac{\Delta V_{1\phi}}{V_{nominal}} \times 100$$</p>
+          
+          <p>Where $R$ is the AC resistance of the conductor at operating temperature ($\Omega/\text{m}$), $X$ is line reactance ($\Omega/\text{m}$), and $\cos\varphi$ is the load power factor. In cables with cross-sections under $16\text{ mm}^2$, inductive reactance is negligible ($X \approx 0$), simplifying the equation to Ohm's Law: $\Delta V = 2 \cdot I \cdot L \cdot R$.</p>
+
+          <table class="reference-table">
+            <thead>
+              <tr>
+                <th>Conductor Cross-Section (mm²)</th>
+                <th>Method C (Clipped Direct) PVC 70°C</th>
+                <th>Method A2 (Insulated Cavity) PVC 70°C</th>
+                <th>Voltage Drop Factor (mV/A/m)</th>
+                <th>Typical Domestic &amp; Commercial Use</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1.5 mm²</strong></td>
+                <td>19.5 A</td>
+                <td>14.5 A</td>
+                <td>$29.0\text{ mV/A/m}$</td>
+                <td>Lighting circuits, smoke detectors, 6A–10A MCB</td>
+              </tr>
+              <tr>
+                <td><strong>2.5 mm²</strong></td>
+                <td>27.0 A</td>
+                <td>18.5 A</td>
+                <td>$18.0\text{ mV/A/m}$</td>
+                <td>Ring main &amp; radial socket outlets, 16A–20A MCB</td>
+              </tr>
+              <tr>
+                <td><strong>4.0 mm²</strong></td>
+                <td>36.0 A</td>
+                <td>25.0 A</td>
+                <td>$11.0\text{ mV/A/m}$</td>
+                <td>Radial power, water heaters, 25A–32A MCB</td>
+              </tr>
+              <tr>
+                <td><strong>6.0 mm²</strong></td>
+                <td>46.0 A</td>
+                <td>32.0 A</td>
+                <td>$7.3\text{ mV/A/m}$</td>
+                <td>Electric cookers, electric showers, 32A–40A MCB</td>
+              </tr>
+              <tr>
+                <td><strong>10.0 mm²</strong></td>
+                <td>63.0 A</td>
+                <td>43.0 A</td>
+                <td>$4.4\text{ mV/A/m}$</td>
+                <td>Heavy domestic shower, sub-distribution, 50A MCB</td>
+              </tr>
+              <tr>
+                <td><strong>16.0 mm²</strong></td>
+                <td>85.0 A</td>
+                <td>57.0 A</td>
+                <td>$2.8\text{ mV/A/m}$</td>
+                <td>Main residential supply tail, 63A–80A breaker</td>
+              </tr>
+              <tr>
+                <td><strong>25.0 mm²</strong></td>
+                <td>112.0 A</td>
+                <td>75.0 A</td>
+                <td>$1.75\text{ mV/A/m}$</td>
+                <td>Heavy 100A residential service entrance sub-main</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="worked-example-card">
+            <h3>Practical Worked Engineering Example: Residential EV Charger Radial</h3>
+            <p><strong>Design Scenario:</strong> Size a dedicated single-phase 230V radial circuit powering a $7.4\text{ kW}$ residential electric vehicle (EV) charger. The continuous load current is $I_b = 32\text{ Amperes}$ ($\cos\varphi = 1.0$). The circuit is protected by a $32\text{ A}$ Type B RCBO ($I_n = 32\text{ A}$). The cable route is $30\text{ meters}$ long, clipped directly to an interior garage masonry wall (Method C) where ambient summer temperature peaks at $35^\circ\text{C}$. Multi-core copper cable with $70^\circ\text{C}$ PVC insulation is specified. Maximum allowable voltage drop is $4.0\%$.</p>
+
+            <p><strong>Step 1: Determine Environmental Correction Factor ($C_a$)</strong></p>
+            <p>For PVC ($70^\circ\text{C}$) at $35^\circ\text{C}$ ambient, $C_a = \sqrt{\frac{70 - 35}{70 - 30}} = \sqrt{\frac{35}{40}} = 0.935$.</p>
+            <p>No grouping derating ($C_g = 1.0$).</p>
+            <p>Required base tabulated rating:</p>
+            <p>$$I_0 \ge \frac{I_n}{C_a} = \frac{32\text{ A}}{0.935} = 34.22\text{ A}$$</p>
+
+            <p><strong>Step 2: Thermal Selection from Table 4D2A (Method C PVC)</strong></p>
+            <ul>
+              <li>$4.0\text{ mm}^2 \implies I_0 = 36\text{ A}$ ($36 \ge 34.22\text{ A} \implies$ Thermal PASS)</li>
+            </ul>
+            <p>Derated capacity of $4.0\text{ mm}^2$: $I_z = 36 \times 0.935 = 33.66\text{ A} \ge 32\text{ A}$.</p>
+
+            <p><strong>Step 3: Check Voltage Drop on $4.0\text{ mm}^2$</strong></p>
+            <p>For $4.0\text{ mm}^2$ copper, $(mV/A/m) = 11.0\text{ mV/A/m}$:</p>
+            <p>$$\Delta V = \frac{11.0 \times 32\text{ A} \times 30\text{ m}}{1000} = \frac{10{,}560}{1000} = 10.56\text{ Volts}$$</p>
+            <p>$$\Delta V\% = \frac{10.56\text{ V}}{230\text{ V}} \times 100 = 4.59\%$$</p>
+            <p><em>Critical Engineering Finding:</em> While $4.0\text{ mm}^2$ passes thermal ampacity, it <strong>FAILS voltage drop</strong> ($4.59\% > 4.0\%$)! Under heavy charging, EV on-board chargers throttle power when voltage sags excessively.</p>
+
+            <p><strong>Step 4: Upsizing to $6.0\text{ mm}^2$ Conductor</strong></p>
+            <p>For $6.0\text{ mm}^2$ copper, $(mV/A/m) = 7.3\text{ mV/A/m}$:</p>
+            <p>$$\Delta V = \frac{7.3 \times 32\text{ A} \times 30\text{ m}}{1000} = 7.01\text{ Volts}$$</p>
+            <p>$$\Delta V\% = \frac{7.01\text{ V}}{230\text{ V}} \times 100 = 3.05\% \le 4.0\% \quad (\text{PASS!})$$</p>
+            <p>The engineer correctly specifies <strong>$6.0\text{ mm}^2$ Copper PVC</strong> to satisfy both thermal and voltage drop standards.</p>
+          </div>
+
+          <h2>Frequently Asked Questions (Single-Phase Cable Sizing)</h2>
+          <div class="faq-item">
+            <h3>Why does an EV charger require a dedicated radial rather than tapping an existing ring circuit?</h3>
+            <p>Electric vehicle charging draws maximum rated current continuously for 4 to 8 hours. Standard domestic ring final circuits (wired in 2.5 mm² protected by a 32A breaker) are designed for intermittent diversity loads. Subjecting a ring circuit to continuous 32A charging creates thermal hotspots at socket terminals, risking joint melting and fire.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What is the minimum cable size for an electric instantaneous shower?</h3>
+            <p>Modern electric showers range from $8.5\text{ kW}$ ($37\text{ A}$ at 230V) to $10.5\text{ kW}$ ($45.6\text{ A}$ at 230V). Due to thermal deratings in loft insulation and voltage drop, an $8.5\text{ kW}$ shower typically requires $6.0\text{ mm}^2$ or $10.0\text{ mm}^2$ cable, while a $9.5\text{ kW}$ or $10.5\text{ kW}$ shower strictly requires $10.0\text{ mm}^2$ copper protected by a 45A or 50A MCB/RCBO.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Can I use a 2-core cable without an earth wire for single-phase circuits?</h3>
+            <p>No. Under modern international regulations (BS 7671, IEC 60364, and NEC), all low-voltage AC wiring must incorporate a dedicated Circuit Protective Conductor (CPC / earth wire). Even if appliances are double-insulated (Class II), the protective earth must be present at all outlet boxes and accessory points for future safety.</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How do harmonics in modern electronic power supplies affect the single-phase neutral?</h3>
+            <p>In single-phase circuits, harmonic distortion does not create neutral overloading (unlike three-phase systems where triplen harmonics sum in the neutral). The neutral carries exactly the same RMS current as the phase conductor. Both phase and neutral conductors must always be sized with identical cross-sectional areas.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="calc-sidebar" id="toolSidebar">
+        <!-- Dynamically rendered sidebar -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Engineering and mathematical tools grounded in international standards.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="engineering.html">Engineering</a></li>
+        <li><a href="ohms-law-calculator.html">Ohm's Law</a></li>
+        <li><a href="sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // Standard IEC Single-Phase Ratings Table (Copper base values)
+    const spRatings = [
+      { size: 1.5,  c_pvc: 19.5, c_xlpe: 26,  mv: 29.0, r_cu: 12.1 },
+      { size: 2.5,  c_pvc: 27.0, c_xlpe: 36,  mv: 18.0, r_cu: 7.41 },
+      { size: 4.0,  c_pvc: 36.0, c_xlpe: 49,  mv: 11.0, r_cu: 4.61 },
+      { size: 6.0,  c_pvc: 46.0, c_xlpe: 62,  mv: 7.3,  r_cu: 3.08 },
+      { size: 10.0, c_pvc: 63.0, c_xlpe: 85,  mv: 4.4,  r_cu: 1.83 },
+      { size: 16.0, c_pvc: 85.0, c_xlpe: 110, mv: 2.8,  r_cu: 1.15 },
+      { size: 25.0, c_pvc: 112,  c_xlpe: 146, mv: 1.75, r_cu: 0.727 },
+      { size: 35.0, c_pvc: 138,  c_xlpe: 180, mv: 1.25, r_cu: 0.524 },
+      { size: 50.0, c_pvc: 168,  c_xlpe: 219, mv: 0.93, r_cu: 0.387 }
+    ];
+
+    const spMethodMultipliers = {
+      "C": 1.00,
+      "A": 0.72,
+      "B": 0.85,
+      "E": 1.10
+    };
+
+    function calculateSinglePhase() {
+      const vNom = parseFloat(document.getElementById("spVoltage").value) || 230;
+      const ib = parseFloat(document.getElementById("spLoadCurrent").value) || 1;
+      const inVal = parseFloat(document.getElementById("spBreakerIn").value) || 16;
+      const conductor = document.getElementById("spConductor").value;
+      const insulation = document.getElementById("spInsulation").value;
+      const method = document.getElementById("spInstallMethod").value;
+      const length = parseFloat(document.getElementById("spRouteLength").value) || 1;
+      const ambTemp = parseFloat(document.getElementById("spAmbientTemp").value) || 30;
+      const maxVd = parseFloat(document.getElementById("spMaxVd").value) || 4.0;
+
+      // Ca
+      let ca = 1.0;
+      if (insulation === "xlpe") {
+        ca = Math.sqrt(Math.max(0.1, (90 - ambTemp) / (90 - 30)));
+      } else {
+        ca = Math.sqrt(Math.max(0.1, (70 - ambTemp) / (70 - 30)));
+      }
+
+      const methodMult = spMethodMultipliers[method] || 1.0;
+      const condMult = (conductor === "aluminum") ? 0.78 : 1.0;
+
+      let selected = null;
+
+      for (let i = 0; i < spRatings.length; i++) {
+        const row = spRatings[i];
+        const baseRating = (insulation === "xlpe") ? row.c_xlpe : row.c_pvc;
+        const deratedIz = baseRating * methodMult * condMult * ca;
+
+        if (deratedIz < inVal) continue;
+
+        let mvVal = row.mv;
+        if (conductor === "aluminum") mvVal *= 1.64;
+
+        const deltaV = (mvVal * ib * length) / 1000;
+        const vdPct = (deltaV / vNom) * 100;
+
+        if (vdPct <= maxVd) {
+          // Loop resistance = 2 * length * r
+          const rPerM = (row.r_cu * ((conductor === "aluminum") ? 1.64 : 1.0)) / 1000;
+          const rLoop = 2 * length * rPerM;
+          const powerLoss = ib * ib * rLoop;
+
+          selected = {
+            size: row.size,
+            iz: deratedIz,
+            deltaV: deltaV,
+            vdPct: vdPct,
+            rLoop: rLoop,
+            powerLoss: powerLoss
+          };
+          break;
+        }
+      }
+
+      if (selected) {
+        document.getElementById("spCableSizeOut").innerText = selected.size + " mm² (" + conductor.toUpperCase() + ")";
+        document.getElementById("spIzOut").innerText = selected.iz.toFixed(1) + " A";
+        document.getElementById("spVdOut").innerText = selected.deltaV.toFixed(2) + " V (" + selected.vdPct.toFixed(2) + "%)";
+        document.getElementById("spLoopResOut").innerText = selected.rLoop.toFixed(3) + " \u03A9";
+        document.getElementById("spPowerLossOut").innerText = selected.powerLoss.toFixed(1) + " W";
+        document.getElementById("spStatusOut").innerText = "Fully Compliant (Ib <= In <= Iz)";
+        document.getElementById("spStatusOut").style.color = "#10b981";
+      } else {
+        document.getElementById("spCableSizeOut").innerText = "> 50 mm²";
+        document.getElementById("spIzOut").innerText = "--";
+        document.getElementById("spVdOut").innerText = "Exceeds Drop Limit";
+        document.getElementById("spLoopResOut").innerText = "--";
+        document.getElementById("spPowerLossOut").innerText = "--";
+        document.getElementById("spStatusOut").innerText = "Non-Compliant: Upsize or Parallel Feeder Required";
+        document.getElementById("spStatusOut").style.color = "#ef4444";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      calculateSinglePhase();
+    });
+  </script>
+</body>
+</html>
