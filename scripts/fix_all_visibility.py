@@ -59,6 +59,9 @@ CAT_MAP = {
             ("motor-starting-current-calculator.html", "Motor Starting Current", "⚙️", "NEMA locked rotor inrush amps", "LRA = (HP × kVA/HP × 1000) ÷ (√3 × V)"),
             ("short-circuit-calculator.html", "Short-Circuit (IEC 60909)", "💥", "Symmetrical fault kA & breaking", "Ik'' = c·Un / (√3·|Zk|)"),
             ("transformer-sizing-calculator.html", "Transformer Sizing (NEC 450)", "⚡", "kVA rating & full-load amps", "FLC = (kVA × 1000) / (√3 × V)"),
+            ("power-factor-calculator.html", "Power Factor (kW to kVAR)", "⚡", "Capacitor bank rating & line current savings", "Qc = P × [tan(θ1) - tan(θ2)]"),
+            ("parallel-resistor-calculator.html", "Parallel Resistor (Req)", "⚡", "Equivalent resistance & branch current divider", "1/Req = ∑(1/Ri) | Conductance G"),
+            ("battery-life-calculator.html", "Battery Life & Runtime", "🔋", "Peukert's law discharge & C-rate runtime", "t = H × (C / IH)^k × DoD"),
             ("resistor-color-code-calculator.html", "Resistor Color Code", "🎨", "4 & 5-band axial resistance", "R = (Digits) × 10ⁿ ± Tol%"),
         ]
     },
@@ -68,12 +71,15 @@ CAT_MAP = {
             ("solar-panel-sizing-calculator.html", "Solar Panel & Array Sizing", "☀️", "Array watts & peak sun hours", "PV (W) = Daily Wh / (PSH × η)"),
             ("solar-battery-bank-calculator.html", "Solar Battery Bank Sizing", "🔋", "Storage Ah & kWh for autonomy", "Storage Ah = Wh ÷ (V × DoD × η)"),
             ("solar-inverter-sizing-calculator.html", "Solar Inverter Sizing", "⚡", "Continuous kVA & surge capacity", "Inverter VA = Peak Continuous Load × 1.25"),
+            ("pv-string-sizing-calculator.html", "PV String Sizing (NEC 690)", "☀️", "MPPT voltage limits & module temperature", "N_max = ⌊V_max / Voc_cold⌋"),
             ("ev-charging-time-calculator.html", "EV Charging Time & Power", "🔌", "Levels 1, 2 & DC Fast charge time", "Time (hrs) = Battery (kWh) ÷ Net kW"),
         ]
     },
     "mechanical.html": {
         "title": "Mechanical & HVAC",
         "tools": [
+            ("bolt-torque-calculator.html", "Bolt Torque & Preload", "🔩", "Tightening torque & clamp load preload", "T = K · D · Fp (VDI 2230)"),
+            ("bearing-life-calculator.html", "Bearing Life (ISO 281)", "⚙️", "L10 & L10h rating life in revs & hours", "L10 = (C / P)^p × 10⁶ revs"),
             ("cooling-load-calculator.html", "Cooling Load (HVAC) Sizing", "❄️", "Sensible & latent heat in BTU/hr", "Q = 1.08 × CFM × ΔT"),
             ("pipe-sizing-calculator.html", "Pipe Sizing & Water Flow", "🚰", "Internal diameter & friction loss", "Q = A × V | Darcy-Weisbach"),
             ("pump-head-calculator.html", "Pump Head (TDH & Flow)", "🌊", "Total dynamic head & motor BHP", "TDH = Static Head + Friction Head"),
@@ -102,6 +108,8 @@ CAT_MAP = {
     "fire-safety.html": {
         "title": "Fire & Life Safety",
         "tools": [
+            ("fire-alarm-battery-calculator.html", "Fire Alarm Battery (NFPA 72)", "🚨", "24h standby + evacuation alarm Ah sizing", "C = 1.20 × (I_sb·T_sb + I_al·T_al)"),
+            ("hydrant-fire-flow-calculator.html", "Hydrant Fire Flow (NFPA 291)", "🚒", "Pitot discharge flow & rated 20 psi capacity", "Q = 29.83·cd·d²√P | Q_R at 20 psi"),
             ("smoke-detector-spacing-calculator.html", "Smoke Detector Spacing & Layout", "🚨", "NFPA 72 ceiling height derating", "S = 30ft Baseline with Derating Factor"),
             ("fire-sprinkler-calculator.html", "Fire Sprinkler Hydraulics", "💦", "NFPA 13 head flow Q=K√P & demand", "Q = K × √P (K-Factor 5.6 & 8.0)"),
         ]

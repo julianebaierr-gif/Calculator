@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fire Alarm Battery Calculator — NFPA 72 Standby &amp; Alarm Ah Sizing</title>
+  <meta name="description" content="Calculate required secondary battery backup capacity (Ampere-hours Ah) for fire alarm control panels per NFPA 72 standards with 24-hour standby and 1.20 safety factor.">
+  <meta name="keywords" content="fire alarm battery calculator, nfpa 72 battery calculation, fire alarm battery sizing, standby alarm current ah, fire panel battery calculation, secondary power supply nfpa 72, 24 hour standby battery">
+  <link rel="canonical" href="https://calchub.org/fire-alarm-battery-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "NFPA 72 Fire Alarm Secondary Battery Sizing Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "EngineeringApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates required secondary power supply sealed lead-acid (SLA) battery storage capacity in Ampere-hours per NFPA 72 Chapter 10 requirements."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What are the NFPA 72 battery standby and alarm duration requirements?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Per NFPA 72 (National Fire Alarm and Signaling Code), standard protected premises fire alarm systems require secondary battery storage capable of operating the system under quiescent non-alarm standby load for at least 24 hours, followed by at least 5 minutes of full evacuation notification alarm load at maximum rated output. For emergency voice/alarm communication systems (EVACS) or high-rise mass notification systems, the alarm evacuation duration requirement increases to 15 minutes."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why does NFPA 72 mandate a 1.20 (20%) battery aging de-rating safety factor?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "NFPA 72 Section 10.6.7.2 mandates a minimum 20% safety factor (multiplier of 1.20) because rechargeable sealed lead-acid (SLA/VRLA) batteries suffer irreversible chemical degradation, sulfation, and internal resistance increases over time. Battery manufacturers define end-of-life as the point when capacity drops to 80% of rated nameplate capacity. The 1.20 multiplier guarantees that even when an aged battery reaches 80% capacity at year 3 or 4, it can still reliably satisfy the full 24-hour standby plus evacuation alarm requirement."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the formula for calculating fire alarm battery Ampere-hours?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The required minimum battery capacity is: C_min = 1.20 × [ (I_standby × T_standby) + (I_alarm × T_alarm) ], where I_standby is quiescent supervisor current in Amperes, T_standby is standby duration in hours (typically 24.0 or 60.0 hours), I_alarm is peak total alarm current in Amperes, and T_alarm is evacuation duration in hours (5 minutes = 0.0833 hours, or 15 minutes = 0.250 hours)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does temperature affect fire alarm sealed lead-acid battery capacity?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Standard SLA batteries are rated at an optimal ambient temperature of 25°C (77°F). At freezing temperatures (0°C / 32°F), available electrochemical capacity drops by approximately 15% to 20%, requiring larger batteries or climate-controlled enclosures. Conversely, operating in unconditioned boiler rooms above 35°C (95°F) accelerates grid corrosion and halves battery operational lifespan."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="cat-theme-fire">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+          <a href="civil.html" class="nav-link">🏗️ Civil</a>
+          <a href="finance.html" class="nav-link">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+        </div>
+        <div class="nav-row">
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="fire-safety.html" class="nav-link active">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="calc-page-header">
+    <div class="calc-page-header-inner">
+      <span class="category-tag">🚨 Life Safety Systems &amp; NFPA 72</span>
+      <h1 class="calc-page-title">Fire Alarm Battery Calculator</h1>
+      <p class="calc-page-desc">Calculate required secondary standby battery capacity (Ampere-hours Ah) for Fire Alarm Control Panels (FACP) and Notification Appliance Circuit (NAC) power supplies per NFPA 72 Chapter 10.</p>
+    </div>
+  </div>
+
+  <div class="layout-container" style="display:flex;gap:2rem;max-width:1200px;margin:2rem auto;padding:0 1.25rem;align-items:start;">
+    
+    <main style="flex:1;min-width:0;">
+      <div class="calculator-workspace">
+        <section class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title"><span>🚨</span> Panel Supervisory &amp; Alarm Loads</h2>
+            <span class="status-info">NFPA 72 Table 10.6.7.2</span>
+          </div>
+          <form id="fa-form" onsubmit="return false;">
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="standby-current">Quiescent Standby Current (Amps)</label>
+                <input type="number" id="standby-current" class="form-control" value="0.450" min="0.01" max="50.0" step="0.005" oninput="runFaCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="standby-hours">Standby Duration (Hours)</label>
+                <select id="standby-hours" class="form-control" onchange="runFaCalc()">
+                  <option value="24" selected>24 Hours (NFPA 72 Standard Premises)</option>
+                  <option value="48">48 Hours (Remote Supervised Station)</option>
+                  <option value="60">60 Hours (Central Station / High Reliability)</option>
+                  <option value="4">4 Hours (Emergency Generator Equipped)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="alarm-current">Full Notification Alarm Current (Amps)</label>
+                <input type="number" id="alarm-current" class="form-control" value="3.850" min="0.1" max="100.0" step="0.05" oninput="runFaCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="alarm-minutes">Evacuation Alarm Duration (Minutes)</label>
+                <select id="alarm-minutes" class="form-control" onchange="runFaCalc()">
+                  <option value="5" selected>5 Minutes (Standard Horn/Strobe Notification)</option>
+                  <option value="15">15 Minutes (Emergency Voice Evacuation - EVACS)</option>
+                  <option value="30">30 Minutes (Special Industrial / High Occupancy)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="safety-factor">NFPA 72 Battery De-Rating Factor</label>
+                <select id="safety-factor" class="form-control" onchange="runFaCalc()">
+                  <option value="1.20" selected>1.20 (NFPA 72 Mandatory 20% Aging Reserve)</option>
+                  <option value="1.25">1.25 (Cold Temperature Environment / Enhanced Margin)</option>
+                  <option value="1.00">1.00 (Unadjusted Theoretical Minimum)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="battery-voltage">System Nominal DC Voltage</label>
+                <select id="battery-voltage" class="form-control" onchange="runFaCalc()">
+                  <option value="24" selected>24V DC (Two 12V SLA Batteries in Series)</option>
+                  <option value="12">12V DC (Single 12V SLA Battery)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-actions" style="margin-top:1.5rem;display:flex;gap:1rem;">
+              <button type="button" class="btn btn-primary" onclick="runFaCalc()">Calculate Battery Capacity</button>
+              <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Print NFPA 72 Submittal</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="results-card">
+          <h2 class="results-title">Secondary Power Sizing Summary</h2>
+          
+          <div class="primary-result-box" style="margin-bottom:1.5rem;text-align:center;padding:1.5rem;border-radius:12px;background:#F8FAFC;border:2px solid #E2E8F0;">
+            <div class="primary-result-label" style="font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em;color:#64748B;">Minimum Required Battery Capacity</div>
+            <div id="res-min-ah" class="primary-result-value" style="font-size:2.5rem;font-weight:800;color:#0F172A;margin:0.25rem 0;">13.34 Ah</div>
+            <div id="res-rec-battery" style="font-size:1.05rem;color:#DC2626;font-weight:700;">Standard Recommendation: 18 Ah (Two 12V 18Ah SLA in Series)</div>
+          </div>
+
+          <div class="result-details-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Standby Ah Load (24h)</span>
+              <span id="res-standby-ah" class="result-val" style="font-size:1.1rem;font-weight:700;color:#2563EB;">10.80 Ah</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Alarm Ah Load</span>
+              <span id="res-alarm-ah" class="result-val" style="font-size:1.1rem;font-weight:700;color:#DC2626;">0.32 Ah</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Raw Calculated Capacity</span>
+              <span id="res-raw-ah" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">11.12 Ah</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">20% Aging Safety Margin</span>
+              <span id="res-margin-ah" class="result-val" style="font-size:1.1rem;font-weight:700;color:#059669;">+ 2.22 Ah</span>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem;padding:0.85rem;border-radius:8px;background:#FEF2F2;border:1px solid #FECACA;font-size:0.85rem;color:#991B1B;">
+            <strong>🚨 Notification Circuit Design:</strong> Check strobe candela spacing with our <a href="smoke-detector-spacing-calculator.html" style="color:#991B1B;font-weight:700;">Smoke Detector Spacing Calculator</a> and verify water supply hydraulically with the <a href="fire-sprinkler-calculator.html" style="color:#991B1B;font-weight:700;">Fire Sprinkler Hydraulic Calculator</a>.
+          </div>
+        </section>
+      </div>
+
+      <article class="educational-content" style="margin-top:3rem;line-height:1.7;color:#334155;">
+        <h2>NFPA 72 Secondary Power Supply Compliance Mandates</h2>
+        <p>In life safety building engineering, fire detection and alarm systems are fundamentally categorized as life safety systems that must remain fully operational when municipal AC utility mains power is severed—a common occurrence during building fires, structural collapses, and severe electrical storms. Under <strong>NFPA 72 (National Fire Alarm and Signaling Code) Section 10.6.7</strong>, all protected premises fire alarm systems are required to feature a reliable secondary (standby) power supply, almost universally implemented via dedicated valve-regulated sealed lead-acid (VRLA/SLA) rechargeable batteries housed inside the Fire Alarm Control Panel (FACP) or external battery cabinets.</p>
+
+        <p>A compliant secondary power calculation must account for two completely distinct operating modes: <strong>quiescent supervisory standby</strong> (continuous baseline current drawn by microprocessors, smoke detector loops, addressable polling modules, and LED indicators) and <strong>alarm notification</strong> (heavy instantaneous current drawn by horn/strobes, chime-strobes, voice evacuation amplifiers, and door holder releases).</p>
+
+        <h2>The Governing NFPA 72 Calculation Formula</h2>
+        <p>The total Ampere-hour ($C$) battery requirement is computed using the standard algebraic summation defined in fire protection engineering submittals:</p>
+        <div class="formula-box" style="background:#F1F5F9;padding:1.25rem;border-radius:8px;margin:1.5rem 0;font-family:monospace;border-left:4px solid #DC2626;">
+          $$C_{\text{required}} = 1.20 \cdot \left[ \left( I_{\text{standby}} \cdot T_{\text{standby}} \right) + \left( I_{\text{alarm}} \cdot \frac{T_{\text{alarm, min}}}{60} \right) \right]$$
+        </div>
+        <p>Where:</p>
+        <ul>
+          <li><strong>$I_{\text{standby}}$</strong> = Total supervisory standby current drawn by all connected modules and initiating circuits in Amperes ($A$).</li>
+          <li><strong>$T_{\text{standby}}$</strong> = Mandated standby operational duration in hours ($24.0\text{ hours}$ for standard facilities; $60.0\text{ hours}$ for central stations).</li>
+          <li><strong>$I_{\text{alarm}}$</strong> = Peak total alarm current drawn during active evacuation notification in Amperes ($A$).</li>
+          <li><strong>$T_{\text{alarm, min}}$</strong> = Required evacuation duration in minutes ($5\text{ minutes} = \frac{5}{60} = 0.0833\text{ hrs}$; or $15\text{ minutes} = 0.250\text{ hrs}$ for voice systems).</li>
+          <li><strong>$1.20$</strong> = Mandatory $20\%$ battery aging safety factor per NFPA 72 Section 10.6.7.2.</li>
+        </ul>
+
+        <h2>Standard Commercial SLA Battery Sizes &amp; Enclosure Fit</h2>
+        <p>Engineers cannot specify fractional battery ratings (such as $13.34\text{ Ah}$). Instead, you must specify the next larger standard commercial battery size. Standard 12V SLA battery capacities and dimensions include:</p>
+
+        <div class="table-responsive" style="overflow-x:auto;margin:1.5rem 0;">
+          <table class="table-custom" style="width:100%;border-collapse:collapse;border:1px solid #E2E8F0;">
+            <thead style="background:#F8FAFC;">
+              <tr style="border-bottom:2px solid #CBD5E1;text-align:left;">
+                <th style="padding:0.75rem;">Nominal Ah Rating (at 20-hr rate)</th>
+                <th style="padding:0.75rem;">Standard Voltage</th>
+                <th style="padding:0.75rem;">Typical Enclosure Location</th>
+                <th style="padding:0.75rem;">Terminal Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:0.75rem;"><strong>7.0 Ah – 8.0 Ah</strong></td>
+                <td style="padding:0.75rem;">12V (2x for 24V)</td>
+                <td style="padding:0.75rem;">Internal to standard FACP cabinet bottom</td>
+                <td style="padding:0.75rem;">F1 / F2 Faston tab</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;background:#F8FAFC;">
+                <td style="padding:0.75rem;"><strong>12.0 Ah</strong></td>
+                <td style="padding:0.75rem;">12V (2x for 24V)</td>
+                <td style="padding:0.75rem;">Internal to large FACP cabinets</td>
+                <td style="padding:0.75rem;">F2 Faston tab</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:0.75rem;"><strong>18.0 Ah</strong></td>
+                <td style="padding:0.75rem;">12V (2x for 24V)</td>
+                <td style="padding:0.75rem;">Internal large cabinets or external BB-17 box</td>
+                <td style="padding:0.75rem;">M5 / M6 threaded nut &amp; bolt</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;background:#F8FAFC;">
+                <td style="padding:0.75rem;"><strong>26.0 Ah – 33.0 Ah</strong></td>
+                <td style="padding:0.75rem;">12V (2x for 24V)</td>
+                <td style="padding:0.75rem;">Dedicated external locked red battery cabinet</td>
+                <td style="padding:0.75rem;">M6 threaded terminal post</td>
+              </tr>
+              <tr>
+                <td style="padding:0.75rem;"><strong>55.0 Ah</strong></td>
+                <td style="padding:0.75rem;">12V (2x for 24V)</td>
+                <td style="padding:0.75rem;">Heavy-duty floor-mounted battery rack / enclosure</td>
+                <td style="padding:0.75rem;">M8 insert threaded post</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="worked-example-card" style="background:#F8FAFC;border:2px solid #E2E8F0;border-radius:12px;padding:1.5rem;margin:2rem 0;">
+          <h3 style="margin-top:0;color:#0F172A;display:flex;align-items:center;gap:0.5rem;">
+            <span>📋</span> Real-World Engineering Worked Example: High-Rise Voice System
+          </h3>
+          <p><strong>Scenario:</strong> A life safety engineer is designing an addressable Emergency Voice/Alarm Communication System (EVACS) for an 8-story commercial office building. The panel equipment schedule shows:</p>
+          <ul>
+            <li>Quiescent supervisory standby current: $I_{\text{standby}} = 0.620\text{ A}$</li>
+            <li>Standby requirement: $24\text{ hours}$</li>
+            <li>Active alarm evacuation current (audio amplifiers + strobes): $I_{\text{alarm}} = 6.450\text{ A}$</li>
+            <li>Voice alarm evacuation duration: $15\text{ minutes}$ per NFPA 72</li>
+          </ul>
+
+          <ol style="padding-left:1.25rem;line-height:1.8;">
+            <li><strong>Calculate Standby Capacity Load:</strong>
+              $$\text{Standby Ah} = 0.620\text{ A} \times 24.0\text{ hrs} = 14.88\text{ Ah}$$
+            </li>
+            <li><strong>Convert Alarm Minutes to Hours:</strong>
+              $$T_{\text{alarm}} = \frac{15\text{ min}}{60\text{ min/hr}} = 0.250\text{ hrs}$$
+            </li>
+            <li><strong>Calculate Alarm Capacity Load:</strong>
+              $$\text{Alarm Ah} = 6.450\text{ A} \times 0.250\text{ hrs} = 1.6125\text{ Ah}$$
+            </li>
+            <li><strong>Sum Raw Required Ah:</strong>
+              $$\text{Raw Total} = 14.88 + 1.6125 = 16.4925\text{ Ah}$$
+            </li>
+            <li><strong>Apply Mandatory 1.20 NFPA 72 Aging Factor:</strong>
+              $$C_{\text{min}} = 1.20 \times 16.4925\text{ Ah} = 19.791\text{ Ah}$$
+            </li>
+            <li><strong>Commercial Battery Selection:</strong> Because $19.79\text{ Ah}$ exceeds standard $18\text{ Ah}$ batteries, the engineer must specify a pair of <strong>12V 26 Ah (or 33 Ah)</strong> batteries housed in an external red battery cabinet.</li>
+          </ol>
+        </div>
+
+        
+        <h2>Notification Appliance Circuit (NAC) End-of-Discharge Voltage Drop Analysis</h2>
+        <p>A critical engineering consideration often overlooked in secondary battery calculations is the physical behavior of <strong>Notification Appliance Circuits (NACs)</strong> as battery terminal voltage decays during continuous operation. While a nominal 24V DC fire alarm battery bank floats on utility power at approximately 27.6V DC (2.30V per cell), severing AC mains power forces the system to discharge along the electrochemical SLA discharge curve. By the end of the mandatory 24-hour standby period, the open-circuit cell voltage drops toward 21.0V to 20.4V DC (1.75V per cell—the standard low-voltage cutoff threshold).</p>
+
+        <p>When the panel initiates full emergency evacuation notification at this depleted state, the sudden instantaneous draw of 4 to 10 Amperes of alarm current causes an immediate internal ohmic $I \cdot R_{	ext{int}}$ voltage drop across aged battery lead plates, accompanied by substantial $I \cdot R_{	ext{wire}}$ conductor voltage drop across long wire loops. Per <strong>UL 864 (Standard for Control Units and Accessories for Fire Alarm Systems)</strong>, all listed notification appliances (horns, strobes, speakers) are rated for regulated 24V DC operation with an allowable operating window of 16.0V to 33.0V DC. If an undersized battery drops below 19V DC at the panel terminals during alarm, downstream strobes at the end of a 500-foot loop may receive less than 16.0V DC, causing visible strobe flash failure, asynchronous pulsing, or audible horn distortion in direct violation of life safety standards.</p>
+
+        <h2>Constant Current vs Constant Power Battery Ratings</h2>
+        <p>Standard manufacturer battery datasheets provide two distinct capacity discharge tables: <strong>Constant Current (Amperes)</strong> and <strong>Constant Power (Watts per Cell)</strong>. Standard fire alarm initiating circuits and conventional horn/strobe loads exhibit resistive and semi-constant-current characteristics, making Ampere-hour (Ah) summations accurate. However, modern high-efficiency switching Emergency Voice/Alarm Communication Systems (EVACS) incorporate Class-D digital audio amplifiers. These switching power supplies behave as <em>constant power loads</em>: as battery DC bus voltage declines, the amplifier input switching regulators draw progressively <em>higher current</em> to maintain audio output wattage ($I = P / V$). For high-rise voice evacuation systems, engineers must consult manufacturer Constant Power discharge tables down to 1.75 VPC cutoff to confirm battery bank capability.</p>
+
+
+        <h2>Frequently Asked Technical Questions</h2>
+        <div class="faq-accordion" style="margin-top:1.5rem;">
+          <div class="faq-item" style="border-bottom:1px solid #E2E8F0;padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">When is a 60-hour standby battery capacity mandatory instead of 24 hours?</h4>
+            <p style="margin:0;color:#64748B;">Under NFPA 72, a 60-hour secondary supply is required for systems that do not transmit supervisory signals to a constantly attended location (such as a 24/7 central monitoring station or proprietary supervising station) or where local facilities remain unattended over long holiday weekends without automatic trouble reporting.</p>
+          </div>
+          <div class="faq-item" style="border-bottom:1px solid #E2E8F0;padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">Can a dedicated emergency backup diesel generator replace fire alarm batteries?</h4>
+            <p style="margin:0;color:#64748B;">No, but it can reduce the battery standby duration requirement. When an NFPA 110 Type 10, Class 24 Level 1 emergency standby generator is installed with automatic transfer switch (ATS), NFPA 72 allows reducing the battery standby requirement from 24 hours down to 4 hours, which covers the interval during generator startup or transient maintenance refueling.</p>
+          </div>
+          <div class="faq-item" style="border-bottom:1px solid #E2E8F0;padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">How frequently must sealed lead-acid fire alarm batteries be replaced?</h4>
+            <p style="margin:0;color:#64748B;">NFPA 72 Chapter 14 mandates that SLA batteries must undergo annual load voltage testing and be replaced no later than 3 to 5 years from their manufacturing date code, or whenever an impedance/conductance test reveals capacity below 80% of rating.</p>
+          </div>
+          <div class="faq-item" style="padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">Why do fire alarm control panels use 24V DC rather than 12V DC?</h4>
+            <p style="margin:0;color:#64748B;">Doubling the system voltage from 12V to 24V halves the required circuit current for equivalent wattage, which reduces conductor I²R voltage drop across long notification appliance circuits (NACs) by 75%. This allows fire alarm horns and strobes to operate reliably at wire run distances exceeding 500 to 1,000 feet.</p>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <aside class="sidebar" style="width:300px;flex-shrink:0;">
+      <div class="sidebar-card" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;">
+        <h3 style="font-size:1rem;margin-top:0;color:#0F172A;">🚨 Fire Protection Tools</h3>
+        <ul style="list-style:none;padding:0;margin:0;font-size:0.88rem;line-height:2;">
+          <li><a href="fire-alarm-battery-calculator.html" style="font-weight:700;color:#DC2626;">🚨 Fire Alarm Battery (NFPA 72)</a></li>
+          <li><a href="hydrant-fire-flow-calculator.html" style="color:#475569;">🚒 Hydrant Fire Flow (NFPA 291)</a></li>
+          <li><a href="smoke-detector-spacing-calculator.html" style="color:#475569;">🚨 Smoke Detector Spacing</a></li>
+          <li><a href="fire-sprinkler-calculator.html" style="color:#475569;">💦 Fire Sprinkler Hydraulics</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;">
+        <h3 style="font-size:1rem;margin-top:0;color:#0F172A;">⚡ Electrical Engineering Suite</h3>
+        <ul style="list-style:none;padding:0;margin:0;font-size:0.88rem;line-height:2;">
+          <li><a href="voltage-drop-calculator.html" style="color:#475569;">📉 Voltage Drop Calculator</a></li>
+          <li><a href="wire-ampacity-calculator.html" style="color:#475569;">🔌 Wire Ampacity (NEC)</a></li>
+          <li><a href="conduit-fill-calculator.html" style="color:#475569;">🪢 Conduit Fill Calculator</a></li>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer class="site-footer" style="background:#0F172A;color:#94A3B8;padding:3rem 1.25rem;margin-top:4rem;">
+    <div style="max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:2rem;">
+      <div>
+        <div style="font-size:1.25rem;font-weight:800;color:#FFFFFF;margin-bottom:0.5rem;">CalcHub</div>
+        <p style="font-size:0.88rem;max-width:320px;">Open-source engineering, financial, and scientific computational tools. 100% verified mathematics.</p>
+      </div>
+      <div>
+        <div style="font-weight:700;color:#FFFFFF;margin-bottom:0.75rem;">NFPA Life Safety Codes</div>
+        <div style="font-size:0.85rem;line-height:2;">
+          NFPA 72 National Fire Alarm &amp; Signaling Code<br>
+          NFPA 101 Life Safety Code<br>
+          UL 864 Control Units &amp; Accessories
+        </div>
+      </div>
+    </div>
+    <div style="max-width:1200px;margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid #1E293B;text-align:center;font-size:0.82rem;">
+      &copy; 2026 CalcHub. Professional Fire &amp; Life Safety Engineering Suite.
+    </div>
+  </footer>
+
+  <script>
+    function runFaCalc() {
+      const iStandby = Math.max(0.001, parseFloat(document.getElementById('standby-current').value) || 0.450);
+      const tStandby = parseFloat(document.getElementById('standby-hours').value) || 24;
+      const iAlarm = Math.max(0.01, parseFloat(document.getElementById('alarm-current').value) || 3.850);
+      const tAlarmMin = parseFloat(document.getElementById('alarm-minutes').value) || 5;
+      const safetyFactor = parseFloat(document.getElementById('safety-factor').value) || 1.20;
+      const vSys = document.getElementById('battery-voltage').value;
+
+      const standbyAh = iStandby * tStandby;
+      const alarmAh = iAlarm * (tAlarmMin / 60.0);
+      const rawAh = standbyAh + alarmAh;
+      const totalMinAh = rawAh * safetyFactor;
+      const marginAh = totalMinAh - rawAh;
+
+      let recAh = 7;
+      if (totalMinAh <= 7.0) recAh = 7.0;
+      else if (totalMinAh <= 8.0) recAh = 8.0;
+      else if (totalMinAh <= 12.0) recAh = 12.0;
+      else if (totalMinAh <= 18.0) recAh = 18.0;
+      else if (totalMinAh <= 26.0) recAh = 26.0;
+      else if (totalMinAh <= 33.0) recAh = 33.0;
+      else if (totalMinAh <= 55.0) recAh = 55.0;
+      else recAh = Math.ceil(totalMinAh / 10) * 10;
+
+      const battConfig = vSys === '24' ? 'Two 12V ' + recAh + 'Ah SLA in Series' : 'Single 12V ' + recAh + 'Ah SLA';
+
+      document.getElementById('res-min-ah').textContent = totalMinAh.toFixed(2) + ' Ah';
+      document.getElementById('res-rec-battery').textContent = 'Commercial Selection: ' + recAh + ' Ah (' + battConfig + ')';
+      document.getElementById('res-standby-ah').textContent = standbyAh.toFixed(2) + ' Ah (' + tStandby + 'h)';
+      document.getElementById('res-alarm-ah').textContent = alarmAh.toFixed(3) + ' Ah (' + tAlarmMin + 'm)';
+      document.getElementById('res-raw-ah').textContent = rawAh.toFixed(2) + ' Ah';
+      document.getElementById('res-margin-ah').textContent = '+ ' + marginAh.toFixed(2) + ' Ah (' + Math.round((safetyFactor - 1)*100) + '%)';
+    }
+
+    window.addEventListener('DOMContentLoaded', runFaCalc);
+  </script>
+</body>
+</html>

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battery Life Calculator — Runtime Hours &amp; Peukert's Law Discharge</title>
+  <meta name="description" content="Calculate battery runtime hours, discharge current C-rate, and Peukert capacity derating for Lithium-ion, LiFePO4, AGM, and lead-acid battery banks under DC load.">
+  <meta name="keywords" content="battery life calculator, battery runtime calculator, battery discharge time, peukert's law calculator, mah to hours calculator, battery ah runtime, lithium vs lead acid discharge">
+  <link rel="canonical" href="https://calchub.org/battery-life-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Electrochemical Battery Runtime & Peukert Law Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "EngineeringApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates battery runtime hours, available discharge capacity, Peukert derating factor, and C-rate for portable electronics and energy storage systems."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How is battery runtime calculated from capacity (Ah) and load (Amps)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Nominal battery runtime is standardly calculated using: T = (Capacity in Ah × Depth of Discharge × Efficiency) / Load Current in Amperes. For instance, a 100 Ah battery discharged to 80% DoD powering a 5 Amp DC load with 95% inverter efficiency delivers: (100 × 0.80 × 0.95) / 5 = 15.2 hours of continuous runtime."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is Peukert's Law and why does it reduce lead-acid battery runtime at high currents?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Formulated by Wilhelm Peukert in 1897, Peukert's Law states that available battery capacity decreases non-linearly as discharge rate increases: C_p = I^k × t, where k is the Peukert exponent (typically 1.15 to 1.30 for lead-acid batteries, but nearly ideal 1.02 to 1.05 for Lithium Iron Phosphate). At heavy discharge rates, slow acid diffusion inside lead-acid plates starves the active material of sulfate ions, reducing delivered energy by over 40%."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between Depth of Discharge (DoD) for Lithium vs Lead-Acid?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Deep-cycle Lead-Acid (FLA/AGM/Gel) batteries should rarely be discharged beyond 50% Depth of Discharge (DoD) to avoid accelerating sulfation and slashing cycle life below 500 cycles. In contrast, modern Lithium Iron Phosphate (LiFePO4) and Lithium-ion chemistry can safely operate at 80% to 95% DoD while delivering 3,000 to 6,000 charge-discharge cycles."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do you calculate battery runtime when load is specified in Watts instead of Amps?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Convert load power in Watts to DC current using Ohm's Law: Current (A) = Power (W) / Nominal Battery Voltage (V). For example, a 120 Watt DC load operating on a 12V battery bank draws: 120 W / 12 V = 10 Amperes. If an AC inverter is used, divide the current by inverter efficiency (typically 0.88 to 0.94) to account for DC-to-AC conversion losses."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="cat-theme-engineering">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="engineering.html" class="nav-link active">⚡ Electrical</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+          <a href="civil.html" class="nav-link">🏗️ Civil</a>
+          <a href="finance.html" class="nav-link">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+        </div>
+        <div class="nav-row">
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="fire-safety.html" class="nav-link">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="calc-page-header">
+    <div class="calc-page-header-inner">
+      <span class="category-tag">⚡ Electrochemical Energy Storage &amp; Electronics</span>
+      <h1 class="calc-page-title">Battery Life Calculator</h1>
+      <p class="calc-page-desc">Calculate battery runtime in hours and days, discharge C-rate, and available watt-hour capacity for Lithium LiFePO4, AGM, and lead-acid chemistries using Peukert's law.</p>
+    </div>
+  </div>
+
+  <div class="layout-container" style="display:flex;gap:2rem;max-width:1200px;margin:2rem auto;padding:0 1.25rem;align-items:start;">
+    
+    <main style="flex:1;min-width:0;">
+      <div class="calculator-workspace">
+        <section class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title"><span>🔋</span> Battery &amp; Electrical Load Setup</h2>
+            <span class="status-info">Electrochemical Modeling</span>
+          </div>
+          <form id="battery-form" onsubmit="return false;">
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="batt-chemistry">Battery Chemistry &amp; Peukert Exponent</label>
+                <select id="batt-chemistry" class="form-control" onchange="applyChemistryDefaults()">
+                  <option value="lifepo4" data-k="1.04" data-dod="0.90" data-v="12.8" selected>Lithium Iron Phosphate (LiFePO4 / k = 1.04 / 90% DoD)</option>
+                  <option value="li-ion" data-k="1.05" data-dod="0.80" data-v="3.7">Lithium-Ion / LiPo (Cell 3.7V / k = 1.05 / 80% DoD)</option>
+                  <option value="agm" data-k="1.15" data-dod="0.50" data-v="12.0">AGM / Gel Deep Cycle (k = 1.15 / 50% DoD)</option>
+                  <option value="fla" data-k="1.25" data-dod="0.50" data-v="12.0">Flooded Lead-Acid (Golf Cart / k = 1.25 / 50% DoD)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="batt-capacity">Nominal Capacity (Ah)</label>
+                <input type="number" id="batt-capacity" class="form-control" value="100" min="0.1" max="10000" step="1" oninput="runBatteryCalc()">
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="batt-voltage">Nominal Pack Voltage (V DC)</label>
+                <input type="number" id="batt-voltage" class="form-control" value="12.8" min="1.2" max="1000" step="0.1" oninput="runBatteryCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="load-type">Load Specification Method</label>
+                <select id="load-type" class="form-control" onchange="runBatteryCalc()">
+                  <option value="current" selected>Discharge Current (Amperes / A)</option>
+                  <option value="power">Continuous Power (Watts / W)</option>
+                  <option value="milliamps">Low Power Electronics (Milliamps / mA)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="load-value">Load Value (Amps, Watts, or mA)</label>
+                <input type="number" id="load-value" class="form-control" value="10" min="0.001" max="5000" step="0.5" oninput="runBatteryCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="depth-of-discharge">Target Depth of Discharge (DoD %)</label>
+                <input type="number" id="depth-of-discharge" class="form-control" value="90" min="10" max="100" step="5" oninput="runBatteryCalc()">
+              </div>
+            </div>
+
+            <div class="calc-actions" style="margin-top:1.5rem;display:flex;gap:1rem;">
+              <button type="button" class="btn btn-primary" onclick="runBatteryCalc()">Calculate Battery Runtime</button>
+              <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Print Discharge Analysis</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="results-card">
+          <h2 class="results-title">Discharge Runtime &amp; Energy Analysis</h2>
+          
+          <div class="primary-result-box" style="margin-bottom:1.5rem;text-align:center;padding:1.5rem;border-radius:12px;background:#F8FAFC;border:2px solid #E2E8F0;">
+            <div class="primary-result-label" style="font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em;color:#64748B;">Estimated Battery Runtime</div>
+            <div id="res-runtime-primary" class="primary-result-value" style="font-size:2.5rem;font-weight:800;color:#0F172A;margin:0.25rem 0;">8 Hours 41 Minutes</div>
+            <div id="res-runtime-sub" style="font-size:1.05rem;color:#059669;font-weight:700;">8.68 Decimal Hours (0.36 Days Continuous)</div>
+          </div>
+
+          <div class="result-details-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Effective Delivered Capacity</span>
+              <span id="res-eff-capacity" class="result-val" style="font-size:1.1rem;font-weight:700;color:#2563EB;">86.8 Ah (90% DoD)</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Total Usable Energy</span>
+              <span id="res-usable-energy" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">1,111 Watt-hours (1.11 kWh)</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Discharge C-Rate</span>
+              <span id="res-c-rate" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">0.10 C (10h Rate)</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Peukert Derating Loss</span>
+              <span id="res-peukert-loss" class="result-val" style="font-size:1.1rem;font-weight:700;color:#475569;">3.2% Capacity Loss</span>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem;padding:0.85rem;border-radius:8px;background:#F0FDF4;border:1px solid #BBF7D0;font-size:0.85rem;color:#166534;">
+            <strong>☀️ Renewable Integration:</strong> Sizing an off-grid solar system? Calculate your required array with our <a href="solar-panel-sizing-calculator.html" style="color:#166534;font-weight:700;">Solar Panel Sizing Calculator</a> and backup storage with the <a href="solar-battery-bank-calculator.html" style="color:#166534;font-weight:700;">Solar Battery Bank Calculator</a>.
+          </div>
+        </section>
+      </div>
+
+      <article class="educational-content" style="margin-top:3rem;line-height:1.7;color:#334155;">
+        <h2>The Physics of Battery Discharge: Peukert's Law &amp; Chemistry Dynamics</h2>
+        <p>In electrical engineering, estimating the operational autonomy of battery-powered systems requires more than simply dividing nominal Ampere-hour capacity by load amperage. An electrochemical battery is not an ideal bucket of coulombs that pours out energy at a 100% constant rate regardless of discharge velocity. Instead, chemical reaction kinetics, internal series resistance ($R_{int}$), and ion diffusion rates across the electrolyte fundamentally dictate how much usable energy can be extracted before cell voltage collapses below its minimum low-voltage cutoff threshold.</p>
+
+        <p>In 1897, German scientist Wilhelm Peukert discovered that as the discharge current increases, the available capacity of a lead-acid battery diminishes exponentially. This phenomenon is modeled mathematically by <strong>Peukert's Law</strong>, and it explains why a 100 Ah deep-cycle battery can power a 5-Amp load for 20 hours (delivering 100 Ah), but will collapse in under 18 minutes if discharged at 200 Amps (delivering only 60 Ah of useful energy).</p>
+
+        <h2>Mathematical Discharge &amp; Runtime Formulations</h2>
+
+        <h3>1. The Classical Peukert Equation</h3>
+        <p>Peukert's equation relates discharge current to discharge duration:</p>
+        <div class="formula-box" style="background:#F1F5F9;padding:1.25rem;border-radius:8px;margin:1.5rem 0;font-family:monospace;border-left:4px solid #2563EB;">
+          $$C_p = I^k \cdot t$$
+        </div>
+        <p>Where:</p>
+        <ul>
+          <li><strong>$C_p$</strong> = Peukert capacity constant for the battery.</li>
+          <li><strong>$I$</strong> = Discharge current in Amperes.</li>
+          <li><strong>$t$</strong> = Time to full discharge in hours.</li>
+          <li><strong>$k$</strong> = Peukert exponent (dimensionless parameter characterizing internal electrochemical resistance).</li>
+        </ul>
+
+        <p>When normalized against the standard manufacturer rating duration ($H$, typically the $20\text{-hour}$ rating for deep-cycle batteries or $1\text{-hour}$ for Lithium), the effective runtime $t$ under load current $I$ is calculated as:</p>
+        <div class="formula-box" style="background:#F1F5F9;padding:1.25rem;border-radius:8px;margin:1.5rem 0;font-family:monospace;border-left:4px solid #059669;">
+          $$t = H \cdot \left( \frac{C_{\text{rated}}}{I \cdot H} \right)^k \cdot \text{DoD}$$
+        </div>
+
+        <h3>2. Conversion Between Electrical Load Units</h3>
+        <p>When consumer devices specify continuous load in Watts ($P$) rather than Amps ($I$), current drawn from the DC bus is calculated via Ohm's Law:</p>
+        <div class="formula-box" style="background:#F1F5F9;padding:1.25rem;border-radius:8px;margin:1.5rem 0;font-family:monospace;border-left:4px solid #7C3AED;">
+          $$I = \frac{P}{V_{\text{nominal}} \cdot \eta_{\text{inverter}}}$$
+        </div>
+        <p>Where $\eta_{\text{inverter}}$ represents DC-to-AC power inverter conversion efficiency (typically $0.88$ to $0.94$).</p>
+
+        <h2>Electrochemical Battery Chemistry Comparison Table</h2>
+        <p>Different rechargeable chemistries exhibit radically different Peukert exponents, usable depths of discharge, and thermal tolerances:</p>
+
+        <div class="table-responsive" style="overflow-x:auto;margin:1.5rem 0;">
+          <table class="table-custom" style="width:100%;border-collapse:collapse;border:1px solid #E2E8F0;">
+            <thead style="background:#F8FAFC;">
+              <tr style="border-bottom:2px solid #CBD5E1;text-align:left;">
+                <th style="padding:0.75rem;">Battery Chemistry</th>
+                <th style="padding:0.75rem;">Peukert Exponent ($k$)</th>
+                <th style="padding:0.75rem;">Recommended DoD</th>
+                <th style="padding:0.75rem;">Cycle Life</th>
+                <th style="padding:0.75rem;">Round-Trip Efficiency</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:0.75rem;"><strong>Lithium Iron Phosphate (LiFePO4)</strong></td>
+                <td style="padding:0.75rem;">1.02 – 1.05</td>
+                <td style="padding:0.75rem;">80% – 95%</td>
+                <td style="padding:0.75rem;">3,500 – 6,000 cycles</td>
+                <td style="padding:0.75rem;">95% – 98%</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;background:#F8FAFC;">
+                <td style="padding:0.75rem;"><strong>Lithium-Ion / Li-Polymer (NMC/LCO)</strong></td>
+                <td style="padding:0.75rem;">1.04 – 1.08</td>
+                <td style="padding:0.75rem;">80%</td>
+                <td style="padding:0.75rem;">800 – 1,500 cycles</td>
+                <td style="padding:0.75rem;">92% – 95%</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:0.75rem;"><strong>AGM Deep-Cycle Sealed Lead-Acid</strong></td>
+                <td style="padding:0.75rem;">1.12 – 1.18</td>
+                <td style="padding:0.75rem;">50%</td>
+                <td style="padding:0.75rem;">400 – 700 cycles</td>
+                <td style="padding:0.75rem;">80% – 85%</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;background:#F8FAFC;">
+                <td style="padding:0.75rem;"><strong>Flooded Lead-Acid (Wet Cell)</strong></td>
+                <td style="padding:0.75rem;">1.20 – 1.30</td>
+                <td style="padding:0.75rem;">50%</td>
+                <td style="padding:0.75rem;">300 – 500 cycles</td>
+                <td style="padding:0.75rem;">75% – 80%</td>
+              </tr>
+              <tr>
+                <td style="padding:0.75rem;"><strong>Nickel-Metal Hydride (NiMH)</strong></td>
+                <td style="padding:0.75rem;">1.10 – 1.15</td>
+                <td style="padding:0.75rem;">70%</td>
+                <td style="padding:0.75rem;">500 – 1,000 cycles</td>
+                <td style="padding:0.75rem;">65% – 70%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="worked-example-card" style="background:#F8FAFC;border:2px solid #E2E8F0;border-radius:12px;padding:1.5rem;margin:2rem 0;">
+          <h3 style="margin-top:0;color:#0F172A;display:flex;align-items:center;gap:0.5rem;">
+            <span>📋</span> Real-World Engineering Worked Example: Marine Inverter System
+          </h3>
+          <p><strong>Scenario:</strong> A cruising sailboat installs a $12\text{V}$, $200\text{ Ah}$ AGM battery bank ($k = 1.15$, rated at the $20\text{-hr}$ rate). The boat operates a $360\text{ Watt}$ refrigeration compressor powered by an inverter ($\eta = 0.90$). The owner limits discharge to $50\%$ DoD to maximize battery bank longevity.</p>
+
+          <ol style="padding-left:1.25rem;line-height:1.8;">
+            <li><strong>Calculate DC Current Drawn from the Battery Bank:</strong>
+              $$I = \frac{360\text{ W}}{12\text{ V} \times 0.90} = \frac{360}{10.8} = 33.33\text{ Amperes}$$
+            </li>
+            <li><strong>Determine the C-Rate:</strong>
+              $$\text{C-Rate} = \frac{33.33\text{ A}}{200\text{ Ah}} \approx 0.167\text{ C} \quad (\approx 6\text{-hour discharge rate})$$
+            </li>
+            <li><strong>Apply Peukert's Formulation ($H = 20\text{ hrs}$):</strong>
+              $$\text{Full Discharge Time } t_{\text{full}} = 20 \times \left( \frac{200}{33.33 \times 20} \right)^{1.15} = 20 \times \left( \frac{200}{666.6} \right)^{1.15} = 20 \times (0.300)^{1.15} \approx 5.01\text{ Hours}$$
+            </li>
+            <li><strong>Apply Depth of Discharge ($50\%$ DoD):</strong>
+              $$\text{Usable Autonomy} = 5.01\text{ hrs} \times 0.50 \approx 2.50\text{ Hours } (2\text{h } 30\text{m})$$
+            </li>
+            <li><strong>Comparison with Lithium:</strong> If the owner replaces the AGM bank with a $200\text{ Ah}$ LiFePO4 battery ($k = 1.04$, usable at $90\%$ DoD), the usable runtime increases to $5.4\text{ hours}$—more than double the autonomy for the exact same nameplate Ah rating!</li>
+          </ol>
+        </div>
+
+        
+        <h2>Electrochemical Cell Polarization &amp; Dynamic Internal Resistance</h2>
+        <p>When an electrical load draws current from a battery cell, the closed-circuit operating terminal voltage ($V_{	ext{terminal}}$) immediately drops below its open-circuit potential ($V_{	ext{oc}}$). This voltage loss—termed <strong>overpotential</strong> or <strong>polarization</strong>—stems from three distinct electrochemical mechanisms occurring inside the battery:</p>
+        <ul>
+          <li><strong>Ohmic (IR) Polarization:</strong> Instantaneous resistive losses across the metallic current collectors, tabs, active electrode coatings, and the ionic resistance of the liquid or gel electrolyte. Governed strictly by Ohm's Law ($\Delta V_{	ext{ohmic}} = I \cdot R_{	ext{int}}$).</li>
+          <li><strong>Activation (Charge-Transfer) Polarization:</strong> The energy barrier required to drive chemical redox reactions at the interface between electrode materials and the electrolyte. Governed by the Butler-Volmer equation.</li>
+          <li><strong>Concentration (Mass-Transport) Polarization:</strong> The slowest dynamic component, caused by finite diffusion rates of lithium ions or sulfate ions migrating through the electrolyte and electrode pores. Under heavy continuous discharge, ion depletion occurs at the reaction sites, causing terminal voltage to sag prematurely even though chemical energy remains inside the bulk material.</li>
+        </ul>
+
+        <h2>State of Charge (SoC) Tracking &amp; Battery Management System (BMS) Logic</h2>
+        <p>In modern lithium-ion and LiFePO4 battery banks, calculating remaining runtime and operational health is handled by an intelligent digital <strong>Battery Management System (BMS)</strong>. Because lithium iron phosphate has an extraordinarily flat discharge voltage curve—maintaining approximately 3.20V to 3.25V per cell across 20% to 80% State of Charge (SoC)—measuring voltage alone provides an inaccurate estimation of remaining capacity. Instead, professional BMS units utilize dual-mode state estimation:</p>
+        <ol>
+          <li><strong>Coulomb Counting (Current Integration):</strong> A precision shunt resistor or Hall-effect sensor measures instantaneous current ($I(t)$) in milliamperes at high sampling frequencies (100 Hz to 1 kHz). The BMS numerically integrates current over time:
+            $$	ext{SoC}(t) = 	ext{SoC}_0 - rac{1}{C_{	ext{rated}}} \int_0^t I(t) \, dt$$
+          </li>
+          <li><strong>Extended Kalman Filtering (EKF):</strong> Over long discharge cycles, Coulomb counting accumulates minor sensor drift errors. To eliminate drift, the BMS runs an adaptive Kalman filter algorithm that blends current integration with dynamic electrochemical equivalent-circuit models (ECM) and temperature-compensated open-circuit voltage lookups during rest intervals, maintaining state-of-charge tracking precision within &plusmn;1% accuracy.</li>
+        </ol>
+
+
+        <h2>Frequently Asked Technical Questions</h2>
+        <div class="faq-accordion" style="margin-top:1.5rem;">
+          <div class="faq-item" style="border-bottom:1px solid #E2E8F0;padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">Why doesn't Lithium LiFePO4 suffer from Peukert's capacity loss?</h4>
+            <p style="margin:0;color:#64748B;">Lithium Iron Phosphate cells utilize solid-state intercalation of lithium ions into olivine crystalline iron-phosphate cathode structures. Because lithium ions have exceptionally high mobility and the cells have near-negligible internal resistance compared to lead-acid liquid sulfuric acid dissociation, the Peukert exponent of LiFePO4 is nearly ideal (k ≈ 1.02 to 1.04), allowing the cell to deliver ~98% of its capacity even at a rapid 1C (1-hour) discharge rate.</p>
+          </div>
+          <div class="faq-item" style="border-bottom:1px solid #E2E8F0;padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">How does ambient cold temperature affect battery runtime?</h4>
+            <p style="margin:0;color:#64748B;">Electrochemical reaction kinetics slow down significantly at low temperatures. At 0°C (32°F), a standard AGM or lead-acid battery delivers only about 75% to 80% of its rated capacity. At -20°C (-4°F), usable capacity falls below 50%. Furthermore, lithium batteries must never be recharged at temperatures below freezing (0°C) without internal heating blankets, as doing so causes permanent metallic lithium plating and internal short circuits.</p>
+          </div>
+          <div class="faq-item" style="border-bottom:1px solid #E2E8F0;padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">What is the relationship between C-rate and battery life expectancy?</h4>
+            <p style="margin:0;color:#64748B;">The C-rate is the discharge current normalized to rated capacity (e.g., discharging a 100 Ah battery at 50 Amps is 0.5C). High continuous C-rates (&gt; 1C) generate internal ohmic I²R heating, which elevates internal cell temperatures, accelerates electrolyte breakdown, and degrades the solid-electrolyte interphase (SEI) layer, substantially reducing total cumulative lifetime cycles.</p>
+          </div>
+          <div class="faq-item" style="padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">How do you convert milliamp-hours (mAh) to Watt-hours (Wh)?</h4>
+            <p style="margin:0;color:#64748B;">To convert milliamp-hours to Watt-hours, multiply the mAh by nominal cell voltage in Volts and divide by 1,000: Wh = (mAh × V) / 1000. For example, a 5,000 mAh smartphone battery operating at a nominal 3.85V contains: (5000 × 3.85) / 1000 = 19.25 Watt-hours of total electrochemical energy.</p>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <aside class="sidebar" style="width:300px;flex-shrink:0;">
+      <div class="sidebar-card" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;">
+        <h3 style="font-size:1rem;margin-top:0;color:#0F172A;">⚡ Electrical Energy Suite</h3>
+        <ul style="list-style:none;padding:0;margin:0;font-size:0.88rem;line-height:2;">
+          <li><a href="battery-life-calculator.html" style="font-weight:700;color:#2563EB;">🔋 Battery Life &amp; Runtime</a></li>
+          <li><a href="solar-battery-bank-calculator.html" style="color:#475569;">🔋 Solar Battery Bank Sizing</a></li>
+          <li><a href="ohms-law-calculator.html" style="color:#475569;">⚡ Ohm's Law Calculator</a></li>
+          <li><a href="voltage-drop-calculator.html" style="color:#475569;">📉 Voltage Drop Calculator</a></li>
+          <li><a href="wire-ampacity-calculator.html" style="color:#475569;">🔌 Wire Ampacity (NEC)</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;">
+        <h3 style="font-size:1rem;margin-top:0;color:#0F172A;">☀️ Solar &amp; Renewable Tools</h3>
+        <ul style="list-style:none;padding:0;margin:0;font-size:0.88rem;line-height:2;">
+          <li><a href="solar-panel-sizing-calculator.html" style="color:#475569;">☀️ Solar Panel Sizing</a></li>
+          <li><a href="solar-inverter-sizing-calculator.html" style="color:#475569;">⚡ Solar Inverter Sizing</a></li>
+          <li><a href="ev-charging-time-calculator.html" style="color:#475569;">🔌 EV Charging Time &amp; Power</a></li>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer class="site-footer" style="background:#0F172A;color:#94A3B8;padding:3rem 1.25rem;margin-top:4rem;">
+    <div style="max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:2rem;">
+      <div>
+        <div style="font-size:1.25rem;font-weight:800;color:#FFFFFF;margin-bottom:0.5rem;">CalcHub</div>
+        <p style="font-size:0.88rem;max-width:320px;">Open-source engineering, financial, and scientific computational tools. 100% verified mathematics.</p>
+      </div>
+      <div>
+        <div style="font-weight:700;color:#FFFFFF;margin-bottom:0.75rem;">Electrochemical Standards</div>
+        <div style="font-size:0.85rem;line-height:2;">
+          IEC 62619 Secondary Lithium Cells<br>
+          IEEE 485 Stationary Battery Sizing<br>
+          UL 1973 Energy Storage Systems
+        </div>
+      </div>
+    </div>
+    <div style="max-width:1200px;margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid #1E293B;text-align:center;font-size:0.82rem;">
+      &copy; 2026 CalcHub. Professional Electrochemical &amp; Power Storage Suite.
+    </div>
+  </footer>
+
+  <script>
+    function applyChemistryDefaults() {
+      const chem = document.getElementById('batt-chemistry');
+      const opt = chem.options[chem.selectedIndex];
+      const dod = parseFloat(opt.dataset.dod) * 100;
+      const v = parseFloat(opt.dataset.v);
+
+      document.getElementById('depth-of-discharge').value = dod;
+      document.getElementById('batt-voltage').value = v;
+      runBatteryCalc();
+    }
+
+    function runBatteryCalc() {
+      const chem = document.getElementById('batt-chemistry');
+      const opt = chem.options[chem.selectedIndex];
+      const k = parseFloat(opt.dataset.k) || 1.05;
+
+      const cRated = Math.max(0.01, parseFloat(document.getElementById('batt-capacity').value) || 100);
+      const vNom = Math.max(0.5, parseFloat(document.getElementById('batt-voltage').value) || 12.8);
+      const loadType = document.getElementById('load-type').value;
+      const loadVal = Math.max(0.0001, parseFloat(document.getElementById('load-value').value) || 10);
+      const dodPct = Math.min(100, Math.max(5, parseFloat(document.getElementById('depth-of-discharge').value) || 90));
+      const dodFrac = dodPct / 100.0;
+
+      // Determine load current in Amperes
+      let iLoad = 10;
+      if (loadType === 'current') {
+        iLoad = loadVal;
+      } else if (loadType === 'power') {
+        iLoad = loadVal / vNom;
+      } else if (loadType === 'milliamps') {
+        iLoad = loadVal / 1000.0;
+      }
+
+      const H = (opt.value === 'lifepo4' || opt.value === 'li-ion') ? 1.0 : 20.0;
+
+      // Peukert calculation: t = H * (C_rated / (I * H))^k * DoD
+      let hours = 0;
+      if (Math.abs(k - 1.0) < 0.001) {
+        hours = (cRated / iLoad) * dodFrac;
+      } else {
+        const ratio = cRated / (iLoad * H);
+        hours = H * Math.pow(ratio, k) * dodFrac;
+      }
+
+      if (hours < 0 || isNaN(hours)) hours = 0;
+
+      const totalMinutes = Math.round(hours * 60);
+      const hPart = Math.floor(totalMinutes / 60);
+      const mPart = totalMinutes % 60;
+      const days = hours / 24.0;
+
+      // Usable energy
+      const usableWh = cRated * vNom * dodFrac;
+      const cRate = iLoad / cRated;
+
+      // Theoretical linear hours vs Peukert hours
+      const linearHours = (cRated / iLoad) * dodFrac;
+      const peukertLossPct = linearHours > 0 ? Math.max(0, ((linearHours - hours) / linearHours) * 100) : 0;
+
+      let runtimeStr = '';
+      if (hours < 1) {
+        runtimeStr = totalMinutes + ' Minutes';
+      } else if (hours < 48) {
+        runtimeStr = hPart + ' Hours ' + mPart + ' Minutes';
+      } else {
+        runtimeStr = days.toFixed(1) + ' Days (' + Math.round(hours) + ' Hours)';
+      }
+
+      document.getElementById('res-runtime-primary').textContent = runtimeStr;
+      document.getElementById('res-runtime-sub').textContent = hours.toFixed(2) + ' Decimal Hours (' + days.toFixed(2) + ' Days Continuous)';
+      document.getElementById('res-eff-capacity').textContent = (cRated * dodFrac).toFixed(1) + ' Ah (' + dodPct + '% DoD)';
+      document.getElementById('res-usable-energy').textContent = Math.round(usableWh).toLocaleString() + ' Wh (' + (usableWh / 1000).toFixed(2) + ' kWh)';
+      document.getElementById('res-c-rate').textContent = cRate.toFixed(3) + ' C (' + (1/cRate).toFixed(1) + 'h Rate)';
+      document.getElementById('res-peukert-loss').textContent = peukertLossPct.toFixed(1) + '% Peukert Loss';
+    }
+
+    window.addEventListener('DOMContentLoaded', runBatteryCalc);
+  </script>
+</body>
+</html>

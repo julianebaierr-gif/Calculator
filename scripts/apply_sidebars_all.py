@@ -61,6 +61,9 @@ CATEGORIES = {
             ("cable-sizing-calculator.html", "Cable Sizing (IEC/NEC)", "🔌", "IEC/NEC ampacity & derating"),
             ("voltage-drop-calculator.html", "Voltage Drop Calculator", "📉", "NEC 3% & 5% copper/aluminum run"),
             ("ohms-law-calculator.html", "Ohm's Law Calculator", "⚡", "Voltage, current, power & ohms"),
+            ("power-factor-calculator.html", "Power Factor (kW to kVAR)", "⚡", "Capacitor bank rating & line current savings"),
+            ("parallel-resistor-calculator.html", "Parallel Resistor (Req)", "⚡", "Equivalent resistance & branch current divider"),
+            ("battery-life-calculator.html", "Battery Life & Runtime", "🔋", "Peukert's law discharge & C-rate runtime"),
             ("resistor-color-code-calculator.html", "Resistor Color Code", "🎨", "4 & 5-band axial resistance"),
         ]
     },
@@ -72,6 +75,7 @@ CATEGORIES = {
             ("solar-panel-sizing-calculator.html", "Solar Panel & Array Sizing", "☀️", "Array watts & peak sun hours"),
             ("solar-battery-bank-calculator.html", "Solar Battery Bank Sizing", "🔋", "Storage Ah & kWh for autonomy"),
             ("solar-inverter-sizing-calculator.html", "Solar Inverter Sizing", "⚡", "Continuous kVA & surge capacity"),
+            ("pv-string-sizing-calculator.html", "PV String Sizing (NEC 690)", "☀️", "MPPT voltage limits & module temperature"),
             ("ev-charging-time-calculator.html", "EV Charging Time & Power", "🔌", "Levels 1, 2 & DC Fast charge time"),
         ]
     },
@@ -80,6 +84,8 @@ CATEGORIES = {
         "icon": "⚙️",
         "hub": "mechanical.html",
         "tools": [
+            ("bolt-torque-calculator.html", "Bolt Torque & Preload", "🔩", "Tightening torque & clamp load preload"),
+            ("bearing-life-calculator.html", "Bearing Life (ISO 281)", "⚙️", "L10 & L10h rating life in revs & hours"),
             ("pump-head-calculator.html", "Pump Head (TDH & Flow)", "🌊", "Total dynamic head & motor BHP"),
             ("gear-ratio-calculator.html", "Gear Ratio & Speed", "⚙️", "Velocity reduction & torque ratio"),
             ("cooling-load-calculator.html", "Cooling Load (HVAC) Sizing", "❄️", "Sensible & latent heat in BTU/hr"),
@@ -116,6 +122,8 @@ CATEGORIES = {
         "icon": "🚨",
         "hub": "fire-safety.html",
         "tools": [
+            ("fire-alarm-battery-calculator.html", "Fire Alarm Battery (NFPA 72)", "🚨", "24h standby + evacuation alarm Ah sizing"),
+            ("hydrant-fire-flow-calculator.html", "Hydrant Fire Flow (NFPA 291)", "🚒", "Pitot discharge flow & rated 20 psi capacity"),
             ("fire-sprinkler-calculator.html", "Fire Sprinkler Hydraulics", "💦", "NFPA 13 head flow Q=K√P & demand"),
             ("smoke-detector-spacing-calculator.html", "Smoke Detector Spacing & Layout", "🚨", "NFPA 72 ceiling height derating"),
             ("cable-sizing-calculator.html", "Cable Sizing (IEC/NEC)", "🔌", "Fire alarm circuit conductor gauge"),
@@ -163,17 +171,17 @@ def determine_tool_cat(filename):
         return "health"
     if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72"]):
         return "finance"
-    if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity"]):
+    if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity", "power-factor", "parallel-resistor", "battery-life"]):
         return "engineering"
-    if any(k in f for k in ["solar", "charging"]):
+    if any(k in f for k in ["solar", "charging", "pv-string"]):
         return "solar"
-    if any(k in f for k in ["cooling", "pipe", "torque", "pump-head", "gear-ratio"]):
+    if any(k in f for k in ["cooling", "pipe", "torque", "pump-head", "gear-ratio", "bolt-torque", "bearing-life"]):
         return "mechanical"
     if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt"]):
         return "civil"
     if any(k in f for k in ["chemical", "chlorine"]):
         return "chemical"
-    if any(k in f for k in ["sprinkler", "smoke"]):
+    if any(k in f for k in ["sprinkler", "smoke", "fire-alarm", "hydrant"]):
         return "fire"
     if "subnet" in f:
         return "programmer"

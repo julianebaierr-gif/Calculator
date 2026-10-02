@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hydrant Fire Flow Calculator — NFPA 291 Pitot Flow &amp; Rated 20 PSI Capacity</title>
+  <meta name="description" content="Calculate fire hydrant water discharge flow (GPM) using pitot tube pressure and determine rated available fire flow at 20 psi residual pressure per NFPA 291 color coding standards.">
+  <meta name="keywords" content="hydrant fire flow calculator, nfpa 291 fire flow, pitot fire flow calculator, rated flow at 20 psi, fire hydrant gpm calculation, coefficient of discharge cd, hydrant color code nfpa">
+  <link rel="canonical" href="https://calchub.org/hydrant-fire-flow-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "NFPA 291 Fire Hydrant Flow & Rating Calculator",
+        "operatingSystem": "All",
+        "applicationCategory": "EngineeringApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Calculates Pitot discharge flow, rated available fire flow at 20 psi residual pressure, and NFPA 291 color classification."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How is fire hydrant discharge flow calculated from pitot tube pressure?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Hydrant discharge flow rate is calculated per NFPA 291 using the orifice equation: Q = 29.83 × c_d × d² × √P, where Q is discharge flow in gallons per minute (GPM), c_d is the dimensionless coefficient of discharge (0.90 for smooth rounded outlets, 0.80 for square outlets, 0.70 for projecting inside), d is the internal diameter of the hydrant butt in inches, and P is the velocity Pitot pressure measured at the center of the water stream in pounds per square inch (PSI)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the NFPA 291 formula for rated fire flow at 20 PSI residual pressure?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The available flow at 20 psi residual pressure is determined using the Hazen-Williams pressure extrapolation formula: Q_R = Q_F × [ (P_S - 20) / (P_S - P_R) ]^0.54, where Q_R is rated fire flow at 20 psi (GPM), Q_F is actual total flow measured during the flow test (GPM), P_S is the static pressure before opening hydrants (PSI), and P_R is residual pressure measured at the test gauge while flowing (PSI)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the NFPA 291 hydrant bonnet color code classifications?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "NFPA 291 establishes four standardized color classifications based on rated flow at 20 psi: Class AA (Light Blue): 1,500 GPM or greater; Class A (Green): 1,000 to 1,499 GPM; Class B (Orange): 500 to 999 GPM; Class C (Red): Less than 500 GPM. This enables fire attack crews to instantly gauge water supply capacity upon arrival."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why is 20 PSI universally considered the minimum residual pressure in municipal water mains?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Water utilities and fire departments enforce 20 psi residual pressure to prevent cavitation in fire department pumper suction impellers and, crucially, to maintain positive pressure against groundwater infiltration. If pressure drops below 20 psi (or approaches negative pressure), contaminated groundwater can siphon through pipe joints into the municipal drinking water supply (back-siphonage)."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="cat-theme-fire">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main Navigation">
+        <div class="nav-row">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="engineering.html" class="nav-link">⚡ Electrical</a>
+          <a href="mechanical.html" class="nav-link">⚙️ Mechanical</a>
+          <a href="civil.html" class="nav-link">🏗️ Civil</a>
+          <a href="finance.html" class="nav-link">🏦 Finance</a>
+          <a href="math.html" class="nav-link">🔢 Math</a>
+          <a href="chemical.html" class="nav-link">🧪 Chemical</a>
+        </div>
+        <div class="nav-row">
+          <a href="health.html" class="nav-link">⚖️ Health</a>
+          <a href="solar-energy.html" class="nav-link">☀️ Solar</a>
+          <a href="fire-safety.html" class="nav-link active">🚨 Fire &amp; Safety</a>
+          <a href="programmer.html" class="nav-link">👨‍💻 Programmer</a>
+          <a href="datetime.html" class="nav-link">📅 Date &amp; Time</a>
+          <a href="converter.html" class="nav-link">🔄 Converter</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="calc-page-header">
+    <div class="calc-page-header-inner">
+      <span class="category-tag">🚒 Water Supply Hydraulics &amp; NFPA 291</span>
+      <h1 class="calc-page-title">Hydrant Fire Flow Calculator</h1>
+      <p class="calc-page-desc">Calculate actual discharge flow from fire hydrant nozzles using pitot pressure and extrapolate available fire flow at 20 psi residual pressure per NFPA 291 flow testing standards.</p>
+    </div>
+  </div>
+
+  <div class="layout-container" style="display:flex;gap:2rem;max-width:1200px;margin:2rem auto;padding:0 1.25rem;align-items:start;">
+    
+    <main style="flex:1;min-width:0;">
+      <div class="calculator-workspace">
+        <section class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title"><span>🚒</span> Hydrant Flow Test Field Data</h2>
+            <span class="status-info">NFPA 291 Standards</span>
+          </div>
+          <form id="hydrant-form" onsubmit="return false;">
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="nozzle-diam">Flowing Nozzle Diameter</label>
+                <select id="nozzle-diam" class="form-control" onchange="runHydrantCalc()">
+                  <option value="2.5" selected>2.5 Inch (Standard Hose Butt / 2.50")</option>
+                  <option value="4.5">4.5 Inch (Pumper Steamer Nozzle / 4.50")</option>
+                  <option value="4.0">4.0 Inch (Storz Connection / 4.00")</option>
+                  <option value="5.0">5.0 Inch (Large Pumper Outlet / 5.00")</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="discharge-coeff">Outlet Nozzle Discharge Coeff ($c_d$)</label>
+                <select id="discharge-coeff" class="form-control" onchange="runHydrantCalc()">
+                  <option value="0.90" selected>0.90 — Smooth, Well-Rounded Outlet</option>
+                  <option value="0.80">0.80 — Square, Sharp-Edged Outlet</option>
+                  <option value="0.70">0.70 — Projecting Inwards (Rough Barrel)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="pitot-pressure">Flowing Pitot Gauge Pressure (PSI)</label>
+                <input type="number" id="pitot-pressure" class="form-control" value="28" min="1" max="150" step="1" oninput="runHydrantCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="num-outlets">Number of Outlets Flowing</label>
+                <select id="num-outlets" class="form-control" onchange="runHydrantCalc()">
+                  <option value="1" selected>1 Nozzle Flowing</option>
+                  <option value="2">2 Nozzles Flowing Simultaneously</option>
+                  <option value="3">3 Nozzles Flowing Simultaneously</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="static-pressure">Static Pressure at Test Hydrant (PSI)</label>
+                <input type="number" id="static-pressure" class="form-control" value="65" min="25" max="250" step="1" oninput="runHydrantCalc()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="residual-pressure">Residual Pressure at Test Hydrant (PSI)</label>
+                <input type="number" id="residual-pressure" class="form-control" value="48" min="21" max="249" step="1" oninput="runHydrantCalc()">
+              </div>
+            </div>
+
+            <div class="calc-actions" style="margin-top:1.5rem;display:flex;gap:1rem;">
+              <button type="button" class="btn btn-primary" onclick="runHydrantCalc()">Calculate Fire Flow &amp; Rating</button>
+              <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Print Flow Test Certificate</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="results-card">
+          <h2 class="results-title">Hydrant Rating &amp; Capacity Classification</h2>
+          
+          <div class="primary-result-box" style="margin-bottom:1.5rem;text-align:center;padding:1.5rem;border-radius:12px;background:#F8FAFC;border:2px solid #E2E8F0;">
+            <div class="primary-result-label" style="font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em;color:#64748B;">Rated Fire Flow at 20 PSI Residual</div>
+            <div id="res-rated-flow" class="primary-result-value" style="font-size:2.5rem;font-weight:800;color:#0F172A;margin:0.25rem 0;">1,478 GPM</div>
+            <div id="res-color-class" style="font-size:1.1rem;color:#16A34A;font-weight:700;">🟢 Class A (Green Bonnet) — 1,000 to 1,499 GPM</div>
+          </div>
+
+          <div class="result-details-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Actual Flow During Test (Qf)</span>
+              <span id="res-test-flow" class="result-val" style="font-size:1.1rem;font-weight:700;color:#2563EB;">887 GPM</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Flow Rate in Liters / Min</span>
+              <span id="res-test-lpm" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">3,358 LPM</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Test Pressure Drop (Ps - Pr)</span>
+              <span id="res-press-drop" class="result-val" style="font-size:1.1rem;font-weight:700;color:#0F172A;">17 PSI Drop</span>
+            </div>
+            <div class="result-item" style="background:#FFFFFF;border:1px solid #E2E8F0;padding:0.75rem;border-radius:8px;">
+              <span class="result-label" style="display:block;font-size:0.78rem;color:#64748B;">Hazen-Williams Exponent Factor</span>
+              <span id="res-hw-factor" class="result-val" style="font-size:1.1rem;font-weight:700;color:#7C3AED;">1.666</span>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem;padding:0.85rem;border-radius:8px;background:#F0FDF4;border:1px solid #BBF7D0;font-size:0.85rem;color:#166534;">
+            <strong>💦 Water Supply Analysis:</strong> Verify that available water flow meets building fire demand with our <a href="fire-sprinkler-calculator.html" style="color:#166534;font-weight:700;">Fire Sprinkler Hydraulic Calculator</a> and size distribution mains with our <a href="pipe-sizing-calculator.html" style="color:#166534;font-weight:700;">Pipe Sizing Calculator</a>.
+          </div>
+        </section>
+      </div>
+
+      <article class="educational-content" style="margin-top:3rem;line-height:1.7;color:#334155;">
+        <h2>The Science of Fire Hydrant Testing &amp; Water Supply Evaluation</h2>
+        <p>Municipal water distribution grids must provide sufficient volume and pressure for both domestic consumption and emergency structural fire suppression. Evaluating a water main's fire-fighting capacity requires a dual-hydrant field test conducted under the standardized protocols of <strong>NFPA 291: Recommended Practice for Water Flow Testing and Marking of Hydrants</strong> and the <strong>American Water Works Association (AWWA M17)</strong> manual.</p>
+
+        <p>A standardized test utilizes at least two adjacent hydrants: a <strong>Test Hydrant</strong> (where static pressure $P_s$ and residual pressure $P_r$ are measured using an unflowing pressure cap) and one or more <strong>Flow Hydrants</strong> located downstream (where nozzles are opened and stream velocity is measured using a handheld Pitot tube gauge).</p>
+
+        <h2>NFPA 291 Mathematical Formulation</h2>
+
+        <h3>1. Pitot Discharge Flow Rate ($Q_F$)</h3>
+        <p>The flow velocity of water discharging from a hydrant butt is converted to volumetric discharge using Torricelli's orifice velocity law, adjusted for empirical units:</p>
+        <div class="formula-box" style="background:#F1F5F9;padding:1.25rem;border-radius:8px;margin:1.5rem 0;font-family:monospace;border-left:4px solid #2563EB;">
+          $$Q = 29.83 \cdot c_d \cdot d^2 \cdot \sqrt{P}$$
+        </div>
+        <p>Where:</p>
+        <ul>
+          <li><strong>$Q$</strong> = Discharging flow rate in gallons per minute (GPM).</li>
+          <li><strong>$c_d$</strong> = Dimensionless coefficient of discharge based on internal nozzle butt geometry (typically $0.90$ for modern hydrants with smooth rounded transitions).</li>
+          <li><strong>$d$</strong> = Measured inside diameter of the flowing nozzle outlet in inches (e.g., $2.50\text{ in}$ or $4.50\text{ in}$).</li>
+          <li><strong>$P$</strong> = Pitot velocity pressure measured in the center of the discharging stream in pounds per square inch (PSI).</li>
+        </ul>
+
+        <h3>2. Rated Fire Flow at 20 PSI Residual ($Q_R$)</h3>
+        <p>Because opening hydrants causes a pressure drop in the distribution network due to pipe friction, municipal fire flow capacity is universally standardized to the flow available at a minimum residual pressure of <strong>20 PSI</strong>. This is extrapolated using the Hazen-Williams friction loss relationship:</p>
+        <div class="formula-box" style="background:#F1F5F9;padding:1.25rem;border-radius:8px;margin:1.5rem 0;font-family:monospace;border-left:4px solid #059669;">
+          $$Q_R = Q_F \cdot \left( \frac{P_S - 20}{P_S - P_R} \right)^{0.54}$$
+        </div>
+        <p>Where:</p>
+        <ul>
+          <li><strong>$Q_R$</strong> = Rated available fire flow at $20\text{ PSI}$ residual pressure (GPM).</li>
+          <li><strong>$Q_F$</strong> = Total actual flow measured across all discharging outlets during the field test (GPM).</li>
+          <li><strong>$P_S$</strong> = Static pressure recorded at the test hydrant with no hydrants flowing (PSI).</li>
+          <li><strong>$P_R$</strong> = Residual pressure recorded at the test hydrant with all test hydrants flowing (PSI).</li>
+          <li><strong>$0.54$</strong> = Empirical exponent derived from the Hazen-Williams friction loss formula ($h_f \propto Q^{1.852}$, where $\frac{1}{1.852} \approx 0.54$).</li>
+        </ul>
+
+        <h2>NFPA 291 Hydrant Color Coding Classification</h2>
+        <p>To assist responding fire company commanders in making split-second tactical decisions regarding apparatus positioning and hose line deployments, NFPA 291 establishes a standardized color code for hydrant bonnets and nozzle caps:</p>
+
+        <div class="table-responsive" style="overflow-x:auto;margin:1.5rem 0;">
+          <table class="table-custom" style="width:100%;border-collapse:collapse;border:1px solid #E2E8F0;">
+            <thead style="background:#F8FAFC;">
+              <tr style="border-bottom:2px solid #CBD5E1;text-align:left;">
+                <th style="padding:0.75rem;">NFPA Class</th>
+                <th style="padding:0.75rem;">Bonnet &amp; Cap Color</th>
+                <th style="padding:0.75rem;">Rated Capacity (at 20 PSI)</th>
+                <th style="padding:0.75rem;">Fireground Tactical Capability</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:0.75rem;"><strong>Class AA</strong></td>
+                <td style="padding:0.75rem;"><span style="color:#0284C7;font-weight:700;">🔵 Light Blue</span></td>
+                <td style="padding:0.75rem;">1,500 GPM or greater</td>
+                <td style="padding:0.75rem;">Can supply master streams, multiple pumpers, and large commercial fires.</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;background:#F8FAFC;">
+                <td style="padding:0.75rem;"><strong>Class A</strong></td>
+                <td style="padding:0.75rem;"><span style="color:#16A34A;font-weight:700;">🟢 Green</span></td>
+                <td style="padding:0.75rem;">1,000 – 1,499 GPM</td>
+                <td style="padding:0.75rem;">Standard commercial and residential structural fire attack supply.</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:0.75rem;"><strong>Class B</strong></td>
+                <td style="padding:0.75rem;"><span style="color:#EA580C;font-weight:700;">🟠 Orange</span></td>
+                <td style="padding:0.75rem;">500 – 999 GPM</td>
+                <td style="padding:0.75rem;">Single pumper supply; moderate residential occupancy protection.</td>
+              </tr>
+              <tr>
+                <td style="padding:0.75rem;"><strong>Class C</strong></td>
+                <td style="padding:0.75rem;"><span style="color:#DC2626;font-weight:700;">🔴 Red</span></td>
+                <td style="padding:0.75rem;">Less than 500 GPM</td>
+                <td style="padding:0.75rem;">Deficient water supply; risk of pulling pumper into cavitation or pulling vacuum.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="worked-example-card" style="background:#F8FAFC;border:2px solid #E2E8F0;border-radius:12px;padding:1.5rem;margin:2rem 0;">
+          <h3 style="margin-top:0;color:#0F172A;display:flex;align-items:center;gap:0.5rem;">
+            <span>📋</span> Real-World Engineering Worked Example: Warehouse Fire Flow Test
+          </h3>
+          <p><strong>Scenario:</strong> A fire protection engineer conducts a flow test for a proposed warehouse sprinkler system connection. Field gauge observations:</p>
+          <ul>
+            <li>Static pressure before flow: $P_S = 72\text{ PSI}$</li>
+            <li>Residual pressure while flowing: $P_R = 54\text{ PSI}$</li>
+            <li>Flow hydrant outlet: One $2.5\text{ inch}$ butt with rounded inlet ($c_d = 0.90$)</li>
+            <li>Measured pitot velocity pressure: $P = 32\text{ PSI}$</li>
+          </ul>
+
+          <ol style="padding-left:1.25rem;line-height:1.8;">
+            <li><strong>Calculate Test Discharge Flow ($Q_F$):</strong>
+              $$Q_F = 29.83 \times 0.90 \times (2.5)^2 \times \sqrt{32} = 29.83 \times 0.90 \times 6.25 \times 5.6569 \approx 949\text{ GPM}$$
+            </li>
+            <li><strong>Calculate Pressure Terms:</strong>
+              $$P_S - 20 = 72 - 20 = 52\text{ PSI}$$
+              $$P_S - P_R = 72 - 54 = 18\text{ PSI}$$
+            </li>
+            <li><strong>Compute Extrapolation Ratio:</strong>
+              $$\left( \frac{52}{18} \right)^{0.54} = (2.8889)^{0.54} \approx 1.767$$
+            </li>
+            <li><strong>Calculate Rated Fire Flow at 20 PSI ($Q_R$):</strong>
+              $$Q_R = 949\text{ GPM} \times 1.767 \approx 1,677\text{ GPM}$$
+            </li>
+            <li><strong>NFPA 291 Classification:</strong> Since $Q_R = 1,677\text{ GPM} \ge 1,500\text{ GPM}$, the hydrant is classified as <strong>Class AA</strong> and painted with a <strong>Light Blue</strong> bonnet.</li>
+          </ol>
+        </div>
+
+        
+        <h2>Hazen-Williams Hydraulic Friction &amp; Water Distribution C-Factors</h2>
+        <p>The mathematical foundation of the NFPA 291 fire flow rating equation ($Q_R \propto \Delta P^{0.54}$) is directly rooted in the classical <strong>Hazen-Williams hydraulic formula</strong> for pressurized water flow in closed municipal pipelines. In fluid dynamics, friction head loss ($h_f$) in a municipal distribution water main is modeled as:</p>
+        <div class="formula-box" style="background:#F1F5F9;padding:1.25rem;border-radius:8px;margin:1.5rem 0;font-family:monospace;border-left:4px solid #2563EB;">
+          $$h_f = rac{10.67 \cdot L \cdot Q^{1.852}}{C^{1.852} \cdot D^{4.87}}$$
+        </div>
+        <p>Where $L$ is pipeline length in feet, $D$ is pipe inside diameter in feet, $Q$ is volumetric flow rate in cubic feet per second, and $C$ is the Hazen-Williams roughness coefficient. Inverting the friction relationship reveals that flow is proportional to pressure drop raised to the exponent $rac{1}{1.852} pprox 0.54$.</p>
+
+        <p>The roughness coefficient $C$ dramatically affects available fire flow in aged municipal grids. Unlined cast iron water mains installed in older metropolitan centers in the early 20th century suffer severe internal tuberculation, dropping their hydraulic $C$-factor from an initial 130 down to 80 or lower. This tuberculation increases pipeline friction resistance by over 300%, severely restricting water delivery during large commercial fires. Conversely, modern cement-mortar lined ductile iron pipe (CMLDI) and molecularly oriented PVC pipe (AWWA C900) maintain a pristine $C$-factor between 140 and 150 over decades of service, ensuring maximum available GPM at minimal pressure drop.</p>
+
+        <h2>Multi-Hydrant Simultaneous Group Testing Protocols</h2>
+        <p>In large industrial parks, airports, and commercial warehousing districts, structural fire protection design requires available fire flows exceeding 2,500 to 5,000 GPM. A single 2.5-inch hydrant butt flowing at standard municipal pressure cannot deliver this volume without exceeding hazardous outlet velocities. Under NFPA 291 Chapter 4, test engineers conduct <strong>Group Hydrant Flow Tests</strong>:</p>
+        <ul>
+          <li><strong>Gauge Hydrant (Residual Hydrant):</strong> Placed centrally between the water main supply source and the discharging hydrants. Static pressure ($P_S$) and residual pressure ($P_R$) are continuously monitored here.</li>
+          <li><strong>Flow Hydrants 1, 2, and 3:</strong> Multiple surrounding hydrants are opened sequentially. Stream velocity pressure is measured at each active outlet butt using calibrated Pitot tubes.</li>
+          <li><strong>Flow Summation:</strong> The total test flow is calculated by summing all individual discharges: $Q_F = \sum Q_i = Q_1 + Q_2 + Q_3$. The aggregated group flow is then extrapolated to 20 PSI residual using the standard NFPA 291 formula, verifying whether the water distribution grid can support large fire attack apparatus and multiple building riser connections simultaneously.</li>
+        </ul>
+
+
+        <h2>Frequently Asked Technical Questions</h2>
+        <div class="faq-accordion" style="margin-top:1.5rem;">
+          <div class="faq-item" style="border-bottom:1px solid #E2E8F0;padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">How far should the Pitot blade tip be held from the hydrant orifice?</h4>
+            <p style="margin:0;color:#64748B;">Per NFPA 291 Section 4.3.2, the opening of the Pitot tube orifice should be held exactly in the center of the discharging stream, at a distance of one-half the nozzle diameter (approximately 1.25 inches for a 2.5-inch nozzle) away from the face of the outlet butt.</p>
+          </div>
+          <div class="faq-item" style="border-bottom:1px solid #E2E8F0;padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">What is the minimum pressure drop required for an accurate flow test?</h4>
+            <p style="margin:0;color:#64748B;">NFPA 291 recommends inducing a residual pressure drop of at least 25% of static pressure (or at least 10 to 15 PSI drop). If the pressure drop is too small (&lt; 5 PSI), minor gauge reading errors become magnified exponentially when extrapolated down to 20 PSI, producing inaccurate capacity ratings.</p>
+          </div>
+          <div class="faq-item" style="border-bottom:1px solid #E2E8F0;padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">Can multiple nozzles or multiple hydrants be flowed at once?</h4>
+            <p style="margin:0;color:#64748B;">Yes. In strong municipal grids with large mains (12-inch or larger), opening a single 2.5-inch nozzle may not produce an adequate pressure drop. In such cases, test crews open the 4.5-inch pumper steamer nozzle or flow two hydrants simultaneously. The test flow Q_F is simply the mathematical sum of the individual nozzle discharges.</p>
+          </div>
+          <div class="faq-item" style="padding:1rem 0;">
+            <h4 style="margin:0 0 0.5rem 0;color:#0F172A;font-size:1.05rem;">Why is a diffuser used during hydrant flow tests?</h4>
+            <p style="margin:0;color:#64748B;">Unrestricted water discharge at 1,000+ GPM has tremendous kinetic energy capable of tearing up asphalt, washing out landscaping, and propelling dangerous gravel projectiles. Hose monsters and stream diffusers disperse the high-velocity jet into an aerated spray while incorporating built-in Pitot gauges for accurate measurement.</p>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <aside class="sidebar" style="width:300px;flex-shrink:0;">
+      <div class="sidebar-card" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;">
+        <h3 style="font-size:1rem;margin-top:0;color:#0F172A;">🚒 Water &amp; Fire Safety Tools</h3>
+        <ul style="list-style:none;padding:0;margin:0;font-size:0.88rem;line-height:2;">
+          <li><a href="hydrant-fire-flow-calculator.html" style="font-weight:700;color:#DC2626;">🚒 Hydrant Fire Flow (NFPA 291)</a></li>
+          <li><a href="fire-alarm-battery-calculator.html" style="color:#475569;">🚨 Fire Alarm Battery (NFPA 72)</a></li>
+          <li><a href="fire-sprinkler-calculator.html" style="color:#475569;">💦 Fire Sprinkler Hydraulics</a></li>
+          <li><a href="pipe-sizing-calculator.html" style="color:#475569;">🚰 Pipe Sizing &amp; Flow</a></li>
+          <li><a href="pump-head-calculator.html" style="color:#475569;">🌊 Pump Head (TDH)</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:1.25rem;">
+        <h3 style="font-size:1rem;margin-top:0;color:#0F172A;">⚡ Civil &amp; Fluid Engineering</h3>
+        <ul style="list-style:none;padding:0;margin:0;font-size:0.88rem;line-height:2;">
+          <li><a href="chlorine-dosing-calculator.html" style="color:#475569;">💧 Chlorine Dosing Calculator</a></li>
+          <li><a href="chemical-dosing-calculator.html" style="color:#475569;">🧪 Chemical Dosing Rate</a></li>
+          <li><a href="unit-converter.html" style="color:#475569;">🔄 Universal Unit Converter</a></li>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer class="site-footer" style="background:#0F172A;color:#94A3B8;padding:3rem 1.25rem;margin-top:4rem;">
+    <div style="max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:2rem;">
+      <div>
+        <div style="font-size:1.25rem;font-weight:800;color:#FFFFFF;margin-bottom:0.5rem;">CalcHub</div>
+        <p style="font-size:0.88rem;max-width:320px;">Open-source engineering, financial, and scientific computational tools. 100% verified mathematics.</p>
+      </div>
+      <div>
+        <div style="font-weight:700;color:#FFFFFF;margin-bottom:0.75rem;">Hydraulic Testing Standards</div>
+        <div style="font-size:0.85rem;line-height:2;">
+          NFPA 291 Fire Flow Testing &amp; Marking<br>
+          AWWA M17 Installation, Field Testing &amp; Maintenance<br>
+          NFPA 13 Installation of Sprinkler Systems
+        </div>
+      </div>
+    </div>
+    <div style="max-width:1200px;margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid #1E293B;text-align:center;font-size:0.82rem;">
+      &copy; 2026 CalcHub. Professional Municipal &amp; Fire Hydraulics Suite.
+    </div>
+  </footer>
+
+  <script>
+    function runHydrantCalc() {
+      const d = parseFloat(document.getElementById('nozzle-diam').value) || 2.5;
+      const cd = parseFloat(document.getElementById('discharge-coeff').value) || 0.90;
+      const pitotP = Math.max(1, parseFloat(document.getElementById('pitot-pressure').value) || 28);
+      const numOutlets = parseInt(document.getElementById('num-outlets').value) || 1;
+      const ps = Math.max(25, parseFloat(document.getElementById('static-pressure').value) || 65);
+      const pr = Math.max(21, Math.min(ps - 1, parseFloat(document.getElementById('residual-pressure').value) || 48));
+
+      // Single outlet flow: Q = 29.83 * cd * d^2 * sqrt(P)
+      const qSingle = 29.83 * cd * (d * d) * Math.sqrt(pitotP);
+      const qTotalFlow = qSingle * numOutlets;
+      const qTotalLpm = qTotalFlow * 3.78541;
+
+      // Pressure drop
+      const deltaP = ps - pr;
+      const targetDeltaP = ps - 20;
+
+      // Hazen-Williams rating: Q_R = Q_F * ( (Ps - 20) / (Ps - Pr) )^0.54
+      let ratedFlow = 0;
+      let hwFactor = 1.0;
+      if (deltaP > 0) {
+        hwFactor = Math.pow(targetDeltaP / deltaP, 0.54);
+        ratedFlow = qTotalFlow * hwFactor;
+      }
+
+      // Color classification
+      let colorClass = '';
+      if (ratedFlow >= 1500) {
+        colorClass = '\uD83D\uDD35 Class AA (Light Blue Bonnet) \u2014 \u2265 1,500 GPM';
+      } else if (ratedFlow >= 1000) {
+        colorClass = '\uD83D\uDFE2 Class A (Green Bonnet) \u2014 1,000 to 1,499 GPM';
+      } else if (ratedFlow >= 500) {
+        colorClass = '\uD83D\uDFE0 Class B (Orange Bonnet) \u2014 500 to 999 GPM';
+      } else {
+        colorClass = '\uD83D\uDD34 Class C (Red Bonnet) \u2014 < 500 GPM (Deficient)';
+      }
+
+      document.getElementById('res-rated-flow').textContent = Math.round(ratedFlow).toLocaleString() + ' GPM';
+      document.getElementById('res-color-class').textContent = colorClass;
+      document.getElementById('res-test-flow').textContent = Math.round(qTotalFlow).toLocaleString() + ' GPM (' + numOutlets + ' outlet' + (numOutlets > 1 ? 's' : '') + ')';
+      document.getElementById('res-test-lpm').textContent = Math.round(qTotalLpm).toLocaleString() + ' LPM';
+      document.getElementById('res-press-drop').textContent = deltaP.toFixed(0) + ' PSI Drop';
+      document.getElementById('res-hw-factor').textContent = hwFactor.toFixed(3);
+    }
+
+    window.addEventListener('DOMContentLoaded', runHydrantCalc);
+  </script>
+</body>
+</html>
