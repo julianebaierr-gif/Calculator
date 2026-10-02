@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceleration Calculator | Kinematic Motion & SUVAT Solver</title>
+  <meta name="description" content="Calculate uniform linear acceleration, final velocity, initial speed, displacement, travel time, and g-force equivalents using Newtonian SUVAT kinematics.">
+  <link rel="canonical" href="https://calchub.cloud/acceleration-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Acceleration Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Computes linear acceleration, final velocity, displacement, elapsed transit time, and gravitational force load factors based on standard classical kinematic equations.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the primary formula for calculating uniform acceleration?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The primary kinematic formula for uniform linear acceleration is a = (v - u) / t, where 'a' represents acceleration in meters per second squared (m/s²), 'v' is final velocity in m/s, 'u' is initial velocity in m/s, and 't' is time interval in seconds."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does acceleration convert into standard Earth G-forces (g)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Standard gravitational acceleration at Earth's surface (1g) equals exactly 9.80665 m/s² (32.174 ft/s²). To convert linear acceleration into G-force load, divide the calculated acceleration value by 9.80665 m/s²."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between negative acceleration and deceleration?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Acceleration is a directional vector quantity. 'Negative acceleration' mathematically denotes acceleration pointing in the negative coordinate direction. 'Deceleration' specifically refers to a reduction in absolute speed, which occurs whenever the acceleration vector opposes the current velocity vector."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which kinematic equation should be used if elapsed time is unknown?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "When elapsed time 't' is unknown, the Torricelli kinematic equation v² = u² + 2as should be used, enabling direct calculation of acceleration as a = (v² - u²) / (2s), where 's' is total linear displacement."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="logo">CalcHub</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="physics.html" class="active">Physics</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="engineering.html">Electrical</a>
+        <a href="civil.html">Civil</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <div class="content-wrapper">
+      <div class="calculator-container">
+        <h1>Acceleration Calculator</h1>
+        <p class="lead-text">Compute uniform acceleration, final velocity, elapsed travel time, braking distance, and peak g-force load using classical Newtonian SUVAT kinematics.</p>
+
+        <div class="calc-card">
+          <div class="form-group">
+            <label for="calcMode">Calculation Target</label>
+            <select id="calcMode" class="form-control">
+              <option value="find_a">Solve for Acceleration (a) [Given u, v, t]</option>
+              <option value="find_a_dist">Solve for Acceleration (a) [Given u, v, s]</option>
+              <option value="find_v">Solve for Final Velocity (v) [Given u, a, t]</option>
+              <option value="find_s">Solve for Distance / Displacement (s) [Given u, a, t]</option>
+              <option value="find_t">Solve for Time (t) [Given u, v, a]</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half" id="grp_u">
+              <label for="val_u">Initial Velocity (u)</label>
+              <div class="input-with-unit">
+                <input type="number" id="val_u" class="form-control" value="0" step="any">
+                <select id="unit_u" class="unit-select">
+                  <option value="mps">m/s</option>
+                  <option value="kph">km/h</option>
+                  <option value="mph">mph</option>
+                  <option value="fps">ft/s</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group col-half" id="grp_v">
+              <label for="val_v">Final Velocity (v)</label>
+              <div class="input-with-unit">
+                <input type="number" id="val_v" class="form-control" value="27.778" step="any">
+                <select id="unit_v" class="unit-select">
+                  <option value="mps" selected>m/s (100 km/h)</option>
+                  <option value="kph">km/h</option>
+                  <option value="mph">mph</option>
+                  <option value="fps">ft/s</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half" id="grp_a" style="display:none;">
+              <label for="val_a">Acceleration (a)</label>
+              <div class="input-with-unit">
+                <input type="number" id="val_a" class="form-control" value="3.5" step="any">
+                <select id="unit_a" class="unit-select">
+                  <option value="mps2">m/s²</option>
+                  <option value="fps2">ft/s²</option>
+                  <option value="g">g (standard)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group col-half" id="grp_t">
+              <label for="val_t">Elapsed Time (t)</label>
+              <div class="input-with-unit">
+                <input type="number" id="val_t" class="form-control" value="7.5" step="any" min="0.0001">
+                <select id="unit_t" class="unit-select">
+                  <option value="s">Seconds (s)</option>
+                  <option value="min">Minutes</option>
+                  <option value="h">Hours</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group col-half" id="grp_s" style="display:none;">
+              <label for="val_s">Displacement / Distance (s)</label>
+              <div class="input-with-unit">
+                <input type="number" id="val_s" class="form-control" value="100" step="any">
+                <select id="unit_s" class="unit-select">
+                  <option value="m">Meters (m)</option>
+                  <option value="km">Kilometers (km)</option>
+                  <option value="ft">Feet (ft)</option>
+                  <option value="mi">Miles</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button type="button" id="calcBtn" class="btn btn-primary">Calculate Motion</button>
+            <button type="button" id="resetBtn" class="btn btn-secondary">Reset Defaults</button>
+          </div>
+
+          <div id="resultsPanel" class="results-panel">
+            <div class="result-box primary-result">
+              <div class="result-label" id="primaryLabel">Calculated Acceleration (a)</div>
+              <div class="result-value" id="primaryValue">3.704 m/s²</div>
+              <div class="result-sub" id="primarySub">Equivalent to 0.378 g load factor</div>
+            </div>
+
+            <div class="result-grid">
+              <div class="result-item">
+                <span class="sub-label">Displacement / Distance (s)</span>
+                <span class="sub-value" id="secDistance">104.17 m (341.8 ft)</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Average Velocity (v_avg)</span>
+                <span class="sub-value" id="secAvgVel">13.89 m/s (50.0 km/h)</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Elapsed Transit Time (t)</span>
+                <span class="sub-value" id="secTime">7.50 seconds</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Specific Kinetic Energy Change</span>
+                <span class="sub-value" id="secEnergy">385.8 J/kg</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>1. Fundamentals of Classical Linear Acceleration</h2>
+          <p>In classical Newtonian mechanics, acceleration describes the instantaneous or time-averaged rate of change of an object's velocity vector with respect to time. Because velocity comprises both magnitude (speed) and directional orientation, acceleration can arise through increasing linear speed, decreasing linear speed (commonly referred to as braking or deceleration), or continuously redirecting the trajectory path as observed in orbital and circular motions.</p>
+          <p>For one-dimensional rectilinear translation under the assumption of a constant (uniform) net force, the average acceleration \(\bar{a}\) over an elapsed time interval \(\Delta t = t_2 - t_1\) is defined by the fundamental differential quotient:</p>
+          <div class="math-block">
+            $$a = \frac{\Delta v}{\Delta t} = \frac{v - u}{t}$$
+          </div>
+          <p>Where \(u\) is initial translational velocity in meters per second (\(\text{m/s}\)), \(v\) is final translational velocity in \(\text{m/s}\), and \(t\) is total elapsed duration in seconds (\(\text{s}\)). The standard Système International (SI) derived unit of linear acceleration is meters per second squared (\(\text{m/s}^2\)), which directly represents the velocity change in meters per second accumulated during every single second of sustained motion.</p>
+
+          <h2>2. The Core SUVAT Kinematic Equations</h2>
+          <p>When an engineering system undergoes constant linear acceleration—such as an aircraft accelerating down an uninclined runway, a high-speed passenger train decelerating during regenerative service braking, or an elevator carriage rising between skyscraper floors—the motion is completely governed by five interconnected variables collectively known by the British acronym <strong>SUVAT</strong>:</p>
+          <ul>
+            <li><strong>s</strong> = Linear displacement or net distance traversed (\(\text{m}\))</li>
+            <li><strong>u</strong> = Initial translational velocity (\(\text{m/s}\))</li>
+            <li><strong>v</strong> = Final translational velocity (\(\text{m/s}\))</li>
+            <li><strong>a</strong> = Uniform linear acceleration (\(\text{m/s}^2\))</li>
+            <li><strong>t</strong> = Total elapsed travel duration (\(\text{s}\))</li>
+          </ul>
+          <p>By algebraically integrating Newton's second law of motion under constant boundary conditions, physicists and mechanical engineers utilize four invariant kinematic formulations:</p>
+          <div class="math-block">
+            $$v = u + at$$
+          </div>
+          <div class="math-block">
+            $$s = ut + \frac{1}{2}at^2$$
+          </div>
+          <div class="math-block">
+            $$v^2 = u^2 + 2as$$
+          </div>
+          <div class="math-block">
+            $$s = \left(\frac{u + v}{2}\right) t$$
+          </div>
+          <p>In real-world engineering projects where tracking continuous temporal position is unfeasible—such as forensic automobile crash reconstruction or structural crash-cushion design—the Torricelli equation \(v^2 = u^2 + 2as\) eliminates the time parameter entirely, allowing engineers to isolate required deceleration rates directly from tire skid-mark measurements and residual vehicle structural deformations:</p>
+          <div class="math-block">
+            $$a = \frac{v^2 - u^2}{2s}$$
+          </div>
+
+          <h2>3. Real-World Engineering Acceleration Benchmarks</h2>
+          <p>To provide practical physical context when verifying mechanical simulations, robotic motion profiles, and automotive dynamometer testing, the reference table below outlines representative linear acceleration rates and corresponding standardized gravitational load factors (\(g = 9.80665\text{ m/s}^2\)):</p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Physical Dynamic Scenario</th>
+                <th>Acceleration (\(\text{m/s}^2\))</th>
+                <th>Equivalent G-Force (\(g\))</th>
+                <th>Typical Operational Context</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Commercial High-Speed Rail (TGV / Shinkansen)</td>
+                <td>0.5 – 0.8</td>
+                <td>0.05 – 0.08 g</td>
+                <td>Passenger comfort ceiling during normal station departure</td>
+              </tr>
+              <tr>
+                <td>Modern Skyscraper Passenger Elevator</td>
+                <td>1.0 – 1.5</td>
+                <td>0.10 – 0.15 g</td>
+                <td>ISO 18738 passenger ride quality vertical comfort limit</td>
+              </tr>
+              <tr>
+                <td>Standard Family Sedan (0 to 100 km/h in 9.5 s)</td>
+                <td>2.92</td>
+                <td>0.30 g</td>
+                <td>Typical highway on-ramp merge acceleration rate</td>
+              </tr>
+              <tr>
+                <td>Heavy Road Truck Emergency Antilock Braking</td>
+                <td>5.5 – 6.5</td>
+                <td>0.56 – 0.66 g</td>
+                <td>Dry asphalt road tire-pavement friction coefficient limit</td>
+              </tr>
+              <tr>
+                <td>Earth Surface Free-Fall Gravity (\(g_0\))</td>
+                <td>9.81</td>
+                <td>1.00 g</td>
+                <td>Unresisted gravitational acceleration at sea level (45° lat)</td>
+              </tr>
+              <tr>
+                <td>Formula 1 Braking Zone (Corner Entry)</td>
+                <td>45.0 – 55.0</td>
+                <td>4.6 – 5.6 g</td>
+                <td>High aerodynamic downforce carbon-ceramic brake engagement</td>
+              </tr>
+              <tr>
+                <td>Spacecraft Ascent Stage Max-Q (Falcon 9 / Saturn V)</td>
+                <td>29.4 – 39.2</td>
+                <td>3.0 – 4.0 g</td>
+                <td>Human astronaut sustained acceleration structural safety threshold</td>
+              </tr>
+              <tr>
+                <td>Automotive Airbag Pyrotechnic Sensor Trigger</td>
+                <td>150.0 – 300.0</td>
+                <td>15 – 30 g</td>
+                <td>Micro-electro-mechanical (MEMS) crash deceleration boundary</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>4. Worked Engineering Case Study: High-Speed Train Deceleration Profile</h2>
+          <div class="worked-example-card">
+            <h3>Problem Statement</h3>
+            <p>An intercity electric passenger train travels at a cruising velocity of \(250\text{ km/h}\) (\(69.444\text{ m/s}\)). Approaching a metropolitan terminal zone, signal interlocking automation commands the braking system to bring the train smoothly to a controlled stop (\(v = 0\text{ m/s}\)) across an allowable track length of \(2,200\text{ meters}\).</p>
+            <p><strong>Required:</strong> Determine the uniform deceleration rate \(a\) (in \(\text{m/s}^2\) and \(g\)-load) and calculate the total stopping time \(t\) required to reach a complete standstill.</p>
+
+            <h3>Step-by-Step Mathematical Solution</h3>
+            <p><strong>Step 1: Convert units into standard SI metric values:</strong></p>
+            <ul>
+              <li>Initial velocity: \(u = 250\text{ km/h} \div 3.6 = 69.444\text{ m/s}\)</li>
+              <li>Final velocity: \(v = 0\text{ m/s}\)</li>
+              <li>Stopping distance: \(s = 2,200\text{ m}\)</li>
+            </ul>
+
+            <p><strong>Step 2: Calculate required deceleration rate using the Torricelli equation:</strong></p>
+            <div class="math-block">
+              $$v^2 = u^2 + 2as \implies a = \frac{v^2 - u^2}{2s}$$
+            </div>
+            <div class="math-block">
+              $$a = \frac{0^2 - (69.444)^2}{2 \times 2,200} = \frac{-4822.53}{4,400} = -1.096\text{ m/s}^2$$
+            </div>
+            <p>The negative sign confirms deceleration opposing the travel direction. The absolute deceleration magnitude is \(1.096\text{ m/s}^2\).</p>
+
+            <p><strong>Step 3: Convert deceleration into gravitational G-force load factor:</strong></p>
+            <div class="math-block">
+              $$\text{G-force} = \frac{|a|}{9.80665} = \frac{1.096}{9.80665} \approx 0.112\text{ g}$$
+            </div>
+            <p>This falls comfortably within European railway passenger ride-quality standards (maximum service deceleration \(\le 1.2\text{ m/s}^2\)).</p>
+
+            <p><strong>Step 4: Calculate total elapsed stopping duration:</strong></p>
+            <div class="math-block">
+              $$t = \frac{v - u}{a} = \frac{0 - 69.444}{-1.096} \approx 63.36\text{ seconds (1.06 minutes)}$$
+            </div>
+            <p><strong>Verification via average velocity:</strong> Average speed \(\bar{v} = (69.444 + 0)/2 = 34.722\text{ m/s}\). Total distance \(s = \bar{v} \times t = 34.722 \times 63.36 = 2,200.0\text{ m}\), confirming algebraic exactness.</p>
+          </div>
+
+          <h2>5. Critical Design Considerations and Common Pitfalls</h2>
+          <p>When applying kinematic formulations across physical and mechanical designs, engineers and students must guard against three prevalent misconceptions:</p>
+          <ul>
+            <li><strong>Non-Constant Acceleration Regimes:</strong> SUVAT relationships strictly presuppose constant linear acceleration. In internal combustion or electric motor vehicles, torque curves and aerodynamic drag (\(F_{\text{drag}} \propto v^2\)) cause instantaneous acceleration to drop significantly as velocity increases. When acceleration varies with time or speed, differential integration \(s = \int v(t)\,dt\) or numerical Euler/Runge-Kutta solvers must be deployed.</li>
+            <li><strong>Deceleration Direction Confusion:</strong> A negative sign on acceleration does not inherently indicate slowing down. If an object is moving in the negative coordinate direction (\(u < 0\)) and undergoes negative acceleration (\(a < 0\)), its absolute speed actually increases. Deceleration occurs if and only if the vector dot product \(\vec{a} \cdot \vec{v} < 0\).</li>
+            <li><strong>Aerodynamic Drag in Gravitational Free-Fall:</strong> Treating falling bodies as possessing pure \(9.81\text{ m/s}^2\) acceleration over long vertical drops introduces severe design errors. Atmospheric drag rapidly balances weight at terminal velocity \(v_t = \sqrt{2mg / (\rho C_d A)}\), at which point net linear acceleration drops identically to zero.</li>
+          </ul>
+
+          <h2>6. Frequently Asked Questions (FAQ)</h2>
+          <div class="faq-item">
+            <h3>How do you calculate acceleration without having the elapsed time?</h3>
+            <p>When time is unmeasured or variable, utilize the kinematic energy relation \(v^2 = u^2 + 2as\). Rearranging the formula yields \(a = (v^2 - u^2) / (2s)\). You only need the initial speed, final speed, and total linear distance traversed.</p>
+          </div>
+          <div class="faq-item">
+            <h3>What is the difference between average and instantaneous acceleration?</h3>
+            <p>Average acceleration measures total net velocity change across an extended macroscopic time window (\(\Delta v / \Delta t\)). Instantaneous acceleration represents the infinitesimal first time derivative of velocity (\(a = dv/dt\)) at one exact mathematical instant, measured continuously by vehicle accelerometers.</p>
+          </div>
+          <div class="faq-item">
+            <h3>Can an object have a velocity of zero while having non-zero acceleration?</h3>
+            <p>Yes. A classic example is a ball thrown vertically into the air. At the apex of its trajectory, its instantaneous velocity is precisely zero (\(v = 0\text{ m/s}\)). However, Earth's downward gravitational acceleration remains fully active at \(9.81\text{ m/s}^2\), causing the ball to immediately transition into downward motion.</p>
+          </div>
+          <div class="faq-item">
+            <h3>How do units of km/h² relate to standard m/s²?</h3>
+            <p>To convert kilometers per hour squared (\(\text{km/h}^2\)) into meters per second squared (\(\text{m/s}^2\)), divide by \(12,960\) (\(3,600^2 / 1,000\)). Conversely, to convert \(\text{m/s}^2\) into \(\text{km/h}^2\), multiply the value by \(12,960\).</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="sidebar" id="toolSidebar">
+        <!-- Injected via apply_sidebars_all.py -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, science, and technical calculation tools.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Calculation Engine
+    const toMps = (v, unit) => {
+      switch(unit) {
+        case 'kph': return v / 3.6;
+        case 'mph': return v * 0.44704;
+        case 'fps': return v * 0.3048;
+        default: return v;
+      }
+    };
+    const fromMps = (v, unit) => {
+      switch(unit) {
+        case 'kph': return v * 3.6;
+        case 'mph': return v / 0.44704;
+        case 'fps': return v / 0.3048;
+        default: return v;
+      }
+    };
+    const toSeconds = (t, unit) => {
+      switch(unit) {
+        case 'min': return t * 60;
+        case 'h': return t * 3600;
+        default: return t;
+      }
+    };
+    const toMeters = (s, unit) => {
+      switch(unit) {
+        case 'km': return s * 1000;
+        case 'ft': return s * 0.3048;
+        case 'mi': return s * 1609.344;
+        default: return s;
+      }
+    };
+    const toMps2 = (a, unit) => {
+      switch(unit) {
+        case 'fps2': return a * 0.3048;
+        case 'g': return a * 9.80665;
+        default: return a;
+      }
+    };
+
+    function updateFormVisibility() {
+      const mode = document.getElementById('calcMode').value;
+      document.getElementById('grp_u').style.display = 'block';
+      document.getElementById('grp_v').style.display = 'block';
+      document.getElementById('grp_t').style.display = 'block';
+      document.getElementById('grp_s').style.display = 'none';
+      document.getElementById('grp_a').style.display = 'none';
+
+      if (mode === 'find_a') {
+        // u, v, t visible
+      } else if (mode === 'find_a_dist') {
+        document.getElementById('grp_t').style.display = 'none';
+        document.getElementById('grp_s').style.display = 'block';
+      } else if (mode === 'find_v') {
+        document.getElementById('grp_v').style.display = 'none';
+        document.getElementById('grp_a').style.display = 'block';
+      } else if (mode === 'find_s') {
+        document.getElementById('grp_v').style.display = 'none';
+        document.getElementById('grp_a').style.display = 'block';
+      } else if (mode === 'find_t') {
+        document.getElementById('grp_t').style.display = 'none';
+        document.getElementById('grp_a').style.display = 'block';
+      }
+      calculate();
+    }
+
+    function calculate() {
+      const mode = document.getElementById('calcMode').value;
+      const u = toMps(parseFloat(document.getElementById('val_u').value) || 0, document.getElementById('unit_u').value);
+      const v = toMps(parseFloat(document.getElementById('val_v').value) || 0, document.getElementById('unit_v').value);
+      const t = toSeconds(parseFloat(document.getElementById('val_t').value) || 1, document.getElementById('unit_t').value);
+      const s = toMeters(parseFloat(document.getElementById('val_s').value) || 1, document.getElementById('unit_s').value);
+      const a = toMps2(parseFloat(document.getElementById('val_a').value) || 0, document.getElementById('unit_a').value);
+
+      let calc_a = 0, calc_v = 0, calc_s = 0, calc_t = 0;
+
+      if (mode === 'find_a') {
+        calc_a = (v - u) / (t || 0.0001);
+        calc_v = v;
+        calc_t = t;
+        calc_s = u * t + 0.5 * calc_a * t * t;
+      } else if (mode === 'find_a_dist') {
+        calc_a = (v * v - u * u) / (2 * (s || 0.0001));
+        calc_v = v;
+        calc_s = s;
+        calc_t = Math.abs(calc_a) > 1e-6 ? (v - u) / calc_a : (2 * s) / (u + v || 0.0001);
+      } else if (mode === 'find_v') {
+        calc_a = a;
+        calc_t = t;
+        calc_v = u + a * t;
+        calc_s = u * t + 0.5 * a * t * t;
+      } else if (mode === 'find_s') {
+        calc_a = a;
+        calc_t = t;
+        calc_v = u + a * t;
+        calc_s = u * t + 0.5 * a * t * t;
+      } else if (mode === 'find_t') {
+        calc_a = a;
+        calc_v = v;
+        calc_t = Math.abs(a) > 1e-6 ? (v - u) / a : 0;
+        calc_s = u * calc_t + 0.5 * a * calc_t * calc_t;
+      }
+
+      const pLabel = document.getElementById('primaryLabel');
+      const pVal = document.getElementById('primaryValue');
+      const pSub = document.getElementById('primarySub');
+
+      if (mode === 'find_a' || mode === 'find_a_dist') {
+        pLabel.textContent = "Calculated Acceleration (a)";
+        pVal.textContent = calc_a.toFixed(3) + " m/s² (" + (calc_a * 3.28084).toFixed(3) + " ft/s²)";
+        pSub.textContent = "Gravitational Load Equivalent: " + (calc_a / 9.80665).toFixed(3) + " g";
+      } else if (mode === 'find_v') {
+        pLabel.textContent = "Calculated Final Velocity (v)";
+        pVal.textContent = calc_v.toFixed(2) + " m/s (" + (calc_v * 3.6).toFixed(1) + " km/h)";
+        pSub.textContent = "Equivalent to " + (calc_v * 2.23694).toFixed(1) + " mph (" + (calc_v * 3.28084).toFixed(1) + " ft/s)";
+      } else if (mode === 'find_s') {
+        pLabel.textContent = "Calculated Displacement / Distance (s)";
+        pVal.textContent = calc_s.toFixed(2) + " m (" + (calc_s * 3.28084).toFixed(1) + " ft)";
+        pSub.textContent = "Equivalent to " + (calc_s / 1000).toFixed(3) + " km (" + (calc_s / 1609.344).toFixed(3) + " miles)";
+      } else if (mode === 'find_t') {
+        pLabel.textContent = "Calculated Transit Time (t)";
+        pVal.textContent = calc_t.toFixed(3) + " seconds";
+        pSub.textContent = "Equivalent to " + (calc_t / 60).toFixed(2) + " minutes";
+      }
+
+      document.getElementById('secDistance').textContent = calc_s.toFixed(2) + " m (" + (calc_s * 3.28084).toFixed(1) + " ft)";
+      const avgVel = (u + calc_v) / 2;
+      document.getElementById('secAvgVel').textContent = avgVel.toFixed(2) + " m/s (" + (avgVel * 3.6).toFixed(1) + " km/h)";
+      document.getElementById('secTime').textContent = calc_t.toFixed(2) + " seconds";
+      const deltaEk = 0.5 * (calc_v * calc_v - u * u);
+      document.getElementById('secEnergy').textContent = deltaEk.toFixed(1) + " J/kg";
+    }
+
+    document.getElementById('calcMode').addEventListener('change', updateFormVisibility);
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', calculate);
+      el.addEventListener('change', calculate);
+    });
+    document.getElementById('calcBtn').addEventListener('click', calculate);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('calcMode').value = 'find_a';
+      document.getElementById('val_u').value = '0';
+      document.getElementById('val_v').value = '27.778';
+      document.getElementById('val_t').value = '7.5';
+      updateFormVisibility();
+    });
+
+    window.addEventListener('DOMContentLoaded', updateFormVisibility);
+  </script>
+</body>
+</html>

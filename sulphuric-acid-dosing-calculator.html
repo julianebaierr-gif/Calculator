@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sulfuric Acid Dosing Calculator | H2SO4 Neutralization Sizer</title>
+  <meta name="description" content="Calculate sulfuric acid (H2SO4) dosing rates for water alkalinity reduction, pH neutralization, cooling tower scale control, and chemical feed pump sizing.">
+  <link rel="canonical" href="https://calchub.cloud/sulphuric-acid-dosing-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Sulfuric Acid Dosing Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates concentrated sulfuric acid (93% and 98% H2SO4) feed rates, alkalinity reduction stoichiometry, wastewater pH neutralization, and metering pump stroke parameters.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the stoichiometric ratio of sulfuric acid to water alkalinity?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The reaction between sulfuric acid and calcium bicarbonate alkalinity is: Ca(HCO3)2 + H2SO4 -> CaSO4 + 2CO2 + 2H2O. Stoichiometrically, 98.08 grams of pure H2SO4 neutralizes 100.09 grams of alkalinity as CaCO3, establishing a mass ratio of 0.980 mg/L of pure H2SO4 per 1.0 mg/L of alkalinity as CaCO3 reduced."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why is 93% (66° Baumé) sulfuric acid preferred over 98% in industrial feed systems?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "While 98% sulfuric acid is more concentrated, 93.2% H2SO4 (66° Baumé) has a significantly lower freezing point of -35°C (-31°F) compared to +3°C (+37°F) for 98% acid. In cold climates, 98% sulfuric acid freezes readily in unheated outdoor storage tanks and pipelines, whereas 93% acid remains liquid without electrical heat tracing."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does sulfuric acid dosing impact sulfate concentration and calcium sulfate scaling?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Every 1.0 mg/L of pure H2SO4 added to water contributes exactly 0.979 mg/L of sulfate ions (SO4 2-). In cooling towers and reverse osmosis reject streams, excessive sulfuric acid dosing can trigger calcium sulfate (gypsum, CaSO4·2H2O) precipitation once the solubility product exceeds [Ca2+][SO4 2-] > 5x10^-5."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What safety precautions are critical when diluting concentrated sulfuric acid?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Diluting sulfuric acid is intensely exothermic, releasing approximately 74.7 kJ/mol of heat. Operators must strictly follow the rule: ALWAYS ADD ACID TO WATER, NEVER WATER TO ACID. Adding water to concentrated acid causes violent localized boiling, explosive steam generation, and hazardous acid splattering."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="chemical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="chemical.html">Chemical &amp; Water Treatment</a> &rsaquo; 
+      <span>Sulfuric Acid Dosing Calculator</span>
+    </nav>
+
+    <h1 class="tool-title">Sulfuric Acid Dosing &amp; Neutralization Calculator</h1>
+    <p class="tool-subtitle">H₂SO₄ Alkalinity Reduction, Wastewater pH Neutralization &amp; Chemical Pump Sizing</p>
+
+    <div class="calculator-layout">
+      <!-- Calculator Core Interface -->
+      <div class="calculator-card">
+        <div class="calc-form">
+          <div class="form-group">
+            <label for="treatmentApplication">Process Application Objective</label>
+            <select id="treatmentApplication" class="form-control" onchange="updateApplicationPreset()">
+              <option value="alkalinity_trim" selected>Cooling Tower Alkalinity Trimming (M-Alkalinity Scale Prevention)</option>
+              <option value="wastewater_neut">Alkaline Wastewater Neutralization (pH 11 &rarr; pH 7.5)</option>
+              <option value="ro_pretreat">Reverse Osmosis Feed Decarbonation (LSI Suppression)</option>
+              <option value="direct_dose">Direct Target Acid Concentration (mg/L Dose)</option>
+            </select>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="waterFlowVal">Water Flow Rate</label>
+              <input type="number" id="waterFlowVal" class="form-control" value="500" step="50" min="0.1">
+            </div>
+            <div class="form-group">
+              <label for="waterFlowUnit">Flow Units</label>
+              <select id="waterFlowUnit" class="form-control">
+                <option value="gpm" selected>Gallons / Minute (GPM)</option>
+                <option value="m3h">Cubic Meters / Hour (m³/h)</option>
+                <option value="mgd">Million Gallons / Day (MGD)</option>
+                <option value="lps">Liters / Second (L/s)</option>
+                <option value="mld">Million Liters / Day (MLD)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Alkalinity Inputs -->
+          <div id="alkalinityInputsGroup" class="grid-2-col">
+            <div class="form-group">
+              <label for="initialAlkVal">Initial Alkalinity (as CaCO₃)</label>
+              <input type="number" id="initialAlkVal" class="form-control" value="220" step="5" min="0">
+              <span class="field-hint">Raw water mg/L as CaCO₃</span>
+            </div>
+            <div class="form-group">
+              <label for="targetAlkVal">Target Alkalinity (as CaCO₃)</label>
+              <input type="number" id="targetAlkVal" class="form-control" value="80" step="5" min="0">
+              <span class="field-hint">Desired treated mg/L as CaCO₃</span>
+            </div>
+          </div>
+
+          <!-- Direct Dose Input -->
+          <div id="directDoseGroup" class="form-group" style="display: none;">
+            <label for="directAcidDosePpm">Target Pure H₂SO₄ Dose (mg/L ppm)</label>
+            <input type="number" id="directAcidDosePpm" class="form-control" value="50.0" step="5.0" min="0.1">
+          </div>
+
+          <!-- Commercial Acid Grade -->
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="acidCommercialGrade">Sulfuric Acid Commercial Grade</label>
+              <select id="acidCommercialGrade" class="form-control" onchange="updateGradeProps()">
+                <option value="93" selected>66° Baumé / 93.2% Industrial (SG = 1.835, Freezes -35°C)</option>
+                <option value="98">98.0% Concentrated Technical (SG = 1.840, Freezes +3°C)</option>
+                <option value="77">60° Baumé / 77.7% (SG = 1.706, Freezes -11°C)</option>
+                <option value="50">50.0% Dilute / Battery Grade (SG = 1.395)</option>
+                <option value="custom">Custom Concentration &amp; Specific Gravity</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="acidStrengthPct">Active H₂SO₄ Concentration (% w/w)</label>
+              <input type="number" id="acidStrengthPct" class="form-control" value="93.2" step="0.5" min="10.0" max="100.0">
+            </div>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="acidSGVal">Solution Specific Gravity (SG)</label>
+              <input type="number" id="acidSGVal" class="form-control" value="1.835" step="0.005" min="1.05" max="1.90">
+            </div>
+            <div class="form-group">
+              <label for="dosingPumpMaxCapacityLph">Metering Pump Max Rating (L/h)</label>
+              <input type="number" id="dosingPumpMaxCapacityLph" class="form-control" value="50.0" step="5.0" min="0.5">
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary" onclick="calcSulfuricAcid()" style="width: 100%; margin-top: 15px;">Calculate Acid Dosing Rate</button>
+        </div>
+      </div>
+
+      <!-- Output Results Panel -->
+      <div class="results-card">
+        <div class="result-box primary-result">
+          <div class="result-label">Feed Pump Volumetric Delivery Rate</div>
+          <div id="resPumpLphVal" class="result-value">9.16 L / hour</div>
+          <div id="resPumpAlternateUnits" class="result-subtext">152.7 mL/min (2.42 GPH commercial 93.2% acid)</div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-item">
+            <span class="result-label">Active Pure H₂SO₄ Dose</span>
+            <span id="resPureAcidDose" class="result-value highlight">137.2 mg/L</span>
+            <span id="resPureAcidDoseSub" class="result-subtext">Neutralizes 140.0 mg/L Alkalinity</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Daily Commercial Acid Mass</span>
+            <span id="resDailyCommercialKg" class="result-value">403.4 kg / day</span>
+            <span id="resDailyCommercialLbs" class="result-subtext">889.4 lbs / day commercial acid</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Daily Volumetric Acid Use</span>
+            <span id="resDailyCommercialLiters" class="result-value">219.8 L / day</span>
+            <span class="result-subtext">58.1 US Gallons / day</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Pump Stroke Setting</span>
+            <span id="resPumpStrokeSetting" class="result-value">18.3%</span>
+            <span class="result-subtext">Of 50.0 L/h maximum pump rating</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Sulfate Ion (SO₄²⁻) Increase</span>
+            <span id="resSulfateIncrease" class="result-value">+134.4 mg/L</span>
+            <span class="result-subtext">Added mineral sulfate load</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Exothermic Heat Release</span>
+            <span id="resExothermicHeat" class="result-value">7.8 kW</span>
+            <span class="result-subtext">Continuous heat of mixing</span>
+          </div>
+        </div>
+
+        <div class="result-details" style="margin-top: 15px;">
+          <p><strong>Drum / Tote Storage Autonomy:</strong> <span id="resStorageAutonomy">Standard 1,000 L IBC Tote lasts 4.5 Days | 200 L Drum lasts 0.9 Days.</span></p>
+          <p><strong>Gypsum Scaling Warning:</strong> <span id="resGypsumWarning">Sulfate increase is within safe limits for non-scaling calcium sulfate operation.</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1000+ Words Engineering Body -->
+    <article class="article-body">
+      <h2>Principles of Industrial Sulfuric Acid Water Treatment</h2>
+      <p><strong>Sulfuric acid</strong> ($\text{H}_2\text{SO}_4$, hydrogen sulfate) is the world's most widely consumed commodity chemical and the primary mineral acid utilized across industrial cooling water systems, municipal drinking water decarbonation, reverse osmosis pretreatment, and wastewater neutralization facilities. Renowned for its high electronegativity, intense chemical density, and low unit production cost, sulfuric acid provides double the neutralization capacity per mole compared to monoprotic acids like hydrochloric acid ($\text{HCl}$) or nitric acid ($\text{HNO}_3$).</p>
+
+      <p>In aqueous environments, sulfuric acid acts as a <strong>diprotic strong mineral acid</strong>. Its dissociation occurs in two sequential equilibrium stages:</p>
+
+      <div class="formula-box">
+        $$\text{Stage 1: } \text{H}_2\text{SO}_4 + \text{H}_2\text{O} \longrightarrow \text{H}_3\text{O}^+ + \text{HSO}_4^- \quad (K_{a1} \gg 10^3, \text{ essentially 100% dissociated})$$
+        $$\text{Stage 2: } \text{HSO}_4^- + \text{H}_2\text{O} \rightleftharpoons \text{H}_3\text{O}^+ + \text{SO}_4^{2-} \quad (K_{a2} = 1.02 \times 10^{-2}\text{ at } 25^\circ\text{C}, pK_{a2} = 1.99)$$
+      </div>
+
+      <p>Because the second dissociation constant $K_{a2}$ is relatively large, both hydrogen protons dissociate completely at all operational pH levels encountered in industrial water treatment ($\text{pH } &gt; 3.5$). Consequently, every mole of pure $\text{H}_2\text{SO}_4$ ($98.078\text{ g/mol}$) releases exactly two equivalents of reactive hydronium ions ($\text{H}^+$), yielding an equivalent weight of:</p>
+
+      <div class="formula-box">
+        $$\text{Equivalent Weight} = \frac{\text{MW}}{z} = \frac{98.078\text{ g/mol}}{2\text{ eq/mol}} = 49.039\text{ g/equivalent}$$
+      </div>
+
+      <h2>Alkalinity Destruction Stoichiometry in Cooling Towers and RO</h2>
+      <p>In recirculating evaporative cooling towers, evaporation removes pure water vapor while leaving dissolved minerals behind. This concentrates calcium bicarbonate ($\text{Ca(HCO}_3)_2$), elevating pH and carbonate ion ($\text{CO}_3^{2-}$) levels until insoluble calcium carbonate ($\text{CaCO}_3$) scale forms on condenser tubes. To maximize cycles of concentration ($CoC$) without scaling, water treatment engineers inject sulfuric acid to selectively destroy bicarbonate alkalinity, converting it into soluble calcium sulfate ($\text{CaSO}_4$) and off-gassed carbon dioxide ($\text{CO}_2$):</p>
+
+      <div class="formula-box">
+        $$\text{Ca(HCO}_3)_2 + \text{H}_2\text{SO}_4 \longrightarrow \text{CaSO}_4 + 2\text{CO}_2\uparrow + 2\text{H}_2\text{O}$$
+      </div>
+
+      <p>Because alkalinity is universally reported in terms of calcium carbonate equivalents ($\text{mg/L as CaCO}_3$, $\text{MW} = 100.087\text{ g/mol}$), the exact stoichiometric relationship between pure sulfuric acid demand and alkalinity destruction is:</p>
+
+      <div class="formula-box">
+        $$\text{Stoichiometric Mass Ratio} = \frac{\text{MW}(\text{H}_2\text{SO}_4)}{\text{MW}(\text{CaCO}_3)} = \frac{98.078\text{ g}}{100.087\text{ g}} = 0.97993 \approx 0.980\text{ mg/L H}_2\text{SO}_4\text{ per mg/L Alk destroyed}$$
+      </div>
+
+      <p>Conversely, $1.0\text{ mg/L of pure 100% H}_2\text{SO}_4$ destroys exactly $1.0205\text{ mg/L of alkalinity as CaCO}_3$. The required pure acid dosage ($D_{\text{pure}}$ in $\text{mg/L}$) for a target alkalinity reduction ($\Delta\text{Alk} = \text{Alk}_{\text{initial}} - \text{Alk}_{\text{target}}$) is formulated as:</p>
+
+      <div class="formula-box">
+        $$D_{\text{pure}}\text{ (mg/L)} = 0.980 \times \left( \text{Alk}_{\text{initial}} - \text{Alk}_{\text{target}} \right)$$
+      </div>
+
+      <h2>Commercial Grades: 66° Baumé (93.2%) vs. 98% Concentrated Acid</h2>
+      <p>Commercial sulfuric acid is manufactured and transported in standardized grades designated either by percentage weight or by the historical <strong>Baumé hydrometer scale (°Bé)</strong>:</p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Commercial Grade Designation</th>
+              <th>Baumé Gravity (°Bé)</th>
+              <th>H₂SO₄ Concentration (% w/w)</th>
+              <th>Specific Gravity (at 15.5°C)</th>
+              <th>Freezing Point (°C / °F)</th>
+              <th>Viscosity (cP at 20°C)</th>
+              <th>Primary Industrial Application</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>66° Baumé (Technical / Industrial)</td>
+              <td>66.0 &deg;Bé</td>
+              <td>93.19 &ndash; 93.50%</td>
+              <td>1.835 kg/L</td>
+              <td>&minus;35.0 &deg;C (&minus;31 &deg;F)</td>
+              <td>23.5 cP</td>
+              <td>Water treatment benchmark (does not freeze)</td>
+            </tr>
+            <tr>
+              <td>Concentrated Technical Grade</td>
+              <td>66.3 &deg;Bé</td>
+              <td>98.00 &ndash; 98.50%</td>
+              <td>1.840 kg/L</td>
+              <td>+3.0 &deg;C (+37.4 &deg;F)</td>
+              <td>27.0 cP</td>
+              <td>Chemical synthesis, high-volume shipping</td>
+            </tr>
+            <tr>
+              <td>60° Baumé (Glover Acid)</td>
+              <td>60.0 &deg;Bé</td>
+              <td>77.67%</td>
+              <td>1.706 kg/L</td>
+              <td>&minus;11.2 &deg;C (+11.8 &deg;F)</td>
+              <td>14.0 cP</td>
+              <td>Fertilizer acidulation, battery manufacturing</td>
+            </tr>
+            <tr>
+              <td>Dilute Battery Grade</td>
+              <td>35.0 &deg;Bé</td>
+              <td>50.00%</td>
+              <td>1.395 kg/L</td>
+              <td>&minus;37.0 &deg;C (&minus;35 &deg;F)</td>
+              <td>4.5 cP</td>
+              <td>Small-scale automated metering, lower fuming</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>A crucial engineering decision in water plant design is choosing between <strong>93%</strong> and <strong>98%</strong> acid. While 98% sulfuric acid offers higher active payload per truckload, it displays an anomalously high freezing point of $+3.0^\circ\text{C}\ (37.4^\circ\text{F})$. In temperate and cold climates, 98% acid will solidify inside outdoor pipelines and unheated bulk storage tanks during winter nights. In contrast, 93.2% acid sits precisely within a eutectic freezing depression valley, remaining fully liquid down to $-35.0^\circ\text{C}\ (-31^\circ\text{F})$, eliminating the need for expensive electrical heat tracing.</p>
+
+      <h2>Mathematical Sizing Formulas for Dosing Metering Skids</h2>
+      <p>To convert active acid demand ($D_{\text{pure}}$) into commercial stock solution consumption, calculations must account for reagent concentration ($\%_{\text{active}}$) and specific gravity ($\text{SG}$):</p>
+
+      <div class="formula-box">
+        $$\dot{m}_{\text{comm}}\text{ (kg/day)} = \frac{Q\text{ (m}^3/\text{day)} \times D_{\text{pure}}\text{ (mg/L)}}{1,000 \times \left(\frac{\%_{\text{active}}}{100}\right)}$$
+        $$\dot{m}_{\text{comm}}\text{ (lb/day)} = Q\text{ (MGD)} \times D_{\text{pure}}\text{ (ppm)} \times 8.3454 \times \frac{1}{\left(\frac{\%_{\text{active}}}{100}\right)}$$
+      </div>
+
+      <p>The volumetric feed rate delivered by the positive displacement metering pump ($q_{\text{pump}}$ in Liters per hour or Gallons per hour) is:</p>
+
+      <div class="formula-box">
+        $$q_{\text{pump}}\text{ (L/h)} = \frac{\dot{m}_{\text{comm}}\text{ (kg/day)}}{24\text{ h/day} \times \text{SG}\text{ (kg/L)}} = \frac{Q\text{ (m}^3/\text{h)} \times D_{\text{pure}}\text{ (g/m}^3)}{\left(\frac{\%_{\text{active}}}{100}\right) \times \text{SG} \times 1,000}$$
+      </div>
+
+      <h2>Sulfate Accumulation and Calcium Sulfate (Gypsum) Limits</h2>
+      <p>A fundamental side-effect of sulfuric acid dosing is the introduction of sulfate anions ($\text{SO}_4^{2-}$). Every $1.0\text{ mg/L of 100% H}_2\text{SO}_4$ adds exactly:</p>
+
+      <div class="formula-box">
+        $$\Delta[\text{SO}_4^{2-}] = D_{\text{pure}} \times \left(\frac{\text{MW}(\text{SO}_4)}{\text{MW}(\text{H}_2\text{SO}_4)}\right) = D_{\text{pure}} \times \left(\frac{96.06}{98.08}\right) = 0.9794 \times D_{\text{pure}}\text{ (mg/L)}$$
+      </div>
+
+      <p>In waters with elevated natural calcium hardness, excessive sulfate accumulation can trigger the precipitation of <strong>calcium sulfate dihydrate (gypsum, $\text{CaSO}_4 \cdot 2\text{H}_2\text{O}$)</strong>:</p>
+
+      <div class="formula-box">
+        $$\text{Ca}^{2+} + \text{SO}_4^{2-} + 2\text{H}_2\text{O} \rightleftharpoons \text{CaSO}_4 \cdot 2\text{H}_2\text{O}\downarrow \quad (K_{sp} \approx 4.93 \times 10^{-5}\text{ at } 25^\circ\text{C})$$
+      </div>
+      <p>Unlike calcium carbonate, gypsum cannot be dissolved with acid cleaning. Once formed, it requires aggressive chelating agents (such as hot alkaline EDTA) or high-pressure mechanical hydro-blasting. Industrial guidelines mandate that the product of calcium (as $\text{Ca}^{2+}$ in $\text{mg/L}$) and sulfate (as $\text{SO}_4^{2-}$ in $\text{mg/L}$) must not exceed the gypsum threshold limit: $[\text{Ca}^{2+}] \times [\text{SO}_4^{2-}] &lt; 500,000\text{ (mg/L)}^2$. If this threshold is approached, hydrochloric acid ($\text{HCl}$) must be substituted for alkalinity trimming.</p>
+
+      <h2>Practical Worked Case Study: Cooling Tower Alkalinity Neutralization</h2>
+      <div class="worked-example-card">
+        <h3>Industrial Water Treatment Case Study: 1,000 GPM Make-up Stream</h3>
+        <p><strong>Scenario:</strong> A power plant cooling tower operates at $CoC = 4.0$ cycles of concentration. The raw make-up water flow rate is $Q = 1,000\text{ GPM}$ ($227.1\text{ m}^3/\text{h}$, equivalent to $1.44\text{ MGD}$). Raw make-up analysis shows a total alkalinity of $240.0\text{ mg/L as CaCO}_3$. To prevent calcium carbonate scaling while maintaining a mild protective Langelier Saturation Index ($LSI = +0.3$) in the recirculating basin, plant chemistry dictates reducing the make-up alkalinity down to $70.0\text{ mg/L as CaCO}_3$. Commercial $93.2\%\text{ w/w (66° Bé)}$ sulfuric acid ($\text{SG} = 1.835\text{ kg/L}$) is utilized. Sizing target: determine active acid dose, commercial mass flow rate, dosing pump volumetric feed rate, and verify pump stroke percentage on a $50.0\text{ L/h}$ diaphragm pump skid.</p>
+
+        <p><strong>Step 1: Compute Alkalinity Reduction and Active Pure Acid Dose:</strong></p>
+        $$\Delta\text{Alk} = 240.0\text{ mg/L} - 70.0\text{ mg/L} = 170.0\text{ mg/L as CaCO}_3\text{ reduced}$$
+        $$D_{\text{pure}} = 170.0\text{ mg/L} \times 0.980 = 166.60\text{ mg/L pure 100% H}_2\text{SO}_4\ (166.6\text{ ppm})$$
+
+        <p><strong>Step 2: Calculate Daily Pure Acid Delivery:</strong></p>
+        $$\dot{m}_{\text{pure}} = 1.44\text{ MGD} \times 166.60\text{ ppm} \times 8.3454\text{ lb/(MGD}\cdot\text{ppm)} = 2,002.1\text{ lbs/day}\ (908.1\text{ kg/day})$$
+
+        <p><strong>Step 3: Account for 93.2% Commercial Strength and Specific Gravity:</strong></p>
+        $$\dot{m}_{\text{comm}} = \frac{908.1\text{ kg/day}}{0.932} = 974.36\text{ kg / day commercial 93.2% acid}\ (2,148.1\text{ lbs/day})$$
+        $$\text{Daily Volume} = \frac{974.36\text{ kg/day}}{1.835\text{ kg/L}} = 531.0\text{ Liters / day}\ (140.3\text{ Gallons/day})$$
+
+        <p><strong>Step 4: Metering Pump Delivery Rate and Stroke Setting:</strong></p>
+        $$q_{\text{pump}} = \frac{531.0\text{ Liters}}{24\text{ hours}} = 22.125\text{ Liters / hour}\ (368.8\text{ mL/min} = 5.845\text{ GPH})$$
+        $$\text{Stroke}\% = \left( \frac{22.125\text{ L/h}}{50.0\text{ L/h}} \right) \times 100\% = 44.25\%$$
+        <p>Operating at $44.3\%$ stroke length is within the ideal linear metering band ($20\%\text{ to } 80\%$).</p>
+
+        <p><strong>Step 5: Storage Tank Autonomy:</strong></p>
+        <p>A standard $1,000\text{ Liter}$ intermediate bulk container (IBC tote) of 93% sulfuric acid provides:</p>
+        $$\text{Autonomy} = \frac{1,000\text{ Liters}}{531.0\text{ Liters / day}} \approx 1.88\text{ Operating Days}$$
+        <p><em>Engineering Recommendation:</em> Due to rapid turnover, the facility should install a permanent bulk carbon steel or lined storage tank rated for a minimum of $20,000\text{ Liters}$ (approx. 35 days autonomy).</p>
+      </div>
+
+      <h2>Materials of Construction and Safety Handling Protocols</h2>
+      <p>Concentrated sulfuric acid exhibits unique corrosive behavior depending on water content:</p>
+      <ul>
+        <li><strong>Concentrated Acid (&gt;90% H₂SO₄):</strong> Concentrated acid acts as an oxidizing agent, passivating carbon steel by forming an insoluble iron sulfate ($\text{FeSO}_4$) protective barrier. Carbon steel tanks (with $1/4\text{ inch}$ corrosion allowance), Alloy 20, Hastelloy C-276, and PTFE/PVDF piping are standard. Velocity must be kept below $0.9\text{ m/s}\ (3\text{ ft/s})$ to prevent scouring the iron sulfate passivating film.</li>
+        <li><strong>Dilute Acid (&lt;70% H₂SO₄):</strong> Once diluted, the protective iron sulfate layer dissolves and sulfuric acid aggressively attacks carbon steel. Wetted components must be fabricated from PVDF (Kynar), PTFE (Teflon), FRP (vinyl ester), or high-nickel alloys.</li>
+        <li><strong>Exothermic Heat Release:</strong> Diluting sulfuric acid releases immense thermal energy ($\Delta H_{\text{dilution}} = -74.7\text{ kJ/mol}$). In-line chemical injection quills must project into the turbulent center third of the pipe ($v &gt; 1.5\text{ m/s}$) fabricated from Hastelloy C-276 to prevent local boiling and thermal stress cracking.</li>
+      </ul>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">
+            <span class="logo-icon">&pi;</span>
+            <span class="logo-text">Calc<strong>Hub</strong></span>
+          </div>
+          <p class="footer-about">High-precision chemical neutralization, sulfuric acid stoichiometry, and cooling water alkalinity control engineering tools conforming to AWWA and CTI standards.</p>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Engineering Disciplines</h4>
+          <ul class="footer-links">
+            <li><a href="chemical.html">Chemical &amp; Water Treatment</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+            <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+            <li><a href="civil.html">Civil &amp; Construction</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Standard References</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.cti.org" target="_blank" rel="noopener">Cooling Technology Institute (CTI) Guidelines</a></li>
+            <li><a href="https://www.awwa.org" target="_blank" rel="noopener">AWWA Standard B511 Sulfuric Acid</a></li>
+            <li><a href="https://www.osha.gov" target="_blank" rel="noopener">OSHA Chemical Safety Standard 1910.119</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Free, open, client-side engineering tools.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const ACID_GRADES = {
+      "93": { strength: 93.2, sg: 1.835 },
+      "98": { strength: 98.0, sg: 1.840 },
+      "77": { strength: 77.7, sg: 1.706 },
+      "50": { strength: 50.0, sg: 1.395 },
+      "custom": { strength: 93.2, sg: 1.835 }
+    };
+
+    function updateApplicationPreset() {
+      const app = document.getElementById("treatmentApplication").value;
+      if (app === "alkalinity_trim") {
+        document.getElementById("alkalinityInputsGroup").style.display = "grid";
+        document.getElementById("directDoseGroup").style.display = "none";
+        document.getElementById("initialAlkVal").value = 220;
+        document.getElementById("targetAlkVal").value = 80;
+      } else if (app === "wastewater_neut") {
+        document.getElementById("alkalinityInputsGroup").style.display = "grid";
+        document.getElementById("directDoseGroup").style.display = "none";
+        document.getElementById("initialAlkVal").value = 450;
+        document.getElementById("targetAlkVal").value = 50;
+      } else if (app === "ro_pretreat") {
+        document.getElementById("alkalinityInputsGroup").style.display = "grid";
+        document.getElementById("directDoseGroup").style.display = "none";
+        document.getElementById("initialAlkVal").value = 180;
+        document.getElementById("targetAlkVal").value = 40;
+      } else if (app === "direct_dose") {
+        document.getElementById("alkalinityInputsGroup").style.display = "none";
+        document.getElementById("directDoseGroup").style.display = "block";
+      }
+      calcSulfuricAcid();
+    }
+
+    function updateGradeProps() {
+      const g = document.getElementById("acidCommercialGrade").value;
+      if (g !== "custom") {
+        const item = ACID_GRADES[g];
+        document.getElementById("acidStrengthPct").value = item.strength;
+        document.getElementById("acidSGVal").value = item.sg;
+      }
+      calcSulfuricAcid();
+    }
+
+    function calcSulfuricAcid() {
+      const flowVal = parseFloat(document.getElementById("waterFlowVal").value) || 0;
+      const flowUnit = document.getElementById("waterFlowUnit").value;
+      const app = document.getElementById("treatmentApplication").value;
+      const strengthPct = parseFloat(document.getElementById("acidStrengthPct").value) || 93.2;
+      const sg = parseFloat(document.getElementById("acidSGVal").value) || 1.835;
+      const maxPumpLph = parseFloat(document.getElementById("dosingPumpMaxCapacityLph").value) || 50.0;
+
+      // Flow conversion to m3/day and m3/h
+      let m3_per_day = 0;
+      let m3_per_hour = 0;
+      if (flowUnit === "gpm") {
+        m3_per_hour = flowVal * 0.227125;
+        m3_per_day = m3_per_hour * 24.0;
+      } else if (flowUnit === "m3h") {
+        m3_per_hour = flowVal;
+        m3_per_day = flowVal * 24.0;
+      } else if (flowUnit === "mgd") {
+        m3_per_day = flowVal * 3785.41;
+        m3_per_hour = m3_per_day / 24.0;
+      } else if (flowUnit === "lps") {
+        m3_per_hour = flowVal * 3.6;
+        m3_per_day = m3_per_hour * 24.0;
+      } else if (flowUnit === "mld") {
+        m3_per_day = flowVal * 1000.0;
+        m3_per_hour = m3_per_day / 24.0;
+      }
+
+      // Calculate pure active H2SO4 dose
+      let pureDoseMgL = 50.0;
+      let alkDestroyed = 0;
+
+      if (app === "direct_dose") {
+        pureDoseMgL = parseFloat(document.getElementById("directAcidDosePpm").value) || 50.0;
+        alkDestroyed = pureDoseMgL / 0.980;
+      } else {
+        const initAlk = parseFloat(document.getElementById("initialAlkVal").value) || 0;
+        const targetAlk = parseFloat(document.getElementById("targetAlkVal").value) || 0;
+        alkDestroyed = Math.max(0, initAlk - targetAlk);
+        pureDoseMgL = alkDestroyed * 0.980; // 0.980 mg H2SO4 per mg CaCO3
+      }
+
+      // Mass rates
+      const pureKgPerDay = (m3_per_day * pureDoseMgL) / 1000.0;
+      const pureKgPerHour = pureKgPerDay / 24.0;
+
+      const commKgPerDay = pureKgPerDay / (strengthPct / 100.0);
+      const commLbsPerDay = commKgPerDay * 2.20462;
+
+      const commLitersPerDay = commKgPerDay / sg;
+      const commLitersPerHour = commLitersPerDay / 24.0;
+      const commMlPerMin = (commLitersPerHour * 1000.0) / 60.0;
+      const commGph = commLitersPerHour * 0.264172;
+
+      // Pump stroke
+      const strokePct = (commLitersPerHour / maxPumpLph) * 100.0;
+
+      // Sulfate addition: 96.06 / 98.08 = 0.9794
+      const deltaSulfateMgL = pureDoseMgL * 0.9794;
+
+      // Heat of dilution approx 74.7 kJ/mol H2SO4
+      // mol/s = (pureKgPerHour / 3600) * 1000 / 98.08
+      const molesPerSec = (pureKgPerHour * 1000.0) / (3600.0 * 98.08);
+      const heatKw = molesPerSec * 74.7;
+
+      // Autonomy
+      const toteDays = commLitersPerDay > 0 ? (1000.0 / commLitersPerDay).toFixed(1) : "N/A";
+      const drumDays = commLitersPerDay > 0 ? (200.0 / commLitersPerDay).toFixed(1) : "N/A";
+
+      // Render Outputs
+      document.getElementById("resPumpLphVal").textContent = commLitersPerHour.toFixed(2) + " L / hour";
+      document.getElementById("resPumpAlternateUnits").textContent = commMlPerMin.toFixed(1) + " mL/min (" + commGph.toFixed(2) + " GPH commercial " + strengthPct + "% acid)";
+
+      document.getElementById("resPureAcidDose").textContent = pureDoseMgL.toFixed(1) + " mg/L";
+      document.getElementById("resPureAcidDoseSub").textContent = "Neutralizes " + alkDestroyed.toFixed(1) + " mg/L Alkalinity as CaCO₃";
+
+      document.getElementById("resDailyCommercialKg").textContent = commKgPerDay.toLocaleString(undefined, {maximumFractionDigits: 1}) + " kg / day";
+      document.getElementById("resDailyCommercialLbs").textContent = commLbsPerDay.toLocaleString(undefined, {maximumFractionDigits: 1}) + " lbs / day commercial acid";
+
+      document.getElementById("resDailyCommercialLiters").textContent = commLitersPerDay.toFixed(1) + " L / day";
+
+      document.getElementById("resPumpStrokeSetting").textContent = strokePct.toFixed(1) + "%";
+
+      document.getElementById("resSulfateIncrease").textContent = "+" + deltaSulfateMgL.toFixed(1) + " mg/L";
+      document.getElementById("resExothermicHeat").textContent = heatKw.toFixed(1) + " kW";
+
+      document.getElementById("resStorageAutonomy").textContent = "Standard 1,000 L IBC Tote lasts " + toteDays + " Days | 200 L Drum lasts " + drumDays + " Days.";
+
+      let gypMsg = "Sulfate increase is within safe limits for non-scaling calcium sulfate operation.";
+      if (deltaSulfateMgL > 250) {
+        gypMsg = "Caution: Sulfate increase (" + deltaSulfateMgL.toFixed(0) + " mg/L) is substantial. Verify [Ca²⁺] × [SO₄²⁻] < 500,000 to prevent gypsum precipitation.";
+      }
+      document.getElementById("resGypsumWarning").textContent = gypMsg;
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      calcSulfuricAcid();
+    });
+  </script>
+</body>
+</html>

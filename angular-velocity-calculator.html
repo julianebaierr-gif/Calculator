@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angular Velocity Calculator | RPM, Rad/s & Tangential Speed</title>
+  <meta name="description" content="Convert between RPM, radians per second (rad/s), and degrees/s. Calculate tangential linear velocity, centripetal acceleration, and rotation period.">
+  <link rel="canonical" href="https://calchub.cloud/angular-velocity-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Angular Velocity Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates rotational speed conversions (RPM, rad/s, Hz), tangential peripheral velocity, radial centripetal acceleration, and rotational period for rotating machinery.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How do you convert RPM (revolutions per minute) to radians per second (rad/s)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Because one complete revolution encompasses 2π radians and one minute equals 60 seconds, the exact conversion formula is: ω (rad/s) = RPM × (2π / 60) ≈ RPM × 0.104719755."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the relationship between angular velocity and linear tangential speed?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Linear tangential velocity (v) at any radial point is directly proportional to angular velocity (ω in rad/s) and radial distance (r): v = ω × r. Doubling the distance from the axis of rotation doubles the peripheral linear speed."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is centripetal acceleration derived from angular velocity?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The inward radial acceleration keeping a mass in circular trajectory equals a_c = v² / r = ω² × r. Expressing centripetal acceleration in terms of angular velocity demonstrates quadratic scaling with rotational speed."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between rotational frequency and angular velocity?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Rotational frequency (f or Hz) measures complete cycles or revolutions per unit time (rev/s). Angular velocity (ω) measures the swept angular displacement in radians per unit time. They are related by the factor 2π: ω = 2πf."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="logo">CalcHub</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="physics.html" class="active">Physics</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="engineering.html">Electrical</a>
+        <a href="civil.html">Civil</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <div class="content-wrapper">
+      <div class="calculator-container">
+        <h1>Angular Velocity Calculator</h1>
+        <p class="lead-text">Convert rotational speed across RPM, rad/s, and Hz, while evaluating peripheral tangential speed, rim centripetal acceleration, and cycle period.</p>
+
+        <div class="calc-card">
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="rotSpeed">Rotational Speed / Angular Velocity</label>
+              <div class="input-with-unit">
+                <input type="number" id="rotSpeed" class="form-control" value="1800" step="any">
+                <select id="rotUnit" class="unit-select">
+                  <option value="rpm" selected>RPM (rev/min)</option>
+                  <option value="radps">rad/s</option>
+                  <option value="hz">Hz (rev/s)</option>
+                  <option value="degps">deg/s</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group col-half">
+              <label for="radius">Rotor / Wheel Radius (r)</label>
+              <div class="input-with-unit">
+                <input type="number" id="radius" class="form-control" value="150" step="any">
+                <select id="radUnit" class="unit-select">
+                  <option value="mm" selected>Millimeters (mm)</option>
+                  <option value="cm">Centimeters (cm)</option>
+                  <option value="m">Meters (m)</option>
+                  <option value="in">Inches (in)</option>
+                  <option value="ft">Feet (ft)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button type="button" id="calcBtn" class="btn btn-primary">Calculate Dynamics</button>
+            <button type="button" id="resetBtn" class="btn btn-secondary">Reset to Standard 4-Pole Motor</button>
+          </div>
+
+          <div id="resultsPanel" class="results-panel">
+            <div class="result-box primary-result">
+              <div class="result-label">Angular Velocity (&omega;)</div>
+              <div class="result-value" id="resOmega">188.50 rad/s</div>
+              <div class="result-sub" id="resOmegaSub">1,800.0 RPM &bull; 30.00 Hz (rev/s) &bull; 10,800.0 &deg;/s</div>
+            </div>
+
+            <div class="result-grid">
+              <div class="result-item">
+                <span class="sub-label">Tangential Linear Velocity (v)</span>
+                <span class="sub-value" id="resTangVel">28.27 m/s (101.8 km/h)</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Centripetal Acceleration (a_c)</span>
+                <span class="sub-value" id="resCentAcc">5,329.6 m/s² (543.5 g)</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Period of One Revolution (T)</span>
+                <span class="sub-value" id="resPeriod">33.33 ms (0.0333 s)</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Rotational Frequency (f)</span>
+                <span class="sub-value" id="resFreq">30.00 Hz (cycles/sec)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>1. Theoretical Foundation of Angular Velocity</h2>
+          <p>Angular velocity represents the vector rate at which an object rotates or revolves around a specified central axis, quantifying how rapidly an angular displacement \(\theta\) changes with elapsed time \(t\). While linear velocity describes the straight-line displacement per unit time in meters per second (\(\text{m/s}\)), angular velocity describes rotational progress in radians per second (\(\text{rad/s}\)).</p>
+          <p>For uniform circular rotation, the average angular velocity \(\omega\) is formulated as:</p>
+          <div class="math-block">
+            $$\omega = \frac{\Delta \theta}{\Delta t} = \frac{2\pi}{T} = 2\pi f$$
+          </div>
+          <p>Where \(\Delta \theta\) represents angular swept angle in radians, \(\Delta t\) is elapsed time in seconds, \(T\) is the period required to complete one full revolution (\(T = 1/f\)), and \(f\) is rotational frequency in revolutions per second (\(\text{Hz}\)). In vector mechanics, angular velocity \(\vec{\omega}\) is an axial pseudovector oriented perpendicular to the plane of rotation, with its pointing direction rigorously dictated by the classical Right-Hand Grip Rule.</p>
+
+          <h2>2. Conversion Mathematics: RPM, Rad/s, and Degrees/s</h2>
+          <p>Rotating machinery, industrial prime movers, automotive internal combustion engines, and electric servomotors are overwhelmingly rated on equipment nameplates in revolutions per minute (<strong>RPM</strong>). However, all core physical dynamics and stress formulations mandate the use of radians per second. The derivation for the dimensional conversion factor proceeds as follows:</p>
+          <ul>
+            <li>One full revolution equals exactly \(2\pi\) radians (\(\approx 6.2831853\text{ rad}\)).</li>
+            <li>One minute contains exactly \(60\) seconds.</li>
+          </ul>
+          <p>Consequently, the direct scaling relationship connecting rotational RPM to angular speed \(\omega\) in \(\text{rad/s}\) is:</p>
+          <div class="math-block">
+            $$\omega = \text{RPM} \times \left(\frac{2\pi\text{ rad}}{60\text{ s}}\right) = \text{RPM} \times \left(\frac{\pi}{30}\right) \approx \text{RPM} \times 0.104719755$$
+          </div>
+          <p>Conversely, to convert known angular velocity in \(\text{rad/s}\) back into operational RPM:</p>
+          <div class="math-block">
+            $$\text{RPM} = \omega \times \left(\frac{30}{\pi}\right) \approx \omega \times 9.5492966$$
+          </div>
+
+          <h2>3. Tangential Velocity and Centripetal Acceleration</h2>
+          <p>Every point on a rotating rigid body shares the exact same angular velocity \(\omega\). However, the linear peripheral speed—known as <strong>tangential velocity</strong> \(v\)—scales directly with the radial distance \(r\) from the rotational axis:</p>
+          <div class="math-block">
+            $$v = \omega \cdot r = \left(\frac{2\pi \cdot \text{RPM}}{60}\right) r$$
+          </div>
+          <p>Because the direction of the tangential velocity vector is continually changing throughout the circular orbit, the mass at radius \(r\) is subject to an inward radial acceleration called <strong>centripetal acceleration</strong> \(a_c\):</p>
+          <div class="math-block">
+            $$a_c = \frac{v^2}{r} = \omega^2 r = \left(\frac{2\pi \cdot \text{RPM}}{60}\right)^2 r$$
+          </div>
+          <p>This formulation illustrates the fundamental reason why high-speed rotating components—such as gas turbine impellers, centrifugal superchargers, and ultracentrifuge rotors—experience massive structural hoop stresses: the centripetal acceleration and associated centrifugal bursting forces scale quadratically with rotational speed (\(\propto \omega^2\)).</p>
+
+          <h2>4. Industrial and Engineering Benchmark Reference Table</h2>
+          <p>To assist mechanical rotating equipment designers and test engineers, the table below provides representative angular velocities, operational RPMs, and typical rim tangential speeds across diverse engineering applications:</p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Rotating System / Machine</th>
+                <th>Standard Speed (RPM)</th>
+                <th>Angular Velocity \(\omega\) (rad/s)</th>
+                <th>Typical Radius \(r\)</th>
+                <th>Peripheral Tip Speed \(v\)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Earth Planetary Rotation (Sidereal Day)</td>
+                <td>0.000694</td>
+                <td>\(7.292 \times 10^{-5}\)</td>
+                <td>6,378 km (Equator)</td>
+                <td>465.1 m/s (1,674 km/h)</td>
+              </tr>
+              <tr>
+                <td>Offshore Wind Turbine Rotor (15 MW)</td>
+                <td>7.5 – 10.0</td>
+                <td>0.785 – 1.047</td>
+                <td>118 m (Blade tip)</td>
+                <td>92.6 – 123.6 m/s (445 km/h)</td>
+              </tr>
+              <tr>
+                <td>Hydraulic Francis Hydro-Turbine Runner</td>
+                <td>100 – 375</td>
+                <td>10.47 – 39.27</td>
+                <td>2.5 m</td>
+                <td>26.2 – 98.2 m/s</td>
+              </tr>
+              <tr>
+                <td>4-Pole 60 Hz AC Induction Motor</td>
+                <td>1,750 (Nominal slip)</td>
+                <td>183.26</td>
+                <td>75 mm (Shaft surface)</td>
+                <td>13.74 m/s (49.5 km/h)</td>
+              </tr>
+              <tr>
+                <td>Commercial Vehicle Alternator / Supercharger</td>
+                <td>12,000 – 18,000</td>
+                <td>1,256.6 – 1,885.0</td>
+                <td>35 mm (Pulley rim)</td>
+                <td>44.0 – 66.0 m/s</td>
+              </tr>
+              <tr>
+                <td>Automotive Turbocharger Turbine Wheel</td>
+                <td>120,000 – 220,000</td>
+                <td>12,566 – 23,038</td>
+                <td>25 mm (Inducer tip)</td>
+                <td>314 – 576 m/s (Supersonic)</td>
+              </tr>
+              <tr>
+                <td>High-Speed Dental Air-Bearing Drill</td>
+                <td>350,000 – 400,000</td>
+                <td>36,652 – 41,888</td>
+                <td>0.8 mm (Bur edge)</td>
+                <td>29.3 – 33.5 m/s</td>
+              </tr>
+              <tr>
+                <td>Laboratory Analytical Ultracentrifuge</td>
+                <td>60,000 – 100,000</td>
+                <td>6,283 – 10,472</td>
+                <td>70 mm (Tube well)</td>
+                <td>440 – 733 m/s (\(> 800,000\text{ g}\))</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>5. Worked Engineering Case Study: High-Speed Centrifuge Rotor Stress Design</h2>
+          <div class="worked-example-card">
+            <h3>Problem Statement</h3>
+            <p>A biochemical laboratory centrifuge is designed to separate viral particles from cell suspensions. The titanium rotor operates at a rotational speed of \(24,000\text{ RPM}\). The biological test samples sit in outer test-tube buckets located at a maximum radial distance of \(r = 120\text{ mm}\) (\(0.12\text{ m}\)) from the central spindle axis.</p>
+            <p><strong>Required:</strong></p>
+            <ol>
+              <li>Compute the angular velocity \(\omega\) in radians per second.</li>
+              <li>Determine the linear tangential speed \(v\) of the test-tube carriage.</li>
+              <li>Calculate the centripetal acceleration \(a_c\) and express it as Relative Centrifugal Force (RCF in multiples of Earth \(g = 9.80665\text{ m/s}^2\)).</li>
+            </ol>
+
+            <h3>Step-by-Step Mathematical Solution</h3>
+            <p><strong>Step 1: Calculate angular velocity \(\omega\):</strong></p>
+            <div class="math-block">
+              $$\omega = \text{RPM} \times \left(\frac{2\pi}{60}\right) = 24,000 \times \left(\frac{\pi}{30}\right) = 800\pi \approx 2,513.274\text{ rad/s}$$
+            </div>
+
+            <p><strong>Step 2: Calculate peripheral tangential velocity \(v\):</strong></p>
+            <div class="math-block">
+              $$v = \omega \cdot r = 2,513.274\text{ rad/s} \times 0.12\text{ m} \approx 301.59\text{ m/s}$$
+            </div>
+            <p>Converting to kilometers per hour: \(301.59 \times 3.6 = 1,085.7\text{ km/h}\) (nearing the speed of sound in air, requiring an evacuated vacuum chamber to mitigate aerodynamic frictional heating).</p>
+
+            <p><strong>Step 3: Calculate centripetal acceleration \(a_c\):</strong></p>
+            <div class="math-block">
+              $$a_c = \omega^2 \cdot r = (2,513.274)^2 \times 0.12 \approx 6,316,547 \times 0.12 = 757,985.6\text{ m/s}^2$$
+            </div>
+
+            <p><strong>Step 4: Convert into Relative Centrifugal Force (G-force load factor):</strong></p>
+            <div class="math-block">
+              $$\text{RCF} = \frac{a_c}{g} = \frac{757,985.6}{9.80665} \approx 77,293\text{ g}$$
+            </div>
+            <p><strong>Engineering Conclusion:</strong> Every gram of biological fluid and carrier tube experiences an apparent outward body force equivalent to \(77.29\text{ kilograms}\) of gravitational weight, verifying that the titanium grade must possess high fatigue strength and ultrasonic flaw inspection certification.</p>
+          </div>
+
+          <h2>6. Practical Dynamics: Critical Speeds and Flywheel Kinetic Energy</h2>
+          <p>In mechanical powertrain engineering, angular velocity directly determines two critical design phenomena:</p>
+          <ul>
+            <li><strong>Rotational Kinetic Energy Storage:</strong> Flywheels store kinetic energy based on their mass moment of inertia \(I\) and the square of angular velocity:
+              <div class="math-block">
+                $$E_k = \frac{1}{2} I \omega^2$$
+              </div>
+              Doubling the operational angular velocity quadruples the stored kinetic energy, making speed increase far more mass-efficient than adding physical flywheel weight.
+            </li>
+            <li><strong>Critical Shaft Whirling Resonance:</strong> Flexible transmission shafts exhibit natural lateral bending frequencies. When the rotational angular velocity matches the shaft's lateral natural frequency (\(\omega = \omega_n = \sqrt{k/m}\)), resonance causes severe dynamic deflection and catastrophic bearing failure unless traversed rapidly during startup acceleration.</li>
+          </ul>
+
+          <h2>7. Frequently Asked Questions (FAQ)</h2>
+          <div class="faq-item">
+            <h3>Why must angular velocity be in rad/s rather than RPM for physical formulas?</h3>
+            <p>A radian is a dimensionless ratio of arc length to radius (\(s / r\)). When calculating tangential speed (\(v = \omega r\)) or acceleration (\(a = \omega^2 r\)), using radians preserves consistent SI dimensional units (\(\text{m/s}\) and \(\text{m/s}^2\)). RPM includes an arbitrary unit of time (minutes) and cycles (revolutions) that require continuous conversion factors.</p>
+          </div>
+          <div class="faq-item">
+            <h3>How is angular velocity related to motor torque and output shaft power?</h3>
+            <p>Mechanical shaft power \(P\) in watts equals torque \(\tau\) in Newton-meters multiplied directly by angular velocity \(\omega\) in rad/s: \(P = \tau \times \omega\). Expressed in terms of RPM: \(P (\text{kW}) = (\tau \times \text{RPM}) / 9,548.8\).</p>
+          </div>
+          <div class="faq-item">
+            <h3>What is the difference between angular speed and angular velocity?</h3>
+            <p>Angular speed is a scalar representing solely the magnitude of rotational rate (e.g., \(100\text{ rad/s}\)). Angular velocity is a vector that specifies both rotational rate and axis orientation with direction defined by the right-hand rule.</p>
+          </div>
+          <div class="faq-item">
+            <h3>How does angular acceleration (\(\alpha\)) relate to angular velocity (\(\omega\))?</h3>
+            <p>Angular acceleration \(\alpha\) is the rate of change of angular velocity with respect to time: \(\alpha = d\omega / dt = (\omega_2 - \omega_1) / t\), measured in radians per second squared (\(\text{rad/s}^2\)).</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="sidebar" id="toolSidebar">
+        <!-- Injected via apply_sidebars_all.py -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, science, and technical calculation tools.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Rotational Speed Conversion Engine
+    const toRadPerSec = (val, unit) => {
+      switch(unit) {
+        case 'rpm': return val * (Math.PI / 30);
+        case 'hz': return val * (2 * Math.PI);
+        case 'degps': return val * (Math.PI / 180);
+        default: return val;
+      }
+    };
+    const toMeters = (r, unit) => {
+      switch(unit) {
+        case 'mm': return r / 1000;
+        case 'cm': return r / 100;
+        case 'in': return r * 0.0254;
+        case 'ft': return r * 0.3048;
+        default: return r;
+      }
+    };
+
+    function calculate() {
+      const rawSpeed = parseFloat(document.getElementById('rotSpeed').value) || 0;
+      const speedUnit = document.getElementById('rotUnit').value;
+      const rawRadius = parseFloat(document.getElementById('radius').value) || 0;
+      const radUnit = document.getElementById('radUnit').value;
+
+      const omega = toRadPerSec(rawSpeed, speedUnit);
+      const r_m = toMeters(rawRadius, radUnit);
+
+      const rpm = omega * (30 / Math.PI);
+      const hz = omega / (2 * Math.PI);
+      const degps = omega * (180 / Math.PI);
+      const period = hz > 1e-6 ? 1 / hz : 0;
+
+      const v_tang = omega * r_m;
+      const a_cent = omega * omega * r_m;
+      const g_force = a_cent / 9.80665;
+
+      document.getElementById('resOmega').textContent = omega.toFixed(2) + " rad/s";
+      document.getElementById('resOmegaSub').textContent = 
+        rpm.toLocaleString('en-US', {maximumFractionDigits: 1}) + " RPM • " + 
+        hz.toFixed(2) + " Hz (rev/s) • " + 
+        degps.toLocaleString('en-US', {maximumFractionDigits: 1}) + " °/s";
+
+      document.getElementById('resTangVel').textContent = 
+        v_tang.toFixed(2) + " m/s (" + (v_tang * 3.6).toFixed(1) + " km/h | " + (v_tang * 2.23694).toFixed(1) + " mph)";
+
+      if (a_cent > 100000) {
+        document.getElementById('resCentAcc').textContent = 
+          a_cent.toExponential(3) + " m/s² (" + g_force.toLocaleString('en-US', {maximumFractionDigits: 1}) + " g)";
+      } else {
+        document.getElementById('resCentAcc').textContent = 
+          a_cent.toFixed(1) + " m/s² (" + g_force.toFixed(1) + " g)";
+      }
+
+      if (period < 0.01 && period > 0) {
+        document.getElementById('resPeriod').textContent = (period * 1000).toFixed(2) + " ms (" + period.toExponential(3) + " s)";
+      } else {
+        document.getElementById('resPeriod').textContent = period.toFixed(4) + " s";
+      }
+
+      document.getElementById('resFreq').textContent = hz.toFixed(2) + " Hz (" + (hz * 60).toFixed(0) + " rev/min)";
+    }
+
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', calculate);
+      el.addEventListener('change', calculate);
+    });
+    document.getElementById('calcBtn').addEventListener('click', calculate);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('rotSpeed').value = '1750';
+      document.getElementById('rotUnit').value = 'rpm';
+      document.getElementById('radius').value = '75';
+      document.getElementById('radUnit').value = 'mm';
+      calculate();
+    });
+
+    window.addEventListener('DOMContentLoaded', calculate);
+  </script>
+</body>
+</html>

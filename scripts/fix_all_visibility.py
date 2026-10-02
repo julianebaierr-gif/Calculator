@@ -203,6 +203,19 @@ CAT_MAP = {
             ("phosphate-dosing-calculator.html", "Phosphate Dosing (Boiler & Lead CCT)", "💧", "ASME / EPRI TSP/DSP congruent treatment & EPA LCR", "10 Ca²⁺ + 6 PO₄³⁻ + 2 OH⁻ ➔ Hydroxyapatite sludge"),
             ("polymer-dosing-calculator.html", "Polymer Dosing (Sludge Dewatering)", "🧪", "Centrifuge & belt press kg/DT, aging tank & pump LPH", "Dose = kg active / DT sludge | 45-min hydration"),
             ("ro-antiscalant-dosing-calculator.html", "RO Antiscalant (Membrane Scaling)", "🌊", "Concentration factor CF=1/(1-Y), LSI & neat pump LPH", "CF = 1/(1-Y) | Prevents CaCO₃, CaSO₄, BaSO₄ & SiO₂"),
+            ("sulphuric-acid-dosing-calculator.html", "Sulfuric Acid (H₂SO₄) Dosing", "🧪", "93% & 98% H₂SO₄ feed, alkalinity reduction & cooling tower", "98.08 g H₂SO₄ per 100.09 g CaCO₃ | 0.980 mass ratio"),
+            ("titration-calculator.html", "Acid-Base Titration (C₁V₁ = C₂V₂)", "🔬", "Equivalence point, analyte molarity & polyprotic curves", "C_A · V_A · n_A = C_B · V_B · n_B | Buffer inflection"),
+        ]
+    },
+    "physics.html": {
+        "title": "Physics & Applied Mechanics",
+        "tools": [
+            ("acceleration-calculator.html", "Acceleration (SUVAT Kinematics)", "🚀", "Uniform acceleration, velocity, travel time & g-force", "a = (v - u) / t | v² = u² + 2as | s = ut + ½at²"),
+            ("angular-velocity-calculator.html", "Angular Velocity (RPM to Rad/s)", "⚙️", "Rotational speed, peripheral tangential velocity & rim g-force", "ω = 2π·RPM/60 | v = ω·r | a_c = ω²·r"),
+            ("centripetal-force-calculator.html", "Centripetal Force (Circular Motion)", "🔄", "Inward force, roadway banked turn angles & loop critical velocity", "F_c = mv²/r = mω²r | tan(θ) = v²/(gr)"),
+            ("doppler-effect-calculator.html", "Doppler Effect (Sound & Radar Shift)", "🔊", "Acoustic frequency shift, apparent pitch & medical ultrasound", "f' = f₀ · (c ± v_o) / (c ∓ v_s) | Mach cone"),
+            ("escape-velocity-calculator.html", "Escape Velocity (Planetary Gravity)", "🪐", "Gravitational escape speed, orbital speed & Schwarzschild radius", "v_e = √(2GM/r) = √(2gr) | v_orb = v_e / √2"),
+            ("free-fall-calculator.html", "Free Fall (Vacuum & Air Drag)", "🪂", "Impact velocity, fall time & terminal velocity modeling", "v = gt = √(2gh) | v_t = √((2mg)/(ρ·Cd·A))"),
         ]
     },
     "fire-safety.html": {
@@ -400,6 +413,7 @@ def update_index_page():
         <a href="mechanical.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">⚙️ Mechanical ({len(CAT_MAP['mechanical.html']['tools'])})</a>
         <a href="civil.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">🏗️ Civil ({len(CAT_MAP['civil.html']['tools'])})</a>
         <a href="chemical.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">🧪 Chemical ({len(CAT_MAP['chemical.html']['tools'])})</a>
+        <a href="physics.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">🔬 Physics ({len(CAT_MAP['physics.html']['tools'])})</a>
         <a href="fire-safety.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">🚨 Fire ({len(CAT_MAP['fire-safety.html']['tools'])})</a>
         <a href="programmer.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">👨‍💻 Tech ({len(CAT_MAP['programmer.html']['tools'])})</a>
         <a href="datetime.html" class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.85rem;">📅 Date ({len(CAT_MAP['datetime.html']['tools'])})</a>

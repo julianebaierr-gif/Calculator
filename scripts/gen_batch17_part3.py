@@ -1,0 +1,958 @@
+# -*- coding: utf-8 -*-
+"""
+Script to generate Batch 17 Part 3 tools:
+1. centripetal-force-calculator.html
+2. doppler-effect-calculator.html
+"""
+import os
+
+TOOL_1_HTML = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Centripetal Force Calculator | Circular Motion & G-Force Sizer</title>
+  <meta name="description" content="Calculate centripetal force, radial acceleration, banked turn angles, and g-force load factors for circular motion from mass, velocity, radius, or rotational RPM.">
+  <link rel="canonical" href="https://calchub.cloud/centripetal-force-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Centripetal Force Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates inward centripetal force, radial acceleration, road highway banking angle, and apparent gravitational load factors for circular translational and rotational systems.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the primary equation for centripetal force?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The primary formulation for centripetal force is Fc = (m × v²) / r, where 'm' is mass in kilograms, 'v' is tangential linear speed in meters per second, and 'r' is circular radius in meters. Expressed in terms of angular velocity (ω in rad/s), Fc = m × ω² × r."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the physical difference between centripetal force and centrifugal force?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Centripetal force is a genuine real net physical force directed radially inward toward the curvature center, produced by tension, friction, or gravity. Centrifugal force is an apparent, fictitious inertial force observed only within a rotating, non-inertial reference frame due to the object's linear momentum."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is the ideal banking angle for a curved roadway calculated?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The ideal roadway banking angle (where lateral tire friction is zero) is calculated using θ = arctan(v² / (g × r)), where 'v' is design vehicle speed in m/s, 'g' is gravitational acceleration (9.81 m/s²), and 'r' is curve radius in meters."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why does centripetal force scale with the square of velocity?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Centripetal force scales with v² because doubling translational velocity not only doubles the rate at which distance along the circle is traversed, but also doubles the rate at which the direction of the velocity vector must be redirected inward, resulting in a fourfold increase in required acceleration."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="logo">CalcHub</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="physics.html" class="active">Physics</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="engineering.html">Electrical</a>
+        <a href="civil.html">Civil</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <div class="content-wrapper">
+      <div class="calculator-container">
+        <h1>Centripetal Force Calculator</h1>
+        <p class="lead-text">Calculate inward centripetal force, radial acceleration, highway banking angles, and G-force load factors for vehicles, rollercoasters, and rotating machinery.</p>
+
+        <div class="calc-card">
+          <div class="form-row">
+            <div class="form-group col-third">
+              <label for="massVal">Object Mass (m)</label>
+              <div class="input-with-unit">
+                <input type="number" id="massVal" class="form-control" value="1200" step="any" min="0.0001">
+                <select id="massUnit" class="unit-select">
+                  <option value="kg" selected>kg</option>
+                  <option value="g">grams (g)</option>
+                  <option value="lbs">pounds (lbs)</option>
+                  <option value="ton">Metric Tons</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group col-third">
+              <label for="speedVal">Speed / Velocity (v)</label>
+              <div class="input-with-unit">
+                <input type="number" id="speedVal" class="form-control" value="80" step="any" min="0">
+                <select id="speedUnit" class="unit-select">
+                  <option value="kph" selected>km/h</option>
+                  <option value="mps">m/s</option>
+                  <option value="mph">mph</option>
+                  <option value="rpm">RPM</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group col-third">
+              <label for="radiusVal">Radius of Turn (r)</label>
+              <div class="input-with-unit">
+                <input type="number" id="radiusVal" class="form-control" value="150" step="any" min="0.001">
+                <select id="radiusUnit" class="unit-select">
+                  <option value="m" selected>Meters (m)</option>
+                  <option value="ft">Feet (ft)</option>
+                  <option value="km">Kilometers (km)</option>
+                  <option value="cm">Centimeters (cm)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button type="button" id="calcBtn" class="btn btn-primary">Calculate Forces</button>
+            <button type="button" id="resetBtn" class="btn btn-secondary">Reset to Standard Passenger Car</button>
+          </div>
+
+          <div id="resultsPanel" class="results-panel">
+            <div class="result-box primary-result">
+              <div class="result-label">Centripetal Force (F_c)</div>
+              <div class="result-value" id="resForce">3,950.6 N</div>
+              <div class="result-sub" id="resForceSub">Equivalent to 888.1 lbf (402.8 kgf)</div>
+            </div>
+
+            <div class="result-grid">
+              <div class="result-item">
+                <span class="sub-label">Centripetal Acceleration (a_c)</span>
+                <span class="sub-value" id="resAcc">3.29 m/s²</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Lateral G-Force Load Factor</span>
+                <span class="sub-value" id="resGForce">0.336 g</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Frictionless Banked Angle (&theta;)</span>
+                <span class="sub-value" id="resBankAngle">18.55&deg; (slope 33.6%)</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Orbital / Revolution Period (T)</span>
+                <span class="sub-value" id="resPeriod">42.41 seconds</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>1. Physical Principles of Inward Centripetal Force</h2>
+          <p>According to Newton's First Law of Motion (the law of inertia), any mass in motion will naturally persevere along an unswerving straight trajectory at constant speed unless acted upon by a non-zero net external force. Whenever a physical body follows a curved, circular, or orbital path, its direction of travel is continuously changing. Because velocity is an intrinsically directional vector quantity, this perpetual directional alteration represents an ongoing acceleration directed orthogonally toward the center of curvature.</p>
+          <p>By applying Newton's Second Law of Motion (\(\vec{F}_{\text{net}} = m \vec{a}\)), maintaining this curved motion demands a sustained net physical force directed radially inward toward the instantaneous center of rotation. This inward restoring force is mathematically defined as the <strong>centripetal force</strong> (\(F_c\), derived from the Latin roots <em>centrum</em> meaning "center" and <em>petere</em> meaning "to seek").</p>
+          <div class="math-block">
+            $$F_c = m \cdot a_c = \frac{m v^2}{r}$$
+          </div>
+          <p>Where \(m\) represents mass in kilograms (\(\text{kg}\)), \(v\) is instantaneous tangential velocity in meters per second (\(\text{m/s}\)), and \(r\) is radius of curvature in meters (\(\text{m}\)). The SI derived unit of centripetal force is the Newton (\(\text{N} = \text{kg}\cdot\text{m/s}^2\)). Crucially, centripetal force is not an exotic new class of fundamental interaction; rather, it is the role played by existing physical forces—such as lateral tire-pavement friction during vehicle cornering, tensile stress in a tethered cable, gravitational attraction in planetary satellite orbits, or normal force on a banked velodrome track.</p>
+
+          <h2>2. Mathematical Formulations: Linear vs. Angular Velocity</h2>
+          <p>Depending on whether the engineering problem involves vehicular travel along a roadway or high-speed rotating mechanical equipment like turbines and centrifuges, centripetal force can be formulated using either linear translational speed \(v\) or rotational angular velocity \(\omega\) (expressed in radians per second):</p>
+          <div class="math-block">
+            $$v = \omega \cdot r = \left(\frac{2\pi \cdot \text{RPM}}{60}\right) r$$
+          </div>
+          <p>Substituting this relationship into the fundamental force equation yields the angular formulation of centripetal force:</p>
+          <div class="math-block">
+            $$F_c = \frac{m (\omega r)^2}{r} = m \omega^2 r = m \left(\frac{2\pi \cdot \text{RPM}}{60}\right)^2 r$$
+          </div>
+          <p>When expressed in terms of the total orbital period \(T\) (the elapsed time required to complete one full revolution, where \(T = 2\pi r / v = 2\pi / \omega\)), centripetal force simplifies to:</p>
+          <div class="math-block">
+            $$F_c = \frac{4 \pi^2 m r}{T^2}$$
+          </div>
+          <p>This formulation underscores a fundamental principle of structural mechanics: for a fixed angular rotational speed \(\omega\), centripetal force grows linearly with radius (\(F_c \propto r\)). Conversely, for a fixed linear translational velocity \(v\), centripetal force is inversely proportional to radius (\(F_c \propto 1/r\)), demonstrating why highway engineers broaden curve radii to reduce rollover hazards.</p>
+
+          <h2>3. Real-World Engineering and Physical Benchmarks</h2>
+          <p>To assist transportation engineers, amusement park designers, and rotating machinery specialists, the table below documents representative centripetal accelerations, lateral \(g\)-forces, and physical mechanisms across diverse applications:</p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>System / Physical Scenario</th>
+                <th>Tangential Speed</th>
+                <th>Radius of Curvature</th>
+                <th>Centripetal Acceleration (\(a_c\))</th>
+                <th>Lateral Load Factor (\(g\))</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>International Space Station (LEO Orbit)</td>
+                <td>7,660 m/s (27,580 km/h)</td>
+                <td>6,778 km (400 km alt)</td>
+                <td>8.66 m/s²</td>
+                <td>0.883 g (Earth gravity)</td>
+              </tr>
+              <tr>
+                <td>Interstate Highway Curve (Civil Standard)</td>
+                <td>110 km/h (30.56 m/s)</td>
+                <td>450 m</td>
+                <td>2.07 m/s²</td>
+                <td>0.211 g (Tire friction)</td>
+              </tr>
+              <tr>
+                <td>High-Speed Train (TGV Curved Track Cant)</td>
+                <td>320 km/h (88.89 m/s)</td>
+                <td>4,000 m</td>
+                <td>1.98 m/s²</td>
+                <td>0.201 g (Track superelevation)</td>
+              </tr>
+              <tr>
+                <td>Roller Coaster Vertical Clothoid Loop (Base)</td>
+                <td>90 km/h (25.0 m/s)</td>
+                <td>15 m</td>
+                <td>41.67 m/s²</td>
+                <td>4.25 g (Seat track normal force)</td>
+              </tr>
+              <tr>
+                <td>Formula 1 Racecar (High-Downforce Sweeper)</td>
+                <td>240 km/h (66.67 m/s)</td>
+                <td>95 m</td>
+                <td>46.78 m/s²</td>
+                <td>4.77 g (Aerodynamic downforce)</td>
+              </tr>
+              <tr>
+                <td>Industrial Decanter Centrifuge Rotor</td>
+                <td>3,600 RPM (\(\omega = 377\text{ rad/s}\))</td>
+                <td>250 mm (0.25 m)</td>
+                <td>35,530 m/s²</td>
+                <td>3,623 g (Bowl structural hoop stress)</td>
+              </tr>
+              <tr>
+                <td>Washing Machine Spin Cycle (Domestic)</td>
+                <td>1,400 RPM (\(\omega = 146.6\text{ rad/s}\))</td>
+                <td>240 mm (0.24 m)</td>
+                <td>5,158 m/s²</td>
+                <td>526 g (Drum perforation shear)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>4. Worked Engineering Case Study: Highway Interchange Banked Curve Design</h2>
+          <div class="worked-example-card">
+            <h3>Problem Statement</h3>
+            <p>A civil transportation agency is engineering a high-speed motorway exit ramp designed for traffic cruising at \(v = 90\text{ km/h}\) (\(25.0\text{ m/s}\)). Due to right-of-way topographic boundaries, the centerline turn radius is constrained to \(r = 200\text{ meters}\). The design vehicle is a loaded commercial box van with a total mass of \(m = 4,500\text{ kg}\).</p>
+            <p><strong>Required:</strong></p>
+            <ol>
+              <li>Compute the inward centripetal force \(F_c\) necessary to keep the vehicle safely on its curved path.</li>
+              <li>Determine the lateral acceleration and express it as a standardized G-force load factor.</li>
+              <li>Calculate the ideal roadway banking angle \(\theta\) (superelevation) such that lateral tire friction requirements are reduced to zero on ice-covered pavement.</li>
+            </ol>
+
+            <h3>Step-by-Step Mathematical Solution</h3>
+            <p><strong>Step 1: Convert design parameters into standard SI metric units:</strong></p>
+            <ul>
+              <li>Design speed: \(v = 90\text{ km/h} \div 3.6 = 25.0\text{ m/s}\)</li>
+              <li>Radius: \(r = 200\text{ m}\)</li>
+              <li>Vehicle mass: \(m = 4,500\text{ kg}\)</li>
+              <li>Earth gravity: \(g = 9.80665\text{ m/s}^2\)</li>
+            </ul>
+
+            <p><strong>Step 2: Calculate required centripetal force \(F_c\):</strong></p>
+            <div class="math-block">
+              $$F_c = \frac{m v^2}{r} = \frac{4,500 \times (25.0)^2}{200} = \frac{4,500 \times 625}{200} = 14,062.5\text{ N (14.06 kN)}$$
+            </div>
+            <p>Converting to gravitational force units: \(14,062.5\text{ N} \div 4.44822 \approx 3,161.4\text{ lbf}\).</p>
+
+            <p><strong>Step 3: Calculate centripetal acceleration and G-force load:</strong></p>
+            <div class="math-block">
+              $$a_c = \frac{v^2}{r} = \frac{(25.0)^2}{200} = \frac{625}{200} = 3.125\text{ m/s}^2$$
+            </div>
+            <div class="math-block">
+              $$\text{G-force} = \frac{a_c}{g} = \frac{3.125}{9.80665} \approx 0.3187\text{ g}$$
+            </div>
+
+            <p><strong>Step 4: Compute the frictionless roadway superelevation banking angle \(\theta\):</strong></p>
+            <p>Resolving the roadway normal force \(N\) into horizontal and vertical components yields:</p>
+            <div class="math-block">
+              $$N \sin\theta = \frac{m v^2}{r} \quad \text{and} \quad N \cos\theta = mg$$
+            </div>
+            <div class="math-block">
+              $$\tan\theta = \frac{N \sin\theta}{N \cos\theta} = \frac{v^2}{g \cdot r} = \frac{625}{9.80665 \times 200} = \frac{625}{1961.33} \approx 0.31866$$
+            </div>
+            <div class="math-block">
+              $$\theta = \arctan(0.31866) \approx 17.67^\circ$$
+            </div>
+            <p><strong>Engineering Assessment:</strong> A bank angle of \(17.67^\circ\) corresponds to a cross-slope grade of \(31.87\%\). Because standard AASHTO civil guidelines limit highway superelevation to a maximum of \(8\% \text{ to } 10\%\) to prevent stationary slow vehicles from sliding down icy banks during winter traffic jams, the engineering team must either expand the curve radius to at least \(r = 450\text{ m}\) or post a mandatory advisory speed reduction to \(55\text{ km/h}\).</p>
+          </div>
+
+          <h2>5. Centrifugal vs. Centripetal Force: Resolving the Confusion</h2>
+          <p>One of the most persistent confusions in physics is the distinction between <em>centripetal</em> and <em>centrifugal</em> forces:</p>
+          <ul>
+            <li><strong>Inertial (Stationary) Reference Frame:</strong> To an external stationary observer on the ground, only centripetal force exists. When a car makes a left turn, the friction of the road pushes the tires to the left. The passenger’s body simply wants to continue moving forward in a straight line (inertia). The car's door comes into contact with the passenger and pushes inward. No outward force is acting on the passenger.</li>
+            <li><strong>Non-Inertial (Rotating) Reference Frame:</strong> From the perspective of an observer sitting inside the turning car, Newton’s laws do not directly hold because the reference frame is accelerating. To reconcile motion using Newtonian equations inside this accelerating coordinate system, an artificial "fictitious" or d'Alembert body force—centrifugal force—is introduced, directed radially outward with magnitude equal to \(m v^2 / r\).</li>
+          </ul>
+
+          <h2>6. Frequently Asked Questions (FAQ)</h2>
+          <div class="faq-item">
+            <h3>What happens to centripetal force if velocity is doubled?</h3>
+            <p>Because centripetal force is proportional to the square of velocity (\(F_c \propto v^2\)), doubling the travel speed quadruples the required centripetal force (\(2^2 = 4\)). Tripling speed increases required force by a factor of 9, explaining why modest speeding on curves drastically escalates skid risk.</p>
+          </div>
+          <div class="faq-item">
+            <h3>Does centripetal force do physical work on an object?</h3>
+            <p>No. Mechanical work is defined as \(W = \vec{F} \cdot \vec{d} = F d \cos\theta\). Because the centripetal force vector is always perpendicular (\(\theta = 90^\circ\)) to the instantaneous displacement vector along the tangent, \(\cos 90^\circ = 0\). Centripetal force alters direction of motion but never does thermodynamic work or changes kinetic energy.</p>
+          </div>
+          <div class="faq-item">
+            <h3>What is the minimum speed needed to complete a vertical loop-the-loop?</h3>
+            <p>At the apex of a vertical circular loop, gravity assists the normal force. For the vehicle to avoid falling, the normal force must be at least zero (\(N \ge 0\)), leaving gravity to supply the entire centripetal force: \(mg = mv^2 / r\). Solving for velocity yields the critical minimum speed: \(v_{\text{crit}} = \sqrt{gr}\).</p>
+          </div>
+          <div class="faq-item">
+            <h3>How do rotating space stations generate artificial gravity?</h3>
+            <p>A rotating cylinder in space creates an apparent outward centrifugal force on its inner hull. To simulate Earth gravity (\(a_c = 9.81\text{ m/s}^2\)), the required angular speed is \(\omega = \sqrt{g / r}\). For human comfort (keeping rotation under 2 RPM to avoid Coriolis motion sickness), the radius \(r\) must be approximately 224 meters or larger.</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="sidebar" id="toolSidebar">
+        <!-- Injected via apply_sidebars_all.py -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, science, and technical calculation tools.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Centripetal Force Calculation Engine
+    const toKg = (m, unit) => {
+      switch(unit) {
+        case 'g': return m / 1000;
+        case 'lbs': return m * 0.45359237;
+        case 'ton': return m * 1000;
+        default: return m;
+      }
+    };
+    const toMps = (v, unit, r_m) => {
+      switch(unit) {
+        case 'kph': return v / 3.6;
+        case 'mph': return v * 0.44704;
+        case 'rpm': return (v * 2 * Math.PI / 60) * r_m;
+        default: return v;
+      }
+    };
+    const toMeters = (r, unit) => {
+      switch(unit) {
+        case 'ft': return r * 0.3048;
+        case 'km': return r * 1000;
+        case 'cm': return r / 100;
+        default: return r;
+      }
+    };
+
+    function calculate() {
+      const rawMass = parseFloat(document.getElementById('massVal').value) || 0;
+      const massUnit = document.getElementById('massUnit').value;
+      const rawRadius = parseFloat(document.getElementById('radiusVal').value) || 1;
+      const radiusUnit = document.getElementById('radiusUnit').value;
+
+      const r_m = toMeters(rawRadius, radiusUnit);
+      const m_kg = toKg(rawMass, massUnit);
+
+      const rawSpeed = parseFloat(document.getElementById('speedVal').value) || 0;
+      const speedUnit = document.getElementById('speedUnit').value;
+      const v_mps = toMps(rawSpeed, speedUnit, r_m);
+
+      const g = 9.80665;
+      const a_c = r_m > 1e-6 ? (v_mps * v_mps) / r_m : 0;
+      const f_c = m_kg * a_c;
+      const g_force = a_c / g;
+
+      // Frictionless banking angle tan(theta) = v^2 / (g*r)
+      const tanTheta = r_m > 1e-6 ? (v_mps * v_mps) / (g * r_m) : 0;
+      const thetaRad = Math.atan(tanTheta);
+      const thetaDeg = thetaRad * (180 / Math.PI);
+      const crossSlopePct = tanTheta * 100;
+
+      // Period T = 2*pi*r / v
+      const period = v_mps > 1e-6 ? (2 * Math.PI * r_m) / v_mps : 0;
+
+      // Format Force
+      if (f_c > 1000000) {
+        document.getElementById('resForce').textContent = (f_c / 1000000).toFixed(3) + " MN (" + (f_c / 1000).toFixed(1) + " kN)";
+      } else if (f_c > 1000) {
+        document.getElementById('resForce').textContent = (f_c / 1000).toFixed(2) + " kN (" + f_c.toLocaleString('en-US', {maximumFractionDigits: 1}) + " N)";
+      } else {
+        document.getElementById('resForce').textContent = f_c.toFixed(2) + " N";
+      }
+
+      const lbf = f_c / 4.4482216;
+      const kgf = f_c / g;
+      document.getElementById('resForceSub').textContent = 
+        "Equivalent to " + lbf.toLocaleString('en-US', {maximumFractionDigits: 1}) + " lbf (" + 
+        kgf.toLocaleString('en-US', {maximumFractionDigits: 1}) + " kgf)";
+
+      document.getElementById('resAcc').textContent = a_c.toFixed(2) + " m/s² (" + (a_c * 3.28084).toFixed(1) + " ft/s²)";
+      document.getElementById('resGForce').textContent = g_force.toFixed(3) + " g";
+      document.getElementById('resBankAngle').textContent = thetaDeg.toFixed(2) + "° (slope " + crossSlopePct.toFixed(1) + "%)";
+
+      if (period > 3600) {
+        document.getElementById('resPeriod').textContent = (period / 3600).toFixed(2) + " hours";
+      } else if (period > 60) {
+        document.getElementById('resPeriod').textContent = (period / 60).toFixed(2) + " minutes (" + period.toFixed(1) + " s)";
+      } else {
+        document.getElementById('resPeriod').textContent = period.toFixed(2) + " seconds";
+      }
+    }
+
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', calculate);
+      el.addEventListener('change', calculate);
+    });
+    document.getElementById('calcBtn').addEventListener('click', calculate);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('massVal').value = '1200';
+      document.getElementById('massUnit').value = 'kg';
+      document.getElementById('speedVal').value = '80';
+      document.getElementById('speedUnit').value = 'kph';
+      document.getElementById('radiusVal').value = '150';
+      document.getElementById('radiusUnit').value = 'm';
+      calculate();
+    });
+
+    window.addEventListener('DOMContentLoaded', calculate);
+  </script>
+</body>
+</html>
+"""
+
+TOOL_2_HTML = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doppler Effect Calculator | Sound & Optical Frequency Shift</title>
+  <meta name="description" content="Calculate acoustic and optical Doppler frequency shifts, observed pitch, apparent wavelength, and relative velocity for moving sound sources and observers.">
+  <link rel="canonical" href="https://calchub.cloud/doppler-effect-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Doppler Effect Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates acoustic and electromagnetic Doppler frequency shifts, apparent wavelengths, pitch variation in semitones, and relative velocities for moving audio or radar sources.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the general formula for the acoustic Doppler effect?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The general acoustic formula is f' = f₀ × ((c ± v_o) / (c ∓ v_s)), where f₀ is source emitted frequency, c is speed of sound in the medium, v_o is observer velocity, and v_s is source velocity. Top signs apply when approaching, bottom signs when receding."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does air temperature affect the speed of sound and Doppler shift?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The speed of sound in dry air scales with temperature: c ≈ 331.3 × √(1 + T / 273.15) m/s, or approximately 331.3 + 0.606 × T (°C). At 20°C, sound travels at 343.4 m/s. Higher temperatures increase sound speed, which slightly reduces the percentage Doppler shift for a given source velocity."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What happens when a sound source travels faster than the speed of sound?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "When source velocity equals or exceeds the medium sound speed (v_s ≥ c, Mach number M ≥ 1), the standard Doppler formula mathematically yields a singularity or negative frequency. Physically, the emitted wavefronts coalesce into a conical shock wave (Mach cone) with half-angle sin(μ) = 1/M, perceived as a sonic boom."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is the Doppler effect used in medical ultrasound?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Medical Doppler ultrasonography directs high-frequency ultrasound (2–10 MHz) into blood vessels. Moving red blood cells reflect the waves with a frequency shift Δf = (2 × f₀ × v × cos θ) / c. By measuring Δf and insonation angle θ, diagnostic scanners calculate blood flow velocity and detect arterial stenosis."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="logo">CalcHub</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="physics.html" class="active">Physics</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="engineering.html">Electrical</a>
+        <a href="civil.html">Civil</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <div class="content-wrapper">
+      <div class="calculator-container">
+        <h1>Doppler Effect Calculator</h1>
+        <p class="lead-text">Calculate apparent observed frequency, acoustic wavelength compression, relative pitch shift, and Doppler velocity for sound waves, radar, and moving vehicles.</p>
+
+        <div class="calc-card">
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="baseFreq">Emitted Frequency (f₀)</label>
+              <div class="input-with-unit">
+                <input type="number" id="baseFreq" class="form-control" value="440" step="any" min="0.001">
+                <select id="baseFreqUnit" class="unit-select">
+                  <option value="hz" selected>Hz (Concert A)</option>
+                  <option value="khz">kHz</option>
+                  <option value="mhz">MHz</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group col-half">
+              <label for="tempC">Air Temperature (Speed of Sound)</label>
+              <div class="input-with-unit">
+                <input type="number" id="tempC" class="form-control" value="20" step="any">
+                <select id="mediumSelect" class="unit-select">
+                  <option value="air" selected>Air (°C)</option>
+                  <option value="water">Freshwater (1482 m/s)</option>
+                  <option value="seawater">Seawater (1522 m/s)</option>
+                  <option value="custom">Custom (m/s)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="sourceSpeed">Source Velocity (v_s)</label>
+              <div class="input-with-unit">
+                <input type="number" id="sourceSpeed" class="form-control" value="90" step="any">
+                <select id="sourceSpeedUnit" class="unit-select">
+                  <option value="kph" selected>km/h</option>
+                  <option value="mps">m/s</option>
+                  <option value="mph">mph</option>
+                </select>
+              </div>
+              <div class="radio-row" style="margin-top:6px;">
+                <label><input type="radio" name="sourceDir" value="towards" checked> Moving Toward Observer</label>
+                <label style="margin-left:12px;"><input type="radio" name="sourceDir" value="away"> Moving Away</label>
+                <label style="margin-left:12px;"><input type="radio" name="sourceDir" value="stationary"> Stationary (0)</label>
+              </div>
+            </div>
+
+            <div class="form-group col-half">
+              <label for="obsSpeed">Observer Velocity (v_o)</label>
+              <div class="input-with-unit">
+                <input type="number" id="obsSpeed" class="form-control" value="0" step="any">
+                <select id="obsSpeedUnit" class="unit-select">
+                  <option value="kph" selected>km/h</option>
+                  <option value="mps">m/s</option>
+                  <option value="mph">mph</option>
+                </select>
+              </div>
+              <div class="radio-row" style="margin-top:6px;">
+                <label><input type="radio" name="obsDir" value="stationary" checked> Stationary (0)</label>
+                <label style="margin-left:12px;"><input type="radio" name="obsDir" value="towards"> Moving Toward Source</label>
+                <label style="margin-left:12px;"><input type="radio" name="obsDir" value="away"> Moving Away</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button type="button" id="calcBtn" class="btn btn-primary">Calculate Doppler Shift</button>
+            <button type="button" id="resetBtn" class="btn btn-secondary">Reset to Emergency Siren Example</button>
+          </div>
+
+          <div id="resultsPanel" class="results-panel">
+            <div class="result-box primary-result">
+              <div class="result-label">Observed Frequency (f')</div>
+              <div class="result-value" id="resObsFreq">474.55 Hz</div>
+              <div class="result-sub" id="resShiftSub">+34.55 Hz shift (+7.85% pitch rise)</div>
+            </div>
+
+            <div class="result-grid">
+              <div class="result-item">
+                <span class="sub-label">Speed of Sound in Medium (c)</span>
+                <span class="sub-value" id="resSpeedSound">343.4 m/s (1,236 km/h)</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Apparent Wavelength (&lambda;')</span>
+                <span class="sub-value" id="resWavelength">0.724 m (72.4 cm)</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Musical Pitch Shift</span>
+                <span class="sub-value" id="resMusicalShift">+1.31 semitones (+131 cents)</span>
+              </div>
+              <div class="result-item">
+                <span class="sub-label">Source Mach Number (M)</span>
+                <span class="sub-value" id="resMach">Mach 0.073 (Subsonic)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>1. Physical Mechanics of the Acoustic Doppler Shift</h2>
+          <p>The Doppler effect, first formulated by Austrian physicist Christian Doppler in 1842, describes the perceived change in frequency or wavelength of a wave for an observer moving relative to the wave source. While the physical wave-generation frequency at the source emitter remains completely invariant, the spatial separation between successive wavefronts compresses or expands along the relative vector axis of travel.</p>
+          <p>When an acoustic emitter—such as an emergency ambulance siren or a high-speed passenger locomotive horn—moves toward a stationary listener, each subsequent pressure wavefront is emitted from a location closer to the listener than the preceding wavefront. Consequently, the wavefronts bunch together in front of the source, resulting in a shortened apparent spatial wavelength \(\lambda'\):</p>
+          <div class="math-block">
+            $$\lambda' = \frac{c - v_s}{f_0}$$
+          </div>
+          <p>Because the speed of sound \(c\) through the undisturbed atmospheric medium is strictly dictated by thermodynamic fluid properties (temperature, adiabatic index, and molecular weight) and remains independent of source velocity, the compressed wavefronts arrive at the stationary observer's ear at an increased arrival rate, perceived psychoacoustically as a higher musical pitch.</p>
+
+          <h2>2. General Mathematical Formulations for Classical Wave Propagation</h2>
+          <p>In classical fluid acoustics, wave propagation requires a physical transmitting medium (such as air or water). Because motion relative to this medium is physical and non-symmetric, source motion and observer motion produce mathematically distinct expressions that combine into the master Doppler formulation:</p>
+          <div class="math-block">
+            $$f' = f_0 \left( \frac{c \pm v_o}{c \mp v_s} \right)$$
+          </div>
+          <p>Where:</p>
+          <ul>
+            <li>\(f'\) = Apparent observed frequency received by detector (\(\text{Hz}\))</li>
+            <li>\(f_0\) = Intrinsic emitted frequency at source (\(\text{Hz}\))</li>
+            <li>\(c\) = Phase velocity of acoustic waves in the transmission medium (\(\text{m/s}\))</li>
+            <li>\(v_o\) = Translational velocity of the observer relative to the medium (\(\text{m/s}\))</li>
+            <li>\(v_s\) = Translational velocity of the source relative to the medium (\(\text{m/s}\))</li>
+          </ul>
+          <p><strong>Sign Conventions:</strong> In the numerator, the \(+\) sign applies when the observer moves <em>toward</em> the source (intercepting wavefronts faster), while the \(-\) sign applies when moving <em>away</em>. In the denominator, the \(-\) sign applies when the source moves <em>toward</em> the observer (compressing wavefronts), while the \(+\) sign applies when moving <em>away</em>.</p>
+
+          <h2>3. Sound Speed Scaling with Ambient Air Temperature</h2>
+          <p>In atmospheric acoustics, the speed of sound \(c\) in ideal dry air varies primarily with absolute thermodynamic temperature \(T_K\) according to Laplace’s formula \(c = \sqrt{\gamma R_{\text{spec}} T_K}\). For engineering calculations at standard sea-level pressure, this simplifies to:</p>
+          <div class="math-block">
+            $$c \approx 331.3 \times \sqrt{1 + \frac{T}{273.15}} \approx 331.3 + 0.606 \times T \,(^\circ\text{C}) \quad [\text{m/s}]$$
+          </div>
+          <p>At standard ISO room temperature of \(20^\circ\text{C}\) (\(68^\circ\text{F}\)), the speed of sound equals exactly \(343.4\text{ m/s}\) (\(1,236.2\text{ km/h}\)). In colder winter conditions (\(-10^\circ\text{C}\)), sound speed drops to \(325.2\text{ m/s}\), producing a noticeably larger percentage Doppler shift for the exact same vehicular speed.</p>
+
+          <h2>4. Real-World Engineering and Scientific Applications</h2>
+          <p>The Doppler principle is not merely a sonic curiosity; it serves as the foundational operating mechanism across vast domains of modern scientific instrumentation and radar systems:</p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Technology / Scientific System</th>
+                <th>Operating Frequency</th>
+                <th>Target Medium / Velocity</th>
+                <th>Observed Doppler Frequency Shift (\(\Delta f\))</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Highway Police Radar Gun (Ka-Band)</td>
+                <td>34.7 GHz (\(\lambda = 8.6\text{ mm}\))</td>
+                <td>Vehicle at 130 km/h (36.1 m/s)</td>
+                <td>8,358 Hz (Two-way radar reflection)</td>
+              </tr>
+              <tr>
+                <td>Cardiovascular Color Doppler Ultrasound</td>
+                <td>5.0 MHz (Acoustic)</td>
+                <td>Aortic blood flow at 1.2 m/s</td>
+                <td>7,800 Hz (Insonation angle \(\theta = 60^\circ\))</td>
+              </tr>
+              <tr>
+                <td>Commercial Airliner Weather Radar (X-Band)</td>
+                <td>9.375 GHz</td>
+                <td>Severe storm downdraft at 45 m/s</td>
+                <td>2,812 Hz (Precipitation reflectivity)</td>
+              </tr>
+              <tr>
+                <td>LEO Communication Satellite (Starlink / GPS)</td>
+                <td>1.575 GHz (L1 band)</td>
+                <td>Orbital velocity 7.5 km/s</td>
+                <td>\(\pm 39.4\text{ kHz}\) (Drift across horizon transit)</td>
+              </tr>
+              <tr>
+                <td>Astronomical Optical Spectroscopy (Hubble)</td>
+                <td>\(656.3\text{ nm}\) (H-alpha line)</td>
+                <td>Distant galaxy receding at \(0.15 c\)</td>
+                <td>Redshift \(z = 0.162\) (\(\lambda' = 762.6\text{ nm}\))</td>
+              </tr>
+              <tr>
+                <td>Acoustic Doppler Current Profiler (ADCP)</td>
+                <td>300 kHz (Marine sonar)</td>
+                <td>Ocean river discharge at 2.5 m/s</td>
+                <td>985 Hz (Suspended sediment backscatter)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>5. Worked Engineering Case Study: Medical Color Doppler Blood Flow Velocimetry</h2>
+          <div class="worked-example-card">
+            <h3>Problem Statement</h3>
+            <p>A vascular sonographer examines a patient suspected of internal carotid artery stenosis. The clinical ultrasound transducer emits a beam with a center carrier frequency of \(f_0 = 4.0\text{ MHz}\) (\(4.0 \times 10^6\text{ Hz}\)). The speed of acoustic propagation in human soft tissue is standardized at \(c = 1,540\text{ m/s}\). The probe beam intercepts the blood vessel axis at an insonation angle of \(\theta = 45^\circ\). The diagnostic machine detects a peak Doppler frequency shift of \(\Delta f = 4,200\text{ Hz}\).</p>
+            <p><strong>Required:</strong></p>
+            <ol>
+              <li>Determine the true peak systolic blood velocity \(v\) flowing through the stenotic arterial lumen.</li>
+              <li>Evaluate whether the velocity exceeds clinical diagnostic thresholds for critical arterial narrowing (\(> 1.25\text{ m/s}\)).</li>
+            </ol>
+
+            <h3>Step-by-Step Mathematical Solution</h3>
+            <p><strong>Step 1: Understand the two-way ultrasonic Doppler equation:</strong></p>
+            <p>In medical diagnostic ultrasound, red blood cells act first as moving receivers that intercept incident sound waves, and second as moving secondary emitters that backscatter echoes to the stationary transducer crystals. This dual interaction produces a two-way Doppler shift modified by the cosine of the insonation angle \(\theta\):</p>
+            <div class="math-block">
+              $$\Delta f = f' - f_0 = \frac{2 f_0 \cdot v \cdot \cos\theta}{c}$$
+            </div>
+
+            <p><strong>Step 2: Rearrange to isolate blood velocity \(v\):</strong></p>
+            <div class="math-block">
+              $$v = \frac{\Delta f \cdot c}{2 f_0 \cdot \cos\theta}$$
+            </div>
+
+            <p><strong>Step 3: Substitute clinical parameters:</strong></p>
+            <ul>
+              <li>Doppler shift: \(\Delta f = 4,200\text{ Hz}\)</li>
+              <li>Tissue sound speed: \(c = 1,540\text{ m/s}\)</li>
+              <li>Emitted frequency: \(f_0 = 4.0 \times 10^6\text{ Hz}\)</li>
+              <li>Insonation angle: \(\cos 45^\circ \approx 0.7071\)</li>
+            </ul>
+            <div class="math-block">
+              $$v = \frac{4,200 \times 1,540}{2 \times (4.0 \times 10^6) \times 0.7071} = \frac{6,468,000}{5,656,854} \approx 1.143\text{ m/s}$$
+            </div>
+            <p>Converting to centimeters per second: \(v = 114.3\text{ cm/s}\).</p>
+
+            <p><strong>Clinical Diagnostic Evaluation:</strong> Normal internal carotid artery peak systolic velocity is typically \(< 125\text{ cm/s}\) (\(1.25\text{ m/s}\)). Because the measured velocity is \(114.3\text{ cm/s}\), it falls within the borderline normal range, ruling out severe lumen obstruction (\(> 70\%\) diameter reduction, which typically drives jet velocities above \(230\text{ cm/s}\)).</p>
+          </div>
+
+          <h2>6. Acoustic Shock Waves and the Relativistic Optical Doppler Shift</h2>
+          <p>When analyzing high-velocity regimes, two critical physical boundaries alter standard Doppler behavior:</p>
+          <ul>
+            <li><strong>Supersonic Shock Waves (Mach Cone):</strong> When the source velocity approaches the acoustic medium speed (\(v_s \to c\)), the denominator \((c - v_s) \to 0\), causing apparent frequency to diverge toward infinity. When the source breaks the sound barrier (\(v_s > c\), Mach number \(M = v_s / c > 1\)), wavefronts cannot escape ahead of the vehicle. Instead, they overlap constructively along a conical envelope known as the <strong>Mach cone</strong>, with opening half-angle:
+              <div class="math-block">
+                $$\sin\mu = \frac{c}{v_s} = \frac{1}{M}$$
+              </div>
+            </li>
+            <li><strong>Relativistic Optical Doppler Effect:</strong> For electromagnetic radiation in a vacuum (where no material medium exists and light speed \(c\) is invariant in all reference frames), Einstein’s special relativity governs the shift. Incorporating time dilation \(\gamma = 1 / \sqrt{1 - \beta^2}\), the longitudinal optical Doppler equation is:
+              <div class="math-block">
+                $$f' = f_0 \sqrt{\frac{1 - \beta}{1 + \beta}} \quad \text{where } \beta = \frac{v}{c}$$
+              </div>
+            </li>
+          </ul>
+
+          <h2>7. Frequently Asked Questions (FAQ)</h2>
+          <div class="faq-item">
+            <h3>Why does an ambulance siren drop sharply in pitch as it passes by?</h3>
+            <p>As the ambulance approaches, the received frequency is continuously elevated (\(f' = f_0 \frac{c}{c - v_s}\)). At the precise moment of closest approach (broadside), the radial component of velocity drops momentarily to zero. As it recedes, the frequency immediately switches to a depressed pitch (\(f' = f_0 \frac{c}{c + v_s}\)). The sudden transition between these two steady states is perceived as the characteristic downward siren pitch drop.</p>
+          </div>
+          <div class="faq-item">
+            <h3>How do you calculate musical pitch change in semitones from frequency ratio?</h3>
+            <p>In standard 12-tone equal temperament music theory, one octave represents a frequency doubling (\(2:1\)) divided into 12 logarithmic semitones. The pitch shift in semitones \(\Delta S\) is calculated as: \(\Delta S = 12 \times \log_2(f' / f_0) = 39.863 \times \log_{10}(f' / f_0)\).</p>
+          </div>
+          <div class="faq-item">
+            <h3>Can the Doppler effect occur if the source and observer travel at identical speeds?</h3>
+            <p>If the source and observer move in the same direction at identical speeds relative to the air (\(v_s = v_o\)), the relative distance between them remains constant. In this specific case, the numerator and denominator cancel (\((c - v) / (c - v) = 1\)), and the observed frequency is exactly equal to the emitted frequency (\(f' = f_0\)).</p>
+          </div>
+          <div class="faq-item">
+            <h3>Why is the insonation angle critical in medical Doppler ultrasound?</h3>
+            <p>Because the measured Doppler shift is proportional to \(\cos\theta\), an angle of \(\theta = 90^\circ\) yields \(\cos 90^\circ = 0\), completely eliminating any detectable frequency shift regardless of how rapidly blood is flowing. Diagnostic ultrasound guidelines mandate maintaining the insonation angle between \(30^\circ \text{ and } 60^\circ\).</p>
+          </div>
+        </article>
+      </div>
+
+      <aside class="sidebar" id="toolSidebar">
+        <!-- Injected via apply_sidebars_all.py -->
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, science, and technical calculation tools.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Doppler Effect Calculation Engine
+    const toHz = (f, unit) => {
+      switch(unit) {
+        case 'khz': return f * 1000;
+        case 'mhz': return f * 1000000;
+        default: return f;
+      }
+    };
+    const toMps = (v, unit) => {
+      switch(unit) {
+        case 'kph': return v / 3.6;
+        case 'mph': return v * 0.44704;
+        default: return v;
+      }
+    };
+
+    function getSoundSpeed() {
+      const medium = document.getElementById('mediumSelect').value;
+      if (medium === 'water') return 1482;
+      if (medium === 'seawater') return 1522;
+      if (medium === 'custom') {
+        return parseFloat(document.getElementById('tempC').value) || 343;
+      }
+      // Air calculation
+      const tempC = parseFloat(document.getElementById('tempC').value) || 20;
+      return 331.3 * Math.sqrt(1 + (tempC / 273.15));
+    }
+
+    function calculate() {
+      const rawBaseFreq = parseFloat(document.getElementById('baseFreq').value) || 440;
+      const baseFreqUnit = document.getElementById('baseFreqUnit').value;
+      const f0 = toHz(rawBaseFreq, baseFreqUnit);
+
+      const c = getSoundSpeed();
+
+      const rawSourceSpeed = parseFloat(document.getElementById('sourceSpeed').value) || 0;
+      const sourceUnit = document.getElementById('sourceSpeedUnit').value;
+      const sourceSpeed = toMps(rawSourceSpeed, sourceUnit);
+
+      const rawObsSpeed = parseFloat(document.getElementById('obsSpeed').value) || 0;
+      const obsUnit = document.getElementById('obsSpeedUnit').value;
+      const obsSpeed = toMps(rawObsSpeed, obsUnit);
+
+      const sourceDir = document.querySelector('input[name="sourceDir"]:checked').value;
+      const obsDir = document.querySelector('input[name="obsDir"]:checked').value;
+
+      let effective_vs = 0;
+      if (sourceDir === 'towards') effective_vs = sourceSpeed;
+      else if (sourceDir === 'away') effective_vs = -sourceSpeed;
+
+      let effective_vo = 0;
+      if (obsDir === 'towards') effective_vo = obsSpeed;
+      else if (obsDir === 'away') effective_vo = -obsSpeed;
+
+      // Formula: f' = f0 * ((c + effective_vo) / (c - effective_vs))
+      let denom = c - effective_vs;
+      let numer = c + effective_vo;
+
+      let f_obs = 0;
+      let isSupersonic = false;
+
+      if (denom <= 0) {
+        isSupersonic = true;
+        f_obs = 0;
+      } else {
+        f_obs = f0 * (numer / denom);
+      }
+
+      const delta_f = f_obs - f0;
+      const pctChange = f0 > 0 ? (delta_f / f0) * 100 : 0;
+      const wavelength = f_obs > 0 ? c / f_obs : 0;
+
+      // Semitones: 12 * log2(f_obs / f0)
+      const semitones = (f_obs > 0 && f0 > 0) ? 12 * (Math.log(f_obs / f0) / Math.LN2) : 0;
+      const cents = semitones * 100;
+
+      // Mach number
+      const mach = sourceSpeed / c;
+
+      // Render Primary
+      if (isSupersonic) {
+        document.getElementById('resObsFreq').textContent = "Sonic Boom / Shock Wave";
+        document.getElementById('resShiftSub').textContent = "Source speed exceeds medium sound speed (Mach " + mach.toFixed(2) + " ≥ 1.0)";
+      } else {
+        let fText = f_obs > 1000000 ? (f_obs / 1000000).toFixed(4) + " MHz" :
+                    f_obs > 1000 ? (f_obs / 1000).toFixed(3) + " kHz" :
+                    f_obs.toFixed(2) + " Hz";
+        document.getElementById('resObsFreq').textContent = fText;
+
+        let shiftSign = delta_f >= 0 ? "+" : "";
+        let dText = Math.abs(delta_f) > 1000 ? (delta_f / 1000).toFixed(2) + " kHz" : delta_f.toFixed(2) + " Hz";
+        document.getElementById('resShiftSub').textContent = 
+          shiftSign + dText + " shift (" + shiftSign + pctChange.toFixed(2) + "% pitch " + (delta_f >= 0 ? "rise" : "drop") + ")";
+      }
+
+      document.getElementById('resSpeedSound').textContent = 
+        c.toFixed(1) + " m/s (" + (c * 3.6).toFixed(0) + " km/h | " + (c * 2.23694).toFixed(0) + " mph)";
+
+      if (wavelength > 1) {
+        document.getElementById('resWavelength').textContent = wavelength.toFixed(3) + " m (" + (wavelength * 3.28084).toFixed(2) + " ft)";
+      } else {
+        document.getElementById('resWavelength').textContent = (wavelength * 100).toFixed(2) + " cm (" + (wavelength * 1000).toFixed(1) + " mm)";
+      }
+
+      let semiSign = semitones >= 0 ? "+" : "";
+      document.getElementById('resMusicalShift').textContent = 
+        semiSign + semitones.toFixed(2) + " semitones (" + semiSign + cents.toFixed(0) + " cents)";
+
+      document.getElementById('resMach').textContent = 
+        "Mach " + mach.toFixed(3) + " (" + (mach >= 1.0 ? "Supersonic" : mach >= 0.8 ? "Transonic" : "Subsonic") + ")";
+    }
+
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', calculate);
+      el.addEventListener('change', calculate);
+    });
+    document.getElementById('calcBtn').addEventListener('click', calculate);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('baseFreq').value = '440';
+      document.getElementById('baseFreqUnit').value = 'hz';
+      document.getElementById('tempC').value = '20';
+      document.getElementById('mediumSelect').value = 'air';
+      document.getElementById('sourceSpeed').value = '90';
+      document.getElementById('sourceSpeedUnit').value = 'kph';
+      document.getElementById('obsSpeed').value = '0';
+      document.getElementById('obsSpeedUnit').value = 'kph';
+      document.querySelector('input[name="sourceDir"][value="towards"]').checked = true;
+      document.querySelector('input[name="obsDir"][value="stationary"]').checked = true;
+      calculate();
+    });
+
+    window.addEventListener('DOMContentLoaded', calculate);
+  </script>
+</body>
+</html>
+"""
+
+def main():
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    p1 = os.path.join(base_dir, "centripetal-force-calculator.html")
+    p2 = os.path.join(base_dir, "doppler-effect-calculator.html")
+
+    with open(p1, "w", encoding="utf-8") as f:
+        f.write(TOOL_1_HTML)
+    print(f"Generated {p1}")
+
+    with open(p2, "w", encoding="utf-8") as f:
+        f.write(TOOL_2_HTML)
+    print(f"Generated {p2}")
+
+if __name__ == "__main__":
+    main()

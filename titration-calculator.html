@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Titration Calculator | Acid-Base Equivalence &amp; Molarity Solver</title>
+  <meta name="description" content="Calculate unknown analyte concentration, equivalence point volume, normality, titration curves, and indicator selection for acid-base and redox titrations.">
+  <link rel="canonical" href="https://calchub.cloud/titration-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Titration Calculator",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculates volumetric analytical titration stoichiometry, unknown analyte concentration and mass, equivalence point burette volumes, and color indicator selection.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the primary equation for volumetric titration?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "At the stoichiometric equivalence point, the moles of reactive equivalents of titrant equal the equivalents of analyte: N1 * V1 = N2 * V2, or in terms of molarity: M_titrant * V_titrant * z_titrant = M_analyte * V_analyte * z_analyte, where z represents the valence or stoichiometric factor (protons H+ donated/accepted or electrons transferred)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between the equivalence point and the end point?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The equivalence point is the exact theoretical stoichiometric state where moles of titrant added chemically equal moles of analyte. The end point is the experimentally observed physical event (such as a color change from phenolphthalein or an electrometric potential jump) where the titrator stops adding reagent. Proper indicator selection minimizes the titration error between end point and equivalence point."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why is the equivalence point pH not always 7.0 in acid-base titrations?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "While titrating a strong acid with a strong base produces neutral salt and water with pH = 7.00 at 25°C, titrating a weak acid (e.g., acetic acid) with a strong base (NaOH) produces a conjugate base (acetate CH3COO-) that hydrolyzes water, causing the equivalence point to be alkaline (pH 8.5 to 9.2). Conversely, titrating a weak base with a strong acid results in an acidic equivalence point (pH 4.5 to 5.5)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does burette reading precision affect titration accuracy?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A standard 50 mL Class A analytical burette has graduation marks of 0.1 mL and can be interpolated to ±0.02 mL. Delivering an equivalence volume greater than 20 mL ensures the volumetric measurement uncertainty remains below ±0.1%, conforming to ISO/IEC 17025 testing standards."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-category="chemical">
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        <span class="logo-icon">&pi;</span>
+        <span class="logo-text">Calc<strong>Hub</strong></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="mechanical.html">Mechanical</a>
+        <a href="civil.html">Civil &amp; Roof</a>
+        <a href="solar-energy.html">Solar</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo; 
+      <a href="chemical.html">Chemical &amp; Water Treatment</a> &rsaquo; 
+      <span>Titration Calculator</span>
+    </nav>
+
+    <h1 class="tool-title">Analytical Titration &amp; Molarity Calculator</h1>
+    <p class="tool-subtitle">Equivalence Point Stoichiometry, Normality (N₁V₁ = N₂V₂), Analyte Mass &amp; Indicator Sizer</p>
+
+    <div class="calculator-layout">
+      <!-- Calculator Core Interface -->
+      <div class="calculator-card">
+        <div class="calc-form">
+          <div class="form-group">
+            <label for="titrationPreset">Titration Chemistry Preset</label>
+            <select id="titrationPreset" class="form-control" onchange="updateTitrationPreset()">
+              <option value="sa_sb" selected>Strong Acid (HCl) vs. Strong Base (NaOH)</option>
+              <option value="wa_sb">Weak Acid (Acetic Acid) vs. Strong Base (NaOH)</option>
+              <option value="sb_sa_di">Diprotic Acid (H₂SO₄) vs. Strong Base (NaOH)</option>
+              <option value="khp_naoh">Primary Standard KHP vs. NaOH Standardization</option>
+              <option value="redox_kmno4">Redox Titration: KMnO₄ (z=5) vs. Fe²⁺ (z=1)</option>
+              <option value="edta_hardness">Complexometric: EDTA vs. Total Water Hardness (Ca²⁺)</option>
+              <option value="custom">Custom Titrant &amp; Analyte Entry</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="titrationSolveTarget">Variable to Solve For</label>
+            <select id="titrationSolveTarget" class="form-control" onchange="updateTitrationInputs()">
+              <option value="analyte_conc" selected>Analyte Concentration (M &amp; N) [Given Titrant Volume]</option>
+              <option value="titrant_vol">Required Titrant Volume (Vₜ) [Given Analyte Molarity]</option>
+            </select>
+          </div>
+
+          <!-- Titrant Parameters -->
+          <div style="background: #F8FAFC; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #E2E8F0;">
+            <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; color: var(--primary);">Standard Titrant in Burette</h4>
+            <div class="grid-2-col">
+              <div class="form-group">
+                <label for="titrantMolarityVal">Titrant Molarity (Mₜ)</label>
+                <input type="number" id="titrantMolarityVal" class="form-control" value="0.1000" step="0.005" min="0.0001">
+                <span class="field-hint">Known standard mol/L</span>
+              </div>
+              <div class="form-group">
+                <label for="titrantValenceZ">Titrant Valence (zₜ)</label>
+                <input type="number" id="titrantValenceZ" class="form-control" value="1" step="1" min="1" max="6">
+                <span class="field-hint">e.g., 1 for NaOH/HCl, 5 for KMnO₄</span>
+              </div>
+            </div>
+            <div id="titrantVolGroup" class="form-group">
+              <label for="titrantVolumeMl">Delivered Burette Volume (Vₜ) (mL)</label>
+              <input type="number" id="titrantVolumeMl" class="form-control" value="24.35" step="0.05" min="0.01">
+              <span class="field-hint">Final burette reading minus initial</span>
+            </div>
+          </div>
+
+          <!-- Analyte Parameters -->
+          <div style="background: #F8FAFC; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #E2E8F0;">
+            <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; color: var(--text-main);">Unknown Analyte in Flask</h4>
+            <div class="grid-2-col">
+              <div class="form-group">
+                <label for="analyteVolumeMl">Analyte Aliquot Volume (Vₐ) (mL)</label>
+                <input type="number" id="analyteVolumeMl" class="form-control" value="25.00" step="1.0" min="0.1">
+                <span class="field-hint">Pipetted sample volume</span>
+              </div>
+              <div class="form-group">
+                <label for="analyteValenceZ">Analyte Valence (zₐ)</label>
+                <input type="number" id="analyteValenceZ" class="form-control" value="1" step="1" min="1" max="6">
+                <span class="field-hint">Reactive protons/electrons per mole</span>
+              </div>
+            </div>
+            <div id="analyteConcInputGroup" class="form-group" style="display: none;">
+              <label for="analyteMolarityInputVal">Analyte Known Molarity (Mₐ)</label>
+              <input type="number" id="analyteMolarityInputVal" class="form-control" value="0.0974" step="0.005" min="0.0001">
+            </div>
+            <div class="form-group">
+              <label for="analyteMolarMassVal">Analyte Molar Mass (MW) (g/mol)</label>
+              <input type="number" id="analyteMolarMassVal" class="form-control" value="36.46" step="0.01" min="1.0">
+              <span class="field-hint">For gravimetric mass determination</span>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary" onclick="calcTitration()" style="width: 100%; margin-top: 10px;">Solve Titration Stoichiometry</button>
+        </div>
+      </div>
+
+      <!-- Output Results Panel -->
+      <div class="results-card">
+        <div class="result-box primary-result">
+          <div id="resPrimaryTitrationLabel" class="result-label">Calculated Analyte Concentration</div>
+          <div id="resPrimaryTitrationVal" class="result-value">0.09740 M</div>
+          <div id="resPrimaryTitrationAlt" class="result-subtext">Normality = 0.09740 N | 3.551 g/L active analyte</div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-item">
+            <span class="result-label">Analyte Aliquot Mass</span>
+            <span id="resAnalyteSampleMass" class="result-value highlight">88.78 mg</span>
+            <span id="resAnalyteSampleMassSub" class="result-subtext">In 25.00 mL sample flask</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Equivalence Titrant Volume</span>
+            <span id="resEquivalenceVolume" class="result-value">24.35 mL</span>
+            <span class="result-subtext">Burette delivery volume</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Substance Quantity</span>
+            <span id="resTotalMolesAnalyte" class="result-value">2.435 mmol</span>
+            <span class="result-subtext">0.002435 moles in flask</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Equivalence Point pH</span>
+            <span id="resEquilPH" class="result-value">pH 7.00</span>
+            <span class="result-subtext">Neutral salt formed</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Recommended Indicator</span>
+            <span id="resRecIndicator" class="result-value">Bromothymol Blue</span>
+            <span id="resRecIndicatorRange" class="result-subtext">Transition pH 6.0 &ndash; 7.6</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Titration Precision</span>
+            <span id="resTitrationError" class="result-value">&plusmn;0.08% Error</span>
+            <span class="result-subtext">Class A burette &plusmn;0.02 mL</span>
+          </div>
+        </div>
+
+        <div class="result-details" style="margin-top: 15px;">
+          <p><strong>Stoichiometric Reaction Ratio:</strong> <span id="resReactionRatio">1 mole Titrant reacts with 1 mole Analyte (1:1 stoichiometry).</span></p>
+          <p><strong>Color Transition End-Point:</strong> <span id="resColorTransition">Yellow (acid) &rarr; Emerald Green &rarr; Blue (basic) at equivalence.</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1000+ Words Engineering Body -->
+    <article class="article-body">
+      <h2>Foundations of Quantitative Volumetric Titrimetry</h2>
+      <p><strong>Titration</strong> (also termed <em>volumetric analysis</em> or <em>titrimetry</em>) represents one of the oldest, most accurate, and foundational analytical methodologies in chemical metrology, pharmaceutical quality assurance, and environmental water testing. Originating in late 18th-century France through the pioneering work of François-Antoine-Henri Descroizilles and Joseph Louis Gay-Lussac, titrimetry determines the unknown concentration of an identified chemical substance (the <strong>analyte</strong>) by quantitatively reacting it with a measured volume of a standardized reagent solution of known concentration (the <strong>titrant</strong>).</p>
+
+      <p>Unlike instrumental spectroscopic techniques that rely on empirical calibration curves, volumetric titration is a <strong>primary ratio method</strong> grounded directly in the fundamental laws of chemical stoichiometry. When executed with calibrated Class A volumetric glassware (transfer pipettes and analytical burettes), titration routinely delivers measurement uncertainties below $\pm 0.1\%$, making it the definitive referee technique for standardizing secondary working solutions and validating automated online chemical analyzers.</p>
+
+      <h2>The Principle of Chemical Equivalents (N₁V₁ = N₂V₂)</h2>
+      <p>At the center of volumetric analysis lies the concept of <strong>chemical equivalence</strong>. The reaction reaches its theoretical completion at the <strong>stoichiometric equivalence point</strong>, where the number of reactive equivalents of titrant added from the burette exactly equals the number of equivalents of analyte initially present in the titration vessel:</p>
+
+      <div class="formula-box">
+        $$\text{Equivalents of Titrant} = \text{Equivalents of Analyte}$$
+        $$N_{\text{titrant}} \times V_{\text{titrant}} = N_{\text{analyte}} \times V_{\text{analyte}}$$
+      </div>
+
+      <p>Where $N$ represents normality (equivalents per liter, $\text{eq/L}$) and $V$ is liquid volume. Because normality is related to molar concentration ($M$ in $\text{mol/L}$) by the equivalence factor $z$ ($N = M \cdot z$):</p>
+
+      <div class="formula-box">
+        $$M_{\text{titrant}} \cdot V_{\text{titrant}} \cdot z_{\text{titrant}} = M_{\text{analyte}} \cdot V_{\text{analyte}} \cdot z_{\text{analyte}}$$
+      </div>
+
+      <p>Where $z$ denotes the stoichiometric valence factor:</p>
+      <ul>
+        <li><strong>In Acid-Base Neutralization:</strong> $z$ is the number of reactive hydronium ions ($\text{H}^+$) donated or accepted per molecule. For hydrochloric acid ($\text{HCl}$) and sodium hydroxide ($\text{NaOH}$), $z = 1$. For diprotic sulfuric acid ($\text{H}_2\text{SO}_4$) or oxalic acid ($\text{H}_2\text{C}_2\text{O}_4$), $z = 2$. For triprotic citric acid ($\text{H}_3\text{C}_6\text{H}_5\text{O}_7$), $z = 3$.</li>
+        <li><strong>In Oxidation-Reduction (Redox):</strong> $z$ is the integer number of electrons transferred per formula unit in the half-reaction. In permanganate redox titrations in acidic media ($\text{MnO}_4^- + 8\text{H}^+ + 5\text{e}^- \to \text{Mn}^{2+} + 4\text{H}_2\text{O}$), $z_{\text{KMnO}_4} = 5$, reacting with ferrous iron ($\text{Fe}^{2+} \to \text{Fe}^{3+} + \text{e}^-$, where $z_{\text{Fe}} = 1$).</li>
+        <li><strong>In Complexometric Titrations:</strong> In standard water hardness determination using ethylenediaminetetraacetic acid (EDTA), disodium EDTA forms a $1:1$ hexadentate chelate complex with divalent metal cations ($\text{Ca}^{2+} + \text{EDTA}^{4-} \to [\text{Ca-EDTA}]^{2-}$), establishing an effective $z = 1$ stoichiometry for both species.</li>
+      </ul>
+
+      <h2>Analytical Inversion Formulas for Analyte Properties</h2>
+      <p>Rearranging the equivalence relation allows direct calculation of the target analytical metrics:</p>
+
+      <h3>1. Unknown Analyte Molar Concentration (M_analyte)</h3>
+      <div class="formula-box">
+        $$M_{\text{analyte}} = \frac{M_{\text{titrant}} \times V_{\text{titrant}} \times z_{\text{titrant}}}{V_{\text{analyte}} \times z_{\text{analyte}}}$$
+      </div>
+
+      <h3>2. Unknown Analyte Mass in Aliquot (m_analyte)</h3>
+      <p>Multiplying the calculated moles by the molecular weight ($M_w$ in $\text{g/mol}$) gives the absolute gravimetric mass of pure substance contained within the pipetted sample volume:</p>
+      <div class="formula-box">
+        $$m_{\text{analyte}}\text{ (grams)} = M_{\text{analyte}}\text{ (mol/L)} \times V_{\text{analyte}}\text{ (L)} \times M_w\text{ (g/mol)}$$
+        $$m_{\text{analyte}}\text{ (mg)} = M_{\text{analyte}} \times V_{\text{analyte}}\text{ (mL)} \times M_w$$
+      </div>
+
+      <h3>3. Mass Concentration in Original Sample</h3>
+      <div class="formula-box">
+        $$C_{\text{mass}}\text{ (g/L)} = M_{\text{analyte}}\text{ (mol/L)} \times M_w\text{ (g/mol)}$$
+      </div>
+
+      <h2>Equivalence Point vs. End Point and Titration Curves</h2>
+      <p>A critical distinction in analytical chemistry is the divergence between the theoretical <strong>equivalence point</strong> and the experimental <strong>end point</strong>:</p>
+      <ul>
+        <li><strong>Equivalence Point:</strong> The exact thermodynamic point where stoichiometric chemical parity is achieved. It is fixed strictly by chemistry.</li>
+        <li><strong>End Point:</strong> The physical detection event where the human operator or automated photometric titrator halts the burette (e.g., visual color transition of a dye, inflection point of a potentiometric pH curve, or permanent faint pink tint of excess $\text{MnO}_4^-$).</li>
+      </ul>
+
+      <p>The mathematical difference between the end point volume and the true equivalence volume represents the <strong>titration error</strong>. To minimize titration error, the color change interval of the visual indicator must align precisely with the steep vertical inflection zone of the titration curve:</p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Titration System</th>
+              <th>Equivalence Point pH</th>
+              <th>Chemical Cause of Equivalence pH</th>
+              <th>Steep Inflection Range</th>
+              <th>Recommended Visual Indicator</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Strong Acid vs. Strong Base (e.g., HCl + NaOH)</td>
+              <td>pH = 7.00 (at 25°C)</td>
+              <td>Neutral spectator ions (Na⁺, Cl⁻)</td>
+              <td>pH 4.0 &ndash; 10.0</td>
+              <td>Bromothymol Blue (6.0&ndash;7.6) or Phenolphthalein</td>
+            </tr>
+            <tr>
+              <td>Weak Acid vs. Strong Base (e.g., Acetic + NaOH)</td>
+              <td>pH = 8.5 &ndash; 9.2</td>
+              <td>Conjugate base hydrolysis (CH₃COO⁻ + H₂O &rightleftharpoons; CH₃COOH + OH⁻)</td>
+              <td>pH 7.0 &ndash; 10.5</td>
+              <td>Phenolphthalein (8.2&ndash;10.0) or Thymol Blue</td>
+            </tr>
+            <tr>
+              <td>Strong Acid vs. Weak Base (e.g., HCl + NH₃)</td>
+              <td>pH = 4.8 &ndash; 5.5</td>
+              <td>Conjugate acid hydrolysis (NH₄⁺ + H₂O &rightleftharpoons; NH₃ + H₃O⁺)</td>
+              <td>pH 3.5 &ndash; 6.5</td>
+              <td>Methyl Red (4.4&ndash;6.2) or Methyl Orange</td>
+            </tr>
+            <tr>
+              <td>Weak Acid vs. Weak Base (e.g., Acetic + NH₃)</td>
+              <td>Variable (near 7)</td>
+              <td>Both ions hydrolyze; very gentle slope</td>
+              <td>No sharp inflection</td>
+              <td>Not recommended for visual titration (use pH meter)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Standard Visual Indicators Reference Table</h2>
+      <p>The table below summarizes standard analytical pH indicators, their transition intervals, and color transformations per <strong>ASTM E200 Standard Practice for Preparation, Standardization, and Storage of Standard and Reagent Solutions</strong>:</p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Indicator Name</th>
+              <th>Acid Form Color</th>
+              <th>Transition Interval (pH)</th>
+              <th>Base Form Color</th>
+              <th>pKa Value</th>
+              <th>Typical Analytical Application</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Thymol Blue (Acid Range)</td>
+              <td>Red</td>
+              <td>1.2 &ndash; 2.8</td>
+              <td>Yellow</td>
+              <td>1.65</td>
+              <td>Extremely strong acid titrations</td>
+            </tr>
+            <tr>
+              <td>Methyl Orange</td>
+              <td>Red</td>
+              <td>3.1 &ndash; 4.4</td>
+              <td>Orange-Yellow</td>
+              <td>3.47</td>
+              <td>Total alkalinity ($M$-alkalinity), weak base titrations</td>
+            </tr>
+            <tr>
+              <td>Bromocresol Green</td>
+              <td>Yellow</td>
+              <td>3.8 &ndash; 5.4</td>
+              <td>Blue</td>
+              <td>4.68</td>
+              <td>Ammonia Kjeldahl nitrogen determination</td>
+            </tr>
+            <tr>
+              <td>Methyl Red</td>
+              <td>Red</td>
+              <td>4.4 &ndash; 6.2</td>
+              <td>Yellow</td>
+              <td>4.95</td>
+              <td>Mineral acid standardization against sodium carbonate</td>
+            </tr>
+            <tr>
+              <td>Bromothymol Blue</td>
+              <td>Yellow</td>
+              <td>6.0 &ndash; 7.6</td>
+              <td>Blue</td>
+              <td>7.10</td>
+              <td>Strong acid &ndash; strong base neutral titrations</td>
+            </tr>
+            <tr>
+              <td>Phenol Red</td>
+              <td>Yellow</td>
+              <td>6.8 &ndash; 8.4</td>
+              <td>Red-Violet</td>
+              <td>7.90</td>
+              <td>Swimming pool water testing, biological assays</td>
+            </tr>
+            <tr>
+              <td>Phenolphthalein</td>
+              <td>Colorless</td>
+              <td>8.2 &ndash; 10.0</td>
+              <td>Deep Magenta-Pink</td>
+              <td>9.40</td>
+              <td>Phenolphthalein alkalinity ($P$-alk), organic acids</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Practical Worked Case Study: Primary Standardization of 0.1 M NaOH with KHP</h2>
+      <div class="worked-example-card">
+        <h3>Quality Assurance Analytical Case Study: Primary Reagent Standardization</h3>
+        <p><strong>Scenario:</strong> Sodium hydroxide ($\text{NaOH}$) pellets cannot serve as a primary analytical standard because dry $\text{NaOH}$ is deliquescent and absorbs atmospheric carbon dioxide to form sodium carbonate ($\text{Na}_2\text{CO}_3$). To determine its exact analytical molarity, a chemist standardizes a newly formulated nominal $0.1\text{ M NaOH}$ solution against high-purity potassium hydrogen phthalate ($\text{KHP}$, chemical formula $\text{KHC}_8\text{H}_4\text{O}_4$, $\text{MW} = 204.2212\text{ g/mol}$, $100.0\%\text{ primary standard grade}$). The chemist accurately weighs $m_{\text{KHP}} = 0.5106\text{ grams}$ on a calibrated 5-place analytical balance and dissolves it into $V_{\text{water}} = 50.0\text{ mL}$ of carbon-dioxide-free deionized water with 3 drops of phenolphthalein indicator. Titration to a permanent faint pink persistence ($30\text{ seconds}$) requires $V_{\text{NaOH}} = 24.85\text{ mL}$ delivered from a Class A burette. Calculate: (1) moles of KHP neutralized, (2) exact molarity of the $\text{NaOH}$ titrant, (3) titrant normality, and (4) estimate the burette volumetric reading uncertainty.</p>
+
+        <p><strong>Step 1: Calculate Substance Quantity of Primary Standard KHP:</strong></p>
+        <p>KHP is a monoprotic acid ($z = 1$):</p>
+        $$\text{KHC}_8\text{H}_4\text{O}_4 + \text{NaOH} \longrightarrow \text{KNaC}_8\text{H}_4\text{O}_4 + \text{H}_2\text{O}$$
+        $$n_{\text{KHP}} = \frac{m_{\text{KHP}}}{M_w} = \frac{0.5106\text{ g}}{204.2212\text{ g/mol}} = 2.50023 \times 10^{-3}\text{ moles}\ (2.50023\text{ mmol})$$
+
+        <p><strong>Step 2: Determine Exact Molarity of Sodium Hydroxide:</strong></p>
+        <p>Because the stoichiometric reaction ratio is $1:1$ ($z_{\text{NaOH}} = 1, z_{\text{KHP}} = 1$):</p>
+        $$n_{\text{NaOH}} = n_{\text{KHP}} = 2.50023 \times 10^{-3}\text{ moles}$$
+        $$M_{\text{NaOH}} = \frac{n_{\text{NaOH}}}{V_{\text{NaOH}}\text{ (L)}} = \frac{2.50023 \times 10^{-3}\text{ mol}}{0.02485\text{ L}} = 0.100613\text{ mol/L}$$
+        $$\text{Standardized Concentration: } M = 0.1006\text{ M (mol/L)}, \quad N = 0.1006\text{ N}$$
+
+        <p><strong>Step 3: Uncertainty Analysis (Class A Burette):</strong></p>
+        <p>A $50\text{ mL}$ Class A burette possesses a tolerance of $\pm 0.05\text{ mL}$ (with interpolation repeatability $\pm 0.02\text{ mL}$). The relative volumetric uncertainty is:</p>
+        $$\text{Relative Uncertainty} = \frac{\pm 0.02\text{ mL}}{24.85\text{ mL}} \times 100\% = \pm 0.080\%$$
+        <p>Because the delivered volume ($24.85\text{ mL}$) exceeds half-scale capacity ($&gt;20\text{ mL}$), volumetric error is constrained well below $0.1\%$, proving the reliability of the standardized concentration.</p>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">
+            <span class="logo-icon">&pi;</span>
+            <span class="logo-text">Calc<strong>Hub</strong></span>
+          </div>
+          <p class="footer-about">High-precision analytical chemistry, volumetric titration stoichiometry, and equivalence point calculation tools conforming to IUPAC, ASTM, and ISO 17025 standards.</p>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Engineering Disciplines</h4>
+          <ul class="footer-links">
+            <li><a href="chemical.html">Chemical &amp; Water Treatment</a></li>
+            <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+            <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+            <li><a href="civil.html">Civil &amp; Construction</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-title">Standard References</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.iupac.org" target="_blank" rel="noopener">IUPAC Analytical Chemistry Compendium</a></li>
+            <li><a href="https://www.astm.org" target="_blank" rel="noopener">ASTM E200 Standard Titrimetric Practice</a></li>
+            <li><a href="https://www.iso.org" target="_blank" rel="noopener">ISO/IEC 17025 Testing &amp; Calibration</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. All rights reserved. Free, open, client-side engineering tools.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const TITRATION_PRESETS = {
+      sa_sb: { tM: 0.1000, tZ: 1, aZ: 1, aMw: 36.46, eqPH: "pH 7.00", ind: "Bromothymol Blue", indRange: "pH 6.0 - 7.6", indTrans: "Yellow (acid) → Green → Blue (base)" },
+      wa_sb: { tM: 0.1000, tZ: 1, aZ: 1, aMw: 60.05, eqPH: "pH 8.72", ind: "Phenolphthalein", indRange: "pH 8.2 - 10.0", indTrans: "Colorless (acid) → Faint Pink (endpoint)" },
+      sb_sa_di: { tM: 0.1000, tZ: 1, aZ: 2, aMw: 98.08, eqPH: "pH 7.00", ind: "Bromothymol Blue", indRange: "pH 6.0 - 7.6", indTrans: "Yellow → Green → Blue" },
+      khp_naoh: { tM: 0.1000, tZ: 1, aZ: 1, aMw: 204.22, eqPH: "pH 8.90", ind: "Phenolphthalein", indRange: "pH 8.2 - 10.0", indTrans: "Colorless → Permanent Faint Pink" },
+      redox_kmno4: { tM: 0.0200, tZ: 5, aZ: 1, aMw: 55.85, eqPH: "Redox Equiv", ind: "Self-Indicating (KMnO₄)", indRange: "Colorless → Faint Purple", indTrans: "First persistent pink drop" },
+      edta_hardness: { tM: 0.0100, tZ: 1, aZ: 1, aMw: 100.09, eqPH: "pH 10.0 buffer", ind: "Eriochrome Black T (EBT)", indRange: "pH 9.0 - 11.0", indTrans: "Wine Red (Ca-EBT) → Sky Blue (free EBT)" },
+      custom: { tM: 0.1000, tZ: 1, aZ: 1, aMw: 36.46, eqPH: "Variable", ind: "Bromothymol Blue", indRange: "pH 6.0 - 7.6", indTrans: "Visual color transition" }
+    };
+
+    function updateTitrationPreset() {
+      const p = document.getElementById("titrationPreset").value;
+      if (p !== "custom") {
+        const item = TITRATION_PRESETS[p];
+        document.getElementById("titrantMolarityVal").value = item.tM;
+        document.getElementById("titrantValenceZ").value = item.tZ;
+        document.getElementById("analyteValenceZ").value = item.aZ;
+        document.getElementById("analyteMolarMassVal").value = item.aMw;
+      }
+      calcTitration();
+    }
+
+    function updateTitrationInputs() {
+      const target = document.getElementById("titrationSolveTarget").value;
+      document.getElementById("titrantVolGroup").style.display = target === "analyte_conc" ? "block" : "none";
+      document.getElementById("analyteConcInputGroup").style.display = target === "titrant_vol" ? "block" : "none";
+      calcTitration();
+    }
+
+    function calcTitration() {
+      const target = document.getElementById("titrationSolveTarget").value;
+      const tM = parseFloat(document.getElementById("titrantMolarityVal").value) || 0.1;
+      const tZ = parseFloat(document.getElementById("titrantValenceZ").value) || 1;
+      const aV = parseFloat(document.getElementById("analyteVolumeMl").value) || 25.0;
+      const aZ = parseFloat(document.getElementById("analyteValenceZ").value) || 1;
+      const aMw = parseFloat(document.getElementById("analyteMolarMassVal").value) || 36.46;
+
+      const presetKey = document.getElementById("titrationPreset").value;
+      const preset = TITRATION_PRESETS[presetKey] || TITRATION_PRESETS.sa_sb;
+
+      let aM = 0;
+      let tV = 0;
+
+      if (target === "analyte_conc") {
+        tV = parseFloat(document.getElementById("titrantVolumeMl").value) || 24.35;
+        // M_a * V_a * z_a = M_t * V_t * z_t
+        aM = (tM * tV * tZ) / (aV * aZ);
+      } else {
+        aM = parseFloat(document.getElementById("analyteMolarityInputVal").value) || 0.1;
+        // V_t = (M_a * V_a * z_a) / (M_t * z_t)
+        tV = (aM * aV * aZ) / (tM * tZ);
+      }
+
+      const aN = aM * aZ;
+      const totalMoles = aM * (aV / 1000.0);
+      const sampleMassGrams = totalMoles * aMw;
+      const massConcGL = aM * aMw;
+
+      const relError = tV > 0 ? (0.02 / tV) * 100.0 : 0.1;
+
+      // Update UI
+      if (target === "analyte_conc") {
+        document.getElementById("resPrimaryTitrationLabel").textContent = "Calculated Analyte Concentration";
+        document.getElementById("resPrimaryTitrationVal").textContent = aM < 0.001 ? aM.toExponential(4) + " M" : aM.toFixed(5) + " M";
+        document.getElementById("resPrimaryTitrationAlt").textContent = "Normality = " + aN.toFixed(5) + " N | " + massConcGL.toFixed(3) + " g/L (" + (massConcGL * 1000).toLocaleString(undefined, {maximumFractionDigits: 0}) + " ppm)";
+      } else {
+        document.getElementById("resPrimaryTitrationLabel").textContent = "Required Titrant Equivalence Volume";
+        document.getElementById("resPrimaryTitrationVal").textContent = tV.toFixed(2) + " mL";
+        document.getElementById("resPrimaryTitrationAlt").textContent = "Burette delivery volume for " + aV.toFixed(1) + " mL of " + aM.toFixed(4) + " M analyte";
+      }
+
+      if (sampleMassGrams >= 1.0) {
+        document.getElementById("resAnalyteSampleMass").textContent = sampleMassGrams.toFixed(4) + " g";
+      } else {
+        document.getElementById("resAnalyteSampleMass").textContent = (sampleMassGrams * 1000.0).toFixed(2) + " mg";
+      }
+      document.getElementById("resAnalyteSampleMassSub").textContent = "In " + aV.toFixed(2) + " mL sample flask";
+
+      document.getElementById("resEquivalenceVolume").textContent = tV.toFixed(2) + " mL";
+      document.getElementById("resTotalMolesAnalyte").textContent = (totalMoles * 1000.0).toFixed(3) + " mmol";
+
+      document.getElementById("resEquilPH").textContent = preset.eqPH;
+      document.getElementById("resRecIndicator").textContent = preset.ind;
+      document.getElementById("resRecIndicatorRange").textContent = "Transition: " + preset.indRange;
+
+      document.getElementById("resTitrationError").textContent = "±" + relError.toFixed(2) + "% Error";
+
+      document.getElementById("resReactionRatio").textContent = tZ + " eq Titrant reacts with " + aZ + " eq Analyte (Ratio: " + (tZ/aZ).toFixed(2) + " : 1).";
+      document.getElementById("resColorTransition").textContent = preset.indTrans;
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      calcTitration();
+    });
+  </script>
+</body>
+</html>

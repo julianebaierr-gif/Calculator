@@ -215,6 +215,21 @@ CATEGORIES = {
             ("phosphate-dosing-calculator.html", "Phosphate Dosing (Boiler & Lead CCT)", "💧", "ASME / EPRI TSP/DSP congruent treatment & EPA LCR"),
             ("polymer-dosing-calculator.html", "Polymer Dosing (Sludge Dewatering)", "🧪", "Centrifuge & belt press kg/DT, aging tank & pump LPH"),
             ("ro-antiscalant-dosing-calculator.html", "RO Antiscalant (Membrane Scaling)", "🌊", "Concentration factor CF=1/(1-Y), LSI & neat pump LPH"),
+            ("sulphuric-acid-dosing-calculator.html", "Sulfuric Acid (H₂SO₄) Dosing", "🧪", "93% & 98% H₂SO₄ feed, alkalinity reduction & cooling tower"),
+            ("titration-calculator.html", "Acid-Base Titration (C₁V₁ = C₂V₂)", "🔬", "Equivalence point, analyte molarity & polyprotic curves"),
+        ]
+    },
+    "physics": {
+        "name": "Physics & Applied Mechanics",
+        "icon": "🔬",
+        "hub": "physics.html",
+        "tools": [
+            ("acceleration-calculator.html", "Acceleration (SUVAT)", "🚀", "Uniform acceleration & g-force"),
+            ("angular-velocity-calculator.html", "Angular Velocity", "⚙️", "RPM to rad/s & tangential speed"),
+            ("centripetal-force-calculator.html", "Centripetal Force", "🔄", "Inward force & roadway banking"),
+            ("doppler-effect-calculator.html", "Doppler Effect", "🔊", "Sound & radar frequency shift"),
+            ("escape-velocity-calculator.html", "Escape Velocity", "🪐", "Planetary gravity & orbital speed"),
+            ("free-fall-calculator.html", "Free Fall Calculator", "🪂", "Impact speed & air drag terminal velocity"),
         ]
     },
     "fire": {
@@ -283,8 +298,10 @@ def determine_tool_cat(filename):
         return "mechanical"
     if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt", "rainwater-downpipe", "block", "drywall", "excavation", "flooring", "footing", "gravel", "paint", "roof-pitch", "slab", "slope", "soil", "tile"]):
         return "civil"
-    if any(k in f for k in ["chemical", "chlorine", "alum", "boyle", "calcium-hypochlorite", "caustic", "charles", "chlorine-dioxide", "coagulant", "combined-gas", "dilution", "gay-lussac", "half-life", "henderson", "hydrazine", "ideal-gas", "lime-dosing", "molar-mass", "molarity", "ph-calculator", "ph-poh", "phosphate", "polymer", "ro-antiscalant"]):
+    if any(k in f for k in ["chemical", "chlorine", "alum", "boyle", "calcium-hypochlorite", "caustic", "charles", "chlorine-dioxide", "coagulant", "combined-gas", "dilution", "gay-lussac", "half-life", "henderson", "hydrazine", "ideal-gas", "lime-dosing", "molar-mass", "molarity", "ph-calculator", "ph-poh", "phosphate", "polymer", "ro-antiscalant", "sulphuric", "titration"]):
         return "chemical"
+    if any(k in f for k in ["acceleration", "angular-velocity", "centripetal-force", "doppler-effect", "escape-velocity", "free-fall"]):
+        return "physics"
     if any(k in f for k in ["sprinkler", "smoke", "fire-alarm", "hydrant", "fire-pump", "nac", "strobe"]):
         return "fire"
     if "subnet" in f:
@@ -328,7 +345,7 @@ def update_all_sidebars():
     category_pages = set([
         "index.html", "404.html", "health.html", "finance.html", "math.html",
         "engineering.html", "solar-energy.html", "mechanical.html", "civil.html",
-        "chemical.html", "fire-safety.html", "programmer.html", "datetime.html", "converter.html"
+        "chemical.html", "physics.html", "fire-safety.html", "programmer.html", "datetime.html", "converter.html"
     ])
 
     all_html_files = glob.glob(os.path.join(BASE_DIR, "*.html"))
