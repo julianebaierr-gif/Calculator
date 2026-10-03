@@ -99,6 +99,14 @@ CAT_MAP = {
             ("decimal-to-fraction-calculator.html", "Decimal to Fraction Calculator", "➗", "Terminating & repeating decimals to rational p/q", "p/q reduced via GCD | 10^(k+p)x - 10^k x"),
             ("exponent-calculator.html", "Exponent & Powers Calculator", "⚡", "Powers bⁿ, negative reciprocals & fractional roots", "bᵐ·bⁿ = bᵐ⁺ⁿ | b⁻ⁿ = 1/bⁿ | b^(p/q) = ⁿ√(bᵖ)"),
             ("factorial-calculator.html", "Factorial & Permutation Calculator", "❗", "n!, permutations P(n, r), combinations C(n, r) & Stirling", "n! = ∏ k | P(n,r) = n!/(n-r)! | C(n,r) = n!/[r!(n-r)!]"),
+            ("fraction-to-percent-calculator.html", "Fraction to Percent Calculator", "➗", "Proper, improper & mixed numbers to exact percentage", "P = (a/b) × 100% | GCD Euclidean reduction"),
+            ("geometric-sequence-calculator.html", "Geometric Sequence & Series Calculator", "📈", "Nth term an = a1·rⁿ⁻¹, finite Sn & infinite S∞", "an = a1·rⁿ⁻¹ | Sn = a1(1-rⁿ)/(1-r) | S∞ = a1/(1-r)"),
+            ("logarithm-calculator.html", "Logarithm Calculator (Log, Ln, Log2)", "🪵", "Arbitrary base log_b(x), ln, log10 & change of base", "log_b(x) = ln(x) / ln(b) | b^y = x"),
+            ("long-division-calculator.html", "Long Division with Steps & Remainders", "➗", "Quotient Q, remainder R & repeating decimal expansion", "A = B·Q + R (0 ≤ R < B) | DMSB tableau"),
+            ("mean-median-mode-calculator.html", "Mean, Median, Mode & Range Calculator", "📊", "Central tendency, multimodal frequencies & skewness", "Mean = ∑x/n | Median | Mode | Range = Max - Min"),
+            ("midpoint-calculator.html", "Midpoint & Distance (2D & 3D)", "📍", "2D/3D midpoint, Euclidean distance & vector slope", "M = ((x1+x2)/2, (y1+y2)/2) | d = √(Δx² + Δy²)"),
+            ("modulo-calculator.html", "Modulo & Modular Arithmetic Calculator", "🔄", "A mod M, congruence classes, Euclidean quotient & inverse", "A = M·Q + R | a ≡ b (mod m) | Extended Euclidean"),
+            ("nth-root-calculator.html", "Nth Root & Radical Solver", "√", "Arbitrary radical index ⁿ√A & Newton-Raphson approximation", "x_{k+1} = (1/n)[(n-1)x_k + A/x_kⁿ⁻¹]"),
         ]
     },
     "engineering.html": {

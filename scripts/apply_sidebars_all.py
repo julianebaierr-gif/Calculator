@@ -99,6 +99,14 @@ CATEGORIES = {
             ("decimal-to-fraction-calculator.html", "Decimal to Fraction Calculator", "➗", "Terminating & repeating decimals to rational p/q"),
             ("exponent-calculator.html", "Exponent & Powers Calculator", "⚡", "Powers bⁿ, negative reciprocals & fractional roots"),
             ("factorial-calculator.html", "Factorial & Permutation Calculator", "❗", "n!, permutations P(n, r), combinations C(n, r) & Stirling"),
+            ("fraction-to-percent-calculator.html", "Fraction to Percent Calculator", "➗", "Proper, improper & mixed numbers to exact percentage"),
+            ("geometric-sequence-calculator.html", "Geometric Sequence & Series Calculator", "📈", "Nth term an = a1·rⁿ⁻¹, finite Sn & infinite S∞"),
+            ("logarithm-calculator.html", "Logarithm Calculator (Log, Ln, Log2)", "🪵", "Arbitrary base log_b(x), ln, log10 & change of base"),
+            ("long-division-calculator.html", "Long Division with Steps & Remainders", "➗", "Quotient Q, remainder R & repeating decimal expansion"),
+            ("mean-median-mode-calculator.html", "Mean, Median, Mode & Range Calculator", "📊", "Central tendency, multimodal frequencies & skewness"),
+            ("midpoint-calculator.html", "Midpoint & Distance (2D & 3D)", "📍", "2D/3D midpoint, Euclidean distance & vector slope"),
+            ("modulo-calculator.html", "Modulo & Modular Arithmetic Calculator", "🔄", "A mod M, congruence classes, Euclidean quotient & inverse"),
+            ("nth-root-calculator.html", "Nth Root & Radical Solver", "√", "Arbitrary radical index ⁿ√A & Newton-Raphson approximation"),
         ]
     },
     "engineering": {
@@ -395,7 +403,7 @@ def determine_tool_cat(filename):
         return "datetime"
     if any(k in f for k in ["unit-converter", "length-converter", "weight-converter", "temperature-converter", "area-converter", "volume-converter", "pressure-converter", "speed-converter", "energy-converter", "power-converter", "force-converter", "data-storage-converter", "data-transfer-rate-converter", "frequency-converter", "flow-rate-converter", "fuel-economy-converter", "angle-converter", "density-converter", "illuminance-converter", "thermal-conductivity-converter", "viscosity-converter", "cooking-converter", "number-base-converter", "roman-numeral-converter", "time-converter", "time-zone", "unix-timestamp"]):
         return "converter"
-    if any(k in f for k in ["percentage", "fraction", "ratio", "gpa", "standard-deviation", "gcd-lcm", "quadratic-equation", "pythagorean", "scientific-notation", "significant-figures", "prime-number", "absolute-value", "area-calculator", "arithmetic-sequence", "circle-calculator", "cube-root", "decimal-to-fraction", "exponent", "factorial"]):
+    if any(k in f for k in ["percentage", "fraction", "ratio", "gpa", "standard-deviation", "gcd-lcm", "quadratic-equation", "pythagorean", "scientific-notation", "significant-figures", "prime-number", "absolute-value", "area-calculator", "arithmetic-sequence", "circle-calculator", "cube-root", "decimal-to-fraction", "exponent", "factorial", "fraction-to-percent", "geometric-sequence", "logarithm", "long-division", "mean-median-mode", "midpoint", "modulo", "nth-root"]):
         return "math"
     return "math"
 
