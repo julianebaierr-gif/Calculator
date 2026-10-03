@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rounding Calculator - Round to Decimals, Whole & Significant Figures</title>
+  <meta name="description" content="Round numbers to any decimal place, nearest integer, or significant figures using standard half-up, half-even (Banker's rounding), ceiling, and floor rules.">
+  <link rel="canonical" href="https://calchub.org/rounding-calculator.html">
+  <meta property="og:title" content="Rounding Calculator - Complete Rounding Modes Solver">
+  <meta property="og:description" content="Round numbers across multiple IEEE 754 precision modes including standard half up, banker's rounding, floor, ceiling, and truncate with error metrics.">
+  <meta property="og:url" content="https://calchub.org/rounding-calculator.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Rounding Calculator - Decimal & Place Value Solver">
+  <meta name="twitter:description" content="Free online rounding calculator. Round to tenths, hundredths, thousandths, or nearest integer using banker's, standard, and floor methods.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Rounding Calculator",
+    "url": "https://calchub.org/rounding-calculator.html",
+    "description": "Calculates numerical rounding across arbitrary decimal places and place values using standard arithmetic, Banker's rounding, ceiling, and floor.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the standard rule for rounding numbers?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Under the standard 'Round Half Up' rule, examine the digit immediately to the right of the target place value. If that digit is 0, 1, 2, 3, or 4, keep the target digit unchanged (round down). If it is 5, 6, 7, 8, or 9, increase the target digit by 1 (round up)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is Banker's Rounding (Round Half to Even)?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Banker's rounding (IEEE 754 default) rounds exact half-way cases (ending in 5) to the nearest even digit. For example, 2.5 rounds to 2, while 3.5 rounds to 4. This eliminates systematic upward statistical bias in financial balance sheets."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between rounding and truncating?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Rounding adjusts the retained digit depending on the value of discarded digits. Truncating (chopping) simply deletes all digits beyond the target place value towards zero, regardless of their magnitude (e.g., 3.89 truncated to one decimal is 3.8)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does rounding negative numbers work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "In symmetric rounding (round half away from zero), -2.5 rounds to -3. In floor rounding (round down), -2.5 rounds to -3 because -3 is less than -2.5. In ceiling rounding (round up), -2.5 rounds to -2."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">CalcHub</a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="math.html" class="active">Math & Statistics</a>
+        <a href="converter.html">Converters</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &gt;
+      <a href="math.html">Math</a> &gt;
+      <span>Rounding Calculator</span>
+    </nav>
+
+    <div class="content-layout">
+      <div class="main-column">
+        <div class="calculator-card">
+          <div class="calculator-header">
+            <span class="calc-icon">🔄</span>
+            <h1>Rounding Calculator</h1>
+          </div>
+          <p class="calc-description">
+            Round any real number to specified decimal places or place values using standard arithmetic, Banker's rounding (IEEE 754), ceiling, floor, or truncation.
+          </p>
+
+          <form id="calc-form" class="calc-form" onsubmit="return false;">
+            <div class="input-grid">
+              <div class="form-group">
+                <label for="num_input">Number to Round:</label>
+                <input type="number" id="num_input" class="form-control" value="3.14159265" step="any" placeholder="e.g. 3.14159" required>
+                <span class="help-text">Input real number (positive or negative).</span>
+              </div>
+              <div class="form-group">
+                <label for="round_precision">Target Place Value / Precision:</label>
+                <select id="round_precision" class="form-control">
+                  <option value="-3">Thousands (1,000s)</option>
+                  <option value="-2">Hundreds (100s)</option>
+                  <option value="-1">Tens (10s)</option>
+                  <option value="0">Nearest Whole Integer (1s)</option>
+                  <option value="1">Tenths (0.1)</option>
+                  <option value="2">Hundredths / Cents (0.01)</option>
+                  <option value="3">Thousandths (0.001)</option>
+                  <option value="4" selected>Ten-Thousandths (0.0001)</option>
+                  <option value="6">Millionths (0.000001)</option>
+                </select>
+                <span class="help-text">Place value anchor for rounding.</span>
+              </div>
+              <div class="form-group">
+                <label for="round_mode">Rounding Method:</label>
+                <select id="round_mode" class="form-control">
+                  <option value="half_up" selected>Round Half Up (Standard School)</option>
+                  <option value="half_even">Round Half to Even (Banker's / IEEE 754)</option>
+                  <option value="ceil">Ceiling (Round Up, +&infin;)</option>
+                  <option value="floor">Floor (Round Down, -&infin;)</option>
+                  <option value="trunc">Truncate (Towards Zero)</option>
+                </select>
+                <span class="help-text">Tie-breaking and direction rule.</span>
+              </div>
+            </div>
+
+            <button type="button" id="btn-calculate" class="btn btn-primary" onclick="calculateRounding()">Round Number</button>
+          </form>
+
+          <div id="result-box" class="result-box" style="display:none;">
+            <h3>Rounding Solution</h3>
+            <div class="result-highlight" id="primary-result">3.1416</div>
+            
+            <div class="result-grid">
+              <div class="result-item">
+                <span class="res-label">Selected Mode Result:</span>
+                <span class="res-val" id="res-primary">3.1416</span>
+              </div>
+              <div class="result-item">
+                <span class="res-label">Banker's (Half to Even):</span>
+                <span class="res-val" id="res-bankers">3.1416</span>
+              </div>
+              <div class="result-item">
+                <span class="res-label">Floor (\(\lfloor x \rfloor\)):</span>
+                <span class="res-val" id="res-floor">3.1415</span>
+              </div>
+              <div class="result-item">
+                <span class="res-label">Ceiling (\(\lceil x \rceil\)):</span>
+                <span class="res-val" id="res-ceil">3.1416</span>
+              </div>
+              <div class="result-item">
+                <span class="res-label">Truncated (Towards 0):</span>
+                <span class="res-val" id="res-trunc">3.1415</span>
+              </div>
+              <div class="result-item">
+                <span class="res-label">Roundoff Error:</span>
+                <span class="res-val" id="res-error">+0.00000735</span>
+              </div>
+            </div>
+
+            <div class="conversion-steps" id="steps-output">
+              <!-- Steps output -->
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>1. Mathematical Foundations of Numerical Rounding</h2>
+          <p>
+            In applied arithmetic, numerical analysis, and digital computer architecture, <strong>rounding</strong> is the mathematical operation that replaces a real number \(x\) with an approximate representation \(\tilde{x}\) that has a shorter, simpler, or more explicit representation (such as an integer or a decimal with fewer fractional digits).
+          </p>
+          <p>
+            Rounding is ubiquitous across accounting, currency transactions, scientific telemetry, and hardware floating-point ALUs. However, because rounding deliberately discards fine information, it introduces a residual discrepancy known as <strong>roundoff error</strong>:
+          </p>
+          $$\epsilon = \tilde{x} - x$$
+          <p>
+            The fundamental objective of rounding theory is to minimize roundoff error while preserving statistical neutrality (avoiding systemic upward or downward drift when summing large sequences of rounded figures).
+          </p>
+
+          <h2>2. The Taxonomy of Formal Rounding Modes</h2>
+          <p>
+            International standards (including IEEE 754 for floating-point arithmetic and ISO/IEC 10967) formally codify five canonical rounding paradigms:
+          </p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Rounding Paradigm</th>
+                <th>Formal Tie-Breaking Rule</th>
+                <th>Positive Example (\(+2.5\))</th>
+                <th>Negative Example (\(-2.5\))</th>
+                <th>Statistical Bias</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Round Half Up (Symmetric)</strong></td>
+                <td>If remainder is \(\ge 0.5\), round away from zero.</td>
+                <td>\(+3\)</td>
+                <td>\(-3\)</td>
+                <td>Slight upward bias for positive data.</td>
+              </tr>
+              <tr>
+                <td><strong>Round Half Down</strong></td>
+                <td>If remainder is \(> 0.5\), round up; if exactly \(0.5\), round down.</td>
+                <td>\(+2\)</td>
+                <td>\(-2\)</td>
+                <td>Slight downward bias for positive data.</td>
+              </tr>
+              <tr>
+                <td><strong>Round Half to Even (Banker's)</strong></td>
+                <td>If remainder is exactly \(0.5\), round to the nearest <strong>even</strong> digit.</td>
+                <td>\(+2\) (since 2 is even)</td>
+                <td>\(-2\) (since -2 is even)</td>
+                <td><strong>Zero Statistical Bias</strong> (Perfect balance).</td>
+              </tr>
+              <tr>
+                <td><strong>Ceiling (\(\lceil x \rceil\))</strong></td>
+                <td>Always round towards \(+\infty\) regardless of remainder.</td>
+                <td>\(+3\)</td>
+                <td>\(-2\)</td>
+                <td>Strong upward bias.</td>
+              </tr>
+              <tr>
+                <td><strong>Floor (\(\lfloor x \rfloor\))</strong></td>
+                <td>Always round towards \(-\infty\) regardless of remainder.</td>
+                <td>\(+2\)</td>
+                <td>\(-3\)</td>
+                <td>Strong downward bias.</td>
+              </tr>
+              <tr>
+                <td><strong>Truncation (Chop)</strong></td>
+                <td>Always round towards zero (discard fractional tail).</td>
+                <td>\(+2\)</td>
+                <td>\(-2\)</td>
+                <td>Directional bias towards zero.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>3. Banker's Rounding: Why the Financial World Rejects Standard Rounding</h2>
+          <p>
+            In elementary school mathematics, children are universally taught <em>Round Half Up</em>: any number ending in 5 rounds upward. While simple to teach, this rule introduces a catastrophic cumulative distortion into financial ledger accounting and scientific data processing.
+          </p>
+          <p>
+            Consider the ten possible trailing digits in the decimal system: \(\{0, 1, 2, 3, 4, 5, 6, 7, 8, 9\}\).
+          </p>
+          <ul>
+            <li>Digits \(\{0, 1, 2, 3, 4\}\) round down (5 outcomes).</li>
+            <li>Digits \(\{5, 6, 7, 8, 9\}\) round up (5 outcomes).</li>
+          </ul>
+          <p>
+            At first glance, this appears symmetric. However, the digit \(0\) requires <strong>no rounding adjustment</strong> (it already lands exactly on the target). Therefore, among the remaining 9 digits requiring an adjustment:
+          </p>
+          <ul>
+            <li>Four digits \(\{1, 2, 3, 4\}\) round down.</li>
+            <li>Five digits \(\{5, 6, 7, 8, 9\}\) round up.</li>
+          </ul>
+          <p>
+            Because the half-way tie (5) is always rounded up, summing millions of financial transactions (such as banking interest credits or retail sales tax line items) systematically over-accumulates currency by approximately \(0.5\) cents per rounded transaction.
+          </p>
+          <p>
+            <strong>The Banker's Solution:</strong> Under <em>Round Half to Even</em>, exact half-way cases round up 50% of the time (when the preceding digit is odd) and down 50% of the time (when the preceding digit is even):
+          </p>
+          $$2.5 \xrightarrow{\text{even}} 2, \quad 3.5 \xrightarrow{\text{even}} 4, \quad 4.5 \xrightarrow{\text{even}} 4, \quad 5.5 \xrightarrow{\text{even}} 6$$
+          <p>
+            This alternating parity eliminates systematic drift, making Banker's rounding mandatory in IEEE 754 microprocessor hardware and international financial accounting standards.
+          </p>
+
+          <h2>4. Reference Matrix: Place Value Rounding Scale</h2>
+          <p>
+            The table below demonstrates how the constant \(\pi \approx 3.1415926535\) is rounded across various place-value targets:
+          </p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Target Place Value</th>
+                <th>Exponent (\(10^k\))</th>
+                <th>Rounded Output (\(\tilde{x}\))</th>
+                <th>Roundoff Discrepancy (\(\epsilon\))</th>
+                <th>Typical Real-World Application</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Nearest Hundred</td>
+                <td>\(10^2\)</td>
+                <td>0</td>
+                <td>\(-3.141593\)</td>
+                <td>National budget macro estimations</td>
+              </tr>
+              <tr>
+                <td>Nearest Ten</td>
+                <td>\(10^1\)</td>
+                <td>0</td>
+                <td>\(-3.141593\)</td>
+                <td>Crowd size estimation</td>
+              </tr>
+              <tr>
+                <td>Nearest Whole Integer</td>
+                <td>\(10^0\)</td>
+                <td>3</td>
+                <td>\(-0.141593\)</td>
+                <td>Discrete counts, inventory units</td>
+              </tr>
+              <tr>
+                <td>Tenths (0.1)</td>
+                <td>\(10^{-1}\)</td>
+                <td>3.1</td>
+                <td>\(-0.041593\)</td>
+                <td>Speedometer readings, temperature gauges</td>
+              </tr>
+              <tr>
+                <td>Hundredths (0.01)</td>
+                <td>\(10^{-2}\)</td>
+                <td>3.14</td>
+                <td>\(-0.001593\)</td>
+                <td>Currency cents ($USD, €EUR), GPA scales</td>
+              </tr>
+              <tr>
+                <td>Thousandths (0.001)</td>
+                <td>\(10^{-3}\)</td>
+                <td>3.142</td>
+                <td>\(+0.000407\)</td>
+                <td>Machining tolerances (thou / mils)</td>
+              </tr>
+              <tr>
+                <td>Ten-Thousandths (0.0001)</td>
+                <td>\(10^{-4}\)</td>
+                <td>3.1416</td>
+                <td>\(+0.000007\)</td>
+                <td>Chemical molarity concentrations</td>
+              </tr>
+              <tr>
+                <td>Millionths (0.000001)</td>
+                <td>\(10^{-6}\)</td>
+                <td>3.141593</td>
+                <td>\(+0.00000035\)</td>
+                <td>GPS latitude and longitude coordinates</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>5. Applied Financial and Aerospace Engineering Case Studies</h2>
+
+          <div class="worked-example-card">
+            <h3>Case Study 1: Financial Banking Transaction Batch Summation Drift</h3>
+            <p>
+              An automated banking transaction processor computes interest payments for 100,000 checking accounts. Each account accrues an exact fractional interest balance of \(\$12.345\). Compare the cumulative ledger total under Standard Rounding (Half Up) versus Banker's Rounding (Half to Even).
+            </p>
+            <div class="example-body">
+              <p><strong>True Exact Total:</strong></p>
+              $$\text{Exact Sum} = 100,000 \times \$12.345 = \$1,234,500.00$$
+              <p><strong>Method A: Standard Half Up:</strong></p>
+              $$\$12.345 \text{ rounds to } \$12.35$$
+              $$\text{Sum} = 100,000 \times \$12.35 = \$1,235,000.00$$
+              $$\text{Accumulated Drift} = \$1,235,000.00 - \$1,234,500.00 = +\$500.00 \text{ (Artificial Bank Overpayment)}$$
+              <p><strong>Method B: Banker's Rounding (Half to Even):</strong></p>
+              <p>The digit before the 5 is 4 (an even digit). Therefore, \(\$12.345\) rounds down to \(\$12.34\). Over an alternating mix of even and odd accounts, the drift cancels out to near zero.</p>
+              <p><strong>Banking Finding:</strong> Standard rounding costs the financial institution \(\$500\) in artificial balance sheet distortion per batch.</p>
+            </div>
+          </div>
+
+          <div class="worked-example-card">
+            <h3>Case Study 2: Civil Structural Foundation Concrete Pour Batching (Ceiling Rule)</h3>
+            <p>
+              A structural engineering team calculates that a commercial grade-beam foundation pour requires \(43.18\text{ cubic yards}\) of ready-mix concrete. Ready-mix transit mixers deliver concrete strictly in whole-cubic-yard integer increments. Which rounding mode is legally mandatory?
+            </p>
+            <div class="example-body">
+              <p><strong>Engineering Rule:</strong> Ready-mix ordering requires the <strong>Ceiling Rule</strong> (\(\lceil x \rceil\)).</p>
+              $$\text{Order Volume} = \lceil 43.18 \rceil = 44\text{ cubic yards}$$
+              <p>Rounding down to 43 cubic yards would create a catastrophic structural underfill resulting in cold-joint construction failure.</p>
+            </div>
+          </div>
+
+          <h2>6. Frequently Asked Questions (FAQ)</h2>
+          <div class="faq-accordion">
+            <div class="faq-item">
+              <h3 class="faq-question">Why does JavaScript's Math.round() behave differently for negative numbers?</h3>
+              <div class="faq-answer">
+                <p>
+                  JavaScript's <code>Math.round(x)</code> implements round-half-up towards \(+\infty\). Consequently, <code>Math.round(-2.5)</code> evaluates to \(-2\) (because \(-2 > -2.5\)), whereas standard mathematical symmetric rounding yields \(-3\).
+                </p>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <h3 class="faq-question">What is roundoff error accumulation in long computational loops?</h3>
+              <div class="faq-answer">
+                <p>
+                  When billions of numerical calculations are chained together in computational simulations (such as weather forecasting or molecular dynamics), tiny roundoff errors in binary floating-point representations compound exponentially, leading to catastrophic cancellation.
+                </p>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <h3 class="faq-question">How does rounding differ from significant figures?</h3>
+              <div class="faq-answer">
+                <p>
+                  Rounding to decimal places anchors to a fixed place value relative to the decimal point (e.g., hundredths). Rounding to significant figures anchors to the most significant non-zero digit regardless of where the decimal point lies. You can apply sig-fig rules using our <a href="significant-figures-calculator.html">Significant Figures Calculator</a>.
+                </p>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <h3 class="faq-question">How do you round a number to the nearest fraction (e.g., 1/16)?</h3>
+              <div class="faq-answer">
+                <p>
+                  To round to the nearest fraction \(1/k\), multiply the number by \(k\), round to the nearest whole integer using standard rounding, and divide by \(k\). For example, to round \(3.41\) to the nearest \(1/8\): \(3.41 \times 8 = 27.28 \to 27 \to 27/8 = 3 \frac{3}{8}\).
+                </p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <aside class="sidebar-column">
+        <div class="sidebar-card">
+          <h3 class="sidebar-title">Related Math Calculators</h3>
+          <ul class="sidebar-nav">
+            <li><a href="significant-figures-calculator.html">Significant Figures Calculator</a></li>
+            <li><a href="scientific-notation-calculator.html">Scientific Notation Calculator</a></li>
+            <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
+            <li><a href="percent-error-calculator.html">Percent Error Calculator</a></li>
+            <li><a href="fraction-calculator.html">Fraction Calculator</a></li>
+            <li><a href="decimal-to-fraction-calculator.html">Decimal to Fraction Calculator</a></li>
+            <li><a href="modulo-calculator.html">Modulo Calculator</a></li>
+            <li><a href="long-division-calculator.html">Long Division Calculator</a></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>Comprehensive mathematical, financial, and precision calculation tools.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Discipline Hubs</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="math.html">Mathematics</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Electrical & Engineering</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed computational algorithms.</p>
+    </div>
+  </footer>
+
+  <script>
+    function roundHalfEven(val, decimals) {
+      var factor = Math.pow(10, decimals);
+      var scaled = val * factor;
+      var floor = Math.floor(scaled);
+      var diff = scaled - floor;
+
+      if (Math.abs(diff - 0.5) < 1e-12) {
+        return (floor % 2 === 0 ? floor : floor + 1) / factor;
+      }
+      return Math.round(scaled) / factor;
+    }
+
+    function calculateRounding() {
+      var x = parseFloat(document.getElementById("num_input").value);
+      var places = parseInt(document.getElementById("round_precision").value);
+      var mode = document.getElementById("round_mode").value;
+
+      if (isNaN(x)) {
+        alert("Please enter a valid numerical value to round.");
+        return;
+      }
+
+      var factor = Math.pow(10, places);
+      var primaryVal = 0;
+
+      if (mode === "half_up") {
+        primaryVal = Math.round(x * factor) / factor;
+      } else if (mode === "half_even") {
+        primaryVal = roundHalfEven(x, places);
+      } else if (mode === "ceil") {
+        primaryVal = Math.ceil(x * factor) / factor;
+      } else if (mode === "floor") {
+        primaryVal = Math.floor(x * factor) / factor;
+      } else if (mode === "trunc") {
+        primaryVal = Math.trunc(x * factor) / factor;
+      }
+
+      var bankersVal = roundHalfEven(x, places);
+      var floorVal = Math.floor(x * factor) / factor;
+      var ceilVal = Math.ceil(x * factor) / factor;
+      var truncVal = Math.trunc(x * factor) / factor;
+      var roundoffErr = primaryVal - x;
+
+      var dispPlaces = Math.max(0, places);
+      var resStr = places >= 0 ? primaryVal.toFixed(dispPlaces) : primaryVal.toString();
+
+      document.getElementById("primary-result").innerText = resStr;
+      document.getElementById("res-primary").innerText = resStr;
+      document.getElementById("res-bankers").innerText = places >= 0 ? bankersVal.toFixed(dispPlaces) : bankersVal.toString();
+      document.getElementById("res-floor").innerText = places >= 0 ? floorVal.toFixed(dispPlaces) : floorVal.toString();
+      document.getElementById("res-ceil").innerText = places >= 0 ? ceilVal.toFixed(dispPlaces) : ceilVal.toString();
+      document.getElementById("res-trunc").innerText = places >= 0 ? truncVal.toFixed(dispPlaces) : truncVal.toString();
+      document.getElementById("res-error").innerText = (roundoffErr >= 0 ? "+" : "") + roundoffErr.toFixed(6);
+
+      var steps = "<h4>Step-by-Step Rounding Procedure:</h4><ol>";
+      steps += "<li><strong>Input Number:</strong> x = " + x + "</li>";
+      steps += "<li><strong>Scale by Target Place Factor:</strong> " + x + " &times; 10^(" + places + ") = " + (x * factor).toFixed(6) + "</li>";
+      steps += "<li><strong>Apply " + mode + " Rule:</strong> Scaled result becomes " + (primaryVal * factor) + "</li>";
+      steps += "<li><strong>Scale Back:</strong> " + (primaryVal * factor) + " / 10^(" + places + ") = <strong>" + resStr + "</strong></li>";
+      steps += "<li><strong>Roundoff Discrepancy:</strong> " + primaryVal + " - (" + x + ") = <strong>" + (roundoffErr >= 0 ? "+" : "") + roundoffErr.toFixed(6) + "</strong></li>";
+      steps += "</ol>";
+
+      document.getElementById("steps-output").innerHTML = steps;
+      document.getElementById("result-box").style.display = "block";
+    }
+
+    window.addEventListener("DOMContentLoaded", function() {
+      calculateRounding();
+    });
+  </script>
+</body>
+</html>

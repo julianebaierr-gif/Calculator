@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sum of Integers Calculator - Consecutive Numbers & Gauss Series</title>
+  <meta name="description" content="Calculate the sum of consecutive integers, sum of first n numbers, sum of squares, and sum of cubes using Gauss's arithmetic series formulas with step-by-step proofs.">
+  <link rel="canonical" href="https://calchub.org/sum-of-integers-calculator.html">
+  <meta property="og:title" content="Sum of Integers Calculator - Gauss Series & Range Sum">
+  <meta property="og:description" content="Compute consecutive integer sums, triangular numbers, square series, and cube series with closed-form mathematical derivations.">
+  <meta property="og:url" content="https://calchub.org/sum-of-integers-calculator.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Sum of Integers Calculator - Arithmetic Series Solver">
+  <meta name="twitter:description" content="Free sum of integers calculator. Evaluates consecutive sums from a to b, triangular numbers, sums of squares, and loop iteration complexities.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Sum of Integers Calculator",
+    "url": "https://calchub.org/sum-of-integers-calculator.html",
+    "description": "Calculates the sum of consecutive integers from a to b, triangular numbers, sum of squares, and sum of cubes using Gauss arithmetic progression formulas.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Gauss's formula for the sum of the first n integers?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The sum of the first n consecutive positive integers is given by Carl Friedrich Gauss's formula: S_n = n(n + 1) / 2."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do you calculate the sum of integers between a and b?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The sum of consecutive integers from a to b inclusive is: S = n · (a + b) / 2, where the number of terms is n = b - a + 1."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the formula for the sum of consecutive squares?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The sum of the squares of the first n integers is: ∑ k² = n(n + 1)(2n + 1) / 6."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the formula for the sum of consecutive cubes?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Nicomachus's Theorem states that the sum of the first n cubes equals the square of the sum of the first n integers: ∑ k³ = [n(n + 1) / 2]² = S_n²."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">CalcHub</a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="math.html" class="active">Math & Statistics</a>
+        <a href="converter.html">Converters</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &gt;
+      <a href="math.html">Math</a> &gt;
+      <span>Sum of Integers Calculator</span>
+    </nav>
+
+    <div class="content-layout">
+      <div class="main-column">
+        <div class="calculator-card">
+          <div class="calculator-header">
+            <span class="calc-icon">∑</span>
+            <h1>Sum of Integers Calculator</h1>
+          </div>
+          <p class="calc-description">
+            Calculate the sum of consecutive integers between any starting and ending values, triangular numbers, sum of squares \(\sum k^2\), and sum of cubes \(\sum k^3\).
+          </p>
+
+          <form id="calc-form" class="calc-form" onsubmit="return false;">
+            <div class="input-grid">
+              <div class="form-group">
+                <label for="start_int">Start Integer (\(a\)):</label>
+                <input type="number" id="start_int" class="form-control" value="1" step="1" placeholder="e.g. 1" required>
+                <span class="help-text">First term of the sequence.</span>
+              </div>
+              <div class="form-group">
+                <label for="end_int">End Integer (\(b\)):</label>
+                <input type="number" id="end_int" class="form-control" value="100" step="1" placeholder="e.g. 100" required>
+                <span class="help-text">Last term of the sequence (\(b \ge a\)).</span>
+              </div>
+              <div class="form-group" style="display:flex;align-items:flex-end;">
+                <button type="button" id="btn-calculate" class="btn btn-primary" style="width:100%;" onclick="calculateSumOfIntegers()">Compute Series Sum</button>
+              </div>
+            </div>
+          </form>
+
+          <div id="result-box" class="result-box" style="display:none;">
+            <h3>Series Summation Results</h3>
+            <div class="result-highlight" id="primary-result">Sum (1 to 100) = 5,050</div>
+            
+            <div class="result-grid">
+              <div class="result-item">
+                <span class="res-label">Consecutive Linear Sum (\(S\)):</span>
+                <span class="res-val" id="res-sum">5,050</span>
+              </div>
+              <div class="result-item">
+                <span class="res-label">Number of Terms (\(n\)):</span>
+                <span class="res-val" id="res-terms">100</span>
+              </div>
+              <div class="result-item">
+                <span class="res-label">Arithmetic Mean (\(\bar{x}\)):</span>
+                <span class="res-val" id="res-mean">50.50</span>
+              </div>
+              <div class="result-item">
+                <span class="res-label">Sum of Squares (\(\sum k^2\)):</span>
+                <span class="res-val" id="res-sum-sq">338,350</span>
+              </div>
+              <div class="result-item">
+                <span class="res-label">Sum of Cubes (\(\sum k^3\)):</span>
+                <span class="res-val" id="res-sum-cube">25,502,500</span>
+              </div>
+              <div class="result-item">
+                <span class="res-label">Formula Representation:</span>
+                <span class="res-val" id="res-formula">\(\frac{n(a + b)}{2}\)</span>
+              </div>
+            </div>
+
+            <div class="conversion-steps" id="steps-output">
+              <!-- Steps output -->
+            </div>
+          </div>
+        </div>
+
+        <article class="article-body">
+          <h2>1. Mathematical Foundations of Consecutive Integer Summation</h2>
+          <p>
+            The summation of consecutive integers is one of the foundational cornerstones of discrete mathematics, combinatorics, and algorithmic complexity. Formally, a sequence of consecutive integers constitutes an <strong>arithmetic progression</strong> with initial term \(a\), terminal term \(b\), and common difference \(d = 1\).
+          </p>
+          <p>
+            The total number of terms \(n\) in the inclusive interval \([a, b]\) is:
+          </p>
+          $$n = b - a + 1$$
+          <p>
+            The total sum \(S\) of these \(n\) consecutive integers is given by the pairing theorem:
+          </p>
+          $$S = \sum_{k=a}^b k = \frac{n(a + b)}{2} = n \cdot \bar{x}$$
+          <p>
+            where \(\bar{x} = \frac{a + b}{2}\) represents the exact arithmetic mean of the sequence.
+          </p>
+
+          <h2>2. Gauss's Pairing Proof and Triangular Numbers</h2>
+          <p>
+            According to mathematical lore, when Carl Friedrich Gauss was an elementary schoolboy in Brunswick, Germany (c. 1787), his teacher asked the class to compute the sum of the first 100 integers: \(1 + 2 + 3 + \dots + 100\). While other students began laborious addition, young Gauss noticed that folding the sequence back upon itself created 50 pairs that each summed to 101:
+          </p>
+          $$\begin{aligned}
+          S &= 1 &+ 2 &+ 3 &+ \dots &+ 99 &+ 100 \\
+          S &= 100 &+ 99 &+ 98 &+ \dots &+ 2 &+ 1 \\
+          \hline
+          2S &= 101 &+ 101 &+ 101 &+ \dots &+ 101 &+ 101
+          \end{aligned}$$
+          <p>
+            Because there are exactly 100 terms:
+          </p>
+          $$2S = 100 \times 101 \implies S = \frac{100 \times 101}{2} = 5,050$$
+          <p>
+            This established the universal formula for the \(n\)th <strong>triangular number</strong> \(T_n\):
+          </p>
+          $$T_n = \sum_{k=1}^n k = \frac{n(n + 1)}{2}$$
+
+          <h2>3. Higher Power Integer Sums: Squares, Cubes and Faulhaber's Theorem</h2>
+          <p>
+            In mathematical analysis, evaluating Riemann sums and polynomial integrals requires closed-form formulas for higher powers of integers, codified by Johann Faulhaber in 1631:
+          </p>
+
+          <h3>3.1 Sum of Consecutive Squares (\(\sum k^2\))</h3>
+          <p>
+            The sum of the squares of the first \(n\) positive integers is:
+          </p>
+          $$\sum_{k=1}^n k^2 = 1^2 + 2^2 + 3^2 + \dots + n^2 = \frac{n(n + 1)(2n + 1)}{6}$$
+          <p>
+            For an arbitrary interval \([a, b]\), evaluate:
+          </p>
+          $$\sum_{k=a}^b k^2 = \sum_{k=1}^b k^2 - \sum_{k=1}^{a-1} k^2$$
+
+          <h3>3.2 Sum of Consecutive Cubes (\(\sum k^3\)) - Nicomachus's Theorem</h3>
+          <p>
+            Remarkably, the sum of the cubes of the first \(n\) integers is identically equal to the square of the sum of the integers themselves:
+          </p>
+          $$\sum_{k=1}^n k^3 = 1^3 + 2^3 + 3^3 + \dots + n^3 = \left[ \frac{n(n + 1)}{2} \right]^2 = T_n^2$$
+
+          <h3>3.3 Mathematical Induction Proof of the Gauss Sum</h3>
+          <p>
+            To rigorously verify Gauss's formula for all \(n \in \mathbb{N}^+\), apply mathematical induction:
+          </p>
+          <ol>
+            <li>
+              <strong>Base Case (\(n = 1\)):</strong>
+              $$\sum_{k=1}^1 k = 1, \quad \frac{1(1 + 1)}{2} = \frac{2}{2} = 1 \quad (\text{Holds true})$$
+            </li>
+            <li>
+              <strong>Induction Hypothesis:</strong> Assume true for \(n = m\): \(\sum_{k=1}^m k = \frac{m(m + 1)}{2}\).
+            </li>
+            <li>
+              <strong>Induction Step (\(n = m + 1\)):</strong>
+              $$\sum_{k=1}^{m+1} k = \left( \sum_{k=1}^m k \right) + (m + 1) = \frac{m(m + 1)}{2} + (m + 1)$$
+              Factoring out \((m + 1)\):
+              $$(m + 1) \left( \frac{m}{2} + 1 \right) = (m + 1) \left( \frac{m + 2}{2} \right) = \frac{(m + 1)((m + 1) + 1)}{2}$$
+              The identity holds for \(m + 1\), completing the proof for all natural numbers \(\mathbb{N}^+\).
+            </li>
+          </ol>
+
+          <h2>4. Reference Matrix: Consecutive Sums and Triangular Numbers</h2>
+          <p>
+            The matrix below compiles standard benchmark summation horizons:
+          </p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Range Horizon (\(n\))</th>
+                <th>Linear Sum (\(S_n\))</th>
+                <th>Arithmetic Mean (\(\bar{x}\))</th>
+                <th>Sum of Squares (\(\sum k^2\))</th>
+                <th>Sum of Cubes (\(\sum k^3\))</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1 to 5</td>
+                <td>15</td>
+                <td>3.0</td>
+                <td>55</td>
+                <td>225</td>
+              </tr>
+              <tr>
+                <td>1 to 10</td>
+                <td>55</td>
+                <td>5.5</td>
+                <td>385</td>
+                <td>3,025</td>
+              </tr>
+              <tr>
+                <td>1 to 20</td>
+                <td>210</td>
+                <td>10.5</td>
+                <td>2,870</td>
+                <td>44,100</td>
+              </tr>
+              <tr>
+                <td>1 to 50</td>
+                <td>1,275</td>
+                <td>25.5</td>
+                <td>42,925</td>
+                <td>1,625,625</td>
+              </tr>
+              <tr>
+                <td>1 to 100</td>
+                <td>5,050</td>
+                <td>50.5</td>
+                <td>338,350</td>
+                <td>25,502,500</td>
+              </tr>
+              <tr>
+                <td>1 to 500</td>
+                <td>125,250</td>
+                <td>250.5</td>
+                <td>41,791,750</td>
+                <td>15,687,562,500</td>
+              </tr>
+              <tr>
+                <td>1 to 1,000</td>
+                <td>500,500</td>
+                <td>500.5</td>
+                <td>333,833,500</td>
+                <td>250,500,250,000</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>5. Computer Science, Networking & Civil Engineering Case Studies</h2>
+
+          <div class="worked-example-card">
+            <h3>Case Study 1: Computer Science Nested Loop Algorithmic Time Complexity</h3>
+            <p>
+              A software performance engineer analyzes a quadratic bubble-sort routine containing nested loops:
+            </p>
+            <pre style="background:#F8FAFC;padding:0.75rem;border-radius:6px;font-size:0.85rem;border:1px solid #E2E8F0;">
+for (int i = 1; i < N; i++) {
+    for (int j = i + 1; j <= N; j++) {
+        compare_and_swap(j, i);
+    }
+}</pre>
+            <p>
+              For an input dataset of size \(N = 500\), determine the exact number of comparisons executed.
+            </p>
+            <div class="example-body">
+              <p><strong>Analysis:</strong> On outer iteration \(i = 1\), the inner loop runs \(N - 1\) times. On iteration \(i = 2\), it runs \(N - 2\) times, down to 1 time. The total operations equal the sum of integers from 1 to \(N - 1 = 499\):</p>
+              $$\text{Comparisons} = \sum_{k=1}^{499} k = \frac{499(500)}{2} = 499 \times 250 = 124,750 \text{ operations}$$
+              <p><strong>Complexity Result:</strong> The nested loops execute exactly \(124,750\) operations, confirming the asymptotic bound \(O(N^2) \approx \frac{1}{2}N^2\).</p>
+            </div>
+          </div>
+
+          <div class="worked-example-card">
+            <h3>Case Study 2: Civil Structural Tiered Amphitheater Seating Capacity</h3>
+            <p>
+              An architectural design team designs a fan-shaped tiered outdoor amphitheater. Row 1 (the lowest row) has \(a = 36\text{ seats}\). Due to radial expansion, each subsequent row adds exactly 1 additional seat (\(d = 1\)). The theater has \(n = 25\text{ rows}\), so the top row has \(b = 36 + 24 = 60\text{ seats}\). Calculate the total seating capacity.
+            </p>
+            <div class="example-body">
+              <p><strong>Parameters:</strong> \(a = 36\), \(b = 60\), \(n = 25\).</p>
+              <p><strong>Step 1: Compute total capacity:</strong></p>
+              $$S = \frac{n(a + b)}{2} = \frac{25 \times (36 + 60)}{2} = \frac{25 \times 96}{2} = 25 \times 48 = 1,200\text{ seats}$$
+              <p><strong>Architectural Verification:</strong> The venue provides an exact total capacity of \(1,200\) spectator seats.</p>
+            </div>
+          </div>
+
+          <div class="worked-example-card">
+            <h3>Case Study 3: Cloud Data Center Full-Mesh VPC Peering Connections</h3>
+            <p>
+              A cloud infrastructure architect designs a multi-region VPC topology linking \(V = 48\text{ virtual networks}\) in a non-blocking full-mesh peering configuration. Calculate the required peering connection tunnels.
+            </p>
+            <div class="example-body">
+              <p><strong>Graph Theory Formulation:</strong> In a complete undirected graph \(K_V\), the number of bidirectional connections equals the sum of integers from 1 to \(V - 1\):</p>
+              $$E = \frac{V(V - 1)}{2} = \frac{48 \times 47}{2} = 24 \times 47 = 1,128\text{ peering tunnels}$$
+              <p><strong>Network Finding:</strong> Because maintaining 1,128 tunnels exceeds cloud quota limits (typically 50-125 peerings per VPC), the architect transitions the design to a centralized Transit Gateway topology.</p>
+            </div>
+          </div>
+
+          <h2>6. Frequently Asked Questions (FAQ)</h2>
+          <div class="faq-accordion">
+            <div class="faq-item">
+              <h3 class="faq-question">Can the starting integer \(a\) be negative?</h3>
+              <div class="faq-answer">
+                <p>
+                  Yes! The formula \(S = \frac{n(a + b)}{2}\) is universally valid for all integers, positive, zero, or negative. For example, summing from \(-5\) to \(+5\): \(n = 5 - (-5) + 1 = 11\) terms, \(S = \frac{11(-5 + 5)}{2} = 0\), because symmetric positive and negative terms cancel out.
+                </p>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <h3 class="faq-question">What is the handshake problem in network graph theory?</h3>
+              <div class="faq-answer">
+                <p>
+                  If \(N\) people in a room each shake hands with every other person, the total handshakes is equal to the sum of integers from 1 to \(N-1\): \(\frac{N(N-1)}{2}\). This formula defines the number of edges in a complete network graph \(K_N\).
+                </p>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <h3 class="faq-question">How does this relate to an arithmetic sequence?</h3>
+              <div class="faq-answer">
+                <p>
+                  Consecutive integers represent a specific arithmetic sequence where the common difference is \(d = 1\). For sequences with different step sizes (e.g., odd numbers where \(d = 2\)), use our generalized <a href="arithmetic-sequence-calculator.html">Arithmetic Sequence Calculator</a>.
+                </p>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <h3 class="faq-question">How do you find the sum of only even or only odd integers?</h3>
+              <div class="faq-answer">
+                <p>
+                  The sum of the first \(n\) even integers is \(n(n + 1)\). The sum of the first \(n\) odd integers is a perfect square: \(n^2\). For example, the sum of the first 4 odd numbers is \(1 + 3 + 5 + 7 = 16 = 4^2\).
+                </p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <aside class="sidebar-column">
+        <div class="sidebar-card">
+          <h3 class="sidebar-title">Related Math Calculators</h3>
+          <ul class="sidebar-nav">
+            <li><a href="arithmetic-sequence-calculator.html">Arithmetic Sequence Calculator</a></li>
+            <li><a href="geometric-sequence-calculator.html">Geometric Sequence Calculator</a></li>
+            <li><a href="mean-median-mode-calculator.html">Mean Median Mode Calculator</a></li>
+            <li><a href="factorial-calculator.html">Factorial Calculator</a></li>
+            <li><a href="prime-number-calculator.html">Prime Number Calculator</a></li>
+            <li><a href="gcd-lcm-calculator.html">GCD & LCM Calculator</a></li>
+            <li><a href="factors-calculator.html">Factors Calculator</a></li>
+            <li><a href="pythagorean-theorem-calculator.html">Pythagorean Theorem Calculator</a></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>Comprehensive mathematical, combinatorial, and discrete calculation tools.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Discipline Hubs</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="math.html">Mathematics</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Electrical & Engineering</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed computational algorithms.</p>
+    </div>
+  </footer>
+
+  <script>
+    function sumSquares(n) {
+      return (n * (n + 1) * (2 * n + 1)) / 6;
+    }
+
+    function sumCubes(n) {
+      var s = (n * (n + 1)) / 2;
+      return s * s;
+    }
+
+    function calculateSumOfIntegers() {
+      var a = parseInt(document.getElementById("start_int").value);
+      var b = parseInt(document.getElementById("end_int").value);
+
+      if (isNaN(a) || isNaN(b)) {
+        alert("Please enter valid integers for start and end.");
+        return;
+      }
+
+      if (b < a) {
+        alert("Ending integer b must be greater than or equal to starting integer a.");
+        return;
+      }
+
+      var n = b - a + 1;
+      var sum = (n * (a + b)) / 2;
+      var mean = (a + b) / 2;
+
+      // Sum of squares & cubes between a and b
+      var sqSum = 0;
+      var cubeSum = 0;
+      if (a >= 1) {
+        sqSum = sumSquares(b) - sumSquares(a - 1);
+        cubeSum = sumCubes(b) - sumCubes(a - 1);
+      } else {
+        // Direct accumulation for non-positive start
+        for (var k = a; k <= b; k++) {
+          sqSum += (k * k);
+          cubeSum += (k * k * k);
+        }
+      }
+
+      document.getElementById("primary-result").innerText = "Sum (" + a + " to " + b + ") = " + sum.toLocaleString();
+      document.getElementById("res-sum").innerText = sum.toLocaleString();
+      document.getElementById("res-terms").innerText = n.toLocaleString();
+      document.getElementById("res-mean").innerText = mean.toFixed(2);
+      document.getElementById("res-sum-sq").innerText = sqSum.toLocaleString();
+      document.getElementById("res-sum-cube").innerText = cubeSum.toLocaleString();
+      document.getElementById("res-formula").innerText = n + " &times; (" + a + " + " + b + ") / 2";
+
+      var steps = "<h4>Step-by-Step Gauss Summation:</h4><ol>";
+      steps += "<li><strong>Count Terms:</strong> n = " + b + " - " + a + " + 1 = <strong>" + n + " terms</strong></li>";
+      steps += "<li><strong>Average of Bounds:</strong> (" + a + " + " + b + ") / 2 = <strong>" + mean.toFixed(2) + "</strong></li>";
+      steps += "<li><strong>Gauss Sum Formula:</strong> S = n &times; (a + b) / 2 = " + n + " &times; " + (a + b) + " / 2 = <strong>" + sum.toLocaleString() + "</strong></li>";
+      steps += "<li><strong>Sum of Squares (&sum;k&sup2;):</strong> <strong>" + sqSum.toLocaleString() + "</strong></li>";
+      steps += "<li><strong>Sum of Cubes (&sum;k&sup3;):</strong> <strong>" + cubeSum.toLocaleString() + "</strong></li>";
+      steps += "</ol>";
+
+      document.getElementById("steps-output").innerHTML = steps;
+      document.getElementById("result-box").style.display = "block";
+    }
+
+    window.addEventListener("DOMContentLoaded", function() {
+      calculateSumOfIntegers();
+    });
+  </script>
+</body>
+</html>

@@ -107,6 +107,14 @@ CAT_MAP = {
             ("midpoint-calculator.html", "Midpoint & Distance (2D & 3D)", "📍", "2D/3D midpoint, Euclidean distance & vector slope", "M = ((x1+x2)/2, (y1+y2)/2) | d = √(Δx² + Δy²)"),
             ("modulo-calculator.html", "Modulo & Modular Arithmetic Calculator", "🔄", "A mod M, congruence classes, Euclidean quotient & inverse", "A = M·Q + R | a ≡ b (mod m) | Extended Euclidean"),
             ("nth-root-calculator.html", "Nth Root & Radical Solver", "√", "Arbitrary radical index ⁿ√A & Newton-Raphson approximation", "x_{k+1} = (1/n)[(n-1)x_k + A/x_kⁿ⁻¹]"),
+            ("square-root-calculator.html", "Square Root Calculator", "√", "Principal square root, Newton-Raphson & radical simplifier", "√x = s | x_{n+1} = ½(x_n + S/x_n)"),
+            ("percent-to-fraction-calculator.html", "Percent to Fraction Calculator", "％", "Exact rational fraction, mixed number & GCD reduction", "Fraction = P / 100 = (P/GCD) / (100/GCD)"),
+            ("percent-error-calculator.html", "Percent Error & Accuracy", "🎯", "Experimental vs theoretical error, precision & uncertainty", "% Error = (|Experimental - Theoretical| / |Theoretical|) × 100%"),
+            ("rounding-calculator.html", "Rounding Calculator", "🔢", "Round to nearest integer, decimals, half-even & sig figs", "Round half-up, half-even (Banker's) & ceiling/floor"),
+            ("factors-calculator.html", "Factors & Factor Pairs Calculator", "🔢", "Divisor pairs, prime factorization & aliquot sums", "N mod d = 0 | d(n) = ∏(α_i+1) | σ(n) = ∏(p^(a+1)-1)/(p-1)"),
+            ("sum-of-integers-calculator.html", "Sum of Integers & Series Calculator", "∑", "Gauss consecutive sum, squared sums & range summation", "S = n(n+1)/2 | ∑k² = n(n+1)(2n+1)/6"),
+            ("triangle-area-calculator.html", "Triangle Area Calculator", "🔺", "Heron's formula, SAS, base-height & Shoelace coordinates", "A = ½bh | A = √[s(s-a)(s-b)(s-c)] | A = ½ab·sin(γ)"),
+            ("variance-calculator.html", "Variance Calculator (Sample & Population)", "📊", "Sample s² (n-1), population σ² (N) & deviation table", "s² = ∑(x - x̄)² / (n - 1) | σ² = ∑(x - μ)² / N"),
         ]
     },
     "engineering.html": {

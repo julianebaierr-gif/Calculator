@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Variance Calculator - Sample &amp; Population Dispersion Solver</title>
+  <meta name="description" content="Calculate sample variance (s^2), population variance (sigma^2), standard deviation, mean, and sum of squared deviations with full step-by-step tables.">
+  <link rel="canonical" href="https://calchub.org/variance-calculator.html">
+  <meta property="og:title" content="Variance Calculator - Sample &amp; Population Statistical Dispersion">
+  <meta property="og:description" content="Free statistical variance calculator. Compute sample variance with Bessel's correction (n - 1), population variance (N), standard deviation, and step-by-step deviations.">
+  <meta property="og:url" content="https://calchub.org/variance-calculator.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Variance Calculator - Accurate Statistical Dispersion Tool">
+  <meta name="twitter:description" content="Calculate statistical variance, standard deviation, and sum of squares for sample and population data with complete step-by-step deviation tables.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Variance Calculator",
+    "url": "https://calchub.org/variance-calculator.html",
+    "description": "Calculates sample variance (s^2), population variance (sigma^2), standard deviation, mean, sum of squared deviations, and step-by-step deviation tables.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the difference between sample variance and population variance?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Population variance (sigma^2) measures dispersion across every single member of an entire target population and divides the sum of squared deviations by N. Sample variance (s^2) estimates population variance from a subset sample and divides by n - 1 (Bessel's correction) to correct for sample mean bias."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why does sample variance divide by (n - 1) instead of n?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Dividing by n - 1 is known as Bessel's correction. Because the true population mean is unknown, sample deviations are calculated relative to the sample mean x-bar. Deviations around x-bar are always smaller on average than deviations around the true mean mu, causing an uncorrected sample variance to underestimate true variance. Dividing by n - 1 restores an unbiased expected value."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does variance relate to standard deviation?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Standard deviation is simply the positive square root of variance: s = sqrt(s^2) or sigma = sqrt(sigma^2). While variance is expressed in squared units of the original data, standard deviation is expressed in the identical original measurement units, making it more intuitive to interpret."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can statistical variance ever be negative?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. In real-valued mathematical statistics, variance can never be negative. It is the average of squared deviations (x - mean)^2, and the square of any real number is non-negative. A variance of zero indicates that every single observation in the dataset is identical."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">CalcHub</a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="math.html" class="active">Math &amp; Statistics</a>
+        <a href="converter.html">Converters</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="calculator-container">
+    <div class="calculator-header">
+      <div class="calc-icon" aria-hidden="true">&#963;<sup>2</sup></div>
+      <h1>Variance Calculator</h1>
+      <p class="calc-description">Compute sample variance (s<sup>2</sup>), population variance (&sigma;<sup>2</sup>), standard deviation, sum of squares, and complete step-by-step deviation tables.</p>
+    </div>
+
+    <div class="calculator-body">
+      <div class="input-group">
+        <label for="dataset-input">Dataset Values</label>
+        <textarea id="dataset-input" class="form-control" rows="4" placeholder="Enter numbers separated by commas, spaces, or newlines, e.g. 14, 22, 19, 25, 30, 21, 28">14, 22, 19, 25, 30, 21, 28</textarea>
+        <span class="help-text">Accepts integers and decimal values separated by commas, spaces, tabs, or line breaks.</span>
+      </div>
+
+      <div class="input-grid">
+        <div class="input-group">
+          <label for="var-type">Calculation Scope</label>
+          <select id="var-type" class="form-control" onchange="calculateVariance()">
+            <option value="sample" selected>Sample Variance (s&sup2;, divide by n - 1)</option>
+            <option value="population">Population Variance (&sigma;&sup2;, divide by N)</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="precision-select">Decimal Precision</label>
+          <select id="precision-select" class="form-control" onchange="calculateVariance()">
+            <option value="2">2 decimal places</option>
+            <option value="4" selected>4 decimal places</option>
+            <option value="6">6 decimal places</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:16px;">
+        <button id="calc-btn" class="btn-primary" onclick="calculateVariance()" style="flex:1;">Compute Variance</button>
+        <button id="reset-btn" class="btn-secondary" onclick="resetVariance()">Reset</button>
+      </div>
+
+      <div id="result-box" class="result-box" style="margin-top:24px;">
+        <h2 class="result-title">Statistical Dispersion Summary</h2>
+        <div class="result-highlight" style="font-size:1.8rem; font-weight:700; color:var(--primary); margin-bottom:16px;" id="res-var">
+          Variance (s&sup2;): 28.2381
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:16px;">
+          <div><span class="res-label">Standard Deviation:</span> <strong class="res-val" id="res-sd">5.3140</strong></div>
+          <div><span class="res-label">Arithmetic Mean (&mu; / x̄):</span> <strong class="res-val" id="res-mean">22.7143</strong></div>
+          <div><span class="res-label">Observations Count (n):</span> <strong class="res-val" id="res-count">7</strong></div>
+          <div><span class="res-label">Sum of Squares (SS):</span> <strong class="res-val" id="res-ss">169.4286</strong></div>
+          <div><span class="res-label">Sum (&sum;x):</span> <strong class="res-val" id="res-sum">159.0000</strong></div>
+          <div><span class="res-label">Std Error of Mean (SE):</span> <strong class="res-val" id="res-se">2.0085</strong></div>
+          <div><span class="res-label">Coeff. of Variation (CV):</span> <strong class="res-val" id="res-cv">23.3941%</strong></div>
+        </div>
+
+        <h3 style="margin-top:20px; font-size:1.1rem; color:var(--text-dark);">Step-by-Step Calculation Breakdown</h3>
+        <div id="res-steps" style="background:var(--bg-subtle, #f8fafc); padding:16px; border-radius:8px; font-family:monospace; font-size:0.95rem; white-space:pre-wrap; border:1px solid var(--border-color, #e2e8f0); margin-bottom:16px;"></div>
+
+        <h3 style="margin-top:16px; font-size:1.1rem; color:var(--text-dark);">Data Point Deviation Table</h3>
+        <div style="overflow-x:auto;">
+          <table class="data-table" id="res-table" style="width:100%; margin-top:8px;">
+            <thead>
+              <tr>
+                <th>Index (i)</th>
+                <th>Observation (x<sub>i</sub>)</th>
+                <th>Deviation (x<sub>i</sub> - x̄)</th>
+                <th>Squared Deviation (x<sub>i</sub> - x̄)&sup2;</th>
+              </tr>
+            </thead>
+            <tbody id="res-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <article class="article-body">
+      <h2>Comprehensive Engineering &amp; Statistical Guide to Variance</h2>
+      <p>In mathematical statistics, probability theory, and data science, variance represents the second central moment of a probability distribution. It serves as the primary quantitative measure of statistical dispersion, quantifying the expected squared distance of individual data points from their arithmetic mean. While the mean, median, and mode describe the central tendency of a dataset (explored in our <a href="mean-median-mode-calculator.html">Mean Median Mode Calculator</a>), variance reveals how tightly the data clusters around that center or how broadly it is dispersed across the distribution space.</p>
+
+      <p>Variance plays an indispensable role across scientific and engineering disciplines. In finance and asset management, variance quantifies portfolio volatility and underpins Harry Markowitz's Modern Portfolio Theory. In mechanical engineering and manufacturing quality control, variance in machine tolerances defines Six Sigma process capability indices (\(C_p\) and \(C_{pk}\)). In genetics, Ronald Fisher introduced the Analysis of Variance (ANOVA) to partition total phenotypic variance into additive genetic and environmental components. In machine learning, the bias-variance tradeoff governs model generalization error, regularization, and overfitting.</p>
+
+      <h2>Mathematical Formulations: Population vs. Sample Variance</h2>
+      <p>A crucial distinction in inferential statistics is the difference between an entire population and a representative sample drawn from that population.</p>
+
+      <h3>1. Population Variance (\(\sigma^2\))</h3>
+      <p>When you have access to every individual observation in a complete target population consisting of \(N\) elements, the population mean \(\mu\) is known with absolute certainty. The population variance \(\sigma^2\) is defined as the arithmetic average of all squared deviations:</p>
+      $$\sigma^2 = \frac{1}{N} \sum_{i=1}^{N} (x_i - \mu)^2$$
+      <p>Where:</p>
+      <ul>
+        <li>\(\sigma^2\) is the population variance (sigma squared).</li>
+        <li>\(N\) is the total finite population size.</li>
+        <li>\(x_i\) represents each individual observation.</li>
+        <li>\(\mu = \frac{1}{N}\sum_{i=1}^{N} x_i\) is the true population arithmetic mean.</li>
+      </ul>
+
+      <h3>2. Sample Variance (\(s^2\)) &amp; Bessel's Correction</h3>
+      <p>In virtually all real-world scientific investigations, observing the entire population is financially or physically impossible. Instead, researchers collect a random sample of size \(n\). Because the true population mean \(\mu\) is unknown, researchers must approximate it using the sample mean \(\bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i\).</p>
+      <p>Crucially, individual sample data points are mathematically closer to their own sample mean \(\bar{x}\) than to the true, unknown population mean \(\mu\). If we were to divide the sum of squared sample deviations by \(n\), the resulting estimator would systematically underestimate the true population variance by a factor of \(\frac{n-1}{n}\). To eliminate this downward bias, German astronomer Friedrich Wilhelm Bessel introduced Bessel's correction, replacing \(n\) with the degrees of freedom \(n - 1\):</p>
+      $$s^2 = \frac{1}{n - 1} \sum_{i=1}^{n} (x_i - \bar{x})^2$$
+      <p>Because the expected value of this estimator satisfies \(\mathbb{E}[s^2] = \sigma^2\), sample variance using \(n - 1\) is an unbiased estimator of population variance.</p>
+
+      <h3>3. Computational Shortcut Formula vs. Two-Pass Algorithm</h3>
+      <p>Expanding the polynomial \((x_i - \bar{x})^2 = x_i^2 - 2x_i\bar{x} + \bar{x}^2\) yields the classic computational shortcut formula:</p>
+      $$s^2 = \frac{\sum_{i=1}^{n} x_i^2 - \frac{(\sum_{i=1}^{n} x_i)^2}{n}}{n - 1}$$
+      <p>While mathematically identical in infinite-precision arithmetic, this shortcut formula can suffer from catastrophic cancellation in floating-point software when data values are large with tiny variance. To ensure absolute numerical accuracy, modern statistical software (including this calculator) computes the mean first, then sums the squared differences in a stable two-pass algorithm, or utilizes B. P. Welford's running one-pass recurrence algorithm.</p>
+
+      <h2>Relationship to Standard Deviation &amp; Auxiliary Dispersion Metrics</h2>
+      <p>Because variance squares the deviation distances, its resulting numerical output is expressed in squared units (e.g., \(\text{meters}^2\), \(\text{dollars}^2\), or \(\text{seconds}^2\)). While mathematically essential for linear algebra and ANOVA partitions, squared units lack intuitive dimensional interpretability. Taking the positive square root of variance yields the <a href="standard-deviation-calculator.html">Standard Deviation</a>, which returns the measure of dispersion back to original units:</p>
+      $$s = \sqrt{s^2}, \quad \sigma = \sqrt{\sigma^2}$$
+      <p>Other vital dispersion metrics derived directly from variance include:</p>
+      <div class="formula-box">
+        <h3>Derived Dispersion Metrics</h3>
+        $$\text{Standard Error of the Mean (SE): } SE = \frac{s}{\sqrt{n}}$$
+        $$\text{Coefficient of Variation (CV): } CV = \left( \frac{s}{\bar{x}} \right) \times 100\%$$
+        $$\text{Sum of Squared Errors (SS): } SS = \sum_{i=1}^{n} (x_i - \bar{x})^2 = (n - 1)s^2$$
+      </div>
+
+      <h2>Statistical Dispersion Metric Comparison Table</h2>
+      <p>The following multi-column benchmark matrix summarizes the mathematical characteristics, bias properties, degrees of freedom, and typical applications of variance and its related dispersion metrics:</p>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Dispersion Metric</th>
+            <th>Symbol</th>
+            <th>Formula</th>
+            <th>Denominator</th>
+            <th>Bias Property</th>
+            <th>Primary Application</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Sample Variance</td>
+            <td>\(s^2\)</td>
+            <td>\(\frac{\sum (x_i - \bar{x})^2}{n - 1}\)</td>
+            <td>\(n - 1\) (Degrees of Freedom)</td>
+            <td>Unbiased for \(\sigma^2\)</td>
+            <td>Inferential research, ANOVA, t-tests, regression analysis</td>
+          </tr>
+          <tr>
+            <td>Population Variance</td>
+            <td>\(\sigma^2\)</td>
+            <td>\(\frac{\sum (x_i - \mu)^2}{N}\)</td>
+            <td>\(N\) (Total Population)</td>
+            <td>Exact parameter</td>
+            <td>Complete census datasets, theoretical probability distributions</td>
+          </tr>
+          <tr>
+            <td>Sample Standard Deviation</td>
+            <td>\(s\)</td>
+            <td>\(\sqrt{s^2}\)</td>
+            <td>\(\sqrt{n - 1}\)</td>
+            <td>Slightly biased (Jensen's inequality)</td>
+            <td>Confidence intervals, error bars, empirical rule (68-95-99.7%)</td>
+          </tr>
+          <tr>
+            <td>Population Standard Deviation</td>
+            <td>\(\sigma\)</td>
+            <td>\(\sqrt{\sigma^2}\)</td>
+            <td>\(\sqrt{N}\)</td>
+            <td>Exact parameter</td>
+            <td>Z-score standardization, normal distribution modeling</td>
+          </tr>
+          <tr>
+            <td>Sum of Squares (SS)</td>
+            <td>\(SS\)</td>
+            <td>\(\sum (x_i - \bar{x})^2\)</td>
+            <td>\(1\) (No division)</td>
+            <td>Additive metric</td>
+            <td>Partition of variance in regression sum of squares (SSR, SSE, SST)</td>
+          </tr>
+          <tr>
+            <td>Standard Error of the Mean</td>
+            <td>\(SE\)</td>
+            <td>\(\frac{s}{\sqrt{n}}\)</td>
+            <td>\(\sqrt{n(n - 1)}\)</td>
+            <td>Unbiased estimator of sampling variability</td>
+            <td>Sampling distribution spread, margin of error in polling</td>
+          </tr>
+          <tr>
+            <td>Coefficient of Variation</td>
+            <td>\(CV\)</td>
+            <td>\(\frac{s}{\bar{x}} \times 100\%\)</td>
+            <td>Dimensionless ratio</td>
+            <td>Normalized relative variability</td>
+            <td>Comparing variability across different units (e.g. weight vs height)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Real-World Engineering, Clinical &amp; Financial Case Studies</h2>
+      <p>The following real-world worked case studies demonstrate how statistical variance is computed and applied in practical industrial, financial, and clinical environments.</p>
+
+      <div class="worked-example-card">
+        <h3>Case Study 1: Modern Portfolio Theory &amp; Financial Asset Variance</h3>
+        <p><strong>Scenario:</strong> A quantitative investment analyst evaluates the annual return volatility of a technology hedge fund over a 5-year sample window. The recorded annual returns are: \(12.0\%\), \(-4.0\%\), \(18.0\%\), \(6.0\%\), and \(8.0\%\). The analyst must compute the sample variance and standard deviation to determine the portfolio's Sharpe ratio risk penalty.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Calculate the sample mean return \(\bar{x}\):
+            $$\bar{x} = \frac{12.0 + (-4.0) + 18.0 + 6.0 + 8.0}{5} = \frac{40.0}{5} = 8.0\%$$
+          </li>
+          <li>Compute deviations and squared deviations from the mean for each year:
+            <ul>
+              <li>Year 1: \((12.0 - 8.0) = +4.0 \implies (+4.0)^2 = 16.0\)</li>
+              <li>Year 2: \((-4.0 - 8.0) = -12.0 \implies (-12.0)^2 = 144.0\)</li>
+              <li>Year 3: \((18.0 - 8.0) = +10.0 \implies (+10.0)^2 = 100.0\)</li>
+              <li>Year 4: \((6.0 - 8.0) = -2.0 \implies (-2.0)^2 = 4.0\)</li>
+              <li>Year 5: \((8.0 - 8.0) = 0.0 \implies (0.0)^2 = 0.0\)</li>
+            </ul>
+          </li>
+          <li>Sum the squared deviations (Sum of Squares, SS):
+            $$SS = 16.0 + 144.0 + 100.0 + 4.0 + 0.0 = 264.0$$
+          </li>
+          <li>Apply Bessel's correction with degrees of freedom \(n - 1 = 5 - 1 = 4\):
+            $$s^2 = \frac{SS}{n - 1} = \frac{264.0}{4} = 66.0000 (\%^2)$$
+          </li>
+          <li>Compute sample standard deviation:
+            $$s = \sqrt{66.0} \approx 8.1240\%$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> The hedge fund has a sample variance of \(66.0000 (\%^2)\) and an annualized return volatility (standard deviation) of \(8.1240\%\).</p>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 2: Six Sigma Precision Machining Quality Control</h3>
+        <p><strong>Scenario:</strong> A CNC lathe manufactures titanium orthopedic bone screws with a nominal target shaft diameter of \(4.500 \text{ mm}\). A quality assurance engineer measures a random batch of 6 finished screws: \(4.502\), \(4.498\), \(4.505\), \(4.496\), \(4.500\), and \(4.501 \text{ mm}\). The ISO 13485 quality standard mandates that the batch variance \(s^2\) must not exceed \(0.000015 \text{ mm}^2\).</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Calculate sample mean shaft diameter:
+            $$\bar{x} = \frac{4.502 + 4.498 + 4.505 + 4.496 + 4.500 + 4.501}{6} = \frac{27.002}{6} \approx 4.500333 \text{ mm}$$
+          </li>
+          <li>Calculate deviations and squared deviations:
+            <ul>
+              <li>\(d_1 = (4.502 - 4.500333) = +0.001667 \implies d_1^2 \approx 0.00000278\)</li>
+              <li>\(d_2 = (4.498 - 4.500333) = -0.002333 \implies d_2^2 \approx 0.00000544\)</li>
+              <li>\(d_3 = (4.505 - 4.500333) = +0.004667 \implies d_3^2 \approx 0.00002178\)</li>
+              <li>\(d_4 = (4.496 - 4.500333) = -0.004333 \implies d_4^2 \approx 0.00001878\)</li>
+              <li>\(d_5 = (4.500 - 4.500333) = -0.000333 \implies d_5^2 \approx 0.00000011\)</li>
+              <li>\(d_6 = (4.501 - 4.500333) = +0.000667 \implies d_6^2 \approx 0.00000044\)</li>
+            </ul>
+          </li>
+          <li>Sum of squared deviations:
+            $$SS \approx 0.00004933 \text{ mm}^2$$
+          </li>
+          <li>Compute sample variance dividing by \(n - 1 = 6 - 1 = 5\):
+            $$s^2 = \frac{0.00004933}{5} \approx 0.00000987 \text{ mm}^2$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> Because the calculated sample variance \(s^2 = 0.00000987 \text{ mm}^2\) is strictly below the maximum threshold of \(0.000015 \text{ mm}^2\), the manufacturing batch passes quality inspection.</p>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 3: Clinical Laboratory Automated Immunoassay Precision</h3>
+        <p><strong>Scenario:</strong> A clinical pathology laboratory validates a new automated chemiluminescence immunoassay analyzer for serum troponin-T measurements (ng/L). A reference control serum with known uniform concentration is tested in 8 replicate runs: \(24, 26, 25, 23, 27, 25, 26, 24\). The laboratory manager requires both sample variance and the Coefficient of Variation (CV) to ensure analytical repeatability.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Calculate mean troponin-T level:
+            $$\bar{x} = \frac{24 + 26 + 25 + 23 + 27 + 25 + 26 + 24}{8} = \frac{200}{8} = 25.0000 \text{ ng/L}$$
+          </li>
+          <li>Compute squared deviations from \(25.0\):
+            $$\sum (x_i - \bar{x})^2 = (-1)^2 + (1)^2 + (0)^2 + (-2)^2 + (2)^2 + (0)^2 + (1)^2 + (-1)^2$$
+            $$SS = 1 + 1 + 0 + 4 + 4 + 0 + 1 + 1 = 12.0000$$
+          </li>
+          <li>Calculate sample variance with \(n - 1 = 7\):
+            $$s^2 = \frac{12.0}{7} \approx 1.7143 \text{ (ng/L)}^2$$
+          </li>
+          <li>Calculate sample standard deviation:
+            $$s = \sqrt{1.7143} \approx 1.3093 \text{ ng/L}$$
+          </li>
+          <li>Calculate Coefficient of Variation:
+            $$CV = \frac{s}{\bar{x}} \times 100\% = \frac{1.3093}{25.0} \times 100\% = 5.2372\%$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> The analyzer exhibits a replicate sample variance of \(1.7143 \text{ (ng/L)}^2\) and a Coefficient of Variation of \(5.2372\%\), demonstrating excellent analytical precision within clinical diagnostic guidelines.</p>
+      </div>
+
+      <h2>Properties of Mathematical Variance</h2>
+      <p>Understanding the algebraic transformations of variance is essential when modeling stochastic systems, propagating experimental uncertainties, or combining multiple independent random variables:</p>
+      <ul>
+        <li><strong>Additive Invariance:</strong> Adding a constant \(c\) to every data point shifts the mean by \(c\) but does not alter the spread: \(\text{Var}(X + c) = \text{Var}(X)\).</li>
+        <li><strong>Multiplicative Scaling:</strong> Multiplying every observation by a constant scalar \(a\) scales the variance quadratically: \(\text{Var}(aX) = a^2 \text{Var}(X)\). For instance, converting measurements from meters to centimeters multiplies the variance by \(100^2 = 10,000\).</li>
+        <li><strong>Sum of Independent Variables:</strong> For two independent random variables \(X\) and \(Y\), the variance of their sum or difference equals the sum of their individual variances: \(\text{Var}(X \pm Y) = \text{Var}(X) + \text{Var}(Y)\). Notice that variance adds even when subtracting random variables because uncertainty always accumulates.</li>
+        <li><strong>Variance of Correlated Variables:</strong> If \(X\) and \(Y\) are correlated, their covariance \(\text{Cov}(X, Y)\) enters the equation: \(\text{Var}(X + Y) = \text{Var}(X) + \text{Var}(Y) + 2\text{Cov}(X, Y)\).</li>
+      </ul>
+
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-item">
+        <div class="faq-question">When should I select Sample Variance instead of Population Variance?</div>
+        <div class="faq-answer">Select Sample Variance whenever your dataset represents a subset, trial sample, clinical cohort, or experimental batch drawn from a broader real-world population. Use Population Variance only when you have collected data on every single entity in the entire universe of interest (such as a 100% complete census of all employees in a closed private firm, or when evaluating a purely theoretical mathematical distribution).</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">Why does Bessel's correction use (n - 1) instead of (n - 2) or another value?</div>
+        <div class="faq-answer">The denominator represents the "degrees of freedom." In a sample of n values, you have n independent pieces of information. However, to calculate deviations, you must first calculate the sample mean x-bar. Once the sample mean is fixed, the last deviation is mathematically determined because the sum of deviations around the mean must identically equal zero: \(\sum (x_i - \bar{x}) = 0\). This consumes exactly 1 degree of freedom, leaving n - 1 free variables.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">Why can't standard deviation be directly averaged across subgroups?</div>
+        <div class="faq-answer">Standard deviations cannot be linearly averaged because square roots are non-linear operators (Jensen's inequality). To combine dispersion across multiple distinct subgroups, you must pool their variances using weighted sums of squares and pooled degrees of freedom, and only take the square root at the final step.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">How does variance differ from Mean Absolute Deviation (MAD)?</div>
+        <div class="faq-answer">Variance squares each deviation \((x_i - \bar{x})^2\), which heavily penalizes large outliers and makes variance mathematically differentiable for calculus, optimization algorithms, and ordinary least squares (OLS) regression. Mean Absolute Deviation takes the absolute value \(|x_i - \bar{x}|\), which gives equal proportional weight to all deviations and is more robust against extreme anomalies, but is non-differentiable at zero.</div>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>Comprehensive mathematical, statistical, and engineering calculation tools.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Discipline Hubs</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="math.html">Mathematics</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed computational algorithms.</p>
+    </div>
+  </footer>
+
+  <script>
+    function parseData(text) {
+      if (!text) return [];
+      var parts = text.split(/[\s,;\n\r\t]+/);
+      var nums = [];
+      for (var i = 0; i < parts.length; i++) {
+        var str = parts[i].trim();
+        if (str !== "") {
+          var val = parseFloat(str);
+          if (!isNaN(val)) nums.push(val);
+        }
+      }
+      return nums;
+    }
+
+    function calculateVariance() {
+      var raw = document.getElementById('dataset-input').value;
+      var data = parseData(raw);
+      var type = document.getElementById('var-type').value;
+      var prec = parseInt(document.getElementById('precision-select').value, 10) || 4;
+
+      if (data.length === 0) {
+        showError("Please enter at least one valid numerical observation.");
+        return;
+      }
+
+      if (type === 'sample' && data.length < 2) {
+        showError("Sample variance requires at least 2 observations for (n - 1) degrees of freedom.");
+        return;
+      }
+
+      var n = data.length;
+      var sum = 0;
+      for (var i = 0; i < n; i++) sum += data[i];
+      var mean = sum / n;
+
+      var ss = 0;
+      var rowsHtml = "";
+      for (var i = 0; i < n; i++) {
+        var dev = data[i] - mean;
+        var devSq = dev * dev;
+        ss += devSq;
+        rowsHtml += "<tr>" +
+                    "<td>" + (i + 1) + "</td>" +
+                    "<td>" + data[i].toFixed(prec) + "</td>" +
+                    "<td>" + (dev >= 0 ? "+" : "") + dev.toFixed(prec) + "</td>" +
+                    "<td>" + devSq.toFixed(prec) + "</td>" +
+                    "</tr>";
+      }
+
+      var denom = (type === 'sample') ? (n - 1) : n;
+      var variance = ss / denom;
+      var sd = Math.sqrt(variance);
+      var se = (type === 'sample') ? (sd / Math.sqrt(n)) : (sd / Math.sqrt(n));
+      var cv = (mean !== 0) ? (sd / Math.abs(mean) * 100) : 0;
+
+      var varLabel = (type === 'sample') ? "Sample Variance (s²)" : "Population Variance (σ²)";
+      var denomLabel = (type === 'sample') ? "(n - 1) = " + denom : "N = " + denom;
+
+      document.getElementById('res-var').innerText = varLabel + ": " + variance.toFixed(prec);
+      document.getElementById('res-sd').innerText = sd.toFixed(prec);
+      document.getElementById('res-mean').innerText = mean.toFixed(prec);
+      document.getElementById('res-count').innerText = n.toString();
+      document.getElementById('res-ss').innerText = ss.toFixed(prec);
+      document.getElementById('res-sum').innerText = sum.toFixed(prec);
+      document.getElementById('res-se').innerText = se.toFixed(prec);
+      document.getElementById('res-cv').innerText = cv.toFixed(prec) + "%";
+
+      var steps = "Dataset Size: " + n + " values\n" +
+                  "1. Arithmetic Mean: Sum / " + n + " = " + sum.toFixed(prec) + " / " + n + " = " + mean.toFixed(prec) + "\n" +
+                  "2. Sum of Squared Deviations (SS): " + ss.toFixed(prec) + "\n" +
+                  "3. Denominator (" + denomLabel + ")\n" +
+                  "4. Variance Formula: " + (type === 'sample' ? "s² = SS / (n - 1)" : "σ² = SS / N") + "\n" +
+                  "   Variance = " + ss.toFixed(prec) + " / " + denom + " = " + variance.toFixed(prec) + "\n" +
+                  "5. Standard Deviation = sqrt(Variance) = sqrt(" + variance.toFixed(prec) + ") = " + sd.toFixed(prec);
+
+      document.getElementById('res-steps').innerText = steps;
+      document.getElementById('res-table-body').innerHTML = rowsHtml;
+    }
+
+    function showError(msg) {
+      document.getElementById('res-var').innerText = "Error";
+      document.getElementById('res-sd').innerText = "N/A";
+      document.getElementById('res-mean').innerText = "N/A";
+      document.getElementById('res-count').innerText = "0";
+      document.getElementById('res-ss').innerText = "N/A";
+      document.getElementById('res-sum').innerText = "N/A";
+      document.getElementById('res-se').innerText = "N/A";
+      document.getElementById('res-cv').innerText = "N/A";
+      document.getElementById('res-steps').innerText = "Error: " + msg;
+      document.getElementById('res-table-body').innerHTML = "<tr><td colspan='4' style='text-align:center;'>No valid data</td></tr>";
+    }
+
+    function resetVariance() {
+      document.getElementById('dataset-input').value = "14, 22, 19, 25, 30, 21, 28";
+      document.getElementById('var-type').value = "sample";
+      document.getElementById('precision-select').value = "4";
+      calculateVariance();
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      calculateVariance();
+    });
+  </script>
+</body>
+</html>

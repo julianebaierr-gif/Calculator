@@ -107,6 +107,14 @@ CATEGORIES = {
             ("midpoint-calculator.html", "Midpoint & Distance (2D & 3D)", "📍", "2D/3D midpoint, Euclidean distance & vector slope"),
             ("modulo-calculator.html", "Modulo & Modular Arithmetic Calculator", "🔄", "A mod M, congruence classes, Euclidean quotient & inverse"),
             ("nth-root-calculator.html", "Nth Root & Radical Solver", "√", "Arbitrary radical index ⁿ√A & Newton-Raphson approximation"),
+            ("square-root-calculator.html", "Square Root Calculator", "√", "Principal square root, Newton-Raphson & radical simplifier"),
+            ("percent-to-fraction-calculator.html", "Percent to Fraction Calculator", "％", "Exact rational fraction, mixed number & GCD reduction"),
+            ("percent-error-calculator.html", "Percent Error & Accuracy", "🎯", "Experimental vs theoretical error, precision & uncertainty"),
+            ("rounding-calculator.html", "Rounding Calculator", "🔢", "Round to nearest integer, decimals, half-even & sig figs"),
+            ("factors-calculator.html", "Factors & Factor Pairs Calculator", "🔢", "Divisor pairs, prime factorization & aliquot sums"),
+            ("sum-of-integers-calculator.html", "Sum of Integers & Series Calculator", "∑", "Gauss consecutive sum, squared sums & range summation"),
+            ("triangle-area-calculator.html", "Triangle Area Calculator", "🔺", "Heron's formula, SAS, base-height & Shoelace coordinates"),
+            ("variance-calculator.html", "Variance Calculator (Sample & Population)", "📊", "Sample s² (n-1), population σ² (N) & deviation table"),
         ]
     },
     "engineering": {
@@ -403,7 +411,7 @@ def determine_tool_cat(filename):
         return "datetime"
     if any(k in f for k in ["unit-converter", "length-converter", "weight-converter", "temperature-converter", "area-converter", "volume-converter", "pressure-converter", "speed-converter", "energy-converter", "power-converter", "force-converter", "data-storage-converter", "data-transfer-rate-converter", "frequency-converter", "flow-rate-converter", "fuel-economy-converter", "angle-converter", "density-converter", "illuminance-converter", "thermal-conductivity-converter", "viscosity-converter", "cooking-converter", "number-base-converter", "roman-numeral-converter", "time-converter", "time-zone", "unix-timestamp"]):
         return "converter"
-    if any(k in f for k in ["percentage", "fraction", "ratio", "gpa", "standard-deviation", "gcd-lcm", "quadratic-equation", "pythagorean", "scientific-notation", "significant-figures", "prime-number", "absolute-value", "area-calculator", "arithmetic-sequence", "circle-calculator", "cube-root", "decimal-to-fraction", "exponent", "factorial", "fraction-to-percent", "geometric-sequence", "logarithm", "long-division", "mean-median-mode", "midpoint", "modulo", "nth-root"]):
+    if any(k in f for k in ["percentage", "fraction", "ratio", "gpa", "standard-deviation", "gcd-lcm", "quadratic-equation", "pythagorean", "scientific-notation", "significant-figures", "prime-number", "absolute-value", "area-calculator", "arithmetic-sequence", "circle-calculator", "cube-root", "decimal-to-fraction", "exponent", "factorial", "fraction-to-percent", "geometric-sequence", "logarithm", "long-division", "mean-median-mode", "midpoint", "modulo", "nth-root", "square-root", "percent-to-fraction", "percent-error", "rounding", "factors", "sum-of-integers", "triangle-area", "variance"]):
         return "math"
     return "math"
 
