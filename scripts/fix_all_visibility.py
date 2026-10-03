@@ -303,6 +303,14 @@ CAT_MAP = {
             ("pressure-converter.html", "Pressure & Vacuum Converter", "💨", "Pascals, bar, PSI, atmospheres, Torr & inches of mercury", "1 atm = 101,325 Pa = 14.696 psi | 1 bar = 100 kPa"),
             ("speed-converter.html", "Speed & Velocity Converter", "🚀", "m/s, km/h, mph, knots, feet/s & Mach sound barrier", "1 m/s = 3.6 km/h | 1 mph = 1.609344 km/h | 1 kt = 1.852 km/h"),
             ("energy-converter.html", "Energy & Work Converter", "⚡", "Joules, kWh, calories, kcal, BTU, electron-volts & therms", "1 J = 1 N·m | 1 kWh = 3.6 MJ | 1 kcal = 4,184 J"),
+            ("power-converter.html", "Power Converter (Watts, kW, HP)", "⚡", "Mechanical HP, metric PS, Watts, kilowatts & BTU/hr", "1 HP = 745.699872 W | 1 kW = 1,000 W | 1 PS = 735.49875 W"),
+            ("force-converter.html", "Force Converter (Newtons, lbf, kN)", "💪", "Newtons, pound-force, dynes, kips & kilogram-force", "F = m·a | 1 lbf = 4.448222 N | 1 kgf = 9.80665 N"),
+            ("data-storage-converter.html", "Data Storage Converter (GB, TB, GiB)", "💾", "Decimal SI bytes (KB, MB, GB, TB) & binary IEC units (KiB, MiB, GiB, TiB)", "1 TB = 10¹² bytes | 1 TiB = 2⁴⁰ bytes = 1,099.5 GB"),
+            ("data-transfer-rate-converter.html", "Data Transfer Rate Converter (Mbps, Gbps)", "🌐", "Bandwidth, bits vs bytes, Gbps, MB/s & transfer download time", "1 Byte = 8 bits | T_transfer = File Size / Transfer Rate"),
+            ("frequency-converter.html", "Frequency Converter (Hz, RPM, rad/s)", "📻", "Hertz, kHz, MHz, GHz, rotational RPM & angular velocity rad/s", "f = RPM / 60 | ω = 2π·f | λ = c / f"),
+            ("flow-rate-converter.html", "Flow Rate Converter (GPM, L/min, m³/h)", "🌊", "Volumetric flow, US GPM, Imperial GPM, L/min, m³/h & CFS", "Q = A·v | 1 US GPM = 3.78541 L/min | 1 m³/h = 4.403 GPM"),
+            ("fuel-economy-converter.html", "Fuel Economy Converter (MPG, L/100km)", "⛽", "Harmonic fuel consumption, US MPG, UK MPG, L/100km & km/L", "L/100km = 235.215 / MPG_US | MPG_UK = 1.20095·MPG_US"),
+            ("angle-converter.html", "Angle Converter (Degrees, Radians, MOA)", "📐", "Sexagesimal degrees, radians, gradians, MOA & milliradians mrad", "rad = deg × π/180 | 1 MOA = 1/60° | 1 mrad = 3.438 MOA"),
         ]
     }
 }

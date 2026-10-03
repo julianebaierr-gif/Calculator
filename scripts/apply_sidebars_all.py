@@ -333,6 +333,14 @@ CATEGORIES = {
             ("pressure-converter.html", "Pressure & Vacuum Converter", "💨", "Pascals, bar, PSI, atmospheres, Torr & inHg"),
             ("speed-converter.html", "Speed & Velocity Converter", "🚀", "m/s, km/h, mph, knots, feet/s & Mach"),
             ("energy-converter.html", "Energy & Work Converter", "⚡", "Joules, kWh, calories, kcal, BTU & electron-volts"),
+            ("power-converter.html", "Power Converter (Watts, kW, HP)", "⚡", "Mechanical HP, metric PS, Watts & kilowatts"),
+            ("force-converter.html", "Force Converter (Newtons, lbf, kN)", "💪", "Newtons, pound-force, dynes & kips"),
+            ("data-storage-converter.html", "Data Storage Converter (GB, TB, GiB)", "💾", "Decimal SI bytes & binary IEC units"),
+            ("data-transfer-rate-converter.html", "Data Transfer Rate Converter (Mbps, Gbps)", "🌐", "Bandwidth, bits vs bytes & download speed"),
+            ("frequency-converter.html", "Frequency Converter (Hz, RPM, rad/s)", "📻", "Hertz, kHz, MHz, GHz & RPM"),
+            ("flow-rate-converter.html", "Flow Rate Converter (GPM, L/min, m³/h)", "🌊", "Volumetric flow, US GPM, L/min & m³/h"),
+            ("fuel-economy-converter.html", "Fuel Economy Converter (MPG, L/100km)", "⛽", "Harmonic fuel consumption, US MPG & L/100km"),
+            ("angle-converter.html", "Angle Converter (Degrees, Radians, MOA)", "📐", "Degrees, radians, gradians, MOA & mrad"),
         ]
     }
 }
@@ -361,7 +369,7 @@ def determine_tool_cat(filename):
         return "programmer"
     if any(k in f for k in ["date-difference", "age"]):
         return "datetime"
-    if any(k in f for k in ["unit-converter", "length-converter", "weight-converter", "temperature-converter", "area-converter", "volume-converter", "pressure-converter", "speed-converter", "energy-converter"]):
+    if any(k in f for k in ["unit-converter", "length-converter", "weight-converter", "temperature-converter", "area-converter", "volume-converter", "pressure-converter", "speed-converter", "energy-converter", "power-converter", "force-converter", "data-storage-converter", "data-transfer-rate-converter", "frequency-converter", "flow-rate-converter", "fuel-economy-converter", "angle-converter"]):
         return "converter"
     if any(k in f for k in ["percentage", "fraction", "ratio", "gpa", "standard-deviation"]):
         return "math"
