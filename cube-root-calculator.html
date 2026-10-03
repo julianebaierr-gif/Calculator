@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cube Root Calculator — Principal, Complex Roots & Newton-Raphson | CalcHub</title>
+  <meta name="description" content="Calculate principal real and complex cube roots (∛x), perfect cubes table, Newton-Raphson iterations, and volume-to-length dimensional scaling.">
+  <meta name="keywords" content="cube root calculator, principal cube root, complex cube roots of unity, newton raphson cube root, perfect cubes list, square cube law, radical calculator">
+  <meta name="author" content="CalcHub Real & Complex Analysis Board">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://calchub.org/cube-root-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+
+  <meta property="og:title" content="Cube Root Calculator — Principal, Complex Roots & Newton-Raphson | CalcHub">
+  <meta property="og:description" content="Compute exact real and complex cube roots of any positive or negative number with step-by-step Newton-Raphson iterations.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://calchub.org/cube-root-calculator.html">
+
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://calchub.org/cube-root-calculator.html#app",
+      "name": "Cube Root & Radical Extraction Engine",
+      "url": "https://calchub.org/cube-root-calculator.html",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "High-precision algebraic solver for real and complex cube roots with Newton-Raphson numerical convergence."
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://calchub.org/"},
+        {"@type": "ListItem", "position": 2, "name": "Math & Engineering Calculators", "item": "https://calchub.org/math.html"},
+        {"@type": "ListItem", "position": 3, "name": "Cube Root Calculator", "item": "https://calchub.org/cube-root-calculator.html"}
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why can negative numbers have real cube roots, unlike square roots?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In arithmetic, raising a negative real number to an odd integer power yields a negative result: (-y)³ = (-y) · (-y) · (-y) = -y³. Because the function f(x) = x³ is strictly monotonic and bijective across the entire real line (-∞, +∞), every real number—positive, negative, or zero—possesses exactly one unique real cube root: ∛(-N) = -∛(N). In contrast, square roots require squaring, which always yields non-negative outputs in the real domain."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are the three complex cube roots of unity?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "By the Fundamental Theorem of Algebra, the polynomial z³ = 1 has exactly 3 roots in the complex plane. The first root is the real number 1. The remaining two roots form a complex conjugate pair: ω = -0.5 + i(√3 / 2) = e^(i 2π/3), and ω² = -0.5 - i(√3 / 2) = e^(i 4π/3). For any real number N, its three cube roots are ∛N, ∛N · ω, and ∛N · ω²."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the Newton-Raphson algorithm compute cube roots numerically?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "To find ∛N, define the objective function f(x) = x³ - N = 0 with derivative f'(x) = 3x². Applying Newton's recurrence formula yields: x_{n+1} = x_n - (x_n³ - N) / (3x_n²) = (2x_n + N / x_n²) / 3. Starting from an initial guess, each iteration roughly doubles the number of accurate decimal digits due to quadratic convergence."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the Square-Cube Law relate cube roots to biological allometry?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Square-Cube Law states that as an organism or structure scales proportionally, its surface area scales with the square of length (A ∝ L²), while its volume and mass scale with the cube of length (V ∝ L³). Inverting this scaling, an organism's linear dimensions scale with the cube root of its body mass: L ∝ ∛M. This fundamental geometric constraint explains why giant insects cannot exist, as mass overwhelms cross-sectional leg bone strength."
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</head>
+<body class="converter-page">
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="converter.html">Converters</a>
+        <a href="math.html" class="active">Math & Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="page-layout">
+        <div class="content-column">
+          <header class="tool-header">
+            <div class="badge-tag">Real &amp; Complex Analysis</div>
+            <h1 class="tool-title">Cube Root Calculator</h1>
+            <p class="tool-subtitle">Calculate real principal and complex cube roots (\(\sqrt[3]{N}\)), perfect cube verification, and step-by-step Newton-Raphson numerical iterations.</p>
+          </header>
+
+          <section class="calculator-card" aria-label="Cube Root Solver">
+            <div class="calc-grid">
+              <div class="input-group">
+                <label for="cubeInputVal" class="input-label">Number (\(N\))</label>
+                <input type="number" id="cubeInputVal" class="calc-input" value="1728" step="any">
+              </div>
+            </div>
+
+            <div class="primary-result" style="margin-top: 25px;">
+              <div class="result-label">Principal Real Cube Root (\(\sqrt[3]{N}\))</div>
+              <div class="result-value" id="cubePrimaryResult">12</div>
+              <div class="result-subtext" id="cubePrimarySubtext">Exact Integer Cube: 12³ = 1,728</div>
+            </div>
+
+            <div class="results-grid" style="margin-top: 20px;">
+              <div class="result-item">
+                <div class="result-label">First Complex Root (\(z_1\))</div>
+                <div class="result-value" id="resComplex1">-6.000 + 10.392i</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Second Complex Root (\(z_2\))</div>
+                <div class="result-value" id="resComplex2">-6.000 - 10.392i</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Perfect Cube Status</div>
+                <div class="result-value" id="resPerfectCube">Yes (Integer 12)</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Cube of Result (\((\sqrt[3]{N})^3\))</div>
+                <div class="result-value" id="resCubeVerify">1,728.0000</div>
+              </div>
+            </div>
+
+            <div class="conversion-steps" style="margin-top: 25px;">
+              <h3>Newton-Raphson Iterative Convergence Steps</h3>
+              <div id="cubeStepsDisplay" style="font-family: monospace; font-size: 0.95rem; line-height: 1.6; background: rgba(0,0,0,0.03); padding: 16px; border-radius: 8px; border-left: 4px solid var(--accent, #2563eb);">
+                Loading numerical iterations...
+              </div>
+            </div>
+          </section>
+
+          <article class="article-body">
+            <h2>1. Mathematical Definition and Analytical Properties of the Cube Root</h2>
+            <p>In algebra, real analysis, and number theory, the <strong>cube root</strong> of a real or complex number \(N\) is a number \(x\) that satisfies the cubic algebraic equation:</p>
+
+            $$x^3 = N \iff x = \sqrt[3]{N} = N^{1/3}$$
+
+            <p>Unlike the square root function \(f(x) = \sqrt{x}\), which is defined strictly on the non-negative real interval \([0, +\infty)\) in real arithmetic, the cubic function \(f(x) = x^3\) is an odd, strictly increasing bijection mapping the entire real line \(\mathbb{R} = (-\infty, +\infty)\) onto itself. Consequently:</p>
+            <ul>
+              <li>Every real number \(N \in \mathbb{R}\) possesses exactly <strong>one unique real cube root</strong>.</li>
+              <li>For positive inputs (\(N > 0\)), the real root is positive: \(\sqrt[3]{N} > 0\).</li>
+              <li>For zero (\(N = 0\)), \(\sqrt[3]{0} = 0\).</li>
+              <li>For negative inputs (\(N < 0\)), the real root is strictly negative: \(\sqrt[3]{-N} = -\sqrt[3]{N}\) (for example, \(\sqrt[3]{-64} = -4\) because \((-4) \times (-4) \times (-4) = -64\)).</li>
+            </ul>
+
+            <h2>2. Complex Roots and the Cube Roots of Unity</h2>
+            <p>By the Fundamental Theorem of Algebra, any polynomial equation of degree 3 must possess exactly three roots in the complex plane \(\mathbb{C}\), counted with multiplicity. The equation \(x^3 - N = 0\) has three distinct solutions.</p>
+
+            <h3>2.1 The Roots of Unity (\(\omega\))</h3>
+            <p>Consider the fundamental equation \(z^3 = 1\). Factoring as a difference of cubes:</p>
+
+            $$z^3 - 1 = (z - 1)(z^2 + z + 1) = 0$$
+
+            <p>Setting the factors to zero yields the three cube roots of unity:</p>
+            <ol>
+              <li>Real root: \(z_0 = 1\).</li>
+              <li>Complex roots from the quadratic formula on \(z^2 + z + 1 = 0\):</li>
+            </ol>
+
+            $$\omega = \frac{-1 + i\sqrt{3}}{2} = e^{i \frac{2\pi}{3}} \approx -0.5 + 0.866025i$$
+
+            $$\omega^2 = \frac{-1 - i\sqrt{3}}{2} = e^{i \frac{4\pi}{3}} = e^{-i \frac{2\pi}{3}} \approx -0.5 - 0.866025i$$
+
+            <p>These roots form an equilateral triangle inscribed within the unit circle of the complex Argand plane, mutually separated by radial phase angles of \(120^\circ\) (\(\frac{2\pi}{3}\text{ radians}\)).</p>
+
+            <h3>2.2 The Complete Root Triplet for Any Real Number \(N\)</h3>
+            <p>Let \(r = \sqrt[3]{N}\) denote the principal real cube root. The three complete roots are given by:</p>
+
+            $$x_0 = r$$
+
+            $$x_1 = r \cdot \omega = r\left(-\frac{1}{2} + i\frac{\sqrt{3}}{2}\right) = -\frac{r}{2} + i\frac{r\sqrt{3}}{2}$$
+
+            $$x_2 = r \cdot \omega^2 = r\left(-\frac{1}{2} - i\frac{\sqrt{3}}{2}\right) = -\frac{r}{2} - i\frac{r\sqrt{3}}{2}$$
+
+            <p>The two non-real roots are exact complex conjugates of each other (\(x_2 = x_1^*\)).</p>
+
+            <h2>3. Numerical Algorithms: Newton-Raphson Root Extraction</h2>
+            <p>Before digital computers, mental calculators and engineers used logarithms or table interpolation to extract cube roots. Modern floating-point units execute numerical approximation algorithms.</p>
+
+            <h3>3.1 Derivation of Newton's Method</h3>
+            <p>Let \(f(x) = x^3 - N = 0\). The first derivative is \(f'(x) = 3x^2\). Applying Newton's tangent-line recurrence formula:</p>
+
+            $$x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)} = x_n - \frac{x_n^3 - N}{3x_n^2}$$
+
+            <p>Distributing across a common denominator yields the standard computational algorithm:</p>
+
+            $$x_{n+1} = \frac{3x_n^3 - (x_n^3 - N)}{3x_n^2} = \frac{2x_n^3 + N}{3x_n^2} = \frac{1}{3}\left(2x_n + \frac{N}{x_n^2}\right)$$
+
+            <p>The algorithm exhibits <strong>quadratic convergence</strong> (\(O(\epsilon^2)\)): once the estimate is close to the root, each successive step roughly doubles the number of verified significant decimal figures. For example, computing \(\sqrt[3]{1728}\) from an initial seed of \(x_0 = 10\) converges to 12.00000000 in only 4 iterations.</p>
+
+            <h2>4. Physical and Engineering Applications</h2>
+
+            <h3>4.1 The Square-Cube Law and Biological Allometry</h3>
+            <p>First articulated by Galileo Galilei in 1638 in <em>Two New Sciences</em>, the Square-Cube Law dictates how geometry changes with scale. If a solid body expands proportionally by a linear scale factor \(L\):</p>
+            <ul>
+              <li>Surface area scales quadratically: \(\mathcal{A} \propto L^2\).</li>
+              <li>Volume and mass scale cubically: \(\mathcal{V} \propto L^3 \implies M = \rho \mathcal{V} \propto L^3\).</li>
+            </ul>
+            <p>Inverting this relation proves that an organism's linear dimensions scale with the <strong>cube root of its mass</strong>:</p>
+
+            $$L \propto \sqrt[3]{M}$$
+
+            <p>This principle governs metabolic scaling (Kleiber's Law), bone thickness, heat dissipation in mammals, and structural engineering beam design.</p>
+
+            <h3>4.2 Materials Science: Crystal Lattice Edge Lengths</h3>
+            <p>In solid-state physics and X-ray crystallography, the cubic unit cell dimension \(a\) of a crystalline material with density \(\rho\), molar mass \(M\), and \(n\) atoms per unit cell satisfies:</p>
+
+            $$\rho = \frac{n \cdot M}{N_A \cdot a^3} \implies a = \sqrt[3]{\frac{n \cdot M}{\rho \cdot N_A}}$$
+
+            <p>where \(N_A \approx 6.02214 \times 10^{23}\text{ mol}^{-1}\) is Avogadro's number.</p>
+
+            <h2>5. Benchmark Comparative Reference Table</h2>
+            <p>The table below catalogues representative numbers across perfect cubes, negative values, and decimals, detailing real roots, complex roots, and perfect cube classifications.</p>
+
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Number (\(N\))</th>
+                  <th>Principal Real Root (\(\sqrt[3]{N}\))</th>
+                  <th>First Complex Root (\(z_1\))</th>
+                  <th>Second Complex Root (\(z_2\))</th>
+                  <th>Perfect Cube?</th>
+                  <th>Verification (\(r^3\))</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>1.000</td>
+                  <td>\(-0.500 + 0.866i\)</td>
+                  <td>\(-0.500 - 0.866i\)</td>
+                  <td>Yes (\(1^3\))</td>
+                  <td>1.000</td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>2.000</td>
+                  <td>\(-1.000 + 1.732i\)</td>
+                  <td>\(-1.000 - 1.732i\)</td>
+                  <td>Yes (\(2^3\))</td>
+                  <td>8.000</td>
+                </tr>
+                <tr>
+                  <td>27</td>
+                  <td>3.000</td>
+                  <td>\(-1.500 + 2.598i\)</td>
+                  <td>\(-1.500 - 2.598i\)</td>
+                  <td>Yes (\(3^3\))</td>
+                  <td>27.000</td>
+                </tr>
+                <tr>
+                  <td>64</td>
+                  <td>4.000</td>
+                  <td>\(-2.000 + 3.464i\)</td>
+                  <td>\(-2.000 - 3.464i\)</td>
+                  <td>Yes (\(4^3\))</td>
+                  <td>64.000</td>
+                </tr>
+                <tr>
+                  <td>125</td>
+                  <td>5.000</td>
+                  <td>\(-2.500 + 4.330i\)</td>
+                  <td>\(-2.500 - 4.330i\)</td>
+                  <td>Yes (\(5^3\))</td>
+                  <td>125.000</td>
+                </tr>
+                <tr>
+                  <td>-216</td>
+                  <td>-6.000</td>
+                  <td>\(+3.000 - 5.196i\)</td>
+                  <td>\(+3.000 + 5.196i\)</td>
+                  <td>Yes (\((-6)^3\))</td>
+                  <td>-216.000</td>
+                </tr>
+                <tr>
+                  <td>1,000</td>
+                  <td>10.000</td>
+                  <td>\(-5.000 + 8.660i\)</td>
+                  <td>\(-5.000 - 8.660i\)</td>
+                  <td>Yes (\(10^3\))</td>
+                  <td>1,000.000</td>
+                </tr>
+                <tr>
+                  <td>1,728</td>
+                  <td>12.000</td>
+                  <td>\(-6.000 + 10.392i\)</td>
+                  <td>\(-6.000 - 10.392i\)</td>
+                  <td>Yes (\(12^3\))</td>
+                  <td>1,728.000</td>
+                </tr>
+                <tr>
+                  <td>50</td>
+                  <td>\(3.6840\)</td>
+                  <td>\(-1.842 + 3.190i\)</td>
+                  <td>\(-1.842 - 3.190i\)</td>
+                  <td>No (Irrational)</td>
+                  <td>50.000</td>
+                </tr>
+                <tr>
+                  <td>0.125</td>
+                  <td>0.500</td>
+                  <td>\(-0.250 + 0.433i\)</td>
+                  <td>\(-0.250 - 0.433i\)</td>
+                  <td>Yes (\((1/2)^3\))</td>
+                  <td>0.125</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h2>6. Worked Materials Science Case Study: Unit Cell Parameter of Copper</h2>
+            <div class="worked-example-card">
+              <div class="example-header">
+                <strong>Materials Science Case Study:</strong> FCC Copper Lattice Constant Extraction
+              </div>
+              <div class="example-body">
+                <p><strong>Scenario:</strong> A materials metallurgist examines pure copper (\(\text{Cu}\)), which crystallizes in a Face-Centered Cubic (FCC) lattice structure containing \(n = 4\text{ atoms}\) per unit cell. Copper has an atomic mass of \(M = 63.546\text{ g/mol}\) and a measured bulk density of \(\rho = 8.960\text{ g/cm}^3\). Avogadro's constant is \(N_A = 6.02214 \times 10^{23}\text{ mol}^{-1}\). The metallurgist must calculate the unit cell volume and extract its cube root to determine the lattice parameter \(a\) in picometers (\(\text{pm}\)).</p>
+
+                <p><strong>Step 1: Calculate Mass of One Unit Cell</strong><br>
+                $$m_{\text{cell}} = \frac{n \times M}{N_A} = \frac{4 \times 63.546\text{ g/mol}}{6.02214 \times 10^{23}\text{ mol}^{-1}} = \frac{254.184}{6.02214 \times 10^{23}} \approx 4.22082 \times 10^{-22}\text{ grams}$$</p>
+
+                <p><strong>Step 2: Calculate Unit Cell Volume (\(V_{\text{cell}}\))</strong><br>
+                $$V_{\text{cell}} = \frac{m_{\text{cell}}}{\rho} = \frac{4.22082 \times 10^{-22}\text{ g}}{8.960\text{ g/cm}^3} \approx 4.71074 \times 10^{-23}\text{ cm}^3$$</p>
+
+                <p><strong>Step 3: Extract the Cube Root to Find Lattice Parameter \(a\)</strong><br>
+                $$a = \sqrt[3]{V_{\text{cell}}} = \sqrt[3]{4.71074 \times 10^{-23}\text{ cm}^3}$$
+                Expressing in scientific notation with exponent divisible by 3:
+                $$V_{\text{cell}} = 47.1074 \times 10^{-24}\text{ cm}^3$$
+                $$a = \sqrt[3]{47.1074} \times 10^{-8}\text{ cm} \approx 3.6116 \times 10^{-8}\text{ cm}$$</p>
+
+                <p><strong>Step 4: Convert to Picometers (\(1\text{ pm} = 10^{-10}\text{ cm}\))</strong><br>
+                $$a = 3.6116 \times 10^{-8}\text{ cm} = 361.16\text{ picometers (pm)} = 0.36116\text{ nm}$$
+                X-ray diffraction experiments confirm the FCC copper lattice constant at \(361.5\text{ pm}\), verifying the calculation within \(0.1\%\) tolerance.</p>
+              </div>
+            </div>
+
+            <h2>7. Frequently Asked Questions (FAQ)</h2>
+            <div class="faq-accordion">
+              <div class="faq-item">
+                <h3 class="faq-question">Can the cube root of a non-perfect cube integer ever be rational?</h3>
+                <div class="faq-answer">
+                  <p>No. By the Rational Root Theorem, if an integer \(N\) is not a perfect cube of another integer, its cube root \(\sqrt[3]{N}\) is guaranteed to be an irrational number that cannot be represented as a ratio of two integers. Its decimal expansion is infinite and non-repeating (e.g., \(\sqrt[3]{2} \approx 1.25992104989...\)).</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">What is the difference between principal root and complex roots?</h3>
+                <div class="faq-answer">
+                  <p>The <em>principal real root</em> is the single real-valued solution on the real number line. The <em>complex roots</em> are the remaining two roots in the complex plane, which possess non-zero imaginary components (\(u \pm vi\)). In real analysis and everyday calculators, "cube root" refers exclusively to the principal real root.</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">How does a cube root relate to fractional exponent notation?</h3>
+                <div class="faq-answer">
+                  <p>In accordance with exponent laws, radical root notation is mathematically identical to rational exponent notation: \(\sqrt[3]{N} = N^{1/3}\). Raising \(N^{1/3}\) to the third power invokes the power-of-a-power law: \((N^{1/3})^3 = N^{(1/3) \times 3} = N^1 = N\).</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">Why does the Delian problem (doubling the cube) require cube roots?</h3>
+                <div class="faq-answer">
+                  <p>The ancient Greek Delian problem asked how to construct a cube with double the volume of a given cube using only a compass and straightedge. If the original cube has volume \(V = s^3 = 1\), the doubled cube has volume \(2\), requiring an edge length of \(s = \sqrt[3]{2}\). In 1837, Pierre Wantzel proved using field theory that \(\sqrt[3]{2}\) is not a constructible number because its minimal polynomial is of degree 3 (not a power of 2), proving compass-and-straightedge construction is impossible.</p>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <aside class="sidebar-column">
+          <div class="sidebar-card">
+            <h3 class="sidebar-title">Related Math Calculators</h3>
+            <ul class="sidebar-nav">
+              <li><a href="prime-number-calculator.html">Prime Number Calculator</a></li>
+              <li><a href="exponent-calculator.html">Exponent Calculator</a></li>
+              <li><a href="scientific-notation-calculator.html">Scientific Notation Calculator</a></li>
+              <li><a href="significant-figures-calculator.html">Significant Figures Calculator</a></li>
+              <li><a href="quadratic-equation-calculator.html">Quadratic Equation Calculator</a></li>
+              <li><a href="pythagorean-theorem-calculator.html">Pythagorean Theorem Calculator</a></li>
+              <li><a href="gcd-lcm-calculator.html">GCD and LCM Calculator</a></li>
+              <li><a href="volume-converter.html">Volume Converter</a></li>
+            </ul>
+          </div>
+
+          <div class="sidebar-card">
+            <h3 class="sidebar-title">Cubic Identities</h3>
+            <div style="font-size:0.875rem; line-height:1.5; color:var(--text-muted, #4b5563);">
+              <p><strong>Definition:</strong> \(x = \sqrt[3]{N} \iff x^3 = N\)</p>
+              <p><strong>Negative:</strong> \(\sqrt[3]{-N} = -\sqrt[3]{N}\)</p>
+              <p><strong>Newton:</strong> \(x_{n+1} = \frac{1}{3}(2x_n + \frac{N}{x_n^2})\)</p>
+              <p><strong>Unity:</strong> \(\omega = -\frac{1}{2} \pm i\frac{\sqrt{3}}{2}\)</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h3>CalcHub</h3>
+        <p>High-precision technical calculation engines, engineering references, and discrete mathematical tools.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="math.html">Math & Engineering</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Hub Categories</h4>
+        <ul>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Engineering Tools</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed computational algorithms.</p>
+    </div>
+  </footer>
+
+  <script>
+    function calcCubeRoot() {
+      const inputVal = parseFloat(document.getElementById('cubeInputVal').value);
+      if (isNaN(inputVal)) return;
+
+      const n = inputVal;
+      const isNeg = n < 0;
+      const absN = Math.abs(n);
+      const realRoot = isNeg ? -Math.cbrt(absN) : Math.cbrt(absN);
+
+      // Check perfect cube
+      const rounded = Math.round(realRoot);
+      const isPerfect = Math.abs(rounded * rounded * rounded - n) < 1e-9;
+
+      // Complex roots
+      const realPart = -realRoot / 2;
+      const imagPart = (Math.abs(realRoot) * Math.sqrt(3)) / 2;
+
+      document.getElementById('cubePrimaryResult').textContent = isPerfect ? rounded.toLocaleString() : realRoot.toFixed(6);
+      document.getElementById('cubePrimarySubtext').textContent = isPerfect
+        ? `Exact Integer Cube: ${rounded}³ = ${n.toLocaleString()}`
+        : `Irrational Cube Root: (${realRoot.toFixed(4)})³ ≈ ${n.toLocaleString()}`;
+
+      document.getElementById('resComplex1').textContent = `${realPart.toFixed(4)} + ${imagPart.toFixed(4)}i`;
+      document.getElementById('resComplex2').textContent = `${realPart.toFixed(4)} - ${imagPart.toFixed(4)}i`;
+      document.getElementById('resPerfectCube').textContent = isPerfect ? `Yes (Integer ${rounded})` : "No (Irrational / Non-integer)";
+      document.getElementById('resCubeVerify').textContent = (realRoot * realRoot * realRoot).toFixed(4);
+
+      // Newton-Raphson simulation
+      let x = absN === 0 ? 0 : Math.max(1, absN / 3);
+      let steps = `Target: ∛${n}<br>`;
+      steps += `Initial Newton Seed: x₀ = ${x.toFixed(4)}<br>`;
+
+      for (let i = 1; i <= 5; i++) {
+        if (x === 0) break;
+        x = (2 * x + absN / (x * x)) / 3;
+        steps += `Iteration ${i}: x_${i} = ⅓ [2(${x.toFixed(4)}) + ${absN} / (${x.toFixed(4)})²] = ${ (isNeg ? -x : x).toFixed(6) }<br>`;
+      }
+
+      document.getElementById('cubeStepsDisplay').innerHTML = steps;
+    }
+
+    document.getElementById('cubeInputVal').addEventListener('input', calcCubeRoot);
+    calcCubeRoot();
+  </script>
+</body>
+</html>

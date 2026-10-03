@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Decimal to Fraction Calculator — Terminating & Repeating Decimals | CalcHub</title>
+  <meta name="description" content="Convert terminating and repeating decimals to simplified fractions, mixed numbers, continued fractions, and percentage equivalents with exact algebraic steps.">
+  <meta name="keywords" content="decimal to fraction calculator, convert decimal to fraction, repeating decimal to fraction, fraction simplifier, mixed number calculator, rational approximation, recurring decimal">
+  <meta name="author" content="CalcHub Rational Arithmetic & Number Theory Board">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://calchub.org/decimal-to-fraction-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+
+  <meta property="og:title" content="Decimal to Fraction Calculator — Terminating & Repeating Decimals | CalcHub">
+  <meta property="og:description" content="Convert terminating and recurring decimals into fully reduced rational fractions, mixed fractions, and continued fractions.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://calchub.org/decimal-to-fraction-calculator.html">
+
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://calchub.org/decimal-to-fraction-calculator.html#app",
+      "name": "Decimal to Rational Fraction Converter",
+      "url": "https://calchub.org/decimal-to-fraction-calculator.html",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "High-precision algebraic converter transforming terminating and periodic recurring decimals into simplified rational fractions and mixed numbers."
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://calchub.org/"},
+        {"@type": "ListItem", "position": 2, "name": "Math & Engineering Calculators", "item": "https://calchub.org/math.html"},
+        {"@type": "ListItem", "position": 3, "name": "Decimal to Fraction Calculator", "item": "https://calchub.org/decimal-to-fraction-calculator.html"}
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How is a terminating decimal converted into a simplified fraction?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For a terminating decimal with d digits after the decimal point, express the decimal as an integer divided by 10^d. For example, 0.375 has 3 decimal digits, so write it as 375 / 1000. Next, calculate the Greatest Common Divisor (GCD) of the numerator and denominator using the Euclidean algorithm: gcd(375, 1000) = 125. Divide both numbers by 125 to obtain the simplified fraction: 375 / 125 = 3 and 1000 / 125 = 8, yielding 3/8."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the algebraic subtraction method convert a repeating decimal into a fraction?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Let x equal the repeating decimal (e.g., x = 0.1666...). Multiply x by 10^k (where k is the number of non-repeating digits, here 1): 10x = 1.666... Next, multiply by 10^(k + p) (where p is the length of the repeating cycle, here 1): 100x = 16.666... Subtract the first equation from the second to cancel the infinite decimal tails: 100x - 10x = 90x = 15. Solve for x: x = 15 / 90. Dividing by gcd(15, 90) = 15 simplifies to 1/6."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why can some fractions only be represented as infinite repeating decimals?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Because our standard number system is base 10 (decimal), the prime factors of the base are strictly 2 and 5 (10 = 2 × 5). A simplified fraction p / q produces a terminating decimal if and only if the prime factorization of the denominator q contains no prime factors other than 2 and 5 (q = 2^a · 5^b). If q has any other prime factors (such as 3, 7, 11, or 13), division produces an infinite repeating decimal."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a continued fraction and why is it used for best rational approximations?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A continued fraction expresses a real number as a nested sequence of integer quotients: x = a_0 + 1 / (a_1 + 1 / (a_2 + ...)). Truncating a continued fraction at successive terms yields convergents that represent the mathematically optimal rational approximations to the number with the smallest possible denominators, fundamental in horology (gear teeth counts) and Diophantine analysis."
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</head>
+<body class="converter-page">
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="converter.html">Converters</a>
+        <a href="math.html" class="active">Math & Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="page-layout">
+        <div class="content-column">
+          <header class="tool-header">
+            <div class="badge-tag">Rational Arithmetic &amp; Number Theory</div>
+            <h1 class="tool-title">Decimal to Fraction Calculator</h1>
+            <p class="tool-subtitle">Convert terminating and recurring repeating decimals to simplified fractions, mixed numbers, continued fractions, and percentage representations.</p>
+          </header>
+
+          <section class="calculator-card" aria-label="Decimal to Fraction Solver">
+            <div class="calc-grid">
+              <div class="input-group">
+                <label for="decTypeSelect" class="input-label">Decimal Type</label>
+                <select id="decTypeSelect" class="calc-input">
+                  <option value="terminating">Terminating Decimal (e.g. 0.875, 2.34)</option>
+                  <option value="repeating">Repeating Decimal (e.g. 0.333..., 0.1666...)</option>
+                </select>
+              </div>
+
+              <div class="input-group" id="inputTermGroup">
+                <label for="decInputVal" class="input-label" id="labelDecInput">Decimal Value</label>
+                <input type="text" id="decInputVal" class="calc-input" value="0.875">
+              </div>
+
+              <div class="input-group" id="inputRepGroup" style="display:none;">
+                <label for="repPatternVal" class="input-label">Repeating Digits (the bar part)</label>
+                <input type="text" id="repPatternVal" class="calc-input" value="6" placeholder="e.g. 3 for 0.333, or 6 for 0.1666">
+              </div>
+            </div>
+
+            <div class="primary-result" style="margin-top: 25px;">
+              <div class="result-label">Simplified Fraction (\(\frac{p}{q}\))</div>
+              <div class="result-value" id="fracPrimaryResult">7 / 8</div>
+              <div class="result-subtext" id="fracSubtext">Reduced via GCD = 125: 875/1000 = 7/8</div>
+            </div>
+
+            <div class="results-grid" style="margin-top: 20px;">
+              <div class="result-item">
+                <div class="result-label">Mixed Number</div>
+                <div class="result-value" id="resMixedNum">7/8 (Proper)</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Percentage Equivalent</div>
+                <div class="result-value" id="resPercent">87.5%</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Denominator Prime Factors</div>
+                <div class="result-value" id="resDenomFactors">2³ (Terminating)</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Decimal Verification</div>
+                <div class="result-value" id="resDecVerify">0.875000</div>
+              </div>
+            </div>
+
+            <div class="conversion-steps" style="margin-top: 25px;">
+              <h3>Algebraic Conversion Steps</h3>
+              <div id="decFracStepsDisplay" style="font-family: monospace; font-size: 0.95rem; line-height: 1.6; background: rgba(0,0,0,0.03); padding: 16px; border-radius: 8px; border-left: 4px solid var(--accent, #2563eb);">
+                Loading conversion breakdown...
+              </div>
+            </div>
+          </section>
+
+          <article class="article-body">
+            <h2>1. Structural Anatomy of Decimal and Rational Numbers</h2>
+            <p>In number theory and real analysis, the set of <strong>rational numbers</strong> \(\mathbb{Q}\) is defined formally as the set of all quotients formed by two integers:</p>
+
+            $$\mathbb{Q} = \left\{ \frac{p}{q} : p, q \in \mathbb{Z}, \; q \neq 0 \right\}$$
+
+            <p>When expressed in the standard positional base-10 decimal system, every rational number generates either a <strong>terminating decimal</strong> (having a finite number of digits following the decimal point) or an <strong>infinite repeating decimal</strong> (exhibiting a periodic repeating cycle of digits known as the <em>repetend</em> or <em>period</em>). Conversely, numbers whose decimal expansions are infinite and non-periodic—such as \(\pi\), \(e\), or \(\sqrt{2}\)—are strictly <strong>irrational</strong> (\(\mathbb{R} \setminus \mathbb{Q}\)) and cannot be represented exactly as a ratio of two integers.</p>
+
+            <h2>2. Terminating Decimals: Formulation and Reduction</h2>
+            <p>A decimal number is terminating if its fractional part ends after a finite number \(d\) of digits:</p>
+
+            $$x = I + 0.d_1 d_2 d_3 \dots d_k$$
+
+            <p>where \(I \in \mathbb{Z}\) is the integer component and \(k\) is the total count of decimal places. Because the base of numeration is 10, the decimal represents a fraction with denominator \(10^k\):</p>
+
+            $$x = \frac{\text{Numerator}}{\text{Denominator}} = \frac{I \cdot 10^k + \sum_{j=1}^k d_j \cdot 10^{k - j}}{10^k}$$
+
+            <h3>2.1 Reduction via the Greatest Common Divisor (GCD)</h3>
+            <p>To reduce the fraction to its lowest terms (\(\gcd(p, q) = 1\)), computational engines apply Euclid's Algorithm to find \(g = \gcd(\text{Numerator}, 10^k)\). Dividing both the numerator and denominator by \(g\) produces the unique canonical fraction:</p>
+
+            $$p = \frac{\text{Numerator}}{g}, \quad q = \frac{10^k}{g}$$
+
+            <p>For example, converting \(0.875\):</p>
+            <ol>
+              <li>The decimal has 3 decimal places: \(\frac{875}{10^3} = \frac{875}{1000}\).</li>
+              <li>Compute \(\gcd(875, 1000) = 125\).</li>
+              <li>Divide: \(\frac{875 / 125}{1000 / 125} = \frac{7}{8}\).</li>
+            </ol>
+
+            <h3>2.2 The Denominator Prime Factorization Criterion</h3>
+            <p>A fundamental theorem of arithmetic states that a reduced fraction \(\frac{p}{q}\) terminates if and only if the prime factorization of its denominator contains exclusively prime factors 2 and 5:</p>
+
+            $$q = 2^\alpha \cdot 5^\beta \quad (\alpha, \beta \ge 0)$$
+
+            <p>Because \(10 = 2 \times 5\), any denominator whose prime factorization contains any prime other than 2 or 5 (such as 3, 7, 11, 13) cannot divide into any finite power of 10 without leaving a recurring remainder, inevitably generating an infinite periodic repetend.</p>
+
+            <h2>3. Repeating Decimals: The Algebraic Subtraction Method</h2>
+            <p>When a decimal exhibits a periodic cycle of repeating digits (indicated in mathematics by an overline bar, e.g., \(0.\overline{3} = 0.3333\dots\) or \(0.1\overline{6} = 0.16666\dots\)), it can be transformed into an exact rational fraction using <em>algebraic elimination</em>.</p>
+
+            <h3>3.1 General Derivation for Mixed Repeating Decimals</h3>
+            <p>Let a decimal have an integer part \(I\), a non-repeating decimal part of length \(k\), and a repeating cycle of length \(p\):</p>
+
+            $$x = I.a_1 a_2 \dots a_k \, \overline{b_1 b_2 \dots b_p}$$
+
+            <p><strong>Step 1: Shift the non-repeating digits to the left of the decimal.</strong><br>
+            Multiply the entire equation by \(10^k\):</p>
+
+            $$10^k x = I a_1 a_2 \dots a_k . \overline{b_1 b_2 \dots b_p}$$
+
+            <p><strong>Step 2: Shift one complete period of repeating digits.</strong><br>
+            Multiply the original equation by \(10^{k + p}\):</p>
+
+            $$10^{k + p} x = I a_1 a_2 \dots a_k b_1 b_2 \dots b_p . \overline{b_1 b_2 \dots b_p}$$
+
+            <p><strong>Step 3: Subtract Equation 1 from Equation 2.</strong><br>
+            Because the infinite recurring fractional tails are identical (\(0.\overline{b_1\dots b_p}\)), subtracting eliminates the infinite decimal tail completely:</p>
+
+            $$(10^{k + p} - 10^k) x = (I a_1 \dots a_k b_1 \dots b_p) - (I a_1 \dots a_k)$$
+
+            $$x = \frac{(I a_1 \dots a_k b_1 \dots b_p) - (I a_1 \dots a_k)}{10^k(10^p - 1)}$$
+
+            <p>Notice that \(10^p - 1\) produces a string of \(p\) nines (e.g., \(999\) for \(p = 3\)), and multiplying by \(10^k\) appends \(k\) trailing zeros, forming the classic denominator \(9990\dots0\).</p>
+
+            <h3>3.2 Worked Example: Converting \(0.1\overline{6}\)</h3>
+            <ul>
+              <li>Non-repeating length \(k = 1\) (the digit 1); repeating length \(p = 1\) (the digit 6).</li>
+              <li>\(10^1 x = 10x = 1.666\dots\)</li>
+              <li>\(10^{1+1} x = 100x = 16.666\dots\)</li>
+              <li>Subtract: \(100x - 10x = 90x = 16 - 1 = 15\)</li>
+              <li>Solve: \(x = \frac{15}{90}\). Dividing by \(\gcd(15, 90) = 15\) gives \(x = \frac{1}{6}\).</li>
+            </ul>
+
+            <h2>4. Continued Fractions and Best Rational Approximations</h2>
+            <p>Beyond standard decimal conversion, real numbers can be represented uniquely as <strong>Simple Continued Fractions</strong>:</p>
+
+            $$x = a_0 + \frac{1}{a_1 + \frac{1}{a_2 + \frac{1}{a_3 + \dots}}} = [a_0; a_1, a_2, a_3, \dots]$$
+
+            <p>where \(a_0 \in \mathbb{Z}\) and \(a_1, a_2, \dots \in \mathbb{Z}^+\). Continued fractions provide the mathematically <em>best rational approximations</em> (convergents) to any number. By Dirichlet's Approximation Theorem, the convergents \(\frac{p_k}{q_k}\) of a continued fraction satisfy:</p>
+
+            $$\left| x - \frac{p_k}{q_k} \right| < \frac{1}{q_k^2}$$
+
+            <p>This means no other rational fraction with a smaller denominator can come closer to the value of \(x\). This algorithm underpins horological gear train design, astronomical calendar leap year derivations, and cryptographic lattice reduction.</p>
+
+            <h2>5. Benchmark Comparative Reference Table</h2>
+            <p>The table below catalogues benchmark terminating and repeating decimals, showing simplified fractions, mixed numbers, denominator factorizations, and continued fraction representations.</p>
+
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Decimal Input</th>
+                  <th>Type</th>
+                  <th>Simplified Fraction</th>
+                  <th>Mixed Number</th>
+                  <th>Denominator Factors</th>
+                  <th>Continued Fraction</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>\(0.875\)</td>
+                  <td>Terminating</td>
+                  <td>\(7 / 8\)</td>
+                  <td>\(7/8\)</td>
+                  <td>\(2^3\)</td>
+                  <td>\([0; 1, 7]\)</td>
+                </tr>
+                <tr>
+                  <td>\(0.125\)</td>
+                  <td>Terminating</td>
+                  <td>\(1 / 8\)</td>
+                  <td>\(1/8\)</td>
+                  <td>\(2^3\)</td>
+                  <td>\([0; 8]\)</td>
+                </tr>
+                <tr>
+                  <td>\(0.\overline{3}\)</td>
+                  <td>Pure Repeating</td>
+                  <td>\(1 / 3\)</td>
+                  <td>\(1/3\)</td>
+                  <td>\(3^1\)</td>
+                  <td>\([0; 3]\)</td>
+                </tr>
+                <tr>
+                  <td>\(0.1\overline{6}\)</td>
+                  <td>Mixed Repeating</td>
+                  <td>\(1 / 6\)</td>
+                  <td>\(1/6\)</td>
+                  <td>\(2 \times 3\)</td>
+                  <td>\([0; 6]\)</td>
+                </tr>
+                <tr>
+                  <td>\(0.\overline{142857}\)</td>
+                  <td>Pure Repeating</td>
+                  <td>\(1 / 7\)</td>
+                  <td>\(1/7\)</td>
+                  <td>\(7^1\)</td>
+                  <td>\([0; 7]\)</td>
+                </tr>
+                <tr>
+                  <td>\(2.625\)</td>
+                  <td>Terminating</td>
+                  <td>\(21 / 8\)</td>
+                  <td>\(2\frac{5}{8}\)</td>
+                  <td>\(2^3\)</td>
+                  <td>\([2; 1, 1, 1, 3]\)</td>
+                </tr>
+                <tr>
+                  <td>\(0.0625\)</td>
+                  <td>Terminating</td>
+                  <td>\(1 / 16\)</td>
+                  <td>\(1/16\)</td>
+                  <td>\(2^4\)</td>
+                  <td>\([0; 16]\)</td>
+                </tr>
+                <tr>
+                  <td>\(0.\overline{09}\)</td>
+                  <td>Pure Repeating</td>
+                  <td>\(1 / 11\)</td>
+                  <td>\(1/11\)</td>
+                  <td>\(11^1\)</td>
+                  <td>\([0; 11]\)</td>
+                </tr>
+                <tr>
+                  <td>\(0.41\overline{6}\)</td>
+                  <td>Mixed Repeating</td>
+                  <td>\(5 / 12\)</td>
+                  <td>\(5/12\)</td>
+                  <td>\(2^2 \times 3\)</td>
+                  <td>\([0; 2, 2, 2]\)</td>
+                </tr>
+                <tr>
+                  <td>\(3.14\)</td>
+                  <td>Terminating</td>
+                  <td>\(157 / 50\)</td>
+                  <td>\(3\frac{7}{50}\)</td>
+                  <td>\(2 \times 5^2\)</td>
+                  <td>\([3; 7, 7]\)</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h2>6. Worked Precision Machining Case Study: Tooling Collet & Drill Bit Selection</h2>
+            <div class="worked-example-card">
+              <div class="example-header">
+                <strong>Mechanical Machining Case Study:</strong> Digital Caliper Reading to Fractional Drill Bit Index
+              </div>
+              <div class="example-body">
+                <p><strong>Scenario:</strong> A CNC machinist measures a precision locating pin on a motor casing using a digital Vernier micrometer. The micrometer displays a decimal diameter of \(D = 0.4375\text{ inches}\). The machinist must select an exact fractional jobber drill bit from standard Imperial 64th-inch index tooling. The machinist must: (1) convert \(0.4375\) to a simplified fraction, (2) determine whether it matches a standard 64th or 32nd drill bit increment, and (3) verify denominator prime factors.</p>
+
+                <p><strong>Step 1: Formulate Fraction with Power of 10 Denominator</strong><br>
+                The measurement has 4 decimal digits:
+                $$D = \frac{4,375}{10,000}$$</p>
+
+                <p><strong>Step 2: Calculate Greatest Common Divisor (GCD)</strong><br>
+                Applying Euclid's algorithm:
+                $$\begin{aligned}
+                10000 &= 4375 \times 2 + 1250 \\
+                4375 &= 1250 \times 3 + 625 \\
+                1250 &= 625 \times 2 + 0
+                \end{aligned}$$
+                Thus, \(\gcd(4375, 10000) = 625\).</p>
+
+                <p><strong>Step 3: Reduce the Fraction</strong><br>
+                $$\text{Numerator} = \frac{4,375}{625} = 7$$
+                $$\text{Denominator} = \frac{10,000}{625} = 16$$
+                Therefore:
+                $$D = \frac{7}{16}\text{ inches}$$</p>
+
+                <p><strong>Step 4: Tooling Verification</strong><br>
+                $$\frac{7}{16} = \frac{14}{32} = \frac{28}{64}\text{ inches}$$
+                The machinist selects a standard \(7/16\text{ inch}\) high-speed steel (HSS) twist drill bit, matching the blueprint specification with zero conversion error.</p>
+              </div>
+            </div>
+
+            <h2>7. Frequently Asked Questions (FAQ)</h2>
+            <div class="faq-accordion">
+              <div class="faq-item">
+                <h3 class="faq-question">Why does 0.999... equal exactly 1?</h3>
+                <div class="faq-answer">
+                  <p>In real analysis, \(0.\overline{9}\) and \(1\) are two different representations of the exact same real number. Using algebra: let \(x = 0.\overline{9}\). Then \(10x = 9.\overline{9}\). Subtracting \(x\) gives \(10x - x = 9x = 9 \implies x = 1\). Similarly, \(\frac{1}{3} = 0.\overline{3}\); multiplying both sides by 3 yields \(3 \times \frac{1}{3} = 1 = 0.\overline{9}\).</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">What is the difference between a proper fraction and an improper fraction?</h3>
+                <div class="faq-answer">
+                  <p>A proper fraction has a numerator smaller than its denominator (\(|p| < q\)), representing a magnitude strictly less than 1 (e.g., \(3/4\)). An improper fraction has a numerator greater than or equal to its denominator (\(|p| \ge q\)), representing a magnitude of 1 or greater (e.g., \(7/4\)), which can be written as a mixed number (\(1\frac{3}{4}\)).</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">Can an irrational number like Pi (π) be converted to a fraction?</h3>
+                <div class="faq-answer">
+                  <p>No. By definition, irrational numbers cannot be expressed as an exact ratio of two integers. Fractions like \(22/7\) (\(\approx 3.142857\)) and \(355/113\) (\(\approx 3.1415929\)) are merely close rational approximations derived from the continued fraction expansion of \(\pi\), but they are not exact.</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">How does a computer represent fractions in hardware?</h3>
+                <div class="faq-answer">
+                  <p>Standard computer hardware uses IEEE 754 binary floating-point representation, which expresses numbers using powers of 2. Because 10 is not a power of 2, decimals like 0.1 cannot be represented exactly in binary floating-point (they become infinite repeating binary fractions <code>0.0001100110011...₂</code>), which is why rational arithmetic libraries (such as Python's <code>fractions.Fraction</code>) store numerator and denominator as separate arbitrary-precision integers.</p>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <aside class="sidebar-column">
+          <div class="sidebar-card">
+            <h3 class="sidebar-title">Related Math Calculators</h3>
+            <ul class="sidebar-nav">
+              <li><a href="fraction-calculator.html">Fraction Calculator</a></li>
+              <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
+              <li><a href="gcd-lcm-calculator.html">GCD and LCM Calculator</a></li>
+              <li><a href="scientific-notation-calculator.html">Scientific Notation Calculator</a></li>
+              <li><a href="significant-figures-calculator.html">Significant Figures Calculator</a></li>
+              <li><a href="ratio-calculator.html">Ratio Calculator</a></li>
+              <li><a href="quadratic-equation-calculator.html">Quadratic Equation Calculator</a></li>
+              <li><a href="pythagorean-theorem-calculator.html">Pythagorean Theorem Calculator</a></li>
+            </ul>
+          </div>
+
+          <div class="sidebar-card">
+            <h3 class="sidebar-title">Rational Conversion Rules</h3>
+            <div style="font-size:0.875rem; line-height:1.5; color:var(--text-muted, #4b5563);">
+              <p><strong>Terminating:</strong> \(\frac{\text{Digits}}{10^d}\)</p>
+              <p><strong>Simplify:</strong> Divide by \(\gcd(p, q)\)</p>
+              <p><strong>Repeating:</strong> \((10^{k+p} - 10^k)x = \text{Int}\)</p>
+              <p><strong>Denominator:</strong> \(q = 2^a \cdot 5^b \implies\) Finite</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h3>CalcHub</h3>
+        <p>High-precision technical calculation engines, engineering references, and discrete mathematical tools.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="math.html">Math & Engineering</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Hub Categories</h4>
+        <ul>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Engineering Tools</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed computational algorithms.</p>
+    </div>
+  </footer>
+
+  <script>
+    function gcd(a, b) {
+      a = Math.abs(a);
+      b = Math.abs(b);
+      while (b > 0) {
+        const t = b;
+        b = a % b;
+        a = t;
+      }
+      return a;
+    }
+
+    function updateDecTypeUi() {
+      const type = document.getElementById('decTypeSelect').value;
+      const repGroup = document.getElementById('inputRepGroup');
+      const labelDec = document.getElementById('labelDecInput');
+
+      if (type === 'repeating') {
+        repGroup.style.display = 'block';
+        labelDec.textContent = "Non-Repeating Part (e.g. 0.1 for 0.1666, or 0 for 0.333)";
+      } else {
+        repGroup.style.display = 'none';
+        labelDec.textContent = "Decimal Value";
+      }
+      calcDecToFrac();
+    }
+
+    function calcDecToFrac() {
+      const type = document.getElementById('decTypeSelect').value;
+      const decStr = document.getElementById('decInputVal').value.trim();
+
+      if (!decStr) return;
+
+      let num = 0, den = 1;
+      let steps = "";
+      let floatVal = 0;
+
+      if (type === 'terminating') {
+        floatVal = parseFloat(decStr);
+        if (isNaN(floatVal)) return;
+
+        const isNeg = decStr.startsWith('-');
+        const clean = decStr.replace('-', '');
+        const parts = clean.split('.');
+        const intPart = parseInt(parts[0] || "0", 10);
+        const decPart = parts.length > 1 ? parts[1] : "";
+        const decPlaces = decPart.length;
+
+        if (decPlaces === 0) {
+          num = intPart;
+          den = 1;
+        } else {
+          den = Math.pow(10, decPlaces);
+          num = intPart * den + parseInt(decPart, 10);
+        }
+
+        const g = gcd(num, den);
+        const simpNum = (isNeg ? -1 : 1) * (num / g);
+        const simpDen = den / g;
+
+        document.getElementById('fracPrimaryResult').textContent = `${simpNum} / ${simpDen}`;
+        document.getElementById('fracSubtext').textContent = `Reduced via GCD = ${g}: ${isNeg ? '-' : ''}${num}/${den} = ${simpNum}/${simpDen}`;
+
+        // Mixed number
+        const absSimpNum = Math.abs(simpNum);
+        const whole = Math.floor(absSimpNum / simpDen);
+        const rem = absSimpNum % simpDen;
+        let mixedText = "";
+        if (whole === 0) {
+          mixedText = `${simpNum}/${simpDen} (Proper)`;
+        } else if (rem === 0) {
+          mixedText = `${simpNum < 0 ? -whole : whole} (Integer)`;
+        } else {
+          mixedText = `${simpNum < 0 ? '-' : ''}${whole} ${rem}/${simpDen} (Mixed)`;
+        }
+        document.getElementById('resMixedNum').textContent = mixedText;
+        document.getElementById('resPercent').textContent = `${(floatVal * 100).toFixed(4)}%`;
+        document.getElementById('resDecVerify').textContent = floatVal.toFixed(6);
+
+        // Denominator factors
+        let tempDen = simpDen;
+        let p2 = 0, p5 = 0;
+        while (tempDen % 2 === 0) { p2++; tempDen /= 2; }
+        while (tempDen % 5 === 0) { p5++; tempDen /= 5; }
+        let factorDesc = [];
+        if (p2 > 0) factorDesc.push(`2^${p2}`);
+        if (p5 > 0) factorDesc.push(`5^${p5}`);
+        if (tempDen > 1) factorDesc.push(`other (${tempDen})`);
+        document.getElementById('resDenomFactors').textContent = factorDesc.join(" × ") || "1 (Integer)";
+
+        steps += `1. Decimal places count: d = ${decPlaces}<br>`;
+        steps += `2. Unreduced fraction: ${isNeg ? '-' : ''}${num} / ${den}<br>`;
+        steps += `3. Euclidean GCD(${num}, ${den}) = ${g}<br>`;
+        steps += `4. Simplified fraction: ${simpNum} / ${simpDen}`;
+      } else {
+        const repPattern = document.getElementById('repPatternVal').value.trim();
+        if (!repPattern) return;
+
+        floatVal = parseFloat(decStr);
+        const isNeg = decStr.startsWith('-');
+        const clean = decStr.replace('-', '');
+        const parts = clean.split('.');
+        const intPart = parseInt(parts[0] || "0", 10);
+        const nonRepPart = parts.length > 1 ? parts[1] : "";
+
+        const k = nonRepPart.length;
+        const p = repPattern.length;
+
+        // Formula: 10^k * x and 10^(k+p) * x
+        const factor1 = Math.pow(10, k);
+        const factor2 = Math.pow(10, k + p);
+
+        const val1 = Math.floor(floatVal * factor1);
+        const val2 = parseInt((parts[0] || "0") + nonRepPart + repPattern, 10);
+
+        const numDiff = val2 - val1;
+        const denDiff = factor2 - factor1;
+
+        const g = gcd(numDiff, denDiff);
+        const simpNum = (isNeg ? -1 : 1) * (numDiff / g);
+        const simpDen = denDiff / g;
+
+        document.getElementById('fracPrimaryResult').textContent = `${simpNum} / ${simpDen}`;
+        document.getElementById('fracSubtext').textContent = `Repeating Period: ${p} digits | Reduced via GCD = ${g}`;
+
+        const absSimpNum = Math.abs(simpNum);
+        const whole = Math.floor(absSimpNum / simpDen);
+        const rem = absSimpNum % simpDen;
+        let mixedText = "";
+        if (whole === 0) {
+          mixedText = `${simpNum}/${simpDen} (Proper)`;
+        } else if (rem === 0) {
+          mixedText = `${simpNum < 0 ? -whole : whole} (Integer)`;
+        } else {
+          mixedText = `${simpNum < 0 ? '-' : ''}${whole} ${rem}/${simpDen} (Mixed)`;
+        }
+        document.getElementById('resMixedNum').textContent = mixedText;
+        document.getElementById('resPercent').textContent = `${((simpNum / simpDen) * 100).toFixed(4)}%`;
+        document.getElementById('resDecVerify').textContent = (simpNum / simpDen).toFixed(6);
+        document.getElementById('resDenomFactors').textContent = `Denominator: ${simpDen}`;
+
+        steps += `1. Non-repeating digits k = ${k}; Repeating digits p = ${p}<br>`;
+        steps += `2. Equation 1: 10^${k}x = ${val1}.${repPattern}...<br>`;
+        steps += `3. Equation 2: 10^${k+p}x = ${val2}.${repPattern}...<br>`;
+        steps += `4. Subtract: (${factor2} - ${factor1})x = ${val2} - ${val1} ➔ ${denDiff}x = ${numDiff}<br>`;
+        steps += `5. Divide and simplify: ${simpNum} / ${simpDen}`;
+      }
+
+      document.getElementById('decFracStepsDisplay').innerHTML = steps;
+    }
+
+    document.getElementById('decTypeSelect').addEventListener('change', updateDecTypeUi);
+    document.getElementById('decInputVal').addEventListener('input', calcDecToFrac);
+    document.getElementById('repPatternVal').addEventListener('input', calcDecToFrac);
+    updateDecTypeUi();
+  </script>
+</body>
+</html>

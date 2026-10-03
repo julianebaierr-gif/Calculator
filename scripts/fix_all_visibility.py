@@ -90,7 +90,15 @@ CAT_MAP = {
             ("pythagorean-theorem-calculator.html", "Pythagorean Theorem Calculator", "🔺", "Hypotenuse, perpendicular legs & 3D space diagonal", "a² + b² = c² | d = √(x² + y² + z²)"),
             ("scientific-notation-calculator.html", "Scientific & Engineering Notation", "🔬", "Standard form m × 10ⁿ, engineering notation & SI prefixes", "m × 10ⁿ (1 ≤ |m| < 10) | Engineering n mod 3 = 0"),
             ("significant-figures-calculator.html", "Significant Figures Calculator", "📏", "Sig fig counter, round-to-even & uncertainty propagation", "Multiplication: Min SF | Addition: Min Decimals"),
-            ("prime-number-calculator.html", "Prime Number & Factorization Engine", "⚛️", "Primality test, divisor counts d(n) & prime factor tree", "Unique factorization: n = ∏ p_i^α_i | d(n) = ∏(α_i+1)"),
+            ("prime-number-calculator.html", "Prime Number & Factorization Engine", "⚛️", "Prime primality test, divisor count d(n) & prime factor tree", "Unique factorization: n = ∏ p_i^α_i | d(n) = ∏(α_i+1)"),
+            ("absolute-value-calculator.html", "Absolute Value Calculator", "📏", "Real modulus |x|, complex magnitude & distance", "|x| = √(x²) | d = |x - y|"),
+            ("area-calculator.html", "Geometric Area Calculator", "📐", "2D surface area across polygons, circles & Heron", "Rectangle, Triangle, Circle, Heron & Shoelace"),
+            ("arithmetic-sequence-calculator.html", "Arithmetic Sequence Calculator", "🔢", "Nth term an = a1 + (n-1)d & Gauss partial sum Sn", "an = a1 + (n-1)d | Sn = (n/2)(a1 + an)"),
+            ("circle-calculator.html", "Circle Calculator", "⭕", "Radius, circumference, area, sector & chord", "C = 2πr | A = πr² | s = rθ | c = 2r·sin(θ/2)"),
+            ("cube-root-calculator.html", "Cube Root Calculator", "🧊", "Principal real root, complex roots & Newton-Raphson", "x³ = N | x_{n+1} = ⅓[2x_n + N/x_n²]"),
+            ("decimal-to-fraction-calculator.html", "Decimal to Fraction Calculator", "➗", "Terminating & repeating decimals to rational p/q", "p/q reduced via GCD | 10^(k+p)x - 10^k x"),
+            ("exponent-calculator.html", "Exponent & Powers Calculator", "⚡", "Powers bⁿ, negative reciprocals & fractional roots", "bᵐ·bⁿ = bᵐ⁺ⁿ | b⁻ⁿ = 1/bⁿ | b^(p/q) = ⁿ√(bᵖ)"),
+            ("factorial-calculator.html", "Factorial & Permutation Calculator", "❗", "n!, permutations P(n, r), combinations C(n, r) & Stirling", "n! = ∏ k | P(n,r) = n!/(n-r)! | C(n,r) = n!/[r!(n-r)!]"),
         ]
     },
     "engineering.html": {

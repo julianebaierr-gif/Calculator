@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circle Calculator — Radius, Diameter, Circumference & Sector Area | CalcHub</title>
+  <meta name="description" content="Calculate circle radius, diameter, circumference, area, arc length, chord length, sector area, and circular segment with exact geometric formulas.">
+  <meta name="keywords" content="circle calculator, radius to circumference, circle area calculator, diameter to radius, arc length calculator, sector area calculator, chord length, circular segment">
+  <meta name="author" content="CalcHub Euclidean Geometry & Conic Sections Board">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://calchub.org/circle-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+
+  <meta property="og:title" content="Circle Calculator — Radius, Diameter, Circumference & Sector Area | CalcHub">
+  <meta property="og:description" content="Solve all circle geometric properties from any single input: radius, diameter, circumference, total area, sector area, arc length, and chord.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://calchub.org/circle-calculator.html">
+
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://calchub.org/circle-calculator.html#app",
+      "name": "Circle & Circular Sector Geometry Engine",
+      "url": "https://calchub.org/circle-calculator.html",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "High-precision geometric solver for circles, circumference, diameter, area, circular sectors, chords, and arc segments."
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://calchub.org/"},
+        {"@type": "ListItem", "position": 2, "name": "Math & Engineering Calculators", "item": "https://calchub.org/math.html"},
+        {"@type": "ListItem", "position": 3, "name": "Circle Calculator", "item": "https://calchub.org/circle-calculator.html"}
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How are the fundamental circle formulas derived from the definition of Pi (π)?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "By mathematical definition, Pi (π ≈ 3.1415926535...) is the ratio of any circle's circumference C to its diameter d: π = C / d. From this axiom, multiplying by d gives C = π · d = 2πr. In calculus, dividing a circle of radius r into infinitely thin concentric rings of circumference 2πx and thickness dx, the area is the integral A = ∫₀ʳ 2πx dx = [πx²]₀ʳ = πr²."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between a circular sector and a circular segment?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A circular sector is a pie-shaped portion of a circle enclosed by two radii and an arc (Area = 0.5 · r² · θ, where θ is in radians). A circular segment is the region enclosed between a straight chord line and the adjacent arc. The area of a circular segment is calculated by subtracting the area of the central triangle from the sector: Area_segment = 0.5 · r² · (θ - sin θ)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do you calculate arc length and chord length for a given central angle?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For a central angle θ in radians, arc length along the circumference is s = r · θ. If θ is in degrees, s = (θ / 360°) · 2πr. The straight-line chord length connecting the two arc endpoints is derived from a right triangle splitting the central angle: c = 2r · sin(θ / 2)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the sagitta of a circular arc and where is it used in engineering?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The sagitta (or height of an arc) is the perpendicular distance from the midpoint of a chord to the peak of the arc. It is calculated as h = r - √(r² - (c / 2)²). Sagitta calculations are essential in optical lens manufacturing to verify curvature radius and in civil transportation engineering for measuring railway curve deflection."
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</head>
+<body class="converter-page">
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="converter.html">Converters</a>
+        <a href="math.html" class="active">Math & Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="page-layout">
+        <div class="content-column">
+          <header class="tool-header">
+            <div class="badge-tag">Euclidean Geometry & Conic Sections</div>
+            <h1 class="tool-title">Circle Calculator</h1>
+            <p class="tool-subtitle">Compute radius, diameter, circumference, area, arc length, sector area, chord length, and sagitta from any known circle dimension.</p>
+          </header>
+
+          <section class="calculator-card" aria-label="Circle Geometry Solver">
+            <div class="calc-grid">
+              <div class="input-group">
+                <label for="circleInputMode" class="input-label">Known Primary Parameter</label>
+                <select id="circleInputMode" class="calc-input">
+                  <option value="radius">Radius (r)</option>
+                  <option value="diameter">Diameter (d)</option>
+                  <option value="circumference">Circumference (C)</option>
+                  <option value="area">Total Area (A)</option>
+                </select>
+              </div>
+
+              <div class="input-group">
+                <label for="primaryValue" class="input-label" id="labelPrimaryVal">Radius (r)</label>
+                <input type="number" id="primaryValue" class="calc-input" value="10" step="any" min="0.0001">
+              </div>
+
+              <div class="input-group">
+                <label for="sectorAngle" class="input-label">Sector Central Angle (\(\theta^\circ\))</label>
+                <input type="number" id="sectorAngle" class="calc-input" value="60" min="0.001" max="360" step="any">
+              </div>
+            </div>
+
+            <div class="primary-result" style="margin-top: 25px;">
+              <div class="result-label">Computed Circle Area (\(A\))</div>
+              <div class="result-value" id="circlePrimaryArea">314.1593</div>
+              <div class="result-subtext" id="circlePrimarySubtext">Formula: A = π × (10)² = 314.1593</div>
+            </div>
+
+            <div class="results-grid" style="margin-top: 20px;">
+              <div class="result-item">
+                <div class="result-label">Radius (\(r\))</div>
+                <div class="result-value" id="resRadius">10.0000</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Diameter (\(d = 2r\))</div>
+                <div class="result-value" id="resDiameter">20.0000</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Circumference (\(C = 2\pi r\))</div>
+                <div class="result-value" id="resCircumference">62.8319</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Arc Length (\(s = r\theta\))</div>
+                <div class="result-value" id="resArcLength">10.4720</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Sector Area (\(A_{\text{sec}}\))</div>
+                <div class="result-value" id="resSectorArea">52.3599</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Chord Length (\(c\))</div>
+                <div class="result-value" id="resChordLength">10.0000</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Segment Area (\(A_{\text{seg}}\))</div>
+                <div class="result-value" id="resSegmentArea">9.0590</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Sagitta Height (\(h\))</div>
+                <div class="result-value" id="resSagitta">1.3397</div>
+              </div>
+            </div>
+
+            <div class="conversion-steps" style="margin-top: 25px;">
+              <h3>Step-by-Step Geometric Calculations</h3>
+              <div id="circleStepsDisplay" style="font-family: monospace; font-size: 0.95rem; line-height: 1.6; background: rgba(0,0,0,0.03); padding: 16px; border-radius: 8px; border-left: 4px solid var(--accent, #2563eb);">
+                Loading geometric breakdown...
+              </div>
+            </div>
+          </section>
+
+          <article class="article-body">
+            <h2>1. The Circle in Classical Geometry and Conic Sections</h2>
+            <p>Among all geometric curves in Euclidean two-dimensional space, the <strong>circle</strong> exhibits maximal symmetry, invariant rotational curvature, and optimal area enclosure. Formally, a circle is defined as the locus of all coplanar points equidistant from a fixed central reference point \(O(h, k)\). The constant separation distance is designated as the <strong>radius</strong> (\(r\)). In Cartesian coordinates, the circle is governed by the second-degree implicit equation:</p>
+
+            $$(x - h)^2 + (y - k)^2 = r^2$$
+
+            <p>In the theory of conic sections, a circle represents an ellipse whose eccentricity vanishes entirely (\(e = 0\)), formed when a circular cone is sliced by a cutting plane exactly perpendicular to the cone's axis of symmetry.</p>
+
+            <h2>2. The Constant Pi (\(\pi\)) and Fundamental Mensuration Formulas</h2>
+            <p>The mathematical constant \(\pi\) (approximately \(3.141592653589793\dots\)) is the fundamental transcendental ratio relating a circle's perimeter to its linear width:</p>
+
+            $$\pi = \frac{C}{d} = \frac{C}{2r}$$
+
+            <p>From this foundational definition, all primary circle mensuration properties follow immediately:</p>
+
+            <h3>2.1 Diameter and Circumference</h3>
+            <ul>
+              <li><strong>Diameter (\(d\)):</strong> The maximum chord distance spanning through the center point: \(d = 2r\).</li>
+              <li><strong>Circumference (\(C\)):</strong> The perimeter length enclosing the circular boundary: \(C = 2\pi r = \pi d\).</li>
+            </ul>
+
+            <h3>2.2 Surface Area: Calculus Derivation</h3>
+            <p>The area \(\mathcal{A}\) of a circle can be proven rigorously using Riemann integration. Divide the circle into an infinite sequence of thin concentric circular rings of radius \(x\) and differential radial thickness \(dx\). Each infinitesimal ring unrolls into a thin rectangle of length \(2\pi x\) and width \(dx\), yielding differential area \(dA = 2\pi x \, dx\). Integrating from the origin \(x = 0\) to the perimeter boundary \(x = r\):</p>
+
+            $$\mathcal{A} = \int_0^r 2\pi x \, dx = 2\pi \left[ \frac{x^2}{2} \right]_0^r = \pi r^2 = \frac{\pi d^2}{4} = \frac{C^2}{4\pi}$$
+
+            <p>The Isoperimetric Theorem in differential geometry proves that among all closed plane curves of a fixed perimeter \(C\), the circle encloses the absolute maximum possible surface area.</p>
+
+            <h2>3. Circular Sectors, Arcs, Chords, and Segments</h2>
+            <p>When analyzing portions of a circle subtended by a central angle \(\theta\), trigonometry provides exact closed-form expressions:</p>
+
+            <h3>3.1 Arc Length (\(s\))</h3>
+            <p>An arc represents a fraction of the circumference. If the central angle \(\theta\) is measured in radians:</p>
+
+            $$s = r \cdot \theta \quad (\theta \text{ in radians})$$
+
+            <p>If \(\theta\) is provided in degrees (\(^\circ\)), scale by the degree-to-radian conversion factor \(\frac{\pi}{180^\circ}\):</p>
+
+            $$s = \left(\frac{\theta^\circ}{360^\circ}\right) 2\pi r = \frac{\pi r \theta^\circ}{180^\circ}$$
+
+            <h3>3.2 Sector Area (\(\mathcal{A}_{\text{sector}}\))</h3>
+            <p>A circular sector is the region bounded by two radii and the connecting arc (a slice of pie):</p>
+
+            $$\mathcal{A}_{\text{sector}} = \frac{1}{2} r^2 \theta \quad (\theta \text{ in rad}) = \left(\frac{\theta^\circ}{360^\circ}\right) \pi r^2 = \frac{1}{2} s \cdot r$$
+
+            <h3>3.3 Chord Length (\(c\))</h3>
+            <p>A chord is a straight line segment joining two points along the circle. Dropping an altitude from the center bisects the isosceles central triangle into two right triangles with hypotenuse \(r\) and opposite angle \(\frac{\theta}{2}\):</p>
+
+            $$c = 2r \sin\left(\frac{\theta}{2}\right)$$
+
+            <h3>3.4 Circular Segment Area (\(\mathcal{A}_{\text{segment}}\))</h3>
+            <p>A circular segment is the region bounded strictly between the chord and the arc. Its area equals the sector area minus the area of the isosceles triangle formed by the radii and the chord (\(\mathcal{A}_{\text{tri}} = \frac{1}{2} r^2 \sin\theta\)):</p>
+
+            $$\mathcal{A}_{\text{segment}} = \mathcal{A}_{\text{sector}} - \mathcal{A}_{\text{tri}} = \frac{1}{2} r^2 (\theta - \sin\theta) \quad (\theta \text{ in rad})$$
+
+            <h3>3.5 Sagitta (Height of Arc, \(h\))</h3>
+            <p>The sagitta \(h\) is the maximum perpendicular clearance between the midpoint of the chord and the peak of the arc:</p>
+
+            $$h = r - \sqrt{r^2 - \left(\frac{c}{2}\right)^2} = r \left(1 - \cos\left(\frac{\theta}{2}\right)\right)$$
+
+            <h2>4. Engineering and Physical Mechanics Applications</h2>
+
+            <h3>4.1 Hoop Stress in Cylindrical Pressure Vessels</h3>
+            <p>In mechanical and chemical piping engineering, a pressurized cylindrical vessel of inner radius \(r\) with internal fluid pressure \(P\) and wall thickness \(t\) experiences circumferential tensile stress (hoop stress) derived from circular equilibrium:</p>
+
+            $$\sigma_{\text{hoop}} = \frac{P \cdot r}{t}$$
+
+            <p>Because hoop stress is directly proportional to radius, doubling the pipe diameter doubles the tensile wall stress under identical internal fluid pressures, dictating thicker steel walls in large-diameter pipelines.</p>
+
+            <h3>4.2 Horizontal Curve Radius in Transportation Engineering</h3>
+            <p>In highway and railway engineering, curves are designed as circular arcs to prevent vehicle rollover and skidding under lateral centrifugal acceleration. For a design speed \(V\) (in mph), highway superelevation bank angle \(e\), and tire-pavement side friction factor \(f\), the American Association of State Highway and Transportation Officials (AASHTO) mandates the minimum curve radius:</p>
+
+            $$R_{\min} = \frac{V^2}{15(e + f)}$$
+
+            <h2>5. Benchmark Comparative Reference Table</h2>
+            <p>The table below provides benchmark circle calculations across standard radii, detailing diameter, circumference, area, and sector properties at \(\theta = 60^\circ\).</p>
+
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Radius (\(r\))</th>
+                  <th>Diameter (\(d\))</th>
+                  <th>Circumference (\(C\))</th>
+                  <th>Total Area (\(\mathcal{A}\))</th>
+                  <th>Arc Length (\(60^\circ\))</th>
+                  <th>Sector Area (\(60^\circ\))</th>
+                  <th>Chord (\(60^\circ\))</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1.0</td>
+                  <td>2.0</td>
+                  <td>6.2832</td>
+                  <td>3.1416</td>
+                  <td>1.0472</td>
+                  <td>0.5236</td>
+                  <td>1.0000</td>
+                </tr>
+                <tr>
+                  <td>5.0</td>
+                  <td>10.0</td>
+                  <td>31.4159</td>
+                  <td>78.5398</td>
+                  <td>5.2360</td>
+                  <td>13.0900</td>
+                  <td>5.0000</td>
+                </tr>
+                <tr>
+                  <td>10.0</td>
+                  <td>20.0</td>
+                  <td>62.8319</td>
+                  <td>314.1593</td>
+                  <td>10.4720</td>
+                  <td>52.3599</td>
+                  <td>10.0000</td>
+                </tr>
+                <tr>
+                  <td>14.0</td>
+                  <td>28.0</td>
+                  <td>87.9646</td>
+                  <td>615.7522</td>
+                  <td>14.6608</td>
+                  <td>102.6254</td>
+                  <td>14.0000</td>
+                </tr>
+                <tr>
+                  <td>25.0</td>
+                  <td>50.0</td>
+                  <td>157.0796</td>
+                  <td>1,963.4954</td>
+                  <td>26.1799</td>
+                  <td>327.2492</td>
+                  <td>25.0000</td>
+                </tr>
+                <tr>
+                  <td>50.0</td>
+                  <td>100.0</td>
+                  <td>314.1593</td>
+                  <td>7,853.9816</td>
+                  <td>52.3599</td>
+                  <td>1,308.9969</td>
+                  <td>50.0000</td>
+                </tr>
+                <tr>
+                  <td>100.0</td>
+                  <td>200.0</td>
+                  <td>628.3185</td>
+                  <td>31,415.9265</td>
+                  <td>104.7198</td>
+                  <td>5,235.9878</td>
+                  <td>100.0000</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h2>6. Worked Highway Civil Case Study: Circular Horizontal Roadway Alignment</h2>
+            <div class="worked-example-card">
+              <div class="example-header">
+                <strong>Transportation Engineering Case Study:</strong> Horizontal Freeway Curve Sizing & Arc Geometry
+              </div>
+              <div class="example-body">
+                <p><strong>Scenario:</strong> A highway design engineer aligns a two-lane state connector curving around an environmental wetlands preserve. The design centerline radius is \(R = 1,200.0\text{ ft}\), and the intersection of tangents yields an internal deflection angle \(\Delta = 45.0^\circ\) (\(\frac{\pi}{4}\text{ rad}\)). The surveying crew needs to establish: (1) the curve arc length (\(L\)), (2) the straight-line chord length (\(C\)), (3) the tangent distance from point of curve to vertex (\(T\)), and (4) the middle ordinate sagitta (\(M\)) for roadside barrier clearance.</p>
+
+                <p><strong>Step 1: Calculate Arc Length (\(L\))</strong><br>
+                $$L = R \times \Delta_{\text{rad}} = 1,200.0 \times \left(45.0^\circ \times \frac{\pi}{180^\circ}\right) = 1,200.0 \times 0.785398 = 942.48\text{ ft}$$</p>
+
+                <p><strong>Step 2: Calculate Long Chord Length (\(C\))</strong><br>
+                $$C = 2R \sin\left(\frac{\Delta}{2}\right) = 2(1,200.0) \times \sin(22.5^\circ) = 2,400.0 \times 0.382683 = 918.44\text{ ft}$$</p>
+
+                <p><strong>Step 3: Calculate Tangent Distance (\(T\))</strong><br>
+                $$T = R \tan\left(\frac{\Delta}{2}\right) = 1,200.0 \times \tan(22.5^\circ) = 1,200.0 \times 0.414214 = 497.06\text{ ft}$$</p>
+
+                <p><strong>Step 4: Calculate Middle Ordinate Sagitta (\(M\))</strong><br>
+                $$M = R \left[1 - \cos\left(\frac{\Delta}{2}\right)\right] = 1,200.0 \times [1 - \cos(22.5^\circ)] = 1,200.0 \times [1 - 0.923880] = 91.34\text{ ft}$$
+                The highway guardrail clearance requires at least \(91.34\text{ ft}\) of sightline clearance from the centerline chord.</p>
+              </div>
+            </div>
+
+            <h2>7. Frequently Asked Questions (FAQ)</h2>
+            <div class="faq-accordion">
+              <div class="faq-item">
+                <h3 class="faq-question">Why is a central angle of 60 degrees unique for chord length?</h3>
+                <div class="faq-answer">
+                  <p>When the central angle is \(\theta = 60^\circ\), the triangle formed by the circle center and the two endpoints of the chord is an equilateral triangle (all three angles are \(60^\circ\)). Consequently, the chord length is exactly equal to the radius: \(c = 2r \sin(30^\circ) = 2r(0.5) = r\).</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">How do you find the radius if only the area of the circle is known?</h3>
+                <div class="faq-answer">
+                  <p>To find radius from area, rearrange the formula \(\mathcal{A} = \pi r^2\). Divide both sides by \(\pi\) and extract the principal square root: \(r = \sqrt{\frac{\mathcal{A}}{\pi}}\). For example, if a circle has an area of \(100\text{ m}^2\), its radius is \(r = \sqrt{100 / 3.14159} \approx 5.642\text{ m}\).</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">What is the difference between a secant line and a tangent line to a circle?</h3>
+                <div class="faq-answer">
+                  <p>A <em>secant line</em> intersects the circle at exactly two discrete points, containing a chord in its interior. A <em>tangent line</em> touches the circle at exactly one point (the point of tangency) and is strictly perpendicular to the radius drawn to that point.</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">How does doubling the radius affect the circumference and area of a circle?</h3>
+                <div class="faq-answer">
+                  <p>Circumference scales linearly with radius (\(C \propto r\)), so doubling the radius doubles the circumference (\(2 \times\)). In contrast, area scales quadratically (\(\mathcal{A} \propto r^2\)), so doubling the radius quadruples the area (\(2^2 = 4 \times\)).</p>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <aside class="sidebar-column">
+          <div class="sidebar-card">
+            <h3 class="sidebar-title">Related Math Calculators</h3>
+            <ul class="sidebar-nav">
+              <li><a href="area-calculator.html">Area Calculator</a></li>
+              <li><a href="pythagorean-theorem-calculator.html">Pythagorean Theorem Calculator</a></li>
+              <li><a href="quadratic-equation-calculator.html">Quadratic Equation Calculator</a></li>
+              <li><a href="fraction-calculator.html">Fraction Calculator</a></li>
+              <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
+              <li><a href="gcd-lcm-calculator.html">GCD and LCM Calculator</a></li>
+              <li><a href="scientific-notation-calculator.html">Scientific Notation Calculator</a></li>
+              <li><a href="length-converter.html">Length Converter</a></li>
+            </ul>
+          </div>
+
+          <div class="sidebar-card">
+            <h3 class="sidebar-title">Circle Identities</h3>
+            <div style="font-size:0.875rem; line-height:1.5; color:var(--text-muted, #4b5563);">
+              <p><strong>Diameter:</strong> \(d = 2r\)</p>
+              <p><strong>Circumference:</strong> \(C = 2\pi r\)</p>
+              <p><strong>Area:</strong> \(A = \pi r^2\)</p>
+              <p><strong>Arc:</strong> \(s = r\theta\)</p>
+              <p><strong>Sector:</strong> \(A_{\text{sec}} = \frac{1}{2}r^2\theta\)</p>
+              <p><strong>Chord:</strong> \(c = 2r\sin(\theta/2)\)</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h3>CalcHub</h3>
+        <p>High-precision technical calculation engines, engineering references, and discrete mathematical tools.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="math.html">Math & Engineering</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Hub Categories</h4>
+        <ul>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Engineering Tools</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed computational algorithms.</p>
+    </div>
+  </footer>
+
+  <script>
+    function updateCircleInputLabel() {
+      const mode = document.getElementById('circleInputMode').value;
+      const lbl = document.getElementById('labelPrimaryVal');
+      if (mode === 'radius') lbl.textContent = "Radius (r)";
+      else if (mode === 'diameter') lbl.textContent = "Diameter (d)";
+      else if (mode === 'circumference') lbl.textContent = "Circumference (C)";
+      else lbl.textContent = "Total Area (A)";
+      calcCircle();
+    }
+
+    function calcCircle() {
+      const mode = document.getElementById('circleInputMode').value;
+      const val = parseFloat(document.getElementById('primaryValue').value);
+      const thetaDeg = parseFloat(document.getElementById('sectorAngle').value);
+
+      if (isNaN(val) || val <= 0 || isNaN(thetaDeg) || thetaDeg <= 0) return;
+
+      let r = 0;
+      if (mode === 'radius') {
+        r = val;
+      } else if (mode === 'diameter') {
+        r = val / 2;
+      } else if (mode === 'circumference') {
+        r = val / (2 * Math.PI);
+      } else {
+        r = Math.sqrt(val / Math.PI);
+      }
+
+      const d = 2 * r;
+      const c = 2 * Math.PI * r;
+      const a = Math.PI * r * r;
+
+      const thetaRad = thetaDeg * (Math.PI / 180);
+      const arcLen = r * thetaRad;
+      const sectorArea = 0.5 * r * r * thetaRad;
+      const chordLen = 2 * r * Math.sin(thetaRad / 2);
+      const segmentArea = 0.5 * r * r * (thetaRad - Math.sin(thetaRad));
+      const sagitta = r * (1 - Math.cos(thetaRad / 2));
+
+      document.getElementById('circlePrimaryArea').textContent = a.toFixed(4);
+      document.getElementById('circlePrimarySubtext').textContent = `Formula: A = π × (${r.toFixed(4)})² = ${a.toFixed(4)}`;
+
+      document.getElementById('resRadius').textContent = r.toFixed(4);
+      document.getElementById('resDiameter').textContent = d.toFixed(4);
+      document.getElementById('resCircumference').textContent = c.toFixed(4);
+      document.getElementById('resArcLength').textContent = arcLen.toFixed(4);
+      document.getElementById('resSectorArea').textContent = sectorArea.toFixed(4);
+      document.getElementById('resChordLength').textContent = chordLen.toFixed(4);
+      document.getElementById('resSegmentArea').textContent = segmentArea.toFixed(4);
+      document.getElementById('resSagitta').textContent = sagitta.toFixed(4);
+
+      let stepsHtml = `1. Derived Radius: r = ${r.toFixed(4)}<br>`;
+      stepsHtml += `2. Diameter: d = 2 × ${r.toFixed(4)} = ${d.toFixed(4)}<br>`;
+      stepsHtml += `3. Circumference: C = 2π × ${r.toFixed(4)} = ${c.toFixed(4)}<br>`;
+      stepsHtml += `4. Total Area: A = π × (${r.toFixed(4)})² = ${a.toFixed(4)}<br>`;
+      stepsHtml += `5. Central Angle: θ = ${thetaDeg}° (${thetaRad.toFixed(4)} rad)<br>`;
+      stepsHtml += `6. Arc Length: s = r × θ = ${r.toFixed(4)} × ${thetaRad.toFixed(4)} = ${arcLen.toFixed(4)}<br>`;
+      stepsHtml += `7. Sector Area: A_sec = ½ × r² × θ = ${sectorArea.toFixed(4)}<br>`;
+      stepsHtml += `8. Chord Length: c = 2r × sin(θ/2) = 2(${r.toFixed(4)}) × sin(${ (thetaDeg/2).toFixed(1) }°) = ${chordLen.toFixed(4)}`;
+
+      document.getElementById('circleStepsDisplay').innerHTML = stepsHtml;
+    }
+
+    document.getElementById('circleInputMode').addEventListener('change', updateCircleInputLabel);
+    document.getElementById('primaryValue').addEventListener('input', calcCircle);
+    document.getElementById('sectorAngle').addEventListener('input', calcCircle);
+    updateCircleInputLabel();
+  </script>
+</body>
+</html>

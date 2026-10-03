@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Factorial Calculator — n!, Permutations, Combinations & Stirling | CalcHub</title>
+  <meta name="description" content="Calculate factorial n!, permutations P(n, r), combinations C(n, r), Stirling's asymptotic approximation, Euler's Gamma function, and Pascal identities.">
+  <meta name="keywords" content="factorial calculator, n factorial, permutations calculator, combinations calculator, stirlings approximation, gamma function, zero factorial, combinatorics">
+  <meta name="author" content="CalcHub Combinatorics & Asymptotic Analysis Board">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://calchub.org/factorial-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+
+  <meta property="og:title" content="Factorial Calculator — n!, Permutations, Combinations & Stirling | CalcHub">
+  <meta property="og:description" content="Calculate exact factorials n!, permutations P(n,r), combinations C(n,r), and Stirling's asymptotic formula with complete combinatorics.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://calchub.org/factorial-calculator.html">
+
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://calchub.org/factorial-calculator.html#app",
+      "name": "Factorial & Combinatorial Mathematics Engine",
+      "url": "https://calchub.org/factorial-calculator.html",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "High-precision combinatorics calculator computing n!, permutations P(n,r), combinations C(n,r), and Stirling's asymptotic formula."
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://calchub.org/"},
+        {"@type": "ListItem", "position": 2, "name": "Math & Engineering Calculators", "item": "https://calchub.org/math.html"},
+        {"@type": "ListItem", "position": 3, "name": "Factorial Calculator", "item": "https://calchub.org/factorial-calculator.html"}
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why is zero factorial (0!) equal to 1?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Algebraically, the recursive definition of factorials dictates that n! = n · (n - 1)!. Setting n = 1 yields: 1! = 1 · (0)!. Since 1! = 1, dividing by 1 gives 0! = 1. Combinatorially, n! represents the number of distinct ways to arrange n objects in an ordered sequence. For an empty set (n = 0), there is exactly one way to arrange nothing (the empty arrangement), establishing 0! = 1."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is Stirling's Approximation and when is it utilized?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Stirling's Formula provides an asymptotic approximation for factorials of large numbers: n! ≈ √(2πn) · (n / e)ⁿ. Because calculating exact factorials for large values (like 1000!) causes numerical overflow in computers, Stirling's logarithmic formula ln(n!) ≈ n·ln(n) - n is universally utilized in statistical mechanics, entropy calculations, and thermal physics."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do permutations P(n, r) differ from combinations C(n, r)?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Permutations P(n, r) = n! / (n - r)! count the number of ordered arrangements of r items chosen from n available items (order matters, such as race finishing podiums or PIN codes). Combinations C(n, r) = n! / [r! · (n - r)!] count the number of unordered selections (order does not matter, such as lottery numbers or poker card hands)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Euler's Gamma function extend factorials to non-integers and fractions?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Leonhard Euler defined the Gamma function via the continuous integral Γ(z) = ∫₀^∞ t^(z-1) · e^(-t) dt. Integrating by parts proves Γ(z + 1) = z · Γ(z). For positive integers, Γ(n + 1) = n!. Furthermore, Euler evaluated half-integers: Γ(1/2) = √π, which allows the computation of fractional factorials such as (1/2)! = 0.5 · √π ≈ 0.886227."
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</head>
+<body class="converter-page">
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="converter.html">Converters</a>
+        <a href="math.html" class="active">Math & Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="page-layout">
+        <div class="content-column">
+          <header class="tool-header">
+            <div class="badge-tag">Combinatorics &amp; Asymptotic Analysis</div>
+            <h1 class="tool-title">Factorial Calculator</h1>
+            <p class="tool-subtitle">Calculate exact factorials \(n!\), permutations \(P(n, r)\), combinations \(C(n, r)\), and evaluate Stirling's asymptotic approximation.</p>
+          </header>
+
+          <section class="calculator-card" aria-label="Factorial Solver">
+            <div class="calc-grid">
+              <div class="input-group">
+                <label for="factN" class="input-label">Total Elements (\(n\))</label>
+                <input type="number" id="factN" class="calc-input" value="10" min="0" max="170" step="1">
+              </div>
+
+              <div class="input-group">
+                <label for="factR" class="input-label">Subset Selection (\(r\))</label>
+                <input type="number" id="factR" class="calc-input" value="4" min="0" max="170" step="1">
+              </div>
+            </div>
+
+            <div class="primary-result" style="margin-top: 25px;">
+              <div class="result-label">Computed Factorial (\(n!\))</div>
+              <div class="result-value" id="resFactorialPrimary">3,628,800</div>
+              <div class="result-subtext" id="resFactorialSubtext">10! = 10 × 9 × 8 × ... × 1 = 3,628,800</div>
+            </div>
+
+            <div class="results-grid" style="margin-top: 20px;">
+              <div class="result-item">
+                <div class="result-label">Permutations \(P(n, r)\)</div>
+                <div class="result-value" id="resPermutations">5,040</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Combinations \(C(n, r)\)</div>
+                <div class="result-value" id="resCombinations">210</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Stirling's Approximation</div>
+                <div class="result-value" id="resStirling">3,598,695.6</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Scientific Notation</div>
+                <div class="result-value" id="resFactSci">3.6288 × 10⁶</div>
+              </div>
+            </div>
+
+            <div class="conversion-steps" style="margin-top: 25px;">
+              <h3>Combinatorial Formulas &amp; Expansions</h3>
+              <div id="factStepsDisplay" style="font-family: monospace; font-size: 0.95rem; line-height: 1.6; background: rgba(0,0,0,0.03); padding: 16px; border-radius: 8px; border-left: 4px solid var(--accent, #2563eb);">
+                Loading combinatorial steps...
+              </div>
+            </div>
+          </section>
+
+          <article class="article-body">
+            <h2>1. Foundations of Factorials in Discrete Mathematics</h2>
+            <p>In discrete mathematics, combinatorics, and probability theory, the <strong>factorial</strong> of a non-negative integer \(n\), denoted by the exclamation mark symbol \(n!\) (introduced by French mathematician Christian Kramp in 1808), represents the product of all positive integers less than or equal to \(n\):</p>
+
+            $$n! = \prod_{k=1}^n k = n \times (n - 1) \times (n - 2) \times \dots \times 3 \times 2 \times 1$$
+
+            <p>The factorial operation is defined recursively by the difference equation:</p>
+
+            $$n! = n \times (n - 1)! \quad \text{for } n \ge 1$$
+
+            <p>with the fundamental initial boundary condition:</p>
+
+            $$0! = 1$$
+
+            <h3>1.1 Rigorous Mathematical Proofs that \(0! = 1\)</h3>
+            <p>The identity \(0! = 1\) is often considered counterintuitive, but it is mathematically mandatory for three distinct reasons:</p>
+            <ol>
+              <li><strong>Algebraic Consistency:</strong> Rearranging the recursive definition gives \((n - 1)! = \frac{n!}{n}\). Substituting \(n = 1\):
+                $$0! = (1 - 1)! = \frac{1!}{1} = \frac{1}{1} = 1$$
+                If \(0!\) were defined as 0, evaluating \((n-1)!\) would induce catastrophic division by zero across all higher factorials.</li>
+              <li><strong>Combinatorial Permutations of the Empty Set:</strong> The quantity \(n!\) counts the number of distinct ways to arrange \(n\) items in an ordered queue. An empty set (\(\emptyset\)) containing zero elements has exactly one unique arrangement: the trivial empty arrangement. Thus, \(0! = 1\).</li>
+              <li><strong>The Empty Product Convention:</strong> In mathematical algebra, the empty product of zero factors is universally defined as the multiplicative identity element (1), just as an empty sum equals the additive identity element (0).</li>
+            </ol>
+
+            <h2>2. Permutations and Combinations in Enumerative Combinatorics</h2>
+            <p>Factorials form the mathematical engine underlying all counting problems where subsets of size \(r\) are selected from a universe of size \(n\).</p>
+
+            <h3>2.1 Permutations: Order-Dependent Arrangements</h3>
+            <p>A <strong>permutation</strong> counts the number of ways to select and arrange \(r\) elements from a set of \(n\) distinct elements, where the sequence order matters (such as podium places in an Olympic sprint, horse race trifectas, or alphanumeric passwords):</p>
+
+            $$P(n, r) = {}_n P_r = \frac{n!}{(n - r)!} = n \times (n - 1) \times \dots \times (n - r + 1)$$
+
+            <p>When all \(n\) elements are arranged (\(r = n\)), \(P(n, n) = \frac{n!}{0!} = \frac{n!}{1} = n!\).</p>
+
+            <h3>2.2 Combinations: Unordered Subsets</h3>
+            <p>A <strong>combination</strong> counts the number of ways to select \(r\) elements from \(n\) distinct elements, where the arrangement order does not matter (such as drawing 5 cards in poker, selecting lottery balls, or choosing a committee of delegates):</p>
+
+            $$C(n, r) = \binom{n}{r} = \frac{P(n, r)}{r!} = \frac{n!}{r! (n - r)!}$$
+
+            <p>The binomial coefficients \(\binom{n}{r}\) form the rows of <em>Pascal's Triangle</em> and govern the algebraic expansion of polynomials via the Binomial Theorem:</p>
+
+            $$(x + y)^n = \sum_{k=0}^n \binom{n}{k} x^{n - k} y^k$$
+
+            <h2>3. Euler's Gamma Function: Extending Factorials to the Complex Plane</h2>
+            <p>In standard arithmetic, factorials are restricted to integer inputs. In 1729, Leonhard Euler solved the problem of interpolating factorials across continuous real and complex numbers by introducing the <strong>Gamma Function</strong> \(\Gamma(z)\):</p>
+
+            $$\Gamma(z) = \int_0^\infty t^{z - 1} e^{-t} \, dt \quad (\operatorname{Re}(z) > 0)$$
+
+            <p>Using integration by parts, Euler proved the fundamental functional recurrence relation:</p>
+
+            $$\Gamma(z + 1) = z \cdot \Gamma(z)$$
+
+            <p>For any positive integer \(n\), iterating this relation reveals that the Gamma function shifts the factorial by exactly one:</p>
+
+            $$\Gamma(n + 1) = n! \iff n! = \Gamma(n + 1)$$
+
+            <h3>3.1 Half-Integer Factorials and \(\sqrt{\pi}\)</h3>
+            <p>Evaluating Euler's integral at \(z = \frac{1}{2}\) transforms via Gaussian integration into:</p>
+
+            $$\Gamma\left(\frac{1}{2}\right) = \int_0^\infty t^{-1/2} e^{-t} \, dt = \sqrt{\pi}$$
+
+            <p>Consequently, fractional factorials are exact multiples of \(\sqrt{\pi}\):</p>
+
+            $$\left(\frac{1}{2}\right)! = \Gamma\left(\frac{3}{2}\right) = \frac{1}{2} \Gamma\left(\frac{1}{2}\right) = \frac{\sqrt{\pi}}{2} \approx 0.8862269$$
+
+            $$\left(\frac{3}{2}\right)! = \frac{3}{2} \left(\frac{1}{2}\right)! = \frac{3\sqrt{\pi}}{4} \approx 1.3293403$$
+
+            <h2>4. Stirling's Asymptotic Approximation</h2>
+            <p>As \(n\) increases, \(n!\) grows with astonishing speed, eclipsing exponential growth. In statistical physics and thermodynamics, Scottish mathematician James Stirling derived an asymptotic formula for large \(n\):</p>
+
+            $$n! \sim \sqrt{2\pi n} \left(\frac{n}{e}\right)^n \quad \text{as } n \to \infty$$
+
+            <p>Taking the natural logarithm yields the form indispensable in statistical mechanics (Boltzmann's entropy equation \(S = k_B \ln \Omega\)):</p>
+
+            $$\ln(n!) \approx n \ln(n) - n + \frac{1}{2}\ln(2\pi n) \approx n \ln(n) - n$$
+
+            <p>Stirling's approximation achieves high precision rapidly: for \(n = 10\), the approximation error is less than \(0.8\%\); for \(n = 100\), the error drops below \(0.08\%\).</p>
+
+            <h2>5. Benchmark Comparative Reference Table</h2>
+            <p>The table below catalogues factorials from \(0!\) through \(15!\), illustrating exact values, scientific representations, and Stirling approximations.</p>
+
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>\(n\)</th>
+                  <th>Exact Factorial (\(n!\))</th>
+                  <th>Scientific Notation</th>
+                  <th>Stirling Approximation</th>
+                  <th>Relative Error</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>0</td>
+                  <td>1</td>
+                  <td>\(1.000 \times 10^0\)</td>
+                  <td>N/A</td>
+                  <td>0.00%</td>
+                </tr>
+                <tr>
+                  <td>1</td>
+                  <td>1</td>
+                  <td>\(1.000 \times 10^0\)</td>
+                  <td>\(0.922\)</td>
+                  <td>-7.79%</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>2</td>
+                  <td>\(2.000 \times 10^0\)</td>
+                  <td>\(1.919\)</td>
+                  <td>-4.05%</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>6</td>
+                  <td>\(6.000 \times 10^0\)</td>
+                  <td>\(5.836\)</td>
+                  <td>-2.73%</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>24</td>
+                  <td>\(2.400 \times 10^1\)</td>
+                  <td>\(23.506\)</td>
+                  <td>-2.06%</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>120</td>
+                  <td>\(1.200 \times 10^2\)</td>
+                  <td>\(118.019\)</td>
+                  <td>-1.65%</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>720</td>
+                  <td>\(7.200 \times 10^2\)</td>
+                  <td>\(710.078\)</td>
+                  <td>-1.38%</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>5,040</td>
+                  <td>\(5.040 \times 10^3\)</td>
+                  <td>\(4,980.396\)</td>
+                  <td>-1.18%</td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>40,320</td>
+                  <td>\(4.032 \times 10^4\)</td>
+                  <td>\(39,902.395\)</td>
+                  <td>-1.04%</td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>362,880</td>
+                  <td>\(3.629 \times 10^5\)</td>
+                  <td>\(359,536.873\)</td>
+                  <td>-0.92%</td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>3,628,800</td>
+                  <td>\(3.629 \times 10^6\)</td>
+                  <td>\(3,598,695.619\)</td>
+                  <td>-0.83%</td>
+                </tr>
+                <tr>
+                  <td>12</td>
+                  <td>479,001,600</td>
+                  <td>\(4.790 \times 10^8\)</td>
+                  <td>\(475,687,486.47\)</td>
+                  <td>-0.69%</td>
+                </tr>
+                <tr>
+                  <td>15</td>
+                  <td>1,307,674,368,000</td>
+                  <td>\(1.308 \times 10^{12}\)</td>
+                  <td>\(1,300,430,722,199\)</td>
+                  <td>-0.55%</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h2>6. Worked Probability Case Study: The 52-Card Deck Permutations</h2>
+            <div class="worked-example-card">
+              <div class="example-header">
+                <strong>Probability & Information Theory Case Study:</strong> Total Combinations of a Shuffled Deck of Cards
+              </div>
+              <div class="example-body">
+                <p><strong>Scenario:</strong> A casino statistician models the probability of card shuffling collisions. A standard deck of playing cards contains \(N = 52\text{ cards}\). The statistician must: (1) calculate the total permutations of arrangements in a shuffled deck (\(52!\)), (2) express the result in scientific notation using Stirling's approximation, and (3) calculate the likelihood that any two thoroughly shuffled decks in history have ever shared the identical card sequence.</p>
+
+                <p><strong>Step 1: Formulate the Permutation Count</strong><br>
+                Because all 52 distinct cards are arranged in order, the total possible unique sequences is:
+                $$\Omega = 52!$$</p>
+
+                <p><strong>Step 2: Evaluate using Stirling's Approximation</strong><br>
+                $$52! \sim \sqrt{2\pi(52)} \left(\frac{52}{e}\right)^{52} = \sqrt{104\pi} \times (19.13)^{52}$$
+                Taking common base-10 logarithms:
+                $$\log_{10}(52!) = \sum_{k=1}^{52} \log_{10}(k) \approx 67.906648$$
+                Converting to scientific notation:
+                $$\Omega = 10^{0.906648} \times 10^{67} \approx 8.0658 \times 10^{67}\text{ unique permutations}$$</p>
+
+                <p><strong>Step 3: Cosmic Probability Analysis</strong><br>
+                Assume 7 billion humans have each shuffled a deck 1,000 times per year since the invention of cards 700 years ago:
+                $$\text{Total Human Shuffles} \approx 7 \times 10^9 \times 1,000 \times 700 \approx 4.9 \times 10^{15}\text{ shuffles}$$
+                The ratio of shuffles to total possibilities is:
+                $$\frac{4.9 \times 10^{15}}{8.0658 \times 10^{67}} \approx 6.07 \times 10^{-53}$$
+                Whenever a deck is thoroughly shuffled, that exact sequence of cards has almost certainly never existed before in the entire history of the universe.</p>
+              </div>
+            </div>
+
+            <h2>7. Frequently Asked Questions (FAQ)</h2>
+            <div class="faq-accordion">
+              <div class="faq-item">
+                <h3 class="faq-question">Why does computing 171! cause an overflow error in calculators?</h3>
+                <div class="faq-answer">
+                  <p>Standard 64-bit floating-point registers conform to the IEEE 754 standard, which has a maximum finite exponent threshold of \(2^{1024} \approx 1.797693 \times 10^{308}\). Because \(170! \approx 7.257 \times 10^{306}\), it fits within the limit. However, \(171! \approx 1.241 \times 10^{309}\), which exceeds the maximum possible value representable by a 64-bit double precision float, causing computers to output <code>Infinity</code>.</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">What is a double factorial (n!!)?</h3>
+                <div class="faq-answer">
+                  <p>A double factorial \(n!!\) (not to be confused with \((n!)!\)) is the product of integers having the same parity (odd or even) down to 1 or 2: if \(n\) is odd, \(n!! = n \times (n-2) \times (n-4) \times \dots \times 3 \times 1\) (e.g., \(7!! = 7 \times 5 \times 3 \times 1 = 105\)); if \(n\) is even, \(n!! = n \times (n-2) \times \dots \times 4 \times 2\) (e.g., \(6!! = 6 \times 4 \times 2 = 48\)). Double factorials appear in quantum mechanics integrals and Taylor series expansions of \((1+x)^{1/2}\).</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">Can a negative integer have a factorial?</h3>
+                <div class="faq-answer">
+                  <p>In standard real and complex analysis, the factorial of a negative integer (\(-1!, -2!, -3!, \dots\)) is undefined and diverges to infinity. Under Euler's Gamma function, \(\Gamma(z)\) has simple poles (infinite vertical asymptotes) at all non-positive integers \(z \in \{0, -1, -2, -3, \dots\}\).</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">How does Legendre's formula count the trailing zeros of a factorial?</h3>
+                <div class="faq-answer">
+                  <p>Trailing zeros in \(n!\) are produced by factors of 10, which come from pairs of prime factors 2 and 5. Because factors of 2 are always more plentiful than 5, the count of trailing zeros equals the multiplicity of 5 in \(n!\), given by Legendre's formula: \(Z(n) = \sum_{k=1}^\infty \lfloor\frac{n}{5^k}\rfloor = \lfloor\frac{n}{5}\rfloor + \lfloor\frac{n}{25}\rfloor + \lfloor\frac{n}{125}\rfloor + \dots\). For example, \(100!\) has \(\lfloor 100/5 \rfloor + \lfloor 100/25 \rfloor = 20 + 4 = 24\) trailing zeros.</p>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <aside class="sidebar-column">
+          <div class="sidebar-card">
+            <h3 class="sidebar-title">Related Math Calculators</h3>
+            <ul class="sidebar-nav">
+              <li><a href="exponent-calculator.html">Exponent Calculator</a></li>
+              <li><a href="scientific-notation-calculator.html">Scientific Notation Calculator</a></li>
+              <li><a href="arithmetic-sequence-calculator.html">Arithmetic Sequence Calculator</a></li>
+              <li><a href="gcd-lcm-calculator.html">GCD and LCM Calculator</a></li>
+              <li><a href="prime-number-calculator.html">Prime Number Calculator</a></li>
+              <li><a href="significant-figures-calculator.html">Significant Figures Calculator</a></li>
+              <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
+              <li><a href="fraction-calculator.html">Fraction Calculator</a></li>
+            </ul>
+          </div>
+
+          <div class="sidebar-card">
+            <h3 class="sidebar-title">Factorial Rules</h3>
+            <div style="font-size:0.875rem; line-height:1.5; color:var(--text-muted, #4b5563);">
+              <p><strong>Definition:</strong> \(n! = \prod_{k=1}^n k\)</p>
+              <p><strong>Zero:</strong> \(0! = 1\)</p>
+              <p><strong>Permutations:</strong> \(P(n,r) = \frac{n!}{(n-r)!}\)</p>
+              <p><strong>Combinations:</strong> \(C(n,r) = \frac{n!}{r!(n-r)!}\)</p>
+              <p><strong>Stirling:</strong> \(n! \sim \sqrt{2\pi n}(n/e)^n\)</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h3>CalcHub</h3>
+        <p>High-precision technical calculation engines, engineering references, and discrete mathematical tools.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="math.html">Math & Engineering</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Hub Categories</h4>
+        <ul>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Engineering Tools</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed computational algorithms.</p>
+    </div>
+  </footer>
+
+  <script>
+    function fact(n) {
+      if (n === 0 || n === 1) return 1;
+      let res = 1;
+      for (let i = 2; i <= n; i++) {
+        res *= i;
+      }
+      return res;
+    }
+
+    function calcFactorial() {
+      const n = parseInt(document.getElementById('factN').value, 10);
+      const r = parseInt(document.getElementById('factR').value, 10);
+
+      if (isNaN(n) || n < 0) return;
+
+      const nFact = fact(n);
+      let pVal = 0, cVal = 0;
+
+      if (!isNaN(r) && r >= 0 && r <= n) {
+        pVal = fact(n) / fact(n - r);
+        cVal = pVal / fact(r);
+      }
+
+      let stirling = 0;
+      if (n > 0) {
+        stirling = Math.sqrt(2 * Math.PI * n) * Math.pow(n / Math.E, n);
+      } else {
+        stirling = 1;
+      }
+
+      let primaryText = "";
+      if (nFact > 1e15) {
+        primaryText = nFact.toExponential(6);
+      } else {
+        primaryText = nFact.toLocaleString();
+      }
+
+      document.getElementById('resFactorialPrimary').textContent = primaryText;
+      document.getElementById('resFactorialSubtext').textContent = `${n}! = ${n > 0 ? (n <= 5 ? [...Array(n).keys()].map(k => k+1).join(' × ') : `${n} × ${n-1} × ... × 1`) : '1'}`;
+
+      document.getElementById('resPermutations').textContent = (!isNaN(r) && r <= n) ? (pVal > 1e12 ? pVal.toExponential(4) : pVal.toLocaleString()) : "N/A (r > n)";
+      document.getElementById('resCombinations').textContent = (!isNaN(r) && r <= n) ? (cVal > 1e12 ? cVal.toExponential(4) : cVal.toLocaleString()) : "N/A (r > n)";
+      document.getElementById('resStirling').textContent = stirling > 1e12 ? stirling.toExponential(4) : stirling.toFixed(1);
+      document.getElementById('resFactSci').textContent = nFact.toExponential(4);
+
+      let steps = `1. Factorial n = ${n}<br>`;
+      steps += `2. Expansion: ${n}! = ${primaryText}<br>`;
+      if (!isNaN(r) && r <= n) {
+        steps += `3. Permutations P(${n}, ${r}) = ${n}! / (${n} - ${r})! = ${nFact.toLocaleString()} / ${fact(n-r).toLocaleString()} = ${pVal.toLocaleString()}<br>`;
+        steps += `4. Combinations C(${n}, ${r}) = P(${n}, ${r}) / ${r}! = ${pVal.toLocaleString()} / ${fact(r).toLocaleString()} = ${cVal.toLocaleString()}<br>`;
+      }
+      steps += `5. Stirling's Asymptotic Approximation: √[2π(${n})] × (${n} / e)^${n} ≈ ${stirling > 1e12 ? stirling.toExponential(4) : stirling.toFixed(1)}`;
+
+      document.getElementById('factStepsDisplay').innerHTML = steps;
+    }
+
+    document.getElementById('factN').addEventListener('input', calcFactorial);
+    document.getElementById('factR').addEventListener('input', calcFactorial);
+    calcFactorial();
+  </script>
+</body>
+</html>

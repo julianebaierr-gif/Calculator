@@ -91,6 +91,14 @@ CATEGORIES = {
             ("scientific-notation-calculator.html", "Scientific & Engineering Notation", "🔬", "Standard form m × 10ⁿ, engineering notation & SI prefixes"),
             ("significant-figures-calculator.html", "Significant Figures Calculator", "📏", "Sig fig counter, round-to-even & uncertainty propagation"),
             ("prime-number-calculator.html", "Prime Number & Factorization Engine", "⚛️", "Primality test, divisor counts d(n) & prime factor tree"),
+            ("absolute-value-calculator.html", "Absolute Value Calculator", "📏", "Real modulus |x|, complex magnitude & distance"),
+            ("area-calculator.html", "Geometric Area Calculator", "📐", "2D surface area across polygons, circles & Heron"),
+            ("arithmetic-sequence-calculator.html", "Arithmetic Sequence Calculator", "🔢", "Nth term an = a1 + (n-1)d & Gauss partial sum Sn"),
+            ("circle-calculator.html", "Circle Calculator", "⭕", "Radius, circumference, area, sector & chord"),
+            ("cube-root-calculator.html", "Cube Root Calculator", "🧊", "Principal real root, complex roots & Newton-Raphson"),
+            ("decimal-to-fraction-calculator.html", "Decimal to Fraction Calculator", "➗", "Terminating & repeating decimals to rational p/q"),
+            ("exponent-calculator.html", "Exponent & Powers Calculator", "⚡", "Powers bⁿ, negative reciprocals & fractional roots"),
+            ("factorial-calculator.html", "Factorial & Permutation Calculator", "❗", "n!, permutations P(n, r), combinations C(n, r) & Stirling"),
         ]
     },
     "engineering": {
@@ -387,7 +395,7 @@ def determine_tool_cat(filename):
         return "datetime"
     if any(k in f for k in ["unit-converter", "length-converter", "weight-converter", "temperature-converter", "area-converter", "volume-converter", "pressure-converter", "speed-converter", "energy-converter", "power-converter", "force-converter", "data-storage-converter", "data-transfer-rate-converter", "frequency-converter", "flow-rate-converter", "fuel-economy-converter", "angle-converter", "density-converter", "illuminance-converter", "thermal-conductivity-converter", "viscosity-converter", "cooking-converter", "number-base-converter", "roman-numeral-converter", "time-converter", "time-zone", "unix-timestamp"]):
         return "converter"
-    if any(k in f for k in ["percentage", "fraction", "ratio", "gpa", "standard-deviation", "gcd-lcm", "quadratic-equation", "pythagorean", "scientific-notation", "significant-figures", "prime-number"]):
+    if any(k in f for k in ["percentage", "fraction", "ratio", "gpa", "standard-deviation", "gcd-lcm", "quadratic-equation", "pythagorean", "scientific-notation", "significant-figures", "prime-number", "absolute-value", "area-calculator", "arithmetic-sequence", "circle-calculator", "cube-root", "decimal-to-fraction", "exponent", "factorial"]):
         return "math"
     return "math"
 
