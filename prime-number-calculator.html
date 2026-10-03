@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prime Number Calculator — Primality Test, Factorization & Divisors | CalcHub</title>
+  <meta name="description" content="Test primality of any integer, generate complete prime factorizations, calculate divisor sums, and explore prime number theorems and RSA cryptography.">
+  <meta name="keywords" content="prime number calculator, primality test, prime factorization calculator, is it prime, prime number checker, sieve of eratosthenes, twin primes, mersenne primes, rsa cryptography">
+  <meta name="author" content="CalcHub Number Theory & Cryptographic Mathematics Board">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://calchub.org/prime-number-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+
+  <meta property="og:title" content="Prime Number Calculator — Primality Test, Factorization & Divisors | CalcHub">
+  <meta property="og:description" content="Instant primality checking, prime factor tree decomposition, total divisor counts, and nearest prime navigation for any integer.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://calchub.org/prime-number-calculator.html">
+
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://calchub.org/prime-number-calculator.html#app",
+      "name": "Prime Number & Factorization Engine",
+      "url": "https://calchub.org/prime-number-calculator.html",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "High-precision computational number theory tool for primality verification, canonical prime factorization, and divisor arithmetic."
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://calchub.org/"},
+        {"@type": "ListItem", "position": 2, "name": "Math & Engineering Calculators", "item": "https://calchub.org/math.html"},
+        {"@type": "ListItem", "position": 3, "name": "Prime Number Calculator", "item": "https://calchub.org/prime-number-calculator.html"}
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the formal definition of a prime number and why is 1 excluded?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A prime number is defined as a positive integer strictly greater than 1 that possesses exactly two distinct positive divisors: 1 and itself. The number 1 is deliberately excluded from primes because if 1 were prime, the Fundamental Theorem of Arithmetic (which guarantees the unique prime factorization of every integer up to factor order) would be violated, since one could introduce arbitrarily many powers of 1 (e.g., 6 = 2 * 3 = 1 * 2 * 3 = 1² * 2 * 3), destroying uniqueness."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is trial division only required up to the square root of n (√n)?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "If an integer n is composite, it can be factored as n = a * b. If both factors a and b were strictly greater than √n, their product would exceed n (a * b > √n * √n = n), which is a contradiction. Therefore, at least one non-trivial factor must satisfy factor ≤ √n. If no integer d in the range 2 ≤ d ≤ √n divides n, then n is guaranteed to be prime."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the Sieve of Eratosthenes and how efficient is it?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Sieve of Eratosthenes is an ancient algorithm for finding all prime numbers up to a specified integer limit N. It works iteratively by marking the multiples of each prime starting from 2² = 4 as composite. The algorithm requires O(N log log N) arithmetic operations and O(N) memory, making it far superior to testing each individual integer independently."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do prime numbers form the cryptographic backbone of modern internet security?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Asymmetric cryptosystems like RSA rely on the computational difficulty of prime factorization. Multiplying two large prime numbers (each 1024 or 2048 bits long) to produce a composite semiprime modulus n = p * q requires fractions of a millisecond. However, finding p and q given only n using the best known classical factoring algorithms would require millions of years of supercomputer time, creating a one-way trapdoor function that secures digital signatures, HTTPS connections, and banking transactions."
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</head>
+<body class="converter-page">
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="converter.html">Converters</a>
+        <a href="math.html" class="active">Math & Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="page-layout">
+        <div class="content-column">
+          <header class="tool-header">
+            <div class="badge-tag">Number Theory & Cryptographic Mathematics</div>
+            <h1 class="tool-title">Prime Number Calculator</h1>
+            <p class="tool-subtitle">Verify primality, generate canonical prime factor trees, calculate divisor sums, and find neighboring primes with trial division and sieve algorithms.</p>
+          </header>
+
+          <section class="calculator-card" aria-label="Prime Number Solver">
+            <div class="calc-grid">
+              <div class="input-group">
+                <label for="primeInput" class="input-label">Positive Integer to Test (N)</label>
+                <input type="number" id="primeInput" class="calc-input" value="9973" min="1" max="9007199254740991" step="1">
+              </div>
+            </div>
+
+            <div class="primary-result" style="margin-top: 25px;">
+              <div class="result-label">Primality Verification Status</div>
+              <div class="result-value" id="primePrimaryStatus">9,973 is a PRIME NUMBER</div>
+              <div class="result-subtext" id="primePrimarySubtext">Has exactly 2 distinct divisors: 1 and 9,973</div>
+            </div>
+
+            <div class="results-grid" style="margin-top: 20px;">
+              <div class="result-item">
+                <div class="result-label">Canonical Prime Factorization</div>
+                <div class="result-value" id="resFactorization">9973¹</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Total Divisors Count \(d(n)\)</div>
+                <div class="result-value" id="resDivCount">2 divisors</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Sum of Divisors \(\sigma(n)\)</div>
+                <div class="result-value" id="resDivSum">9,974</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Nearest Lower Prime</div>
+                <div class="result-value" id="resPrevPrime">9,967</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Nearest Higher Prime</div>
+                <div class="result-value" id="resNextPrime">9,977</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Trial Limit (\(\lfloor\sqrt{N}\rfloor\))</div>
+                <div class="result-value" id="resSqrtLimit">99</div>
+              </div>
+            </div>
+
+            <div class="conversion-steps" style="margin-top: 25px;">
+              <h3>Algorithmic Factorization Breakdown</h3>
+              <div id="primeStepsDisplay" style="font-family: monospace; font-size: 0.95rem; line-height: 1.6; background: rgba(0,0,0,0.03); padding: 16px; border-radius: 8px; border-left: 4px solid var(--accent, #2563eb);">
+                Loading factorization breakdown...
+              </div>
+            </div>
+          </section>
+
+          <article class="article-body">
+            <h2>1. Number-Theoretic Foundations of Prime Numbers</h2>
+            <p>In discrete mathematics and abstract algebra, <strong>prime numbers</strong> constitute the fundamental multiplicative building blocks of the positive integers \(\mathbb{Z}^+\). Formally, an integer \(p \in \mathbb{Z}^+\) is defined as prime if and only if \(p > 1\) and its only positive divisors are \(1\) and \(p\). Any integer \(n > 1\) that is not prime is termed <strong>composite</strong>, meaning it can be factored into a product of at least two smaller integers strictly greater than 1.</p>
+
+            <p>The foundational status of primes is immortalized in the <strong>Fundamental Theorem of Arithmetic</strong> (Unique Factorization Theorem), first proven in Euclid's <em>Elements</em> (Book IX, Proposition 14):</p>
+
+            <blockquote>
+              <p>Every integer \(n > 1\) can be represented uniquely as a product of prime powers:</p>
+              $$n = p_1^{\alpha_1} p_2^{\alpha_2} \cdots p_k^{\alpha_k} = \prod_{i=1}^k p_i^{\alpha_i}$$
+              <p>where \(p_1 < p_2 < \dots < p_k\) are distinct prime numbers and \(\alpha_i \in \mathbb{Z}^+\) are positive integer exponents. This factorization is unique up to the permutation of factors.</p>
+            </blockquote>
+
+            <h3>1.1 Why the Number 1 is Neither Prime Nor Composite</h3>
+            <p>Throughout mathematical history, 1 was occasionally considered prime by early thinkers because it has no divisors other than itself. However, modern number theory strictly classifies 1 as a <em>unit</em>. If 1 were classified as a prime, the Fundamental Theorem of Arithmetic would collapse: a number like \(12\) could be factored infinitely many ways (\(2^2 \times 3 = 1 \times 2^2 \times 3 = 1^5 \times 2^2 \times 3\)), requiring awkward ad-hoc qualifications across thousands of algebraic theorems.</p>
+
+            <h2>2. Algorithmic Primality Testing and Complexity</h2>
+            <p>Determining whether a given arbitrary integer \(N\) is prime or composite represents one of the most celebrated algorithmic problems in computer science.</p>
+
+            <h3>2.1 Optimized Trial Division up to \(\sqrt{N}\)</h3>
+            <p>The simplest deterministic primality test checks whether any integer \(d \ge 2\) divides \(N\). A profound mathematical optimization establishes that trial division needs to test divisors only up to the floor of the square root of \(N\) (\(\lfloor\sqrt{N}\rfloor\)).</p>
+
+            <p><strong>Proof:</strong> Suppose \(N\) is composite. Then \(N = a \times b\) for some integers \(a, b\) with \(1 < a \le b < N\). If both factors were strictly greater than \(\sqrt{N}\), their product would satisfy \(a \times b > \sqrt{N} \times \sqrt{N} = N\), creating an algebraic contradiction. Hence, at least one factor must satisfy \(a \le \sqrt{N}\). If no divisor exists in the interval \([2, \sqrt{N}]\), \(N\) is guaranteed to be prime.</p>
+
+            <p>Furthermore, testing all integers is wasteful: by first checking divisibility by 2 and 3, all subsequent prime candidates must be of the form \(6k \pm 1\) for \(k \ge 1\). This cuts the number of candidate test divisions by two-thirds.</p>
+
+            <h3>2.2 The Sieve of Eratosthenes</h3>
+            <p>When identifying all prime numbers up to a specified bound \(M\) (rather than testing a single isolated integer), the ancient Greek polymath Eratosthenes of Cyrene (c. 276 BCE) devised the <strong>Sieve of Eratosthenes</strong>:</p>
+            <ol>
+              <li>Create an indexed boolean array of size \(M\) initialized to <code>true</code>. Set indices 0 and 1 to <code>false</code>.</li>
+              <li>Starting from the smallest prime \(p = 2\), mark all multiples \(2p, 3p, 4p, \dots \le M\) as composite (<code>false</code>). In practice, marking can begin at \(p^2\), since smaller multiples will already have been crossed off by smaller primes.</li>
+              <li>Advance to the next unmarked number and repeat until \(p > \sqrt{M}\).</li>
+            </ol>
+            <p>The total computational complexity is \(O(M \log(\log M))\) arithmetic operations, executing in milliseconds for \(M = 10^7\).</p>
+
+            <h3>2.3 Advanced Probabilistic and Deterministic Tests</h3>
+            <p>For cryptographic numbers spanning hundreds or thousands of decimal digits, trial division up to \(\sqrt{N}\) would require more operations than there are atoms in the universe. Modern systems use advanced algorithms:</p>
+            <ul>
+              <li><strong>Miller-Rabin Primality Test:</strong> A randomized polynomial-time test based on Fermat's Little Theorem. Using deterministic prime bases, it deterministically verifies any 64-bit integer in fewer than 12 modular exponentiations.</li>
+              <li><strong>Baillie-PSW Test:</strong> Combines Miller-Rabin base-2 with a Lucas pseudoprime test; has zero known counterexamples below \(2^{64}\).</li>
+              <li><strong>AKS Primality Test:</strong> Discovered in 2002 by Agrawal, Kayal, and Saxena, proving unconditionally that primality testing belongs to the complexity class <strong>P</strong> (deterministic polynomial time).</li>
+            </ul>
+
+            <h2>3. Divisor Functions and Arithmetic Properties</h2>
+            <p>From the unique prime factorization \(n = \prod_{i=1}^k p_i^{\alpha_i}\), several fundamental multiplicative arithmetic functions can be derived analytically:</p>
+
+            <h3>3.1 Number of Divisors \(\tau(n)\) or \(d(n)\)</h3>
+            <p>The total number of positive divisors of \(n\) equals the product of each prime exponent plus one:</p>
+
+            $$d(n) = \prod_{i=1}^k (\alpha_i + 1) = (\alpha_1 + 1)(\alpha_2 + 1)\cdots(\alpha_k + 1)$$
+
+            <p>For any prime \(p\), \(\alpha_1 = 1\), giving \(d(p) = 1 + 1 = 2\) (divisors 1 and \(p\)).</p>
+
+            <h3>3.2 Sum of Divisors \(\sigma(n)\)</h3>
+            <p>The sum of all positive divisors is given by the geometric series formula:</p>
+
+            $$\sigma(n) = \prod_{i=1}^k \left(\frac{p_i^{\alpha_i + 1} - 1}{p_i - 1}\right)$$
+
+            <p>For any prime \(p\), \(\sigma(p) = p + 1\). If \(\sigma(n) = 2n\), the integer \(n\) is termed a <em>perfect number</em> (such as 6, 28, 496, 8128), which by the Euclid-Euler theorem are intimately linked to Mersenne primes.</p>
+
+            <h2>4. Prime Distribution and Famous Conjectures</h2>
+            <p>Although primes appear irregularly distributed across the number line, their macro-scale asymptotic density adheres to precise mathematical laws:</p>
+
+            <h3>4.1 The Prime Number Theorem (PNT)</h3>
+            <p>Let \(\pi(x)\) denote the prime counting function, representing the number of primes less than or equal to \(x\). Proven independently by Jacques Hadamard and Charles Jean de la Vallée Poussin in 1896, the Prime Number Theorem establishes:</p>
+
+            $$\lim_{x \to \infty} \frac{\pi(x)}{x / \ln(x)} = 1 \implies \pi(x) \sim \frac{x}{\ln(x)} \sim \operatorname{Li}(x)$$
+
+            <p>This implies that the probability of an integer near \(x\) being prime is approximately \(\frac{1}{\ln x}\).</p>
+
+            <h3>4.2 Deep Unsolved Conjectures in Prime Theory</h3>
+            <ul>
+              <li><strong>The Riemann Hypothesis:</strong> Asserts that all non-trivial zeros of the Riemann zeta function \(\zeta(s) = \sum_{n=1}^\infty n^{-s}\) have real part \(\operatorname{Re}(s) = \frac{1}{2}\). Proving this would yield the tightest possible error bounds for the distribution of primes.</li>
+              <li><strong>Goldbach's Strong Conjecture:</strong> Every even integer greater than 2 can be expressed as the sum of two prime numbers (\(2n = p_1 + p_2\)). Verified computationally past \(4 \times 10^{18}\), but unproven in general.</li>
+              <li><strong>Twin Prime Conjecture:</strong> There are infinitely many pairs of primes \((p, p + 2)\) differing by exactly 2 (such as 3 and 5, 11 and 13, 9971 and 9973).</li>
+            </ul>
+
+            <h2>5. Benchmark Comparative Reference Table</h2>
+            <p>The table below provides a detailed structural breakdown across ten benchmark integers, contrasting primes, composites, semiprimes, divisor counts, and divisor sums.</p>
+
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Integer \(N\)</th>
+                  <th>Classification</th>
+                  <th>Prime Factorization</th>
+                  <th>Divisors Count \(d(N)\)</th>
+                  <th>Divisors Sum \(\sigma(N)\)</th>
+                  <th>Nearest Lower Prime</th>
+                  <th>Nearest Higher Prime</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>9,973</td>
+                  <td>Prime</td>
+                  <td>\(9973^1\)</td>
+                  <td>2</td>
+                  <td>9,974</td>
+                  <td>9,967</td>
+                  <td>9,977</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Smallest Prime (Only Even)</td>
+                  <td>\(2^1\)</td>
+                  <td>2</td>
+                  <td>3</td>
+                  <td>None</td>
+                  <td>3</td>
+                </tr>
+                <tr>
+                  <td>1</td>
+                  <td>Unit (Neither)</td>
+                  <td>None</td>
+                  <td>1</td>
+                  <td>1</td>
+                  <td>None</td>
+                  <td>2</td>
+                </tr>
+                <tr>
+                  <td>360</td>
+                  <td>Highly Composite</td>
+                  <td>\(2^3 \times 3^2 \times 5^1\)</td>
+                  <td>24</td>
+                  <td>1,170</td>
+                  <td>359</td>
+                  <td>367</td>
+                </tr>
+                <tr>
+                  <td>1,009</td>
+                  <td>Prime</td>
+                  <td>\(1009^1\)</td>
+                  <td>2</td>
+                  <td>1,010</td>
+                  <td>997</td>
+                  <td>1,013</td>
+                </tr>
+                <tr>
+                  <td>1,729</td>
+                  <td>Composite (Ramanujan-Hardy)</td>
+                  <td>\(7 \times 13 \times 19\)</td>
+                  <td>8</td>
+                  <td>2,688</td>
+                  <td>1,723</td>
+                  <td>1,733</td>
+                </tr>
+                <tr>
+                  <td>8,191</td>
+                  <td>Mersenne Prime (\(2^{13}-1\))</td>
+                  <td>\(8191^1\)</td>
+                  <td>2</td>
+                  <td>8,192</td>
+                  <td>8,179</td>
+                  <td>8,209</td>
+                </tr>
+                <tr>
+                  <td>10,000</td>
+                  <td>Composite</td>
+                  <td>\(2^4 \times 5^4\)</td>
+                  <td>25</td>
+                  <td>24,211</td>
+                  <td>9,973</td>
+                  <td>10,007</td>
+                </tr>
+                <tr>
+                  <td>89</td>
+                  <td>Fibonacci Prime</td>
+                  <td>\(89^1\)</td>
+                  <td>2</td>
+                  <td>90</td>
+                  <td>83</td>
+                  <td>97</td>
+                </tr>
+                <tr>
+                  <td>121</td>
+                  <td>Composite (Square of Prime)</td>
+                  <td>\(11^2\)</td>
+                  <td>3</td>
+                  <td>133</td>
+                  <td>113</td>
+                  <td>127</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h2>6. Worked Cryptographic Case Study: RSA Keypair Generation from Prime Primitives</h2>
+            <div class="worked-example-card">
+              <div class="example-header">
+                <strong>Cryptographic Mathematics Case Study:</strong> Generating RSA Keys from Two Prime Primitives
+              </div>
+              <div class="example-body">
+                <p><strong>Scenario:</strong> A cyber-security software engineer demonstrates the mathematical underpinnings of the RSA public-key cryptosystem using two verified 3-digit prime numbers: \(p = 251\) and \(q = 359\). The engineer must calculate: (1) the composite modulus \(n\), (2) Euler's totient function \(\phi(n)\), (3) a coprime public exponent \(e\), and (4) the private decryption exponent \(d\) using the Extended Euclidean Algorithm.</p>
+
+                <p><strong>Step 1: Verify Primality of \(p\) and \(q\)</strong><br>
+                For \(p = 251\): \(\lfloor\sqrt{251}\rfloor = 15\). Primes to test: \(2, 3, 5, 7, 11, 13\). None divide 251, so 251 is prime.<br>
+                For \(q = 359\): \(\lfloor\sqrt{359}\rfloor = 18\). Primes to test: \(2, 3, 5, 7, 11, 13, 17\). None divide 359, so 359 is prime.</p>
+
+                <p><strong>Step 2: Compute the Semiprime Modulus \(n\)</strong><br>
+                $$n = p \times q = 251 \times 359 = 90,109$$
+                The integer \(n = 90,109\) is published publicly as the encryption modulus.</p>
+
+                <p><strong>Step 3: Calculate Euler's Totient Function \(\phi(n)\)</strong><br>
+                Because \(p\) and \(q\) are prime, the count of integers coprime to \(n\) is:
+                $$\phi(n) = (p - 1)(q - 1) = (250) \times (358) = 89,500$$</p>
+
+                <p><strong>Step 4: Select Public Exponent \(e\) and Compute Private Key \(d\)</strong><br>
+                Choose standard public exponent \(e = 17\) (verifying that \(\gcd(17, 89500) = 1\)).<br>
+                The private decryption key \(d\) must satisfy the modular inverse identity:
+                $$e \cdot d \equiv 1 \pmod{\phi(n)} \implies 17 \cdot d \equiv 1 \pmod{89500}$$
+                Running the Extended Euclidean Algorithm:
+                $$\begin{aligned}
+                89500 &= 17 \times 5264 + 12 \\
+                17 &= 12 \times 1 + 5 \\
+                12 &= 5 \times 2 + 2 \\
+                5 &= 2 \times 2 + 1
+                \end{aligned}$$
+                Back-substituting yields the Bézout identity:
+                $$17 \times (42118) - 89500 \times (8) = 1$$
+                Thus, the private decryption key is \(d = 42,118\). An adversary attempting to decrypt an intercepted message must factor \(90,109\) back into \(251 \times 359\) to derive \(\phi(n)\), which is intractable for large numbers.</p>
+              </div>
+            </div>
+
+            <h2>7. Frequently Asked Questions (FAQ)</h2>
+            <div class="faq-accordion">
+              <div class="faq-item">
+                <h3 class="faq-question">What are Mersenne primes and why are they so heavily studied?</h3>
+                <div class="faq-answer">
+                  <p>A Mersenne prime is a prime number of the form \(M_p = 2^p - 1\), where the exponent \(p\) is itself prime. They are studied intensely through the Great Internet Mersenne Prime Search (GIMPS) because the Lucas-Lehmer test provides an ultra-fast primality test tailored exclusively to this form, enabling computers to discover record-breaking primes containing tens of millions of decimal digits.</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">Are negative numbers ever considered prime?</h3>
+                <div class="faq-answer">
+                  <p>In standard arithmetic and elementary number theory, primes are defined strictly as positive integers (\(p \in \mathbb{Z}^+\)). In advanced ring theory and abstract algebra, elements like \(-2, -3, -5\) are considered <em>irreducible associate elements</em> of the positive primes, differing only by multiplication by a unit (\(-1\)). For all practical computational purposes, primes are positive.</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">What is a semiprime number?</h3>
+                <div class="faq-answer">
+                  <p>A semiprime (also termed a 2-almost prime) is a natural number that is the product of exactly two prime numbers: \(n = p \times q\). The primes may be distinct (e.g., \(15 = 3 \times 5\)) or identical (e.g., \(9 = 3^2\)). Semiprimes are the core component of RSA encryption moduli.</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">Can an even number greater than 2 ever be prime?</h3>
+                <div class="faq-answer">
+                  <p>No. By definition, every even number is divisible by 2. For an even number \(n > 2\), its positive divisors include at least 1, 2, and \(n\). Having at least three distinct divisors violates the primality definition requiring exactly two divisors. Thus, 2 is uniquely the only even prime number.</p>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <aside class="sidebar-column">
+          <div class="sidebar-card">
+            <h3 class="sidebar-title">Related Math Calculators</h3>
+            <ul class="sidebar-nav">
+              <li><a href="gcd-lcm-calculator.html">GCD and LCM Calculator</a></li>
+              <li><a href="fraction-calculator.html">Fraction Calculator</a></li>
+              <li><a href="quadratic-equation-calculator.html">Quadratic Equation Calculator</a></li>
+              <li><a href="pythagorean-theorem-calculator.html">Pythagorean Theorem Calculator</a></li>
+              <li><a href="scientific-notation-calculator.html">Scientific Notation Calculator</a></li>
+              <li><a href="significant-figures-calculator.html">Significant Figures Calculator</a></li>
+              <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
+              <li><a href="ratio-calculator.html">Ratio Calculator</a></li>
+            </ul>
+          </div>
+
+          <div class="sidebar-card">
+            <h3 class="sidebar-title">Number Theory Rules</h3>
+            <div style="font-size:0.875rem; line-height:1.5; color:var(--text-muted, #4b5563);">
+              <p><strong>Prime:</strong> Exactly 2 divisors (\(1, p\))</p>
+              <p><strong>Limit:</strong> Test up to \(\lfloor\sqrt{n}\rfloor\)</p>
+              <p><strong>Form:</strong> All primes \(>3\) are \(6k \pm 1\)</p>
+              <p><strong>Divisors:</strong> \(d(n) = \prod (\alpha_i + 1)\)</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h3>CalcHub</h3>
+        <p>High-precision technical calculation engines, engineering references, and discrete mathematical tools.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="math.html">Math & Engineering</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Hub Categories</h4>
+        <ul>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Engineering Tools</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed computational algorithms.</p>
+    </div>
+  </footer>
+
+  <script>
+    function isPrimeSimple(n) {
+      if (n <= 1) return false;
+      if (n <= 3) return true;
+      if (n % 2 === 0 || n % 3 === 0) return false;
+      let i = 5;
+      while (i * i <= n) {
+        if (n % i === 0 || n % (i + 2) === 0) return false;
+        i += 6;
+      }
+      return true;
+    }
+
+    function factorize(n) {
+      const factors = {};
+      let d = 2;
+      while (d * d <= n) {
+        while (n % d === 0) {
+          factors[d] = (factors[d] || 0) + 1;
+          n = Math.floor(n / d);
+        }
+        d = d === 2 ? 3 : d + 2;
+      }
+      if (n > 1) {
+        factors[n] = (factors[n] || 0) + 1;
+      }
+      return factors;
+    }
+
+    function checkPrime() {
+      const inputVal = parseInt(document.getElementById('primeInput').value, 10);
+      if (isNaN(inputVal) || inputVal < 1) return;
+
+      const n = inputVal;
+      const sqrtN = Math.floor(Math.sqrt(n));
+      document.getElementById('resSqrtLimit').textContent = sqrtN.toLocaleString();
+
+      if (n === 1) {
+        document.getElementById('primePrimaryStatus').textContent = "1 is NEITHER Prime nor Composite";
+        document.getElementById('primePrimarySubtext').textContent = "1 is a unit, having exactly one positive divisor: itself.";
+        document.getElementById('resFactorization').textContent = "None (Unit)";
+        document.getElementById('resDivCount').textContent = "1 divisor";
+        document.getElementById('resDivSum').textContent = "1";
+        document.getElementById('resPrevPrime').textContent = "None";
+        document.getElementById('resNextPrime').textContent = "2";
+        document.getElementById('primeStepsDisplay').innerHTML = "1 is classified as a unit in number theory to preserve the unique factorization theorem.";
+        return;
+      }
+
+      const isPrime = isPrimeSimple(n);
+      const factors = factorize(n);
+
+      // Total divisors d(n) and sum sigma(n)
+      let dCount = 1;
+      let dSum = 1;
+      const factorTerms = [];
+
+      for (const pStr in factors) {
+        const p = parseInt(pStr, 10);
+        const a = factors[pStr];
+        dCount *= (a + 1);
+        dSum *= (Math.pow(p, a + 1) - 1) / (p - 1);
+        factorTerms.push(a > 1 ? `${p}^${a}` : `${p}`);
+      }
+
+      const factorStr = factorTerms.join(" × ");
+
+      if (isPrime) {
+        document.getElementById('primePrimaryStatus').textContent = `${n.toLocaleString()} is a PRIME NUMBER`;
+        document.getElementById('primePrimarySubtext').textContent = `Has exactly 2 distinct divisors: 1 and ${n.toLocaleString()}`;
+      } else {
+        document.getElementById('primePrimaryStatus').textContent = `${n.toLocaleString()} is a COMPOSITE NUMBER`;
+        document.getElementById('primePrimarySubtext').textContent = `Can be factored as ${factorStr}`;
+      }
+
+      document.getElementById('resFactorization').textContent = factorStr;
+      document.getElementById('resDivCount').textContent = `${dCount} divisors`;
+      document.getElementById('resDivSum').textContent = dSum.toLocaleString();
+
+      // Find nearest primes
+      let prevP = "None";
+      for (let p = n - 1; p >= 2; p--) {
+        if (isPrimeSimple(p)) {
+          prevP = p.toLocaleString();
+          break;
+        }
+      }
+      document.getElementById('resPrevPrime').textContent = prevP;
+
+      let nextP = n + 1;
+      while (!isPrimeSimple(nextP)) {
+        nextP++;
+      }
+      document.getElementById('resNextPrime').textContent = nextP.toLocaleString();
+
+      let stepsHtml = `1. Target integer N = ${n.toLocaleString()}<br>`;
+      stepsHtml += `2. Maximum trial division limit: ⌊√${n}⌋ = ${sqrtN.toLocaleString()}<br>`;
+      if (isPrime) {
+        stepsHtml += `3. Tested all prime divisors up to ${sqrtN.toLocaleString()}. No integer divides ${n}.<br>`;
+        stepsHtml += `4. Conclusion: ${n} is strictly prime.`;
+      } else {
+        stepsHtml += `3. Found non-trivial factors via prime decomposition.<br>`;
+        stepsHtml += `4. Canonical Prime Factorization: ${factorStr}<br>`;
+        stepsHtml += `5. Total Divisors d(${n}) = ${dCount}; Sum σ(${n}) = ${dSum.toLocaleString()}.`;
+      }
+      document.getElementById('primeStepsDisplay').innerHTML = stepsHtml;
+    }
+
+    document.getElementById('primeInput').addEventListener('input', checkPrime);
+    checkPrime();
+  </script>
+</body>
+</html>

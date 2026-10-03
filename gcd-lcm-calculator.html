@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GCD and LCM Calculator — Greatest Common Divisor & Least Common Multiple | CalcHub</title>
+  <meta name="description" content="Calculate the Greatest Common Divisor (GCD/GCF) and Least Common Multiple (LCM) with step-by-step Euclidean algorithm, prime factorization, and Bézout identity breakdown.">
+  <meta name="keywords" content="gcd calculator, lcm calculator, greatest common divisor, least common multiple, gcf calculator, euclidean algorithm, prime factorization, coprime numbers, bezout identity">
+  <meta name="author" content="CalcHub Discrete Mathematics & Number Theory Board">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://calchub.org/gcd-lcm-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+
+  <meta property="og:title" content="GCD and LCM Calculator — Greatest Common Divisor & Least Common Multiple | CalcHub">
+  <meta property="og:description" content="Calculate GCD and LCM with step-by-step Euclidean algorithm, prime factorization trees, and mechanical gear sync applications.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://calchub.org/gcd-lcm-calculator.html">
+
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://calchub.org/gcd-lcm-calculator.html#app",
+      "name": "GCD and LCM Multi-Algorithm Engine",
+      "url": "https://calchub.org/gcd-lcm-calculator.html",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "High-precision number theory calculator for computing Greatest Common Divisor (GCD/HCF) and Least Common Multiple (LCM) with Euclidean reduction steps and prime factorization."
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://calchub.org/"},
+        {"@type": "ListItem", "position": 2, "name": "Math & Engineering Calculators", "item": "https://calchub.org/math.html"},
+        {"@type": "ListItem", "position": 3, "name": "GCD & LCM Calculator", "item": "https://calchub.org/gcd-lcm-calculator.html"}
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the mathematical difference between GCD (Greatest Common Divisor) and LCM (Least Common Multiple)?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Greatest Common Divisor (GCD), also known as the Greatest Common Factor (GCF) or Highest Common Factor (HCF), is the largest positive integer that divides two or more given integers without leaving a remainder. In contrast, the Least Common Multiple (LCM) is the smallest positive non-zero integer that is an exact multiple of all given numbers. In terms of prime factorizations, the GCD takes the minimum power of all common prime factors, whereas the LCM takes the maximum power across all prime factors present in either number."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the Euclidean Algorithm compute GCD in logarithmic time?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Euclidean Algorithm operates on the fundamental lemma that gcd(a, b) = gcd(b, a mod b). By repeatedly taking the remainder of division until the remainder equals zero, the divisor at that final step is the exact GCD. Lamé's Theorem proves that the number of division steps required never exceeds 5 times the number of decimal digits of the smaller number, giving it an asymptotic computational complexity of O(log(min(a, b))), making it exponentially faster than brute-force factor checking."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the relationship between GCD, LCM, and the product of two integers?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For any two positive integers a and b, their product is exactly equal to the product of their GCD and their LCM: a * b = gcd(a, b) * lcm(a, b). This fundamental identity allows for the instantaneous derivation of the LCM once the GCD is known: lcm(a, b) = (a * b) / gcd(a, b). Note that this simple two-number product identity does not generalize directly to three or more numbers without applying inclusion-exclusion principles."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where are GCD and LCM applied in mechanical engineering and computer science?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In mechanical engineering, GCD and LCM determine gear train synchronicity and wear patterns. If two meshing gears have coprime tooth counts (GCD = 1), every tooth of gear A contacts every tooth of gear B before repeating, maximizing wear distribution. The LCM defines the exact number of teeth that must pass before the exact same pair of teeth mesh again. In computer science, GCD algorithms underpin RSA asymmetric cryptography key generation via the Extended Euclidean Algorithm to calculate modular multiplicative inverses."
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</head>
+<body class="converter-page">
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="converter.html">Converters</a>
+        <a href="math.html" class="active">Math & Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="page-layout">
+        <div class="content-column">
+          <header class="tool-header">
+            <div class="badge-tag">Discrete Mathematics & Number Theory</div>
+            <h1 class="tool-title">GCD and LCM Calculator</h1>
+            <p class="tool-subtitle">Compute the Greatest Common Divisor (GCD/HCF) and Least Common Multiple (LCM) with Euclidean step-by-step reduction, prime factor analysis, and algebraic verification.</p>
+          </header>
+
+          <section class="calculator-card" aria-label="GCD and LCM Calculator">
+            <div class="calc-grid">
+              <div class="input-group">
+                <label for="gcdNum1" class="input-label">First Integer (A)</label>
+                <input type="number" id="gcdNum1" class="calc-input" value="48" step="1" min="1">
+              </div>
+
+              <div class="input-group">
+                <label for="gcdNum2" class="input-label">Second Integer (B)</label>
+                <input type="number" id="gcdNum2" class="calc-input" value="180" step="1" min="1">
+              </div>
+            </div>
+
+            <div class="input-group" style="margin-top: 15px;">
+              <label for="gcdNum3" class="input-label">Third Integer (C) <span style="font-size:0.8rem; font-weight:normal; opacity:0.75;">(Optional for 3-number analysis)</span></label>
+              <input type="number" id="gcdNum3" class="calc-input" placeholder="Leave empty or enter integer" step="1" min="1">
+            </div>
+
+            <div class="primary-result" style="margin-top: 25px;">
+              <div class="result-label">Computed Greatest Common Divisor (GCD / GCF)</div>
+              <div class="result-value" id="gcdPrimaryResult">12</div>
+              <div class="result-subtext" id="gcdSubtext">Euclidean reduction: gcd(48, 180) = 12</div>
+            </div>
+
+            <div class="results-grid" style="margin-top: 20px;">
+              <div class="result-item">
+                <div class="result-label">Least Common Multiple (LCM)</div>
+                <div class="result-value" id="resLcm">720</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Coprime Status</div>
+                <div class="result-value" id="resCoprime">No (gcd &gt; 1)</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Product A × B</div>
+                <div class="result-value" id="resProduct">8,640</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Identity (GCD × LCM)</div>
+                <div class="result-value" id="resIdentity">8,640</div>
+              </div>
+            </div>
+
+            <div class="conversion-steps" style="margin-top: 25px;">
+              <h3>Algorithmic Reduction & Prime Factorization</h3>
+              <div id="stepsDisplay" style="font-family: monospace; font-size: 0.95rem; line-height: 1.6; background: rgba(0,0,0,0.03); padding: 16px; border-radius: 8px; border-left: 4px solid var(--accent, #2563eb);">
+                Loading calculation steps...
+              </div>
+            </div>
+          </section>
+
+          <article class="article-body">
+            <h2>1. Foundations of Divisibility, Greatest Common Divisor, and Least Common Multiple</h2>
+            <p>In discrete mathematics, number theory, and modern computational algebra, the concepts of divisibility form the bedrock upon which cryptography, distributed consensus algorithms, and harmonic analysis are constructed. Let \(\mathbb{Z}\) denote the set of all integers. Given two integers \(a, b \in \mathbb{Z}\) with \(b \neq 0\), we say that \(b\) divides \(a\) (denoted symbolically as \(b \mid a\)) if and only if there exists an integer \(k \in \mathbb{Z}\) such that \(a = k \cdot b\). When this condition is met, \(b\) is termed a divisor or factor of \(a\), and \(a\) is termed a multiple of \(b\).</p>
+
+            <p>The <strong>Greatest Common Divisor (GCD)</strong>—frequently referred to in secondary education as the <strong>Greatest Common Factor (GCF)</strong> or <strong>Highest Common Factor (HCF)</strong>—of two non-zero integers \(a\) and \(b\) is defined as the largest positive integer \(d\) that satisfies both \(d \mid a\) and \(d \mid b\). Formally, the set of common divisors is defined by:</p>
+
+            $$\mathcal{D}(a, b) = \{x \in \mathbb{Z}^+ : x \mid a \land x \mid b\}$$
+
+            <p>Because \(\mathcal{D}(a, b)\) is a non-empty, finite subset of positive integers (since \(1 \in \mathcal{D}(a, b)\) and every divisor of \(a\) is strictly \(\le |a|\)), the well-ordering principle of natural numbers guarantees that \(\mathcal{D}(a, b)\) contains a unique maximum element, denoted \(\gcd(a, b)\). When \(\gcd(a, b) = 1\), the integers \(a\) and \(b\) are defined as <em>mutually prime</em> or <em>coprime</em>, indicating that they share no non-trivial factors.</p>
+
+            <p>Conversely, the <strong>Least Common Multiple (LCM)</strong> of two non-zero integers \(a\) and \(b\) is defined as the smallest positive integer \(m\) that is a simultaneous multiple of both \(a\) and \(b\). Formally, the set of common multiples is:</p>
+
+            $$\mathcal{M}(a, b) = \{y \in \mathbb{Z}^+ : a \mid y \land b \mid y\}$$
+
+            <p>The unique minimum positive element of \(\mathcal{M}(a, b)\) is denoted \(\operatorname{lcm}(a, b)\). While naive human computation frequently relies on listing multiples or manual factor trees, computational systems utilize foundational number-theoretic theorems to derive these values in microsecond timescales.</p>
+
+            <h2>2. The Euclidean Algorithm: Principles, History, and Proof</h2>
+            <p>Originating around 300 BCE in Book VII of Euclid's <em>Elements</em>, the Euclidean Algorithm remains one of the oldest, most elegant, and most computationally efficient numerical algorithms in active use across computer hardware and software. The algorithm avoids prime factorization entirely, relying instead on a simple division lemma.</p>
+
+            <h3>2.1 Division Algorithm and Invariance Lemma</h3>
+            <p>By the classical Division Algorithm theorem, for any integers \(a\) and \(b\) with \(b > 0\), there exist unique integers \(q\) (quotient) and \(r\) (remainder) such that:</p>
+
+            $$a = b \cdot q + r \quad \text{where} \quad 0 \le r < b$$
+
+            <p>The core invariance principle of the Euclidean algorithm asserts that the common divisors of \(a\) and \(b\) are identical to the common divisors of \(b\) and \(r\). That is:</p>
+
+            $$\gcd(a, b) = \gcd(b, a \bmod b)$$
+
+            <p><strong>Proof of the Lemma:</strong> Let \(d = \gcd(a, b)\). By definition, \(d \mid a\) and \(d \mid b\). Because \(r = a - b \cdot q\), any integer that divides both \(a\) and \(b\) must also divide their linear combination \(a - b \cdot q\). Hence, \(d \mid r\). Thus, \(d\) is a common divisor of \(b\) and \(r\), proving that \(\gcd(a, b) \le \gcd(b, r)\). Conversely, let \(c = \gcd(b, r)\). Since \(c \mid b\) and \(c \mid r\), it follows that \(c \mid (b \cdot q + r)\), meaning \(c \mid a\). Thus \(c\) is a common divisor of \(a\) and \(b\), proving that \(\gcd(b, r) \le \gcd(a, b)\). Combining both inequalities establishes that \(\gcd(a, b) = \gcd(b, r)\) identically.</p>
+
+            <h3>2.2 Algorithmic Execution Steps</h3>
+            <p>The Euclidean reduction proceeds via successive divisions: let \(r_0 = a\) and \(r_1 = b\). For \(k \ge 1\), compute:</p>
+
+            $$\begin{aligned}
+            r_0 &= r_1 \cdot q_1 + r_2 \quad &(0 \le r_2 < r_1) \\
+            r_1 &= r_2 \cdot q_2 + r_3 \quad &(0 \le r_3 < r_2) \\
+            r_2 &= r_3 \cdot q_3 + r_4 \quad &(0 \le r_4 < r_3) \\
+            &\;\vdots \\
+            r_{n-2} &= r_{n-1} \cdot q_{n-1} + r_n \quad &(0 \le r_n < r_{n-1}) \\
+            r_{n-1} &= r_n \cdot q_n + 0
+            \end{aligned}$$
+
+            <p>Because the sequence of remainders strictly decreases (\(r_1 > r_2 > r_3 > \dots \ge 0\)), the process must terminate in a finite number of steps when the remainder reaches zero. The final non-zero remainder, \(r_n\), is exactly \(\gcd(a, b)\).</p>
+
+            <h3>2.3 Computational Complexity and Lamé's Theorem</h3>
+            <p>Gabriel Lamé proved in 1844 that the Euclidean algorithm represents the historical beginning of computational complexity theory. Lamé's theorem proves that the number of division steps required by the Euclidean algorithm never exceeds five times the number of decimal digits in the smaller number \(b\). In big-O notation, the algorithm executes in \(O(\log(\min(a, b)))\) operations, rendering it virtually instantaneous even for 4096-bit cryptographic keys.</p>
+
+            <h2>3. The Fundamental Theorem of Arithmetic and Prime Factorization</h2>
+            <p>An alternative foundational perspective stems from the <strong>Fundamental Theorem of Arithmetic</strong>, which guarantees that every positive integer \(n > 1\) can be represented uniquely as a product of prime powers:</p>
+
+            $$n = \prod_{i=1}^{k} p_i^{\alpha_i} = p_1^{\alpha_1} p_2^{\alpha_2} \cdots p_k^{\alpha_k}$$
+
+            <p>where \(p_1 < p_2 < \dots < p_k\) are distinct prime numbers and \(\alpha_i \in \mathbb{Z}^+\) are positive integer exponents. When analyzing two numbers \(a\) and \(b\), we can express both using a shared union of distinct prime bases \(\{p_1, p_2, \dots, p_m\}\), permitting exponents of zero where a prime is absent:</p>
+
+            $$a = \prod_{i=1}^{m} p_i^{\alpha_i}, \quad b = \prod_{i=1}^{m} p_i^{\beta_i} \quad (\alpha_i, \beta_i \ge 0)$$
+
+            <h3>3.1 Deriving GCD and LCM from Prime Exponents</h3>
+            <p>Under this canonical representation, the Greatest Common Divisor must incorporate each prime factor to the lowest power common to both numbers. Conversely, the Least Common Multiple must incorporate each prime factor to the highest power required by either number:</p>
+
+            $$\gcd(a, b) = \prod_{i=1}^{m} p_i^{\min(\alpha_i, \beta_i)}$$
+
+            $$\operatorname{lcm}(a, b) = \prod_{i=1}^{m} p_i^{\max(\alpha_i, \beta_i)}$$
+
+            <h3>3.2 The Product-GCD-LCM Fundamental Identity</h3>
+            <p>For any two real numbers \(x, y\), the algebraic identity \(\min(x, y) + \max(x, y) = x + y\) holds unconditionally. Applying this principle exponent-by-exponent across all prime factors:</p>
+
+            $$\min(\alpha_i, \beta_i) + \max(\alpha_i, \beta_i) = \alpha_i + \beta_i$$
+
+            <p>Multiplying across all prime factors yields the fundamental product identity:</p>
+
+            $$\gcd(a, b) \times \operatorname{lcm}(a, b) = \prod_{i=1}^{m} p_i^{\min(\alpha_i, \beta_i) + \max(\alpha_i, \beta_i)} = \prod_{i=1}^{m} p_i^{\alpha_i + \beta_i} = a \times b$$
+
+            <p>This magnificent result means that once \(\gcd(a, b)\) is computed via the ultra-fast Euclidean algorithm, the LCM can be derived with a single 64-bit integer division:</p>
+
+            $$\operatorname{lcm}(a, b) = \frac{a \times b}{\gcd(a, b)} = \frac{|a \cdot b|}{\gcd(a, b)}$$
+
+            <h2>4. Bézout's Identity and the Extended Euclidean Algorithm</h2>
+            <p>Beyond finding the divisor itself, Etienne Bézout established in 1779 that the greatest common divisor can always be expressed as an integer linear combination of the initial numbers. Specifically, for non-zero integers \(a\) and \(b\), there exist integers \(x, y \in \mathbb{Z}\) (known as Bézout coefficients) such that:</p>
+
+            $$a \cdot x + b \cdot y = \gcd(a, b)$$
+
+            <p>The <strong>Extended Euclidean Algorithm</strong> computes these coefficients \(x\) and \(y\) concurrently with the GCD by maintaining auxiliary recurrence relations during the back-substitution phase. This capability is paramount in modern cryptographic systems:</p>
+            <ul>
+              <li><strong>Modular Multiplicative Inverses:</strong> When \(\gcd(a, m) = 1\), Bézout's identity simplifies to \(a \cdot x + m \cdot y = 1\). Reducing this modulo \(m\) produces \(a \cdot x \equiv 1 \pmod m\), proving that \(x\) is the modular multiplicative inverse of \(a\) modulo \(m\) (\(x = a^{-1} \bmod m\)).</li>
+              <li><strong>RSA Key Derivation:</strong> In RSA public-key cryptosystems, the private decryption key exponent \(d\) is calculated as the modular inverse of the public encryption exponent \(e\) modulo Euler's totient function \(\phi(n)\): \(d \equiv e^{-1} \pmod{\phi(n)}\).</li>
+              <li><strong>Linear Diophantine Equations:</strong> Equations of the form \(a \cdot x + b \cdot y = c\) possess integer solutions if and only if \(\gcd(a, b) \mid c\).</li>
+            </ul>
+
+            <h2>5. Engineering and Physical Systems Applications</h2>
+            <p>Outside abstract pure mathematics, GCD and LCM govern physical phenomena across mechanical, electrical, and chronometric engineering:</p>
+
+            <h3>5.1 Gear Mesh Wear and Hunting Tooth Frequency</h3>
+            <p>In mechanical gear design, two meshing gears with tooth counts \(N_1\) and \(N_2\) experience physical contact cycles determined entirely by number theory. The total number of tooth mesh events before the exact same pair of teeth touch again is governed by \(\operatorname{lcm}(N_1, N_2)\). If \(\gcd(N_1, N_2) = d > 1\), tooth 1 on gear 1 will only ever touch \(N_2 / d\) specific teeth on gear 2. Any imperfection or manufacturing defect on a tooth repeatedly batters the exact same subset of teeth, inducing localized fatigue and premature mechanical failure. Consequently, precision machine designers deliberately choose <em>hunting tooth</em> gear designs where \(\gcd(N_1, N_2) = 1\) (coprime tooth counts), ensuring that every tooth meshes with every other tooth in rotation, evening out wear and prolonging gearbox lifespans.</p>
+
+            <h3>5.2 Microcontroller PWM, Baud Rates, and Clock Synchronization</h3>
+            <p>Digital systems operating across multiple clock domains (e.g., synchronizing a 16 MHz microcontroller with a 115,200 baud serial UART communication bus or an external SPI peripheral at 10 MHz) require clock dividers. Determining the shortest master period over which two asynchronous periodic signals repeat their relative phase orientation requires calculating the LCM of their respective clock period lengths.</p>
+
+            <h2>6. Benchmark Comparative Reference Table</h2>
+            <p>The following table provides verified GCD, LCM, prime factorizations, and coprimality classifications across representative mathematical and engineering integer pairs.</p>
+
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Integer Pair (A, B)</th>
+                  <th>Prime Factorization (A)</th>
+                  <th>Prime Factorization (B)</th>
+                  <th>GCD / GCF</th>
+                  <th>LCM</th>
+                  <th>Coprime?</th>
+                  <th>Verification (\(A \times B = \gcd \times \operatorname{lcm}\))</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>(48, 180)</td>
+                  <td>\(2^4 \times 3^1\)</td>
+                  <td>\(2^2 \times 3^2 \times 5^1\)</td>
+                  <td>12</td>
+                  <td>720</td>
+                  <td>No</td>
+                  <td>\(8,640 = 12 \times 720\)</td>
+                </tr>
+                <tr>
+                  <td>(17, 31)</td>
+                  <td>\(17^1\)</td>
+                  <td>\(31^1\)</td>
+                  <td>1</td>
+                  <td>527</td>
+                  <td>Yes</td>
+                  <td>\(527 = 1 \times 527\)</td>
+                </tr>
+                <tr>
+                  <td>(144, 360)</td>
+                  <td>\(2^4 \times 3^2\)</td>
+                  <td>\(2^3 \times 3^2 \times 5^1\)</td>
+                  <td>72</td>
+                  <td>720</td>
+                  <td>No</td>
+                  <td>\(51,840 = 72 \times 720\)</td>
+                </tr>
+                <tr>
+                  <td>(35, 64)</td>
+                  <td>\(5^1 \times 7^1\)</td>
+                  <td>\(2^6\)</td>
+                  <td>1</td>
+                  <td>2,240</td>
+                  <td>Yes</td>
+                  <td>\(2,240 = 1 \times 2,240\)</td>
+                </tr>
+                <tr>
+                  <td>(210, 525)</td>
+                  <td>\(2^1 \times 3^1 \times 5^1 \times 7^1\)</td>
+                  <td>\(3^1 \times 5^2 \times 7^1\)</td>
+                  <td>105</td>
+                  <td>1,050</td>
+                  <td>No</td>
+                  <td>\(110,250 = 105 \times 1,050\)</td>
+                </tr>
+                <tr>
+                  <td>(81, 243)</td>
+                  <td>\(3^4\)</td>
+                  <td>\(3^5\)</td>
+                  <td>81</td>
+                  <td>243</td>
+                  <td>No</td>
+                  <td>\(19,683 = 81 \times 243\)</td>
+                </tr>
+                <tr>
+                  <td>(1024, 768)</td>
+                  <td>\(2^{10}\)</td>
+                  <td>\(2^8 \times 3^1\)</td>
+                  <td>256</td>
+                  <td>3,072</td>
+                  <td>No</td>
+                  <td>\(786,432 = 256 \times 3,072\)</td>
+                </tr>
+                <tr>
+                  <td>(59, 101)</td>
+                  <td>\(59^1\)</td>
+                  <td>\(101^1\)</td>
+                  <td>1</td>
+                  <td>5,959</td>
+                  <td>Yes</td>
+                  <td>\(5,959 = 1 \times 5,959\)</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h2>7. Worked Engineering Case Study: Industrial Gearbox Meshing & Service Interval</h2>
+            <div class="worked-example-card">
+              <div class="example-header">
+                <strong>Case Study:</strong> Planetary Gear Mesh Wear and Cyclic Inspection Schedule
+              </div>
+              <div class="example-body">
+                <p><strong>Scenario:</strong> An industrial conveyor drive gearbox connects a motor pinion gear with \(N_1 = 36\) teeth to a secondary driven spur gear with \(N_2 = 84\) teeth. The motor operates continuously at \(n_1 = 1,200\text{ RPM}\). The reliability engineering team needs to determine: (1) whether the gear mesh is prone to localized harmonic wear, (2) the exact rotational periods before the same teeth re-engage, and (3) the hunting tooth engagement frequency.</p>
+
+                <p><strong>Step 1: Calculate the Greatest Common Divisor (GCD)</strong><br>
+                Using the Euclidean algorithm:
+                $$\begin{aligned}
+                84 &= 36 \times 2 + 12 \\
+                36 &= 12 \times 3 + 0
+                \end{aligned}$$
+                The final non-zero remainder is 12. Therefore, \(\gcd(36, 84) = 12\).</p>
+
+                <p><strong>Step 2: Assess Wear Distribution & Tooth Engagement Sets</strong><br>
+                Because \(\gcd(36, 84) = 12 \neq 1\), the gears are <em>not coprime</em>. A given tooth on the 36-tooth pinion will only ever mesh with:
+                $$\frac{84}{\gcd(36, 84)} = \frac{84}{12} = 7 \text{ distinct teeth on the 84-tooth gear}$$
+                Likewise, each tooth on the 84-tooth gear will only ever mesh with \(36 / 12 = 3\) distinct teeth on the pinion. This represents a heavy localized wear vulnerability: if tooth #1 develops a microscopic pit or burr, it will repeatedly strike the exact same 7 teeth on the driven gear, causing accelerated mechanical breakdown.</p>
+
+                <p><strong>Step 3: Calculate the Least Common Multiple (LCM)</strong><br>
+                $$\operatorname{lcm}(36, 84) = \frac{36 \times 84}{\gcd(36, 84)} = \frac{3,024}{12} = 252 \text{ teeth}$$
+                The exact same tooth pair meshes once every 252 tooth passages.</p>
+
+                <p><strong>Step 4: Compute Rotational Frequency and Time Interval</strong><br>
+                The pinion rotates at 1,200 RPM = \(20\text{ rev/sec}\). Teeth mesh at a tooth-passing frequency of:
+                $$f_{\text{mesh}} = 20 \times 36 = 720 \text{ teeth/second}$$
+                The time required for 252 teeth to pass is:
+                $$\Delta t = \frac{252 \text{ teeth}}{720 \text{ teeth/sec}} = 0.35 \text{ seconds}$$
+                Every 0.35 seconds (or every \(252 / 36 = 7\) revolutions of the pinion and \(252 / 84 = 3\) revolutions of the driven gear), the exact same tooth pair collides. The vibration analysis team can isolate a prominent spectral spike at \(1 / 0.35\text{ s} \approx 2.857\text{ Hz}\) to diagnose pinion pitting defects.</p>
+              </div>
+            </div>
+
+            <h2>8. Frequently Asked Questions (FAQ)</h2>
+            <div class="faq-accordion">
+              <div class="faq-item">
+                <h3 class="faq-question">Can the GCD of two negative integers be computed?</h3>
+                <div class="faq-answer">
+                  <p>Yes. By mathematical convention, the GCD is defined strictly as a positive integer. For negative integers \(a\) and \(b\), \(\gcd(a, b) = \gcd(|a|, |b|)\). For example, \(\gcd(-48, 180) = \gcd(48, -180) = \gcd(-48, -180) = 12\). The sign of the numbers does not alter their set of positive divisors.</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">How does one compute GCD and LCM for three or more numbers?</h3>
+                <div class="faq-answer">
+                  <p>The GCD and LCM operations are both associative and commutative. For three integers \(a, b, c\):
+                  $$\gcd(a, b, c) = \gcd(\gcd(a, b), c)$$
+                  $$\operatorname{lcm}(a, b, c) = \operatorname{lcm}(\operatorname{lcm}(a, b), c)$$
+                  Note, however, that the product formula does not hold in the simple form \(a \cdot b \cdot c \neq \gcd(a, b, c) \cdot \operatorname{lcm}(a, b, c)\). The correct three-variable relation involves pairwise GCDs and LCMs via inclusion-exclusion.</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">What occurs when one of the input numbers is zero?</h3>
+                <div class="faq-answer">
+                  <p>Every non-zero integer divides 0 because \(0 = 0 \times k\). Therefore, for any non-zero integer \(a\), \(\gcd(a, 0) = |a|\). The case \(\gcd(0, 0)\) is mathematically undefined (or formally defined as 0 in some abstract algebra contexts) because every integer divides zero, yielding no greatest divisor. For LCM, if either number is 0, the LCM is defined as 0.</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">Why is finding prime factors much slower than running Euclid's algorithm?</h3>
+                <div class="faq-answer">
+                  <p>Finding the prime factors of an arbitrary large composite integer is currently believed to belong to computational complexity class NP-intermediate, with the fastest classical algorithm (the General Number Field Sieve) having sub-exponential running time. In stark contrast, the Euclidean algorithm requires only repeated modular divisions and completes in polynomial logarithmic time \(O(\log(\min(a, b)))\). This fundamental asymmetry makes modern asymmetric RSA cryptography secure.</p>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <aside class="sidebar-column">
+          <div class="sidebar-card">
+            <h3 class="sidebar-title">Related Math Calculators</h3>
+            <ul class="sidebar-nav">
+              <li><a href="fraction-calculator.html">Fraction Calculator</a></li>
+              <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
+              <li><a href="scientific-notation-calculator.html">Scientific Notation Calculator</a></li>
+              <li><a href="significant-figures-calculator.html">Significant Figures Calculator</a></li>
+              <li><a href="quadratic-equation-calculator.html">Quadratic Equation Calculator</a></li>
+              <li><a href="pythagorean-theorem-calculator.html">Pythagorean Theorem Calculator</a></li>
+              <li><a href="prime-number-calculator.html">Prime Number Calculator</a></li>
+              <li><a href="ratio-calculator.html">Ratio Calculator</a></li>
+            </ul>
+          </div>
+
+          <div class="sidebar-card">
+            <h3 class="sidebar-title">Mathematical Identities</h3>
+            <div style="font-size:0.875rem; line-height:1.5; color:var(--text-muted, #4b5563);">
+              <p><strong>Divisibility:</strong> \(b \mid a \iff \exists k \in \mathbb{Z}: a = kb\)</p>
+              <p><strong>Euclidean Lemma:</strong> \(\gcd(a, b) = \gcd(b, a \bmod b)\)</p>
+              <p><strong>Product Law:</strong> \(a \cdot b = \gcd(a, b) \cdot \operatorname{lcm}(a, b)\)</p>
+              <p><strong>Bézout:</strong> \(ax + by = \gcd(a, b)\)</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h3>CalcHub</h3>
+        <p>High-precision technical calculation engines, engineering references, and discrete mathematical tools.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="math.html">Math & Engineering</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Hub Categories</h4>
+        <ul>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Engineering Tools</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed computational algorithms.</p>
+    </div>
+  </footer>
+
+  <script>
+    function primeFactors(n) {
+      n = Math.abs(Math.floor(n));
+      const factors = {};
+      let d = 2;
+      while (d * d <= n) {
+        while (n % d === 0) {
+          factors[d] = (factors[d] || 0) + 1;
+          n /= d;
+        }
+        d = d === 2 ? 3 : d + 2;
+      }
+      if (n > 1) {
+        factors[n] = (factors[n] || 0) + 1;
+      }
+      return factors;
+    }
+
+    function formatFactors(factors) {
+      const keys = Object.keys(factors).map(Number).sort((a,b) => a - b);
+      if (keys.length === 0) return "1";
+      return keys.map(p => factors[p] > 1 ? `${p}^${factors[p]}` : `${p}`).join(" × ");
+    }
+
+    function computeGcdTwo(a, b, recordSteps) {
+      let r0 = Math.abs(a);
+      let r1 = Math.abs(b);
+      const steps = [];
+      if (r1 === 0) return { gcd: r0, steps: ["gcd(" + r0 + ", 0) = " + r0] };
+      
+      while (r1 > 0) {
+        const q = Math.floor(r0 / r1);
+        const r = r0 % r1;
+        if (recordSteps) {
+          steps.push(`${r0} = ${r1} × ${q} + ${r}`);
+        }
+        r0 = r1;
+        r1 = r;
+      }
+      return { gcd: r0, steps: steps };
+    }
+
+    function compute() {
+      const n1 = Math.abs(parseInt(document.getElementById('gcdNum1').value, 10)) || 1;
+      const n2 = Math.abs(parseInt(document.getElementById('gcdNum2').value, 10)) || 1;
+      const n3Val = document.getElementById('gcdNum3').value.trim();
+      const hasN3 = n3Val !== "" && !isNaN(parseInt(n3Val, 10)) && parseInt(n3Val, 10) > 0;
+      const n3 = hasN3 ? Math.abs(parseInt(n3Val, 10)) : null;
+
+      const res12 = computeGcdTwo(n1, n2, true);
+      let finalGcd = res12.gcd;
+      let finalLcm = (n1 * n2) / finalGcd;
+
+      let displayHtml = "<strong>Euclidean Algorithm (A & B):</strong><br>";
+      displayHtml += res12.steps.join("<br>");
+
+      if (hasN3) {
+        const res3 = computeGcdTwo(finalGcd, n3, true);
+        finalGcd = res3.gcd;
+        finalLcm = (finalLcm * n3) / computeGcdTwo(finalLcm, n3, false).gcd;
+        displayHtml += "<br><br><strong>Euclidean Algorithm with C (" + n3 + "):</strong><br>";
+        displayHtml += res3.steps.join("<br>");
+      }
+
+      const factorsA = primeFactors(n1);
+      const factorsB = primeFactors(n2);
+      displayHtml += "<br><br><strong>Prime Factorizations:</strong><br>";
+      displayHtml += `A (${n1}) = ${formatFactors(factorsA)}<br>`;
+      displayHtml += `B (${n2}) = ${formatFactors(factorsB)}`;
+      if (hasN3) {
+        displayHtml += `<br>C (${n3}) = ${formatFactors(primeFactors(n3))}`;
+      }
+
+      document.getElementById('gcdPrimaryResult').textContent = finalGcd.toLocaleString();
+      document.getElementById('gcdSubtext').textContent = hasN3
+        ? `gcd(${n1}, ${n2}, ${n3}) = ${finalGcd}`
+        : `gcd(${n1}, ${n2}) = ${finalGcd}`;
+
+      document.getElementById('resLcm').textContent = finalLcm.toLocaleString();
+      document.getElementById('resCoprime').textContent = finalGcd === 1 ? "Yes (Coprime)" : `No (gcd = ${finalGcd})`;
+
+      if (!hasN3) {
+        const prod = n1 * n2;
+        const identity = finalGcd * finalLcm;
+        document.getElementById('resProduct').textContent = prod.toLocaleString();
+        document.getElementById('resIdentity').textContent = identity.toLocaleString();
+      } else {
+        document.getElementById('resProduct').textContent = (n1 * n2 * n3).toLocaleString();
+        document.getElementById('resIdentity').textContent = "Multi-number";
+      }
+
+      document.getElementById('stepsDisplay').innerHTML = displayHtml;
+    }
+
+    document.getElementById('gcdNum1').addEventListener('input', compute);
+    document.getElementById('gcdNum2').addEventListener('input', compute);
+    document.getElementById('gcdNum3').addEventListener('input', compute);
+    compute();
+  </script>
+</body>
+</html>

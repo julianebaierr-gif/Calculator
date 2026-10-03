@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Significant Figures Calculator — Sig Fig Counter, Rounding & Arithmetic | CalcHub</title>
+  <meta name="description" content="Identify significant figures, round to n sig figs, and compute arithmetic operations with measurement uncertainty rules and round-to-even algorithms.">
+  <meta name="keywords" content="significant figures calculator, sig fig counter, round to sig figs, sig fig rules, significant digits calculator, significant figures addition, chemistry sig figs">
+  <meta name="author" content="CalcHub Metrology & Experimental Measurement Board">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://calchub.org/significant-figures-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+
+  <meta property="og:title" content="Significant Figures Calculator — Sig Fig Counter, Rounding & Arithmetic | CalcHub">
+  <meta property="og:description" content="Count significant digits, round to target precision, and solve multi-term arithmetic following strict metrological rules.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://calchub.org/significant-figures-calculator.html">
+
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://calchub.org/significant-figures-calculator.html#app",
+      "name": "Significant Figures & Metrology Engine",
+      "url": "https://calchub.org/significant-figures-calculator.html",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "High-precision metrology calculator for identifying significant digits, applying round-to-even rounding, and resolving multi-step scientific arithmetic."
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://calchub.org/"},
+        {"@type": "ListItem", "position": 2, "name": "Math & Engineering Calculators", "item": "https://calchub.org/math.html"},
+        {"@type": "ListItem", "position": 3, "name": "Significant Figures Calculator", "item": "https://calchub.org/significant-figures-calculator.html"}
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What are the universal rules for identifying significant figures in a number?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The fundamental rules are: (1) All non-zero digits (1-9) are always significant. (2) Captive or trapped zeros between non-zero digits are always significant (e.g., 405 has 3 sig figs). (3) Leading zeros preceding all non-zero digits are never significant; they serve purely as scale placeholders (e.g., 0.0045 has 2 sig figs). (4) Trailing zeros after a decimal point are always significant (e.g., 4.500 has 4 sig figs). (5) Trailing zeros in a whole number without a decimal point are ambiguous (e.g., 5000) and must be clarified using scientific notation or an explicit decimal point."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do significant figure rules differ between multiplication/division and addition/subtraction?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For multiplication and division, the final result must retain the same number of significant figures as the least precise input value having the lowest count of sig figs. In contrast, for addition and subtraction, the final result is governed by decimal precision (decimal places) rather than total sig figs: the result can have no more digits after the decimal point than the measurement with the fewest decimal places."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the 'Round-Half-to-Even' (Banker's Rounding) rule and why is it preferred in metrology?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Classical rounding always rounds 0.5 upward, which introduces a systemic positive statistical drift in large experimental datasets. Round-half-to-even rounds an exact half-way tie (such as 2.5 or 3.5) to the nearest even integer (2.5 rounds to 2, while 3.5 rounds to 4). Because roughly half of all integers are even and half odd, this rule balances upward and downward rounding over repeated trials, eliminating statistical bias."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do exact numbers affect significant figures in scientific calculations?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Exact numbers—such as counted discrete objects (e.g., 4 beakers), defined conversion constants (e.g., exactly 12 inches per foot, 1000 meters per kilometer, or 2.54 cm per inch), and theoretical mathematical constants (e.g., π or e)—possess an infinite number of significant figures. They never limit or constrain the precision of a calculation."
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</head>
+<body class="converter-page">
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-badge">∑</span>
+        <span>Calc<span class="accent">Hub</span></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">All Calculators</a>
+        <a href="converter.html">Converters</a>
+        <a href="math.html" class="active">Math & Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="page-layout">
+        <div class="content-column">
+          <header class="tool-header">
+            <div class="badge-tag">Metrology & Experimental Measurement</div>
+            <h1 class="tool-title">Significant Figures Calculator</h1>
+            <p class="tool-subtitle">Identify significant digits, perform round-to-even operations, and solve multi-term scientific arithmetic with experimental uncertainty rules.</p>
+          </header>
+
+          <section class="calculator-card" aria-label="Significant Figures Solver">
+            <div class="calc-grid">
+              <div class="input-group">
+                <label for="sigMode" class="input-label">Analysis Mode</label>
+                <select id="sigMode" class="calc-input">
+                  <option value="counter">Sig Fig Counter &amp; Rounder (Single Value)</option>
+                  <option value="arithmetic">Sig Fig Arithmetic (Two Measurements)</option>
+                </select>
+              </div>
+
+              <div class="input-group" id="inputVal1Group">
+                <label for="sigInput1" class="input-label" id="labelSig1">Measurement Value</label>
+                <input type="text" id="sigInput1" class="calc-input" value="0.0040500">
+              </div>
+
+              <div class="input-group" id="roundTargetGroup">
+                <label for="roundDigits" class="input-label">Round to Target Sig Figs</label>
+                <input type="number" id="roundDigits" class="calc-input" value="3" min="1" max="15">
+              </div>
+
+              <div class="input-group" id="sigOpGroup" style="display:none;">
+                <label for="sigOp" class="input-label">Operation</label>
+                <select id="sigOp" class="calc-input">
+                  <option value="mul">Multiplication (×)</option>
+                  <option value="div">Division (÷)</option>
+                  <option value="add">Addition (+)</option>
+                  <option value="sub">Subtraction (−)</option>
+                </select>
+              </div>
+
+              <div class="input-group" id="inputVal2Group" style="display:none;">
+                <label for="sigInput2" class="input-label">Second Measurement</label>
+                <input type="text" id="sigInput2" class="calc-input" value="12.3">
+              </div>
+            </div>
+
+            <div class="primary-result" style="margin-top: 25px;">
+              <div class="result-label" id="sigPrimaryLabel">Significant Figures Count</div>
+              <div class="result-value" id="sigPrimaryResult">5 Sig Figs</div>
+              <div class="result-subtext" id="sigSubtext">Significant Digits: 4, 0, 5, 0, 0</div>
+            </div>
+
+            <div class="results-grid" style="margin-top: 20px;">
+              <div class="result-item">
+                <div class="result-label">Rounded to Target Sig Figs</div>
+                <div class="result-value" id="resRoundedVal">0.00405</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Scientific Notation</div>
+                <div class="result-value" id="resSigSci">4.0500 × 10⁻³</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Decimal Places</div>
+                <div class="result-value" id="resDecPlaces">7</div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Least Significant Column</div>
+                <div class="result-value" id="resLeastCol">10⁻⁷ (0.0000001)</div>
+              </div>
+            </div>
+
+            <div class="conversion-steps" style="margin-top: 25px;">
+              <h3>Rule Breakdown &amp; Analysis</h3>
+              <div id="sigStepsDisplay" style="font-family: monospace; font-size: 0.95rem; line-height: 1.6; background: rgba(0,0,0,0.03); padding: 16px; border-radius: 8px; border-left: 4px solid var(--accent, #2563eb);">
+                Loading digit analysis...
+              </div>
+            </div>
+          </section>
+
+          <article class="article-body">
+            <h2>1. The Physical Philosophy of Significant Figures in Metrology</h2>
+            <p>In pure mathematics, numbers are abstract entities endowed with infinite precision: the integer \(5\) is identically \(5.000000\dots\) to limitless decimal digits. In empirical science, physics, chemistry, and experimental engineering, however, every recorded number represents an observation derived from physical instrumentation subjected to unavoidable measurement uncertainty. An analytical chemist weighing a crystalline precipitate on a four-place analytical balance records \(0.1420\text{ g}\), while a student using a mechanical pan scale records \(0.14\text{ g}\). Though numerically close, these two records convey vastly different degrees of experimental precision.</p>
+
+            <p><strong>Significant Figures</strong> (often abbreviated as <em>sig figs</em> or <em>significant digits</em>) constitute an internationally standardized convention for communicating measurement precision. The number of significant figures in a reported quantity consists of all digits known with absolute certainty, plus exactly one terminal digit that is estimated or subject to instrumental tolerance (\(\pm 1\) in the last decimal place).</p>
+
+            <h2>2. Canonical Rules for Counting Significant Digits</h2>
+            <p>Every digit within a recorded measurement falls into one of several distinct functional categories. The universal rules for classifying digits are codified under ASTM E29 and international metrology guidelines:</p>
+
+            <h3>2.1 Non-Zero Digits</h3>
+            <p>All non-zero integers (\(1, 2, 3, 4, 5, 6, 7, 8, 9\)) are <strong>always significant</strong> regardless of their position relative to the decimal point. For example, the measurement \(384.72\text{ km}\) contains five non-zero digits and thus possesses exactly 5 significant figures.</p>
+
+            <h3>2.2 Captive (Trapped) Zeros</h3>
+            <p>Zeros situated between non-zero digits are <strong>always significant</strong> because their position is constrained by confirmed measurements on either side. For example, in \(6,005\text{ m}\) and \(40.08\text{ g}\), every zero is significant (giving 4 sig figs in each case).</p>
+
+            <h3>2.3 Leading Zeros</h3>
+            <p>Zeros that precede all non-zero digits are <strong>never significant</strong>. They serve solely as positional scale placeholders to indicate the order of magnitude of the decimal point. For example, in \(0.00054\text{ s}\), the four zeros are merely placeholders; the measurement possesses only 2 significant figures (\(5\) and \(4\)). Converting to scientific notation (\(5.4 \times 10^{-4}\text{ s}\)) or an SI metric prefix (\(540\text{ }\mu\text{s}\)) demonstrates that the leading zeros vanish without any loss of measurement information.</p>
+
+            <h3>2.4 Trailing Zeros with an Explicit Decimal Point</h3>
+            <p>Zeros at the end of a number to the right of a decimal point are <strong>always significant</strong>. By deliberately writing trailing zeros after a decimal point, the experimenter asserts that the measurement was verified down to that specific decimal threshold. For example, \(8.500\text{ cm}\) contains 4 significant figures, indicating that the instrument was precise to \(\pm 0.001\text{ cm}\). In contrast, writing \(8.5\text{ cm}\) conveys only 2 significant figures (precision \(\pm 0.1\text{ cm}\)).</p>
+
+            <h3>2.5 Trailing Zeros in Whole Numbers (The Ambiguity Dilemma)</h3>
+            <p>Trailing zeros in integers lacking a decimal point—such as \(1,200\text{ meters}\) or \(50,000\text{ kg}\)—are intrinsically ambiguous. It is impossible from the numerals alone to know whether the zeros represent measured values or approximate scale rounding. To eliminate this ambiguity, metrologists employ three standard methods:</p>
+            <ul>
+              <li><strong>Scientific Notation (Recommended):</strong> Writing \(1.2 \times 10^3\) denotes 2 sig figs; \(1.20 \times 10^3\) denotes 3 sig figs; \(1.200 \times 10^3\) denotes 4 sig figs.</li>
+              <li><strong>Explicit Terminal Decimal:</strong> Writing <code>1200.</code> with a trailing decimal point explicitly indicates 4 sig figs.</li>
+              <li><strong>Overline / Underline:</strong> Placing a bar over the last significant zero (\(12\bar{0}0\)) indicates 3 sig figs.</li>
+            </ul>
+
+            <h2>3. Arithmetic Operations with Uncertainty Propagation</h2>
+            <p>When performing mathematical operations on experimental data, the calculation can never artificially fabricate precision: the output can never be more reliable than the least reliable measured input.</p>
+
+            <h3>3.1 Multiplication and Division: The Sig Fig Count Rule</h3>
+            <p>In multiplication and division, the calculated result is constrained strictly by the total number of significant figures of the input factors. The rule dictates:</p>
+
+            <blockquote>
+              <p>The product or quotient can have no more significant figures than the input value possessing the smallest number of significant figures.</p>
+            </blockquote>
+
+            <p>For example, consider calculating density \(\rho = \frac{m}{V}\):</p>
+
+            $$\rho = \frac{45.26\text{ g}}{3.2\text{ cm}^3} = 14.14375\text{ g/cm}^3$$
+
+            <p>Here, the mass \(45.26\text{ g}\) has 4 sig figs, while the volume \(3.2\text{ cm}^3\) has only 2 sig figs. The least precise factor has 2 sig figs. Therefore, the terminal result must be rounded to exactly 2 significant figures: \(\rho = 14\text{ g/cm}^3\).</p>
+
+            <h3>3.2 Addition and Subtraction: The Decimal Place Rule</h3>
+            <p>In addition and subtraction, the limiting constraint is not the total count of significant figures, but rather the <strong>decimal place position</strong> (the least significant decimal column). The rule dictates:</p>
+
+            <blockquote>
+              <p>The sum or difference can have no more digits to the right of the decimal point than the measurement with the fewest digits to the right of the decimal point.</p>
+            </blockquote>
+
+            <p>Consider summing three fluid volumes:</p>
+
+            $$V_{\text{total}} = 125.1\text{ mL} + 1.254\text{ mL} + 0.08\text{ mL} = 126.434\text{ mL}$$
+
+            <p>The least precise decimal position belongs to \(125.1\text{ mL}\) (tenths column, 1 decimal place). Therefore, the sum must be rounded to the tenths column: \(V_{\text{total}} = 126.4\text{ mL}\), even though the final result has 4 significant figures.</p>
+
+            <h2>4. Rounding Rules and Banker's Rounding (Round-Half-to-Even)</h2>
+            <p>When rounding intermediate numbers to conform to significant figure limits, the standard rule evaluates the first digit to be dropped (the rounding guard digit):</p>
+            <ul>
+              <li>If the first dropped digit is strictly less than 5 (\(0, 1, 2, 3, 4\)), the preceding digit remains unchanged (round down).</li>
+              <li>If the first dropped digit is strictly greater than 5 (\(6, 7, 8, 9\)), or is 5 followed by non-zero digits, increment the preceding digit by 1 (round up).</li>
+              <li><strong>The Half-Way Tie:</strong> When the dropped portion is exactly 5 followed by nothing or only zeros, standard metrology employs <em>Round-Half-to-Even</em> (Banker's Rounding, ASTM E29). Under this rule, round so that the final remaining digit is an even number:
+                <ul>
+                  <li>\(4.65\) rounded to 2 sig figs becomes \(4.6\) (since 6 is even).</li>
+                  <li>\(4.75\) rounded to 2 sig figs becomes \(4.8\) (since 8 is even).</li>
+                </ul>
+              </li>
+            </ul>
+            <p>Round-half-to-even ensures that across large statistical datasets, 50% of borderline cases round down and 50% round up, neutralizing systematic cumulative upward bias.</p>
+
+            <h2>5. Benchmark Comparative Reference Table</h2>
+            <p>The table below provides a comprehensive breakdown of ten representative numerical values, illustrating sig fig counts, decimal places, scientific forms, and rounded results.</p>
+
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Input Number</th>
+                  <th>Total Sig Figs</th>
+                  <th>Significant Digits</th>
+                  <th>Decimal Places</th>
+                  <th>Scientific Notation</th>
+                  <th>Rounded to 3 Sig Figs</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>\(0.0040500\)</td>
+                  <td>5</td>
+                  <td>4, 0, 5, 0, 0</td>
+                  <td>7</td>
+                  <td>\(4.0500 \times 10^{-3}\)</td>
+                  <td>\(0.00405\)</td>
+                </tr>
+                <tr>
+                  <td>\(120.00\)</td>
+                  <td>5</td>
+                  <td>1, 2, 0, 0, 0</td>
+                  <td>2</td>
+                  <td>\(1.2000 \times 10^2\)</td>
+                  <td>\(120\)</td>
+                </tr>
+                <tr>
+                  <td>\(45000\)</td>
+                  <td>2 (ambiguous)</td>
+                  <td>4, 5</td>
+                  <td>0</td>
+                  <td>\(4.5 \times 10^4\)</td>
+                  <td>\(4.50 \times 10^4\)</td>
+                </tr>
+                <tr>
+                  <td>\(0.00008\)</td>
+                  <td>1</td>
+                  <td>8</td>
+                  <td>5</td>
+                  <td>\(8 \times 10^{-5}\)</td>
+                  <td>\(0.0000800\)</td>
+                </tr>
+                <tr>
+                  <td>\(100.04\)</td>
+                  <td>5</td>
+                  <td>1, 0, 0, 0, 4</td>
+                  <td>2</td>
+                  <td>\(1.0004 \times 10^2\)</td>
+                  <td>\(100\)</td>
+                </tr>
+                <tr>
+                  <td>\(3.14159265\)</td>
+                  <td>9</td>
+                  <td>3, 1, 4, 1, 5, 9, 2, 6, 5</td>
+                  <td>8</td>
+                  <td>\(3.14159 \times 10^0\)</td>
+                  <td>\(3.14\)</td>
+                </tr>
+                <tr>
+                  <td>\(5.00 \times 10^8\)</td>
+                  <td>3</td>
+                  <td>5, 0, 0</td>
+                  <td>N/A</td>
+                  <td>\(5.00 \times 10^8\)</td>
+                  <td>\(5.00 \times 10^8\)</td>
+                </tr>
+                <tr>
+                  <td>\(0.01020\)</td>
+                  <td>4</td>
+                  <td>1, 0, 2, 0</td>
+                  <td>5</td>
+                  <td>\(1.020 \times 10^{-2}\)</td>
+                  <td>\(0.0102\)</td>
+                </tr>
+                <tr>
+                  <td>\(65.45\)</td>
+                  <td>4</td>
+                  <td>6, 5, 4, 5</td>
+                  <td>2</td>
+                  <td>\(6.545 \times 10^1\)</td>
+                  <td>\(65.4\) (even tie)</td>
+                </tr>
+                <tr>
+                  <td>\(65.35\)</td>
+                  <td>4</td>
+                  <td>6, 5, 3, 5</td>
+                  <td>2</td>
+                  <td>\(6.35 \times 10^1\)</td>
+                  <td>\(65.4\) (even tie)</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h2>6. Worked Chemical Laboratory Case Study: Analytical Titration Molarity</h2>
+            <div class="worked-example-card">
+              <div class="example-header">
+                <strong>Analytical Chemistry Case Study:</strong> Acid-Base Standard Solution Standardization
+              </div>
+              <div class="example-body">
+                <p><strong>Scenario:</strong> An analytical chemist standardizes a solution of sodium hydroxide (\(\text{NaOH}\)) by titrating against primary standard potassium hydrogen phthalate (\(\text{KHP}\), molecular weight \(MW = 204.22\text{ g/mol}\), known to 5 significant figures). The analytical balance records a KHP mass of \(m = 0.5124\text{ g}\). The initial burette reading is \(V_{\text{initial}} = 0.45\text{ mL}\) and the final reading at the phenolphthalein endpoint is \(V_{\text{final}} = 25.80\text{ mL}\). The chemist must calculate the exact molarity of \(\text{NaOH}\) following rigorous significant figure rules.</p>
+
+                <p><strong>Step 1: Calculate Net Titrant Volume via Subtraction (Decimal Rule)</strong><br>
+                $$V = V_{\text{final}} - V_{\text{initial}} = 25.80\text{ mL} - 0.45\text{ mL} = 25.35\text{ mL}$$
+                Both burette readings have 2 decimal places. Therefore, the difference \(25.35\text{ mL}\) preserves 2 decimal places and has exactly 4 significant figures. Convert volume to liters:
+                $$V = \frac{25.35\text{ mL}}{1000\text{ mL/L}} = 0.02535\text{ L} \quad (4 \text{ sig figs, 1000 is an exact conversion factor})$$</p>
+
+                <p><strong>Step 2: Formulate the Molarity Equation (Multiplication/Division Rule)</strong><br>
+                The stoichiometric reaction is \(1:1\). Molarity \(M\) satisfies:
+                $$M = \frac{m_{\text{KHP}}}{MW_{\text{KHP}} \times V} = \frac{0.5124\text{ g}}{(204.22\text{ g/mol}) \times (0.02535\text{ L})}$$</p>
+
+                <p><strong>Step 3: Analyze Input Significant Figures</strong><br>
+                <ul>
+                  <li>Mass \(m = 0.5124\text{ g}\): 4 significant figures.</li>
+                  <li>Molecular weight \(MW = 204.22\text{ g/mol}\): 5 significant figures.</li>
+                  <li>Volume \(V = 0.02535\text{ L}\): 4 significant figures.</li>
+                </ul>
+                The limiting precision is 4 significant figures.</p>
+
+                <p><strong>Step 4: Compute Intermediate and Terminal Rounded Output</strong><br>
+                $$M = \frac{0.5124}{5.176977} = 0.09897668\dots\text{ mol/L}$$
+                Rounding to 4 significant figures yields:
+                $$M = 0.09898\text{ mol/L} \quad (\text{or } 9.898 \times 10^{-2}\text{ M})$$
+                Reporting any further digits (such as 0.098977) would fabricate non-existent instrumental precision.</p>
+              </div>
+            </div>
+
+            <h2>7. Frequently Asked Questions (FAQ)</h2>
+            <div class="faq-accordion">
+              <div class="faq-item">
+                <h3 class="faq-question">Why do conversion factors like 1 foot = 12 inches not limit significant figures?</h3>
+                <div class="faq-answer">
+                  <p>Definitions established by international standard agreements are exact quantities. By definition, 1 foot contains exactly 12 inches without any experimental tolerance (12.00000... to infinity). Because exact definitions possess infinite significant figures, they never constrain or reduce the precision of an experimental calculation.</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">What are guard digits and when should they be retained during multi-step math?</h3>
+                <div class="faq-answer">
+                  <p>Guard digits are extra decimal digits carried through intermediate computational steps beyond the nominal significant figure limit. You should always retain at least 1 or 2 guard digits (or keep full floating-point precision in a calculator) during intermediate calculations, applying significant figure rounding strictly to the final result. Premature intermediate rounding causes cumulative rounding error drift.</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">How does logarithmic calculation affect significant figures (e.g. pH in chemistry)?</h3>
+                <div class="faq-answer">
+                  <p>In logarithmic operations such as \(\text{pH} = -\log_{10}[\text{H}^+]\), the integer part of the logarithm (the characteristic) serves purely as an exponent/scale indicator. Only the decimal part (the mantissa) reflects the significant figures of the original quantity. Thus, if \([\text{H}^+] = 3.5 \times 10^{-5}\text{ M}\) (2 sig figs), then \(\text{pH} = 4.46\) (2 decimal places in the mantissa represent the 2 sig figs).</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <h3 class="faq-question">Is 100 with a decimal point (100.) accepted as having 3 significant figures?</h3>
+                <div class="faq-answer">
+                  <p>Yes. Placing an explicit decimal point at the end of a whole number (e.g., <code>100.</code>) is standard scientific shorthand indicating that all preceding zeros are measured and significant (3 sig figs). Without the terminal decimal point, 100 is treated as having only 1 significant figure unless specified otherwise in scientific notation (\(1.00 \times 10^2\)).</p>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <aside class="sidebar-column">
+          <div class="sidebar-card">
+            <h3 class="sidebar-title">Related Math Calculators</h3>
+            <ul class="sidebar-nav">
+              <li><a href="scientific-notation-calculator.html">Scientific Notation Calculator</a></li>
+              <li><a href="percentage-calculator.html">Percentage Calculator</a></li>
+              <li><a href="standard-deviation-calculator.html">Standard Deviation Calculator</a></li>
+              <li><a href="fraction-calculator.html">Fraction Calculator</a></li>
+              <li><a href="gcd-lcm-calculator.html">GCD and LCM Calculator</a></li>
+              <li><a href="quadratic-equation-calculator.html">Quadratic Equation Calculator</a></li>
+              <li><a href="pythagorean-theorem-calculator.html">Pythagorean Theorem Calculator</a></li>
+              <li><a href="prime-number-calculator.html">Prime Number Calculator</a></li>
+            </ul>
+          </div>
+
+          <div class="sidebar-card">
+            <h3 class="sidebar-title">Sig Fig Core Rules</h3>
+            <div style="font-size:0.875rem; line-height:1.5; color:var(--text-muted, #4b5563);">
+              <p><strong>Non-zeros:</strong> Always significant</p>
+              <p><strong>Trapped zeros:</strong> Always significant</p>
+              <p><strong>Leading zeros:</strong> Never significant</p>
+              <p><strong>Trailing with dec:</strong> Always significant</p>
+              <p><strong>Multiply/Divide:</strong> Fewest total sig figs</p>
+              <p><strong>Add/Subtract:</strong> Fewest decimal places</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h3>CalcHub</h3>
+        <p>High-precision technical calculation engines, engineering references, and discrete mathematical tools.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="math.html">Math & Engineering</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Hub Categories</h4>
+        <ul>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Engineering Tools</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed computational algorithms.</p>
+    </div>
+  </footer>
+
+  <script>
+    function parseSigFigs(str) {
+      str = str.trim();
+      if (!str) return { count: 0, digits: [], decPlaces: 0, isSci: false };
+
+      // Handle scientific notation e.g. 4.05e-3 or 4.05 * 10^-3
+      let isSci = false;
+      let expPart = "";
+      if (/[eE]/.test(str)) {
+        isSci = true;
+        const parts = str.split(/[eE]/);
+        str = parts[0];
+        expPart = parts[1];
+      }
+
+      const hasDec = str.includes('.');
+      const clean = str.replace('-', '');
+      const parts = clean.split('.');
+      const intPart = parts[0] || "";
+      const decPart = parts.length > 1 ? parts[1] : "";
+
+      let count = 0;
+      const sigDigits = [];
+      let started = false;
+
+      // Scan characters
+      for (let i = 0; i < clean.length; i++) {
+        const c = clean[i];
+        if (c === '.') continue;
+        if (!started) {
+          if (c !== '0') {
+            started = true;
+            count++;
+            sigDigits.push(c);
+          }
+        } else {
+          count++;
+          sigDigits.push(c);
+        }
+      }
+
+      // If no decimal and has trailing zeros
+      if (!hasDec && !isSci) {
+        // Trailing zeros in whole numbers are ambiguous, conventionally stripped
+        while (sigDigits.length > 0 && sigDigits[sigDigits.length - 1] === '0') {
+          sigDigits.pop();
+          count--;
+        }
+      }
+
+      const decPlaces = decPart.length;
+      return { count: count, digits: sigDigits, decPlaces: decPlaces, hasDec: hasDec };
+    }
+
+    function roundToSigFigs(num, targetFigs) {
+      if (num === 0) return "0";
+      const d = Math.ceil(Math.log10(num < 0 ? -num : num));
+      const power = targetFigs - d;
+      const magnitude = Math.pow(10, power);
+      const shifted = Math.round(num * magnitude);
+      const rounded = shifted / magnitude;
+      return rounded.toPrecision(targetFigs);
+    }
+
+    function updateSigMode() {
+      const mode = document.getElementById('sigMode').value;
+      const isArith = mode === 'arithmetic';
+      document.getElementById('sigOpGroup').style.display = isArith ? 'block' : 'none';
+      document.getElementById('inputVal2Group').style.display = isArith ? 'block' : 'none';
+      document.getElementById('roundTargetGroup').style.display = isArith ? 'none' : 'block';
+      document.getElementById('labelSig1').textContent = isArith ? "First Measurement" : "Measurement Value";
+      computeSigFigs();
+    }
+
+    function computeSigFigs() {
+      const mode = document.getElementById('sigMode').value;
+      const val1Str = document.getElementById('sigInput1').value.trim();
+      const val1 = parseFloat(val1Str);
+
+      if (isNaN(val1) || !val1Str) return;
+
+      const parsed1 = parseSigFigs(val1Str);
+      let steps = "";
+
+      if (mode === 'counter') {
+        const targetFigs = parseInt(document.getElementById('roundDigits').value, 10) || 3;
+        const rounded = roundToSigFigs(val1, targetFigs);
+        const sci = val1.toExponential(parsed1.count > 1 ? parsed1.count - 1 : 1);
+
+        document.getElementById('sigPrimaryLabel').textContent = "Significant Figures Count";
+        document.getElementById('sigPrimaryResult').textContent = `${parsed1.count} Sig Figs`;
+        document.getElementById('sigSubtext').textContent = `Significant Digits: ${parsed1.digits.join(', ')}`;
+        document.getElementById('resRoundedVal').textContent = rounded;
+        document.getElementById('resSigSci').textContent = sci;
+        document.getElementById('resDecPlaces').textContent = parsed1.decPlaces;
+        document.getElementById('resLeastCol').textContent = parsed1.hasDec ? `10⁻${parsed1.decPlaces}` : "Units (10⁰)";
+
+        steps += `1. Non-zero sequence starts at '${parsed1.digits[0] || '0'}'.<br>`;
+        steps += `2. Leading zeros are omitted (scale placeholders only).<br>`;
+        steps += `3. Total confirmed significant digits: ${parsed1.count}.<br>`;
+        steps += `4. Target rounding to ${targetFigs} sig figs: ${rounded}.`;
+      } else {
+        const val2Str = document.getElementById('sigInput2').value.trim();
+        const val2 = parseFloat(val2Str);
+        if (isNaN(val2) || !val2Str) return;
+
+        const parsed2 = parseSigFigs(val2Str);
+        const op = document.getElementById('sigOp').value;
+        let resNum = 0;
+        let finalStr = "";
+
+        if (op === 'mul' || op === 'div') {
+          const limitFigs = Math.min(parsed1.count, parsed2.count);
+          resNum = op === 'mul' ? (val1 * val2) : (val1 / val2);
+          finalStr = roundToSigFigs(resNum, limitFigs);
+          document.getElementById('sigPrimaryLabel').textContent = "Arithmetic Result (Sig Fig Rule)";
+          document.getElementById('sigPrimaryResult').textContent = finalStr;
+          document.getElementById('sigSubtext').textContent = `Limited by ${limitFigs} sig figs (least precise input)`;
+          steps += `Multiplication/Division Rule:<br>`;
+          steps += `Term 1 has ${parsed1.count} sig figs; Term 2 has ${parsed2.count} sig figs.<br>`;
+          steps += `Result constrained to min(${parsed1.count}, ${parsed2.count}) = ${limitFigs} sig figs.<br>`;
+          steps += `Raw Calculation: ${resNum} → Rounded: ${finalStr}`;
+        } else {
+          const limitDec = Math.min(parsed1.decPlaces, parsed2.decPlaces);
+          resNum = op === 'add' ? (val1 + val2) : (val1 - val2);
+          finalStr = resNum.toFixed(limitDec);
+          document.getElementById('sigPrimaryLabel').textContent = "Arithmetic Result (Decimal Rule)";
+          document.getElementById('sigPrimaryResult').textContent = finalStr;
+          document.getElementById('sigSubtext').textContent = `Limited by ${limitDec} decimal places (least precise column)`;
+          steps += `Addition/Subtraction Rule:<br>`;
+          steps += `Term 1 has ${parsed1.decPlaces} dec places; Term 2 has ${parsed2.decPlaces} dec places.<br>`;
+          steps += `Result constrained to min(${parsed1.decPlaces}, ${parsed2.decPlaces}) = ${limitDec} decimal places.<br>`;
+          steps += `Raw Calculation: ${resNum} → Rounded: ${finalStr}`;
+        }
+
+        document.getElementById('resRoundedVal').textContent = finalStr;
+        document.getElementById('resSigSci').textContent = resNum.toExponential(3);
+        document.getElementById('resDecPlaces').textContent = `Term 1: ${parsed1.decPlaces} | Term 2: ${parsed2.decPlaces}`;
+        document.getElementById('resLeastCol').textContent = `Term 1: ${parsed1.count} SF | Term 2: ${parsed2.count} SF`;
+      }
+
+      document.getElementById('sigStepsDisplay').innerHTML = steps;
+    }
+
+    document.getElementById('sigMode').addEventListener('change', updateSigMode);
+    document.getElementById('sigOp').addEventListener('change', computeSigFigs);
+    document.getElementById('sigInput1').addEventListener('input', computeSigFigs);
+    document.getElementById('sigInput2').addEventListener('input', computeSigFigs);
+    document.getElementById('roundDigits').addEventListener('input', computeSigFigs);
+    updateSigMode();
+  </script>
+</body>
+</html>

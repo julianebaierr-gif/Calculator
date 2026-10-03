@@ -85,6 +85,12 @@ CATEGORIES = {
             ("fraction-calculator.html", "Fraction Calculator", "➗", "Add, multiply & simplify fractions"),
             ("ratio-calculator.html", "Ratio Simplifier", "⚖️", "Euclid's GCD ratio reduction"),
             ("gpa-calculator.html", "College GPA Calculator", "🎓", "4.0 scale cumulative GPA"),
+            ("gcd-lcm-calculator.html", "GCD and LCM Calculator", "🔢", "Euclidean algorithm reduction & prime factorization"),
+            ("quadratic-equation-calculator.html", "Quadratic Equation Calculator", "📐", "Roots x₁ & x₂, discriminant Δ & parabola vertex (h, k)"),
+            ("pythagorean-theorem-calculator.html", "Pythagorean Theorem Calculator", "🔺", "Hypotenuse, perpendicular legs & 3D space diagonal"),
+            ("scientific-notation-calculator.html", "Scientific & Engineering Notation", "🔬", "Standard form m × 10ⁿ, engineering notation & SI prefixes"),
+            ("significant-figures-calculator.html", "Significant Figures Calculator", "📏", "Sig fig counter, round-to-even & uncertainty propagation"),
+            ("prime-number-calculator.html", "Prime Number & Factorization Engine", "⚛️", "Primality test, divisor counts d(n) & prime factor tree"),
         ]
     },
     "engineering": {
@@ -349,6 +355,8 @@ CATEGORIES = {
             ("number-base-converter.html", "Number Base (Bin, Oct, Dec, Hex)", "💻", "Binary, Octal, Decimal, Hex & Two's Comp"),
             ("roman-numeral-converter.html", "Roman Numeral Converter (1 to 3.9M)", "🏛️", "Classical subtractive & Vinculum bars"),
             ("time-converter.html", "Time Unit & Chronometric Converter", "⏱️", "Seconds, ms, μs, ns, hours, days & years"),
+            ("time-zone-converter.html", "Time Zone & World Clock Converter", "🌍", "UTC offsets, daylight saving transitions & meeting planner"),
+            ("unix-timestamp-converter.html", "Unix Timestamp & Epoch Converter", "💻", "Seconds/milliseconds to ISO 8601 UTC & local datetime"),
         ]
     }
 }
@@ -377,9 +385,9 @@ def determine_tool_cat(filename):
         return "programmer"
     if any(k in f for k in ["date-difference", "age"]):
         return "datetime"
-    if any(k in f for k in ["unit-converter", "length-converter", "weight-converter", "temperature-converter", "area-converter", "volume-converter", "pressure-converter", "speed-converter", "energy-converter", "power-converter", "force-converter", "data-storage-converter", "data-transfer-rate-converter", "frequency-converter", "flow-rate-converter", "fuel-economy-converter", "angle-converter", "density-converter", "illuminance-converter", "thermal-conductivity-converter", "viscosity-converter", "cooking-converter", "number-base-converter", "roman-numeral-converter", "time-converter"]):
+    if any(k in f for k in ["unit-converter", "length-converter", "weight-converter", "temperature-converter", "area-converter", "volume-converter", "pressure-converter", "speed-converter", "energy-converter", "power-converter", "force-converter", "data-storage-converter", "data-transfer-rate-converter", "frequency-converter", "flow-rate-converter", "fuel-economy-converter", "angle-converter", "density-converter", "illuminance-converter", "thermal-conductivity-converter", "viscosity-converter", "cooking-converter", "number-base-converter", "roman-numeral-converter", "time-converter", "time-zone", "unix-timestamp"]):
         return "converter"
-    if any(k in f for k in ["percentage", "fraction", "ratio", "gpa", "standard-deviation"]):
+    if any(k in f for k in ["percentage", "fraction", "ratio", "gpa", "standard-deviation", "gcd-lcm", "quadratic-equation", "pythagorean", "scientific-notation", "significant-figures", "prime-number"]):
         return "math"
     return "math"
 

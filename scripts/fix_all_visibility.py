@@ -85,6 +85,12 @@ CAT_MAP = {
             ("ratio-calculator.html", "Ratio Simplifier", "⚖️", "Euclid's GCD ratio reduction", "X = (B × C) / A"),
             ("age-calculator.html", "Exact Age Calculator", "🎂", "Chronological age & day of week", "Gregorian Leap Calendar"),
             ("gpa-calculator.html", "College GPA Calculator", "🎓", "4.0 scale cumulative GPA", "GPA = ∑(Points × Cr) ÷ ∑Cr"),
+            ("gcd-lcm-calculator.html", "GCD and LCM Calculator", "🔢", "Euclidean algorithm reduction & prime factorization", "gcd(a, b) = gcd(b, a mod b) | a·b = gcd·lcm"),
+            ("quadratic-equation-calculator.html", "Quadratic Equation Calculator", "📐", "Roots x₁ & x₂, discriminant Δ & parabola vertex (h, k)", "x = (-b ± √(b² - 4ac)) / (2a) | Δ = b² - 4ac"),
+            ("pythagorean-theorem-calculator.html", "Pythagorean Theorem Calculator", "🔺", "Hypotenuse, perpendicular legs & 3D space diagonal", "a² + b² = c² | d = √(x² + y² + z²)"),
+            ("scientific-notation-calculator.html", "Scientific & Engineering Notation", "🔬", "Standard form m × 10ⁿ, engineering notation & SI prefixes", "m × 10ⁿ (1 ≤ |m| < 10) | Engineering n mod 3 = 0"),
+            ("significant-figures-calculator.html", "Significant Figures Calculator", "📏", "Sig fig counter, round-to-even & uncertainty propagation", "Multiplication: Min SF | Addition: Min Decimals"),
+            ("prime-number-calculator.html", "Prime Number & Factorization Engine", "⚛️", "Primality test, divisor counts d(n) & prime factor tree", "Unique factorization: n = ∏ p_i^α_i | d(n) = ∏(α_i+1)"),
         ]
     },
     "engineering.html": {
@@ -319,6 +325,8 @@ CAT_MAP = {
             ("number-base-converter.html", "Number Base (Bin, Oct, Dec, Hex)", "💻", "Binary base 2, Octal base 8, Decimal base 10 & Hex base 16", "N = Σ(d_i · b^i) | Two's Complement: -X = ~X + 1"),
             ("roman-numeral-converter.html", "Roman Numeral Converter (1 to 3.9M)", "🏛️", "Classical subtractive notation & Vinculum overline bars", "I=1, V=5, X=10, L=50, C=100, D=500, M=1000 | V̄=5000"),
             ("time-converter.html", "Time Unit & Chronometric Converter", "⏱️", "Seconds, ms, μs, ns, hours, days, weeks & Julian years", "1 s = 9,192,631,770 Cs cycles | Julian Year = 31,557,600 s"),
+            ("time-zone-converter.html", "Time Zone & World Clock Converter", "🌍", "UTC offsets, daylight saving transitions & meeting planner", "UTC ± HH:MM | IANA Zone Database"),
+            ("unix-timestamp-converter.html", "Unix Timestamp & Epoch Converter", "💻", "Seconds/milliseconds to ISO 8601 UTC & local datetime", "t_epoch = Seconds since Jan 1, 1970 00:00:00 UTC"),
         ]
     }
 }
