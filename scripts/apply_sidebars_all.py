@@ -33,6 +33,14 @@ CATEGORIES = {
             ("met-calculator.html", "METs & Activity Caloric Burn", "⚡", "Compendium MET-minutes, VO2 uptake & WHO guidelines"),
             ("ovulation-calculator.html", "Ovulation & Fertile Window", "🌸", "Ogino-Knaus rhythm method, luteal phase & LH surge"),
             ("pregnancy-weight-gain-calculator.html", "Pregnancy Weight Gain (IOM/ACOG)", "🤰", "Pre-pregnancy BMI targets, weekly rates & twin curves"),
+            ("protein-intake-calculator.html", "Protein Intake (ISSN/DRI Optimum)", "🥩", "Daily protein requirements for athletes, hypertrophy & clinical cut"),
+            ("sleep-calculator.html", "Sleep Cycle (90-Min REM Ultradian)", "🌙", "Sleep onset latency, 90-min REM ultradian cycles & wake times"),
+            ("sodium-intake-calculator.html", "Sodium to Salt & AHA Dietary Cap", "🧂", "Dietary sodium conversion, AHA 1,500mg cap & Na/K balance"),
+            ("target-heart-rate-calculator.html", "Target Heart Rate (Karvonen HRR)", "❤️", "Karvonen HRR formula, ACSM cardiovascular zones & VO2max"),
+            ("tdee-calculator.html", "TDEE & Calorie Burn (Total Daily)", "🔥", "Total daily energy expenditure, PAL multiplier & BMR components"),
+            ("waist-to-height-calculator.html", "Waist-to-Height Ratio (WHtR)", "📏", "Central adiposity screening, Ashwell boundary & cardiometabolic risk"),
+            ("waist-to-height-ratio-calculator.html", "Waist-to-Height Ratio Sizer", "📐", "Bariatric WHtR visceral risk evaluation & boundary classification"),
+            ("waist-to-hip-ratio-calculator.html", "Waist-to-Hip Ratio (WHR Risk)", "⚖️", "WHO visceral adiposity ratio, android vs gynoid fat distribution"),
         ]
     },
     "finance": {
@@ -326,7 +334,7 @@ CATEGORIES = {
 
 def determine_tool_cat(filename):
     f = filename.lower()
-    if any(k in f for k in ["bmi", "calorie", "body-fat", "ideal-weight", "water-intake", "bmr", "macro", "a1c", "bac", "body-surface-area", "bsa", "calorie-deficit", "calories-burned", "carbohydrate", "cholesterol", "due-date", "fat-intake", "heart-rate-zone", "lean-body-mass", "max-heart-rate", "met-calculator", "ovulation", "pregnancy-weight-gain"]):
+    if any(k in f for k in ["bmi", "calorie", "body-fat", "ideal-weight", "water-intake", "bmr", "macro", "a1c", "bac", "body-surface-area", "bsa", "calorie-deficit", "calories-burned", "carbohydrate", "cholesterol", "due-date", "fat-intake", "heart-rate-zone", "lean-body-mass", "max-heart-rate", "met-calculator", "ovulation", "pregnancy-weight-gain", "protein-intake", "sleep-calculator", "sodium-intake", "target-heart-rate", "tdee", "waist-to-height", "waist-to-hip"]):
         return "health"
     if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72", "amortization", "apr-apy", "break-even", "capital-gains", "cd-calculator", "credit-card", "debt-to-income", "down-payment", "emergency-fund", "inflation", "net-salary", "net-worth", "sales-tax", "savings"]):
         return "finance"

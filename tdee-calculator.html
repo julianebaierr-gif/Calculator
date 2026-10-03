@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TDEE Calculator | Total Daily Energy Expenditure & Caloric Sizer</title>
+  <meta name="description" content="Calculate your true Total Daily Energy Expenditure (TDEE) and BMR using Mifflin-St Jeor and Katch-McArdle equations. Factors NEAT, EAT, and TEF components.">
+  <link rel="canonical" href="https://calchub.com/tdee-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Clinical Total Daily Energy Expenditure (TDEE) Calculator",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "description": "Calculates complete Total Daily Energy Expenditure partitioned across Basal Metabolic Rate (BMR), NEAT, EAT, and Thermic Effect of Food (TEF) using validated physiological algorithms."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Total Daily Energy Expenditure (TDEE) and what are its four components?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Total Daily Energy Expenditure (TDEE) is the total quantity of calories metabolized by the human body over a 24-hour period. It is composed of four distinct physiological thermogenic components: Basal Metabolic Rate (BMR, 60%–75%), Non-Exercise Activity Thermogenesis (NEAT, 15%–30%), Exercise Activity Thermogenesis (EAT, 5%–15%), and the Thermic Effect of Food (TEF, ~10%)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which formula is most accurate for estimating Basal Metabolic Rate (BMR)?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Systematic reviews conducted by the Academy of Nutrition and Dietetics established that the Mifflin-St Jeor equation (1990) is the most reliable predictive formula for the general adult population, with an error rate within ±10% in over 80% of subjects. When body fat percentage is accurately known via DEXA or hydrostatic weighing, the Katch-McArdle equation is preferred because it derives BMR directly from metabolically active Fat-Free Mass (FFM)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why is NEAT (Non-Exercise Activity Thermogenesis) so important for weight loss?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Pioneering clinical research by Dr. James Levine at the Mayo Clinic demonstrated that NEAT is the single most variable component of human energy expenditure, varying between individuals of similar stature by up to 1,000 to 2,000 kcal per day. NEAT encompasses spontaneous daily physical movement—including walking, posture maintenance, occupational physical activity, and fidgeting. Unconscious down-regulation of NEAT during caloric deficits is the primary driver of metabolic plateaus."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is metabolic adaptation and how does it affect TDEE during dieting?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Metabolic adaptation (adaptive thermogenesis) refers to the biological reduction in 24-hour energy expenditure beyond what would be predicted purely from lost body mass. As body weight declines, circulating leptin, active thyroid hormone (triiodothyronine, T3), and sympathetic nervous system tone fall, while mitochondrial efficiency increases. Consequently, actual maintenance calories can drop by 10% to 15% below theoretical mathematical formulas."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How should caloric intake be adjusted for fat loss versus muscle gain?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "For sustainable fat loss with lean muscle preservation, clinical guidelines recommend a moderate deficit of 20% to 25% below maintenance TDEE (typically a 400 to 600 kcal/day deficit, targeting roughly 0.5% to 1.0% of body weight loss per week). For muscular hypertrophy, a modest surplus of 5% to 10% above TDEE (200 to 300 kcal/day) fuels muscle protein synthesis while minimizing adipose accumulation."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="header">
+    <div class="header-container">
+      <div class="header-logo">
+        <a href="index.html" class="logo-link">
+          <span class="logo-icon">🧮</span>
+          <span class="logo-text">CalcHub</span>
+        </a>
+      </div>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="health.html" class="nav-link active">Health & Fitness</a>
+        <a href="finance.html" class="nav-link">Finance</a>
+        <a href="engineering.html" class="nav-link">Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <nav class="breadcrumb-nav">
+      <ol class="breadcrumb-list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="health.html">Health & Fitness</a></li>
+        <li class="active">TDEE Calculator</li>
+      </ol>
+    </nav>
+
+    <div class="page-layout">
+      <div class="calculator-container">
+        <div class="calculator-card">
+          <h1 class="calculator-title">Total Daily Energy Expenditure (TDEE) Calculator</h1>
+          <p class="calculator-subtitle">Calculate your precise 24-hour maintenance energy expenditure and partition calories across BMR, NEAT, EAT, and TEF components.</p>
+
+          <form id="tdee-form" class="calculator-form">
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="unit-system" class="form-label">Measurement System</label>
+                <select id="unit-system" class="form-select">
+                  <option value="us" selected>US Customary (lbs, ft/in)</option>
+                  <option value="metric">Metric (kg, cm)</option>
+                </select>
+              </div>
+              <div class="form-group col-half">
+                <label for="gender" class="form-label">Biological Sex</label>
+                <select id="gender" class="form-select">
+                  <option value="male" selected>Male (+5 s-factor)</option>
+                  <option value="female">Female (-161 s-factor)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- US Height Inputs -->
+            <div id="height-us-group" class="form-row">
+              <div class="form-group col-half">
+                <label for="height-feet" class="form-label">Height (Feet)</label>
+                <input type="number" id="height-feet" class="form-input" min="4" max="7" value="5" required>
+              </div>
+              <div class="form-group col-half">
+                <label for="height-inches" class="form-label">Height (Inches)</label>
+                <input type="number" id="height-inches" class="form-input" min="0" max="11" value="10" required>
+              </div>
+            </div>
+
+            <!-- Metric Height Input -->
+            <div id="height-metric-group" class="form-group" style="display: none;">
+              <label for="height-cm" class="form-label">Height (Centimeters)</label>
+              <input type="number" id="height-cm" class="form-input" min="120" max="230" value="178" step="0.5">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="body-weight" class="form-label">Current Weight (<span class="weight-unit">lbs</span>)</label>
+                <input type="number" id="body-weight" class="form-input" min="60" max="600" value="175" step="0.5" required>
+              </div>
+              <div class="form-group col-half">
+                <label for="body-age" class="form-label">Age (Years)</label>
+                <input type="number" id="body-age" class="form-input" min="15" max="100" value="30" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="activity-level" class="form-label">Physical Activity Level (PAL Multiplier)</label>
+              <select id="activity-level" class="form-select">
+                <option value="1.2">Sedentary (Desk job, minimal physical activity) [PAL 1.20]</option>
+                <option value="1.375" selected>Lightly Active (Light exercise / walking 1-3 days/wk) [PAL 1.375]</option>
+                <option value="1.55">Moderately Active (Moderate training / sports 3-5 days/wk) [PAL 1.55]</option>
+                <option value="1.725">Very Active (Hard training / gym workouts 6-7 days/wk) [PAL 1.725]</option>
+                <option value="1.9">Extremely Active (Twice daily training or manual labor job) [PAL 1.90]</option>
+              </select>
+            </div>
+
+            <button type="submit" class="calculate-btn">Compute Daily Energy Expenditure</button>
+          </form>
+
+          <div id="calculator-results" class="results-container" style="display: none;">
+            <h2 class="results-heading">Your 24-Hour Energy Profile</h2>
+
+            <div class="results-grid">
+              <div class="result-card primary-result">
+                <span class="result-label">Maintenance TDEE</span>
+                <span id="res-tdee" class="result-value">--</span>
+                <span class="result-subtext">Calories to maintain current weight</span>
+              </div>
+
+              <div class="result-card highlight-card">
+                <span class="result-label">Basal Metabolic Rate (BMR)</span>
+                <span id="res-bmr" class="result-value">--</span>
+                <span class="result-subtext">Mifflin-St Jeor resting baseline (~65% TDEE)</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Fat Loss Deficit (20% Cut)</span>
+                <span id="res-cut" class="result-value">--</span>
+                <span class="result-subtext">~1 lb fat loss per week (Moderate deficit)</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Lean Bulking Surplus (+10%)</span>
+                <span id="res-bulk" class="result-value">--</span>
+                <span class="result-subtext">Optimal hypertrophy without excess fat</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Aggressive Deficit (25% Cut)</span>
+                <span id="res-agg-cut" class="result-value">--</span>
+                <span class="result-subtext">~1.5 lbs fat loss per week (Strict cut)</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Thermic Effect of Food (TEF)</span>
+                <span id="res-tef" class="result-value">--</span>
+                <span class="result-subtext">~10% of total daily energy budget</span>
+              </div>
+            </div>
+
+            <div class="summary-box mt-4">
+              <h3 class="summary-title">Thermogenic Partitioning Analysis</h3>
+              <p id="res-partition-text" class="summary-text">Loading energy balance breakdown...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚖️</span>
+            <h3 class="widget-title">Related Health & Fitness</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bmr-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMR Calculator</a></li>
+            <li><a href="macro-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Macro Split Calculator</a></li>
+            <li><a href="calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Calculator (TDEE)</a></li>
+            <li><a href="bmi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Daily Water Intake</a></li>
+            <li><a href="a1c-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> HbA1c to eAG Glucose Sizer</a></li>
+            <li><a href="bac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Blood Alcohol (BAC) Clearance</a></li>
+            <li><a href="body-surface-area-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Surface Area (Mosteller)</a></li>
+            <li><a href="bsa-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Oncology BSA & Calvert Dosing</a></li>
+            <li><a href="calorie-deficit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Deficit & Fat Loss Planner</a></li>
+            <li><a href="calories-burned-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exercise Calories Burned (METs)</a></li>
+            <li><a href="carbohydrate-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Carbohydrate Intake & Glycogen</a></li>
+            <li><a href="cholesterol-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cholesterol Ratio & Castelli Risk</a></li>
+            <li><a href="due-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Due Date & Gestation</a></li>
+            <li><a href="fat-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Dietary Fat Intake (Grams/Day)</a></li>
+            <li><a href="heart-rate-zone-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heart Rate Zone (Karvonen HRR)</a></li>
+            <li><a href="lean-body-mass-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lean Body Mass (Boer & James)</a></li>
+            <li><a href="max-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Max Heart Rate (Tanaka & Gulati)</a></li>
+            <li><a href="met-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> METs & Activity Caloric Burn</a></li>
+            <li><a href="ovulation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ovulation & Fertile Window</a></li>
+            <li><a href="pregnancy-weight-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Weight Gain (IOM/ACOG)</a></li>
+            <li><a href="protein-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Protein Intake (ISSN/DRI Optimum)</a></li>
+            <li><a href="sleep-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sleep Cycle (90-Min REM Ultradian)</a></li>
+            <li><a href="sodium-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sodium to Salt & AHA Dietary Cap</a></li>
+            <li><a href="target-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Target Heart Rate (Karvonen HRR)</a></li>
+            <li><a href="tdee-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> TDEE & Calorie Burn (Total Daily)</a></li>
+            <li><a href="waist-to-height-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio (WHtR)</a></li>
+            <li><a href="waist-to-height-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio Sizer</a></li>
+            <li><a href="waist-to-hip-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Hip Ratio (WHR Risk)</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="health.html" class="sidebar-category-link">View All Health & Fitness Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <article class="article-body">
+      <h2>The Physiology of Total Daily Energy Expenditure (TDEE)</h2>
+      <p>Human energy metabolism operates under the fundamental laws of thermodynamics: energy cannot be created or destroyed, only transformed from one chemical or mechanical state into another. <strong>Total Daily Energy Expenditure (TDEE)</strong> represents the aggregate number of kilocalories metabolized by the human body across a 24-hour period to sustain cellular organ viability, digest nutrients, maintain core body temperature, perform involuntary postural shifts, and execute mechanical muscular work.</p>
+
+      <p>TDEE is not a static monolithic number; it is a dynamic biological composite partitioned across four distinct physiological compartments:</p>
+
+      $$TDEE = \text{BMR} + \text{NEAT} + \text{EAT} + \text{TEF}$$
+
+      <div class="table-container my-4">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Thermogenic Component</th>
+              <th>Proportion of Total TDEE</th>
+              <th>Physiological Definition</th>
+              <th>Primary Biological Determinants</th>
+              <th>Inter-Individual Variability</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Basal Metabolic Rate (BMR)</strong></td>
+              <td>60% – 75%</td>
+              <td>Energy expended in a thermoneutral environment in post-absorptive rest to maintain vital organs (brain, liver, heart, kidneys).</td>
+              <td>Fat-Free Mass (FFM), stature, biological sex, age, thyroid hormones ($T_3, T_4$).</td>
+              <td>Low to Moderate (±10% across cohorts of identical lean mass).</td>
+            </tr>
+            <tr>
+              <td><strong>Non-Exercise Activity Thermogenesis (NEAT)</strong></td>
+              <td>15% – 30%</td>
+              <td>Energy expended in spontaneous, non-volitional physical activity (postural shifts, occupational movement, pacing, fidgeting).</td>
+              <td>Hypothalamic orexinergic signaling, occupational demands, conscious movement habits.</td>
+              <td><strong>Extremely High</strong> (varies by 1,000 to 2,000 kcal/day between individuals).</td>
+            </tr>
+            <tr>
+              <td><strong>Exercise Activity Thermogenesis (EAT)</strong></td>
+              <td>5% – 15%</td>
+              <td>Energy expended in structured, volitional athletic exercise (resistance training, cycling, running, sports).</td>
+              <td>Exercise intensity, duration, mechanical efficiency, training frequency.</td>
+              <td>Highly variable depending on weekly athletic commitment.</td>
+            </tr>
+            <tr>
+              <td><strong>Thermic Effect of Food (TEF)</strong></td>
+              <td>8% – 12% (~10%)</td>
+              <td>Energy expended in the mechanical digestion, intestinal absorption, hepatic deamination, and cellular storage of nutrients.</td>
+              <td>Macronutrient distribution: Protein (20–30%), Carbohydrates (5–10%), Fats (0–3%).</td>
+              <td>Modest; determined strictly by diet composition and total caloric volume.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Mathematical Modeling of Basal Metabolic Rate (BMR)</h2>
+      <p>Because direct calorimetry (measuring human heat dissipation within an airtight chamber) and indirect calorimetry (measuring respiratory oxygen consumption and carbon dioxide production via metabolic cart) are clinically resource-intensive, validated mathematical formulas provide accurate estimations:</p>
+
+      <h3>1. The Mifflin-St Jeor Equation (1990) - General Population Standard</h3>
+      <p>Formulated by Dr. Mark Mifflin and colleagues at the University of Nevada School of Medicine, this equation was validated by the Academy of Nutrition and Dietetics as the most dependable equation for individuals of normal, overweight, and obese classifications:</p>
+
+      $$\text{Men: } BMR\text{ (kcal/day)} = 10 \times W\text{ (kg)} + 6.25 \times H\text{ (cm)} - 5 \times A\text{ (years)} + 5$$
+      $$\text{Women: } BMR\text{ (kcal/day)} = 10 \times W\text{ (kg)} + 6.25 \times H\text{ (cm)} - 5 \times A\text{ (years)} - 161$$
+
+      <h3>2. The Katch-McArdle Equation (1996) - Lean Body Mass Model</h3>
+      <p>When body fat percentage has been determined via clinical dual-energy X-ray absorptiometry (DEXA) or hydrostatic weighing, the Katch-McArdle formula removes the confounding effect of inert adipose tissue, anchoring metabolic burn strictly to metabolically active <strong>Fat-Free Mass ($FFM$)</strong>:</p>
+
+      $$BMR\text{ (kcal/day)} = 370 + (21.6 \times LBM\text{ in kg})$$
+
+      <h2>Physical Activity Level (PAL) Multipliers</h2>
+      <p>To scale Basal Metabolic Rate up to Total Daily Energy Expenditure, exercise physiologists utilize the standardized <strong>Physical Activity Level (PAL)</strong> factors established by the Food and Agriculture Organization (FAO), World Health Organization (WHO), and United Nations University (UNU):</p>
+
+      $$TDEE = BMR \times PAL$$
+
+      <ul>
+        <li><strong>Sedentary ($PAL = 1.20$):</strong> Minimal movement; typical modern office worker who commutes via motor vehicle, works seated at a computer, and engages in sedentary evening relaxation.</li>
+        <li><strong>Lightly Active ($PAL = 1.375$):</strong> Sustains regular recreational movement, logging 5,000 to 7,500 daily steps, or participates in light structured exercise 1 to 3 days per week.</li>
+        <li><strong>Moderately Active ($PAL = 1.55$):</strong> Engages in deliberate moderate physical training (gym resistance training, running, swimming) 3 to 5 days per week, logging 8,000 to 10,000 daily steps.</li>
+        <li><strong>Very Active ($PAL = 1.725$):</strong> Sustains vigorous physical conditioning 6 to 7 days per week, or maintains a physically demanding job (e.g., active nurse, agricultural worker, warehouse loader).</li>
+        <li><strong>Extremely Active ($PAL = 1.90$):</strong> Professional athletes undergoing twice-daily training sessions, elite military personnel, or heavy construction laborers.</li>
+      </ul>
+
+      <h2>NEAT: The Great Metabolic Variator</h2>
+      <p>Pioneering investigations by Dr. James Levine at the Mayo Clinic Endocrinology Division revolutionized modern understanding of human energy expenditure. Levine demonstrated that while BMR is largely determined by lean mass, <strong>Non-Exercise Activity Thermogenesis (NEAT)</strong> explains the massive discrepancy in weight loss success among individuals on identical diets:</p>
+      <ul>
+        <li><strong>The 1,000-Calorie Daily Delta:</strong> Two individuals of identical height, body weight, and age can exhibit NEAT differences exceeding <strong>1,000 to 1,500 kcal per day</strong> based purely on occupational movement and spontaneous subconscious motor activity (such as standing versus sitting, taking stairs, pacing while talking, and postural muscle tone).</li>
+        <li><strong>Subconscious Down-Regulation in Energy Deficits:</strong> During hypocaloric dieting, the brain perceives an energy crisis and subconsciously dampens spontaneous movement to conserve energy. Individuals often sit more, walk slower, and fidget less without realizing it, dramatically lowering their actual TDEE and causing "unexpected" weight loss plateaus. Tracking daily step count (e.g., maintaining 8,000 to 10,000 steps/day) actively prevents this compensatory collapse in NEAT.</li>
+      </ul>
+
+      <h2>Metabolic Adaptation (Adaptive Thermogenesis)</h2>
+      <p>During prolonged weight reduction, the human body exhibits <strong>Adaptive Thermogenesis</strong>—a defense mechanism engineered during evolutionary famine to preserve adipose tissue reserves. Groundbreaking research led by Dr. Kevin Hall at the National Institutes of Health (NIH) demonstrates that as adipose mass declines:</p>
+      <ul>
+        <li>Circulating <strong>leptin</strong> concentrations plummet by over 50%, signaling the hypothalamus to stimulate intense appetite and downregulate basal metabolic burn.</li>
+        <li>Active thyroid hormone (triiodothyronine, $T_3$) declines while reverse $T_3$ ($rT_3$) rises, dampening mitochondrial uncoupling protein-1 ($UCP1$) thermogenesis.</li>
+        <li>Skeletal muscle mitochondrial efficiency increases, meaning fewer calories are burned to perform the exact same mechanical physical movement.</li>
+      </ul>
+      <p>Consequently, actual maintenance TDEE at a reduced weight is frequently <strong>100 to 300 kcal lower</strong> than what standard mathematical formulas predict for someone of that new weight who was never obese. Clinicians account for this adaptation by prescribing periodic "diet breaks" at maintenance TDEE to transiently restore leptin, thyroid, and metabolic signaling.</p>
+
+      <h2>Step-by-Step Worked Energy Balance Case Study</h2>
+      <p>The following case study illustrates an evidence-based clinical dietetic TDEE calculation and energetic prescription for fat loss:</p>
+
+      <div class="worked-example-card my-4">
+        <h3 class="example-title">Energy Balance Case Profile: Fat Loss Deficit Sizing</h3>
+        <p><strong>Patient Baseline:</strong> A 32-year-old male marketing manager presents for body composition consultation. Measurements: Height = <strong>5 feet 11 inches (71 inches / 180.34 cm)</strong>, Body Weight = <strong>190 lbs (86.18 kg)</strong>. He lifts weights at the gym 4 days per week and walks during lunch, categorizing him as <strong>Moderately Active ($PAL = 1.55$)</strong>.</p>
+        
+        <div class="example-step">
+          <div class="step-num">Step 1</div>
+          <div class="step-content">
+            <strong>Calculate Basal Metabolic Rate (BMR) via Mifflin-St Jeor:</strong>
+            $$\text{Height in cm} = (5 \times 12 + 11) \times 2.54 = 71 \times 2.54 = 180.34 \text{ cm}$$
+            $$BMR = (10 \times 86.18) + (6.25 \times 180.34) - (5 \times 32) + 5$$
+            $$BMR = 861.8 + 1127.13 - 160 + 5 = \mathbf{1,833.93 \approx 1,834 \text{ kcal/day}}$$
+            His body expends 1,834 kcal every 24 hours purely to sustain coma-state organ viability.
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 2</div>
+          <div class="step-content">
+            <strong>Calculate Total Daily Energy Expenditure (TDEE):</strong>
+            Applying the Moderately Active PAL factor ($1.55$):
+            $$TDEE = BMR \times PAL = 1,834 \times 1.55 = \mathbf{2,842.7 \approx 2,843 \text{ kcal/day}}$$
+            To maintain his current weight of 190 lbs, he must consume approximately 2,843 kcal daily.
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 3</div>
+          <div class="step-content">
+            <strong>Compute Thermogenic Partitioning Breakdown:</strong>
+            $$\text{Basal Metabolic Rate (BMR)} \approx \mathbf{1,834 \text{ kcal}} \quad (64.5\%)$$
+            $$\text{Thermic Effect of Food (TEF, 10\%)} \approx \mathbf{284 \text{ kcal}} \quad (10.0\%)$$
+            $$\text{Activity Thermogenesis (NEAT + EAT)} = 2,843 - (1,834 + 284) = \mathbf{725 \text{ kcal}} \quad (25.5\%)$$
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 4</div>
+          <div class="step-content">
+            <strong>Structure an Evidence-Based Fat Loss Deficit:</strong>
+            Prescribing a moderate 20% caloric restriction targets approximately 1 pound of fat loss per week while preventing lean muscle catabolism and metabolic adaptation:
+            $$\text{Deficit} = 2,843 \times 0.20 = \mathbf{568.6 \approx 570 \text{ kcal/day}}$$
+            $$\text{Target Intake} = 2,843 - 570 = \mathbf{2,273 \approx 2,275 \text{ kcal/day}}$$
+            Consuming 2,275 kcal/day creates a weekly deficit of $570 \times 7 = 3,990\text{ kcal}$, generating approximately 1.14 lbs of fat mass reduction per week.
+          </div>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <span class="logo-icon">🧮</span>
+            <span class="logo-text">CalcHub</span>
+          </div>
+          <p class="footer-tagline">Clinical, financial, and engineering reference calculators built with precision and peer-reviewed rigor.</p>
+        </div>
+        <div class="footer-links">
+          <h4 class="footer-heading">Health Calculators</h4>
+          <ul class="footer-nav">
+            <li><a href="tdee-calculator.html">TDEE Calculator</a></li>
+            <li><a href="bmr-calculator.html">BMR Calculator</a></li>
+            <li><a href="calorie-deficit-calculator.html">Calorie Deficit Calculator</a></li>
+            <li><a href="macro-calculator.html">Macro Split Calculator</a></li>
+            <li><a href="protein-intake-calculator.html">Protein Intake Calculator</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4 class="footer-heading">Categories</h4>
+          <ul class="footer-nav">
+            <li><a href="health.html">Health & Fitness</a></li>
+            <li><a href="finance.html">Financial Tools</a></li>
+            <li><a href="engineering.html">Engineering</a></li>
+            <li><a href="index.html">Directory</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. Educational and clinical calculation tools. Consult a registered dietitian for individualized nutrition therapy.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('tdee-form');
+      const unitSystem = document.getElementById('unit-system');
+      const genderSelect = document.getElementById('gender');
+      const heightUsGroup = document.getElementById('height-us-group');
+      const heightMetricGroup = document.getElementById('height-metric-group');
+      const heightFeet = document.getElementById('height-feet');
+      const heightInches = document.getElementById('height-inches');
+      const heightCm = document.getElementById('height-cm');
+      const bodyWeightInput = document.getElementById('body-weight');
+      const bodyAgeInput = document.getElementById('body-age');
+      const activitySelect = document.getElementById('activity-level');
+      const weightUnitLabels = document.querySelectorAll('.weight-unit');
+      const resultsContainer = document.getElementById('calculator-results');
+
+      unitSystem.addEventListener('change', function() {
+        const isMetric = unitSystem.value === 'metric';
+        if (isMetric) {
+          heightUsGroup.style.display = 'none';
+          heightMetricGroup.style.display = 'block';
+          weightUnitLabels.forEach(el => el.textContent = 'kg');
+
+          const ft = parseFloat(heightFeet.value) || 5;
+          const inc = parseFloat(heightInches.value) || 10;
+          const totalIn = (ft * 12) + inc;
+          heightCm.value = (totalIn * 2.54).toFixed(1);
+
+          bodyWeightInput.value = (parseFloat(bodyWeightInput.value) * 0.453592).toFixed(1);
+          bodyWeightInput.min = '30';
+          bodyWeightInput.max = '280';
+        } else {
+          heightUsGroup.style.display = 'flex';
+          heightMetricGroup.style.display = 'none';
+          weightUnitLabels.forEach(el => el.textContent = 'lbs');
+
+          const cm = parseFloat(heightCm.value) || 178;
+          const totalIn = cm / 2.54;
+          heightFeet.value = Math.floor(totalIn / 12);
+          heightInches.value = Math.round(totalIn % 12);
+
+          bodyWeightInput.value = (parseFloat(bodyWeightInput.value) / 0.453592).toFixed(1);
+          bodyWeightInput.min = '60';
+          bodyWeightInput.max = '600';
+        }
+      });
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const isMetric = unitSystem.value === 'metric';
+        const isMale = genderSelect.value === 'male';
+        const age = parseFloat(bodyAgeInput.value) || 30;
+        const pal = parseFloat(activitySelect.value) || 1.375;
+
+        let weightKg = 0;
+        let heightCmVal = 0;
+
+        if (isMetric) {
+          weightKg = parseFloat(bodyWeightInput.value) || 0;
+          heightCmVal = parseFloat(heightCm.value) || 0;
+        } else {
+          const rawWeight = parseFloat(bodyWeightInput.value) || 0;
+          weightKg = rawWeight * 0.453592;
+
+          const ft = parseFloat(heightFeet.value) || 0;
+          const inc = parseFloat(heightInches.value) || 0;
+          heightCmVal = ((ft * 12) + inc) * 2.54;
+        }
+
+        if (weightKg <= 0 || heightCmVal <= 0) return;
+
+        // BMR via Mifflin-St Jeor
+        const s = isMale ? 5 : -161;
+        const bmr = Math.round((10 * weightKg) + (6.25 * heightCmVal) - (5 * age) + s);
+        const tdee = Math.round(bmr * pal);
+
+        const moderateCut = Math.round(tdee * 0.80);
+        const aggCut = Math.round(tdee * 0.75);
+        const leanBulk = Math.round(tdee * 1.10);
+        const tef = Math.round(tdee * 0.10);
+
+        // Display results
+        document.getElementById('res-tdee').textContent = tdee.toLocaleString() + ' kcal / day';
+        document.getElementById('res-bmr').textContent = bmr.toLocaleString() + ' kcal / day';
+        document.getElementById('res-cut').textContent = moderateCut.toLocaleString() + ' kcal / day';
+        document.getElementById('res-bulk').textContent = leanBulk.toLocaleString() + ' kcal / day';
+        document.getElementById('res-agg-cut').textContent = aggCut.toLocaleString() + ' kcal / day';
+        document.getElementById('res-tef').textContent = '~' + tef.toLocaleString() + ' kcal / day';
+
+        document.getElementById('res-partition-text').textContent =
+          'Your baseline BMR accounts for ' + bmr + ' kcal (the energy required to sustain vital organ systems in complete rest). Physical activity and occupational thermogenesis add approximately ' + Math.round(tdee - bmr - tef) + ' kcal, while digestion (TEF) expends roughly ' + tef + ' kcal. A moderate 20% deficit targeting ' + moderateCut + ' kcal/day creates a safe, sustainable fat loss rate of roughly 1 lb per week.';
+
+        resultsContainer.style.display = 'block';
+        resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+
+      // Initial execution
+      form.dispatchEvent(new Event('submit'));
+    });
+  </script>
+</body>
+</html>

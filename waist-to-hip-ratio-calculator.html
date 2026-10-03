@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waist-to-Hip Ratio Calculator | WHO Body Shape & Health Risk</title>
+  <meta name="description" content="Calculate your Waist-to-Hip Ratio (WHR) based on World Health Organization (WHO) standards. Differentiate Android vs Gynoid body fat and cardiovascular risk.">
+  <link rel="canonical" href="https://calchub.com/waist-to-hip-ratio-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Clinical Waist-to-Hip Ratio (WHR) Calculator",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "description": "Calculates Waist-to-Hip Ratio (WHR), classifies Android versus Gynoid fat distribution, and stratifies cardiometabolic health risk according to World Health Organization (WHO) criteria."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the Waist-to-Hip Ratio (WHR) and what are the WHO clinical cutoffs?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Waist-to-Hip Ratio (WHR) is calculated by dividing waist circumference by hip circumference. According to the World Health Organization (WHO Technical Report Series 916), central obesity and substantially increased health risk are defined as a WHR greater than 0.90 for men and greater than 0.85 for women."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between Android ('Apple') and Gynoid ('Pear') fat distribution?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Android obesity refers to fat concentrated intra-abdominally around the waist and portal visceral organs, producing an 'apple' shape. It is strongly linked to insulin resistance, metabolic syndrome, and coronary artery disease. Gynoid obesity refers to fat concentrated subcutaneously around the hips, buttocks, and thighs ('pear' shape). Gynoid fat acts as an inert metabolic sink that is not associated with elevated cardiovascular risk."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Where should the hip circumference be measured?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Per World Health Organization standardized anthropometric protocol, hip circumference must be measured at the widest horizontal diameter over the greater trochanters of the femurs and the maximum extension of the buttocks, keeping the measuring tape parallel to the floor."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What did the landmark INTERHEART study find regarding WHR versus BMI?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The landmark INTERHEART study (published in The Lancet, evaluating 27,098 subjects across 52 countries) proved that Waist-to-Hip Ratio is substantially more predictive of myocardial infarction than Body Mass Index (BMI). The population attributable risk (PAR) for myocardial infarction was 33.7% for elevated WHR compared to negligible predictive value for BMI."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why do women naturally have a lower WHR cutoff than men?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Biological women have wider pelvic skeletal geometry and higher estrogen receptor-alpha (ERα) density in gluteofemoral adipose tissue, which selectively directs fat deposition to the hips and thighs. Consequently, women maintain a lower baseline WHR, and the clinical threshold for central visceral obesity is lower (0.85) than in men (0.90)."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="header">
+    <div class="header-container">
+      <div class="header-logo">
+        <a href="index.html" class="logo-link">
+          <span class="logo-icon">🧮</span>
+          <span class="logo-text">CalcHub</span>
+        </a>
+      </div>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="health.html" class="nav-link active">Health & Fitness</a>
+        <a href="finance.html" class="nav-link">Finance</a>
+        <a href="engineering.html" class="nav-link">Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <nav class="breadcrumb-nav">
+      <ol class="breadcrumb-list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="health.html">Health & Fitness</a></li>
+        <li class="active">Waist-to-Hip Ratio Calculator</li>
+      </ol>
+    </nav>
+
+    <div class="page-layout">
+      <div class="calculator-container">
+        <div class="calculator-card">
+          <h1 class="calculator-title">Clinical Waist-to-Hip Ratio (WHR) Calculator</h1>
+          <p class="calculator-subtitle">Evaluate your body fat distribution, distinguish Android vs Gynoid somatotypes, and assess cardiovascular health risk using World Health Organization (WHO) standards.</p>
+
+          <form id="whr-form" class="calculator-form">
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="unit-system" class="form-label">Measurement Units</label>
+                <select id="unit-system" class="form-select">
+                  <option value="us" selected>US Customary (Inches)</option>
+                  <option value="metric">Metric (Centimeters)</option>
+                </select>
+              </div>
+              <div class="form-group col-half">
+                <label for="gender" class="form-label">Biological Sex</label>
+                <select id="gender" class="form-select">
+                  <option value="male" selected>Male (WHO Cutoff: &gt;0.90)</option>
+                  <option value="female">Female (WHO Cutoff: &gt;0.85)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="waist-circ" class="form-label">Waist Circumference (<span class="unit-label">Inches</span>)</label>
+                <input type="number" id="waist-circ" class="form-input" min="15" max="80" value="34" step="0.25" required>
+                <small class="form-hint">Midpoint between bottom rib and top of iliac crest.</small>
+              </div>
+              <div class="form-group col-half">
+                <label for="hip-circ" class="form-label">Hip Circumference (<span class="unit-label">Inches</span>)</label>
+                <input type="number" id="hip-circ" class="form-input" min="20" max="90" value="40" step="0.25" required>
+                <small class="form-hint">Widest horizontal circumference over the buttocks.</small>
+              </div>
+            </div>
+
+            <button type="submit" class="calculate-btn">Compute Waist-to-Hip Ratio</button>
+          </form>
+
+          <div id="calculator-results" class="results-container" style="display: none;">
+            <h2 class="results-heading">Body Composition &amp; Risk Profile</h2>
+
+            <div class="results-grid">
+              <div class="result-card primary-result">
+                <span class="result-label">Waist-to-Hip Ratio (WHR)</span>
+                <span id="res-whr-value" class="result-value">--</span>
+                <span id="res-whr-badge" class="result-subtext badge-tag">Low Risk</span>
+              </div>
+
+              <div class="result-card highlight-card">
+                <span class="result-label">Body Fat Distribution Pattern</span>
+                <span id="res-fat-pattern" class="result-value">--</span>
+                <span class="result-subtext">Android vs. Gynoid Morphology</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">WHO Cardiometabolic Risk Level</span>
+                <span id="res-who-risk" class="result-value">--</span>
+                <span class="result-subtext">Based on WHO Technical Report 916</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Clinical Risk Cutoff Threshold</span>
+                <span id="res-cutoff-threshold" class="result-value">--</span>
+                <span class="result-subtext">Sex-specific boundary</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Target Waist Circumference</span>
+                <span id="res-target-waist" class="result-value">--</span>
+                <span class="result-subtext">To reach low-risk WHR at current hip size</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Variance from Cutoff</span>
+                <span id="res-variance-status" class="result-value">--</span>
+                <span id="res-variance-note" class="result-subtext">Margin</span>
+              </div>
+            </div>
+
+            <div class="summary-box mt-4">
+              <h3 class="summary-title">Cardiometabolic Risk Interpretation</h3>
+              <p id="res-clinical-text" class="summary-text">Loading anthropometric evaluation...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚖️</span>
+            <h3 class="widget-title">Related Health & Fitness</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bmr-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMR Calculator</a></li>
+            <li><a href="macro-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Macro Split Calculator</a></li>
+            <li><a href="calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Calculator (TDEE)</a></li>
+            <li><a href="bmi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Daily Water Intake</a></li>
+            <li><a href="a1c-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> HbA1c to eAG Glucose Sizer</a></li>
+            <li><a href="bac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Blood Alcohol (BAC) Clearance</a></li>
+            <li><a href="body-surface-area-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Surface Area (Mosteller)</a></li>
+            <li><a href="bsa-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Oncology BSA & Calvert Dosing</a></li>
+            <li><a href="calorie-deficit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Deficit & Fat Loss Planner</a></li>
+            <li><a href="calories-burned-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exercise Calories Burned (METs)</a></li>
+            <li><a href="carbohydrate-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Carbohydrate Intake & Glycogen</a></li>
+            <li><a href="cholesterol-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cholesterol Ratio & Castelli Risk</a></li>
+            <li><a href="due-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Due Date & Gestation</a></li>
+            <li><a href="fat-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Dietary Fat Intake (Grams/Day)</a></li>
+            <li><a href="heart-rate-zone-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heart Rate Zone (Karvonen HRR)</a></li>
+            <li><a href="lean-body-mass-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lean Body Mass (Boer & James)</a></li>
+            <li><a href="max-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Max Heart Rate (Tanaka & Gulati)</a></li>
+            <li><a href="met-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> METs & Activity Caloric Burn</a></li>
+            <li><a href="ovulation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ovulation & Fertile Window</a></li>
+            <li><a href="pregnancy-weight-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Weight Gain (IOM/ACOG)</a></li>
+            <li><a href="protein-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Protein Intake (ISSN/DRI Optimum)</a></li>
+            <li><a href="sleep-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sleep Cycle (90-Min REM Ultradian)</a></li>
+            <li><a href="sodium-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sodium to Salt & AHA Dietary Cap</a></li>
+            <li><a href="target-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Target Heart Rate (Karvonen HRR)</a></li>
+            <li><a href="tdee-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> TDEE & Calorie Burn (Total Daily)</a></li>
+            <li><a href="waist-to-height-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio (WHtR)</a></li>
+            <li><a href="waist-to-height-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio Sizer</a></li>
+            <li><a href="waist-to-hip-ratio-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Waist-to-Hip Ratio (WHR Risk)</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="health.html" class="sidebar-category-link">View All Health & Fitness Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <article class="article-body">
+      <h2>The Physiology of Regional Body Fat Distribution</h2>
+      <p>In clinical cardiology and metabolic medicine, body composition is defined not merely by total adipose mass, but by regional anatomical partitioning. For decades, total weight and Body Mass Index ($BMI = kg/m^2$) served as the primary clinical metrics for obesity. However, BMI fails completely to identify <em>where</em> adipose tissue is sequestered. The <strong>Waist-to-Hip Ratio (WHR)</strong> evaluates the proportionality between central abdominal fat and peripheral gluteofemoral subcutaneous fat, exposing two radically different biological somatotypes:</p>
+      <ul>
+        <li><strong>Android ("Apple") Adiposity:</strong> Adipose tissue is predominantly accumulated intra-abdominally within the greater omentum and mesentery surrounding visceral organs. Android obesity is driven by high density of lipolytic $\beta$-adrenergic receptors and glucocorticoid sensitivity, draining directly into the hepatic portal circulation. It represents the driving force behind the metabolic syndrome, atherogenic dyslipidemia, and systemic insulin resistance.</li>
+        <li><strong>Gynoid ("Pear") Adiposity:</strong> Adipose tissue is concentrated subcutaneously over the gluteal and femoral regions (hips and thighs). Gynoid fat possesses high lipoprotein lipase ($LPL$) activity and high density of anti-lipolytic $\alpha_{2A}$-adrenergic receptors, acting as an inert, protective metabolic buffer that sequesters excess triglycerides away from the liver and skeletal muscle.</li>
+      </ul>
+
+      <h2>Mathematical Formulation: Waist-to-Hip Ratio (WHR)</h2>
+      <p>The Waist-to-Hip Ratio is the dimensionless mathematical quotient of waist circumference ($W$) divided by hip circumference ($H$), measured in identical linear units:</p>
+
+      $$WHR = \frac{\text{Waist Circumference}}{\text{Hip Circumference}}$$
+
+      <p>Because the hip circumference in the denominator reflects gluteofemoral subcutaneous fat and pelvic skeletal width, WHR serves as a physiological contrast ratio: a high WHR indicates an expansion of visceral abdominal mass relative to protective lower-body peripheral mass.</p>
+
+      <h2>World Health Organization (WHO) Diagnostic Criteria</h2>
+      <p>The <strong>World Health Organization (WHO Technical Report Series 916)</strong> established global clinical thresholds defining substantially increased cardiometabolic disease risk:</p>
+
+      <div class="table-container my-4">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Biological Sex</th>
+              <th>Low Cardiometabolic Risk</th>
+              <th>Moderate Health Risk</th>
+              <th>Substantially Increased Risk (Central Obesity)</th>
+              <th>Primary Clinical Significance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Men</strong></td>
+              <td>WHR &le; 0.90</td>
+              <td>WHR 0.91 – 0.99</td>
+              <td><strong>WHR &ge; 1.00</strong> (Strict threshold: &gt; 0.90)</td>
+              <td>Substantial elevation in coronary heart disease, stroke, and hepatic steatosis.</td>
+            </tr>
+            <tr>
+              <td><strong>Women</strong></td>
+              <td>WHR &le; 0.80</td>
+              <td>WHR 0.81 – 0.84</td>
+              <td><strong>WHR &ge; 0.85</strong></td>
+              <td>Significant increase in insulin resistance, gestational diabetes, and cardiovascular events.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>The Landmark INTERHEART Study: Proving WHR Superiority Over BMI</h2>
+      <p>The definitive epidemiological proof of WHR's diagnostic supremacy over Body Mass Index was established by the landmark <strong>INTERHEART Study</strong>, published in <em>The Lancet</em> by Dr. Salim Yusuf and international collaborators across 262 centers in <strong>52 countries</strong> evaluating 27,098 individuals:</p>
+      <ul>
+        <li><strong>Predictive Power for Myocardial Infarction:</strong> The INTERHEART investigators evaluated whether BMI, waist circumference, or waist-to-hip ratio best predicted first acute myocardial infarction (heart attack). After multivariable adjustment for smoking, hypertension, diabetes, and lipid profiles, <strong>Waist-to-Hip Ratio was the single strongest anthropometric predictor of myocardial infarction across all regions and ethnic groups globally</strong>.</li>
+        <li><strong>Population Attributable Risk (PAR):</strong> Elevated WHR accounted for <strong>33.7% of the Population Attributable Risk (PAR)</strong> for myocardial infarction worldwide, whereas BMI had virtually zero independent predictive power once WHR was accounted for. Individuals in the highest quintile of WHR exhibited more than double the odds of myocardial infarction compared to the lowest quintile ($\text{Odds Ratio } 2.44$).</li>
+        <li><strong>The False Security of Low BMI:</strong> INTERHEART demonstrated that individuals with a low or normal BMI (<25 kg/m&sup2;) who harbored a high WHR faced greater cardiovascular risk than individuals with an elevated BMI but a favorable, low WHR.</li>
+      </ul>
+
+      <h2>Biological Sexual Dimorphism in Adipose Partitioning</h2>
+      <p>The biological cutoffs for WHR differ decisively between men (0.90) and women (0.85) due to profound neuroendocrine and evolutionary differences:</p>
+      <ul>
+        <li><strong>Estrogen and Lipoprotein Lipase (LPL):</strong> In premenopausal women, ovarian 17&beta;-estradiol acts upon estrogen receptor-alpha ($ER\alpha$) in gluteofemoral adipocytes, selectively upregulating lipoprotein lipase activity and directing dietary fat into subcutaneous hip and thigh depots to store energy for pregnancy and lactation.</li>
+        <li><strong>The Menopausal Metabolic Shift:</strong> Following menopause, estrogen levels plummet, and the androgen-to-estrogen ratio increases. Postmenopausal women experience an accelerated redistribution of body fat from gynoid subcutaneous depots into central visceral depots, resulting in a rapid increase in WHR and a steep rise in cardiovascular morbidity matching male rates.</li>
+        <li><strong>Androgen Influences in Men:</strong> In men, testosterone suppresses subcutaneous femoral fat accumulation while visceral fat receptors remain highly sensitive to cortisol and sympathetic stimulation, predisposing men to android abdominal fat accumulation starting in early adulthood.</li>
+      </ul>
+
+      <h2>Step-by-Step Worked Clinical Case Study</h2>
+      <p>The following case study illustrates an evidence-based clinical cardiology assessment comparing BMI and WHR in a female patient presenting for cardiovascular risk profiling:</p>
+
+      <div class="worked-example-card my-4">
+        <h3 class="example-title">Cardiovascular Prevention Case Profile: Android Obesity Screening</h3>
+        <p><strong>Patient Baseline:</strong> A 50-year-old perimenopausal female presents for a routine checkup. Anthropometrics: Height = <strong>5 feet 4 inches (64 inches / 162.6 cm)</strong>, Body Weight = <strong>140 lbs (63.5 kg)</strong>. Measured Waist Circumference = <strong>32.5 inches (82.55 cm)</strong>, Measured Hip Circumference = <strong>36.0 inches (91.44 cm)</strong>.</p>
+        
+        <div class="example-step">
+          <div class="step-num">Step 1</div>
+          <div class="step-content">
+            <strong>Compute Traditional Body Mass Index (BMI):</strong>
+            $$\text{BMI} = 703 \times \frac{140}{(64)^2} = 703 \times \frac{140}{4096} = \mathbf{24.03 \text{ kg/m}^2}$$
+            Evaluation: A BMI of 24.03 falls within the 18.5–24.9 range, classifying her as <em>"Normal Weight."</em> Under traditional clinic workflows, no metabolic concerns would be raised.
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 2</div>
+          <div class="step-content">
+            <strong>Calculate Waist-to-Hip Ratio (WHR):</strong>
+            $$WHR = \frac{\text{Waist Circumference}}{\text{Hip Circumference}} = \frac{32.5 \text{ in}}{36.0 \text{ in}} = \mathbf{0.903}$$
+            In metric equivalents: $82.55 \text{ cm} / 91.44 \text{ cm} = \mathbf{0.903}$.
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 3</div>
+          <div class="step-content">
+            <strong>Evaluate Against WHO Technical Report 916 Standards:</strong>
+            For adult females, the WHO cutoff for substantially increased cardiometabolic risk is <strong>WHR &gt; 0.85</strong>.
+            $$\Delta = 0.903 - 0.850 = \mathbf{+0.053 \text{ above clinical risk ceiling}}$$
+            Her WHR of 0.903 diagnoses <strong>Android (Apple-shaped) Obesity</strong> despite a completely normal BMI!
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 4</div>
+          <div class="step-content">
+            <strong>Compute Target Waist for Her Current Hip Dimension:</strong>
+            To reach the low-risk threshold ($\le 0.80$) at her current hip circumference of 36.0 inches:
+            $$\text{Target Waist} = 36.0 \times 0.80 = \mathbf{28.8 \text{ inches}}$$
+            She must reduce her waist circumference by $32.5 - 28.8 = \mathbf{3.7 \text{ inches}}$ to eliminate excess visceral fat.
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 5</div>
+          <div class="step-content">
+            <strong>Diagnostic Corroboration &amp; Intervention:</strong>
+            Fasting laboratory testing reveals an early atherogenic lipid profile (Triglycerides 188 mg/dL, HDL-C 42 mg/dL) and borderline fasting glucose (104 mg/dL). Initiating a Mediterranean dietary pattern rich in monounsaturated fats and prescribing 150 minutes of weekly aerobic exercise successfully reverses central visceral accumulation and restores a gynoid lipid profile.
+          </div>
+        </div>
+      </div>
+
+      <h2>Standardized Anthropometric Measurement Technique (WHO Protocol)</h2>
+      <p>Accurate calculation of WHR requires exact anatomical landmark identification to eliminate clinical measurement variability:</p>
+      <ul>
+        <li><strong>Waist Measurement:</strong> Standing erect with arms at sides, place the measuring tape horizontally around the torso at the midpoint between the inferior margin of the lowest palpable rib and the highest point of the iliac crest (usually level with the navel). Record at the end of a normal expiration.</li>
+        <li><strong>Hip Measurement:</strong> Place the measuring tape horizontally around the maximum extension of the buttocks, corresponding anatomically to the level of the <strong>greater trochanters of the femurs</strong>. Ensure the tape is parallel to the floor from front, side, and rear views.</li>
+        <li><strong>Consistency:</strong> Both measurements must be taken with the tape snug against the skin or light undergarments without compressing subcutaneous tissue. Repeat twice; if measurements differ by $>1\text{ cm}$, take a third reading and calculate the average.</li>
+      </ul>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <span class="logo-icon">🧮</span>
+            <span class="logo-text">CalcHub</span>
+          </div>
+          <p class="footer-tagline">Clinical, financial, and engineering reference calculators built with precision and peer-reviewed rigor.</p>
+        </div>
+        <div class="footer-links">
+          <h4 class="footer-heading">Health Calculators</h4>
+          <ul class="footer-nav">
+            <li><a href="waist-to-hip-ratio-calculator.html">Waist to Hip Ratio Calculator</a></li>
+            <li><a href="waist-to-height-ratio-calculator.html">Waist to Height Ratio Calculator</a></li>
+            <li><a href="bmi-calculator.html">BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
+            <li><a href="cholesterol-ratio-calculator.html">Cholesterol Ratio Calculator</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4 class="footer-heading">Categories</h4>
+          <ul class="footer-nav">
+            <li><a href="health.html">Health & Fitness</a></li>
+            <li><a href="finance.html">Financial Tools</a></li>
+            <li><a href="engineering.html">Engineering</a></li>
+            <li><a href="index.html">Directory</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. Educational and clinical calculation tools. Consult a physician for individualized cardiovascular risk assessment.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('whr-form');
+      const unitSystem = document.getElementById('unit-system');
+      const genderSelect = document.getElementById('gender');
+      const waistInput = document.getElementById('waist-circ');
+      const hipInput = document.getElementById('hip-circ');
+      const unitLabels = document.querySelectorAll('.unit-label');
+      const resultsContainer = document.getElementById('calculator-results');
+
+      unitSystem.addEventListener('change', function() {
+        const isMetric = unitSystem.value === 'metric';
+        if (isMetric) {
+          unitLabels.forEach(el => el.textContent = 'Centimeters');
+          waistInput.value = (parseFloat(waistInput.value) * 2.54).toFixed(1);
+          hipInput.value = (parseFloat(hipInput.value) * 2.54).toFixed(1);
+          waistInput.min = '40';
+          waistInput.max = '200';
+          hipInput.min = '50';
+          hipInput.max = '225';
+        } else {
+          unitLabels.forEach(el => el.textContent = 'Inches');
+          waistInput.value = (parseFloat(waistInput.value) / 2.54).toFixed(1);
+          hipInput.value = (parseFloat(hipInput.value) / 2.54).toFixed(1);
+          waistInput.min = '15';
+          waistInput.max = '80';
+          hipInput.min = '20';
+          hipInput.max = '90';
+        }
+      });
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const isMetric = unitSystem.value === 'metric';
+        const isMale = genderSelect.value === 'male';
+        const waist = parseFloat(waistInput.value) || 0;
+        const hip = parseFloat(hipInput.value) || 0;
+        const unitStr = isMetric ? 'cm' : 'in';
+
+        if (waist <= 0 || hip <= 0) return;
+
+        const whr = waist / hip;
+        const cutoff = isMale ? 0.90 : 0.85;
+        const optimalCutoff = isMale ? 0.85 : 0.80;
+        const targetWaist = (hip * optimalCutoff).toFixed(1);
+        const variance = (whr - cutoff).toFixed(2);
+
+        let riskLevel = '';
+        let badgeHtml = '';
+        let patternStr = '';
+        let clinicalText = '';
+
+        if (whr > cutoff) {
+          riskLevel = 'Substantially Increased Risk (Central Obesity)';
+          badgeHtml = '<span class="status-above">High Risk (&gt; ' + cutoff + ')</span>';
+          patternStr = 'Android Morphology ("Apple" Shape)';
+          clinicalText = 'Your WHR exceeds the WHO clinical boundary of ' + cutoff + ' for ' + (isMale ? 'men' : 'women') + '. This indicates prominent central visceral adipose deposition around intra-abdominal portal organs. Elevated risk for type 2 diabetes, atherogenic dyslipidemia, and coronary artery disease. A waist reduction of ' + Math.abs((waist - targetWaist).toFixed(1)) + ' ' + unitStr + ' is recommended to reach the low-risk band.';
+        } else if (whr > optimalCutoff) {
+          riskLevel = 'Moderate Health Risk';
+          badgeHtml = '<span class="status-below">Moderate Risk</span>';
+          patternStr = 'Intermediate Distribution';
+          clinicalText = 'Your WHR is within the intermediate range. Maintain active physical exercise and balanced nutrition to prevent progressive waist enlargement.';
+        } else {
+          riskLevel = 'Low Cardiometabolic Risk';
+          badgeHtml = '<span class="status-normal">Low Risk (&le; ' + optimalCutoff + ')</span>';
+          patternStr = 'Gynoid Morphology ("Pear" / Low Central Fat)';
+          clinicalText = 'Congratulations! Your WHR is comfortably within the WHO low-risk category. Your body fat distribution reflects minimal deep visceral accumulation and optimal cardiovascular protection.';
+        }
+
+        // Render results
+        document.getElementById('res-whr-value').textContent = whr.toFixed(2);
+        document.getElementById('res-whr-badge').innerHTML = badgeHtml;
+        document.getElementById('res-fat-pattern').textContent = patternStr;
+        document.getElementById('res-who-risk').textContent = riskLevel;
+        document.getElementById('res-cutoff-threshold').textContent = 'WHR > ' + cutoff + ' (' + (isMale ? 'Male' : 'Female') + ')';
+        document.getElementById('res-target-waist').textContent = targetWaist + ' ' + unitStr;
+        document.getElementById('res-variance-status').textContent = (variance > 0 ? '+' : '') + variance;
+        document.getElementById('res-variance-note').textContent = variance > 0 ? 'Above WHO clinical cutoff' : 'Safely below WHO cutoff';
+        document.getElementById('res-clinical-text').textContent = clinicalText;
+
+        resultsContainer.style.display = 'block';
+        resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+
+      // Initial execution
+      form.dispatchEvent(new Event('submit'));
+    });
+  </script>
+</body>
+</html>

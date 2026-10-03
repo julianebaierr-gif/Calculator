@@ -43,5 +43,5 @@ for cat in unbuilt:
     status = "COMPLETE" if u_count == 0 else f"{u_count} REMAINING"
     print(f"{cat}: {b_count}/{b_count + u_count} built ({status})")
     if u_count > 0:
-        for t in unbuilt[cat][:6]:
+        for t in unbuilt[cat]:
             print(f"   - {t[0]} -> {t[1]}")

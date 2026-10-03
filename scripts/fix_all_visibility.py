@@ -36,6 +36,14 @@ CAT_MAP = {
             ("met-calculator.html", "METs & Activity Caloric Burn", "⚡", "Compendium MET-minutes, VO2 uptake & WHO guidelines", "Calories = MET · 3.5 · W(kg) / 200 · min | MET-min/wk"),
             ("ovulation-calculator.html", "Ovulation & Fertile Window", "🌸", "Ogino-Knaus rhythm method, luteal phase & LH surge", "Ovulation = Cycle - Luteal | Fertile: [Od - 5, Od]"),
             ("pregnancy-weight-gain-calculator.html", "Pregnancy Weight Gain (IOM/ACOG)", "🤰", "Pre-pregnancy BMI targets, weekly rates & twin curves", "Target GWG per IOM 2009 guidelines by BMI class"),
+            ("protein-intake-calculator.html", "Protein Intake (ISSN/DRI Optimum)", "🥩", "Daily protein requirements for athletes, hypertrophy & clinical cut", "DRI: 0.8 g/kg | ISSN: 1.4-2.0 g/kg | Cut: 2.3-3.1 g/kg FFM"),
+            ("sleep-calculator.html", "Sleep Cycle (90-Min REM Ultradian)", "🌙", "Sleep onset latency, 90-min REM ultradian cycles & wake times", "Sleep Time = Wake Time - (n × 90 min) - Latency (14 min)"),
+            ("sodium-intake-calculator.html", "Sodium to Salt & AHA Dietary Cap", "🧂", "Dietary sodium conversion, AHA 1,500mg cap & Na/K balance", "Salt (NaCl g) = Sodium (mg) × 2.54 ÷ 1000 | AHA Ideal: 1,500 mg"),
+            ("target-heart-rate-calculator.html", "Target Heart Rate (Karvonen HRR)", "❤️", "Karvonen HRR formula, ACSM cardiovascular zones & VO2max", "THR = ((HR_max - HR_rest) × Intensity%) + HR_rest"),
+            ("tdee-calculator.html", "TDEE & Calorie Burn (Total Daily)", "🔥", "Total daily energy expenditure, PAL multiplier & BMR components", "TDEE = BMR × PAL = BMR + TEF + EAT + NEAT"),
+            ("waist-to-height-calculator.html", "Waist-to-Height Ratio (WHtR)", "📏", "Central adiposity screening, Ashwell boundary & cardiometabolic risk", "WHtR = Waist Circumference ÷ Stature Height | Optimal < 0.50"),
+            ("waist-to-height-ratio-calculator.html", "Waist-to-Height Ratio Sizer", "📐", "Bariatric WHtR visceral risk evaluation & boundary classification", "WHtR = Waist / Height | Boundary: <0.4 Take Care, 0.5 Ok, >0.6 High"),
+            ("waist-to-hip-ratio-calculator.html", "Waist-to-Hip Ratio (WHR Risk)", "⚖️", "WHO visceral adiposity ratio, android vs gynoid fat distribution", "WHR = Waist (cm) ÷ Hip (cm) | WHO High Risk: M > 0.90, F > 0.85"),
         ]
     },
     "finance.html": {

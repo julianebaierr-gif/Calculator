@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Target Heart Rate Calculator | ACSM & AHA Training Bands</title>
+  <meta name="description" content="Calculate your exact target heart rate (THR) training zones using the Karvonen Heart Rate Reserve (HRR) and Tanaka formulas. Grounded in ACSM exercise guidelines.">
+  <link rel="canonical" href="https://calchub.com/target-heart-rate-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Clinical Target Heart Rate Calculator",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "description": "Calculates clinical aerobic target heart rate zones comparing the Karvonen Heart Rate Reserve method with straight percentage formulas according to ACSM and AHA standards."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the difference between the Karvonen formula and the straight % HRmax method?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The straight percentage method simply multiplies maximum heart rate by target intensity [THR = HRmax × Intensity%]. In contrast, the Karvonen formula utilizes Heart Rate Reserve (HRR = HRmax - HRrest) and factors in baseline resting fitness: [THR = (HRR × Intensity%) + HRrest]. The Karvonen formula tracks true percentage of maximal oxygen uptake (VO2max) with significantly greater physiological accuracy."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the recommended target heart rate for moderate-intensity exercise?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "According to the American College of Sports Medicine (ACSM) and the American Heart Association (AHA), moderate-intensity aerobic exercise corresponds to 40% to 59% of Heart Rate Reserve (HRR) or 64% to 76% of maximum heart rate. For a 40-year-old with a resting heart rate of 65 bpm, moderate aerobic intensity spans approximately 111 to 133 beats per minute."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What target heart rate is recommended for vigorous exercise and VO2 max improvement?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Vigorous-intensity training, which stimulates mitochondrial biogenesis, expands left ventricular stroke volume, and elevates VO2 max, corresponds to 60% to 89% of Heart Rate Reserve (HRR) or 77% to 95% of HRmax. High-intensity interval training (HIIT) occurs at or above 90% HRR."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do beta-blocker medications affect target heart rate calculations?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Beta-adrenergic receptor antagonists (such as metoprolol, carvedilol, and atenolol) competitively block cardiac beta-1 receptors, dampening chronotropic pacemaking and lowering peak exercise heart rate by 20% to 35%. Mathematical age-predicted HRmax formulas significantly overestimate target heart rates for patients on beta-blockers. In these individuals, exercise intensity should be guided by Borg Rating of Perceived Exertion (RPE 12–14 on 6–20 scale) or individualized stress testing."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which formula is best for calculating maximum heart rate in target heart rate calculations?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Tanaka formula [HRmax = 208 - (0.7 × Age)] is the gold standard for general adult populations, validated across 18,712 subjects in a meta-analysis. For women, the Gulati formula [HRmax = 206 - (0.88 × Age)], derived from the St. James Women Take Heart Project, provides superior clinical accuracy by accounting for the steeper rate of chronotropic decline with age in females."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="header">
+    <div class="header-container">
+      <div class="header-logo">
+        <a href="index.html" class="logo-link">
+          <span class="logo-icon">🧮</span>
+          <span class="logo-text">CalcHub</span>
+        </a>
+      </div>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="health.html" class="nav-link active">Health & Fitness</a>
+        <a href="finance.html" class="nav-link">Finance</a>
+        <a href="engineering.html" class="nav-link">Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <nav class="breadcrumb-nav">
+      <ol class="breadcrumb-list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="health.html">Health & Fitness</a></li>
+        <li class="active">Target Heart Rate Calculator</li>
+      </ol>
+    </nav>
+
+    <div class="page-layout">
+      <div class="calculator-container">
+        <div class="calculator-card">
+          <h1 class="calculator-title">Clinical Target Heart Rate Calculator</h1>
+          <p class="calculator-subtitle">Calculate personalized aerobic and anaerobic target heart rate training bands using the Karvonen Heart Rate Reserve (HRR) and Tanaka algorithms.</p>
+
+          <form id="thr-form" class="calculator-form">
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="thr-age" class="form-label">Age (Years)</label>
+                <input type="number" id="thr-age" class="form-input" min="15" max="100" value="35" required>
+              </div>
+              <div class="form-group col-half">
+                <label for="thr-rest" class="form-label">Resting Heart Rate (BPM)</label>
+                <input type="number" id="thr-rest" class="form-input" min="35" max="120" value="62" required>
+                <small class="form-hint">Measure immediately upon waking (healthy resting: 50–75 BPM).</small>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="hrmax-model" class="form-label">HRmax Formula Model</label>
+                <select id="hrmax-model" class="form-select">
+                  <option value="tanaka" selected>Tanaka Formula: 208 - (0.7 × Age) [Gold Standard]</option>
+                  <option value="gulati">Gulati Formula: 206 - (0.88 × Age) [Female-Specific]</option>
+                  <option value="gellish">Gellish Formula: 207 - (0.7 × Age)</option>
+                  <option value="fox">Fox Formula: 220 - Age [Legacy Standard]</option>
+                </select>
+              </div>
+              <div class="form-group col-half">
+                <label for="calc-method" class="form-label">Calculation Methodology</label>
+                <select id="calc-method" class="form-select">
+                  <option value="karvonen" selected>Karvonen HRR Formula (Recommended, Anchored to Fitness)</option>
+                  <option value="straight">Straight % of HRmax (Traditional Simplified Method)</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="calculate-btn">Compute Target Training Zones</button>
+          </form>
+
+          <div id="calculator-results" class="results-container" style="display: none;">
+            <h2 class="results-heading">ACSM &amp; AHA Cardiovascular Training Bands</h2>
+
+            <div class="results-grid">
+              <div class="result-card primary-result">
+                <span class="result-label">Max Heart Rate (HRmax)</span>
+                <span id="res-hrmax" class="result-value">--</span>
+                <span id="res-hrr" class="result-subtext">Heart Rate Reserve: -- BPM</span>
+              </div>
+
+              <div class="result-card highlight-card">
+                <span class="result-label">Moderate Aerobic Zone (AHA Target)</span>
+                <span id="res-moderate-band" class="result-value">--</span>
+                <span class="result-subtext">40% – 59% HRR (Fat oxidation &amp; base health)</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Vigorous Aerobic Zone (Cardio)</span>
+                <span id="res-vigorous-band" class="result-value">--</span>
+                <span class="result-subtext">60% – 84% HRR (Aerobic capacity &amp; stamina)</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Anaerobic Threshold / HIIT Zone</span>
+                <span id="res-anaerobic-band" class="result-value">--</span>
+                <span class="result-subtext">85% – 95% HRR (Lactate clearance &amp; VO2 max)</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Warm-Up / Active Recovery</span>
+                <span id="res-recovery-band" class="result-value">--</span>
+                <span class="result-subtext">&lt; 40% HRR (Cool-down &amp; mobility)</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Borg RPE Moderate Equivalent</span>
+                <span id="res-borg-rpe" class="result-value">12 – 14</span>
+                <span class="result-subtext">"Somewhat Hard" on 6–20 Borg Scale</span>
+              </div>
+            </div>
+
+            <div class="summary-box mt-4">
+              <h3 class="summary-title">Cardiorespiratory Training Prescription</h3>
+              <p id="res-thr-summary" class="summary-text">Loading exercise physiology recommendations...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚖️</span>
+            <h3 class="widget-title">Related Health & Fitness</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bmr-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMR Calculator</a></li>
+            <li><a href="macro-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Macro Split Calculator</a></li>
+            <li><a href="calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Calculator (TDEE)</a></li>
+            <li><a href="bmi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Daily Water Intake</a></li>
+            <li><a href="a1c-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> HbA1c to eAG Glucose Sizer</a></li>
+            <li><a href="bac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Blood Alcohol (BAC) Clearance</a></li>
+            <li><a href="body-surface-area-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Surface Area (Mosteller)</a></li>
+            <li><a href="bsa-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Oncology BSA & Calvert Dosing</a></li>
+            <li><a href="calorie-deficit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Deficit & Fat Loss Planner</a></li>
+            <li><a href="calories-burned-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exercise Calories Burned (METs)</a></li>
+            <li><a href="carbohydrate-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Carbohydrate Intake & Glycogen</a></li>
+            <li><a href="cholesterol-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cholesterol Ratio & Castelli Risk</a></li>
+            <li><a href="due-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Due Date & Gestation</a></li>
+            <li><a href="fat-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Dietary Fat Intake (Grams/Day)</a></li>
+            <li><a href="heart-rate-zone-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heart Rate Zone (Karvonen HRR)</a></li>
+            <li><a href="lean-body-mass-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lean Body Mass (Boer & James)</a></li>
+            <li><a href="max-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Max Heart Rate (Tanaka & Gulati)</a></li>
+            <li><a href="met-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> METs & Activity Caloric Burn</a></li>
+            <li><a href="ovulation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ovulation & Fertile Window</a></li>
+            <li><a href="pregnancy-weight-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Weight Gain (IOM/ACOG)</a></li>
+            <li><a href="protein-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Protein Intake (ISSN/DRI Optimum)</a></li>
+            <li><a href="sleep-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sleep Cycle (90-Min REM Ultradian)</a></li>
+            <li><a href="sodium-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sodium to Salt & AHA Dietary Cap</a></li>
+            <li><a href="target-heart-rate-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Target Heart Rate (Karvonen HRR)</a></li>
+            <li><a href="tdee-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> TDEE & Calorie Burn (Total Daily)</a></li>
+            <li><a href="waist-to-height-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio (WHtR)</a></li>
+            <li><a href="waist-to-height-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio Sizer</a></li>
+            <li><a href="waist-to-hip-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Hip Ratio (WHR Risk)</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="health.html" class="sidebar-category-link">View All Health & Fitness Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <article class="article-body">
+      <h2>The Physiology of Exercise Heart Rate and Cardiovascular Strain</h2>
+      <p>During physical exertion, systemic oxygen delivery must scale proportionally with muscular metabolic demand. Total oxygen uptake ($VO_2$) is governed by the <strong>Fick Principle</strong>:</p>
+
+      $$VO_2 = \text{Cardiac Output } (CO) \times (C_aO_2 - C_vO_2) = (HR \times SV) \times (C_aO_2 - C_vO_2)$$
+
+      <p>Where $HR$ is heart rate in beats per minute, $SV$ is left ventricular stroke volume in milliliters per beat, and $(C_aO_2 - C_vO_2)$ represents the systemic arteriovenous oxygen difference. In untrained and recreational adults, stroke volume reaches its physiological plateau at roughly 40% to 50% of maximal aerobic capacity ($VO_2\text{max}$). Beyond this plateau, all further increases in cardiac output and tissue oxygen delivery must be mediated entirely by elevations in <strong>heart rate</strong>. Because heart rate exhibits a remarkably linear relationship with $VO_2$ between 50% and 90% of aerobic capacity, monitoring exercise heart rate serves as the primary clinical and athletic standard for prescribing exercise intensity.</p>
+
+      <h2>Mathematical Formulations: Straight % HRmax vs. Karvonen HRR</h2>
+      <p>Two principal mathematical models exist for computing Target Heart Rate ($THR$):</p>
+
+      <h3>1. The Straight Percentage of HRmax Method (% HRmax)</h3>
+      <p>The traditional simplified method computes target heart rate as an unadjusted proportion of estimated or measured maximum heart rate ($HR_{\text{max}}$):</p>
+
+      $$THR = HR_{\text{max}} \times \text{Target Intensity \%}$$
+
+      <p>While computationally simple, this method suffers from a major physiological flaw: it treats a subject with a resting heart rate of 45 BPM (elite marathoner) identically to a subject with a resting heart rate of 85 BPM (sedentary individual) if both share the same age and maximum heart rate. As demonstrated in exercise physiology trials, % HRmax systematically underestimates true metabolic exertion ($VO_2$ reserve) by 10% to 15% at submaximal workloads.</p>
+
+      <h3>2. The Karvonen Heart Rate Reserve (HRR) Method</h3>
+      <p>In 1957, Finnish exercise physiologist Dr. Martti Karvonen developed the <strong>Heart Rate Reserve (HRR)</strong> equation. HRR represents the functional chronotropic span between basal metabolic resting rate and maximal cardiac capacity:</p>
+
+      $$\text{Heart Rate Reserve (HRR)} = HR_{\text{max}} - HR_{\text{rest}}$$
+      $$THR = (HRR \times \text{Target Intensity \%}) + HR_{\text{rest}}$$
+
+      <p>Extensive cross-validation studies (such as those by Swain and Leutholtz) confirm that percentage of Heart Rate Reserve (% HRR) equates almost 1:1 with <strong>Percentage of Oxygen Uptake Reserve (% $VO_2\text{R}$)</strong>. Consequently, the Karvonen formula is the official method endorsed by the <strong>American College of Sports Medicine (ACSM)</strong> for precise exercise prescription.</p>
+
+      <div class="table-container my-4">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ACSM Intensity Classification</th>
+              <th>% Heart Rate Reserve (% HRR)</th>
+              <th>% Maximum Heart Rate (% HRmax)</th>
+              <th>Borg RPE Scale (6 – 20)</th>
+              <th>Physiological Adaptations &amp; Clinical Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Very Light / Active Recovery</strong></td>
+              <td>&lt; 30% HRR</td>
+              <td>&lt; 57% HRmax</td>
+              <td>&lt; 9 ("Very Light")</td>
+              <td>Post-event active recovery, joint mobilization, lymphatic clearance.</td>
+            </tr>
+            <tr>
+              <td><strong>Light Intensity</strong></td>
+              <td>30% – 39% HRR</td>
+              <td>57% – 63% HRmax</td>
+              <td>9 – 11 ("Fairly Light")</td>
+              <td>Initial conditioning for deconditioned individuals; minimal cardiac stress.</td>
+            </tr>
+            <tr>
+              <td><strong>Moderate Intensity (AHA Target)</strong></td>
+              <td>40% – 59% HRR</td>
+              <td>64% – 76% HRmax</td>
+              <td>12 – 13 ("Somewhat Hard")</td>
+              <td>Primary cardioprotective baseline; stimulates fat oxidation and improves insulin sensitivity.</td>
+            </tr>
+            <tr>
+              <td><strong>Vigorous Intensity (Aerobic Base)</strong></td>
+              <td>60% – 84% HRR</td>
+              <td>77% – 93% HRmax</td>
+              <td>14 – 16 ("Hard")</td>
+              <td>Elevates $VO_2\text{max}$, upregulates myocardial compliance, increases stroke volume.</td>
+            </tr>
+            <tr>
+              <td><strong>Near-Maximal / Anaerobic HIIT</strong></td>
+              <td>&ge; 85% HRR</td>
+              <td>&ge; 94% HRmax</td>
+              <td>17 – 20 ("Very Hard" to "Max")</td>
+              <td>Lactate tolerance, glycolytic buffering capacity, motor unit recruitment.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Selecting the Accurate Maximum Heart Rate Formula</h2>
+      <p>Because the Karvonen calculation depends on maximum heart rate, selecting an empirically validated HRmax equation is critical. While the legacy Fox equation ($220 - \text{Age}$) remains widely used on commercial cardiovascular machines, it possesses a high standard error of estimate (SEE $\pm 11$ BPM) and underestimates HRmax in adults over 40:</p>
+      <ul>
+        <li><strong>Tanaka Equation (2001):</strong> $HR_{\text{max}} = 208 - (0.7 \times \text{Age})$. Derived from a meta-analysis of 351 studies involving 18,712 subjects. Recommended as the universal baseline for healthy adults.</li>
+        <li><strong>Gulati Female-Specific Formula (2010):</strong> $HR_{\text{max}} = 206 - (0.88 \times \text{Age})$. Derived from the St. James Women Take Heart Project evaluating 5,437 asymptomatic women. Accounts for the steeper age-related chronotropic decline in females and prevents over-prescription of exercise intensity in women over 45.</li>
+        <li><strong>Gellish Equation (2007):</strong> $HR_{\text{max}} = 207 - (0.7 \times \text{Age})$. Longitudinal stress-testing protocol with high correlation ($r = -0.93$) and lowest residual variance in adult fitness cohorts.</li>
+      </ul>
+
+      <h2>Pharmacological Chronotropic Blunting: The Beta-Blocker Dilemma</h2>
+      <p>A critical contraindication to mathematical target heart rate formulas occurs in patients prescribed <strong>Beta-Adrenergic Receptor Antagonists (Beta-Blockers)</strong>—such as metoprolol, atenolol, bisoprolol, and carvedilol. These medications competitively bind to cardiac $\beta_1$-adrenergic receptors, blunting adenylyl cyclase activation and dampening sympathetic catecholaminergic acceleration of the sinoatrial node:</p>
+      <ul>
+        <li><strong>Magnitude of Chronotropic Suppression:</strong> Beta-blockers lower resting heart rate by 15 to 25 BPM and attenuate peak exercise heart rate by <strong>20% to 35%</strong> (frequently capping maximum exercise heart rate at 115 to 135 BPM regardless of age).</li>
+        <li><strong>Failure of Mathematical Formulas:</strong> Applying the Tanaka or Karvonen formula to a 55-year-old on metoprolol will predict a vigorous target zone of 135 to 150 BPM—a heart rate the patient's pharmacologically blocked sinoatrial node cannot physically attain without extreme circulatory distress!</li>
+        <li><strong>Clinical Solution (Borg RPE &amp; Stress Testing):</strong> In patients on beta-blocker therapy, target heart rates must either be established via direct physician-supervised Cardiopulmonary Exercise Testing (CPET) on the medication, or exercise intensity must be prescribed using the <strong>Borg Rating of Perceived Exertion (RPE) scale</strong>. Prescribing an RPE of <strong>12 to 14 ("Somewhat Hard")</strong> safely maintains patients in the moderate-to-vigorous cardioprotective window without relying on heart rate metrics.</li>
+      </ul>
+
+      <h2>Step-by-Step Worked Clinical Case Study</h2>
+      <p>The following case study illustrates an evidence-based cardiac conditioning prescription using the Karvonen Heart Rate Reserve methodology:</p>
+
+      <div class="worked-example-card my-4">
+        <h3 class="example-title">Cardiorespiratory Exercise Prescription Case Study</h3>
+        <p><strong>Patient Baseline:</strong> A 42-year-old female executive initiates a structured cardiovascular conditioning program. Resting heart rate measured upon waking is <strong>64 BPM</strong>. Anthropometrics confirm no medications. The exercise physiologist applies the female-specific Gulati formula and calculates her ACSM Moderate (40%–59% HRR) and Vigorous (60%–84% HRR) training bands.</p>
+        
+        <div class="example-step">
+          <div class="step-num">Step 1</div>
+          <div class="step-content">
+            <strong>Calculate Female-Specific HRmax via the Gulati Formula:</strong>
+            $$HR_{\text{max}} = 206 - (0.88 \times \text{Age}) = 206 - (0.88 \times 42) = 206 - 36.96 = \mathbf{169.04 \approx 169 \text{ BPM}}$$
+            (Note: The classic Fox formula would have overestimated her maximum at $220 - 42 = 178\text{ BPM}$, an error of +9 BPM).
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 2</div>
+          <div class="step-content">
+            <strong>Calculate Heart Rate Reserve (HRR):</strong>
+            $$HRR = HR_{\text{max}} - HR_{\text{rest}} = 169 - 64 = \mathbf{105 \text{ BPM}}$$
+            Her total available chronotropic operational range is exactly 105 beats per minute.
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 3</div>
+          <div class="step-content">
+            <strong>Compute ACSM Moderate Aerobic Target Zone (40% to 59% HRR):</strong>
+            $$\text{Moderate Floor (40\%)} = (105 \times 0.40) + 64 = 42.0 + 64 = \mathbf{106 \text{ BPM}}$$
+            $$\text{Moderate Ceiling (59\%)} = (105 \times 0.59) + 64 = 61.95 + 64 = \mathbf{126 \text{ BPM}}$$
+            <strong>Target Moderate Zone: 106 to 126 BPM</strong>. (Corresponds to Borg RPE 12–13 "Somewhat Hard", ideal for building mitochondrial density and lipid oxidation).
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 4</div>
+          <div class="step-content">
+            <strong>Compute ACSM Vigorous Aerobic Target Zone (60% to 84% HRR):</strong>
+            $$\text{Vigorous Floor (60\%)} = (105 \times 0.60) + 64 = 63.0 + 64 = \mathbf{127 \text{ BPM}}$$
+            $$\text{Vigorous Ceiling (84\%)} = (105 \times 0.84) + 64 = 88.2 + 64 = \mathbf{152 \text{ BPM}}$$
+            <strong>Target Vigorous Zone: 127 to 152 BPM</strong>. (Corresponds to Borg RPE 14–16 "Hard", ideal for elevating $VO_2\text{max}$ and threshold pace).
+          </div>
+        </div>
+      </div>
+
+      <h2>The Talk Test: Practical Correlation with Target Heart Rates</h2>
+      <p>For individuals exercising without a wearable optical heart rate monitor or electrocardiographic chest strap, the validated <strong>Talk Test</strong> provides an exceptional surrogate for identifying aerobic target zones:</p>
+      <ul>
+        <li><strong>Below Moderate (&lt;40% HRR):</strong> The exerciser can sing or speak continuous paragraphs without pause.</li>
+        <li><strong>Moderate Zone (40% – 59% HRR / 12–13 RPE):</strong> The exerciser can comfortably maintain a conversation and speak in complete sentences, but cannot sing without pausing for breath. This confirms the individual is exercising beneath the first ventilatory threshold ($VT_1$).</li>
+        <li><strong>Vigorous Zone (60% – 84% HRR / 14–16 RPE):</strong> The exerciser can speak only short, broken sentences of 4 to 6 words before needing to take a breath. Ventilation is accelerated by the onset of the isocapnic buffering period ($VT_1$ to $VT_2$).</li>
+        <li><strong>Near-Maximal Zone (&ge;85% HRR / 17+ RPE):</strong> Speech is impossible except for single words or gasps. Ventilation increases exponentially to eliminate excess metabolic carbon dioxide generated by lactic acid buffering.</li>
+      </ul>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <span class="logo-icon">🧮</span>
+            <span class="logo-text">CalcHub</span>
+          </div>
+          <p class="footer-tagline">Clinical, financial, and engineering reference calculators built with precision and peer-reviewed rigor.</p>
+        </div>
+        <div class="footer-links">
+          <h4 class="footer-heading">Health Calculators</h4>
+          <ul class="footer-nav">
+            <li><a href="target-heart-rate-calculator.html">Target Heart Rate Calculator</a></li>
+            <li><a href="max-heart-rate-calculator.html">Max Heart Rate Calculator</a></li>
+            <li><a href="heart-rate-zone-calculator.html">Heart Rate Zone Calculator</a></li>
+            <li><a href="calories-burned-calculator.html">Calories Burned (METs)</a></li>
+            <li><a href="met-calculator.html">MET Calculator</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4 class="footer-heading">Categories</h4>
+          <ul class="footer-nav">
+            <li><a href="health.html">Health & Fitness</a></li>
+            <li><a href="finance.html">Financial Tools</a></li>
+            <li><a href="engineering.html">Engineering</a></li>
+            <li><a href="index.html">Directory</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. Educational and clinical calculation tools. Consult a physician before beginning any vigorous exercise regimen.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('thr-form');
+      const ageInput = document.getElementById('thr-age');
+      const restInput = document.getElementById('thr-rest');
+      const hrmaxModelSelect = document.getElementById('hrmax-model');
+      const calcMethodSelect = document.getElementById('calc-method');
+      const resultsContainer = document.getElementById('calculator-results');
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const age = parseFloat(ageInput.value) || 35;
+        const rest = parseFloat(restInput.value) || 60;
+        const model = hrmaxModelSelect.value;
+        const method = calcMethodSelect.value;
+
+        // Calculate HRmax
+        let hrmax = 0;
+        if (model === 'tanaka') {
+          hrmax = Math.round(208 - (0.7 * age));
+        } else if (model === 'gulati') {
+          hrmax = Math.round(206 - (0.88 * age));
+        } else if (model === 'gellish') {
+          hrmax = Math.round(207 - (0.7 * age));
+        } else {
+          // Fox
+          hrmax = Math.round(220 - age);
+        }
+
+        const hrr = Math.max(hrmax - rest, 30);
+
+        function getBPM(pct) {
+          if (method === 'karvonen') {
+            return Math.round((hrr * pct) + rest);
+          } else {
+            return Math.round(hrmax * pct);
+          }
+        }
+
+        const modLow = getBPM(0.40);
+        const modHigh = getBPM(0.59);
+        const vigLow = getBPM(0.60);
+        const vigHigh = getBPM(0.84);
+        const anLow = getBPM(0.85);
+        const anHigh = getBPM(0.95);
+        const recLow = Math.round(rest);
+        const recHigh = getBPM(0.39);
+
+        // Display results
+        document.getElementById('res-hrmax').textContent = hrmax + ' BPM';
+        document.getElementById('res-hrr').textContent = 'Heart Rate Reserve: ' + hrr + ' BPM (Rest: ' + rest + ')';
+        document.getElementById('res-moderate-band').textContent = modLow + ' – ' + modHigh + ' BPM';
+        document.getElementById('res-vigorous-band').textContent = vigLow + ' – ' + vigHigh + ' BPM';
+        document.getElementById('res-anaerobic-band').textContent = anLow + ' – ' + anHigh + ' BPM';
+        document.getElementById('res-recovery-band').textContent = recLow + ' – ' + recHigh + ' BPM';
+
+        let summaryText = '';
+        if (method === 'karvonen') {
+          summaryText = 'Using the Karvonen formula anchored to your resting rate of ' + rest + ' BPM, your primary moderate aerobic training window is ' + modLow + ' to ' + modHigh + ' BPM. Maintain this zone for 150 minutes per week to fulfill AHA guidelines for cardiorespiratory longevity and metabolic fitness.';
+        } else {
+          summaryText = 'Using the straight percentage of HRmax method (' + hrmax + ' BPM), your moderate training target is ' + modLow + ' to ' + modHigh + ' BPM. Note that the Karvonen HRR method is recommended for superior alignment with true VO2 reserve.';
+        }
+        document.getElementById('res-thr-summary').textContent = summaryText;
+
+        resultsContainer.style.display = 'block';
+        resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+
+      // Initial execution
+      form.dispatchEvent(new Event('submit'));
+    });
+  </script>
+</body>
+</html>

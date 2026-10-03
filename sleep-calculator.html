@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sleep Calculator | 90-Minute Sleep Cycle & Alarm Sizer</title>
+  <meta name="description" content="Calculate optimal wake-up times and bedtimes based on 90-minute ultradian sleep cycles (NREM & REM), sleep latency, and avoiding groggy sleep inertia.">
+  <link rel="canonical" href="https://calchub.com/sleep-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Clinical Sleep Cycle & Bedtime Calculator",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "description": "Calculates prospective bedtimes and wake times utilizing 90-minute ultradian sleep cycle architecture, sleep onset latency offsets, and circadian sleep inertia mitigation."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How long is a natural human sleep cycle?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A standard human ultradian sleep cycle lasts approximately 90 minutes on average (typically ranging between 80 and 110 minutes across normal adults). Each cycle transitions sequentially through non-rapid eye movement stages (NREM N1 light transition, N2 consolidated sleep, N3 slow-wave deep sleep) and concludes with Rapid Eye Movement (REM) dream sleep."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why do I feel exhausted even after sleeping 8 hours?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Waking up feeling groggy, disoriented, and fatigued is termed 'sleep inertia.' It occurs primarily when an alarm interrupts Stage N3 slow-wave deep sleep (delta wave sleep), rather than during light N1/N2 sleep or at the natural completion of a 90-minute cycle. Sleeping 7.5 hours (exactly 5 full 90-minute cycles) frequently leaves people feeling significantly more refreshed than sleeping 8 hours (5.33 cycles, awakening midway through deep slow-wave sleep)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is sleep latency and how much time should be factored into bedtimes?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sleep onset latency is the time elapsed between lying down in bed with the intention to sleep and the electroencephalographic transition to Stage N1 sleep. In healthy adults, physiological sleep latency averages 14 minutes (clinically normal: 10 to 20 minutes). If latency is under 5 minutes, severe chronic sleep deprivation is likely present; if latency exceeds 30 minutes, clinical insomnia may be present."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the glymphatic system and why is deep sleep essential for brain health?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Discovered by Dr. Maiken Nedergaard, the glymphatic system is a glia-mediated convective waste clearance pathway. During Stage N3 slow-wave sleep, interstitial space volume expands by 60%, allowing cerebrospinal fluid (CSF) to wash through cerebral parenchyma via astrocytic aquaporin-4 (AQP4) water channels. This process actively clears neurotoxic metabolic aggregates, including amyloid-beta and phosphorylated tau."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How many sleep cycles are recommended per night?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Healthy adults typically require 5 to 6 completed sleep cycles per night, corresponding to 7.5 to 9.0 hours of actual sleep. Four completed cycles (6.0 hours) represents the absolute minimum chronic threshold to prevent progressive neurocognitive degradation and metabolic dysfunction."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="header">
+    <div class="header-container">
+      <div class="header-logo">
+        <a href="index.html" class="logo-link">
+          <span class="logo-icon">🧮</span>
+          <span class="logo-text">CalcHub</span>
+        </a>
+      </div>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="health.html" class="nav-link active">Health & Fitness</a>
+        <a href="finance.html" class="nav-link">Finance</a>
+        <a href="engineering.html" class="nav-link">Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <nav class="breadcrumb-nav">
+      <ol class="breadcrumb-list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="health.html">Health & Fitness</a></li>
+        <li class="active">Sleep Calculator</li>
+      </ol>
+    </nav>
+
+    <div class="page-layout">
+      <div class="calculator-container">
+        <div class="calculator-card">
+          <h1 class="calculator-title">Clinical Sleep Cycle & Bedtime Calculator</h1>
+          <p class="calculator-subtitle">Calculate optimal sleep and wake times anchored to 90-minute ultradian sleep architecture, sleep latency, and circadian rhythm harmonization.</p>
+
+          <form id="sleep-form" class="calculator-form">
+            <div class="form-group">
+              <label for="calc-mode" class="form-label">Calculation Mode</label>
+              <select id="calc-mode" class="form-select">
+                <option value="wakeup" selected>I need to wake up at a specific time (Find Bedtime)</option>
+                <option value="bedtime">I am going to bed at a specific time (Find Wake-Up Time)</option>
+                <option value="now">I am going to sleep right now (Find Wake-Up Time)</option>
+              </select>
+            </div>
+
+            <div id="target-time-group" class="form-row">
+              <div class="form-group col-half">
+                <label for="target-hour" class="form-label">Hour</label>
+                <select id="target-hour" class="form-select">
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7" selected>7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                  <option value="11">11</option>
+                  <option value="12">12</option>
+                </select>
+              </div>
+              <div class="form-group col-half">
+                <label for="target-minute" class="form-label">Minute &amp; AM/PM</label>
+                <div style="display:flex;gap:0.5rem;">
+                  <select id="target-minute" class="form-select" style="flex:1;">
+                    <option value="0" selected>00</option>
+                    <option value="5">05</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                    <option value="30">30</option>
+                    <option value="35">35</option>
+                    <option value="40">40</option>
+                    <option value="45">45</option>
+                    <option value="50">50</option>
+                    <option value="55">55</option>
+                  </select>
+                  <select id="target-ampm" class="form-select" style="width:85px;">
+                    <option value="AM" selected>AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="latency-mins" class="form-label">Average Time to Fall Asleep (Sleep Latency): <span id="latency-display" class="font-bold text-primary">15 minutes</span></label>
+              <div class="slider-container">
+                <input type="range" id="latency-mins" min="0" max="45" value="15" step="5" class="form-slider">
+              </div>
+              <small class="form-hint">Healthy adults average 14 minutes of sleep onset latency (range: 10–20 mins).</small>
+            </div>
+
+            <button type="submit" class="calculate-btn">Calculate Optimal Sleep Cycles</button>
+          </form>
+
+          <div id="calculator-results" class="results-container" style="display: none;">
+            <h2 class="results-heading" id="results-headline">Recommended Times</h2>
+            <p id="results-intro" class="calculator-subtitle">Waking up at the completion of a 90-minute sleep cycle ensures you wake during light sleep, avoiding groggy sleep inertia.</p>
+
+            <div class="results-grid">
+              <div class="result-card primary-result">
+                <span class="result-label" id="res-card-label-6">6 Cycles (Optimal 9.0 Hours)</span>
+                <span id="res-time-6" class="result-value">--</span>
+                <span class="result-subtext">Peak cognitive & athletic restoration</span>
+              </div>
+
+              <div class="result-card highlight-card">
+                <span class="result-label" id="res-card-label-5">5 Cycles (Recommended 7.5 Hours)</span>
+                <span id="res-time-5" class="result-value">--</span>
+                <span class="result-subtext">Standard healthy adult baseline</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label" id="res-card-label-4">4 Cycles (Minimum 6.0 Hours)</span>
+                <span id="res-time-4" class="result-value">--</span>
+                <span class="result-subtext">Acceptable short-term threshold</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label" id="res-card-label-3">3 Cycles (Power Sleep 4.5 Hours)</span>
+                <span id="res-time-3" class="result-value">--</span>
+                <span class="result-subtext">Emergency shift-work / temporary rest</span>
+              </div>
+            </div>
+
+            <div class="summary-box mt-4">
+              <h3 class="summary-title">Sleep Architecture Breakdown</h3>
+              <p id="res-architecture-text" class="summary-text">Loading polysomnography analysis...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚖️</span>
+            <h3 class="widget-title">Related Health & Fitness</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bmr-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMR Calculator</a></li>
+            <li><a href="macro-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Macro Split Calculator</a></li>
+            <li><a href="calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Calculator (TDEE)</a></li>
+            <li><a href="bmi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Daily Water Intake</a></li>
+            <li><a href="a1c-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> HbA1c to eAG Glucose Sizer</a></li>
+            <li><a href="bac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Blood Alcohol (BAC) Clearance</a></li>
+            <li><a href="body-surface-area-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Surface Area (Mosteller)</a></li>
+            <li><a href="bsa-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Oncology BSA & Calvert Dosing</a></li>
+            <li><a href="calorie-deficit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Deficit & Fat Loss Planner</a></li>
+            <li><a href="calories-burned-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exercise Calories Burned (METs)</a></li>
+            <li><a href="carbohydrate-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Carbohydrate Intake & Glycogen</a></li>
+            <li><a href="cholesterol-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cholesterol Ratio & Castelli Risk</a></li>
+            <li><a href="due-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Due Date & Gestation</a></li>
+            <li><a href="fat-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Dietary Fat Intake (Grams/Day)</a></li>
+            <li><a href="heart-rate-zone-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heart Rate Zone (Karvonen HRR)</a></li>
+            <li><a href="lean-body-mass-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lean Body Mass (Boer & James)</a></li>
+            <li><a href="max-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Max Heart Rate (Tanaka & Gulati)</a></li>
+            <li><a href="met-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> METs & Activity Caloric Burn</a></li>
+            <li><a href="ovulation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ovulation & Fertile Window</a></li>
+            <li><a href="pregnancy-weight-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Weight Gain (IOM/ACOG)</a></li>
+            <li><a href="protein-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Protein Intake (ISSN/DRI Optimum)</a></li>
+            <li><a href="sleep-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Sleep Cycle (90-Min REM Ultradian)</a></li>
+            <li><a href="sodium-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sodium to Salt & AHA Dietary Cap</a></li>
+            <li><a href="target-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Target Heart Rate (Karvonen HRR)</a></li>
+            <li><a href="tdee-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> TDEE & Calorie Burn (Total Daily)</a></li>
+            <li><a href="waist-to-height-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio (WHtR)</a></li>
+            <li><a href="waist-to-height-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio Sizer</a></li>
+            <li><a href="waist-to-hip-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Hip Ratio (WHR Risk)</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="health.html" class="sidebar-category-link">View All Health & Fitness Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <article class="article-body">
+      <h2>Neurobiology of Human Sleep Architecture and Ultradian Rhythms</h2>
+      <p>Sleep is not an inert physiological state of unconsciousness, but an active, highly organized neurobiological process essential for cerebral homeostasis, synaptic plasticity, memory consolidation, immunological competence, and systemic metabolic regulation. Electroencephalography (EEG), electrooculography (EOG), and electromyography (EMG) demonstrate that human sleep is structured into periodic, predictable <strong>ultradian cycles</strong> lasting approximately <strong>90 minutes</strong> (typically spanning 80 to 110 minutes in healthy adults). Across a typical nocturnal sleep period of 7 to 9 hours, a human adult completes four to six discrete sleep cycles.</p>
+
+      <p>Each 90-minute sleep cycle is comprised of two distinct biological states:</p>
+      <ul>
+        <li><strong>Non-Rapid Eye Movement (NREM) Sleep:</strong> Subdivided into three distinct stages representing progressive deepening of sleep and slowing of cortical electrophysiological oscillations.</li>
+        <li><strong>Rapid Eye Movement (REM) Sleep:</strong> Characterized by high-frequency, desynchronized cortical EEG patterns resembling wakefulness, rapid conjugate eye movements, muscle atonia, and vivid narrative dreaming.</li>
+      </ul>
+
+      <h2>The Four Stages of Human Sleep (AASM Classification)</h2>
+      <p>The <em>American Academy of Sleep Medicine (AASM)</em> established the standardized scoring criteria for the stages of human sleep:</p>
+
+      <div class="table-container my-4">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Sleep Stage</th>
+              <th>Predominant EEG Waveforms</th>
+              <th>Percentage of Total Sleep</th>
+              <th>Physiological Characteristics</th>
+              <th>Primary Biological Function</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Stage N1 (Light Transition)</strong></td>
+              <td>Theta waves (4 – 7 Hz), alpha dropout</td>
+              <td>2% – 5%</td>
+              <td>Hypnagogic jerks, slow rolling eye movements, easily aroused by faint noise.</td>
+              <td>Initial bridge between wakefulness and consolidated sleep.</td>
+            </tr>
+            <tr>
+              <td><strong>Stage N2 (Consolidated Light Sleep)</strong></td>
+              <td>Sleep spindles (11–16 Hz) &amp; K-complexes</td>
+              <td>45% – 55%</td>
+              <td>Heart rate decelerates, core body temperature drops, metabolic rate declines.</td>
+              <td>Motor skill procedural memory consolidation, sensory gating via thalamic reticular nucleus.</td>
+            </tr>
+            <tr>
+              <td><strong>Stage N3 (Slow-Wave Deep Sleep / SWS)</strong></td>
+              <td>High-voltage Delta waves (0.5 – 2 Hz, &gt;75 &mu;V)</td>
+              <td>15% – 25%</td>
+              <td>Profound parasympathetic dominance, minimal muscle tone, highest awakening threshold.</td>
+              <td>Human Growth Hormone (HGH) secretion, tissue repair, glymphatic neurotoxin clearance.</td>
+            </tr>
+            <tr>
+              <td><strong>REM Sleep (Paradoxical Sleep)</strong></td>
+              <td>Sawtooth waves, low-voltage mixed frequency</td>
+              <td>20% – 25%</td>
+              <td>Somatic muscle atonia (glycinergic/GABAergic motor neuron inhibition), variable HR and breathing.</td>
+              <td>Emotional memory processing, affective regulation, creative synthesis, and neuroplasticity.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>The Glymphatic Waste Clearance System</h2>
+      <p>A transformative discovery in contemporary neuroscience, spearheaded by Dr. Maiken Nedergaard at the University of Rochester Medical Center, identified the <strong>Glymphatic System</strong>—a brain-wide waste clearance network that operates almost exclusively during deep slow-wave sleep (Stage N3):</p>
+      <ul>
+        <li><strong>Mechanism of Astrocytic Clearance:</strong> During wakefulness, interstitial space within the brain is tightly compressed. During Stage N3 slow-wave sleep, glial cells (astrocytes) shrink, expanding interstitial space volume by <strong>60%</strong>. This creates a low-resistance pathway allowing arterial pulsations to drive convective influx of Cerebrospinal Fluid (CSF) along periarterial channels, filtering across astrocytic endfeet via <strong>Aquaporin-4 (AQP4) water channels</strong>.</li>
+        <li><strong>Elimination of Neurotoxic Aggregates:</strong> Convective interstitial fluid flow sweeps neurotoxic protein byproducts—including <strong>amyloid-beta ($A\beta$)</strong>, <strong>phosphorylated tau</strong>, and alpha-synuclein—into perivenous spaces for lymphatic drainage into the deep cervical lymph nodes.</li>
+        <li><strong>Clinical Pathology of Sleep Fragmentation:</strong> Chronic suppression or fragmentation of Stage N3 sleep severely impairs glymphatic clearance, accelerating cerebral accumulation of amyloid-beta plaques and neurofibrillary tangles, fundamentally elevating long-term risks for Alzheimer's disease and vascular dementia.</li>
+      </ul>
+
+      <h2>Sleep Inertia and the Math of Sleep Cycle Synchronization</h2>
+      <p>A widespread clinical complaint is waking up feeling exhausted, disoriented, and cognitively sluggish despite having slept for 8 or 9 hours. This debilitating state is clinically diagnosed as <strong>Sleep Inertia</strong>. Sleep inertia is caused by an abrupt forced awakening during <strong>Stage N3 Slow-Wave Deep Sleep</strong>, characterized by high-amplitude delta activity. Upon forced waking from Stage N3, the prefrontal cortex exhibits transient hypoperfusion and high lingering concentrations of the neuromodulator <strong>adenosine</strong>, impairing reaction time, working memory, and executive decision-making for 30 to 90 minutes.</p>
+
+      <p>Conversely, waking up at the conclusion of a 90-minute sleep cycle—when the brain has naturally transitioned through REM back into light Stage N1 or Stage N2 sleep—minimizes sleep inertia and allows instantaneous alertness. The mathematical model for optimal bedtimes and alarm times incorporates completed 90-minute ultradian cycles ($C$) and sleep onset latency ($L_{\text{sleep}}$):</p>
+
+      $$\text{Total Sleep Duration} = (N_{\text{cycles}} \times 90 \text{ min}) + L_{\text{sleep}}$$
+
+      <p>Where $N_{\text{cycles}}$ typically equals 5 (7.5 hours of sleep) or 6 (9.0 hours of sleep), and $L_{\text{sleep}}$ represents average physiological sleep onset latency (typically 14 to 15 minutes in healthy adults).</p>
+
+      <h2>Circadian Biology: Melatonin, Cortisol, and Adenosine Pressure</h2>
+      <p>Human sleep-wake timing is governed by the classic <strong>Two-Process Model of Sleep Regulation</strong> formulated by Alexander Borb&eacute;ly:</p>
+      <ul>
+        <li><strong>Process S (Homeostatic Sleep Pressure):</strong> Sleep pressure accumulates as an exponential function of continuous wakefulness. As cerebral neurons hydrolyze Adenosine Triphosphate ($ATP$) for metabolic energy, extracellular concentrations of free <strong>adenosine</strong> rise continuously in the basal forebrain and cortex, binding to inhibitory $A_1$ and $A_{2A}$ receptors. Caffeine functions as a competitive antagonist of adenosine receptors, masking sleep pressure without clearing adenosine. During sleep, adenosine is rapidly metabolized and re-phosphorylated, dissipating Process S.</li>
+        <li><strong>Process C (Circadian Pacemaker):</strong> Driven by the master circadian pacemaker located in the <strong>Suprachiasmatic Nucleus (SCN)</strong> of the anterior hypothalamus. Synchronized by photic input from intrinsically photosensitive retinal ganglion cells (ipRGCs) via the retinohypothalamic tract, the SCN regulates the rhythmic secretion of <strong>melatonin</strong> from the pineal gland. Melatonin begins rising 2 to 3 hours before habitual bedtime (Dim Light Melatonin Onset, DLMO), peak nocturnal levels occur between 2:00 AM and 4:00 AM, and the <strong>Cortisol Awakening Response (CAR)</strong> triggers morning arousal and alertness.</li>
+      </ul>
+
+      <h2>Step-by-Step Worked Clinical Case Study</h2>
+      <p>The following case study illustrates an evidence-based circadian and sleep cycle optimization protocol for a working professional:</p>
+
+      <div class="worked-example-card my-4">
+        <h3 class="example-title">Polysomnographic Case Profile: Sleep Inertia Elimination</h3>
+        <p><strong>Patient Baseline:</strong> A 34-year-old financial analyst must wake up at <strong>6:30 AM</strong> every weekday for work. She currently sets an alarm for 6:30 AM and goes to bed at 10:30 PM (8.0 hours in bed), but complains of chronic morning grogginess and reliance on high-dose caffeine. Her average sleep onset latency is <strong>15 minutes</strong>.</p>
+        
+        <div class="example-step">
+          <div class="step-num">Step 1</div>
+          <div class="step-content">
+            <strong>Analyze the Patient's Current Sleep Cycle Timing:</strong>
+            $$\text{Time in Bed} = \text{10:30 PM to 6:30 AM} = 8.0 \text{ hours} = 480 \text{ minutes}$$
+            $$\text{Actual Sleep Time} = 480 - 15 \text{ min (latency)} = 465 \text{ minutes}$$
+            $$\text{Cycles Completed} = \frac{465 \text{ min}}{90 \text{ min/cycle}} = \mathbf{5.17 \text{ cycles}}$$
+            Because she wakes at 5.17 cycles, her 6:30 AM alarm systematically rings 15 minutes into the deep slow-wave sleep (Stage N3) of her 6th cycle, triggering severe sleep inertia!
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 2</div>
+          <div class="step-content">
+            <strong>Calculate Target Bedtimes for 5 Completed Cycles (7.5 Hours of Sleep):</strong>
+            $$\text{Target Sleep Duration} = 5 \times 90 \text{ min} = 450 \text{ minutes} = 7 \text{ hours } 30 \text{ minutes}$$
+            $$\text{Total Time in Bed} = 450 \text{ min} + 15 \text{ min (latency)} = 465 \text{ minutes} = 7 \text{ hours } 45 \text{ minutes}$$
+            Subtracting 7 hours 45 minutes from 6:30 AM wake-up:
+            $$\text{Optimal Bedtime (5 Cycles)} = \mathbf{10:45 \text{ PM}}$$
+            Going to sleep at 10:45 PM allows her to wake precisely at the completion of cycle 5 in light Stage N1/N2 sleep.
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 3</div>
+          <div class="step-content">
+            <strong>Calculate Target Bedtimes for 6 Completed Cycles (9.0 Hours of Sleep):</strong>
+            $$\text{Target Sleep Duration} = 6 \times 90 \text{ min} = 540 \text{ minutes} = 9 \text{ hours } 00 \text{ minutes}$$
+            $$\text{Total Time in Bed} = 540 \text{ min} + 15 \text{ min} = 555 \text{ minutes} = 9 \text{ hours } 15 \text{ minutes}$$
+            Subtracting 9 hours 15 minutes from 6:30 AM wake-up:
+            $$\text{Optimal Bedtime (6 Cycles)} = \mathbf{9:15 \text{ PM}}$$
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 4</div>
+          <div class="step-content">
+            <strong>Clinical Intervention &amp; Outcome:</strong>
+            The clinician instructs the patient to shift her bedtime from 10:30 PM to <strong>10:45 PM</strong>. Despite spending 15 fewer minutes in bed, she awakens at the conclusion of her 5th cycle rather than in deep N3 slow-wave sleep. Morning sleep inertia resolves completely within three days, with sustained improvements in daytime vigilance and executive cognitive function.
+          </div>
+        </div>
+      </div>
+
+      <h2>Evidence-Based Sleep Hygiene and Chronobiology Principles</h2>
+      <p>To maximize sleep architecture quality and consolidate deep Stage N3 and REM sleep, sleep medicine specialists recommend several environmental and behavioral adaptations:</p>
+      <ul>
+        <li><strong>Thermal Regulation:</strong> Sleep onset requires a drop in core body temperature of approximately $1^\circ\text{C}$ ($2^\circ\text{F}$), facilitated by cutaneous vasodilation in the distal extremities (hands and feet). Maintaining bedroom ambient temperature at <strong>65°F to 68°F (18°C to 20°C)</strong> facilitates natural heat dissipation.</li>
+        <li><strong>Light Spectrum Management:</strong> Blue wavelength light (460–480 nm) strongly stimulates ipRGC melanopsin receptors, acutely suppressing pineal melatonin secretion. Cease exposure to unshaded screens and bright overhead LED lighting at least 60 to 90 minutes prior to bedtime.</li>
+        <li><strong>Adenosine &amp; Pharmacological Timing:</strong> Caffeine exhibits an average elimination half-life of 5 to 7 hours and a quarter-life of 10 to 12 hours. Consuming caffeine past 12:00 PM to 2:00 PM degrades Stage N3 slow-wave amplitude and reduces total restorative sleep time. Similarly, while ethanol (alcohol) acts as a GABAergic sedative that hastens sleep onset, its hepatic metabolism into acetaldehyde induces severe second-half sleep fragmentation and obliterates REM sleep architecture.</li>
+      </ul>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <span class="logo-icon">🧮</span>
+            <span class="logo-text">CalcHub</span>
+          </div>
+          <p class="footer-tagline">Clinical, financial, and engineering reference calculators built with precision and peer-reviewed rigor.</p>
+        </div>
+        <div class="footer-links">
+          <h4 class="footer-heading">Health Calculators</h4>
+          <ul class="footer-nav">
+            <li><a href="sleep-calculator.html">Sleep Cycle Calculator</a></li>
+            <li><a href="tdee-calculator.html">TDEE Calculator</a></li>
+            <li><a href="calorie-deficit-calculator.html">Calorie Deficit Calculator</a></li>
+            <li><a href="max-heart-rate-calculator.html">Max Heart Rate Calculator</a></li>
+            <li><a href="protein-intake-calculator.html">Protein Intake Calculator</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4 class="footer-heading">Categories</h4>
+          <ul class="footer-nav">
+            <li><a href="health.html">Health & Fitness</a></li>
+            <li><a href="finance.html">Financial Tools</a></li>
+            <li><a href="engineering.html">Engineering</a></li>
+            <li><a href="index.html">Directory</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. Educational and clinical calculation tools. Consult a board-certified sleep specialist for chronic sleep disorders.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('sleep-form');
+      const modeSelect = document.getElementById('calc-mode');
+      const targetTimeGroup = document.getElementById('target-time-group');
+      const hourSelect = document.getElementById('target-hour');
+      const minSelect = document.getElementById('target-minute');
+      const ampmSelect = document.getElementById('target-ampm');
+      const latencySlider = document.getElementById('latency-mins');
+      const latencyDisplay = document.getElementById('latency-display');
+      const resultsContainer = document.getElementById('calculator-results');
+
+      latencySlider.addEventListener('input', function() {
+        latencyDisplay.textContent = latencySlider.value + ' minutes';
+      });
+
+      modeSelect.addEventListener('change', function() {
+        if (modeSelect.value === 'now') {
+          targetTimeGroup.style.display = 'none';
+        } else {
+          targetTimeGroup.style.display = 'flex';
+        }
+      });
+
+      function formatTime(totalMinutes) {
+        let normalized = ((totalMinutes % 1440) + 1440) % 1440;
+        let hours = Math.floor(normalized / 60);
+        let mins = normalized % 60;
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        let displayHours = hours % 12;
+        if (displayHours === 0) displayHours = 12;
+        let displayMins = mins < 10 ? '0' + mins : mins;
+        return displayHours + ':' + displayMins + ' ' + ampm;
+      }
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const mode = modeSelect.value;
+        const latency = parseInt(latencySlider.value) || 15;
+        let baseMinutes = 0;
+
+        if (mode === 'now') {
+          const now = new Date();
+          baseMinutes = (now.getHours() * 60) + now.getMinutes();
+        } else {
+          let h = parseInt(hourSelect.value);
+          let m = parseInt(minSelect.value);
+          let ampm = ampmSelect.value;
+          if (ampm === 'PM' && h < 12) h += 12;
+          if (ampm === 'AM' && h === 12) h = 0;
+          baseMinutes = (h * 60) + m;
+        }
+
+        let time6 = '', time5 = '', time4 = '', time3 = '';
+        let headline = '';
+        let cardPrefix = '';
+
+        if (mode === 'wakeup') {
+          // Working backwards from wake time to find bedtimes
+          headline = 'Optimal Bedtimes to Wake Up at ' + formatTime(baseMinutes);
+          cardPrefix = 'Bedtime: ';
+          time6 = formatTime(baseMinutes - (6 * 90) - latency);
+          time5 = formatTime(baseMinutes - (5 * 90) - latency);
+          time4 = formatTime(baseMinutes - (4 * 90) - latency);
+          time3 = formatTime(baseMinutes - (3 * 90) - latency);
+        } else {
+          // Working forwards from bedtime to find wake times
+          headline = 'Optimal Wake Times if Sleeping at ' + formatTime(baseMinutes);
+          cardPrefix = 'Wake Time: ';
+          time6 = formatTime(baseMinutes + latency + (6 * 90));
+          time5 = formatTime(baseMinutes + latency + (5 * 90));
+          time4 = formatTime(baseMinutes + latency + (4 * 90));
+          time3 = formatTime(baseMinutes + latency + (3 * 90));
+        }
+
+        document.getElementById('results-headline').textContent = headline;
+        document.getElementById('res-time-6').textContent = time6;
+        document.getElementById('res-time-5').textContent = time5;
+        document.getElementById('res-time-4').textContent = time4;
+        document.getElementById('res-time-3').textContent = time3;
+
+        document.getElementById('res-architecture-text').textContent =
+          'Five completed cycles (7.5 hours) represents the optimal restorative sweet spot for most adults, maximizing both slow-wave Stage N3 deep sleep (for cellular and glymphatic brain detox) and late-cycle REM sleep (for emotional regulation and cognitive synthesis). Factor in your ' + latency + '-minute sleep onset latency to fall asleep at the ideal circadian window.';
+
+        resultsContainer.style.display = 'block';
+        resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+
+      // Initial execution
+      form.dispatchEvent(new Event('submit'));
+    });
+  </script>
+</body>
+</html>

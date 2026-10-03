@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Protein Intake Calculator | Evidence-Based Daily Protein Sizer</title>
+  <meta name="description" content="Calculate your optimal daily protein intake based on body weight, training goals, fat loss preservation, and clinical standards (RDA, ISSN, and Morton meta-analysis).">
+  <link rel="canonical" href="https://calchub.com/protein-intake-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Clinical & Sports Nutrition Protein Intake Calculator",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "description": "Calculates evidence-based daily protein targets in grams, per-meal distribution boluses, and grams per kilogram body mass across athletic, fat loss, and clinical sarcopenia cohorts."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the difference between the RDA and optimal protein intake for athletes?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Recommended Dietary Allowance (RDA) of 0.8 grams per kilogram of body weight per day (0.36 g/lb) was established by the Food and Nutrition Board to prevent overt nitrogen deficiency in 97.5% of sedentary healthy individuals. It is a biological survival floor, not an optimal target for muscular hypertrophy, tissue repair, or athletic performance. Meta-analyses by Morton et al. demonstrate that active individuals engaged in resistance training require 1.6 to 2.2 g/kg/day (0.73 to 1.0 g/lb) to maximize muscle protein synthesis."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How much protein is needed during a caloric deficit to prevent muscle loss?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "During hypocaloric energy restriction (cutting phases), endogenous protein oxidation increases as gluconeogenesis elevates. Helms et al. and the International Society of Sports Nutrition (ISSN) recommend escalating protein intake to 2.0 to 2.4 g/kg of total body mass (or 2.3 to 3.1 g/kg of fat-free mass) to protect lean skeletal muscle tissue from catabolic breakdown."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the 'leucine trigger' and why does per-meal protein distribution matter?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Muscle Protein Synthesis (MPS) is activated via the intracellular mechanistic target of rapamycin complex 1 (mTORC1) pathway. Initiating maximal MPS requires reaching the 'leucine threshold'—typically 2.5 to 3.0 grams of the essential branched-chain amino acid leucine per bolus (equivalent to roughly 25 to 40 grams of high-quality intact protein). Distributing daily protein into 3 to 5 evenly spaced meals every 3 to 5 hours stimulates MPS multiple times throughout the day."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does high protein intake cause damage to healthy kidneys or bone density?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Comprehensive systematic reviews and randomized controlled trials (including investigations by Antonio et al. examining intakes exceeding 3.3 g/kg/day) confirm that high dietary protein does not impair glomerular filtration rate (GFR), elevate serum creatinine, or compromise renal health in individuals with normal baseline kidney function. Similarly, higher protein intake enhances intestinal calcium absorption and bone mineral density rather than leaching bone minerals."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why do older adults require more protein than young adults?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Aging induces 'anabolic resistance,' a blunted muscle protein synthetic response to hyperaminoacidemia and hyperinsulinemia. To overcome anabolic resistance, prevent sarcopenia, and maintain physical autonomy, the PROT-AGE study group and ESPEN clinical guidelines recommend that healthy older adults consume 1.2 to 1.5 g/kg/day, with individual meal boluses containing at least 35 to 40 grams of leucine-rich protein."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="header">
+    <div class="header-container">
+      <div class="header-logo">
+        <a href="index.html" class="logo-link">
+          <span class="logo-icon">🧮</span>
+          <span class="logo-text">CalcHub</span>
+        </a>
+      </div>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="health.html" class="nav-link active">Health & Fitness</a>
+        <a href="finance.html" class="nav-link">Finance</a>
+        <a href="engineering.html" class="nav-link">Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <nav class="breadcrumb-nav">
+      <ol class="breadcrumb-list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="health.html">Health & Fitness</a></li>
+        <li class="active">Protein Intake Calculator</li>
+      </ol>
+    </nav>
+
+    <div class="page-layout">
+      <div class="calculator-container">
+        <div class="calculator-card">
+          <h1 class="calculator-title">Evidence-Based Protein Intake Calculator</h1>
+          <p class="calculator-subtitle">Determine your personalized daily protein intake, per-meal leucine-trigger distribution, and grams per kilogram targets based on exercise physiology standards.</p>
+
+          <form id="protein-form" class="calculator-form">
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="unit-system" class="form-label">Measurement Units</label>
+                <select id="unit-system" class="form-select">
+                  <option value="us" selected>US Customary (lbs, ft/in)</option>
+                  <option value="metric">Metric (kg, cm)</option>
+                </select>
+              </div>
+              <div class="form-group col-half">
+                <label for="gender" class="form-label">Biological Sex</label>
+                <select id="gender" class="form-select">
+                  <option value="male" selected>Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="body-weight" class="form-label">Current Weight (<span class="weight-unit">lbs</span>)</label>
+                <input type="number" id="body-weight" class="form-input" min="60" max="600" value="175" step="0.5" required>
+              </div>
+              <div class="form-group col-half">
+                <label for="body-age" class="form-label">Age (Years)</label>
+                <input type="number" id="body-age" class="form-input" min="15" max="100" value="28" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="fitness-goal" class="form-label">Primary Training & Health Goal</label>
+              <select id="fitness-goal" class="form-select">
+                <option value="hypertrophy" selected>Muscle Hypertrophy & Strength Training (ISSN / Morton 1.6–2.2 g/kg)</option>
+                <option value="fat-loss">Fat Loss / Caloric Deficit Muscle Retention (Helms 2.0–2.4 g/kg)</option>
+                <option value="endurance">Endurance Athletics / Marathon / Cycling (ACSM 1.2–1.6 g/kg)</option>
+                <option value="sarcopenia">Healthy Aging / Sarcopenia Prevention (PROT-AGE 1.2–1.5 g/kg)</option>
+                <option value="sedentary">Sedentary Maintenance (RDA Baseline 0.8 g/kg)</option>
+              </select>
+              <small class="form-hint">Targets align with peer-reviewed sports nutrition meta-analyses and clinical guidelines.</small>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="meals-count" class="form-label">Daily Meal Frequency</label>
+                <select id="meals-count" class="form-select">
+                  <option value="3">3 Meals / Day</option>
+                  <option value="4" selected>4 Meals / Day (Recommended)</option>
+                  <option value="5">5 Meals / Day</option>
+                  <option value="6">6 Meals / Day</option>
+                </select>
+              </div>
+              <div class="form-group col-half">
+                <label for="activity-level" class="form-label">Physical Activity Tier</label>
+                <select id="activity-level" class="form-select">
+                  <option value="moderate" selected>Moderate (3-4 gym workouts/week)</option>
+                  <option value="high">High (5-7 intense training sessions/week)</option>
+                  <option value="low">Low (Light exercise or walking)</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="calculate-btn">Calculate Daily Protein Target</button>
+          </form>
+
+          <div id="calculator-results" class="results-container" style="display: none;">
+            <h2 class="results-heading">Your Evidence-Based Protein Prescription</h2>
+
+            <div class="results-grid">
+              <div class="result-card primary-result">
+                <span class="result-label">Recommended Daily Target</span>
+                <span id="res-target-grams" class="result-value">--</span>
+                <span id="res-target-rate" class="result-subtext">-- g/kg body weight</span>
+              </div>
+
+              <div class="result-card highlight-card">
+                <span class="result-label">Per-Meal Distribution Bolus</span>
+                <span id="res-meal-grams" class="result-value">--</span>
+                <span class="result-subtext">Exceeds the 2.5g leucine trigger threshold</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Optimal Daily Range</span>
+                <span id="res-range-grams" class="result-value">--</span>
+                <span class="result-subtext">Clinical lower to upper target bounds</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Protein Caloric Equivalent</span>
+                <span id="res-protein-calories" class="result-value">--</span>
+                <span class="result-subtext">Based on 4.0 kcal/g Atwater physiological factor</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Rate per Pound (lbs)</span>
+                <span id="res-rate-lb" class="result-value">--</span>
+                <span class="result-subtext">Grams per lb of total body mass</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Sedentary RDA Baseline Comparison</span>
+                <span id="res-rda-comparison" class="result-value">--</span>
+                <span class="result-subtext">Basic 0.8 g/kg survival floor</span>
+              </div>
+            </div>
+
+            <div class="summary-box mt-4">
+              <h3 class="summary-title">Dietetic Protocol & Anabolic Window Guidance</h3>
+              <p id="res-summary-text" class="summary-text">Loading personalized nutrition recommendations...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚖️</span>
+            <h3 class="widget-title">Related Health & Fitness</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bmr-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMR Calculator</a></li>
+            <li><a href="macro-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Macro Split Calculator</a></li>
+            <li><a href="calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Calculator (TDEE)</a></li>
+            <li><a href="bmi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Daily Water Intake</a></li>
+            <li><a href="a1c-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> HbA1c to eAG Glucose Sizer</a></li>
+            <li><a href="bac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Blood Alcohol (BAC) Clearance</a></li>
+            <li><a href="body-surface-area-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Surface Area (Mosteller)</a></li>
+            <li><a href="bsa-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Oncology BSA & Calvert Dosing</a></li>
+            <li><a href="calorie-deficit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Deficit & Fat Loss Planner</a></li>
+            <li><a href="calories-burned-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exercise Calories Burned (METs)</a></li>
+            <li><a href="carbohydrate-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Carbohydrate Intake & Glycogen</a></li>
+            <li><a href="cholesterol-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cholesterol Ratio & Castelli Risk</a></li>
+            <li><a href="due-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Due Date & Gestation</a></li>
+            <li><a href="fat-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Dietary Fat Intake (Grams/Day)</a></li>
+            <li><a href="heart-rate-zone-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heart Rate Zone (Karvonen HRR)</a></li>
+            <li><a href="lean-body-mass-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lean Body Mass (Boer & James)</a></li>
+            <li><a href="max-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Max Heart Rate (Tanaka & Gulati)</a></li>
+            <li><a href="met-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> METs & Activity Caloric Burn</a></li>
+            <li><a href="ovulation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ovulation & Fertile Window</a></li>
+            <li><a href="pregnancy-weight-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Weight Gain (IOM/ACOG)</a></li>
+            <li><a href="protein-intake-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Protein Intake (ISSN/DRI Optimum)</a></li>
+            <li><a href="sleep-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sleep Cycle (90-Min REM Ultradian)</a></li>
+            <li><a href="sodium-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sodium to Salt & AHA Dietary Cap</a></li>
+            <li><a href="target-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Target Heart Rate (Karvonen HRR)</a></li>
+            <li><a href="tdee-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> TDEE & Calorie Burn (Total Daily)</a></li>
+            <li><a href="waist-to-height-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio (WHtR)</a></li>
+            <li><a href="waist-to-height-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio Sizer</a></li>
+            <li><a href="waist-to-hip-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Hip Ratio (WHR Risk)</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="health.html" class="sidebar-category-link">View All Health & Fitness Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <article class="article-body">
+      <h2>The Physiology of Dietary Protein and Muscle Protein Synthesis (MPS)</h2>
+      <p>Dietary protein is not merely an energetic macronutrient yielding 4 kilocalories per gram; it is the fundamental biological substrate for cellular life. Dietary proteins are digested into free amino acids and small di- and tri-peptides, absorbed into the portal circulation, and delivered to peripheral tissues to sustain structural proteins (collagen, elastin, actin, myosin), physiological enzymes, immunoglobulins, polypeptide hormones, and transport proteins. The preservation and expansion of skeletal muscle mass are governed by the dynamic equilibrium between <strong>Muscle Protein Synthesis (MPS)</strong> and <strong>Muscle Protein Breakdown (MPB)</strong>:</p>
+
+      $$\text{Net Muscle Protein Balance (NPB)} = \text{MPS} - \text{MPB}$$
+
+      <p>In the post-absorptive (fasted) state, MPB exceeds MPS, resulting in a negative net protein balance. Following protein ingestion, intracellular hyperaminoacidemia stimulates MPS and suppresses MPB, transiently shifting net balance into positive territory. To achieve skeletal muscle hypertrophy or maintain muscle mass during energetic stress, cumulative MPS over 24-hour cycles must exceed cumulative MPB.</p>
+
+      <h2>The Recommended Dietary Allowance (RDA) vs. Athletic Optimization</h2>
+      <p>A central point of confusion in nutritional science is the distinction between biological sufficiency and physiological optimization. The established <strong>Recommended Dietary Allowance (RDA)</strong> for protein is <strong>0.8 grams per kilogram of body weight per day (0.36 g/lb)</strong> for healthy adults:</p>
+      <ul>
+        <li><strong>Epidemiological Purpose of the RDA:</strong> The RDA was calculated by the Food and Nutrition Board of the Institute of Medicine utilizing traditional nitrogen balance studies. The experimental goal was to determine the statistical intake required to prevent negative nitrogen balance (overt protein deficiency) in 97.5% of the healthy sedentary population. It represents a <em>survival floor</em> designed to prevent Kwashiorkor and systemic muscle wasting—not a recommendation for active individuals seeking optimal physical function.</li>
+        <li><strong>Methodological Limitations of Nitrogen Balance:</strong> Traditional nitrogen balance measurements systematically underestimate dermal, sweat, and fecal nitrogen losses while overestimating intake, artificially suppressing estimated protein requirements. Modern methodologies utilizing the <em>Indicator Amino Acid Oxidation (IAAO)</em> technique demonstrate that even sedentary adults require approximately <strong>1.0 to 1.2 g/kg/day</strong> to reach physiological saturation.</li>
+      </ul>
+
+      <h2>The Morton et al. Meta-Analysis: The 1.62 g/kg/day Hypertrophy Ceiling</h2>
+      <p>In 2018, Dr. Robert Morton and colleagues published a landmark systematic review and meta-analysis in the <em>British Journal of Sports Medicine</em> encompassing 49 randomized controlled trials and 1,863 resistance-trained participants. The authors evaluated the relationship between graded daily protein intakes and gains in fat-free mass (FFM) and one-repetition maximum (1RM) strength. Their findings established the following clinical insights:</p>
+
+      $$P_{\text{breakpoint}} = 1.62 \text{ g/kg/day} \quad [95\% \text{ CI: } 1.03 - 2.20 \text{ g/kg/day}]$$
+
+      <p>While the mean inflection point beyond which further protein ingestion yielded no statistically significant additional muscle mass was 1.62 g/kg/day, the upper bound of the 95% confidence interval reached <strong>2.20 g/kg/day (1.0 g/lb/day)</strong>. Consequently, the consensus recommendation endorsed by the <strong>International Society of Sports Nutrition (ISSN)</strong> for athletes engaged in resistance exercise spans <strong>1.6 to 2.2 g/kg/day (0.73 to 1.0 g/lb/day)</strong>.</p>
+
+      <div class="table-container my-4">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Cohort &amp; Training Modality</th>
+              <th>Target Protein (g/kg/day)</th>
+              <th>Target Protein (g/lb/day)</th>
+              <th>Physiological Mechanism &amp; Rationale</th>
+              <th>Reference Guideline</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Sedentary Baseline</strong></td>
+              <td>0.8 – 1.0 g/kg</td>
+              <td>0.36 – 0.45 g/lb</td>
+              <td>Prevents negative nitrogen balance and lean tissue depletion in non-exercisers.</td>
+              <td>DRI / WHO Standards</td>
+            </tr>
+            <tr>
+              <td><strong>Endurance Athletes (Runners, Cyclists)</strong></td>
+              <td>1.2 – 1.6 g/kg</td>
+              <td>0.55 – 0.73 g/lb</td>
+              <td>Offsets amino acid oxidation during prolonged aerobic exercise; repairs mitochondrial enzymes.</td>
+              <td>ACSM / ISSN Joint Stand</td>
+            </tr>
+            <tr>
+              <td><strong>Strength / Muscle Hypertrophy</strong></td>
+              <td>1.6 – 2.2 g/kg</td>
+              <td>0.73 – 1.00 g/lb</td>
+              <td>Maximizes myofibrillar MPS, satellite cell proliferation, and contractile tissue hypertrophy.</td>
+              <td>Morton et al. (BJSM 2018)</td>
+            </tr>
+            <tr>
+              <td><strong>Fat Loss / Caloric Restriction</strong></td>
+              <td>2.0 – 2.4 g/kg</td>
+              <td>0.91 – 1.10 g/lb</td>
+              <td>Prevents catabolism of fat-free mass during energy deficit; enhances satiety and TEF.</td>
+              <td>Helms et al. / ISSN Position</td>
+            </tr>
+            <tr>
+              <td><strong>Older Adults (&gt;65y / Sarcopenia)</strong></td>
+              <td>1.2 – 1.5 g/kg</td>
+              <td>0.55 – 0.68 g/lb</td>
+              <td>Overcomes age-related anabolic resistance and blunted postprandial hyperaminoacidemia.</td>
+              <td>PROT-AGE Study Group</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>The Leucine Trigger and Optimal Per-Meal Bolus Distribution</h2>
+      <p>Total daily protein quantity is the primary driver of body composition, but the timing and distribution of individual protein feedings significantly influence the magnitude of Muscle Protein Synthesis. Intracellular signaling governing MPS is stimulated through the <strong>mechanistic Target of Rapamycin Complex 1 (mTORC1)</strong> kinase cascade. Activation of mTORC1 requires phosphorylation of downstream target proteins, including p70S6 kinase ($p70^{S6K}$) and eukaryotic initiation factor 4E-binding protein 1 ($4E\text{-}BP1$).</p>
+
+      <p>Crucially, mTORC1 activation is sensitive to the intracellular concentration of the branched-chain amino acid (BCAA) <strong>leucine</strong>. This phenomenon is termed the <strong>Leucine Trigger Hypothesis</strong>:</p>
+      <ul>
+        <li><strong>The Leucine Threshold:</strong> To maximally stimulate MPS, an individual meal bolus must provide between <strong>2.5 and 3.0 grams of leucine</strong> (or roughly 0.05 g leucine per kg of body mass per meal). Sub-threshold doses fail to fully saturate sestrin2 sensors and produce an attenuated synthetic response.</li>
+        <li><strong>Equivalent Intact Protein Mass:</strong> In high-quality animal proteins (whey, milk, eggs, beef, poultry, fish), leucine comprises approximately 8% to 11% of total amino acid content. Reaching 2.5–3.0g of leucine requires consuming approximately <strong>25 to 40 grams of complete protein per feeding</strong>.</li>
+        <li><strong>Meal Frequency &amp; Refractory Period:</strong> Once stimulated, MPS remains elevated for approximately 2 to 3 hours before returning to baseline, regardless of ongoing aminoacidemia (a phenomenon known as the <em>muscle full effect</em>). Consuming 3 to 5 distinct protein-rich meals spaced every 3 to 5 hours stimulates MPS multiple times throughout the day far more effectively than consuming a single massive bolus.</li>
+      </ul>
+
+      <h2>Thermic Effect of Food (TEF) and Satiety Mechanisms</h2>
+      <p>Dietary protein plays a powerful metabolic role during weight management and fat loss due to its superior <strong>Thermic Effect of Food (TEF)</strong>. TEF represents the metabolic cost of digestion, peptide breakdown, hepatic deamination, and urea cycle excretion:</p>
+
+      $$\text{TEF}_{\text{Protein}} = 20\% - 30\% \quad \text{vs.} \quad \text{TEF}_{\text{Carbohydrate}} = 5\% - 10\% \quad \text{vs.} \quad \text{TEF}_{\text{Fat}} = 0\% - 3\%$$
+
+      <p>Consuming 100 kcal of dietary protein burns 20 to 30 kcal purely through metabolic processing, yielding a net physiological availability of only 70 to 80 kcal. Furthermore, dietary amino acids stimulate the release of potent peripheral satiety peptide hormones—including peptide YY ($PYY$), glucagon-like peptide-1 ($GLP-1$), and cholecystokinin ($CCK$)—while suppressing orexigenic ghrelin secretion from the gastric fundus.</p>
+
+      <h2>Step-by-Step Worked Clinical Case Study</h2>
+      <p>The following case study illustrates an evidence-based sports dietetic assessment for an athlete seeking concurrent muscular hypertrophy and body recomposition:</p>
+
+      <div class="worked-example-card my-4">
+        <h3 class="example-title">Dietetic Case Profile: Hypertrophy &amp; Recomposition Sizing</h3>
+        <p><strong>Patient Baseline:</strong> A 26-year-old male resistance-trained athlete weighing <strong>180 lbs (81.65 kg)</strong> at 14% body fat seeks to maximize lean muscle accretion while minimizing adipose accumulation. He performs 4 heavy barbell hypertrophy sessions per week.</p>
+        
+        <div class="example-step">
+          <div class="step-num">Step 1</div>
+          <div class="step-content">
+            <strong>Determine Target Daily Protein Intake per Kilogram:</strong>
+            Applying the Morton meta-analytic consensus (1.6 to 2.2 g/kg/day), a dedicated hypertrophy target is established at <strong>2.0 g/kg/day</strong>.
+            $$\text{Daily Protein Target} = 81.65 \text{ kg} \times 2.0 \text{ g/kg} = \mathbf{163.3 \text{ g/day}} \approx 165 \text{ g/day}$$
+            In imperial units: $165 \text{ g} / 180 \text{ lbs} = \mathbf{0.92 \text{ g/lb/day}}$.
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 2</div>
+          <div class="step-content">
+            <strong>Calculate Per-Meal Distribution Boluses:</strong>
+            The athlete follows a 4-meal daily schedule (Breakfast, Lunch, Post-Workout, Dinner).
+            $$\text{Per-Meal Bolus} = \frac{165 \text{ g}}{4 \text{ meals}} = \mathbf{41.25 \text{ g/meal}}$$
+            A bolus of 41.25 grams easily delivers ~3.5 to 4.0 grams of leucine, decisively exceeding the 2.5g leucine trigger threshold at every feeding.
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 3</div>
+          <div class="step-content">
+            <strong>Compute Caloric and TEF Energetic Contribution:</strong>
+            Gross caloric energy provided by protein:
+            $$\text{Gross Protein Energy} = 165 \text{ g} \times 4.0 \text{ kcal/g} = \mathbf{660 \text{ kcal/day}}$$
+            Net thermic metabolic cost (assuming average 25% TEF):
+            $$\text{Thermic Burn} = 660 \text{ kcal} \times 0.25 = \mathbf{165 \text{ kcal/day expended in assimilation}}$$
+            Net physiological energy yield: $660 - 165 = 495 \text{ kcal/day}$.
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 4</div>
+          <div class="step-content">
+            <strong>Evaluate Renal &amp; Bone Biomarkers:</strong>
+            Baseline serum creatinine (0.9 mg/dL) and estimated glomerular filtration rate ($eGFR > 90 \text{ mL/min/1.73m}^2$) confirm normal renal baseline. An intake of 2.0 g/kg/day falls safely below clinical concern thresholds, with adequate daily hydration (3.5 L/day) maintaining optimal urinary solute clearance.
+          </div>
+        </div>
+      </div>
+
+      <h2>Protein Quality Metrics: PDCAAS, DIAAS, and Plant Protein Complementation</h2>
+      <p>Not all dietary protein sources possess equivalent biological bioavailability. Protein quality is determined by two factors: amino acid profile (proportions of essential amino acids relative to human tissue requirements) and ileal digestibility:</p>
+      <ul>
+        <li><strong>PDCAAS (Protein Digestibility-Corrected Amino Acid Score):</strong> Truncated at 1.0, PDCAAS evaluates fecal digestibility. Whey, casein, egg white, and soy isolate score 1.0.</li>
+        <li><strong>DIAAS (Digestible Indispensable Amino Acid Score):</strong> The modern gold standard adopted by the FAO, measuring true ileal digestibility without score truncation. Whey isolate scores 1.15–1.30, demonstrating superior digestible amino acid density.</li>
+        <li><strong>Plant-Based Protein Optimization:</strong> Many single plant sources contain a limiting amino acid (e.g., legumes are low in methionine and cysteine; cereal grains are low in lysine). Vegan athletes can match animal protein muscle-building efficacy by consuming 10% to 20% higher total protein (1.8–2.4 g/kg/day) and pairing complementary protein sources (e.g., rice and pea protein blends) to ensure leucine and essential amino acid adequacy.</li>
+      </ul>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <span class="logo-icon">🧮</span>
+            <span class="logo-text">CalcHub</span>
+          </div>
+          <p class="footer-tagline">Clinical, financial, and engineering reference calculators built with precision and peer-reviewed rigor.</p>
+        </div>
+        <div class="footer-links">
+          <h4 class="footer-heading">Health Calculators</h4>
+          <ul class="footer-nav">
+            <li><a href="protein-intake-calculator.html">Protein Intake Calculator</a></li>
+            <li><a href="macro-calculator.html">Macro Split Calculator</a></li>
+            <li><a href="calorie-deficit-calculator.html">Calorie Deficit Calculator</a></li>
+            <li><a href="tdee-calculator.html">TDEE Calculator</a></li>
+            <li><a href="lean-body-mass-calculator.html">Lean Body Mass Calculator</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4 class="footer-heading">Categories</h4>
+          <ul class="footer-nav">
+            <li><a href="health.html">Health & Fitness</a></li>
+            <li><a href="finance.html">Financial Tools</a></li>
+            <li><a href="engineering.html">Engineering</a></li>
+            <li><a href="index.html">Directory</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. Educational and clinical calculation tools. Consult a registered dietitian or physician for individualized nutrition therapy.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('protein-form');
+      const unitSystem = document.getElementById('unit-system');
+      const bodyWeightInput = document.getElementById('body-weight');
+      const weightUnitLabels = document.querySelectorAll('.weight-unit');
+      const goalSelect = document.getElementById('fitness-goal');
+      const mealsSelect = document.getElementById('meals-count');
+      const resultsContainer = document.getElementById('calculator-results');
+
+      // Unit switch
+      unitSystem.addEventListener('change', function() {
+        const isMetric = unitSystem.value === 'metric';
+        if (isMetric) {
+          weightUnitLabels.forEach(el => el.textContent = 'kg');
+          bodyWeightInput.value = (parseFloat(bodyWeightInput.value) * 0.453592).toFixed(1);
+          bodyWeightInput.min = '30';
+          bodyWeightInput.max = '280';
+        } else {
+          weightUnitLabels.forEach(el => el.textContent = 'lbs');
+          bodyWeightInput.value = (parseFloat(bodyWeightInput.value) / 0.453592).toFixed(1);
+          bodyWeightInput.min = '60';
+          bodyWeightInput.max = '600';
+        }
+      });
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const isMetric = unitSystem.value === 'metric';
+        const rawWeight = parseFloat(bodyWeightInput.value) || 0;
+        const goal = goalSelect.value;
+        const meals = parseInt(mealsSelect.value) || 4;
+
+        if (rawWeight <= 0) return;
+
+        const weightKg = isMetric ? rawWeight : rawWeight * 0.453592;
+        const weightLbs = isMetric ? rawWeight / 0.453592 : rawWeight;
+
+        // Determine target rate (g/kg) and range
+        let targetRate = 2.0;
+        let minRate = 1.6;
+        let maxRate = 2.2;
+        let protocolDescription = '';
+
+        if (goal === 'hypertrophy') {
+          targetRate = 2.0;
+          minRate = 1.6;
+          maxRate = 2.2;
+          protocolDescription = 'Targeting 1.6 to 2.2 g/kg/day optimizes muscle protein synthesis for resistance-trained individuals (Morton et al. 2018). Focus on 25–40g complete protein per meal to trigger maximal mTORC1 activation.';
+        } else if (goal === 'fat-loss') {
+          targetRate = 2.2;
+          minRate = 2.0;
+          maxRate = 2.5;
+          protocolDescription = 'Elevated protein during hypocaloric phases (2.0–2.5 g/kg/day) protects lean skeletal muscle mass from catabolism, maximizes the thermic effect of food (TEF), and maintains high satiety.';
+        } else if (goal === 'endurance') {
+          targetRate = 1.4;
+          minRate = 1.2;
+          maxRate = 1.6;
+          protocolDescription = 'Endurance training increases leucine oxidation during prolonged aerobic work. An intake of 1.2–1.6 g/kg supports mitochondrial enzyme repair and glycogen recovery without excessive digestive load.';
+        } else if (goal === 'sarcopenia') {
+          targetRate = 1.35;
+          minRate = 1.2;
+          maxRate = 1.5;
+          protocolDescription = 'Older adults experience anabolic resistance. Consuming 1.2–1.5 g/kg/day with leucine-rich boluses (≥35g per feeding) overcomes blunted protein synthesis and preserves bone mineral density and physical independence.';
+        } else {
+          // Sedentary
+          targetRate = 0.85;
+          minRate = 0.8;
+          maxRate = 1.0;
+          protocolDescription = 'The Recommended Dietary Allowance (0.8 g/kg) provides the statistical baseline to prevent negative nitrogen balance in sedentary adults. For enhanced metabolic health, 1.0–1.2 g/kg is frequently recommended.';
+        }
+
+        const totalGrams = Math.round(weightKg * targetRate);
+        const minGrams = Math.round(weightKg * minRate);
+        const maxGrams = Math.round(weightKg * maxRate);
+        const mealBolus = (totalGrams / meals).toFixed(1);
+        const proteinKcal = totalGrams * 4;
+        const ratePerLb = (totalGrams / weightLbs).toFixed(2);
+        const rdaBaselineGrams = Math.round(weightKg * 0.8);
+
+        // Display results
+        document.getElementById('res-target-grams').textContent = totalGrams + ' g / day';
+        document.getElementById('res-target-rate').textContent = targetRate.toFixed(2) + ' g/kg body weight';
+        document.getElementById('res-meal-grams').textContent = mealBolus + ' g / meal';
+        document.getElementById('res-range-grams').textContent = minGrams + ' – ' + maxGrams + ' g';
+        document.getElementById('res-protein-calories').textContent = proteinKcal + ' kcal / day';
+        document.getElementById('res-rate-lb').textContent = ratePerLb + ' g / lb';
+        document.getElementById('res-rda-comparison').textContent = rdaBaselineGrams + ' g (RDA Floor)';
+        document.getElementById('res-summary-text').textContent = protocolDescription;
+
+        resultsContainer.style.display = 'block';
+        resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+
+      // Initial execution
+      form.dispatchEvent(new Event('submit'));
+    });
+  </script>
+</body>
+</html>
