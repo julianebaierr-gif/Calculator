@@ -311,6 +311,14 @@ CAT_MAP = {
             ("flow-rate-converter.html", "Flow Rate Converter (GPM, L/min, m³/h)", "🌊", "Volumetric flow, US GPM, Imperial GPM, L/min, m³/h & CFS", "Q = A·v | 1 US GPM = 3.78541 L/min | 1 m³/h = 4.403 GPM"),
             ("fuel-economy-converter.html", "Fuel Economy Converter (MPG, L/100km)", "⛽", "Harmonic fuel consumption, US MPG, UK MPG, L/100km & km/L", "L/100km = 235.215 / MPG_US | MPG_UK = 1.20095·MPG_US"),
             ("angle-converter.html", "Angle Converter (Degrees, Radians, MOA)", "📐", "Sexagesimal degrees, radians, gradians, MOA & milliradians mrad", "rad = deg × π/180 | 1 MOA = 1/60° | 1 mrad = 3.438 MOA"),
+            ("density-converter.html", "Density & Specific Gravity Converter", "⚖️", "kg/m³, g/cm³, lb/ft³, lb/gal & petroleum API gravity", "ρ = m/V | SG = ρ/1000 | °API = (141.5/SG) - 131.5"),
+            ("illuminance-converter.html", "Illuminance & Light Level Converter", "💡", "Lux (lx), Foot-Candles (fc), Phot & Nox with IESNA standards", "1 fc = 10.7639 lx | E = (I·cosθ)/d² | OSHA 1926.56"),
+            ("thermal-conductivity-converter.html", "Thermal Conductivity (k-value)", "🌡️", "W/(m·K), BTU/(hr·ft·°F), BTU·in/(hr·ft²·°F) & R-values", "q = -k·∇T | R = L/k | 1 BTU/(hr·ft·°F) = 1.731 W/(m·K)"),
+            ("viscosity-converter.html", "Viscosity (Dynamic & Kinematic)", "🌊", "Centipoise (cP), Pa·s, Centistokes (cSt), Stokes & SUS", "ν = μ/ρ | 1 Pa·s = 1,000 cP | SUS ≈ 4.632·cSt | ΔP = 128μLQ/πD⁴"),
+            ("cooking-converter.html", "Cooking & Baking Recipe Converter", "🍳", "Cups, tbsp, tsp, grams, oz & ingredient bulk densities", "Mass = Vol × ρ_bulk | 1 Cup AP Flour = 120g | 1 Stick Butter = 113.4g"),
+            ("number-base-converter.html", "Number Base (Bin, Oct, Dec, Hex)", "💻", "Binary base 2, Octal base 8, Decimal base 10 & Hex base 16", "N = Σ(d_i · b^i) | Two's Complement: -X = ~X + 1"),
+            ("roman-numeral-converter.html", "Roman Numeral Converter (1 to 3.9M)", "🏛️", "Classical subtractive notation & Vinculum overline bars", "I=1, V=5, X=10, L=50, C=100, D=500, M=1000 | V̄=5000"),
+            ("time-converter.html", "Time Unit & Chronometric Converter", "⏱️", "Seconds, ms, μs, ns, hours, days, weeks & Julian years", "1 s = 9,192,631,770 Cs cycles | Julian Year = 31,557,600 s"),
         ]
     }
 }

@@ -341,6 +341,14 @@ CATEGORIES = {
             ("flow-rate-converter.html", "Flow Rate Converter (GPM, L/min, m³/h)", "🌊", "Volumetric flow, US GPM, L/min & m³/h"),
             ("fuel-economy-converter.html", "Fuel Economy Converter (MPG, L/100km)", "⛽", "Harmonic fuel consumption, US MPG & L/100km"),
             ("angle-converter.html", "Angle Converter (Degrees, Radians, MOA)", "📐", "Degrees, radians, gradians, MOA & mrad"),
+            ("density-converter.html", "Density & Specific Gravity Converter", "⚖️", "kg/m³, g/cm³, lb/ft³, lb/gal & API gravity"),
+            ("illuminance-converter.html", "Illuminance & Light Level Converter", "💡", "Lux (lx), Foot-Candles (fc), Phot & Nox"),
+            ("thermal-conductivity-converter.html", "Thermal Conductivity (k-value)", "🌡️", "W/(m·K), BTU/(hr·ft·°F) & R-values"),
+            ("viscosity-converter.html", "Viscosity (Dynamic & Kinematic)", "🌊", "Centipoise (cP), Pa·s, Centistokes & SUS"),
+            ("cooking-converter.html", "Cooking & Baking Recipe Converter", "🍳", "Cups, tbsp, tsp, grams & ingredient density"),
+            ("number-base-converter.html", "Number Base (Bin, Oct, Dec, Hex)", "💻", "Binary, Octal, Decimal, Hex & Two's Comp"),
+            ("roman-numeral-converter.html", "Roman Numeral Converter (1 to 3.9M)", "🏛️", "Classical subtractive & Vinculum bars"),
+            ("time-converter.html", "Time Unit & Chronometric Converter", "⏱️", "Seconds, ms, μs, ns, hours, days & years"),
         ]
     }
 }
@@ -369,7 +377,7 @@ def determine_tool_cat(filename):
         return "programmer"
     if any(k in f for k in ["date-difference", "age"]):
         return "datetime"
-    if any(k in f for k in ["unit-converter", "length-converter", "weight-converter", "temperature-converter", "area-converter", "volume-converter", "pressure-converter", "speed-converter", "energy-converter", "power-converter", "force-converter", "data-storage-converter", "data-transfer-rate-converter", "frequency-converter", "flow-rate-converter", "fuel-economy-converter", "angle-converter"]):
+    if any(k in f for k in ["unit-converter", "length-converter", "weight-converter", "temperature-converter", "area-converter", "volume-converter", "pressure-converter", "speed-converter", "energy-converter", "power-converter", "force-converter", "data-storage-converter", "data-transfer-rate-converter", "frequency-converter", "flow-rate-converter", "fuel-economy-converter", "angle-converter", "density-converter", "illuminance-converter", "thermal-conductivity-converter", "viscosity-converter", "cooking-converter", "number-base-converter", "roman-numeral-converter", "time-converter"]):
         return "converter"
     if any(k in f for k in ["percentage", "fraction", "ratio", "gpa", "standard-deviation"]):
         return "math"
