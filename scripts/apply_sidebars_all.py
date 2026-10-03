@@ -325,9 +325,14 @@ CATEGORIES = {
         "hub": "converter.html",
         "tools": [
             ("unit-converter.html", "Universal Multi-Unit Converter", "🔄", "Length, mass, temp, pressure & vol"),
-            ("percentage-calculator.html", "Percentage Calculator", "％", "Proportions, discounts & % change"),
-            ("fraction-calculator.html", "Fraction Calculator", "➗", "Arithmetic & fraction conversion"),
-            ("ratio-calculator.html", "Ratio Simplifier", "⚖️", "Irreducible integer proportions"),
+            ("length-converter.html", "Length & Distance Converter", "📏", "Meters, feet, inches, kilometers, miles & nautical miles"),
+            ("weight-converter.html", "Weight & Mass Converter", "⚖️", "Kilograms, pounds, ounces, stone, carats & metric tonnes"),
+            ("temperature-converter.html", "Temperature Scale Converter", "🌡️", "Celsius, Fahrenheit, Kelvin, Rankine & Réaumur"),
+            ("area-converter.html", "Land & Geometric Area Converter", "📐", "Square meters, feet, acres, hectares & square miles"),
+            ("volume-converter.html", "Volume & Capacity Converter", "🧪", "Liters, US gallons, imperial gallons, cubic meters & feet"),
+            ("pressure-converter.html", "Pressure & Vacuum Converter", "💨", "Pascals, bar, PSI, atmospheres, Torr & inHg"),
+            ("speed-converter.html", "Speed & Velocity Converter", "🚀", "m/s, km/h, mph, knots, feet/s & Mach"),
+            ("energy-converter.html", "Energy & Work Converter", "⚡", "Joules, kWh, calories, kcal, BTU & electron-volts"),
         ]
     }
 }
@@ -356,7 +361,7 @@ def determine_tool_cat(filename):
         return "programmer"
     if any(k in f for k in ["date-difference", "age"]):
         return "datetime"
-    if "unit" in f:
+    if any(k in f for k in ["unit-converter", "length-converter", "weight-converter", "temperature-converter", "area-converter", "volume-converter", "pressure-converter", "speed-converter", "energy-converter"]):
         return "converter"
     if any(k in f for k in ["percentage", "fraction", "ratio", "gpa", "standard-deviation"]):
         return "math"

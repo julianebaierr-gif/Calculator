@@ -295,6 +295,14 @@ CAT_MAP = {
         "title": "Universal Unit Converters",
         "tools": [
             ("unit-converter.html", "Universal Multi-Unit Converter", "🔄", "Length, mass, temp, pressure & vol", "100% Client-Side Direct Exact Multipliers"),
+            ("length-converter.html", "Length & Distance Converter", "📏", "Meters, feet, inches, kilometers, miles & nautical miles", "1 in = 0.0254 m | 1 ft = 0.3048 m | 1 mi = 1609.344 m"),
+            ("weight-converter.html", "Weight & Mass Converter", "⚖️", "Kilograms, pounds, ounces, stone, carats & metric tonnes", "1 lb = 0.45359237 kg | Planck h = 6.62607015e-34"),
+            ("temperature-converter.html", "Temperature Scale Converter", "🌡️", "Celsius, Fahrenheit, Kelvin, Rankine & Réaumur", "°F = (°C × 9/5) + 32 | K = °C + 273.15"),
+            ("area-converter.html", "Land & Geometric Area Converter", "📐", "Square meters, feet, acres, hectares & square miles", "1 ac = 43,560 ft² = 4,046.856 m² | 1 ha = 10,000 m²"),
+            ("volume-converter.html", "Volume & Capacity Converter", "🧪", "Liters, US gallons, imperial gallons, cubic meters & feet", "1 US gal = 231 in³ = 3.785 L | 1 UK gal = 4.546 L"),
+            ("pressure-converter.html", "Pressure & Vacuum Converter", "💨", "Pascals, bar, PSI, atmospheres, Torr & inches of mercury", "1 atm = 101,325 Pa = 14.696 psi | 1 bar = 100 kPa"),
+            ("speed-converter.html", "Speed & Velocity Converter", "🚀", "m/s, km/h, mph, knots, feet/s & Mach sound barrier", "1 m/s = 3.6 km/h | 1 mph = 1.609344 km/h | 1 kt = 1.852 km/h"),
+            ("energy-converter.html", "Energy & Work Converter", "⚡", "Joules, kWh, calories, kcal, BTU, electron-volts & therms", "1 J = 1 N·m | 1 kWh = 3.6 MJ | 1 kcal = 4,184 J"),
         ]
     }
 }
