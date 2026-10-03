@@ -20,6 +20,14 @@ CAT_MAP = {
             ("body-fat-calculator.html", "Body Fat Calculator", "📐", "Navy tape body fat & lean mass", "US Navy Circumference Model"),
             ("ideal-weight-calculator.html", "Ideal Body Weight", "🎯", "Devine & Robinson target weight", "IBW = 50kg + 2.3kg/inch"),
             ("water-intake-calculator.html", "Daily Water Intake", "💧", "Baseline & active hydration needs", "Base (35ml/kg) + Exercise"),
+            ("a1c-calculator.html", "HbA1c to eAG Glucose Sizer", "🩸", "ADAG estimated average glucose mg/dL & IFCC mmol/mol", "eAG = 28.7·A1C - 46.7 | IFCC = 10.929·(A1C - 2.15)"),
+            ("bac-calculator.html", "Blood Alcohol (BAC) Clearance", "🍷", "Widmark pharmacokinetic formula & legal driving limit", "BAC = [A/(r·W)·100] - β·t | β = 0.015%/hr"),
+            ("body-surface-area-calculator.html", "Body Surface Area (Mosteller)", "📐", "Mosteller, Du Bois, Haycock & Boyd multi-formula", "BSA = √((H·W)/3600) | CI = CO / BSA"),
+            ("bsa-calculator.html", "Oncology BSA & Calvert Dosing", "💊", "Chemotherapy mg/m², Calvert carboplatin AUC & CrCl", "Dose = Target AUC · (GFR + 25) | CrCl Cockcroft-Gault"),
+            ("calorie-deficit-calculator.html", "Calorie Deficit & Fat Loss Planner", "🔥", "Dynamic metabolic adaptation, protein & goal timeline", "Deficit = TDEE - Intake | 3500 kcal rule & Hall adaptation"),
+            ("calories-burned-calculator.html", "Exercise Calories Burned (METs)", "🏃", "Ainsworth Compendium METs, gross vs net energy & EPOC", "Calories = MET · 3.5 · W(kg) / 200 · Duration"),
+            ("carbohydrate-intake-calculator.html", "Carbohydrate Intake & Glycogen", "🍞", "ACSM/ISSN endurance g/kg & intra-workout fueling", "Carbs (g) = Weight (kg) · Factor (3 to 12 g/kg/day)"),
+            ("cholesterol-ratio-calculator.html", "Cholesterol Ratio & Castelli Risk", "❤️", "Castelli I & II, Non-HDL & Triglyceride/HDL insulin marker", "CRI-I = TC/HDL | CRI-II = LDL/HDL | TG/HDL"),
         ]
     },
     "finance.html": {

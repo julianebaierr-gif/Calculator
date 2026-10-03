@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BAC Calculator | Blood Alcohol Concentration & Widmark Clearance</title>
+  <meta name="description" content="Calculate your Blood Alcohol Concentration (BAC) and estimated sobriety time using the scientific Widmark formula, body mass distribution, and liver clearance rate.">
+  <link rel="canonical" href="https://calchub.com/bac-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Widmark Blood Alcohol Concentration (BAC) Calculator",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "description": "Forensic toxicological calculator estimating Blood Alcohol Concentration (BAC) and time to legal sobriety (0.00% and 0.08%) using the Widmark equation."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the Widmark formula used to calculate Blood Alcohol Concentration?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Widmark equation is: BAC = [A / (r × W) × 100] - (β × t), where A is pure alcohol consumed in grams, W is body weight in grams, r is the gender-specific volume of distribution (0.68 for biological males, 0.55 for females), β is the metabolic elimination rate (typically 0.015% per hour), and t is time elapsed in hours since drinking started."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How much pure alcohol is in one standard US drink?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "In the United States, a standard drink contains exactly 14.0 grams (0.6 fluid ounces or 17.7 mL) of pure ethanol. This corresponds to 12 fluid ounces of regular 5% ABV beer, 5 fluid ounces of 12% ABV table wine, or 1.5 fluid ounces of 40% ABV (80-proof) distilled spirits."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How fast does the human body metabolize and eliminate alcohol?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The human liver eliminates alcohol through zero-order kinetics at an average rate (β factor) of 0.015 g/dL per hour (ranging between 0.012% and 0.020%/hr). Neither black coffee, cold showers, exercise, nor sleep can accelerate this hepatic enzymatic clearance rate."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the physiological symptoms associated with different BAC levels?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "At 0.02-0.03%, mild euphoria and relaxation occur; at 0.05%, judgment and reaction time degrade; at 0.08% (statutory legal DUI limit in the US), gross motor coordination and peripheral vision are impaired; at 0.15%, significant balance loss and nausea occur; and at ≥ 0.30%, severe central nervous system depression, loss of consciousness, and life-threatening respiratory arrest can ensue."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="header">
+    <div class="header-container">
+      <div class="header-logo">
+        <a href="index.html" class="logo-link">
+          <span class="logo-icon">🧮</span>
+          <span class="logo-text">CalcHub</span>
+        </a>
+      </div>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="health.html" class="nav-link active">Health & Fitness</a>
+        <a href="finance.html" class="nav-link">Finance</a>
+        <a href="engineering.html" class="nav-link">Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="calculator-container">
+      <div class="calculator-header">
+        <div class="badge-tag">Forensic Toxicology</div>
+        <h1 class="calculator-title">Blood Alcohol Concentration (BAC) Calculator</h1>
+        <p class="calculator-description">Calculate your estimated Blood Alcohol Concentration (BAC) and time to legal sobriety using the peer-reviewed Widmark pharmacokinetics formula and hepatic elimination models.</p>
+      </div>
+
+      <div class="calculator-grid">
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">Consumption & Physiology Inputs</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="form-group">
+              <label for="gender" class="form-label">Biological Sex (Volume of Distribution)</label>
+              <select id="gender" class="form-select" onchange="calculateBAC()">
+                <option value="male" selected>Male (r = 0.68 - Higher lean muscle mass)</option>
+                <option value="female">Female (r = 0.55 - Higher body water distribution ratio)</option>
+              </select>
+            </div>
+
+            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group">
+                <label for="body-weight" class="form-label">Body Weight</label>
+                <input type="number" id="body-weight" class="form-input" value="180" min="80" max="450" step="1" oninput="calculateBAC()">
+              </div>
+              <div class="form-group">
+                <label for="weight-unit" class="form-label">Unit</label>
+                <select id="weight-unit" class="form-select" onchange="calculateBAC()">
+                  <option value="lbs" selected>Pounds (lbs)</option>
+                  <option value="kg">Kilograms (kg)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="standard-drinks" class="form-label">Number of Standard Drinks Consumed</label>
+              <input type="number" id="standard-drinks" class="form-input" value="3.0" min="0" max="25" step="0.5" oninput="calculateBAC()">
+              <span class="form-hint">1 Standard Drink = 12 oz 5% beer = 5 oz 12% wine = 1.5 oz 40% spirits (14g alcohol)</span>
+            </div>
+
+            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group">
+                <label for="drinking-hours" class="form-label">Drinking Duration (Hours)</label>
+                <input type="number" id="drinking-hours" class="form-input" value="2.0" min="0.25" max="24" step="0.25" oninput="calculateBAC()">
+              </div>
+              <div class="form-group">
+                <label for="beta-rate" class="form-label">Metabolic Rate (β / hr)</label>
+                <select id="beta-rate" class="form-select" onchange="calculateBAC()">
+                  <option value="0.015" selected>Average (0.015% / hr)</option>
+                  <option value="0.012">Slow Metabolism (0.012% / hr)</option>
+                  <option value="0.018">Fast Metabolism (0.018% / hr)</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="calculateBAC()">Calculate Blood Alcohol & Clearance</button>
+          </div>
+        </div>
+
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">BAC Analysis & Sobriety Forecast</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="result-hero" id="bac-hero" style="background:#fef2f2;border-color:#fecaca;">
+              <span class="hero-label">Estimated Current Blood Alcohol</span>
+              <div class="hero-value" id="res-bac" style="color:#b91c1c;font-size:2.4rem;">0.045 %</div>
+              <span class="form-hint" id="res-bac-status" style="font-weight:600;">Legally Safe in US (Under 0.08% Limit), But Impaired</span>
+            </div>
+
+            <div class="results-grid" style="margin-top:1.5rem;">
+              <div class="result-item">
+                <span class="result-label">Peak Theoretical BAC</span>
+                <span class="result-value" id="res-peak-bac">0.075 %</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Pure Alcohol Consumed</span>
+                <span class="result-value" id="res-grams-alcohol">42.0 g</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Time to Legal Limit (0.08%)</span>
+                <span class="result-value" id="res-time-legal">0.0 Hours</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Time to Full Sobriety (0.00%)</span>
+                <span class="result-value" id="res-time-zero">3.0 Hours</span>
+              </div>
+            </div>
+
+            <div class="stat-box" style="margin-top:1.5rem;padding:1rem;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+              <h4 style="font-weight:700;margin-bottom:0.5rem;font-size:0.95rem;">Physiological & Cognitive Effects:</h4>
+              <p id="res-symptoms" style="font-size:0.875rem;color:#475569;margin:0;">
+                Mild impairment of divided attention, slight exaggeration of emotions, minor reduction in ocular tracking and reaction times.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <article class="article-body">
+        <h2>Pharmacokinetics of Alcohol Absorption and Metabolism</h2>
+        <p>
+          Ethanol ($C_2H_5OH$) is a low-molecular-weight, water-soluble alcohol that rapidly permeates biological membranes via passive diffusion. When ingested, alcohol is not chemically digested like carbohydrates, proteins, or lipids. Approximately 20% is absorbed directly through the gastric mucosa of the stomach, while the remaining 80% is absorbed in the upper small intestine, primarily through the highly vascularized duodenal and jejunal villi.
+        </p>
+        <p>
+          The rate of gastric emptying is the dominant factor dictating peak blood alcohol concentration. In the presence of a full meal containing dietary fats and fibrous proteins, the pyloric sphincter remains constricted to allow mechanical churning, delaying gastric emptying and flattening the systemic absorption curve. On an empty stomach, rapid transit into the duodenum produces peak systemic blood concentrations within 30 to 45 minutes of consumption.
+        </p>
+
+        <h2>The Classic Widmark Pharmacokinetic Equation</h2>
+        <p>
+          In 1932, Swedish physician and forensic chemist <strong>Erik M. P. Widmark</strong> formulated the fundamental mathematical model governing human alcohol pharmacokinetics. The model treats the human body as a single-compartment open system where ethanol distributes into total body water:
+        </p>
+
+        <div class="formula-box">
+          <p><strong>The Widmark Equation:</strong></p>
+          $$BAC\text{ (\% g/dL)} = \left[ \frac{A}{r \times W} \times 100 \right] - (\beta \times t)$$
+          <p>Where:</p>
+          <ul>
+            <li><strong>A:</strong> Total mass of pure ethanol ingested (in grams). One US standard drink contains exactly 14.0 grams of ethanol ($A = \text{drinks} \times 14.0\text{ g}$).</li>
+            <li><strong>W:</strong> Total body weight in grams ($1\text{ lb} \approx 453.592\text{ g}$; $1\text{ kg} = 1000\text{ g}$).</li>
+            <li><strong>r:</strong> Widmark's rho factor (reduced body mass or volume of distribution), reflecting the fraction of body mass consisting of water. Widmark empirically established $r = 0.68 \pm 0.08$ for biological men and $r = 0.55 \pm 0.05$ for biological women.</li>
+            <li><strong>&beta; (Beta):</strong> The zero-order elimination rate constant of ethanol clearance, governed by hepatic alcohol dehydrogenase saturation, typically $0.015\text{ g/dL/hr}$ ($0.015\%/\text{hr}$).</li>
+            <li><strong>t:</strong> Total time elapsed in hours from the start of alcohol ingestion.</li>
+          </ul>
+        </div>
+
+        <h2>Biological Sex Differences in Alcohol Distribution</h2>
+        <p>
+          The substantial divergence in the $r$ distribution factor between males ($0.68$) and females ($0.55$) arises from two distinct physiological phenomena:
+        </p>
+        <ol>
+          <li><strong>Body Composition and Total Body Water (TBW):</strong> Ethanol is highly polar and water-soluble; it does not partition into lipid storage tissue (adipose). Because adult females possess on average a higher proportion of essential and subcutaneous body fat and a lower percentage of lean skeletal muscle mass than biological males, their total body water volume is roughly 10% to 15% lower per unit of body weight. Identical ethanol doses in equal-weight individuals therefore yield a substantially higher blood concentration in females.</li>
+          <li><strong>First-Pass Hepatic and Gastric Metabolism:</strong> The gastric mucosa synthesizes gastric alcohol dehydrogenase (ADH) enzymes, which oxidize a modest fraction of ingested ethanol prior to portal circulation. Women have significantly lower gastric ADH activity than men, allowing a larger percentage of ingested alcohol to reach the systemic circulation untouched.</li>
+        </ol>
+
+        <h2>Zero-Order Hepatic Clearance and Elimination Kinetics</h2>
+        <p>
+          More than 90% of circulating ethanol is metabolized in the hepatocytes of the liver through sequential oxidation pathways:
+        </p>
+        $$C_2H_5OH + NAD^+ \xrightarrow{\text{Alcohol Dehydrogenase (ADH)}} CH_3CHO\text{ (Acetaldehyde)} + NADH + H^+$$
+        $$CH_3CHO + NAD^+ + H_2O \xrightarrow{\text{Aldehyde Dehydrogenase (ALDH)}} CH_3COOH\text{ (Acetate)} + NADH + H^+$$
+        <p>
+          The primary rate-limiting enzyme, cytosolic alcohol dehydrogenase (ADH), exhibits a low Michaelis constant ($K_m \approx 0.05\text{ to }0.1\text{ g/L}$ or $0.005\text{ to }0.010\text{ g/dL}$). Consequently, even at very modest blood alcohol concentrations ($BAC > 0.02\%$), the enzyme becomes entirely saturated. The clearance reaction therefore follows <strong>zero-order kinetics</strong>: the liver oxidizes a constant absolute quantity of alcohol per unit time, regardless of whether the BAC is 0.05% or 0.25%. The universal population average clearance rate is $\beta = 0.015\%\text{ per hour}$ (approximately one standard drink metabolized every 60 to 90 minutes).
+        </p>
+
+        <h2>Clinical and Legal BAC Benchmark Reference Table</h2>
+        <p>
+          The following reference table outlines physiological impairment, cognitive deficits, and legal implications across the spectrum of Blood Alcohol Concentrations:
+        </p>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>BAC Range (%)</th>
+                <th>Standard Drink Equivalent (180 lb Male)</th>
+                <th>Neurological &amp; Physiological Symptoms</th>
+                <th>Driving Impairment Severity</th>
+                <th>Legal Classification</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>0.00% – 0.03%</strong></td>
+                <td>1 drink</td>
+                <td>Mild pleasant relaxation, slight elevation in mood, subtle warming sensation.</td>
+                <td>Minor decline in rapid visual tracking; statistically slight risk increase.</td>
+                <td>Legally unimpaired (adult non-commercial drivers).</td>
+              </tr>
+              <tr>
+                <td><strong>0.04% – 0.07%</strong></td>
+                <td>2 – 3 drinks</td>
+                <td>Release of inhibitions, mild motor coordination loss, lowered alertness.</td>
+                <td>Significant reduction in reaction time, emergency braking distance lengthened.</td>
+                <td>Commercial driver violation limit in US (0.04%); impaired driving.</td>
+              </tr>
+              <tr>
+                <td><strong>0.08% – 0.12%</strong></td>
+                <td>4 – 5 drinks</td>
+                <td>Clear motor ataxia, slurred speech, impaired reasoning and short-term memory.</td>
+                <td>Severe loss of peripheral vision, inability to maintain lane position.</td>
+                <td><strong>Per Se Statutory DUI/DWI Violation in all 50 US States</strong>.</td>
+              </tr>
+              <tr>
+                <td><strong>0.13% – 0.19%</strong></td>
+                <td>6 – 8 drinks</td>
+                <td>Gross loss of motor control, vestibular disturbance, dysphoria, nausea.</td>
+                <td>Extreme danger; 25-fold to 50-fold elevated crash probability.</td>
+                <td>Aggravated DUI / felony reckless endangerment jurisdiction.</td>
+              </tr>
+              <tr>
+                <td><strong>0.20% – 0.29%</strong></td>
+                <td>9 – 12 drinks</td>
+                <td>Profound stupor, amnesia (blackout), severe vomiting risk, sensory blunting.</td>
+                <td>Complete operational incapacity.</td>
+                <td>Severe acute alcohol intoxication; medical supervision needed.</td>
+              </tr>
+              <tr>
+                <td><strong>&ge; 0.30%</strong></td>
+                <td>13+ drinks</td>
+                <td>Coma, loss of protective airway reflexes, hypothermia, respiratory arrest.</td>
+                <td>Fatal poisoning threshold.</td>
+                <td>Potentially fatal medical emergency; intensive care required.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Worked Forensic Calculation Example</h2>
+        <div class="worked-example-card">
+          <div class="example-header">
+            <span class="example-badge">Toxicology Case Study</span>
+            <h3 class="example-title">Social Gathering DUI Threshold Assessment</h3>
+          </div>
+          <div class="example-step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Scenario Parameters:</strong> A 160-pound (72.57 kg) biological male consumes 4 pints of craft IPA beer (each pint 16 oz at 6.5% ABV) over a 3.0-hour dinner. The investigator must calculate his current BAC and determine when he will reach the legal driving threshold (0.08%) and full sobriety (0.00%).
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Calculate Total Pure Alcohol Mass (A):</strong>
+              $$\text{Volume} = 4 \times 16\text{ oz} = 64\text{ oz} \approx 1892.7\text{ mL}$$
+              $$\text{Pure Ethanol Volume} = 1892.7\text{ mL} \times 0.065 = 123.03\text{ mL}$$
+              $$\text{Pure Ethanol Mass } (A) = 123.03\text{ mL} \times 0.789\text{ g/mL} = 97.07\text{ grams of alcohol}$$
+              (Equivalent to $97.07 / 14.0 = 6.93\text{ US standard drinks}$.)
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>Calculate Body Weight in Grams and Peak Theoretical BAC:</strong>
+              $$W = 160\text{ lbs} \times 453.592\text{ g/lb} = 72,575\text{ grams}$$
+              $$r\text{ (male)} = 0.68 \implies r \times W = 0.68 \times 72,575 = 49,351\text{ g}$$
+              $$\text{Theoretical Peak BAC} = \frac{97.07}{49,351} \times 100 = 0.1967\%$$
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <strong>Account for Metabolic Elimination Over 3 Hours:</strong>
+              $$\text{Elimination} = \beta \times t = 0.015\%/\text{hr} \times 3.0\text{ hrs} = 0.0450\%$$
+              $$\text{Current BAC} = 0.1967\% - 0.0450\% = \mathbf{0.1517\%}$$
+              $$\text{Time to Legal 0.08\%} = \frac{0.1517 - 0.08}{0.015} = \frac{0.0717}{0.015} = \mathbf{4.78\text{ hours}}$$
+              $$\text{Time to Complete Sobriety (0.00\%)} = \frac{0.1517}{0.015} = \mathbf{10.11\text{ hours}}$$
+            </div>
+          </div>
+        </div>
+
+        <h2>Common Myths and Clinical Realities</h2>
+        <p>
+          Forensic toxicology consistently refutes persistent cultural misconceptions regarding alcohol sobriety:
+        </p>
+        <ul>
+          <li><strong>Caffeine and Cold Showers:</strong> Caffeine acts as an adenosine receptor antagonist that masks perceived drowsiness, creating an illusion of alertness termed "wide-awake drunk." However, caffeine has zero effect on hepatic alcohol dehydrogenase kinetics. BAC remains completely identical, while motor reaction speed remains dangerously impaired.</li>
+          <li><strong>Breathalyzer Partition Ratio Variability:</strong> Breath alcohol analyzers (Evidential Breath Testers) measure alcohol vapor in deep alveolar breath and multiply by an assumed statutory blood-to-breath partition ratio of $2,100:1$. In the general population, true physiological ratios range from $1,800:1$ to $2,400:1$. Body temperature elevation (fever) and hematocrit variations alter Henry's Law equilibrium in alveolar air, potentially introducing a 5% to 10% variance.</li>
+          <li><strong>Sleep and Metabolism:</strong> During deep sleep, gastrointestinal motility slows, and metabolic rates drop marginally. If significant alcohol remains unabsorbed in the stomach before sleep, the morning-after BAC may be surprisingly elevated as residual alcohol continues to enter circulation.</li>
+        </ul>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <span class="logo-icon">🧮</span>
+        <span class="logo-text">CalcHub</span>
+        <p class="footer-tagline">Clinical & Engineering Precision Tools for Health and Science.</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">All Calculators</a>
+        <a href="health.html">Health Calculators</a>
+        <a href="finance.html">Financial Tools</a>
+        <a href="engineering.html">Engineering Tools</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function calculateBAC() {
+      const gender = document.getElementById('gender').value;
+      const r = (gender === 'male') ? 0.68 : 0.55;
+
+      let weight = parseFloat(document.getElementById('body-weight').value) || 0;
+      const unit = document.getElementById('weight-unit').value;
+      if (unit === 'lbs') {
+        weight = weight * 453.592; // grams
+      } else {
+        weight = weight * 1000; // grams
+      }
+
+      const drinks = parseFloat(document.getElementById('standard-drinks').value) || 0;
+      const alcoholGrams = drinks * 14.0; // 14g per US standard drink
+
+      const hours = parseFloat(document.getElementById('drinking-hours').value) || 0;
+      const beta = parseFloat(document.getElementById('beta-rate').value) || 0.015;
+
+      if (weight <= 0) return;
+
+      const peakBAC = (alcoholGrams / (r * weight)) * 100;
+      const eliminated = beta * hours;
+      let currentBAC = peakBAC - eliminated;
+      if (currentBAC < 0) currentBAC = 0;
+
+      document.getElementById('res-bac').innerText = currentBAC.toFixed(3) + ' %';
+      document.getElementById('res-peak-bac').innerText = peakBAC.toFixed(3) + ' %';
+      document.getElementById('res-grams-alcohol').innerText = alcoholGrams.toFixed(1) + ' g';
+
+      // Time to 0.08%
+      let timeToLegal = 0;
+      if (currentBAC > 0.08) {
+        timeToLegal = (currentBAC - 0.08) / beta;
+      }
+      document.getElementById('res-time-legal').innerText = timeToLegal.toFixed(1) + ' Hours';
+
+      // Time to 0.00%
+      let timeToZero = 0;
+      if (currentBAC > 0) {
+        timeToZero = currentBAC / beta;
+      }
+      document.getElementById('res-time-zero').innerText = timeToZero.toFixed(1) + ' Hours';
+
+      // Hero UI updates
+      const hero = document.getElementById('bac-hero');
+      const valEl = document.getElementById('res-bac');
+      const statusEl = document.getElementById('res-bac-status');
+      const sympEl = document.getElementById('res-symptoms');
+
+      if (currentBAC === 0) {
+        hero.style.background = '#f0fdf4';
+        hero.style.borderColor = '#bbf7d0';
+        valEl.style.color = '#15803d';
+        statusEl.innerText = 'Sober (0.00% BAC) - Completely Unimpaired';
+        sympEl.innerText = 'Normal baseline cognitive and neuromuscular function. Fully legal for all motor vehicle operation.';
+      } else if (currentBAC < 0.04) {
+        hero.style.background = '#fefce8';
+        hero.style.borderColor = '#fef08a';
+        valEl.style.color = '#ca8a04';
+        statusEl.innerText = 'Mild Influence - Below Legal Limit';
+        sympEl.innerText = 'Subtle relaxation and warmth. Minor loss of divided attention and minor increase in risk-taking.';
+      } else if (currentBAC < 0.08) {
+        hero.style.background = '#fff7ed';
+        hero.style.borderColor = '#fed7aa';
+        valEl.style.color = '#ea580c';
+        statusEl.innerText = 'Impaired - Approaching Legal DUI Threshold';
+        sympEl.innerText = 'Noticeable reduction in reaction time, tracking moving targets, and steering control. Driving is unsafe.';
+      } else if (currentBAC < 0.15) {
+        hero.style.background = '#fef2f2';
+        hero.style.borderColor = '#fecaca';
+        valEl.style.color = '#b91c1c';
+        statusEl.innerText = 'ILLEGAL (DUI / DWI Violation) - Major Impairment';
+        sympEl.innerText = 'Statutory DUI threshold in all US states. Gross lack of muscular coordination, balance loss, substantially increased accident risk.';
+      } else {
+        hero.style.background = '#450a0a';
+        hero.style.borderColor = '#991b1b';
+        valEl.style.color = '#fca5a5';
+        statusEl.innerText = 'SEVERE INTOXICATION - Acute Danger';
+        statusEl.style.color = '#fecaca';
+        sympEl.innerText = 'Blackout risk, loss of motor control, vomiting, risk of respiratory depression and alcohol poisoning. Medical evaluation required.';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', calculateBAC);
+  </script>
+</body>
+</html>

@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calories Burned Calculator | Exercise MET Energy Expenditure</title>
+  <meta name="description" content="Calculate gross and net calories burned for hundreds of exercises and daily activities using the updated 2024 Ainsworth Compendium of Physical Activities MET database.">
+  <link rel="canonical" href="https://calchub.com/calories-burned-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "MET Exercise Calories Burned Calculator",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "description": "Calculates gross and net calories burned during athletic and occupational activities based on the scientific Ainsworth Compendium of Physical Activities MET values."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a MET (Metabolic Equivalent of Task)?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A MET is a standardized physiological metric representing the ratio of the work metabolic rate to a standard resting metabolic rate. By universal convention, 1 MET is defined as an oxygen uptake of 3.5 milliliters of O2 per kilogram of body weight per minute (3.5 mL O2/kg/min), which is roughly equivalent to 1.0 kilocalorie per kilogram of body mass per hour (1.0 kcal/kg/hr) at quiet sitting rest."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the mathematical formula to calculate calories burned from MET values?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The scientific equation is: Calories Burned = MET × 3.5 × Weight (kg) / 200 × Duration (minutes). Alternatively, using the hourly conversion: Calories = MET × Weight (kg) × Duration (hours)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between Gross Calories Burned and Net Calories Burned?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Gross calories burned represents the total energy expended during the workout, which includes your normal resting metabolic rate. Net calories burned represents only the extra energy burned above your baseline resting rate (Net = Gross Calories - Resting Calories during that duration). When logging exercise for weight loss diets, using Net Calories prevents double-counting calories already accounted for in your daily BMR."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is EPOC (Excess Post-Exercise Oxygen Consumption)?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "EPOC, often called the 'afterburn effect,' is the measurably elevated rate of oxygen consumption following strenuous exercise. It accounts for cellular replenishment of phosphocreatine (PCr) stores, lactate clearance, glycogen resynthesis, and elevated body temperature. EPOC contributes an additional 6% to 15% of the net energy cost of high-intensity interval training (HIIT) or heavy resistance exercise."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="header">
+    <div class="header-container">
+      <div class="header-logo">
+        <a href="index.html" class="logo-link">
+          <span class="logo-icon">🧮</span>
+          <span class="logo-text">CalcHub</span>
+        </a>
+      </div>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="health.html" class="nav-link active">Health & Fitness</a>
+        <a href="finance.html" class="nav-link">Finance</a>
+        <a href="engineering.html" class="nav-link">Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="calculator-container">
+      <div class="calculator-header">
+        <div class="badge-tag">Exercise Physiology</div>
+        <h1 class="calculator-title">Calories Burned by Activity Calculator</h1>
+        <p class="calculator-description">Calculate gross and net energy expenditure across hundreds of exercises and sports based on the official 2024 Ainsworth Compendium of Physical Activities.</p>
+      </div>
+
+      <div class="calculator-grid">
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">Activity &amp; Body Weight Parameters</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="form-group">
+              <label for="activity-select" class="form-label">Physical Activity / Sport Discipline</label>
+              <select id="activity-select" class="form-select" onchange="updateMETAndCalculate()">
+                <optgroup label="Running &amp; Jogging">
+                  <option value="9.8" selected>Running - 6 mph (10 min/mile pace) [9.8 METs]</option>
+                  <option value="8.3">Running - 5 mph (12 min/mile pace) [8.3 METs]</option>
+                  <option value="11.0">Running - 7 mph (8.5 min/mile pace) [11.0 METs]</option>
+                  <option value="11.8">Running - 8 mph (7.5 min/mile pace) [11.8 METs]</option>
+                  <option value="14.5">Running - 10 mph (6.0 min/mile pace) [14.5 METs]</option>
+                </optgroup>
+                <optgroup label="Cycling &amp; Biking">
+                  <option value="6.8">Cycling - Moderate effort (12 - 13.9 mph) [6.8 METs]</option>
+                  <option value="8.5">Cycling - Vigorous effort (14 - 15.9 mph) [8.5 METs]</option>
+                  <option value="12.0">Cycling - Very fast / Racing (&gt; 16 mph) [12.0 METs]</option>
+                  <option value="5.5">Stationary Cycling - Moderate effort (100W) [5.5 METs]</option>
+                  <option value="8.8">Stationary Cycling - High intensity (150-200W) [8.8 METs]</option>
+                </optgroup>
+                <optgroup label="Gym, Strength &amp; Conditioning">
+                  <option value="5.0">Weight Lifting - Vigorous free-weight training [5.0 METs]</option>
+                  <option value="3.5">Weight Lifting - Light/moderate circuit machines [3.5 METs]</option>
+                  <option value="8.0">High-Intensity Interval Training (HIIT) [8.0 METs]</option>
+                  <option value="8.0">Calisthenics - Vigorous push-ups, pull-ups, burpees [8.0 METs]</option>
+                  <option value="10.0">Jumping Rope - Moderate/fast pace (100-120 rpm) [10.0 METs]</option>
+                  <option value="7.0">Rowing Machine - Moderate effort (100W) [7.0 METs]</option>
+                </optgroup>
+                <optgroup label="Walking &amp; Hiking">
+                  <option value="3.5">Walking - Brisk pace (3.5 mph / 5.6 km/h) [3.5 METs]</option>
+                  <option value="2.8">Walking - Casual strolling (2.5 mph) [2.8 METs]</option>
+                  <option value="4.3">Walking - Very brisk (4.0 mph) [4.3 METs]</option>
+                  <option value="6.0">Hiking - Cross-country with daypack [6.0 METs]</option>
+                </optgroup>
+                <optgroup label="Swimming &amp; Water Sports">
+                  <option value="7.0">Swimming - Freestyle / front crawl (moderate) [7.0 METs]</option>
+                  <option value="9.8">Swimming - Freestyle / front crawl (vigorous) [9.8 METs]</option>
+                  <option value="10.3">Swimming - Breaststroke (vigorous effort) [10.3 METs]</option>
+                  <option value="13.8">Swimming - Butterfly stroke [13.8 METs]</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group">
+                <label for="user-weight" class="form-label">Body Weight</label>
+                <input type="number" id="user-weight" class="form-input" value="175" min="60" max="450" step="1" oninput="calculateBurn()">
+              </div>
+              <div class="form-group">
+                <label for="weight-unit" class="form-label">Unit</label>
+                <select id="weight-unit" class="form-select" onchange="calculateBurn()">
+                  <option value="lbs" selected>Pounds (lbs)</option>
+                  <option value="kg">Kilograms (kg)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group">
+                <label for="duration-mins" class="form-label">Duration (Minutes)</label>
+                <input type="number" id="duration-mins" class="form-input" value="45" min="1" max="600" step="5" oninput="calculateBurn()">
+              </div>
+              <div class="form-group">
+                <label for="custom-met" class="form-label">Activity MET Factor</label>
+                <input type="number" id="custom-met" class="form-input" value="9.8" min="0.9" max="25.0" step="0.1" oninput="calculateBurn()">
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="calculateBurn()">Calculate Energy Expenditure</button>
+          </div>
+        </div>
+
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">Energy Expenditure Results</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="result-hero" style="background:#fff7ed;border-color:#fed7aa;">
+              <span class="hero-label">Gross Calories Burned</span>
+              <div class="hero-value" id="res-gross-cal" style="color:#c2410c;font-size:2.4rem;">585 kcal</div>
+              <span class="form-hint">Total energy expended including resting metabolic baseline</span>
+            </div>
+
+            <div class="results-grid" style="margin-top:1.5rem;">
+              <div class="result-item">
+                <span class="result-label">Net Exercise Calories</span>
+                <span class="result-value" id="res-net-cal">525 kcal</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Resting Baseline Burn</span>
+                <span class="result-value" id="res-resting-cal">60 kcal</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Caloric Burn Rate</span>
+                <span class="result-value" id="res-burn-rate">13.0 kcal / min</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Fat Mass Equivalent</span>
+                <span class="result-value" id="res-fat-equiv">0.17 lbs fat</span>
+              </div>
+            </div>
+
+            <div class="stat-box" style="margin-top:1.5rem;padding:1rem;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+              <h4 style="font-weight:700;margin-bottom:0.5rem;font-size:0.95rem;">Exercise Metabolism &amp; EPOC Insights:</h4>
+              <p id="res-epoc-note" style="font-size:0.875rem;color:#475569;margin:0;">
+                High-intensity running (9.8 METs) generates an estimated 6% to 10% additional EPOC afterburn (~35–58 kcal) over the 12-24 hours post-workout during glycogen and phosphagen resynthesis.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <article class="article-body">
+        <h2>The Physiology of Exercise Energy Expenditure</h2>
+        <p>
+          During physical exertion, skeletal muscle myocytes undergo rapid cycles of actin-myosin cross-bridge formation powered by the hydrolysis of adenosine triphosphate ($ATP$). Because intracellular muscular ATP concentrations are strictly limited (sustaining only 1 to 2 seconds of maximal contraction), the body continuously resynthesizes ATP through three integrated energetic pathways:
+        </p>
+        <ol>
+          <li><strong>The Phosphagen (ATP-PCr) System:</strong> Rapid anaerobic rephosphorylation mediated by creatine kinase ($CP + ADP \leftrightarrow ATP + C$), dominating the first 10 seconds of maximal burst output.</li>
+          <li><strong>Anaerobic Glycolysis:</strong> Fast enzymatic breakdown of muscle glycogen into pyruvate and lactate in the sarcoplasm, powering high-intensity bouts lasting 30 to 120 seconds.</li>
+          <li><strong>Aerobic Oxidative Phosphorylation:</strong> Mitochondrial oxidation of pyruvate (from carbohydrates) and free fatty acids through the Krebs cycle and electron transport chain ($ETC$), supplying virtually limitless energy for prolonged submaximal aerobic exercise.</li>
+        </ol>
+
+        <h2>The MET Concept: Standardization of Human Work</h2>
+        <p>
+          Quantifying the energy cost of diverse physical tasks across varying body sizes requires a universal physiological currency. In 1993, Dr. Barbara Ainsworth and colleagues published the landmark <em>Compendium of Physical Activities</em> (extensively revised in 2000, 2011, and 2024), establishing the <strong>Metabolic Equivalent of Task (MET)</strong> as the international standard.
+        </p>
+        <div class="formula-box">
+          <p><strong>Standard Definition of 1 MET:</strong></p>
+          $$1\text{ MET} \equiv 3.5\text{ mL } O_2\text{ / kg / min} \approx 1.0\text{ kcal / kg / hour}$$
+          <p>
+            One MET represents the baseline rate of oxygen consumption of an average adult sitting quietly at rest. An activity assigned a value of 8.0 METs demands eight times the oxygen uptake and energy consumption of quiet rest.
+          </p>
+        </div>
+
+        <h2>Mathematical Derivation of Caloric Burn from Oxygen Uptake</h2>
+        <p>
+          The conversion from oxygen consumption to kilocalories relies on indirect respiratory calorimetry. When a human metabolizes a standard mixed diet of carbohydrates and fats, each liter of oxygen consumed ($1\text{ L } O_2$) liberates approximately <strong>4.86 to 5.05 kilocalories</strong> of heat energy (conventionally approximated as $5.0\text{ kcal/L } O_2$):
+        </p>
+        $$\text{Rate (kcal/min)} = \text{MET} \times 3.5\frac{\text{mL } O_2}{\text{kg}\cdot\text{min}} \times \frac{1\text{ L}}{1000\text{ mL}} \times 5.0\frac{\text{kcal}}{\text{L } O_2} \times \text{Weight (kg)}$$
+        $$\text{Rate (kcal/min)} = \text{MET} \times \frac{3.5 \times 5.0}{1000} \times \text{Weight (kg)} = \frac{\text{MET} \times 3.5 \times \text{Weight (kg)}}{200}$$
+        <p>
+          Integrating over total exercise duration ($t$ in minutes) yields the standard scientific formula:
+        </p>
+        <div class="formula-box">
+          <p><strong>Universal Exercise Calorie Equation:</strong></p>
+          $$\text{Gross Calories Burned} = \text{MET} \times \frac{3.5 \times \text{Weight (kg)}}{200} \times \text{Duration (min)}$$
+          $$\text{Net Calories Burned} = (\text{MET} - 1.0) \times \frac{3.5 \times \text{Weight (kg)}}{200} \times \text{Duration (min)}$$
+        </div>
+
+        <h2>Gross vs. Net Energy Expenditure: Preventing Dietary Double-Counting</h2>
+        <p>
+          A critical pitfall in sports nutrition and fat loss planning is confusing <em>Gross</em> energy expenditure with <em>Net</em> energy expenditure:
+        </p>
+        <ul>
+          <li><strong>Gross Expenditure:</strong> Measures the entire quantity of fuel burned during the workout window, including the baseline calories your body would have expended sitting on the couch doing nothing.</li>
+          <li><strong>Net Expenditure:</strong> Subtracts the baseline resting metabolic rate ($1.0\text{ MET}$), isolating the exact surplus calories expended solely due to the physical movement.</li>
+        </ul>
+        <p>
+          For example, a 180-pound male running for 60 minutes at 6 mph (9.8 METs) burns approximately <strong>800 Gross kcal</strong>. However, his baseline resting expenditure during that same hour would have been approximately <strong>82 kcal</strong>. His true net exercise energy expenditure is therefore <strong>718 Net kcal</strong>. If his daily food log adds back the full 800 gross calories while already using a baseline TDEE that accounts for 24 hours of resting metabolism, he will inadvertently overconsume food and stall fat loss.
+        </p>
+
+        <h2>Comprehensive Compendium MET Reference Table</h2>
+        <p>
+          The table below demonstrates validated MET ratings from the 2024 Ainsworth Compendium and expected hourly caloric expenditures for a standard 165 lb (75 kg) individual:
+        </p>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Physical Activity &amp; Discipline</th>
+                <th>Compendium MET</th>
+                <th>Intensity Classification</th>
+                <th>Gross Burn (75 kg, 60 min)</th>
+                <th>Net Burn (75 kg, 60 min)</th>
+                <th>Primary Fuel Substrate</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Sleeping / Lying Quietly</strong></td>
+                <td>0.9</td>
+                <td>Resting Baseline</td>
+                <td>68 kcal</td>
+                <td>-8 kcal</td>
+                <td>90% Fatty Acids</td>
+              </tr>
+              <tr>
+                <td><strong>Desk Work / Computer Typing</strong></td>
+                <td>1.3</td>
+                <td>Sedentary</td>
+                <td>98 kcal</td>
+                <td>23 kcal</td>
+                <td>80% Fatty Acids</td>
+              </tr>
+              <tr>
+                <td><strong>Casual Walking (2.5 mph)</strong></td>
+                <td>2.8</td>
+                <td>Light Intensity</td>
+                <td>210 kcal</td>
+                <td>135 kcal</td>
+                <td>70% Fatty Acids, 30% Glucose</td>
+              </tr>
+              <tr>
+                <td><strong>Brisk Fitness Walk (3.5 mph)</strong></td>
+                <td>3.5</td>
+                <td>Moderate Intensity</td>
+                <td>263 kcal</td>
+                <td>188 kcal</td>
+                <td>50% Fatty Acids, 50% Glucose</td>
+              </tr>
+              <tr>
+                <td><strong>Resistance Weight Training (Vigorous)</strong></td>
+                <td>5.0</td>
+                <td>Moderate / Hard</td>
+                <td>375 kcal</td>
+                <td>300 kcal</td>
+                <td>70% Glycogen, 30% Phosphagen</td>
+              </tr>
+              <tr>
+                <td><strong>Cycling (Moderate, 12–14 mph)</strong></td>
+                <td>6.8</td>
+                <td>Vigorous Intensity</td>
+                <td>510 kcal</td>
+                <td>435 kcal</td>
+                <td>60% Glucose, 40% Fatty Acids</td>
+              </tr>
+              <tr>
+                <td><strong>Swimming Freestyle (Moderate)</strong></td>
+                <td>7.0</td>
+                <td>Vigorous Intensity</td>
+                <td>525 kcal</td>
+                <td>450 kcal</td>
+                <td>65% Glucose, 35% Fatty Acids</td>
+              </tr>
+              <tr>
+                <td><strong>HIIT / Calisthenics Circuit</strong></td>
+                <td>8.0</td>
+                <td>Very Vigorous</td>
+                <td>600 kcal</td>
+                <td>525 kcal</td>
+                <td>80% Glycogen, 20% Lactate</td>
+              </tr>
+              <tr>
+                <td><strong>Running (6 mph / 10 min pace)</strong></td>
+                <td>9.8</td>
+                <td>High Intensity</td>
+                <td>735 kcal</td>
+                <td>660 kcal</td>
+                <td>75% Glucose, 25% Fatty Acids</td>
+              </tr>
+              <tr>
+                <td><strong>Jumping Rope (Moderate, 100 rpm)</strong></td>
+                <td>10.0</td>
+                <td>High Intensity</td>
+                <td>750 kcal</td>
+                <td>675 kcal</td>
+                <td>85% Glycogen, 15% Phosphagen</td>
+              </tr>
+              <tr>
+                <td><strong>Running (8 mph / 7.5 min pace)</strong></td>
+                <td>11.8</td>
+                <td>Very High Intensity</td>
+                <td>885 kcal</td>
+                <td>810 kcal</td>
+                <td>90% Glucose, 10% Fatty Acids</td>
+              </tr>
+              <tr>
+                <td><strong>Competitive Rowing (Max Effort)</strong></td>
+                <td>12.0</td>
+                <td>Near Maximal</td>
+                <td>900 kcal</td>
+                <td>825 kcal</td>
+                <td>Anaerobic Glycolysis Dominated</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Worked Exercise Physiology Case Study</h2>
+        <div class="worked-example-card">
+          <div class="example-header">
+            <span class="example-badge">Training Science Case</span>
+            <h3 class="example-title">Endurance Cycling vs. Resistance Training Fuel Expenditure</h3>
+          </div>
+          <div class="example-step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Athlete Profile:</strong> A 180-pound (81.65 kg) male triathlete performs two distinct training sessions: a 75-minute outdoor road cycling session at 15.0 mph ($8.5\text{ METs}$) on Tuesday, and a 60-minute vigorous free-weight hypertrophy workout ($5.0\text{ METs}$) on Wednesday. The sports nutritionist must calculate his gross and net expenditure for both sessions.
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Calculate Tuesday Cycling Expenditure (75 min, 8.5 METs):</strong>
+              $$\text{Gross Burn} = 8.5 \times \frac{3.5 \times 81.65}{200} \times 75 = 8.5 \times 1.4289 \times 75 = \mathbf{910.9\text{ Gross kcal}}$$
+              $$\text{Resting Cost} = 1.0 \times 1.4289 \times 75 = 107.2\text{ kcal}$$
+              $$\text{Net Burn} = 910.9 - 107.2 = \mathbf{803.7\text{ Net kcal}}$$
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>Calculate Wednesday Resistance Training (60 min, 5.0 METs):</strong>
+              $$\text{Gross Burn} = 5.0 \times \frac{3.5 \times 81.65}{200} \times 60 = 5.0 \times 1.4289 \times 60 = \mathbf{428.7\text{ Gross kcal}}$$
+              $$\text{Resting Cost} = 1.0 \times 1.4289 \times 60 = 85.7\text{ kcal}$$
+              $$\text{Net Burn} = 428.7 - 85.7 = \mathbf{343.0\text{ Net kcal}}$$
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <strong>EPOC Afterburn Considerations:</strong>
+              While cycling burned significantly more raw calories during the session ($804\text{ net}$ vs $343\text{ net}$), heavy resistance training causes widespread micro-trauma to myofibrillar proteins, elevating muscle protein synthesis (MPS) and EPOC by an estimated 10% to 14% (~45 kcal) over the subsequent 24 to 48 hours during muscular repair and remodeling.
+            </div>
+          </div>
+        </div>
+
+        <h2>The Constrained Total Energy Expenditure Model: Pontzer's Evolutionary Paradigm</h2>
+        <p>
+          For over a century, exercise science assumed an <em>Additive Model</em> of physical activity, wherein each calorie expended during intentional workouts is simply added on top of basal metabolic rate without systemic feedback:
+        </p>
+        $$\text{Additive Model: } TDEE = BMR + TEF + \text{Exercise Activity}$$
+        <p>
+          However, revolutionary evolutionary anthropology research led by Dr. Herman Pontzer utilizing <strong>Doubly Labeled Water ($^2H_2^{18}O$)</strong>—the undisputed gold standard of human metabolic measurement—revealed that human energy expenditure is <strong>constrained</strong> within an evolved homeostatic ceiling. In cross-cultural comparisons between Western sedentary populations and the Hadza hunter-gatherers of Tanzania (who walk 5 to 10 miles daily), researchers found remarkably similar total daily energy expenditures when adjusted for lean body mass.
+        </p>
+        <p>
+          Under the <strong>Constrained Energy Model</strong>, when physical activity levels rise dramatically over sustained periods, the body actively suppresses baseline physiological expenditures—reducing chronic systemic inflammation, lowering reproductive hormone output, and curtailing non-conscious fidgeting and spontaneous NEAT. While an intense 60-minute workout burns immediate fuel via the MET equation, the long-term net increase in daily caloric burn settles at approximately 72% of the exercise energy expended in normal-weight individuals, and as low as 50% in individuals with obesity. Consequently, exercise must be viewed primarily as a profound stimulus for cardiovascular fitness, glycemic sensitivity, and lean tissue preservation, while nutritional caloric intake remains the primary lever for sustainable adipose reduction.
+        </p>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <span class="logo-icon">🧮</span>
+        <span class="logo-text">CalcHub</span>
+        <p class="footer-tagline">Clinical & Engineering Precision Tools for Health and Science.</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">All Calculators</a>
+        <a href="health.html">Health Calculators</a>
+        <a href="finance.html">Financial Tools</a>
+        <a href="engineering.html">Engineering Tools</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function updateMETAndCalculate() {
+      const selectedMET = document.getElementById('activity-select').value;
+      document.getElementById('custom-met').value = selectedMET;
+      calculateBurn();
+    }
+
+    function calculateBurn() {
+      const weightVal = parseFloat(document.getElementById('user-weight').value) || 0;
+      const unit = document.getElementById('weight-unit').value;
+      const duration = parseFloat(document.getElementById('duration-mins').value) || 0;
+      const met = parseFloat(document.getElementById('custom-met').value) || 0;
+
+      if (weightVal <= 0 || duration <= 0 || met <= 0) return;
+
+      const weightKg = (unit === 'lbs') ? (weightVal * 0.45359237) : weightVal;
+
+      // Gross Burn: MET * (3.5 * weightKg / 200) * duration
+      const ratePerMin = met * (3.5 * weightKg / 200);
+      const grossCalories = Math.round(ratePerMin * duration);
+
+      // Resting Burn: 1.0 * (3.5 * weightKg / 200) * duration
+      const restingRate = 1.0 * (3.5 * weightKg / 200);
+      const restingCalories = Math.round(restingRate * duration);
+
+      const netCalories = Math.max(grossCalories - restingCalories, 0);
+      const burnRate = (grossCalories / duration).toFixed(1);
+      const fatEquiv = (netCalories / 3500).toFixed(2);
+
+      document.getElementById('res-gross-cal').innerText = grossCalories.toLocaleString() + ' kcal';
+      document.getElementById('res-net-cal').innerText = netCalories.toLocaleString() + ' kcal';
+      document.getElementById('res-resting-cal').innerText = restingCalories.toLocaleString() + ' kcal';
+      document.getElementById('res-burn-rate').innerText = burnRate + ' kcal / min';
+      document.getElementById('res-fat-equiv').innerText = fatEquiv + ' lbs fat';
+
+      const epocEl = document.getElementById('res-epoc-note');
+      if (met >= 9.0) {
+        const epocLow = Math.round(netCalories * 0.08);
+        const epocHigh = Math.round(netCalories * 0.15);
+        epocEl.innerHTML = `High-intensity anaerobic activity (${met} METs) induces substantial EPOC afterburn (~${epocLow}–${epocHigh} kcal extra) over 12-24 hours post-workout due to PCr resynthesis, lactate clearance, and elevated core temperature.`;
+      } else if (met >= 5.0) {
+        const epocLow = Math.round(netCalories * 0.05);
+        const epocHigh = Math.round(netCalories * 0.08);
+        epocEl.innerHTML = `Moderate-to-vigorous exercise (${met} METs) produces a modest EPOC afterburn (~${epocLow}–${epocHigh} kcal extra) during cellular recovery and glycogen resynthesis.`;
+      } else {
+        epocEl.innerHTML = `Light aerobic/lifestyle activity (${met} METs) utilizes almost exclusively oxidative lipid pathways with negligible EPOC afterburn once the activity ceases.`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', calculateBurn);
+  </script>
+</body>
+</html>

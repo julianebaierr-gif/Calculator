@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carbohydrate Intake Calculator | Athlete Glycogen & Fueling Sizer</title>
+  <meta name="description" content="Calculate your daily carbohydrate requirements in grams and g/kg based on ACSM, ISSN, and IOC guidelines for endurance, team sports, keto, or bodybuilding.">
+  <link rel="canonical" href="https://calchub.com/carbohydrate-intake-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Sports Carbohydrate Intake & Glycogen Calculator",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "description": "Calculates scientific daily carbohydrate requirements (grams and g/kg/day), intra-workout fueling rates, and glycogen loading targets based on ISSN and IOC sports nutrition consensus."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How many grams of carbohydrates per kilogram of body weight do athletes need daily?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "According to the American College of Sports Medicine (ACSM) and the International Olympic Committee (IOC): low-intensity skill sports require 3 to 5 g/kg/day; moderate training (1 hr/day) requires 5 to 7 g/kg/day; endurance training (1 to 3 hrs/day) requires 6 to 10 g/kg/day; and extreme endurance (> 4 hrs/day) requires 8 to 12 g/kg/day."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How much carbohydrate should endurance athletes consume during long workouts?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "For exercise lasting 1.0 to 2.5 hours, athletes should consume 30 to 60 grams of rapidly oxidizable carbohydrates per hour (glucose or maltodextrin). For ultra-endurance events exceeding 2.5 to 3 hours, up to 90 grams per hour is recommended using a 2:1 glucose-to-fructose ratio to utilize both SGLT1 and GLUT5 intestinal transporters."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How much glycogen can the human body store?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The human body stores approximately 400 to 500 grams of glycogen in skeletal muscle (providing ~1,600 to 2,000 kcal for localized muscular contraction) and approximately 80 to 100 grams in the liver (providing ~320 to 400 kcal to maintain systemic euglycemia during fasting and submaximal exercise)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the carbohydrate protocol for endurance carb-loading?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Modern glycogen supercompensation protocols recommend consuming 10 to 12 grams of carbohydrate per kilogram of body weight per day for 36 to 48 hours prior to an endurance race lasting longer than 90 minutes, accompanied by a structured training taper."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="header">
+    <div class="header-container">
+      <div class="header-logo">
+        <a href="index.html" class="logo-link">
+          <span class="logo-icon">🧮</span>
+          <span class="logo-text">CalcHub</span>
+        </a>
+      </div>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="health.html" class="nav-link active">Health & Fitness</a>
+        <a href="finance.html" class="nav-link">Finance</a>
+        <a href="engineering.html" class="nav-link">Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="calculator-container">
+      <div class="calculator-header">
+        <div class="badge-tag">Sports Dietetics</div>
+        <h1 class="calculator-title">Carbohydrate Intake &amp; Glycogen Sizer</h1>
+        <p class="calculator-description">Calculate evidence-based daily carbohydrate requirements, pre-race glycogen loading protocols, and intra-workout fueling rates based on the ACSM/ISSN consensus.</p>
+      </div>
+
+      <div class="calculator-grid">
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">Athlete Profile &amp; Training Volume</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group">
+                <label for="athlete-weight" class="form-label">Body Weight</label>
+                <input type="number" id="athlete-weight" class="form-input" value="165" min="60" max="400" step="1" oninput="calculateCarbs()">
+              </div>
+              <div class="form-group">
+                <label for="weight-unit" class="form-label">Unit</label>
+                <select id="weight-unit" class="form-select" onchange="calculateCarbs()">
+                  <option value="lbs" selected>Pounds (lbs)</option>
+                  <option value="kg">Kilograms (kg)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="training-tier" class="form-label">Athletic Discipline &amp; Daily Training Load</label>
+              <select id="training-tier" class="form-select" onchange="calculateCarbs()">
+                <option value="sedentary">Sedentary / Weight Management (2 – 3 g/kg/day)</option>
+                <option value="light">Light Training / Skill Sport (&lt; 1 hr/day: 3 – 5 g/kg/day)</option>
+                <option value="moderate" selected>Moderate Training / Team Sports (~1 hr/day: 5 – 7 g/kg/day)</option>
+                <option value="endurance">Endurance Training (1 – 3 hrs/day: 6 – 10 g/kg/day)</option>
+                <option value="extreme">Extreme Endurance / Multi-Hour Tour (&gt; 4 hrs/day: 8 – 12 g/kg/day)</option>
+                <option value="carbload">Pre-Event Glycogen Supercompensation (10 – 12 g/kg/day)</option>
+                <option value="keto">Ketogenic / Very Low Carb (&lt; 50g total / &lt; 0.5 g/kg)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="session-duration" class="form-label">Typical Session Duration (Minutes)</label>
+              <input type="number" id="session-duration" class="form-input" value="90" min="15" max="360" step="15" oninput="calculateCarbs()">
+              <span class="form-hint">Used to calculate intra-workout fueling recommendations</span>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="calculateCarbs()">Calculate Carbohydrate Targets</button>
+          </div>
+        </div>
+
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">Daily Intake &amp; Fueling Matrix</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="result-hero" style="background:#eff6ff;border-color:#bfdbfe;">
+              <span class="hero-label">Target Daily Carbohydrate Intake</span>
+              <div class="hero-value" id="res-target-carbs" style="color:#1d4ed8;font-size:2.4rem;">450 g / day</div>
+              <span class="form-hint" id="res-target-calories">1,800 kcal from carbohydrates (6.0 g/kg body weight)</span>
+            </div>
+
+            <div class="results-grid" style="margin-top:1.5rem;">
+              <div class="result-item">
+                <span class="result-label">Recommended Range</span>
+                <span class="result-value" id="res-carb-range">375 – 524 g</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Total Body Glycogen</span>
+                <span class="result-value" id="res-glycogen-storage">~560 g (~2,240 kcal)</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Intra-Workout Fueling</span>
+                <span class="result-value" id="res-intra-rate">30 – 60 g / hr</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Post-Workout Recovery</span>
+                <span class="result-value" id="res-post-carb">75 – 90 g</span>
+              </div>
+            </div>
+
+            <div class="stat-box" style="margin-top:1.5rem;padding:1rem;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+              <h4 style="font-weight:700;margin-bottom:0.5rem;font-size:0.95rem;">Nutrient Timing &amp; Transporter Saturation:</h4>
+              <p id="res-timing-note" style="font-size:0.875rem;color:#475569;margin:0;">
+                For 90-minute sessions, consuming 30-60 g/hr of rapid-absorbing carbohydrates (dextrose, maltodextrin) prevents premature glycogen depletion and maintains central nervous system power output.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <article class="article-body">
+        <h2>Biochemical Role of Carbohydrates in Athletic Performance</h2>
+        <p>
+          Carbohydrates are the primary, most metabolically efficient macronutrient substrate for fueling high-intensity muscular work. At exercise intensities exceeding 65% of maximal oxygen consumption ($VO_2\text{max}$), oxidative phosphorylation of free fatty acids cannot sustain the rapid turnover rate of muscular $ATP$ required by contracting myofibrils. In contrast, carbohydrate oxidation produces more energy per liter of consumed oxygen ($5.05\text{ kcal/L } O_2$) than lipid oxidation ($4.69\text{ kcal/L } O_2$), conferring an approximate <strong>7% to 11% bioenergetic efficiency advantage</strong> during demanding athletic competition.
+        </p>
+        <p>
+          Carbohydrates are stored in the body in the form of <strong>glycogen</strong>, a branched polymer of glucose molecules organized around a central protein core called glycogenin:
+        </p>
+        <ul>
+          <li><strong>Skeletal Muscle Glycogen (~400 to 500 grams):</strong> Muscle cells lack the enzyme glucose-6-phosphatase, trapping phosphorylated glucose within the myocyte. Muscle glycogen serves exclusively as a localized, intracellular energy supply to power muscle cross-bridge cycling.</li>
+          <li><strong>Hepatic (Liver) Glycogen (~80 to 100 grams):</strong> The liver possesses active glucose-6-phosphatase, allowing it to cleave phosphate groups and liberate free glucose into systemic circulation. Hepatic glycogen maintains systemic blood glucose levels (preventing neuroglycopenic fatigue and central nervous system collapse) during overnight fasting and endurance exertion.</li>
+        </ul>
+
+        <h2>ACSM and ISSN Daily Carbohydrate Intake Guidelines</h2>
+        <p>
+          The joint consensus position stand from the American College of Sports Medicine (ACSM), the Academy of Nutrition and Dietetics (AND), and Dietitians of Canada establishes daily carbohydrate guidelines based on body mass ($g/kg/day$) rather than static percentages of total calories:
+        </p>
+
+        <div class="formula-box">
+          <p><strong>Daily Carbohydrate Prescription Matrix:</strong></p>
+          $$\text{Target Daily Carbs (grams)} = \text{Body Weight (kg)} \times \text{Prescribed Activity Factor (g/kg)}$$
+          <ul>
+            <li><strong>Low Intensity / Skill Sports:</strong> $3 \text{ to } 5\text{ g/kg/day}$ (Archery, golf, bowling, casual gym attendance).</li>
+            <li><strong>Moderate Exercise (~1 hr/day):</strong> $5 \text{ to } 7\text{ g/kg/day}$ (Team sports, resistance training + moderate conditioning).</li>
+            <li><strong>High-Volume Endurance (1 to 3 hrs/day):</strong> $6 \text{ to } 10\text{ g/kg/day}$ (Marathon, triathlon, road cycling, competitive rowing).</li>
+            <li><strong>Extreme Endurance (> 4 to 5 hrs/day):</strong> $8 \text{ to } 12\text{ g/kg/day}$ (Ultra-marathons, multi-stage road races, Tour de France).</li>
+            <li><strong>Carbo-Loading Supercompensation (36-48h pre-race):</strong> $10 \text{ to } 12\text{ g/kg/day}$.</li>
+          </ul>
+        </div>
+
+        <h2>Intra-Workout Fueling and Intestinal Transporter Dynamics</h2>
+        <p>
+          During sustained exercise exceeding 60 minutes, endogenous glycogen stores progressively deplete. Ingesting exogenous carbohydrates during exercise preserves liver glycogen, attenuates the rise in catabolic cortisol, and maintains high rates of carbohydrate oxidation late into competition.
+        </p>
+        <p>
+          The physiological ceiling for exogenous carbohydrate oxidation is dictated by the saturation kinetics of intestinal epithelial transport proteins:
+        </p>
+        <div class="formula-box">
+          <p><strong>Intestinal Transporter Transport Saturation:</strong></p>
+          <ul>
+            <li><strong>Single Glucose / Maltodextrin Formulations (SGLT1 Transporter):</strong> Glucose is absorbed across the apical enterocyte membrane via sodium-glucose cotransporter 1 (SGLT1). SGLT1 saturates at approximately $1.0\text{ to }1.2\text{ grams of glucose per minute}$ ($60\text{ g/hour}$). Consuming more than 60 g/hr of pure glucose leads to unabsorbed solute pooling in the gut lumen, causing osmotic cramping and gastrointestinal distress.</li>
+            <li><strong>Multiple Transportable Carbohydrates (2:1 Glucose:Fructose Ratio):</strong> Fructose is absorbed through an independent, non-sodium-dependent facilitated transporter: <strong>GLUT5</strong>. Combining glucose and fructose in a $2:1$ (or modern $1:0.8$) ratio activates both SGLT1 and GLUT5 pathways simultaneously. This elevates peak exogenous carbohydrate oxidation rates up to <strong>90 to 120 grams per hour</strong> (1.5 to 1.8 g/min), unlocking higher sustained wattage and delaying time to exhaustion.</li>
+          </ul>
+        </div>
+
+        <h2>Comprehensive Sports Nutrition Reference Table</h2>
+        <p>
+          The reference table below displays daily intake targets, glycogen saturation metrics, and intra-workout fueling schedules across athletic disciplines:
+        </p>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Athletic Profile</th>
+                <th>Prescribed g/kg/day</th>
+                <th>Target (70 kg Athlete)</th>
+                <th>Workout Duration</th>
+                <th>Intra-Workout Target</th>
+                <th>Primary Fuel Strategy</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Sedentary / Desk Worker</strong></td>
+                <td>2.0 – 3.0 g/kg</td>
+                <td>140 – 210 g</td>
+                <td>&lt; 30 min</td>
+                <td>None (water only)</td>
+                <td>Low-glycemic complex carbohydrates, high dietary fiber.</td>
+              </tr>
+              <tr>
+                <td><strong>Strength / Hypertrophy</strong></td>
+                <td>4.0 – 6.0 g/kg</td>
+                <td>280 – 420 g</td>
+                <td>45 – 75 min</td>
+                <td>Electrolytes or mouth rinse</td>
+                <td>Pre-workout complex carbs, post-workout rapid starch + protein.</td>
+              </tr>
+              <tr>
+                <td><strong>Team Sports (Soccer / Basketball)</strong></td>
+                <td>5.0 – 7.0 g/kg</td>
+                <td>350 – 490 g</td>
+                <td>60 – 90 min</td>
+                <td>30 – 45 g / hr</td>
+                <td>Isotonic 6% carbohydrate-electrolyte sports beverage at half-time.</td>
+              </tr>
+              <tr>
+                <td><strong>Marathon Runner (Daily)</strong></td>
+                <td>7.0 – 9.0 g/kg</td>
+                <td>490 – 630 g</td>
+                <td>90 – 150 min</td>
+                <td>30 – 60 g / hr</td>
+                <td>Energy gels and chews with water every 20-30 minutes.</td>
+              </tr>
+              <tr>
+                <td><strong>Ironman Triathlete (Daily)</strong></td>
+                <td>8.0 – 10.0 g/kg</td>
+                <td>560 – 700 g</td>
+                <td>2 – 4 hours</td>
+                <td>60 – 90 g / hr</td>
+                <td>2:1 Glucose-to-fructose liquid drink mix + gels + rice bars.</td>
+              </tr>
+              <tr>
+                <td><strong>Pre-Marathon Carbo-Load</strong></td>
+                <td>10.0 – 12.0 g/kg</td>
+                <td>700 – 840 g</td>
+                <td>Rest / Taper</td>
+                <td>N/A (Taper phase)</td>
+                <td>Low-fiber, high-glycemic starches (white rice, pasta, bagels, fruit juice).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Worked Sports Dietetics Case Study</h2>
+        <div class="worked-example-card">
+          <div class="example-header">
+            <span class="example-badge">Endurance Fueling Case</span>
+            <h3 class="example-title">Sub-3 Hour Marathon Fueling &amp; Carbo-Loading Strategy</h3>
+          </div>
+          <div class="example-step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Athlete Profile:</strong> A 28-year-old female marathon runner aiming for a 2:55 finish time. Body weight is 132 lbs (59.87 kg). She is currently 48 hours out from her target race. The sports nutritionist must calculate her 2-day pre-race carbo-loading targets and her race-day intra-workout fueling protocol.
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Calculate Daily Carbo-Loading Target (10.0 g/kg/day):</strong>
+              $$\text{Daily Carbs} = 59.87\text{ kg} \times 10.0\text{ g/kg} = \mathbf{598.7\text{ grams of carbohydrate/day}}$$
+              $$\text{Caloric Contribution} = 598.7\text{ g} \times 4\text{ kcal/g} = \mathbf{2,395\text{ kcal from carbohydrates}}$$
+              Dietary fiber is reduced to &lt; 15 g/day to avoid gastrointestinal fullness and prevent race-day bowel urgency.
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>Calculate Race Morning Pre-Event Meal (3.0 Hours Prior):</strong>
+              Guidelines suggest 1 to 4 g/kg consumed 3 to 4 hours before race start:
+              $$\text{Pre-Race Meal} = 59.87\text{ kg} \times 2.5\text{ g/kg} \approx \mathbf{150\text{ grams of carbohydrate}}$$
+              (e.g., 2 plain white bagels with honey, 1 banana, and 12 oz isotonic sports drink).
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <strong>Calculate Race-Day Intra-Workout Fueling (Target Finish: 175 Minutes):</strong>
+              For a 2 hour 55 minute exertion, the target intake is 60 g/hr:
+              $$\text{Total Exogenous Carbs} = 2.92\text{ hours} \times 60\text{ g/hr} = \mathbf{175\text{ grams total}}$$
+              The athlete consumes one 25-gram dual-source maltodextrin/fructose hydrogel packet every 25 minutes with water, completely preventing the classic 20-mile "bonk" (glycogen depletion).
+            </div>
+          </div>
+        </div>
+
+        <h2>Post-Exercise Glycogen Resynthesis: The Biphasic Recovery Window</h2>
+        <p>
+          Following strenuous glycogen-depleting exercise, skeletal muscle resynthesizes glycogen through a biphasic regulatory process:
+        </p>
+        <ol>
+          <li><strong>The Insulin-Independent Phase (First 30 to 60 Minutes):</strong> Vigorous muscular contractions stimulate calcium release and 5'-AMP-activated protein kinase (AMPK), inducing direct mechanical translocation of intracellular GLUT4 glucose transport vesicles to the sarcolemma without requiring circulating insulin. Coupled with maximal activation of the unphosphorylated form of <em>glycogen synthase</em>, glycogen storage rates reach an unprecedented 20 to 30 mmol/kg wet weight per hour if high-glycemic carbohydrates are delivered immediately.</li>
+          <li><strong>The Insulin-Dependent Phase (Subsequent 2 to 24 Hours):</strong> As sarcolemmal GLUT4 abundance gradually wanes, continued glycogen replenishment becomes strictly dependent on postprandial insulin secretion. Ingesting <strong>1.0 to 1.2 grams of carbohydrate per kilogram of body weight per hour</strong> at 30-minute intervals for the first 4 hours post-workout maximizes total glycogen recovery. Combining 0.3 to 0.4 g/kg of high-leucine protein (such as whey isolate) with a slightly lower carbohydrate intake (0.8 g/kg) stimulates equivalent insulin secretion and glycogen accumulation while simultaneously initiating myofibrillar protein synthesis via mTORC1.</li>
+        </ol>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <span class="logo-icon">🧮</span>
+        <span class="logo-text">CalcHub</span>
+        <p class="footer-tagline">Clinical & Engineering Precision Tools for Health and Science.</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">All Calculators</a>
+        <a href="health.html">Health Calculators</a>
+        <a href="finance.html">Financial Tools</a>
+        <a href="engineering.html">Engineering Tools</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function calculateCarbs() {
+      const weightVal = parseFloat(document.getElementById('athlete-weight').value) || 0;
+      const unit = document.getElementById('weight-unit').value;
+      const tier = document.getElementById('training-tier').value;
+      const duration = parseFloat(document.getElementById('session-duration').value) || 0;
+
+      if (weightVal <= 0) return;
+
+      const weightKg = (unit === 'lbs') ? (weightVal * 0.45359237) : weightVal;
+
+      let gpkgMid = 6.0;
+      let gpkgLow = 5.0;
+      let gpkgHigh = 7.0;
+
+      if (tier === 'sedentary') {
+        gpkgLow = 2.0; gpkgHigh = 3.0; gpkgMid = 2.5;
+      } else if (tier === 'light') {
+        gpkgLow = 3.0; gpkgHigh = 5.0; gpkgMid = 4.0;
+      } else if (tier === 'moderate') {
+        gpkgLow = 5.0; gpkgHigh = 7.0; gpkgMid = 6.0;
+      } else if (tier === 'endurance') {
+        gpkgLow = 6.0; gpkgHigh = 10.0; gpkgMid = 8.0;
+      } else if (tier === 'extreme') {
+        gpkgLow = 8.0; gpkgHigh = 12.0; gpkgMid = 10.0;
+      } else if (tier === 'carbload') {
+        gpkgLow = 10.0; gpkgHigh = 12.0; gpkgMid = 11.0;
+      } else if (tier === 'keto') {
+        gpkgLow = 0.3; gpkgHigh = 0.6; gpkgMid = 0.45;
+      }
+
+      let targetGrams = Math.round(weightKg * gpkgMid);
+      let lowGrams = Math.round(weightKg * gpkgLow);
+      let highGrams = Math.round(weightKg * gpkgHigh);
+
+      if (tier === 'keto') {
+        targetGrams = Math.min(targetGrams, 40);
+        lowGrams = 20;
+        highGrams = 50;
+      }
+
+      const targetCalories = targetGrams * 4;
+
+      document.getElementById('res-target-carbs').innerText = targetGrams.toLocaleString() + ' g / day';
+      document.getElementById('res-target-calories').innerText = `${targetCalories.toLocaleString()} kcal from carbohydrates (${gpkgMid.toFixed(1)} g/kg)`;
+      document.getElementById('res-carb-range').innerText = `${lowGrams} – ${highGrams} g`;
+
+      // Storage estimate: ~15g per kg total body weight capacity
+      const totalStorageG = Math.round(weightKg * 7.5);
+      const totalStorageKcal = totalStorageG * 4;
+      document.getElementById('res-glycogen-storage').innerText = `~${totalStorageG} g (~${totalStorageKcal} kcal)`;
+
+      // Intra workout
+      let intraText = 'None (water)';
+      let postCarbLow = Math.round(weightKg * 1.0);
+      let postCarbHigh = Math.round(weightKg * 1.2);
+
+      if (duration < 45) {
+        intraText = 'None needed';
+      } else if (duration <= 75) {
+        intraText = 'Mouth rinse / 15–30 g';
+      } else if (duration <= 150) {
+        intraText = '30 – 60 g / hr';
+      } else {
+        intraText = '60 – 90 g / hr (2:1 mix)';
+      }
+
+      document.getElementById('res-intra-rate').innerText = intraText;
+      document.getElementById('res-post-carb').innerText = `${postCarbLow} – ${postCarbHigh} g`;
+
+      // Note
+      const noteEl = document.getElementById('res-timing-note');
+      if (tier === 'carbload') {
+        noteEl.innerHTML = `<strong>Glycogen Supercompensation:</strong> Maintain 10-12 g/kg for 36-48 hours pre-race. Favor low-fiber, high-glycemic starches (white rice, pasta, bagels, sports drink) to maximize muscle glycogen by 20-40% without bowel discomfort.`;
+      } else if (tier === 'keto') {
+        noteEl.innerHTML = `<strong>Ketogenic Adaptation:</strong> Restricting carbohydrates below 50 g/day forces hepatic ketogenesis (beta-hydroxybutyrate synthesis). Physical output at intensities > 75% VO2max will be impaired due to diminished pyruvate dehydrogenase flux.`;
+      } else if (duration > 120) {
+        noteEl.innerHTML = `For sessions lasting > 2 hours, target 60-90 g/hr using a dual-source glucose:fructose formulation. This utilizes both SGLT1 and GLUT5 transporters, boosting exogenous oxidation by 50% over glucose alone.`;
+      } else {
+        noteEl.innerHTML = `Consume ${postCarbLow}-${postCarbHigh} g of fast-digesting carbohydrates with 25-35 g of high-leucine protein within 45 minutes post-exercise to accelerate glycogen synthase resynthesis.`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', calculateCarbs);
+  </script>
+</body>
+</html>

@@ -17,6 +17,14 @@ CATEGORIES = {
             ("body-fat-calculator.html", "Body Fat Calculator", "📐", "Navy tape body fat & lean mass"),
             ("ideal-weight-calculator.html", "Ideal Body Weight", "🎯", "Devine & Robinson target weight"),
             ("water-intake-calculator.html", "Daily Water Intake", "💧", "Baseline & active hydration needs"),
+            ("a1c-calculator.html", "HbA1c to eAG Glucose Sizer", "🩸", "ADAG estimated average glucose mg/dL & IFCC mmol/mol"),
+            ("bac-calculator.html", "Blood Alcohol (BAC) Clearance", "🍷", "Widmark pharmacokinetic formula & legal driving limit"),
+            ("body-surface-area-calculator.html", "Body Surface Area (Mosteller)", "📐", "Mosteller, Du Bois, Haycock & Boyd multi-formula"),
+            ("bsa-calculator.html", "Oncology BSA & Calvert Dosing", "💊", "Chemotherapy mg/m², Calvert carboplatin AUC & CrCl"),
+            ("calorie-deficit-calculator.html", "Calorie Deficit & Fat Loss Planner", "🔥", "Dynamic metabolic adaptation, protein & goal timeline"),
+            ("calories-burned-calculator.html", "Exercise Calories Burned (METs)", "🏃", "Ainsworth Compendium METs, gross vs net energy & EPOC"),
+            ("carbohydrate-intake-calculator.html", "Carbohydrate Intake & Glycogen", "🍞", "ACSM/ISSN endurance g/kg & intra-workout fueling"),
+            ("cholesterol-ratio-calculator.html", "Cholesterol Ratio & Castelli Risk", "❤️", "Castelli I & II, Non-HDL & Triglyceride/HDL insulin marker"),
         ]
     },
     "finance": {
@@ -310,7 +318,7 @@ CATEGORIES = {
 
 def determine_tool_cat(filename):
     f = filename.lower()
-    if any(k in f for k in ["bmi", "calorie", "body-fat", "ideal-weight", "water-intake", "bmr", "macro"]):
+    if any(k in f for k in ["bmi", "calorie", "body-fat", "ideal-weight", "water-intake", "bmr", "macro", "a1c", "bac", "body-surface-area", "bsa", "calorie-deficit", "calories-burned", "carbohydrate", "cholesterol"]):
         return "health"
     if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72", "amortization", "apr-apy", "break-even", "capital-gains", "cd-calculator", "credit-card", "debt-to-income", "down-payment", "emergency-fund", "inflation", "net-salary", "net-worth", "sales-tax", "savings"]):
         return "finance"

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A1C Calculator | Convert HbA1c to eAG Glucose (mg/dL & mmol/L)</title>
+  <meta name="description" content="Convert your Hemoglobin HbA1c percentage to Estimated Average Glucose (eAG) in mg/dL and mmol/L, plus IFCC units (mmol/mol). ADA clinical diagnostic guidelines and glycemic targets.">
+  <link rel="canonical" href="https://calchub.com/a1c-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "HbA1c to eAG Clinical Glucose Converter",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "description": "Clinical calculator converting Hemoglobin A1C percentage to estimated average glucose (eAG) in mg/dL, mmol/L, and IFCC mmol/mol based on the ADAG clinical trial."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the mathematical formula to convert A1C to Estimated Average Glucose (eAG)?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The American Diabetes Association (ADA) formula derived from the A1C-Derived Average Glucose (ADAG) study is: eAG (mg/dL) = 28.7 × A1C (%) - 46.7. To express eAG in International System units (mmol/L), the formula is: eAG (mmol/L) = 1.59 × A1C (%) - 2.59, or simply dividing mg/dL by 18.015."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does A1C differ from daily fingerstick or Continuous Glucose Monitor (CGM) readings?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A capillary blood fingerstick or interstitial CGM reading reflects blood glucose at that exact point in time. In contrast, Hemoglobin A1c (glycated hemoglobin) measures the percentage of hemoglobin proteins coated with glucose over the 90 to 120-day lifespan of red blood cells, weighted heavily toward the preceding 30 days."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the clinical diagnostic thresholds for normal, prediabetes, and diabetes?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "According to American Diabetes Association (ADA) criteria: Normal is an A1C below 5.7% (eAG < 117 mg/dL); Prediabetes is an A1C between 5.7% and 6.4% (eAG 117 to 137 mg/dL); and Diabetes is diagnosed at an A1C of 6.5% or higher (eAG ≥ 140 mg/dL) on two separate laboratory tests."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What conditions can falsely elevate or lower laboratory A1C readings?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Conditions altering erythrocyte turnover skew A1C. Falsely low A1C occurs in hemolytic anemia, acute blood loss, hemodialysis, and recovery from erythropoietin therapy (younger RBCs). Falsely high A1C occurs in iron deficiency anemia, vitamin B12 deficiency, asplenia, and chronic kidney disease with reduced red cell clearance."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="header">
+    <div class="header-container">
+      <div class="header-logo">
+        <a href="index.html" class="logo-link">
+          <span class="logo-icon">🧮</span>
+          <span class="logo-text">CalcHub</span>
+        </a>
+      </div>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="health.html" class="nav-link active">Health & Fitness</a>
+        <a href="finance.html" class="nav-link">Finance</a>
+        <a href="engineering.html" class="nav-link">Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="calculator-container">
+      <div class="calculator-header">
+        <div class="badge-tag">Clinical Endocrinology</div>
+        <h1 class="calculator-title">Hemoglobin A1C to eAG Glucose Calculator</h1>
+        <p class="calculator-description">Convert laboratory HbA1c percentage to Estimated Average Glucose (eAG) in mg/dL and mmol/L, plus IFCC units (mmol/mol), adhering to the international ADAG landmark trial.</p>
+      </div>
+
+      <div class="calculator-grid">
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">Patient Glycemic Parameters</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="form-group">
+              <label for="input-mode" class="form-label">Input Measurement Unit</label>
+              <select id="input-mode" class="form-select" onchange="toggleInputMode()">
+                <option value="ngsp" selected>NGSP / US Standard (%)</option>
+                <option value="ifcc">IFCC / International (mmol/mol)</option>
+                <option value="eag_mg">eAG Glucose (mg/dL)</option>
+                <option value="eag_mmol">eAG Glucose (mmol/L)</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="group-a1c">
+              <label for="a1c-val" class="form-label" id="label-val">Hemoglobin A1c Level (%)</label>
+              <input type="number" id="a1c-val" class="form-input" value="7.0" min="3.5" max="20.0" step="0.1">
+              <span class="form-hint" id="hint-val">Clinical diagnostic range: 4.0% to 15.0%</span>
+            </div>
+
+            <div class="form-group">
+              <label for="clinical-target" class="form-label">Patient Clinical Target Guideline</label>
+              <select id="clinical-target" class="form-select">
+                <option value="standard" selected>ADA Standard Adult Diabetic Target (&lt; 7.0%)</option>
+                <option value="tight">AACE / Stringent Early Stage Target (&lt; 6.5%)</option>
+                <option value="elderly">Frail Elderly / Hypoglycemia Prone Target (&lt; 8.0%)</option>
+                <option value="normal">Non-Diabetic Healthy Baseline (&lt; 5.7%)</option>
+              </select>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="calculateA1C()">Convert & Analyze Glycemia</button>
+          </div>
+        </div>
+
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">Estimated Average Glycemia & Status</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="result-hero" style="background:#f0fdf4;border-color:#bbf7d0;">
+              <span class="hero-label" id="res-status-title">Clinical Diagnostic Status</span>
+              <div class="hero-value" id="res-status" style="color:#15803d;font-size:1.6rem;">Controlled Diabetes Target</div>
+              <span class="form-hint" id="res-status-desc">Meets standard American Diabetes Association adult target</span>
+            </div>
+
+            <div class="results-grid" style="margin-top:1.5rem;">
+              <div class="result-item">
+                <span class="result-label">Estimated Glucose (eAG)</span>
+                <span class="result-value" id="res-eag-mg">154 mg/dL</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">International eAG</span>
+                <span class="result-value" id="res-eag-mmol">8.6 mmol/L</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">IFCC Standard Unit</span>
+                <span class="result-value" id="res-ifcc">53 mmol/mol</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">NGSP HbA1c</span>
+                <span class="result-value" id="res-ngsp">7.0 %</span>
+              </div>
+            </div>
+
+            <div class="stat-box" style="margin-top:1.5rem;padding:1rem;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+              <h4 style="font-weight:700;margin-bottom:0.5rem;font-size:0.95rem;">Glycemic Variability & Microvascular Risk:</h4>
+              <p id="res-risk-analysis" style="font-size:0.875rem;color:#475569;margin:0;">
+                At 7.0% A1C (154 mg/dL average), relative risk for diabetic retinopathy and nephropathy progression is reduced by approximately 50-70% compared to sustained levels above 9.0%.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <article class="article-body">
+        <h2>Physiological Principles of Hemoglobin Glycation</h2>
+        <p>
+          Hemoglobin A1c (glycated hemoglobin) is the biochemical gold standard for monitoring chronic glycemic exposure in individuals with diabetes mellitus. Inside human erythrocytes (red blood cells), adult hemoglobin consists predominantly of hemoglobin A ($HbA_0$). As circulating glucose diffuses freely across the erythrocyte membrane through insulin-independent glucose transporter 1 (GLUT1) carrier proteins, it undergoes a spontaneous, non-enzymatic nucleophilic addition reaction with the N-terminal valine residue of the hemoglobin $\beta$-chain.
+        </p>
+        <p>
+          This biochemical cascade begins with the formation of an unstable aldimine intermediate, termed a pre-A1c Schiff base. Over subsequent hours, this Schiff base undergoes an irreversible, non-enzymatic chemical rearrangement known as the <strong>Amadori rearrangement</strong>, yielding a stable, ketoamine covalent adduct: Hemoglobin A1c. Because erythrocytes have a circulating lifespan averaging 115 to 120 days, the percentage of glycated hemoglobin directly mirrors the integrated time-weighted average blood glucose concentration over the preceding 8 to 12 weeks. However, because older erythrocytes continuously undergo splenic phagocytosis while newly formed reticulocytes enter circulation, the past 30 days contribute roughly 50% to the measured A1c value, whereas days 90 to 120 contribute merely 10%.
+        </p>
+
+        <h2>Mathematical Derivation of the ADAG Translation Equations</h2>
+        <p>
+          Historically, patients monitoring capillary blood glucose via fingerstick meters or continuous glucose monitors (CGM) found it challenging to relate an A1c percentage (e.g., 7.8%) to day-to-day blood glucose readings expressed in milligrams per deciliter ($mg/dL$) or millimoles per liter ($mmol/L$). In 2008, the American Diabetes Association (ADA), the European Association for the Study of Diabetes (EASD), and the International Diabetes Federation (IDF) completed the landmark <em>A1C-Derived Average Glucose (ADAG) study</em>.
+        </p>
+        <p>
+          The ADAG trial continuously monitored over 500 adult subjects across multiple multinational centers using continuous glucose monitoring sensors combined with frequent multi-point capillary fingersticks over 12 weeks. Linear regression analysis established a robust correlation ($r = 0.92$) between mean plasma glucose and laboratory high-performance liquid chromatography (HPLC) HbA1c measurements:
+        </p>
+
+        <div class="formula-box">
+          <p><strong>Primary ADAG Estimated Average Glucose (eAG) Equations:</strong></p>
+          $$eAG\text{ (mg/dL)} = 28.7 \times \text{HbA1c (\%)} - 46.7$$
+          $$eAG\text{ (mmol/L)} = 1.59 \times \text{HbA1c (\%)} - 2.59 = \frac{eAG\text{ (mg/dL)}}{18.015}$$
+        </div>
+
+        <p>
+          Conversely, when converting international clinical trial data or European laboratory reports reported in the standard International Federation of Clinical Chemistry and Laboratory Medicine (IFCC) units of millimoles of glycated hemoglobin per mole of total hemoglobin ($mmol/mol$), the exact master equation derived from the global harmonization committee is applied:
+        </p>
+
+        <div class="formula-box">
+          <p><strong>IFCC to NGSP Master Harmonization Equation:</strong></p>
+          $$\text{HbA1c (mmol/mol)} = 10.929 \times (\text{HbA1c [\%]} - 2.15)$$
+          $$\text{HbA1c (\%)} = \frac{\text{HbA1c (mmol/mol)}}{10.929} + 2.15$$
+        </div>
+
+        <h2>Comprehensive Clinical Glycemic Reference Benchmarks</h2>
+        <p>
+          The diagnostic categories established by the American Diabetes Association Standards of Care establish clear diagnostic criteria and treatment benchmarks for clinical endocrinology:
+        </p>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Diagnostic Category</th>
+                <th>HbA1c (%)</th>
+                <th>IFCC (mmol/mol)</th>
+                <th>eAG (mg/dL)</th>
+                <th>eAG (mmol/L)</th>
+                <th>Clinical Action &amp; Microvascular Risk</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Optimal Non-Diabetic</strong></td>
+                <td>4.5% – 5.4%</td>
+                <td>26 – 36</td>
+                <td>82 – 108</td>
+                <td>4.6 – 6.0</td>
+                <td>Physiologically baseline; negligible macro/microvascular excess risk.</td>
+              </tr>
+              <tr>
+                <td><strong>Pre-Diabetes (Impaired)</strong></td>
+                <td>5.7% – 6.4%</td>
+                <td>39 – 46</td>
+                <td>117 – 137</td>
+                <td>6.5 – 7.6</td>
+                <td>Elevated cardiometabolic risk; lifestyle intervention and metformin.</td>
+              </tr>
+              <tr>
+                <td><strong>Diagnostic Diabetes</strong></td>
+                <td>&ge; 6.5%</td>
+                <td>&ge; 48</td>
+                <td>&ge; 140</td>
+                <td>&ge; 7.8</td>
+                <td>Formal diabetes diagnosis threshold (requires 2 concordant tests).</td>
+              </tr>
+              <tr>
+                <td><strong>Standard ADA Target</strong></td>
+                <td>&lt; 7.0%</td>
+                <td>&lt; 53</td>
+                <td>&lt; 154</td>
+                <td>&lt; 8.6</td>
+                <td>Target for non-pregnant adults; halts microvascular retinopathy/nephropathy.</td>
+              </tr>
+              <tr>
+                <td><strong>Suboptimal Control</strong></td>
+                <td>7.1% – 8.5%</td>
+                <td>54 – 69</td>
+                <td>157 – 197</td>
+                <td>8.7 – 11.0</td>
+                <td>Progressive endothelial damage; pharmacotherapy intensification indicated.</td>
+              </tr>
+              <tr>
+                <td><strong>Severe Hyperglycemia</strong></td>
+                <td>&gt; 9.0%</td>
+                <td>&gt; 75</td>
+                <td>&gt; 212</td>
+                <td>&gt; 11.8</td>
+                <td>Exponentially accelerated risk for proliferative retinopathy and ketoacidosis.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Step-by-Step Clinical Case Study</h2>
+        <div class="worked-example-card">
+          <div class="example-header">
+            <span class="example-badge">Endocrinology Case Study</span>
+            <h3 class="example-title">Type 2 Diabetes Mellitus Therapy Optimization</h3>
+          </div>
+          <div class="example-step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Patient Clinical Presentation:</strong> A 54-year-old male with a 6-year history of Type 2 Diabetes presents for routine quarterly review. His laboratory venipuncture report reveals an HbA1c of <strong>8.4%</strong>. The clinician needs to establish his estimated average daily glucose (eAG), convert to IFCC units, and determine therapeutic adjustment.
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Calculate Estimated Average Glucose in mg/dL:</strong>
+              $$eAG = 28.7 \times 8.4 - 46.7 = 241.08 - 46.7 = 194.38\text{ mg/dL}$$
+              Rounding to the nearest whole integer yields an estimated daily blood sugar of <strong>194 mg/dL</strong>.
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>Calculate International System Metrics (mmol/L and IFCC):</strong>
+              $$eAG\text{ (mmol/L)} = \frac{194.38}{18.015} = 10.79\text{ mmol/L}$$
+              $$\text{IFCC} = 10.929 \times (8.4 - 2.15) = 10.929 \times 6.25 = 68.31\text{ mmol/mol}$$
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <strong>Clinical Action Plan:</strong> At 194 mg/dL average glucose, the patient experiences substantial postprandial glycemic excursions above the renal threshold for glucose resorption (~180 mg/dL). SGLT-2 inhibitor or GLP-1 receptor agonist initiation is indicated to titrate towards the target A1c of &lt; 7.0% (154 mg/dL).
+            </div>
+          </div>
+        </div>
+
+        <h2>Interfering Factors and Hemoglobin Variant Confounders</h2>
+        <p>
+          While the A1c assay provides exceptional longitudinal clinical utility, healthcare providers and patients must recognize physiological conditions where HbA1c diverges significantly from true mean blood glucose:
+        </p>
+        <ul>
+          <li><strong>Altered Erythrocyte Turnover:</strong> Conditions that truncate the typical 120-day red blood cell survival curve result in an underestimation of glycemia. Hemolytic anemias, acute or chronic blood loss, splenomegaly, and treatment with recombinant erythropoietin produce an erythrocyte population skewed towards younger cells with insufficient time for glycation, artificially depressing A1C.</li>
+          <li><strong>Prolonged Erythrocyte Survival:</strong> Iron deficiency anemia, folate/vitamin B12 deficiency, and post-splenectomy states retard red blood cell clearance, allowing erythrocytes to circulate for extended periods. This elevates the measured A1c by 0.5% to 1.5% without a corresponding increase in true mean plasma glucose.</li>
+          <li><strong>Hemoglobinopathies:</strong> Common structural hemoglobin variants (including HbS, HbC, HbE, and elevated HbF) can interfere with ion-exchange high-performance liquid chromatography (HPLC) assays, causing analytical artifacts. Enzymatic, boronate-affinity chromatography, or immunoassay methods are required for valid determination in affected individuals.</li>
+          <li><strong>Chronic Kidney Disease (CKD):</strong> Patients with advanced nephropathy (eGFR &lt; 30 mL/min/1.73m²) frequently suffer from a combination of shortened red cell survival, carbamylated hemoglobin formation from uremia, and frequent transfusions, rendering serum fructosamine or continuous glucose monitoring (GMI) more clinically dependable than A1C.</li>
+        </ul>
+
+        <h2>Modern CGM Metrics: Time-in-Range (TIR) and the Glucose Management Indicator (GMI)</h2>
+        <p>
+          With the rapid clinical proliferation of continuous glucose monitoring (CGM) sensor technology, modern diabetology increasingly integrates interstitial sensor readings alongside venipuncture HbA1c. The international consensus on Continuous Glucose Monitoring metrics establishes <strong>Time-in-Range (TIR, 70 to 180 mg/dL or 3.9 to 10.0 mmol/L)</strong> as a primary clinical outcome target. For most non-pregnant adults with type 1 or type 2 diabetes, guidelines recommend a TIR exceeding 70%, with less than 4% of readings in hypoglycemia (&lt; 70 mg/dL) and less than 1% in severe hypoglycemia (&lt; 54 mg/dL).
+        </p>
+        <p>
+          CGM software generates an estimated metric termed the <strong>Glucose Management Indicator (GMI)</strong>, calculated from at least 14 consecutive days of sensor data:
+        </p>
+        <div class="formula-box">
+          <p><strong>Glucose Management Indicator (GMI) Equation:</strong></p>
+          $$GMI\text{ (\%)} = 3.31 + (0.02392 \times \text{Mean Sensor Glucose in mg/dL})$$
+          $$GMI\text{ (mmol/mol)} = 12.71 + (4.70587 \times \text{Mean Sensor Glucose in mmol/L})$$
+        </div>
+        <p>
+          Clinicians frequently observe discordance between laboratory HbA1c and CGM-derived GMI. This divergence—termed the Glycation Gap or Hemoglobin Glycation Index (HGI)—reflects inter-individual differences in intracellular erythrocyte glucose transport, red cell deglycating enzymatic activity (fructosamine-3-kinase), and variations in average red blood cell lifespan. When HbA1c is clinically uninterpretable, alternative intermediate-term glycemic biomarkers such as <strong>serum fructosamine</strong> (reflecting glycated serum total protein over 2 to 3 weeks) or <strong>glycated albumin</strong> (reflecting glycemia over 14 to 21 days) offer invaluable diagnostic clarity.
+        </p>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <span class="logo-icon">🧮</span>
+        <span class="logo-text">CalcHub</span>
+        <p class="footer-tagline">Clinical & Engineering Precision Tools for Health and Science.</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">All Calculators</a>
+        <a href="health.html">Health Calculators</a>
+        <a href="finance.html">Financial Tools</a>
+        <a href="engineering.html">Engineering Tools</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleInputMode() {
+      const mode = document.getElementById('input-mode').value;
+      const label = document.getElementById('label-val');
+      const hint = document.getElementById('hint-val');
+      const input = document.getElementById('a1c-val');
+
+      if (mode === 'ngsp') {
+        label.innerText = 'Hemoglobin A1c Level (%)';
+        hint.innerText = 'Clinical diagnostic range: 4.0% to 15.0%';
+        input.value = '7.0';
+        input.min = '3.5';
+        input.max = '20.0';
+        input.step = '0.1';
+      } else if (mode === 'ifcc') {
+        label.innerText = 'IFCC Standard Units (mmol/mol)';
+        hint.innerText = 'Standard laboratory reporting: 20 to 140 mmol/mol';
+        input.value = '53';
+        input.min = '15';
+        input.max = '195';
+        input.step = '1';
+      } else if (mode === 'eag_mg') {
+        label.innerText = 'Estimated Average Glucose (mg/dL)';
+        hint.innerText = 'Daily average glucose: 70 to 380 mg/dL';
+        input.value = '154';
+        input.min = '50';
+        input.max = '500';
+        input.step = '1';
+      } else if (mode === 'eag_mmol') {
+        label.innerText = 'Estimated Average Glucose (mmol/L)';
+        hint.innerText = 'Daily average glucose: 3.9 to 21.0 mmol/L';
+        input.value = '8.6';
+        input.min = '2.8';
+        input.max = '28.0';
+        input.step = '0.1';
+      }
+      calculateA1C();
+    }
+
+    function calculateA1C() {
+      const mode = document.getElementById('input-mode').value;
+      const val = parseFloat(document.getElementById('a1c-val').value) || 0;
+      let a1c_pct = 0;
+
+      if (mode === 'ngsp') {
+        a1c_pct = val;
+      } else if (mode === 'ifcc') {
+        a1c_pct = (val / 10.929) + 2.15;
+      } else if (mode === 'eag_mg') {
+        a1c_pct = (val + 46.7) / 28.7;
+      } else if (mode === 'eag_mmol') {
+        const mg = val * 18.015;
+        a1c_pct = (mg + 46.7) / 28.7;
+      }
+
+      if (a1c_pct <= 0) return;
+
+      const eag_mg = Math.round(28.7 * a1c_pct - 46.7);
+      const eag_mmol = (eag_mg / 18.015).toFixed(1);
+      const ifcc = Math.round(10.929 * (a1c_pct - 2.15));
+
+      document.getElementById('res-ngsp').innerText = a1c_pct.toFixed(2) + ' %';
+      document.getElementById('res-eag-mg').innerText = eag_mg + ' mg/dL';
+      document.getElementById('res-eag-mmol').innerText = eag_mmol + ' mmol/L';
+      document.getElementById('res-ifcc').innerText = ifcc + ' mmol/mol';
+
+      const statusEl = document.getElementById('res-status');
+      const descEl = document.getElementById('res-status-desc');
+      const riskEl = document.getElementById('res-risk-analysis');
+
+      if (a1c_pct < 5.7) {
+        statusEl.innerText = 'Normal Healthy Glycemia';
+        statusEl.style.color = '#15803d';
+        descEl.innerText = 'Non-diabetic physiological range (A1C < 5.7%, eAG < 117 mg/dL)';
+        riskEl.innerText = 'Physiologic normal baseline. No diabetes-associated microvascular or macrovascular risk.';
+      } else if (a1c_pct < 6.5) {
+        statusEl.innerText = 'Pre-Diabetes (Impaired Glucose)';
+        statusEl.style.color = '#ca8a04';
+        descEl.innerText = 'Elevated progression risk to Type 2 diabetes (5.7% to 6.4%)';
+        riskEl.innerText = 'Increased insulin resistance and endothelial stress. Intensive lifestyle intervention (DPP trial protocol) reduces progression rate by 58%.';
+      } else if (a1c_pct <= 7.0) {
+        statusEl.innerText = 'Controlled Diabetic Target';
+        statusEl.style.color = '#0284c7';
+        descEl.innerText = 'Meets American Diabetes Association adult glycemic benchmark (≤ 7.0%)';
+        riskEl.innerText = 'Optimal glycemic control halts progressive microvascular diabetic nephropathy and retinopathy. Minimal hypoglycemia risk if on metformin or GLP-1.';
+      } else if (a1c_pct <= 8.5) {
+        statusEl.innerText = 'Suboptimal Diabetic Control';
+        statusEl.style.color = '#ea580c';
+        descEl.innerText = 'Elevated mean blood glucose requiring medical evaluation (7.1% to 8.5%)';
+        riskEl.innerText = 'Excess chronic microvascular risk. UKPDS showed each 1% reduction in A1C yields a 37% risk reduction in microvascular disease and 14% in myocardial infarction.';
+      } else {
+        statusEl.innerText = 'Severe Hyperglycemia';
+        statusEl.style.color = '#dc2626';
+        descEl.innerText = 'Critically high average glucose (> 8.5%, eAG > 200 mg/dL)';
+        riskEl.innerText = 'Acute risk for hyperosmolar state, symptomatic polyuria, and aggressive microvascular complications. Urgent clinical pharmacotherapy titration recommended.';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', calculateA1C);
+  </script>
+</body>
+</html>

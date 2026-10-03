@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BSA Calculator | Oncology Chemotherapy & Calvert Carboplatin AUC Sizer</title>
+  <meta name="description" content="Calculate Body Surface Area (BSA in m²) for oncology chemotherapy dosing (mg/m²) and Carboplatin AUC using the Calvert and Cockcroft-Gault CrCl equations.">
+  <link rel="canonical" href="https://calchub.com/bsa-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Oncology BSA & Calvert Carboplatin Dosing Calculator",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "description": "Clinical oncology calculator determining patient Body Surface Area (BSA), target chemotherapy dose (mg/m²), and Carboplatin AUC dosing via the Calvert formula."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How does the Calvert formula calculate Carboplatin dosage?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Calvert equation is: Total Carboplatin Dose (mg) = Target AUC × (GFR + 25). Because carboplatin is cleared almost exclusively by glomerular filtration, dosing by renal clearance (GFR or estimated CrCl via Cockcroft-Gault) achieves the targeted therapeutic plasma exposure (Area Under the Curve) while preventing lethal thrombocytopenia."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Should chemotherapy doses be capped at 2.0 m² for obese cancer patients?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "According to the American Society of Clinical Oncology (ASCO) clinical practice guidelines, full actual weight-based Body Surface Area (BSA) should be used without empirical dose capping, unless clinical toxicity warrants reduction. Historical practice of arbitrarily capping BSA at 2.0 m² led to documented underdosing and worse cancer survival outcomes."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the maximum allowed GFR cap in the Calvert Carboplatin formula?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Both the FDA and ASCO recommend capping estimated GFR (or CrCl) at 125 mL/min in the Calvert formula. For instance, for an AUC of 6, the maximum carboplatin dose is 6 × (125 + 25) = 900 mg, preventing severe hematologic toxicity in hyperfiltering patients."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is Creatinine Clearance (CrCl) calculated for oncology Calvert dosing?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The standard Cockcroft-Gault equation is: CrCl (mL/min) = [(140 - Age) × Weight (kg)] / (72 × Serum Creatinine mg/dL), multiplied by 0.85 for female patients. Actual body weight is generally recommended unless morbidly obese."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="header">
+    <div class="header-container">
+      <div class="header-logo">
+        <a href="index.html" class="logo-link">
+          <span class="logo-icon">🧮</span>
+          <span class="logo-text">CalcHub</span>
+        </a>
+      </div>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="health.html" class="nav-link active">Health & Fitness</a>
+        <a href="finance.html" class="nav-link">Finance</a>
+        <a href="engineering.html" class="nav-link">Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="calculator-container">
+      <div class="calculator-header">
+        <div class="badge-tag">Clinical Oncology</div>
+        <h1 class="calculator-title">Oncology BSA &amp; Chemotherapy Dosing Calculator</h1>
+        <p class="calculator-description">Calculate patient Body Surface Area ($m^2$), weight-based chemotherapy doses ($\text{mg/m}^2$), and target Carboplatin AUC using the Calvert and Cockcroft-Gault equations.</p>
+      </div>
+
+      <div class="calculator-grid">
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">Patient Anthropometrics &amp; Drug Protocol</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group">
+                <label for="chemo-height" class="form-label">Height (cm)</label>
+                <input type="number" id="chemo-height" class="form-input" value="172" min="50" max="240" step="0.5" oninput="calculateChemo()">
+              </div>
+              <div class="form-group">
+                <label for="chemo-weight" class="form-label">Weight (kg)</label>
+                <input type="number" id="chemo-weight" class="form-input" value="72" min="5" max="300" step="0.5" oninput="calculateChemo()">
+              </div>
+            </div>
+
+            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group">
+                <label for="chemo-age" class="form-label">Patient Age (Years)</label>
+                <input type="number" id="chemo-age" class="form-input" value="62" min="18" max="110" step="1" oninput="calculateChemo()">
+              </div>
+              <div class="form-group">
+                <label for="chemo-gender" class="form-label">Biological Sex</label>
+                <select id="chemo-gender" class="form-select" onchange="calculateChemo()">
+                  <option value="female" selected>Female (0.85 CrCl factor)</option>
+                  <option value="male">Male (1.00 CrCl factor)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="chemo-scr" class="form-label">Serum Creatinine (mg/dL)</label>
+              <input type="number" id="chemo-scr" class="form-input" value="0.9" min="0.2" max="10.0" step="0.05" oninput="calculateChemo()">
+              <span class="form-hint">Normal laboratory baseline: 0.6 – 1.2 mg/dL</span>
+            </div>
+
+            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group">
+                <label for="chemo-prescribed" class="form-label">Chemo Dose (mg/m²)</label>
+                <input type="number" id="chemo-prescribed" class="form-input" value="75" min="1" max="2500" step="5" oninput="calculateChemo()">
+              </div>
+              <div class="form-group">
+                <label for="chemo-auc" class="form-label">Target Carboplatin AUC</label>
+                <select id="chemo-auc" class="form-select" onchange="calculateChemo()">
+                  <option value="5" selected>AUC 5 (Standard solid tumor)</option>
+                  <option value="6">AUC 6 (Ovarian / Lung first line)</option>
+                  <option value="4">AUC 4 (Previously irradiated / elderly)</option>
+                  <option value="2">AUC 2 (Weekly radiosensitizing)</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="calculateChemo()">Compute Oncology Dosages</button>
+          </div>
+        </div>
+
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">Dosage Recommendations</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="result-hero" style="background:#fdf2f8;border-color:#fbcfe8;">
+              <span class="hero-label">Calculated BSA (Mosteller)</span>
+              <div class="hero-value" id="res-chemo-bsa" style="color:#be185d;font-size:2.4rem;">1.85 m²</div>
+              <span class="form-hint">Du Bois: <span id="res-chemo-dubois">1.84 m²</span> | ASCO Uncapped Protocol</span>
+            </div>
+
+            <div class="results-grid" style="margin-top:1.5rem;">
+              <div class="result-item">
+                <span class="result-label">Standard Chemotherapy Dose</span>
+                <span class="result-value" id="res-chemo-total-dose">138.8 mg</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Cockcroft-Gault CrCl</span>
+                <span class="result-value" id="res-chemo-crcl">73.5 mL/min</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Calvert Carboplatin Dose</span>
+                <span class="result-value" id="res-carboplatin-dose">492 mg</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Max FDA Cap for AUC</span>
+                <span class="result-value" id="res-carboplatin-cap">750 mg</span>
+              </div>
+            </div>
+
+            <div class="stat-box" style="margin-top:1.5rem;padding:1rem;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+              <h4 style="font-weight:700;margin-bottom:0.5rem;font-size:0.95rem;">Oncology Safety &amp; Organ Clearance Note:</h4>
+              <p id="res-chemo-note" style="font-size:0.875rem;color:#475569;margin:0;">
+                Patient renal function is adequate for full AUC 5 dosing without GFR ceiling truncation. Dose rounding to nearest vial or 5 mg recommended by institutional pharmacy guidelines.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <article class="article-body">
+        <h2>Principles of Chemotherapy Dosing and Pharmacokinetics</h2>
+        <p>
+          Unlike therapeutic agents with broad safety margins (such as penicillins or antihypertensives), antineoplastic cytotoxic medications possess an exceptionally steep dose-response curve paired with a narrow therapeutic window. The concentration required to eradicate malignant clones is frequently indistinguishable from the threshold causing life-threatening myelosuppression, cardiotoxicity, or gastrointestinal mucositis.
+        </p>
+        <p>
+          In the 1950s, laboratory animal studies by Pinkel established that cross-species toxicities of antimetabolite drugs (including methotrexate and 6-mercaptopurine) matched far more accurately when normalized to Body Surface Area ($m^2$) rather than weight ($mg/kg$). Because drug clearance mechanisms—including hepatic blood perfusion, cytochrome P450 enzyme abundance, and glomerular filtration—scale with surface area, the oncology community universally adopted $mg/m^2$ as the standard dosing nomenclature for cytotoxic protocols.
+        </p>
+
+        <h2>The ASCO Obesity Dosing Guidelines</h2>
+        <p>
+          For decades, widespread clinical anxiety over drug-induced toxicity led oncologists to arbitrarily "cap" the body surface area of obese patients at $2.0\text{ m}^2$ or calculate doses using an idealized or adjusted body weight ($ABW$). In 2012 (and updated in 2021), the <strong>American Society of Clinical Oncology (ASCO)</strong> published a definitive practice guideline systematically disproving this dogma:
+        </p>
+        <ul>
+          <li><strong>Actual Weight Preservation:</strong> Retrospective and prospective studies in breast, colon, ovarian, and lung cancers demonstrated that capping BSA at $2.0\text{ m}^2$ resulted in significant underdosing in up to 40% of obese patients, leading to statistically higher cancer recurrence rates and reduced overall survival.</li>
+          <li><strong>Toxicity Parity:</strong> Full, actual weight-based BSA dosing does not result in disproportionate increases in Grade 3 or 4 hematologic toxicities in obese individuals compared to normal-weight peers. ASCO firmly recommends using actual body weight for BSA calculations across all standard curative-intent regimens.</li>
+        </ul>
+
+        <h2>The Calvert Equation for Carboplatin AUC Dosing</h2>
+        <p>
+          While most antineoplastics are dosed in $mg/m^2$, the platinum coordination complex <strong>carboplatin</strong> is a notable exception. Carboplatin is cleared almost exclusively (greater than 85%) through simple renal glomerular filtration, without significant tubular secretion or reabsorption. Dosing carboplatin by surface area produced erratic systemic exposure and unpredictable nadir thrombocytopenia.
+        </p>
+        <p>
+          In 1989, Hilary Calvert and colleagues published a pharmacokinetic formula establishing that carboplatin's systemic exposure—measured as the Area Under the Plasma Concentration-Time Curve ($AUC$ in $mg/mL \cdot min$)—is directly coupled to renal clearance:
+        </p>
+
+        <div class="formula-box">
+          <p><strong>The Calvert Formula:</strong></p>
+          $$\text{Total Carboplatin Dose (mg)} = \text{Target AUC} \times (\text{GFR} + 25)$$
+          <p>Where:</p>
+          <ul>
+            <li><strong>Target AUC:</strong> Chosen clinical exposure target (typically 4 to 6 $mg/mL \cdot min$ for single-agent or combination solid tumor regimens).</li>
+            <li><strong>GFR (mL/min):</strong> Glomerular filtration rate, universally estimated via the Cockcroft-Gault creatinine clearance formula.</li>
+            <li><strong>25:</strong> Empirical non-renal clearance constant ($mL/min$).</li>
+          </ul>
+        </div>
+
+        <h2>Cockcroft-Gault Creatinine Clearance Estimation</h2>
+        <p>
+          In routine oncology clinical practice, serum creatinine is substituted into the Cockcroft-Gault equation to estimate renal capacity for Calvert dosing:
+        </p>
+
+        <div class="formula-box">
+          <p><strong>Cockcroft-Gault Equation:</strong></p>
+          $$CrCl\text{ (mL/min)} = \frac{(140 - \text{Age}) \times \text{Weight (kg)}}{72 \times \text{Serum Creatinine (mg/dL)}} \times (0.85\text{ if female})$$
+          <p>
+            <em>FDA Safety Cap:</em> In 2010, the US FDA and ASCO instituted a maximum GFR cap of <strong>125 mL/min</strong> in the Calvert equation. Patients with supranormal renal clearance (such as young patients with $CrCl > 150\text{ mL/min}$) must have GFR capped at 125 to avoid lethal carboplatin overdosing:
+          </p>
+          $$\text{Max Allowed Carboplatin Dose (mg)} = \text{Target AUC} \times (125 + 25) = \text{Target AUC} \times 150$$
+        </div>
+
+        <h2>Oncology Dosing Reference Table</h2>
+        <p>
+          The table below demonstrates representative cytotoxic regimens, BSA dosing, and Calvert AUC calculations:
+        </p>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Regimen / Protocol</th>
+                <th>Standard Agent</th>
+                <th>Prescribed Metric</th>
+                <th>Standard BSA Dose (1.80 m²)</th>
+                <th>Capped Max Dose / Safety Limit</th>
+                <th>Primary Dose-Limiting Toxicity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>AC Regimen (Breast)</strong></td>
+                <td>Doxorubicin</td>
+                <td>60 mg/m²</td>
+                <td>108 mg</td>
+                <td>Lifetime cumulative cap 450–550 mg/m²</td>
+                <td>Irreversible cardiomyopathy, myelosuppression.</td>
+              </tr>
+              <tr>
+                <td><strong>FOLFOX (Colorectal)</strong></td>
+                <td>Oxaliplatin</td>
+                <td>85 mg/m²</td>
+                <td>153 mg</td>
+                <td>Dose reduce for peripheral neuropathy</td>
+                <td>Cold-induced dysesthesia, sensory neuropathy.</td>
+              </tr>
+              <tr>
+                <td><strong>TC Protocol (Gynecologic)</strong></td>
+                <td>Paclitaxel</td>
+                <td>175 mg/m²</td>
+                <td>315 mg</td>
+                <td>Premedicate with dexamethasone/H1/H2</td>
+                <td>Severe hypersensitivity, peripheral neuropathy.</td>
+              </tr>
+              <tr>
+                <td><strong>TC Protocol (Gynecologic)</strong></td>
+                <td>Carboplatin</td>
+                <td>AUC 5 – 6</td>
+                <td>450 – 550 mg (GFR dep.)</td>
+                <td>Max cap: 750 mg (AUC 5) / 900 mg (AUC 6)</td>
+                <td>Dose-limiting thrombocytopenia, neutropenia.</td>
+              </tr>
+              <tr>
+                <td><strong>Cisplatin Combination</strong></td>
+                <td>Cisplatin</td>
+                <td>75 – 100 mg/m²</td>
+                <td>135 – 180 mg</td>
+                <td>Aggressive pre/post hydration mandatory</td>
+                <td>Nephrotoxicity, ototoxicity, emetogenicity.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Worked Clinical Oncology Case Study</h2>
+        <div class="worked-example-card">
+          <div class="example-header">
+            <span class="example-badge">Oncology Protocol Case</span>
+            <h3 class="example-title">Ovarian Carcinoma Paclitaxel / Carboplatin Sizing</h3>
+          </div>
+          <div class="example-step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Patient Clinical Profile:</strong> A 64-year-old female diagnosed with stage III high-grade serous ovarian carcinoma is scheduled for Cycle 1 of Carboplatin (AUC 6) + Paclitaxel (175 mg/m²). Anthropometrics: Height = 168 cm, Weight = 75 kg. Laboratory values: Serum Creatinine = 0.85 mg/dL.
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Calculate Body Surface Area (Mosteller):</strong>
+              $$BSA = \sqrt{\frac{168 \times 75}{3600}} = \sqrt{\frac{12600}{3600}} = \sqrt{3.5} = \mathbf{1.871\text{ m}^2}$$
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>Calculate Prescribed Paclitaxel Dose:</strong>
+              $$\text{Paclitaxel Dose} = 175\text{ mg/m}^2 \times 1.871\text{ m}^2 = 327.4\text{ mg}$$
+              (Standard oncology pharmacy rounds to <strong>325 mg</strong> or 330 mg per institutional policy.)
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <strong>Calculate Cockcroft-Gault Creatinine Clearance and Calvert Dose:</strong>
+              $$CrCl = \frac{(140 - 64) \times 75}{72 \times 0.85} \times 0.85 = \frac{76 \times 75}{72} = \frac{5700}{72} = \mathbf{79.17\text{ mL/min}}$$
+              Since 79.17 mL/min is below the 125 mL/min FDA cap, uncapped GFR is utilized:
+              $$\text{Carboplatin Dose} = \text{Target AUC} \times (GFR + 25) = 6 \times (79.17 + 25) = 6 \times 104.17 = \mathbf{625\text{ mg}}$$
+              The patient receives Paclitaxel 325 mg IV over 3 hours followed by Carboplatin 625 mg IV over 60 minutes.
+            </div>
+          </div>
+        </div>
+
+        <h2>Pharmacogenomic Stratification and Non-Renal Clearance Pathways</h2>
+        <p>
+          While Body Surface Area ($m^2$) standardizes the geometric denominator for drug distribution volume, systemic clearance remains heavily governed by inter-individual genetic polymorphism in phase I and phase II metabolic enzymes. Modern oncology protocols increasingly mandate pharmacogenomic profiling prior to administering full BSA-calculated dosages:
+        </p>
+        <ul>
+          <li><strong>Dihydropyrimidine Dehydrogenase (DPD / DPYD gene):</strong> DPD is the primary catabolic enzyme responsible for clearing greater than 80% of administered fluoropyrimidines (5-Fluorouracil and capecitabine). Approximately 3% to 5% of patients carry partial DPD deficiency variants ($*2A, *13, \text{c.2846A>T}$), and 0.2% possess complete deficiency. In these individuals, administering a standard BSA-calculated dose results in life-threatening mucositis, neutropenic sepsis, and death. Clinical guidelines (CPIC) mandate a 50% initial dose reduction for intermediate metabolizers and total avoidance in poor metabolizers.</li>
+          <li><strong>UDP-Glucuronosyltransferase 1A1 (UGT1A1):</strong> Irinotecan (used in FOLFIRINOX and FOLFIRI for pancreatic and colorectal cancers) is converted to its active metabolite SN-38, which requires hepatic glucuronidation by UGT1A1 for inactivation. Patients homozygous for the $UGT1A1*28$ allele (Gilbert syndrome genotype) suffer severe clearance impairment, predisposing them to Grade 4 diarrhea and profound neutropenia unless upfront BSA doses are adjusted.</li>
+          <li><strong>Cockcroft-Gault vs. CKD-EPI in Calvert Sizing:</strong> While nephrology guidelines favor the CKD-EPI (2021 race-free) equation for diagnosing chronic kidney disease, oncology protocols universally retain Cockcroft-Gault for carboplatin dosing. CKD-EPI reports GFR in $mL/min/1.73m^2$; substituting this directly into the Calvert equation without de-indexing for individual BSA introduces systematic errors of 15% to 25% in very large or very small patients. When CKD-EPI is used, it must be multiplied by $(\text{Patient BSA} / 1.73)$ before entry into Calvert.</li>
+        </ul>
+
+        <h2>Hemodialysis and Special Organ Dysfunction Adjustments</h2>
+        <p>
+          In end-stage renal disease (ESRD) patients maintained on thrice-weekly intermittent hemodialysis, carboplatin Calvert dosing requires strict timing. Carboplatin is cleared by high-flux dialyzers with an extraction ratio of 40% to 50%. Standard clinical oncology protocol administers carboplatin immediately following a hemodialysis session, allowing a prolonged interdialytic period (typically 44 to 48 hours) for antineoplastic tissue exposure, using an empirical GFR estimate of 0 to 10 mL/min (resulting in a total dose of $AUC \times [0 + 25] = AUC \times 25\text{ mg}$).
+        </p>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <span class="logo-icon">🧮</span>
+        <span class="logo-text">CalcHub</span>
+        <p class="footer-tagline">Clinical & Engineering Precision Tools for Health and Science.</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">All Calculators</a>
+        <a href="health.html">Health Calculators</a>
+        <a href="finance.html">Financial Tools</a>
+        <a href="engineering.html">Engineering Tools</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function calculateChemo() {
+      const h = parseFloat(document.getElementById('chemo-height').value) || 0;
+      const w = parseFloat(document.getElementById('chemo-weight').value) || 0;
+      const age = parseFloat(document.getElementById('chemo-age').value) || 0;
+      const gender = document.getElementById('chemo-gender').value;
+      const scr = parseFloat(document.getElementById('chemo-scr').value) || 0.9;
+      const prescribed = parseFloat(document.getElementById('chemo-prescribed').value) || 0;
+      const targetAUC = parseFloat(document.getElementById('chemo-auc').value) || 5;
+
+      if (h <= 0 || w <= 0 || age <= 0 || scr <= 0) return;
+
+      // Mosteller BSA
+      const bsa = Math.sqrt((h * w) / 3600);
+      const bsa_dubois = 0.007184 * Math.pow(w, 0.425) * Math.pow(h, 0.725);
+
+      document.getElementById('res-chemo-bsa').innerText = bsa.toFixed(2) + ' m²';
+      document.getElementById('res-chemo-dubois').innerText = bsa_dubois.toFixed(2) + ' m²';
+
+      // Standard Chemo Total Dose
+      const totalChemo = prescribed * bsa;
+      document.getElementById('res-chemo-total-dose').innerText = totalChemo.toFixed(1) + ' mg';
+
+      // Cockcroft-Gault CrCl
+      let crcl = ((140 - age) * w) / (72 * scr);
+      if (gender === 'female') {
+        crcl = crcl * 0.85;
+      }
+      document.getElementById('res-chemo-crcl').innerText = crcl.toFixed(1) + ' mL/min';
+
+      // Calvert Formula with 125 cap
+      const cappedGFR = Math.min(crcl, 125);
+      const carboplatinDose = Math.round(targetAUC * (cappedGFR + 25));
+      const maxCap = Math.round(targetAUC * (125 + 25));
+
+      document.getElementById('res-carboplatin-dose').innerText = carboplatinDose + ' mg';
+      document.getElementById('res-carboplatin-cap').innerText = maxCap + ' mg';
+
+      const noteEl = document.getElementById('res-chemo-note');
+      if (crcl > 125) {
+        noteEl.innerHTML = `<strong style="color:#b91c1c;">FDA Safety Cap Applied:</strong> Patient CrCl (${crcl.toFixed(1)} mL/min) exceeds 125 mL/min. GFR capped at 125 mL/min to prevent severe myelotoxicity (max dose ${maxCap} mg).`;
+      } else if (crcl < 50) {
+        noteEl.innerHTML = `<strong style="color:#ca8a04;">Renal Impairment Warning:</strong> Patient CrCl is ${crcl.toFixed(1)} mL/min (< 50 mL/min). Close monitoring of platelet nadir at days 14-21 indicated; verify renal status before subsequent cycles.`;
+      } else {
+        noteEl.innerHTML = `Patient renal function is adequate for full AUC ${targetAUC} dosing without GFR ceiling truncation. Dose rounding to nearest vial or 5 mg recommended by institutional pharmacy guidelines.`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', calculateChemo);
+  </script>
+</body>
+</html>
