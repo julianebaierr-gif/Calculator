@@ -28,6 +28,14 @@ CAT_MAP = {
             ("calories-burned-calculator.html", "Exercise Calories Burned (METs)", "🏃", "Ainsworth Compendium METs, gross vs net energy & EPOC", "Calories = MET · 3.5 · W(kg) / 200 · Duration"),
             ("carbohydrate-intake-calculator.html", "Carbohydrate Intake & Glycogen", "🍞", "ACSM/ISSN endurance g/kg & intra-workout fueling", "Carbs (g) = Weight (kg) · Factor (3 to 12 g/kg/day)"),
             ("cholesterol-ratio-calculator.html", "Cholesterol Ratio & Castelli Risk", "❤️", "Castelli I & II, Non-HDL & Triglyceride/HDL insulin marker", "CRI-I = TC/HDL | CRI-II = LDL/HDL | TG/HDL"),
+            ("due-date-calculator.html", "Pregnancy Due Date & Gestation", "👶", "Naegele's rule, ACOG ultrasound dating & embryo transfer", "EDD = LMP + 1yr - 3mo + 7d + (Cycle - 28d)"),
+            ("fat-intake-calculator.html", "Dietary Fat Intake (Grams/Day)", "🥑", "Saturated fat limit, essential omega-3/6 & keto/macro", "Fat (g) = (TDEE × %Fat) / 9 | DRI 20-35% of kcal"),
+            ("heart-rate-zone-calculator.html", "Heart Rate Zone (Karvonen HRR)", "❤️", "5 cardiovascular training zones & Zone 2 FatMax", "THR = (HRR × Intensity%) + RHR | HRR = HRmax - RHR"),
+            ("lean-body-mass-calculator.html", "Lean Body Mass (Boer & James)", "💪", "Boer, James & Hume equations + normalized FFMI limit", "LBM = 0.407·W + 0.267·H - 19.2 | FFMI Pope ceiling"),
+            ("max-heart-rate-calculator.html", "Max Heart Rate (Tanaka & Gulati)", "🫀", "Tanaka, Gellish, Gulati female-specific & Fox HRmax", "HRmax = 208 - 0.7·Age | Gulati: 206 - 0.88·Age"),
+            ("met-calculator.html", "METs & Activity Caloric Burn", "⚡", "Compendium MET-minutes, VO2 uptake & WHO guidelines", "Calories = MET · 3.5 · W(kg) / 200 · min | MET-min/wk"),
+            ("ovulation-calculator.html", "Ovulation & Fertile Window", "🌸", "Ogino-Knaus rhythm method, luteal phase & LH surge", "Ovulation = Cycle - Luteal | Fertile: [Od - 5, Od]"),
+            ("pregnancy-weight-gain-calculator.html", "Pregnancy Weight Gain (IOM/ACOG)", "🤰", "Pre-pregnancy BMI targets, weekly rates & twin curves", "Target GWG per IOM 2009 guidelines by BMI class"),
         ]
     },
     "finance.html": {

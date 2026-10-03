@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fat Intake Calculator | Daily Dietary Fats, Omega-3 & Hormone Health</title>
+  <meta name="description" content="Calculate your optimal daily fat intake in grams and percentage of calories based on AHA, ISSN, and WHO standards. Saturated fat caps, Omega-3/6 ratio, and keto macros.">
+  <link rel="canonical" href="https://calchub.com/fat-intake-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Clinical Dietary Fat Intake & Lipid Sizer",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "description": "Calculates evidence-based daily dietary fat targets (grams and percentage of TDEE), saturated fat safety limits, and essential fatty acid requirements for hormonal synthesis."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What percentage of daily calories should come from dietary fat?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Acceptable Macronutrient Distribution Range (AMDR) established by the National Academy of Medicine recommends that 20% to 35% of total daily calories come from dietary fat. For an individual consuming 2,000 kcal per day, this corresponds to 44 to 78 grams of fat (since 1 gram of fat provides 9 kilocalories)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why does dietary fat intake impact testosterone and steroid hormone synthesis?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Cholesterol and dietary lipids are the mandatory biochemical substrates for steroidogenesis. In the Leydig cells of the testes and the adrenal cortex, cholesterol is transferred via the StAR protein to the inner mitochondrial membrane and cleaved by cytochrome P450scc into pregnenolone, the precursor to testosterone, estrogen, and cortisol. Clinical trials demonstrate that reducing fat intake below 15-20% of calories significantly depresses circulating free and total testosterone levels."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the American Heart Association (AHA) limit for saturated fat?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The American Heart Association recommends limiting saturated fatty acid (SFA) intake to 5% to 6% of total daily calories for individuals aiming to lower LDL cholesterol, and under 10% for the general population. In a 2,000 kcal diet, 5-6% represents just 11 to 13 grams of saturated fat per day."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are Essential Fatty Acids (EFAs) and what are their daily requirements?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Humans lack delta-12 and delta-15 desaturase enzymes, making two polyunsaturated fatty acids essential: Alpha-Linolenic Acid (ALA, an Omega-3) and Linoleic Acid (LA, an Omega-6). Daily adequate intake (AI) is 1.6 g/day for men and 1.1 g/day for women for ALA, and 14-17 g/day for LA. Marine omega-3s (EPA and DHA) should be consumed at 250 to 500 mg daily for cardioprotection."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="header">
+    <div class="header-container">
+      <div class="header-logo">
+        <a href="index.html" class="logo-link">
+          <span class="logo-icon">🧮</span>
+          <span class="logo-text">CalcHub</span>
+        </a>
+      </div>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="health.html" class="nav-link active">Health & Fitness</a>
+        <a href="finance.html" class="nav-link">Finance</a>
+        <a href="engineering.html" class="nav-link">Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="calculator-container">
+      <div class="calculator-header">
+        <div class="badge-tag">Nutritional Lipidology</div>
+        <h1 class="calculator-title">Dietary Fat Intake &amp; Hormone Sizer</h1>
+        <p class="calculator-description">Calculate your optimal daily dietary fat targets (grams and kcal), saturated fat cardiovascular safety limits, and essential fatty acid requirements based on AHA and ISSN guidelines.</p>
+      </div>
+
+      <div class="calculator-grid">
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">Caloric Intake &amp; Dietary Strategy</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="form-group">
+              <label for="daily-calories" class="form-label">Total Daily Caloric Intake (kcal)</label>
+              <input type="number" id="daily-calories" class="form-input" value="2200" min="1000" max="6000" step="50" oninput="calculateFats()">
+              <span class="form-hint">Your daily maintenance or deficit calorie target</span>
+            </div>
+
+            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group">
+                <label for="body-weight" class="form-label">Body Weight</label>
+                <input type="number" id="body-weight" class="form-input" value="170" min="60" max="450" step="1" oninput="calculateFats()">
+              </div>
+              <div class="form-group">
+                <label for="weight-unit" class="form-label">Unit</label>
+                <select id="weight-unit" class="form-select" onchange="calculateFats()">
+                  <option value="lbs" selected>Pounds (lbs)</option>
+                  <option value="kg">Kilograms (kg)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="diet-protocol" class="form-label">Nutritional Strategy &amp; Goal</label>
+              <select id="diet-protocol" class="form-select" onchange="calculateFats()">
+                <option value="balanced" selected>Standard Balanced Health (25% - 30% of calories)</option>
+                <option value="athletic">Athletic / Bodybuilding Cut (20% of calories - Higher Carbs)</option>
+                <option value="mediterranean">Mediterranean Heart Health (35% of calories - High MUFA)</option>
+                <option value="keto">Standard Ketogenic Diet (70% - 75% of calories)</option>
+                <option value="lowfat">Clinical Low-Fat (15% of calories - Medical supervision)</option>
+              </select>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="calculateFats()">Calculate Dietary Fat Breakdown</button>
+          </div>
+        </div>
+
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">Daily Lipid Targets &amp; Safety Caps</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="result-hero" style="background:#fefce8;border-color:#fef08a;">
+              <span class="hero-label">Target Total Dietary Fat</span>
+              <div class="hero-value" id="res-target-fat-g" style="color:#ca8a04;font-size:2.4rem;">67 g / day</div>
+              <span class="form-hint" id="res-fat-pct">605 kcal from fat (27.5% of total calories | 0.87 g/kg)</span>
+            </div>
+
+            <div class="results-grid" style="margin-top:1.5rem;">
+              <div class="result-item">
+                <span class="result-label">Monounsaturated (MUFA)</span>
+                <span class="result-value" id="res-mufa">33 g (14% kcal)</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Polyunsaturated (PUFA)</span>
+                <span class="result-value" id="res-pufa">18 g (7% kcal)</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">AHA Saturated Fat Cap</span>
+                <span class="result-value" id="res-sfa-cap">&lt; 15 g (&le; 6%)</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Omega-3 EPA/DHA Target</span>
+                <span class="result-value" id="res-omega3">500 – 1000 mg</span>
+              </div>
+            </div>
+
+            <div class="stat-box" style="margin-top:1.5rem;padding:1rem;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+              <h4 style="font-weight:700;margin-bottom:0.5rem;font-size:0.95rem;">Endocrine &amp; Cardiovascular Impact:</h4>
+              <p id="res-endocrine-note" style="font-size:0.875rem;color:#475569;margin:0;">
+                At 27.5% fat intake (0.87 g/kg), cellular steroidogenesis is fully supported for testosterone and estrogen synthesis, while adhering to American Heart Association guidelines for cardiovascular atheroma prevention.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <article class="article-body">
+        <h2>Biochemical Functions of Dietary Lipids</h2>
+        <p>
+          Dietary fats (lipids) are essential macronutrients serving indispensable physiological roles far beyond simple caloric storage. Chemically, over 95% of dietary lipids exist in the form of <strong>triglycerides (triacylglycerols)</strong>, consisting of a glycerol backbone esterified to three fatty acid chains of varying carbon chain lengths and degrees of unsaturation.
+        </p>
+        <p>
+          Unlike carbohydrates, which can be synthesized endogenously via hepatic gluconeogenesis, dietary fats provide structural building blocks and biochemical cofactors that the human body cannot manufacture:
+        </p>
+        <ul>
+          <li><strong>Cellular Membrane Fluidity and Structure:</strong> Phospholipids (such as phosphatidylcholine and phosphatidylethanolamine) form the semi-permeable lipid bilayer of all 37 trillion cells in the human body. The ratio of saturated to polyunsaturated fatty acids embedded in the membrane governs receptor mobility, nutrient transport, and ion channel kinetics.</li>
+          <li><strong>Fat-Soluble Vitamin Absorption:</strong> Dietary lipids are the obligate micellar transport vehicle required for the intestinal solubilization and lymphatic absorption of fat-soluble vitamins: <strong>Vitamin A (retinol), Vitamin D (cholecalciferol), Vitamin E (tocopherol), and Vitamin K (phylloquinone/menaquinone)</strong>. Diets containing under 15% fat lead to chronic micro-nutritional deficiencies and impaired bone mineralization.</li>
+          <li><strong>Steroidogenesis and Endocrine Homeostasis:</strong> Free cholesterol serves as the obligate biochemical precursor for the synthesis of all steroid hormones—including testosterone, dihydrotestosterone (DHT), estradiol, progesterone, cortisol, and aldosterone.</li>
+        </ul>
+
+        <h2>Essential Fatty Acids: Omega-3 and Omega-6 Pathways</h2>
+        <p>
+          Humans lack the delta-12 and delta-15 desaturase enzymes required to insert double bonds beyond carbon-9 from the carboxyl end of a fatty acid chain. Consequently, two distinct polyunsaturated fatty acid (PUFA) families are strictly essential:
+        </p>
+
+        <div class="formula-box">
+          <p><strong>Essential Fatty Acid Elongation &amp; Desaturation Cascades:</strong></p>
+          $$\text{Omega-6 Family: } \text{Linoleic Acid (LA, 18:2n-6)} \xrightarrow{\Delta\text{-6 Desaturase}} \text{Arachidonic Acid (AA, 20:4n-6)} \to \text{Pro-inflammatory Eicosanoids (PGE}_2\text{, LTB}_4\text{)}$$
+          $$\text{Omega-3 Family: } \alpha\text{-Linolenic Acid (ALA, 18:3n-3)} \xrightarrow{\Delta\text{-6 Desaturase}} \text{EPA (20:5n-3)} \to \text{DHA (22:6n-3)} \to \text{Anti-inflammatory Resolvins/Protectins}$$
+          <p>
+            Because both pathways compete for the identical rate-limiting enzyme ($\Delta$-6 desaturase), an excessively skewed dietary Omega-6 to Omega-3 ratio (frequently 16:1 to 20:1 in modern industrialized Western diets rich in refined seed oils) promotes chronic systemic endothelial inflammation. Health agencies recommend targeting an optimal dietary ratio between <strong>2:1 and 4:1</strong>, with at least 250 to 500 mg daily of direct pre-formed marine EPA/DHA.
+          </p>
+        </div>
+
+        <h2>Steroid Hormone Synthesis and the Danger of Extreme Low-Fat Diets</h2>
+        <p>
+          A frequent pitfall among fitness enthusiasts and bodybuilders during severe calorie-cutting phases is driving dietary fat down to extreme lows ($< 10\% - 15\%$ of calories) to prioritize carbohydrate intake. Landmark clinical trials published in the <em>Journal of Clinical Endocrinology &amp; Metabolism</em> demonstrate that this triggers profound neuroendocrine hypogonadism:
+        </p>
+        <ol>
+          <li><strong>Mitochondrial Cholesterol Translocation:</strong> The rate-limiting step in steroidogenesis is the transport of free cholesterol across the mitochondrial intermembrane space, mediated by the <strong>Steroidogenic Acute Regulatory (StAR) protein</strong>. Caloric restriction paired with low lipid intake downregulates StAR expression in testicular Leydig cells.</li>
+          <li><strong>Cytochrome P450 Side-Chain Cleavage:</strong> Inside the inner mitochondrial membrane, the enzyme cytochrome $P450scc$ (CYP11A1) cleaves cholesterol into pregnenolone:
+            $$\text{Cholesterol (C}_{27}\text{)} \xrightarrow{P450scc} \text{Pregnenolone (C}_{21}\text{)} \to \text{Progesterone} \to \text{Androstenedione} \to \text{Testosterone (C}_{19}\text{)}$$
+          </li>
+          <li><strong>Testosterone Suppression:</strong> Studies demonstrate that reducing fat intake from 40% to 20% of calories produces a statistically significant 12% to 15% drop in total and free testosterone, accompanied by an increase in sex hormone-binding globulin (SHBG). The International Society of Sports Nutrition (ISSN) recommends maintaining a baseline dietary fat floor of <strong>at least 0.7 to 1.0 grams per kilogram of body weight</strong> (or a minimum of 20% of daily calories) to preserve neuroendocrine health during prolonged cutting phases.</li>
+        </ol>
+
+        <h2>Cardiovascular Saturated Fat Limits: AHA and ACC Guidelines</h2>
+        <p>
+          While monounsaturated fats (MUFA, found in extra virgin olive oil, avocados, and macadamia nuts) and polyunsaturated fats (PUFA) promote cardiovascular longevity, <strong>saturated fatty acids (SFAs)</strong>—particularly palmitic ($C16:0$), myristic ($C14:0$), and lauric ($C12:0$) acids—exert distinct biological effects on hepatic lipid metabolism:
+        </p>
+        <ul>
+          <li><strong>Hepatic LDL-Receptor Suppression:</strong> High saturated fat consumption reduces the transcriptional expression and cellular recycling of LDL receptors on the surface of hepatocytes via the SREBP-2 pathway. As clearance slows, circulating ApoB-containing LDL particles remain in bloodstream circulation longer, dramatically increasing arterial transit and susceptibility to subendothelial oxidation.</li>
+          <li><strong>AHA SFA Guideline:</strong> The American Heart Association firmly recommends that saturated fat not exceed <strong>5% to 6% of total daily calories</strong> in patients with elevated LDL-C or atherosclerotic risk, and under 10% in the general population. Substituting 5% of daily calories from saturated fats with equivalent calories from polyunsaturated vegetable or marine fats reduces coronary heart disease incidence by approximately 25%.</li>
+        </ul>
+
+        <h2>Comprehensive Dietary Lipid Distribution Matrix</h2>
+        <p>
+          The table below demonstrates evidence-based daily fat distributions across major dietary protocols for an individual consuming 2,200 kcal/day:
+        </p>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Dietary Protocol</th>
+                <th>Fat % of Calories</th>
+                <th>Total Fat (g)</th>
+                <th>SFA Cap (&le; 6%)</th>
+                <th>MUFA Target (g)</th>
+                <th>PUFA Target (g)</th>
+                <th>Physiological Objective</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>AHA Low-Saturated Fat</strong></td>
+                <td>25% – 30%</td>
+                <td>61 – 73 g</td>
+                <td>&lt; 14 g</td>
+                <td>30 – 38 g</td>
+                <td>15 – 22 g</td>
+                <td>Aggressive LDL-C reduction; maximal endothelial protection.</td>
+              </tr>
+              <tr>
+                <td><strong>Mediterranean Diet</strong></td>
+                <td>35% – 40%</td>
+                <td>85 – 98 g</td>
+                <td>&lt; 18 g</td>
+                <td>50 – 62 g</td>
+                <td>18 – 24 g</td>
+                <td>High extra virgin olive oil; elevated HDL and vascular longevity.</td>
+              </tr>
+              <tr>
+                <td><strong>Athletic / Bodybuilding</strong></td>
+                <td>20% – 25%</td>
+                <td>49 – 61 g</td>
+                <td>&lt; 15 g</td>
+                <td>22 – 30 g</td>
+                <td>12 – 18 g</td>
+                <td>Preserves steroid hormone floor while maximizing muscle glycogen.</td>
+              </tr>
+              <tr>
+                <td><strong>Standard Ketogenic</strong></td>
+                <td>70% – 75%</td>
+                <td>171 – 183 g</td>
+                <td>35 – 50 g</td>
+                <td>80 – 95 g</td>
+                <td>30 – 40 g</td>
+                <td>Induces hepatic ketogenesis (BHB production); suppresses insulin.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Worked Nutritional Dietetics Case Study</h2>
+        <div class="worked-example-card">
+          <div class="example-header">
+            <span class="example-badge">Dietetics Case Study</span>
+            <h3 class="example-title">Endocrine Recovery in a Competitive Natural Bodybuilder</h3>
+          </div>
+          <div class="example-step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Client Clinical Profile:</strong> A 26-year-old competitive natural male bodybuilder (Weight = 175 lbs / 79.38 kg) presents with severe lethargy, loss of libido, and a depressed total testosterone level of 240 ng/dL (reference: 300 to 1,000 ng/dL) following a 20-week contest prep. Nutritional audit reveals he was consuming 2,000 kcal/day with only <strong>25 grams of fat per day</strong> (11.2% of calories, or 0.31 g/kg).
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Establish Evidence-Based Endocrine Fat Floor:</strong>
+              Sports nutrition consensus mandates a minimum fat floor of $0.8\text{ to }1.0\text{ g/kg}$ to sustain steroidogenesis:
+              $$\text{Target Fat Intake} = 79.38\text{ kg} \times 0.90\text{ g/kg} = \mathbf{71.4\text{ grams of fat/day}}$$
+              $$\text{Caloric Yield from Fat} = 71.4\text{ g} \times 9\text{ kcal/g} = \mathbf{643\text{ kcal}} \quad (26.8\%\text{ of a 2,400 kcal recovery diet})$$
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>Structure Sub-Fraction Fatty Acid Targets:</strong>
+              <ul>
+                <li><strong>Monounsaturated Fatty Acids (MUFA ~50%):</strong> $35\text{ g}$ from extra virgin olive oil, avocados, and whole eggs to boost testicular steroidogenic enzyme activity.</li>
+                <li><strong>Polyunsaturated Fatty Acids (PUFA ~25%):</strong> $18\text{ g}$ including 3 grams of wild salmon oil yielding 1,000 mg combined EPA/DHA to suppress muscle catabolism and systemic inflammation.</li>
+                <li><strong>Saturated Fatty Acids (SFA ~25%):</strong> $18\text{ g}$ (6.7% of calories) providing free cholesterol for immediate Leydig cell pregnenolone synthesis without exceeding AHA safety thresholds.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <strong>Clinical Outcome:</strong> Following 8 weeks on this structured lipid protocol alongside calorie restoration to maintenance, follow-up morning laboratory testing confirmed normalization of total testosterone to <strong>620 ng/dL</strong> and complete resolution of fatigue.
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <span class="logo-icon">🧮</span>
+        <span class="logo-text">CalcHub</span>
+        <p class="footer-tagline">Clinical & Engineering Precision Tools for Health and Science.</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">All Calculators</a>
+        <a href="health.html">Health Calculators</a>
+        <a href="finance.html">Financial Tools</a>
+        <a href="engineering.html">Engineering Tools</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function calculateFats() {
+      const calories = parseFloat(document.getElementById('daily-calories').value) || 0;
+      const weightVal = parseFloat(document.getElementById('body-weight').value) || 0;
+      const unit = document.getElementById('weight-unit').value;
+      const protocol = document.getElementById('diet-protocol').value;
+
+      if (calories <= 0 || weightVal <= 0) return;
+
+      const weightKg = (unit === 'lbs') ? (weightVal * 0.45359237) : weightVal;
+
+      let pct = 0.275;
+      if (protocol === 'balanced') pct = 0.275;
+      else if (protocol === 'athletic') pct = 0.20;
+      else if (protocol === 'mediterranean') pct = 0.35;
+      else if (protocol === 'keto') pct = 0.725;
+      else if (protocol === 'lowfat') pct = 0.15;
+
+      const fatCalories = calories * pct;
+      const totalFatG = Math.round(fatCalories / 9);
+      const gPerKg = (totalFatG / weightKg).toFixed(2);
+
+      // Sub-fractions
+      let mufaG = Math.round(totalFatG * 0.50);
+      let pufaG = Math.round(totalFatG * 0.25);
+      let sfaG = Math.round(totalFatG * 0.25);
+
+      // AHA SFA cap (6% of calories)
+      const ahaCapG = Math.round((calories * 0.06) / 9);
+
+      document.getElementById('res-target-fat-g').innerText = `${totalFatG} g / day`;
+      document.getElementById('res-fat-pct').innerText = `${Math.round(fatCalories)} kcal from fat (${(pct * 100).toFixed(1)}% of calories | ${gPerKg} g/kg)`;
+
+      document.getElementById('res-mufa').innerText = `${mufaG} g (${Math.round(mufaG * 9 / calories * 100)}% kcal)`;
+      document.getElementById('res-pufa').innerText = `${pufaG} g (${Math.round(pufaG * 9 / calories * 100)}% kcal)`;
+      document.getElementById('res-sfa-cap').innerText = `< ${ahaCapG} g (≤ 6%)`;
+
+      const noteEl = document.getElementById('res-endocrine-note');
+      if (protocol === 'keto') {
+        noteEl.innerHTML = `<strong>Ketogenic Profile:</strong> High fat (${totalFatG} g, ${(pct * 100).toFixed(1)}% kcal) induces hepatic synthesis of acetoacetate and beta-hydroxybutyrate. Ensure majority of fats derive from monounsaturated sources (olive oil, avocado) rather than pure saturated butter to protect ApoB lipid particles.`;
+      } else if (protocol === 'lowfat') {
+        noteEl.innerHTML = `<strong style="color:#b91c1c;">Hormone Suppression Warning:</strong> At 15% fat (${totalFatG} g, ${gPerKg} g/kg), testicular and adrenal steroidogenesis can become impaired. Monitor free testosterone and ensure adequate fat-soluble vitamin (A, D, E, K) supplementation.`;
+      } else {
+        noteEl.innerHTML = `At ${(pct * 100).toFixed(1)}% fat intake (${gPerKg} g/kg), cellular steroidogenesis is fully supported for testosterone and estrogen synthesis, while adhering to American Heart Association guidelines for cardiovascular atheroma prevention.`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', calculateFats);
+  </script>
+</body>
+</html>

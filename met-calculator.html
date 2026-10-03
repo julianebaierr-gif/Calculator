@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MET Calculator | Metabolic Equivalent of Task & MET-Minutes</title>
+  <meta name="description" content="Calculate exercise intensity, calories burned, and weekly MET-minutes using the 2024 Ainsworth Compendium of Physical Activities and WHO health guidelines.">
+  <link rel="canonical" href="https://calchub.com/met-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Clinical MET & Weekly MET-Minutes Calculator",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "description": "Calculates Metabolic Equivalent of Task (MET), oxygen uptake, energy expenditure in kcal, and weekly cumulative MET-minutes adhering to WHO physical activity recommendations."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the exact scientific definition of 1 MET?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "One Metabolic Equivalent of Task (1 MET) is standardized as the resting metabolic rate of an average seated adult, defined as an oxygen uptake (VO2) of 3.5 milliliters of oxygen per kilogram of body weight per minute (3.5 mL O2/kg/min), approximately equivalent to 1.0 kcal per kilogram per hour (1.0 kcal/kg/hr) or 4.184 kJ/kg/hr."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the WHO weekly MET-minute physical activity guidelines?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The World Health Organization (WHO) and CDC recommend achieving at least 500 to 1,000 MET-minutes per week of moderate-to-vigorous physical activity. This is equivalent to 150 to 300 minutes of moderate-intensity activity (3 to 6 METs) or 75 to 150 minutes of vigorous activity (> 6 METs) per week to significantly lower risks of cardiovascular mortality, stroke, and metabolic syndrome."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the intensity cutoffs for light, moderate, and vigorous METs?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Physical activity is clinically categorized into three distinct MET intensity tiers: Light-Intensity Activity is < 3.0 METs (slow walking, typing, standing); Moderate-Intensity Activity is 3.0 to 5.9 METs (brisk walking at 3.5 mph, leisurely cycling, active gardening); and Vigorous-Intensity Activity is ≥ 6.0 METs (jogging, competitive swimming, circuit training)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the Byrne correction for MET calculations in overweight individuals?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "In 2005, Dr. Nuala Byrne and colleagues demonstrated that the standard 1 MET baseline (3.5 mL O2/kg/min) significantly overestimates true resting metabolic rate in overweight and obese individuals, whose resting oxygen consumption averages closer to 2.6 to 2.8 mL O2/kg/min due to the lower metabolic activity of adipose tissue per unit mass."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="header">
+    <div class="header-container">
+      <div class="header-logo">
+        <a href="index.html" class="logo-link">
+          <span class="logo-icon">🧮</span>
+          <span class="logo-text">CalcHub</span>
+        </a>
+      </div>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="health.html" class="nav-link active">Health & Fitness</a>
+        <a href="finance.html" class="nav-link">Finance</a>
+        <a href="engineering.html" class="nav-link">Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="calculator-container">
+      <div class="calculator-header">
+        <div class="badge-tag">Exercise Epidemiology</div>
+        <h1 class="calculator-title">Metabolic Equivalent of Task (MET) Calculator</h1>
+        <p class="calculator-description">Calculate physical work intensity, oxygen uptake ($VO_2$), caloric expenditure, and cumulative weekly MET-minutes based on the 2024 Ainsworth Compendium.</p>
+      </div>
+
+      <div class="calculator-grid">
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">Activity &amp; Frequency Parameters</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="form-group">
+              <label for="met-activity" class="form-label">Activity from 2024 Ainsworth Compendium</label>
+              <select id="met-activity" class="form-select" onchange="syncMETInput()">
+                <optgroup label="Light Activity (&lt; 3.0 METs)">
+                  <option value="1.3">Desk work / Computer typing [1.3 METs]</option>
+                  <option value="2.0">Slow stroll / Window shopping (2.0 mph) [2.0 METs]</option>
+                  <option value="2.5">Stretching / Hatha yoga [2.5 METs]</option>
+                </optgroup>
+                <optgroup label="Moderate Intensity (3.0 – 5.9 METs)">
+                  <option value="3.5" selected>Brisk fitness walking (3.5 mph / 5.6 km/h) [3.5 METs]</option>
+                  <option value="4.0">Water aerobics / Calisthenics (moderate) [4.0 METs]</option>
+                  <option value="5.0">Weight lifting / Free-weight resistance training [5.0 METs]</option>
+                  <option value="5.5">Casual recreational cycling (10-12 mph) [5.5 METs]</option>
+                </optgroup>
+                <optgroup label="Vigorous Intensity (&ge; 6.0 METs)">
+                  <option value="6.0">Cross-country hiking with daypack [6.0 METs]</option>
+                  <option value="7.0">Swimming freestyle (moderate effort) [7.0 METs]</option>
+                  <option value="8.0">High-Intensity Interval Training (HIIT) [8.0 METs]</option>
+                  <option value="9.8">Running (6 mph / 10 min/mile pace) [9.8 METs]</option>
+                  <option value="11.8">Running (8 mph / 7.5 min/mile pace) [11.8 METs]</option>
+                  <option value="12.3">Jumping rope (fast pace, 120-140 rpm) [12.3 METs]</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group">
+                <label for="met-value" class="form-label">MET Value</label>
+                <input type="number" id="met-value" class="form-input" value="3.5" min="0.8" max="25" step="0.1" oninput="calculateMETMetrics()">
+              </div>
+              <div class="form-group">
+                <label for="met-duration" class="form-label">Duration (Mins / Session)</label>
+                <input type="number" id="met-duration" class="form-input" value="45" min="1" max="600" step="5" oninput="calculateMETMetrics()">
+              </div>
+            </div>
+
+            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group">
+                <label for="met-weight" class="form-label">Body Weight</label>
+                <input type="number" id="met-weight" class="form-input" value="160" min="50" max="450" step="1" oninput="calculateMETMetrics()">
+              </div>
+              <div class="form-group">
+                <label for="met-unit" class="form-label">Weight Unit</label>
+                <select id="met-unit" class="form-select" onchange="calculateMETMetrics()">
+                  <option value="lbs" selected>Pounds (lbs)</option>
+                  <option value="kg">Kilograms (kg)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="met-frequency" class="form-label">Weekly Frequency (Sessions per Week)</label>
+              <input type="number" id="met-frequency" class="form-input" value="4" min="1" max="14" step="1" oninput="calculateMETMetrics()">
+              <span class="form-hint">Used to calculate weekly MET-minutes for WHO guidelines</span>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="calculateMETMetrics()">Calculate MET Energy &amp; Volume</button>
+          </div>
+        </div>
+
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">Bioenergetics &amp; Weekly Volume</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="result-hero" style="background:#f0fdf4;border-color:#bbf7d0;">
+              <span class="hero-label">Weekly Exercise Volume</span>
+              <div class="hero-value" id="res-weekly-met-min" style="color:#15803d;font-size:2.4rem;">630 MET-min</div>
+              <span class="form-hint" id="res-who-status" style="font-weight:600;">Meets WHO Recommended Health Target (500 – 1000 MET-min/wk)</span>
+            </div>
+
+            <div class="results-grid" style="margin-top:1.5rem;">
+              <div class="result-item">
+                <span class="result-label">Single Session Energy</span>
+                <span class="result-value" id="res-session-kcal">200 kcal</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Weekly Caloric Burn</span>
+                <span class="result-value" id="res-weekly-kcal">800 kcal / wk</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Oxygen Uptake (VO2)</span>
+                <span class="result-value" id="res-vo2">12.3 mL/kg/min</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Intensity Tier</span>
+                <span class="result-value" id="res-intensity-tier">Moderate (3.5 METs)</span>
+              </div>
+            </div>
+
+            <div class="stat-box" style="margin-top:1.5rem;padding:1rem;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+              <h4 style="font-weight:700;margin-bottom:0.5rem;font-size:0.95rem;">Epidemiological Health &amp; Mortality Risk:</h4>
+              <p id="res-epidemiology-note" style="font-size:0.875rem;color:#475569;margin:0;">
+                Achieving 630 MET-minutes weekly is associated with a 20% to 25% reduction in all-cause mortality, lower incidence of coronary artery disease, and enhanced glycemic control.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <article class="article-body">
+        <h2>The Concept of the Metabolic Equivalent of Task (MET)</h2>
+        <p>
+          In exercise epidemiology and preventive cardiology, quantifying the physical exertion of daily living and athletic sports across diverse populations requires an objective, mass-independent metric. In 1993, Dr. Barbara Ainsworth and an international committee of kinesiologists developed the <strong>Compendium of Physical Activities</strong>, establishing the <strong>Metabolic Equivalent of Task (MET)</strong> as the international standard.
+        </p>
+        <p>
+          One MET represents the baseline resting energy expenditure of an average human adult:
+        </p>
+
+        <div class="formula-box">
+          <p><strong>Universal Physiological Standardization of 1 MET:</strong></p>
+          $$1\text{ MET} \equiv 3.5\text{ mL } O_2\text{ / kg body mass / minute} \approx 1.0\text{ kcal / kg / hour} \approx 4.184\text{ kJ / kg / hour}$$
+          <p>
+            An activity cataloged at 7.0 METs (such as moderate freestyle swimming) requires seven times the rate of oxygen uptake and cellular energy consumption as sitting quietly in an armchair.
+          </p>
+        </div>
+
+        <h2>Mathematical Formulations: From Oxygen Uptake to Caloric Burn</h2>
+        <p>
+          The conversion from METs to mechanical oxygen consumption and gross caloric expenditure is derived through fundamental respiratory calorimetry:
+        </p>
+        $$\text{Gross } VO_2\text{ (mL/kg/min)} = \text{MET} \times 3.5$$
+        $$\text{Energy Rate (kcal/min)} = \text{MET} \times \frac{3.5 \times \text{Weight (kg)}}{200}$$
+        $$\text{Total Session Energy (kcal)} = \text{Energy Rate (kcal/min)} \times \text{Duration (min)}$$
+        <p>
+          To quantify physical activity dose over time, epidemiologists calculate <strong>MET-minutes</strong> or <strong>MET-hours</strong>:
+        </p>
+        $$\text{MET-Minutes} = \text{MET Value} \times \text{Duration in Minutes}$$
+        $$\text{Weekly Physical Activity Dose} = \sum (\text{MET-Minutes per Session} \times \text{Weekly Sessions})$$
+
+        <h2>WHO and CDC Physical Activity Guidelines</h2>
+        <p>
+          The <em>World Health Organization (WHO) Guidelines on Physical Activity and Sedentary Behaviour</em> and the US Department of Health and Human Services (HHS) define exercise volume targets using cumulative weekly MET-minutes:
+        </p>
+        <ul>
+          <li><strong>Insufficient / Inactive (&lt; 500 MET-min/week):</strong> Sedentary lifestyle associated with elevated cardiovascular risk, insulin resistance, sarcopenia, and premature all-cause mortality.</li>
+          <li><strong>Target Baseline (500 to 1,000 MET-min/week):</strong> The standard clinical recommendation. Achieved via 150 to 300 minutes of moderate-intensity activity (e.g., five 30-minute brisk walks at 3.5 METs $= 525\text{ MET-min}$) or 75 to 150 minutes of vigorous activity (e.g., three 25-minute runs at 10 METs $= 750\text{ MET-min}$).</li>
+          <li><strong>Optimal Longevity Band (1,000 to 1,500 MET-min/week):</strong> Associated with maximal cardiovascular protection, optimal mitochondrial density, and a 31% to 37% reduction in premature mortality risk.</li>
+          <li><strong>Diminishing Returns Ceiling (&gt; 3,000 MET-min/week):</strong> Characteristic of competitive endurance athletes. Provides high functional fitness with negligible incremental reduction in all-cause mortality.</li>
+        </ul>
+
+        <h2>The Byrne Correction in Obesity and Special Populations</h2>
+        <p>
+          While the classical value of $1\text{ MET} = 3.5\text{ mL } O_2/\text{kg/min}$ provides exceptional accuracy in young, normal-weight adults ($BMI < 25\text{ kg/m}^2$), clinical research by Dr. Nuala Byrne published in the <em>Journal of Applied Physiology</em> demonstrated significant divergence in overweight and obese populations:
+        </p>
+        <p>
+          Adipose tissue is metabolically quiescent, consuming far less oxygen per gram of tissue than skeletal muscle, the liver, or kidneys. In individuals with significant adiposity ($BMI > 30\text{ kg/m}^2$), true resting metabolic rate averages <strong>2.6 to 2.8 mL O2/kg/min</strong> rather than 3.5. Utilizing the uncorrected 3.5 constant overestimates resting oxygen consumption by up to 25% to 35% in obese patients. Exercise physiologists applying METs to bariatric or metabolic syndrome cohorts frequently utilize adjusted resting denominators ($2.8\text{ mL/kg/min}$) to avoid inflating calculated caloric expenditure.
+        </p>
+
+        <h2>Comprehensive MET Intensity Taxonomy Table</h2>
+        <p>
+          The table below demonstrates representative activities across the three recognized physical activity intensity tiers:
+        </p>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Intensity Classification</th>
+                <th>MET Range</th>
+                <th>Compendium Activity Examples</th>
+                <th>VO2 Demand (mL/kg/min)</th>
+                <th>Physiological Substrate</th>
+                <th>Talking Test Characteristic</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Light Intensity</strong></td>
+                <td>1.0 – 2.9</td>
+                <td>Desk typing (1.3), cooking (2.0), strolling (2.5)</td>
+                <td>3.5 – 10.2</td>
+                <td>&gt; 80% Fatty Acids</td>
+                <td>Can sing or speak in continuous sentences with zero breathlessness.</td>
+              </tr>
+              <tr>
+                <td><strong>Moderate Intensity</strong></td>
+                <td>3.0 – 5.9</td>
+                <td>Brisk walking 3.5 mph (3.5), circuit training (5.0), cycling 11 mph (5.5)</td>
+                <td>10.5 – 20.7</td>
+                <td>50% Fat, 50% Carbohydrates</td>
+                <td>Can converse in comfortable sentences, but cannot sing without pausing for breath.</td>
+              </tr>
+              <tr>
+                <td><strong>Vigorous Intensity</strong></td>
+                <td>6.0 – 8.9</td>
+                <td>Hiking daypack (6.0), swimming freestyle (7.0), HIIT (8.0)</td>
+                <td>21.0 – 31.2</td>
+                <td>70%–85% Carbohydrates</td>
+                <td>Cannot speak more than a few words without stopping to catch breath.</td>
+              </tr>
+              <tr>
+                <td><strong>Near-Maximal / Sprint</strong></td>
+                <td>&ge; 9.0</td>
+                <td>Running 6 mph (9.8), running 8 mph (11.8), jumping rope (12.3)</td>
+                <td>&gt; 31.5</td>
+                <td>&gt; 90% Glycogen &amp; PCr</td>
+                <td>Gasping; speech impossible; sustained only for minutes.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Worked Exercise Epidemiology Case Study</h2>
+        <div class="worked-example-card">
+          <div class="example-header">
+            <span class="example-badge">Public Health Case</span>
+            <h3 class="example-title">Prescribing Physical Activity for Metabolic Syndrome</h3>
+          </div>
+          <div class="example-step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Patient Clinical Profile:</strong> A 52-year-old male with pre-diabetes and mild hypertension weighs 185 lbs (83.91 kg). His physician prescribes an exercise regimen to achieve the WHO target of <strong>750 MET-minutes per week</strong>. The patient chooses a combination of brisk walking (3.5 METs) on weekdays and recreational cycling (6.0 METs) on weekends.
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Calculate Weekday Walking Volume (3 Days × 40 Minutes at 3.5 METs):</strong>
+              $$\text{Session Volume} = 3.5\text{ METs} \times 40\text{ min} = \mathbf{140\text{ MET-minutes}}$$
+              $$\text{3 Weekday Sessions} = 140 \times 3 = \mathbf{420\text{ MET-minutes}}$$
+              $$\text{Weekday Caloric Burn} = 3 \times \left(3.5 \times \frac{3.5 \times 83.91}{200} \times 40\right) = 3 \times 205.6 = \mathbf{616.7\text{ kcal}}$$
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>Calculate Weekend Cycling Volume to Reach Target (Target Remaining = 330 MET-min):</strong>
+              $$\text{Required Cycling Duration} = \frac{330\text{ MET-minutes}}{6.0\text{ METs}} = \mathbf{55\text{ minutes of cycling}}$$
+              $$\text{Weekend Caloric Burn} = 6.0 \times \frac{3.5 \times 83.91}{200} \times 55 = 6.0 \times 1.4684 \times 55 = \mathbf{484.6\text{ kcal}}$$
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <strong>Total Weekly Prescription &amp; Clinical Impact:</strong>
+              $$\text{Total Weekly Volume} = 420 + 330 = \mathbf{750\text{ MET-minutes/week}}$$
+              $$\text{Total Exercise Energy} = 616.7 + 484.6 = \mathbf{1,101.3\text{ kcal/week}}$$
+              Meeting 750 MET-min/week upregulates skeletal muscle GLUT4 transporter expression, lowers fasting glucose, and satisfies the physical activity benchmark proven to halt progression to frank Type 2 Diabetes.
+            </div>
+          </div>
+        </div>
+      <h2>METs in Clinical Cardiology &amp; Diagnostic Exercise Stress Testing</h2>
+        <p>
+          In clinical cardiology, functional capacity expressed in METs represents the single most powerful prognostic indicator of both cardiac and all-cause mortality. During diagnostic treadmill stress testing (such as the standard <strong>Bruce Protocol</strong>, where speed and incline increase every 3 minutes):
+        </p>
+        <div class="table-responsive my-4">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Bruce Protocol Stage</th>
+                <th>Treadmill Speed &amp; Incline</th>
+                <th>Equivalent MET Demand</th>
+                <th>Oxygen Uptake ($VO_2$)</th>
+                <th>Clinical Diagnostic &amp; Prognostic Significance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Stage 1 (Minutes 1–3)</strong></td>
+                <td>1.7 mph @ 10% Grade</td>
+                <td>4.6 METs</td>
+                <td>16.1 mL/kg/min</td>
+                <td>Inability to complete Stage 1 indicates severe physical impairment, advanced heart failure, or severe peripheral artery disease.</td>
+              </tr>
+              <tr>
+                <td><strong>Stage 2 (Minutes 4–6)</strong></td>
+                <td>2.5 mph @ 12% Grade</td>
+                <td>7.0 METs</td>
+                <td>24.5 mL/kg/min</td>
+                <td>Minimum functional capacity required to perform strenuous activities of daily living without angina or excessive dyspnea.</td>
+              </tr>
+              <tr>
+                <td><strong>Stage 3 (Minutes 7–9)</strong></td>
+                <td>3.4 mph @ 14% Grade</td>
+                <td>10.1 METs</td>
+                <td>35.4 mL/kg/min</td>
+                <td><strong>The 10-MET Survival Milestone:</strong> Achieving Stage 3 conveys exceptional long-term cardiac prognosis, regardless of baseline coronary artery calcium (CAC).</td>
+              </tr>
+              <tr>
+                <td><strong>Stage 4 (Minutes 10–12)</strong></td>
+                <td>4.2 mph @ 16% Grade</td>
+                <td>13.5 METs</td>
+                <td>47.3 mL/kg/min</td>
+                <td>High aerobic endurance capacity; characteristic of competitive athletic populations and master endurance runners.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <strong>The Myers Landmark Veterans Affairs Trial:</strong> In a landmark investigation published in the <em>New England Journal of Medicine</em> by Dr. Jonathan Myers and colleagues evaluating 6,213 men undergoing treadmill exercise testing, peak exercise capacity in METs was stronger than any other clinical variable (including smoking, hypertension, diabetes, and left ventricular ejection fraction) in predicting mortality:
+        </p>
+        <ul>
+          <li><strong>The 12% Survival Dividend:</strong> Every 1 MET increase in peak aerobic exercise capacity was associated with a <strong>12% improvement in overall survival</strong>.</li>
+          <li>Patients capable of exercising beyond <strong>10 METs</strong> had an annual mortality rate of less than 1%, whereas those achieving less than 5 METs experienced an annual mortality rate exceeding 5% to 8%.</li>
+          <li><strong>Pre-Operative Surgical Clearance:</strong> The American College of Cardiology and American Heart Association (ACC/AHA) pre-operative guidelines utilize the 4-MET milestone (the ability to climb two flights of stairs or walk briskly up a hill without stopping) as the threshold for proceeding with major elective non-cardiac surgery without invasive cardiac catheterization.</li>
+        </ul>
+
+        <h2>Gross Energy Expenditure vs. Net Energy Expenditure</h2>
+        <p>
+          A frequent mathematical and nutritional error in sports nutrition is failing to distinguish between <strong>Gross Caloric Expenditure</strong> and <strong>Net Caloric Expenditure</strong>:
+        </p>
+        <ul>
+          <li><strong>Gross Energy Expenditure:</strong> Represents the entire caloric burn measured during an exercise session. It includes both the energy required for mechanical movement AND the baseline resting metabolic rate that the individual would have burned anyway simply by staying alive.
+          $$\text{Gross Energy Rate} = \text{MET} \times \frac{3.5 \times \text{Weight (kg)}}{200} \text{ kcal/min}$$
+          </li>
+          <li><strong>Net Energy Expenditure:</strong> Isolates the true <em>additional</em> caloric cost of the physical activity above resting baseline. Because 1 MET is by definition resting metabolic rate, Net METs is calculated by subtracting 1.0:
+          $$\text{Net METs} = \text{Gross METs} - 1.0$$
+          $$\text{Net Caloric Burn} = (\text{MET} - 1.0) \times \frac{3.5 \times \text{Weight (kg)}}{200} \times \text{Duration (min)}$$
+          </li>
+        </ul>
+        <p>
+          <strong>Nutritional Case Example:</strong> If an 80 kg individual cycles at 6.0 METs for 60 minutes:
+        </p>
+        $$\text{Gross Burn} = 6.0 \times \frac{3.5 \times 80}{200} \times 60 = 6.0 \times 1.4 \times 60 = \mathbf{504\text{ kcal}}$$
+        $$\text{Net Burn} = (6.0 - 1.0) \times \frac{3.5 \times 80}{200} \times 60 = 5.0 \times 1.4 \times 60 = \mathbf{420\text{ kcal}}$$
+        <p>
+          The difference of 84 kcal represents resting basal expenditure. If a person adds the full 504 gross kcal to their total daily energy intake while also calculating their BMR for the full 24 hours, they are <em>double-counting</em> those 84 calories, gradually compromising fat loss over consecutive training weeks.
+        </p>
+    </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <span class="logo-icon">🧮</span>
+        <span class="logo-text">CalcHub</span>
+        <p class="footer-tagline">Clinical & Engineering Precision Tools for Health and Science.</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">All Calculators</a>
+        <a href="health.html">Health Calculators</a>
+        <a href="finance.html">Financial Tools</a>
+        <a href="engineering.html">Engineering Tools</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function syncMETInput() {
+      const selectedMET = document.getElementById('met-activity').value;
+      document.getElementById('met-value').value = selectedMET;
+      calculateMETMetrics();
+    }
+
+    function calculateMETMetrics() {
+      const met = parseFloat(document.getElementById('met-value').value) || 0;
+      const duration = parseFloat(document.getElementById('met-duration').value) || 0;
+      const weightVal = parseFloat(document.getElementById('met-weight').value) || 0;
+      const unit = document.getElementById('met-unit').value;
+      const freq = parseFloat(document.getElementById('met-frequency').value) || 0;
+
+      if (met <= 0 || duration <= 0 || weightVal <= 0) return;
+
+      const weightKg = (unit === 'lbs') ? (weightVal * 0.45359237) : weightVal;
+
+      // Energy per min: MET * (3.5 * weightKg / 200)
+      const kcalPerMin = met * (3.5 * weightKg / 200);
+      const sessionKcal = Math.round(kcalPerMin * duration);
+      const weeklyKcal = Math.round(sessionKcal * freq);
+
+      // Volume: MET-min
+      const sessionMETMin = Math.round(met * duration);
+      const weeklyMETMin = Math.round(sessionMETMin * freq);
+
+      // VO2
+      const vo2 = (met * 3.5).toFixed(1);
+
+      document.getElementById('res-weekly-met-min').innerText = `${weeklyMETMin.toLocaleString()} MET-min`;
+      document.getElementById('res-session-kcal').innerText = `${sessionKcal.toLocaleString()} kcal`;
+      document.getElementById('res-weekly-kcal').innerText = `${weeklyKcal.toLocaleString()} kcal / wk`;
+      document.getElementById('res-vo2').innerText = `${vo2} mL/kg/min`;
+
+      // Intensity tier
+      let tier = 'Moderate';
+      if (met < 3.0) tier = 'Light Intensity';
+      else if (met >= 6.0) tier = 'Vigorous Intensity';
+      document.getElementById('res-intensity-tier').innerText = `${tier} (${met} METs)`;
+
+      // WHO Status
+      const whoEl = document.getElementById('res-who-status');
+      const epiEl = document.getElementById('res-epidemiology-note');
+
+      if (weeklyMETMin < 500) {
+        whoEl.innerText = 'Below WHO Recommended Target (< 500 MET-min/wk)';
+        whoEl.style.color = '#ca8a04';
+        epiEl.innerText = `Currently achieving ${weeklyMETMin} MET-minutes. Increasing frequency or duration to reach 500-1,000 MET-min/wk significantly reduces risks of stroke, cardiovascular disease, and metabolic syndrome.`;
+      } else if (weeklyMETMin <= 1000) {
+        whoEl.innerText = 'Meets WHO Recommended Health Target (500 – 1000 MET-min/wk)';
+        whoEl.style.color = '#15803d';
+        epiEl.innerText = `Achieving ${weeklyMETMin} MET-minutes weekly is associated with a 20% to 25% reduction in all-cause mortality, optimal blood pressure regulation, and enhanced glycemic control.`;
+      } else {
+        whoEl.innerText = 'Optimal Longevity & High Cardiorespiratory Volume (> 1000 MET-min/wk)';
+        whoEl.style.color = '#1d4ed8';
+        epiEl.innerText = `High activity volume (${weeklyMETMin} MET-minutes) confers near-maximal cardiovascular longevity, peak mitochondrial density, and strong protection against cardiometabolic disorders.`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', calculateMETMetrics);
+  </script>
+</body>
+</html>

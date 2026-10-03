@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ovulation Calculator | Fertile Window & Menstrual Cycle Predictor</title>
+  <meta name="description" content="Calculate your estimated ovulation date, peak fertile window, implantation timeframe, and expected period using clinical rhythm and luteal phase algorithms.">
+  <link rel="canonical" href="https://calchub.com/ovulation-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Clinical Ovulation and Fertile Window Calculator",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "description": "Calculates prospective ovulation day, six-day fertile window, peak conception dates, and implantation timeline based on menstrual cycle dynamics and luteal phase length."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How is the ovulation date calculated from the menstrual cycle?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ovulation timing is governed by the length of the luteal phase, which remains remarkably stable at approximately 14 days (ranging clinically between 11 and 16 days) across most healthy individuals. In a cycle of length CL, estimated ovulation day occurs at Od = CL - Lp, where Lp is the luteal phase length. For a typical 28-day cycle with a 14-day luteal phase, ovulation occurs on cycle day 14. For a 32-day cycle, ovulation occurs around cycle day 18."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the fertile window and how many days does it last?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The biological fertile window spans exactly six consecutive days: the five days preceding ovulation plus the day of ovulation itself. This timeframe is dictated by physiological gamete survival: healthy human spermatozoa can survive in fertile cervical mucus for up to 120 hours (5 days), while an ovulated secondary oocyte remains viable for fertilization for only 12 to 24 hours post-follicular rupture."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which days offer the highest probability of conception?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Extensive epidemiological studies by Wilcox et al. demonstrate that conception probability peaks two days prior to ovulation (Od - 2) and the day immediately preceding ovulation (Od - 1), yielding conception rates of approximately 25% to 30% per cycle. Having intercourse on the day of ovulation yields a conception probability of roughly 10% to 15%, while intercourse after ovulation has closed drops the probability near zero."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do basal body temperature (BBT) and LH test strips confirm ovulation?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Urinary luteinizing hormone (LH) test strips detect the mid-cycle LH surge (typically exceeding 25 to 40 mIU/mL), which triggers oocyte release 24 to 36 hours later, functioning as a prospective predictor. Conversely, basal body temperature (BBT) shifts upward by 0.4°F to 1.0°F (0.2°C to 0.5°C) 24 to 48 hours after ovulation due to the thermogenic effect of progesterone secreted by the corpus luteum, serving as retrospective confirmation."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What happens if menstrual cycles are irregular?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "For irregular cycles, calendar algorithms use the shortest and longest recorded cycles over the prior 6 to 12 months. The first fertile day is estimated as shortest cycle minus 18 days, while the last fertile day is longest cycle minus 11 days. However, because cycle irregularity is frequently driven by variable follicular phase recruitment or conditions like PCOS, tracking cervical mucus and urinary LH surges provides substantially greater predictive reliability."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="header">
+    <div class="header-container">
+      <div class="header-logo">
+        <a href="index.html" class="logo-link">
+          <span class="logo-icon">🧮</span>
+          <span class="logo-text">CalcHub</span>
+        </a>
+      </div>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="health.html" class="nav-link active">Health & Fitness</a>
+        <a href="finance.html" class="nav-link">Finance</a>
+        <a href="engineering.html" class="nav-link">Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <nav class="breadcrumb-nav">
+      <ol class="breadcrumb-list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="health.html">Health & Fitness</a></li>
+        <li class="active">Ovulation Calculator</li>
+      </ol>
+    </nav>
+
+    <div class="page-layout">
+      <div class="calculator-container">
+        <div class="calculator-card">
+          <h1 class="calculator-title">Clinical Ovulation & Fertile Window Calculator</h1>
+          <p class="calculator-subtitle">Predict estimated ovulation day, peak conception dates, blastocyst implantation window, and next menstrual cycle onset based on endocrinological cycle parameters.</p>
+
+          <form id="ovulation-form" class="calculator-form">
+            <div class="form-group">
+              <label for="lmp-date" class="form-label">First Day of Last Menstrual Period (LMP)</label>
+              <input type="date" id="lmp-date" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+              <label for="cycle-length" class="form-label">Average Menstrual Cycle Length (Days)</label>
+              <div class="slider-container">
+                <input type="range" id="cycle-length" min="21" max="45" value="28" class="form-slider">
+                <span id="cycle-length-val" class="slider-display">28 days</span>
+              </div>
+              <small class="form-hint">Normal adult cycle duration ranges from 21 to 35 days (average 28 days).</small>
+            </div>
+
+            <div class="form-group">
+              <label for="luteal-length" class="form-label">Luteal Phase Duration (Days)</label>
+              <div class="slider-container">
+                <input type="range" id="luteal-length" min="10" max="16" value="14" class="form-slider">
+                <span id="luteal-length-val" class="slider-display">14 days (Default)</span>
+              </div>
+              <small class="form-hint">The post-ovulatory luteal phase is typically 14 days (clinically normal: 11–16 days).</small>
+            </div>
+
+            <button type="submit" class="calculate-btn">Calculate Fertile Window & Timeline</button>
+          </form>
+
+          <div id="calculator-results" class="results-container" style="display: none;">
+            <h2 class="results-heading">Fertility Profile & Cycle Milestones</h2>
+            
+            <div class="results-grid">
+              <div class="result-card primary-result">
+                <span class="result-label">Estimated Ovulation Date</span>
+                <span id="res-ovulation-date" class="result-value">--</span>
+                <span id="res-cycle-day" class="result-subtext">Cycle Day --</span>
+              </div>
+
+              <div class="result-card highlight-card">
+                <span class="result-label">Peak Conception Window</span>
+                <span id="res-peak-window" class="result-value">--</span>
+                <span class="result-subtext">Highest pregnancy probability (Days -2 to 0)</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Full Fertile Window (6 Days)</span>
+                <span id="res-fertile-window" class="result-value">--</span>
+                <span class="result-subtext">5 days prior to ovulation + Ovulation day</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Implantation Window</span>
+                <span id="res-implantation-window" class="result-value">--</span>
+                <span class="result-subtext">Days 6 to 12 post-ovulation</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Earliest Reliable Home Pregnancy Test</span>
+                <span id="res-test-date" class="result-value">--</span>
+                <span class="result-subtext">Sensitive urinary hCG test (≥25 mIU/mL)</span>
+              </div>
+
+              <div class="result-card">
+                <span class="result-label">Next Expected Menstrual Period</span>
+                <span id="res-next-period" class="result-value">--</span>
+                <span class="result-subtext">Onset of next follicular cycle</span>
+              </div>
+            </div>
+
+            <div class="summary-box mt-4">
+              <h3 class="summary-title">Conception Projection</h3>
+              <p id="res-edd-summary" class="summary-text">If fertilization occurs during this cycle's fertile window, your estimated gestational age will reach 40 completed weeks on approximately <strong id="res-edd-date">--</strong>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+            <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚖️</span>
+            <h3 class="widget-title">Related Health & Fitness</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bmr-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMR Calculator</a></li>
+            <li><a href="macro-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Macro Split Calculator</a></li>
+            <li><a href="calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Calculator (TDEE)</a></li>
+            <li><a href="bmi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Daily Water Intake</a></li>
+            <li><a href="a1c-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> HbA1c to eAG Glucose Sizer</a></li>
+            <li><a href="bac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Blood Alcohol (BAC) Clearance</a></li>
+            <li><a href="body-surface-area-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Surface Area (Mosteller)</a></li>
+            <li><a href="bsa-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Oncology BSA & Calvert Dosing</a></li>
+            <li><a href="calorie-deficit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Deficit & Fat Loss Planner</a></li>
+            <li><a href="calories-burned-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exercise Calories Burned (METs)</a></li>
+            <li><a href="carbohydrate-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Carbohydrate Intake & Glycogen</a></li>
+            <li><a href="cholesterol-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cholesterol Ratio & Castelli Risk</a></li>
+            <li><a href="due-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Due Date & Gestation</a></li>
+            <li><a href="fat-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Dietary Fat Intake (Grams/Day)</a></li>
+            <li><a href="heart-rate-zone-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heart Rate Zone (Karvonen HRR)</a></li>
+            <li><a href="lean-body-mass-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lean Body Mass (Boer & James)</a></li>
+            <li><a href="max-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Max Heart Rate (Tanaka & Gulati)</a></li>
+            <li><a href="met-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> METs & Activity Caloric Burn</a></li>
+            <li><a href="ovulation-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Ovulation & Fertile Window</a></li>
+            <li><a href="pregnancy-weight-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Weight Gain (IOM/ACOG)</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="health.html" class="sidebar-category-link">View All Health & Fitness Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <article class="article-body">
+      <h2>The Physiology of Human Ovulation and the Menstrual Cycle</h2>
+      <p>Human reproduction depends on the precisely orchestrated neuroendocrine signaling cascade of the <strong>Hypothalamic-Pituitary-Ovarian (HPO) axis</strong>. Each menstrual cycle represents an integrated sequence of ovarian follicular maturation, episodic steroidogenesis, endometrial differentiation, and, in the absence of conception, programmed tissue breakdown and menstruation. Clinically, a normal menstrual cycle in healthy reproductive-age women ranges between 21 and 35 days, with an average duration of 28 days. While popular intuition frequently assumes that ovulation occurs precisely on day 14 of every woman's cycle, clinical endocrinology demonstrates that cycle variability is predominantly driven by fluctuations in the pre-ovulatory <em>follicular phase</em>, whereas the post-ovulatory <em>luteal phase</em> maintains relative temporal stability.</p>
+
+      <p>The menstrual cycle is chronologically divided into two principal ovarian phases separated by ovulation:</p>
+      <ul>
+        <li><strong>Follicular Phase:</strong> Commencing with the first day of menses (Cycle Day 1), pulsatile secretion of Gonadotropin-Releasing Hormone (GnRH) from the arcuate nucleus of the hypothalamus stimulates the anterior pituitary gland to synthesize and secrete Follicle-Stimulating Hormone (FSH) and Luteinizing Hormone (LH). Circulating FSH recruits an initial cohort of antral follicles within the ovaries. As FSH levels begin to decline mid-follicular phase, the follicle exhibiting the highest density of granulosa cell FSH receptors and aromatase activity emerges as the <em>dominant Graafian follicle</em>, while subordinate cohort follicles undergo apoptotic atresia. Granulosa cells within the dominant follicle progressively secrete rising quantities of 17&beta;-estradiol ($E_2$), which induces rapid proliferation of the endometrial functionalis layer.</li>
+        <li><strong>Ovulatory Phase:</strong> When circulating estradiol levels exceed an empirical threshold of approximately 200 pg/mL for at least 36 to 48 consecutive hours, estrogen exerts a positive feedback switch on the hypothalamus and anterior pituitary. This trigger unleashes a massive, synchronized surge of LH and FSH. The surge activates proteolytic enzymes (including collagenases and plasminogen activator) and prostaglandin synthesis within the follicular wall, inducing thinning and ultimate rupture of the follicular stigma. The secondary oocyte, arrested in metaphase of meiosis II and enveloped by the corona radiata and cumulus oophorus, is extruded into the peritoneal cavity and captured by the fimbriae of the fallopian tube (oviduct). Follicular rupture occurs approximately 24 to 36 hours following the initiation of the LH surge, and 10 to 12 hours after peak LH serum concentrations.</li>
+        <li><strong>Luteal Phase:</strong> Following extrusion of the oocyte, the remnants of the collapsed follicle undergo profound vascularization and cellular transformation, luteinizing into the <em>corpus luteum</em>. Under tonic LH stimulation, the corpus luteum secretes substantial concentrations of progesterone and estradiol. Progesterone arrests endometrial epithelial proliferation and induces dense stromal edema, glycogen-rich glandular secretion, and spiral artery coiling, preparing the endometrial stroma for blastocyst implantation. In the absence of embryonic human chorionic gonadotropin (hCG) signaling, the corpus luteum undergoes functional and structural luteolysis around day 12 to 14 post-ovulation, precipitating progesterone withdrawal, vasoconstriction of spiral arteries, endometrial ischemia, and menstrual sloughing.</li>
+      </ul>
+
+      <h2>Mathematical Modeling of the Fertile Window & Ovulation Timing</h2>
+      <p>The estimation of prospective ovulation timing rests on the biological invariance of the luteal phase duration ($L_p$). While the follicular phase can range widely from 7 to over 25 days depending on individual metabolic, psychological, and physiological variables, the lifespan of the corpus luteum is biologically constrained by programmed luteolytic pathways. Across clinical cohorts, the healthy human luteal phase averages 14 days, with a normal physiological spectrum spanning 11 to 16 days. For any menstrual cycle of known duration $C_L$ and luteal duration $L_p$, the estimated ovulation day ($O_d$) relative to the onset of the Last Menstrual Period (LMP) is expressed as:</p>
+
+      $$O_d = C_L - L_p$$
+
+      <p>In standard 28-day cycles with a normative 14-day luteal phase, ovulation occurs on day $28 - 14 = 14$. In a 34-day cycle, follicular recruitment requires a prolonged timeframe, placing ovulation at day $34 - 14 = 20$. Conversely, in a 24-day cycle, ovulation occurs around cycle day $24 - 14 = 10$.</p>
+
+      <h3>The Biological Six-Day Fertile Window</h3>
+      <p>Conception requires the concurrent presence of viable spermatozoa and a fertile oocyte within the ampullary portion of the fallopian tube. The temporal boundaries of the <strong>fertile window</strong> are strictly determined by the maximum functional survival spans of human male and female gametes within the female reproductive tract:</p>
+      <ul>
+        <li><strong>Spermatozoon Viability:</strong> In the presence of estrogen-primed, hydrated cervical mucus containing linear glycoprotein micellar channels, ejaculated human spermatozoa can maintain progressive motility, survive capacitation, and retain fertilizing capability for up to <strong>120 hours (5 days)</strong> within the crypts of the uterine cervix and fallopian tubes.</li>
+        <li><strong>Oocyte Viability:</strong> Following follicular extrusion, the unfertilized secondary oocyte exhibits a highly restricted viability window. Structural deterioration of the zona pellucida and metabolic decline limit fertilizability to <strong>12 to 24 hours</strong> post-ovulation.</li>
+      </ul>
+
+      <p>Consequently, the biologically active fertile window spans exactly six consecutive days: the five days preceding ovulation plus the day of ovulation itself:</p>
+
+      $$\text{Fertile Window} = [O_d - 5, O_d]$$
+
+      <h3>Epidemiological Probability of Daily Conception</h3>
+      <p>Seminal prospective cohort studies conducted by Dr. Allen Wilcox and colleagues (National Institute of Environmental Health Sciences, published in the <em>New England Journal of Medicine</em>) tracked daily urinary hormone metabolites and timed intercourse across hundreds of menstrual cycles. Their findings established that daily conception probabilities are not uniform across the fertile window. Intercourse occurring two days prior to ovulation or one day prior to ovulation yields the highest likelihood of successful fertilization and clinical pregnancy:</p>
+
+      $$P(\text{Conception} \mid \text{Intercourse on Day } t) = \begin{cases} 0.04 & t = O_d - 5 \\ 0.08 & t = O_d - 4 \\ 0.15 & t = O_d - 3 \\ 0.27 & t = O_d - 2 \\ 0.31 & t = O_d - 1 \\ 0.12 & t = O_d \\ < 0.01 & t \ge O_d + 1 \end{cases}$$
+
+      <p>This mathematical distribution demonstrates that sexual intercourse occurring 24 to 48 hours prior to ovulation maximizes reproductive efficacy because an ample pool of capacitated spermatozoa is already sequestered within the tubal ampulla at the precise instant the oocyte arrives from the infundibulum.</p>
+
+      <div class="table-container my-4">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Menstrual Cycle Phase</th>
+              <th>Typical Cycle Days (28-Day Cycle)</th>
+              <th>Dominant Sex Hormone</th>
+              <th>Endometrial State</th>
+              <th>Cervical Mucus Quality</th>
+              <th>Conception Probability</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Early Follicular (Menses)</strong></td>
+              <td>Days 1 – 5</td>
+              <td>Low Estrogen & Low Progesterone</td>
+              <td>Desquamation / Menstrual sloughing</td>
+              <td>Scant, thick, cellular, acidic</td>
+              <td>Extremely Low (&lt;1%)</td>
+            </tr>
+            <tr>
+              <td><strong>Mid Follicular</strong></td>
+              <td>Days 6 – 9</td>
+              <td>Rising 17&beta;-Estradiol ($E_2$)</td>
+              <td>Proliferative (re-epithelialization)</td>
+              <td>Tacky, sticky, whitish, opaque</td>
+              <td>Low (1% – 5%)</td>
+            </tr>
+            <tr>
+              <td><strong>Late Follicular (Fertile Window)</strong></td>
+              <td>Days 10 – 13</td>
+              <td>Peak Estradiol (&gt;200 pg/mL)</td>
+              <td>Late Proliferative (thickened trilaminar)</td>
+              <td>Watery, clear, stretchy egg-white ($&ge;8$ cm spinnbarkeit)</td>
+              <td><strong>Peak (15% – 31%)</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Ovulation</strong></td>
+              <td>Day 14</td>
+              <td>LH Surge & Secondary FSH Peak</td>
+              <td>Periovulatory / Transition to Secretory</td>
+              <td>Abundant, slippery, alkaline ($pH \approx 7.5$)</td>
+              <td>High (10% – 15%)</td>
+            </tr>
+            <tr>
+              <td><strong>Early to Mid Luteal</strong></td>
+              <td>Days 15 – 22</td>
+              <td>High Progesterone & Moderate $E_2$</td>
+              <td>Secretory (glycogen-rich vacuoles)</td>
+              <td>Rapid thickening, cellular, tacky, hostile plug</td>
+              <td>Zero (&lt;0.1%)</td>
+            </tr>
+            <tr>
+              <td><strong>Late Luteal (Premenstrual)</strong></td>
+              <td>Days 23 – 28</td>
+              <td>Falling Progesterone & $E_2$</td>
+              <td>Ischemic / Spiral artery constriction</td>
+              <td>Dry, scant, impenetrable to sperm</td>
+              <td>Zero (Inconceivable)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Primary Biological Markers and Ovulation Detection Modalities</h2>
+      <p>While calendar algorithms provide an indispensable predictive baseline, multi-modal biological tracking substantially increases the accuracy of pinpointing ovulation in clinical practice. The primary validated biological markers include:</p>
+
+      <h3>1. Urinary Luteinizing Hormone (LH) Immunochromatography</h3>
+      <p>Home ovulation predictor kits (OPKs) utilize qualitative or semi-quantitative lateral flow immunoassay strips that detect urinary LH excretion. Under baseline follicular conditions, tonic LH levels range from 2 to 10 mIU/mL. The mid-cycle surge triggers a precipitous rise to 25 to 100 mIU/mL. A positive OPK test indicates that circulating LH has crossed the analytical threshold, signifying that follicular rupture will typically ensue within <strong>24 to 36 hours</strong> (and within 10 to 16 hours of the LH peak). In women with polycystic ovary syndrome (PCOS), chronically elevated baseline LH levels can generate false-positive results, necessitating specialized quantitative tracking or ultrasound correlation.</p>
+
+      <h3>2. Cervical Mucus Analysis (Billings & Creighton Models)</h3>
+      <p>Under the influence of rising mid-follicular estradiol, the cervical crypts synthesize Type E (estrogenic) mucus, which is thin, alkaline, highly hydrated (98% water), and rich in mucin macromolecules organized into parallel linear chains. This fertile mucus exhibits significant <em>spinnbarkeit</em> (elastic stretching to 8–12 cm without tearing) and displays microscopic "ferning" (crystallization into arborizing sodium chloride and potassium chloride dendrites upon drying). Cervical mucus provides a functional biological conduit that neutralizes vaginal acidity, nourishes sperm, and filters morphologically abnormal spermatozoa.</p>
+
+      <h3>3. Basal Body Temperature (BBT) Biphasic Shift</h3>
+      <p>Basal body temperature tracking requires taking oral, vaginal, or axillary temperature immediately upon awakening after at least four hours of uninterrupted sleep, prior to any physical exertion. Progesterone produced by the newly formed corpus luteum acts directly on the thermoregulatory preoptic nucleus of the anterior hypothalamus, elevating systemic basal body temperature by $0.4^\circ\text{F}\text{ to }1.0^\circ\text{F}$ ($0.2^\circ\text{C}\text{ to }0.5^\circ\text{C}$). The <em>Coverline rule</em> requires three consecutive daily temperatures that are at least $0.2^\circ\text{F}$ higher than the preceding six consecutive baseline follicular days. Crucially, BBT elevation confirms that ovulation has already occurred 24 to 48 hours prior; it is a retrospective confirmatory tool rather than a prospective planning tool.</p>
+
+      <h3>4. Transvaginal Ultrasound (Folliculometry)</h3>
+      <p>Serial transvaginal ultrasonography represents the gold-standard diagnostic reference in reproductive medicine. Serial imaging documents follicular enlargement at a rate of 1.5 to 2.0 mm per day until the dominant Graafian follicle attains a pre-ovulatory mean diameter of 18 to 24 mm. Imminent ovulation is evidenced by the appearance of the <em>cumulus oophorus</em> within the follicular antrum. Successful ovulation is confirmed by the sudden disappearance or collapse of the dominant follicle, internal echoes indicating hemorrhagic filling (corpus hemorrhagicum), and the appearance of free fluid within the pouch of Douglas (rectouterine pouch).</p>
+
+      <h2>Step-by-Step Worked Clinical Case Study</h2>
+      <p>To illustrate the practical calculation of fertile windows, ovulation timing, and subsequent gestational milestones, consider the following reproductive endocrinology scenario:</p>
+
+      <div class="worked-example-card my-4">
+        <h3 class="example-title">Clinical Case Profile: Ovulation & Conception Forecasting</h3>
+        <p><strong>Patient Baseline:</strong> A 31-year-old female with regular 31-day menstrual cycles and a documented 14-day luteal phase is actively timing conception. The first day of her Last Menstrual Period (LMP) was recorded on <strong>October 1</strong>.</p>
+        
+        <div class="example-step">
+          <div class="step-num">Step 1</div>
+          <div class="step-content">
+            <strong>Determine Cycle Day of Ovulation ($O_d$):</strong>
+            $$\text{Cycle Length } (C_L) = 31 \text{ days}, \quad \text{Luteal Phase } (L_p) = 14 \text{ days}$$
+            $$O_d = C_L - L_p = 31 - 14 = \text{Cycle Day 17}$$
+            Starting from LMP on October 1 (Cycle Day 1), adding 16 elapsed days places the estimated ovulation date on <strong>October 17</strong>.
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 2</div>
+          <div class="step-content">
+            <strong>Calculate the Six-Day Biological Fertile Window:</strong>
+            $$\text{Fertile Window} = [O_d - 5, O_d] = [\text{Cycle Day 12}, \text{Cycle Day 17}]$$
+            Corresponding calendar dates: <strong>October 12 through October 17</strong>. Intercourse during this six-day window allows spermatozoa to survive and intercept the ovulated secondary oocyte.
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 3</div>
+          <div class="step-content">
+            <strong>Pinpoint the Peak Fertility Window:</strong>
+            Peak statistical conception rates occur at $O_d - 2$, $O_d - 1$, and $O_d$ (Cycle Days 15, 16, and 17).
+            $$\text{Peak Probability Window} = \mathbf{\text{October 15, 16, and 17}}$$
+            Coitus scheduled every 24 to 48 hours across these peak days yields cumulative per-cycle fecundity exceeding 30%.
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 4</div>
+          <div class="step-content">
+            <strong>Calculate Implantation Window and Pregnancy Testing Date:</strong>
+            Following successful tubal fertilization, the cleaving embryo traverses the fallopian tube as a morula and enters the uterine cavity as a blastocyst. Blastocyst apposition, adhesion, and syncytiotrophoblast invasion into the endometrial decidua occur between days 6 and 12 post-ovulation (median day 8–9).
+            $$\text{Implantation Window} = [O_d + 6, O_d + 12] = [\text{Cycle Day 23}, \text{Cycle Day 29}] = \mathbf{\text{October 23 to October 29}}$$
+            Syncytiotrophoblast invasion secretes hCG into the maternal circulation. Serum hCG doubles every 48 hours. Detectable urinary excretion ($\ge 25\text{ mIU/mL}$) occurs reliably 13 to 14 days post-ovulation: <strong>October 30 or October 31</strong> (coinciding with the expected date of next menses).
+          </div>
+        </div>
+
+        <div class="example-step">
+          <div class="step-num">Step 5</div>
+          <div class="step-content">
+            <strong>Project Estimated Due Date (EDD) if Conceived:</strong>
+            Because this cycle is 31 days (3 days longer than the standard 28-day model), standard Naegele's rule must be adjusted by adding the extra 3 days:
+            $$\text{Adjusted EDD} = \text{LMP} + 280 \text{ days} + (C_L - 28) = \text{Oct 1} + 280 + 3 = \mathbf{\text{July 11 of the subsequent year}}$$
+            Alternatively, calculating from conception day: $O_d + 266 \text{ days} = \text{Oct 17} + 266 \text{ days} = \text{July 11}$.
+          </div>
+        </div>
+      </div>
+
+      <h2>Clinical Factors Influencing Ovulatory Predictability</h2>
+      <p>While mathematical calculators provide an exceptional structural baseline, multiple endocrinological, pharmacological, and physiological conditions can alter or suppress normal ovulatory patterns:</p>
+      <ul>
+        <li><strong>Polycystic Ovary Syndrome (PCOS):</strong> Characterized by hyperandrogenism, chronic ovulatory dysfunction (oligomenorrhea or amenorrhea), and polycystic ovarian morphology on ultrasound (Rotterdam criteria). Altered LH pulse frequency and relative FSH deficiency arrest follicular development at the 5–8 mm stage, producing irregular, unannounced, or absent ovulation.</li>
+        <li><strong>Functional Hypothalamic Amenorrhea (FHA):</strong> Severe energy deficit, excessive endurance training, or intense psychological distress activates the hypothalamic-pituitary-adrenal (HPA) axis. Elevated corticotropin-releasing hormone (CRH) suppresses pulsatile GnRH secretion, precipitating severe hypogonadotropic hypogonadism and anovulation.</li>
+        <li><strong>Hyperprolactinemia:</strong> Elevated serum prolactin (secondary to prolactinomas, dopamine antagonist medications, or untreated primary hypothyroidism) suppresses kisspeptin neuronal signaling, dampening GnRH release and inhibiting normal follicular maturation.</li>
+        <li><strong>Perimenopausal Transition:</strong> Depletion of the primordial follicle pool reduces inhibin-B feedback, resulting in compensatory hyper-elevation of serum FSH. Follicular phases shorten significantly, and erratic anovulatory cycles alternate with unexpected early ovulatory events.</li>
+      </ul>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <span class="logo-icon">🧮</span>
+            <span class="logo-text">CalcHub</span>
+          </div>
+          <p class="footer-tagline">Clinical, financial, and engineering reference calculators built with precision and peer-reviewed rigor.</p>
+        </div>
+        <div class="footer-links">
+          <h4 class="footer-heading">Health Calculators</h4>
+          <ul class="footer-nav">
+            <li><a href="due-date-calculator.html">Due Date Calculator</a></li>
+            <li><a href="pregnancy-weight-gain-calculator.html">Pregnancy Weight Gain</a></li>
+            <li><a href="a1c-calculator.html">A1C Blood Sugar Calculator</a></li>
+            <li><a href="bac-calculator.html">Blood Alcohol Concentration</a></li>
+            <li><a href="heart-rate-zone-calculator.html">Heart Rate Zone Calculator</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4 class="footer-heading">Categories</h4>
+          <ul class="footer-nav">
+            <li><a href="health.html">Health & Fitness</a></li>
+            <li><a href="finance.html">Financial Tools</a></li>
+            <li><a href="engineering.html">Engineering</a></li>
+            <li><a href="index.html">Directory</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CalcHub. Educational and clinical calculation tools. Medical calculations must be verified by a board-certified physician.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('ovulation-form');
+      const lmpInput = document.getElementById('lmp-date');
+      const cycleSlider = document.getElementById('cycle-length');
+      const cycleVal = document.getElementById('cycle-length-val');
+      const lutealSlider = document.getElementById('luteal-length');
+      const lutealVal = document.getElementById('luteal-length-val');
+      const resultsContainer = document.getElementById('calculator-results');
+
+      // Set default LMP to 14 days ago
+      const today = new Date();
+      const defaultLmp = new Date(today.getTime() - (14 * 86400000));
+      lmpInput.value = defaultLmp.toISOString().split('T')[0];
+
+      cycleSlider.addEventListener('input', function() {
+        cycleVal.textContent = cycleSlider.value + ' days';
+      });
+
+      lutealSlider.addEventListener('input', function() {
+        lutealVal.textContent = lutealSlider.value + ' days';
+      });
+
+      function formatDate(date) {
+        return date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        });
+      }
+
+      function formatShortDate(date) {
+        return date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric'
+        });
+      }
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const lmpVal = lmpInput.value;
+        if (!lmpVal) return;
+
+        // Parse date carefully in local time
+        const parts = lmpVal.split('-');
+        const lmp = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+
+        const cycleLength = parseInt(cycleSlider.value);
+        const lutealLength = parseInt(lutealSlider.value);
+
+        // Ovulation day = cycleLength - lutealLength
+        const ovulationCycleDay = cycleLength - lutealLength;
+        const ovulationDate = new Date(lmp.getTime() + (ovulationCycleDay * 86400000));
+
+        // Fertile window: 5 days before ovulation to day of ovulation
+        const fertileStart = new Date(ovulationDate.getTime() - (5 * 86400000));
+        const fertileEnd = new Date(ovulationDate.getTime());
+
+        // Peak conception window: Od - 2 to Od
+        const peakStart = new Date(ovulationDate.getTime() - (2 * 86400000));
+        const peakEnd = new Date(ovulationDate.getTime());
+
+        // Implantation window: Od + 6 to Od + 12
+        const impStart = new Date(ovulationDate.getTime() + (6 * 86400000));
+        const impEnd = new Date(ovulationDate.getTime() + (12 * 86400000));
+
+        // Earliest test date: Od + 12
+        const testDate = new Date(ovulationDate.getTime() + (12 * 86400000));
+
+        // Next period date: LMP + cycleLength
+        const nextPeriod = new Date(lmp.getTime() + (cycleLength * 86400000));
+
+        // EDD: Conception date + 266 days
+        const eddDate = new Date(ovulationDate.getTime() + (266 * 86400000));
+
+        // Display results
+        document.getElementById('res-ovulation-date').textContent = formatDate(ovulationDate);
+        document.getElementById('res-cycle-day').textContent = 'Cycle Day ' + (ovulationCycleDay + 1);
+        document.getElementById('res-peak-window').textContent = formatShortDate(peakStart) + ' – ' + formatShortDate(peakEnd);
+        document.getElementById('res-fertile-window').textContent = formatShortDate(fertileStart) + ' – ' + formatShortDate(fertileEnd);
+        document.getElementById('res-implantation-window').textContent = formatShortDate(impStart) + ' – ' + formatShortDate(impEnd);
+        document.getElementById('res-test-date').textContent = formatDate(testDate);
+        document.getElementById('res-next-period').textContent = formatDate(nextPeriod);
+        document.getElementById('res-edd-date').textContent = formatDate(eddDate);
+
+        resultsContainer.style.display = 'block';
+        resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+
+      // Run on initial load
+      form.dispatchEvent(new Event('submit'));
+    });
+  </script>
+</body>
+</html>

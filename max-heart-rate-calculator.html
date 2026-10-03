@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Max Heart Rate Calculator | Tanaka, Gellish, Gulati & Fox Formulas</title>
+  <meta name="description" content="Calculate your true maximum heart rate (HRmax) comparing Tanaka, Gellish, Gulati (female-specific), Fairbarn, and Fox formulas. Age-graded athletic dispersion.">
+  <link rel="canonical" href="https://calchub.com/max-heart-rate-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Clinical Maximum Heart Rate (HRmax) Multi-Formula Calculator",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "description": "Calculates maximum heart rate comparing Tanaka, Gellish, Gulati (female-specific), Fairbarn, and classic Fox equations with standard error of estimate intervals."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Why is the traditional '220 - Age' formula considered inaccurate?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The classic Fox and Haskell formula (220 - Age), created in 1971 from a compilation of eleven disparate observational studies, lacks formal regression validation. Scientific reviews by Robergs and Landwehr demonstrated that it has a standard error of estimate (SEE) of ±11 to ±12 beats per minute, systematically overestimating HRmax in young adults under 30 and severely underestimating HRmax in adults over 50 by up to 15 bpm."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the Tanaka formula for maximum heart rate?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Tanaka formula [HRmax = 208 - (0.7 × Age)] was derived in 2001 by Dr. Hirofumi Tanaka and colleagues through a meta-analysis of 351 laboratory studies involving 18,712 healthy human subjects. It maintains superior statistical consistency across broad adult populations."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why do women need a gender-specific HRmax formula like the Gulati equation?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "In 2010, the St. James Women Take Heart Project led by Dr. Martha Gulati evaluated 5,437 asymptomatic women and established that female maximum heart rate declines at a faster rate with age than male heart rate. The resulting Gulati formula [HRmax = 206 - (0.88 × Age)] prevents significant over-prescription of exercise intensity in older female athletes."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why does maximum heart rate decline as we age?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Age-related HRmax decline is driven by electrophysiological remodeling of the sinoatrial (SA) node, including a decrease in intrinsic pacemaking rate, gradual fibrosis of conductive nodal tissue, and progressive desensitization and downregulation of cardiac beta-1 adrenergic receptors to sympathetic catecholamines."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="header">
+    <div class="header-container">
+      <div class="header-logo">
+        <a href="index.html" class="logo-link">
+          <span class="logo-icon">🧮</span>
+          <span class="logo-text">CalcHub</span>
+        </a>
+      </div>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="health.html" class="nav-link active">Health & Fitness</a>
+        <a href="finance.html" class="nav-link">Finance</a>
+        <a href="engineering.html" class="nav-link">Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="calculator-container">
+      <div class="calculator-header">
+        <div class="badge-tag">Exercise Cardiology</div>
+        <h1 class="calculator-title">Maximum Heart Rate (HRmax) Sizer</h1>
+        <p class="calculator-description">Calculate and compare your maximum heart rate across the top validated physiological formulas: Tanaka, Gellish, Gulati (Women), Fairbarn, and Fox.</p>
+      </div>
+
+      <div class="calculator-grid">
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">Demographic Parameters</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group">
+                <label for="hrmax-age" class="form-label">Age (Years)</label>
+                <input type="number" id="hrmax-age" class="form-input" value="45" min="10" max="100" step="1" oninput="calculateHRMax()">
+              </div>
+              <div class="form-group">
+                <label for="hrmax-gender" class="form-label">Biological Sex</label>
+                <select id="hrmax-gender" class="form-select" onchange="calculateHRMax()">
+                  <option value="male" selected>Male</option>
+                  <option value="female">Female (Enables Gulati Model)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="hrmax-primary" class="form-label">Primary Reference Algorithm</label>
+              <select id="hrmax-primary" class="form-select" onchange="calculateHRMax()">
+                <option value="tanaka" selected>Tanaka et al. (2001) - 208 - (0.7 × Age) [General Standard]</option>
+                <option value="gellish">Gellish et al. (2007) - 207 - (0.7 × Age) [Stress Test Standard]</option>
+                <option value="gulati">Gulati et al. (2010) - 206 - (0.88 × Age) [Female Cohort]</option>
+                <option value="fairbarn">Fairbarn et al. (1994) - Gender-Specific Regression</option>
+                <option value="fox">Fox &amp; Haskell (1971) - 220 - Age [Legacy Comparison]</option>
+              </select>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="calculateHRMax()">Compute Maximum Heart Rate</button>
+          </div>
+        </div>
+
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">Calculated Maximum Heart Rate</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="result-hero" style="background:#eff6ff;border-color:#bfdbfe;">
+              <span class="hero-label">Primary Estimated HRmax (Tanaka)</span>
+              <div class="hero-value" id="res-hrmax-primary" style="color:#1d4ed8;font-size:2.4rem;">177 BPM</div>
+              <span class="form-hint" id="res-hrmax-range">95% Statistical Confidence Band: 167 – 187 BPM (±10 bpm)</span>
+            </div>
+
+            <div class="results-grid" style="margin-top:1.5rem;">
+              <div class="result-item">
+                <span class="result-label">Gellish Formula</span>
+                <span class="result-value" id="res-hrmax-gellish">176 BPM</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Gulati (Women)</span>
+                <span class="result-value" id="res-hrmax-gulati">166 BPM</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Fairbarn Formula</span>
+                <span class="result-value" id="res-hrmax-fairbarn">173 BPM</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Legacy Fox (220-Age)</span>
+                <span class="result-value" id="res-hrmax-fox">175 BPM</span>
+              </div>
+            </div>
+
+            <div class="stat-box" style="margin-top:1.5rem;padding:1rem;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+              <h4 style="font-weight:700;margin-bottom:0.5rem;font-size:0.95rem;">Exercise Intensity Guidelines (Tanaka Baseline):</h4>
+              <p id="res-intensity-targets" style="font-size:0.875rem;color:#475569;margin:0;">
+                Moderate Aerobic (64%–76%): <strong>113 – 135 BPM</strong> | Vigorous / Threshold (77%–95%): <strong>136 – 168 BPM</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <article class="article-body">
+        <h2>Electrophysiological Basis of Maximum Heart Rate</h2>
+        <p>
+          Maximum heart rate ($HR_{\text{max}}$) is the highest number of contractions the myocardium can execute in one minute during an all-out, maximal graded exercise stress test to volitional exhaustion. Unlike resting heart rate, which demonstrates dramatic plasticity in response to aerobic exercise conditioning, <strong>maximum heart rate is fundamentally non-trainable</strong>. An Olympic marathon champion and a sedentary individual of identical age possess essentially identical physiological maximum heart rates.
+        </p>
+        <p>
+          The intrinsic biological ceiling of cardiac rate is governed by the biophysics of the <strong>sinoatrial (SA) node</strong>, the primary cardiac pacemaker situated at the junction of the superior vena cava and the right atrium. Spontaneous action potentials in the SA node are initiated by hyperpolarization-activated cyclic nucleotide-gated ($HCN4$) channels generating the inward "funny" sodium current ($I_f$), followed by transient T-type ($Ca_v3.1$) and long-lasting L-type ($Ca_v1.2$) calcium channel influx.
+        </p>
+
+        <h2>Why Does Maximum Heart Rate Inevitably Decline with Age?</h2>
+        <p>
+          Across mammalian species, aging produces a universal, linear decrement in maximum chronotropic capacity (roughly 0.7 to 1.0 beats per minute per year in humans). Multiple electrophysiological mechanisms drive this decline:
+        </p>
+        <ol>
+          <li><strong>Structural Remodeling of the Pacemaker:</strong> With chronological aging, the total number of functional P-cells within the sinoatrial node declines, accompanied by progressive fibrofatty infiltration of the nodal extracellular matrix.</li>
+          <li><strong>$\beta_1$-Adrenergic Receptor Downregulation:</strong> Under high-intensity exercise stress, systemic catecholamines (epinephrine and norepinephrine) bind to myocardial $\beta_1$-adrenergic receptors, activating adenylyl cyclase and boosting intracellular cyclic AMP ($cAMP$). In aging myocardium, $\beta_1$-receptor density decreases by 30% to 50%, and post-receptor signal transduction is attenuated, muting the inotropic and chronotropic response to sympathetic stimulation.</li>
+          <li><strong>Intrinsic Action Potential Prolongation:</strong> Repolarization velocity slows with age due to decreased density of rapidly activating delayed rectifier potassium channels ($I_{Kr}$ and $I_{Ks}$), lengthening the absolute refractory period of atrial myocytes and preventing higher frequencies.</li>
+        </ol>
+
+        <h2>Critical Evaluation of Validated HRmax Prediction Equations</h2>
+
+        <div class="formula-box">
+          <p><strong>1. The Tanaka Formula (2001) - Gold Standard Meta-Analysis:</strong></p>
+          $$HR_{\text{max}} = 208 - (0.7 \times \text{Age})$$
+          <p>
+            Published in the <em>Journal of the American College of Cardiology</em> by Dr. Hirofumi Tanaka, Kevin Monahan, and Douglas Seals, this equation synthesized data from 351 studies encompassing 18,712 subjects. It established that the rate of HRmax decline is independent of sex and habitual physical activity status.
+          </p>
+        </div>
+
+        <div class="formula-box">
+          <p><strong>2. The Gellish Formula (2007) - Longitudinal Exercise Stress Protocol:</strong></p>
+          $$HR_{\text{max}} = 207 - (0.7 \times \text{Age})$$
+          <p>
+            Derived by Ronald Gellish and colleagues at the Oakland University Beaumont Center for Human Movement, this formula resulted from a meticulous 25-year longitudinal study of 132 subjects undergoing maximal treadmill stress testing. It demonstrated the highest correlation coefficient ($r = -0.93$) and lowest standard error of any single-cohort equation.
+          </p>
+        </div>
+
+        <div class="formula-box">
+          <p><strong>3. The Gulati Formula (2010) - Female-Specific Landmark Trial:</strong></p>
+          $$HR_{\text{max}} = 206 - (0.88 \times \text{Age})$$
+          <p>
+            In the <em>New England Journal of Medicine</em>, Dr. Martha Gulati published data from the St. James Women Take Heart Project evaluating 5,437 asymptomatic women. Gulati discovered that the age-related slope in women is steeper ($-0.88\text{ bpm/year}$) than the $-0.7\text{ bpm/year}$ observed in male-dominated cohorts. Using standard equations in older women overestimates their HRmax, leading to dangerously excessive exercise target prescriptions.
+          </p>
+        </div>
+
+        <div class="formula-box">
+          <p><strong>4. Fairbarn Equations (1994) - Gender-Stratified Cycle Ergometry:</strong></p>
+          $$\text{Men: } HR_{\text{max}} = 201 - (0.63 \times \text{Age})$$
+          $$\text{Women: } HR_{\text{max}} = 216 - (1.09 \times \text{Age})$$
+        </div>
+
+        <div class="formula-box">
+          <p><strong>5. Fox &amp; Haskell Formula (1971) - The Historical Artifact:</strong></p>
+          $$HR_{\text{max}} = 220 - \text{Age}$$
+          <p>
+            Despite universal presence on commercial gym equipment, this formula was never published in a peer-reviewed investigation. It arose from an arbitrary graphical line fit across an incidental collection of 11 small trials. In 2002, exercise physiologists Robert Robergs and Roberto Landwehr published a scathing review titled <em>"The Surprising History of the 'HRmax=220-age' Equation"</em>, concluding that the formula has no scientific merit and should be eradicated from clinical practice.
+          </p>
+        </div>
+
+        <h2>Comparative Formula Discrepancy Matrix Across Decades</h2>
+        <p>
+          The table below demonstrates how the classic Fox formula diverges from modern validated equations across adult life:
+        </p>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Chronological Age</th>
+                <th>Tanaka (2001)</th>
+                <th>Gellish (2007)</th>
+                <th>Gulati (Women, 2010)</th>
+                <th>Fox Legacy (220-Age)</th>
+                <th>Discrepancy (Fox vs Tanaka)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>20 Years Old</strong></td>
+                <td>194 BPM</td>
+                <td>193 BPM</td>
+                <td>188 BPM</td>
+                <td>200 BPM</td>
+                <td>Fox overestimates by +6 BPM</td>
+              </tr>
+              <tr>
+                <td><strong>30 Years Old</strong></td>
+                <td>187 BPM</td>
+                <td>186 BPM</td>
+                <td>180 BPM</td>
+                <td>190 BPM</td>
+                <td>Fox overestimates by +3 BPM</td>
+              </tr>
+              <tr>
+                <td><strong>40 Years Old</strong></td>
+                <td>180 BPM</td>
+                <td>179 BPM</td>
+                <td>171 BPM</td>
+                <td>180 BPM</td>
+                <td>Equilibrium crossover point</td>
+              </tr>
+              <tr>
+                <td><strong>50 Years Old</strong></td>
+                <td>173 BPM</td>
+                <td>172 BPM</td>
+                <td>162 BPM</td>
+                <td>170 BPM</td>
+                <td>Fox underestimates by -3 BPM</td>
+              </tr>
+              <tr>
+                <td><strong>60 Years Old</strong></td>
+                <td>166 BPM</td>
+                <td>165 BPM</td>
+                <td>153 BPM</td>
+                <td>160 BPM</td>
+                <td>Fox underestimates by -6 BPM</td>
+              </tr>
+              <tr>
+                <td><strong>70 Years Old</strong></td>
+                <td>159 BPM</td>
+                <td>158 BPM</td>
+                <td>144 BPM</td>
+                <td>150 BPM</td>
+                <td>Fox underestimates by -9 BPM</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Worked Exercise Cardiology Case Study</h2>
+        <div class="worked-example-card">
+          <div class="example-header">
+            <span class="example-badge">Exercise Cardiology Case</span>
+            <h3 class="example-title">Prescribing Target HR for a Master Female Athlete</h3>
+          </div>
+          <div class="example-step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Patient Clinical Data:</strong> A 58-year-old female master triathlete is referred for cardiac risk stratification prior to Ironman competition. She relies on heart rate monitoring for high-intensity threshold workouts. The cardiologist evaluates her HRmax using both traditional and female-specific validated algorithms.
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Calculate HRmax via Legacy Fox Formula:</strong>
+              $$HR_{\text{max (Fox)}} = 220 - 58 = \mathbf{162\text{ BPM}}$$
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>Calculate HRmax via Female-Specific Gulati Formula:</strong>
+              $$HR_{\text{max (Gulati)}} = 206 - (0.88 \times 58) = 206 - 51.04 = \mathbf{154.96\text{ BPM}} \implies 155\text{ BPM}$$
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <strong>Clinical Analysis &amp; Safety Threshold:</strong>
+              Using the legacy formula (162 bpm) overestimates her maximum cardiac rate by 7 full beats per minute. If prescribed a 90% VO2 max interval session based on Fox ($162 \times 0.90 = 146\text{ BPM}$), she would actually be operating at <strong>94.2% of her true physiological maximum</strong> ($146 / 155$), substantially increasing myocardial ischemia risk. Prescribing based on the Gulati formula ($155 \times 0.90 = 139.5 \approx 140\text{ BPM}$) ensures physiological accuracy and cardiac safety.
+            </div>
+          </div>
+        </div>
+      <h2>Standard Error of Estimate (SEE) and Individual Dispersion</h2>
+        <p>
+          A vital clinical reality emphasized by exercise physiologists—and routinely overlooked in commercial fitness applications—is that all population regression equations represent <em>statistical averages</em>, not immutable biological laws. Every maximum heart rate formula carries a significant <strong>Standard Error of Estimate (SEE)</strong>:
+        </p>
+        <div class="formula-box my-4">
+          <p><strong>Statistical Dispersion in Population HRmax Equations:</strong></p>
+          $$\text{Tanaka Formula SEE} = \pm 7.2\text{ to } 10.0\text{ BPM}$$
+          $$\text{Gellish Formula SEE} = \pm 7.0\text{ to } 8.5\text{ BPM}$$
+          $$\text{Fox Legacy Formula SEE} = \pm 11.0\text{ to } 12.5\text{ BPM}$$
+        </div>
+        <p>
+          Applying standard Gaussian probability to a 40-year-old individual whose Tanaka-predicted HRmax is 180 BPM:
+        </p>
+        <ul>
+          <li><strong>68% of Individuals (1 Standard Deviation):</strong> True physiological maximum heart rate falls between <strong>172 and 188 BPM</strong> (within ±8 BPM).</li>
+          <li><strong>95% of Individuals (2 Standard Deviations):</strong> True HRmax falls between <strong>164 and 196 BPM</strong> (within ±16 BPM).</li>
+          <li><strong>5% Extreme Outliers:</strong> Approximately 1 in 20 healthy adults exhibits a true physiological maximum heart rate that diverges by more than <strong>16 to 20 BPM</strong> from any mathematical formula!</li>
+        </ul>
+        <p>
+          <strong>Training Prescription Hazard:</strong> If an athlete whose true maximum heart rate is 198 BPM relies on an unadjusted formula predicting 180 BPM, their calculated Zone 4 threshold (85% = 153 BPM) will actually correspond to a leisurely 77% of their true capacity. Conversely, an athlete with an innate maximum of 165 BPM prescribed 153 BPM will unknowingly be pushed into intense, fatiguing anaerobic distress.
+        </p>
+
+        <h2>Gold-Standard Laboratory Testing: Cardiopulmonary Exercise Testing (CPET)</h2>
+        <p>
+          To establish true maximum heart rate without mathematical approximation, exercise physiologists conduct a <strong>Cardiopulmonary Exercise Test (CPET)</strong> utilizing breath-by-breath metabolic gas analysis cart and continuous 12-lead electrocardiography. Protocols include the standardized Bruce treadmill protocol or incremental ramp cycle ergometry.
+        </p>
+        <p>
+          True physiological maximal exertion ($HR_{\text{max}}$ and $VO_2\text{max}$) is objectively confirmed only when at least three of the following five clinical criteria are fulfilled:
+        </p>
+        <ol>
+          <li><strong>Oxygen Uptake Plateau:</strong> Failure of $VO_2$ to increase by &gt;150 mL/min (or &lt;2.1 mL/kg/min) despite a prescribed increase in treadmill speed or elevation.</li>
+          <li><strong>Respiratory Exchange Ratio ($RER$):</strong> Carbon dioxide production divided by oxygen uptake ($VCO_2 / VO_2$) exceeding <strong>1.10 to 1.15</strong>, confirming massive bicarbonate buffering of lactic acidosis.</li>
+          <li><strong>Post-Exercise Blood Lactate:</strong> Capillary blood lactate concentration exceeding <strong>8.0 mmol/L</strong> drawn 2 to 5 minutes post-exhaustion.</li>
+          <li><strong>Rating of Perceived Exertion (RPE):</strong> A score of <strong>19 or 20</strong> on the 15-point Borg Scale, or a 10 on the Category-Ratio 10 (CR10) scale.</li>
+          <li><strong>Heart Rate Plateau:</strong> Heart rate failing to rise further despite increasing mechanical workload, or achieving within ±5 bpm of age-predicted maximum.</li>
+        </ol>
+
+        <h2>Impact of Cardiovascular Pharmacotherapy on Chronotropic Dynamics</h2>
+        <p>
+          Prescription cardiovascular medications fundamentally alter sinoatrial nodal pacemaking and blunting maximum chronotropic capacity:
+        </p>
+        <ul>
+          <li><strong>$\beta$-Adrenergic Receptor Antagonists (Beta-Blockers):</strong> Agents such as metoprolol succinate, atenolol, bisoprolol, and carvedilol competitively inhibit $\beta_1$-adrenergic receptors in nodal tissue. They attenuate maximum exercise heart rate by <strong>20% to 35%</strong> (typically capping peak exercise rate at 120 to 140 BPM regardless of age). <em>Clinical Rule:</em> Mathematical HRmax equations must never be utilized for patients on beta-blocker therapy; exercise prescription must be guided by Borg RPE or physician-supervised stress testing.</li>
+          <li><strong>Non-Dihydropyridine Calcium Channel Blockers:</strong> Diltiazem and verapamil inhibit slow inward calcium currents ($I_{Ca-L}$) in SA and AV nodal cells, dampening peak exercise heart rate by 10 to 15 bpm.</li>
+          <li><strong>Sympathomimetic Agents:</strong> Central nervous system stimulants (such as amphetamines, methylphenidate, high-dose caffeine, and pseudoephedrine) accelerate resting and submaximal heart rates without meaningfully expanding the intrinsic physiological HRmax ceiling.</li>
+        </ul>
+    </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <span class="logo-icon">🧮</span>
+        <span class="logo-text">CalcHub</span>
+        <p class="footer-tagline">Clinical & Engineering Precision Tools for Health and Science.</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">All Calculators</a>
+        <a href="health.html">Health Calculators</a>
+        <a href="finance.html">Financial Tools</a>
+        <a href="engineering.html">Engineering Tools</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function calculateHRMax() {
+      const age = parseFloat(document.getElementById('hrmax-age').value) || 0;
+      const gender = document.getElementById('hrmax-gender').value;
+      const primaryMethod = document.getElementById('hrmax-primary').value;
+
+      if (age <= 0) return;
+
+      const hrmax_tanaka = Math.round(208 - (0.7 * age));
+      const hrmax_gellish = Math.round(207 - (0.7 * age));
+      const hrmax_gulati = Math.round(206 - (0.88 * age));
+      const hrmax_fox = Math.round(220 - age);
+
+      let hrmax_fairbarn = 0;
+      if (gender === 'male') {
+        hrmax_fairbarn = Math.round(201 - (0.63 * age));
+      } else {
+        hrmax_fairbarn = Math.round(216 - (1.09 * age));
+      }
+
+      let primaryVal = hrmax_tanaka;
+      if (primaryMethod === 'gellish') primaryVal = hrmax_gellish;
+      else if (primaryMethod === 'gulati') primaryVal = hrmax_gulati;
+      else if (primaryMethod === 'fairbarn') primaryVal = hrmax_fairbarn;
+      else if (primaryMethod === 'fox') primaryVal = hrmax_fox;
+
+      document.getElementById('res-hrmax-primary').innerText = `${primaryVal} BPM`;
+      document.getElementById('res-hrmax-range').innerText = `95% Statistical Confidence Band: ${primaryVal - 10} – ${primaryVal + 10} BPM (±10 bpm)`;
+      document.getElementById('res-hrmax-gellish').innerText = `${hrmax_gellish} BPM`;
+      document.getElementById('res-hrmax-gulati').innerText = `${hrmax_gulati} BPM`;
+      document.getElementById('res-hrmax-fairbarn').innerText = `${hrmax_fairbarn} BPM`;
+      document.getElementById('res-hrmax-fox').innerText = `${hrmax_fox} BPM`;
+
+      // Intensity bands
+      const modLow = Math.round(primaryVal * 0.64);
+      const modHigh = Math.round(primaryVal * 0.76);
+      const vigLow = Math.round(primaryVal * 0.77);
+      const vigHigh = Math.round(primaryVal * 0.95);
+
+      document.getElementById('res-intensity-targets').innerHTML = `Moderate Aerobic (64%–76%): <strong>${modLow} – ${modHigh} BPM</strong> | Vigorous / Threshold (77%–95%): <strong>${vigLow} – ${vigHigh} BPM</strong>.`;
+    }
+
+    document.addEventListener('DOMContentLoaded', calculateHRMax);
+  </script>
+</body>
+</html>

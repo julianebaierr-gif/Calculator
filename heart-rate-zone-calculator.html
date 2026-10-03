@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heart Rate Zone Calculator | Karvonen HRR & 5-Zone Training Model</title>
+  <meta name="description" content="Calculate your customized 5 aerobic training heart rate zones using the Karvonen formula (Heart Rate Reserve) and Tanaka/Gellish HRmax formulas. Optimize Zone 2 and lactate threshold.">
+  <link rel="canonical" href="https://calchub.com/heart-rate-zone-calculator.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Karvonen 5-Zone Heart Rate Training Calculator",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "description": "Calculates individualized 5-zone cardiovascular training heart rates using the Karvonen Heart Rate Reserve (HRR) formula and Tanaka/Gellish maximum heart rate equations."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the Karvonen formula for target heart rate?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Karvonen formula calculates Target Heart Rate (THR) using Heart Rate Reserve (HRR): THR = (HRmax - HRrest) × Intensity % + HRrest. By incorporating resting heart rate (HRrest), the Karvonen method personalizes training zones to an individual's cardiovascular fitness level far more accurately than straight percentages of maximum heart rate."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why is Zone 2 aerobic training so vital for endurance and metabolic health?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Zone 2 (60% to 70% HRR or ~65% to 75% HRmax) represents the highest training intensity where cellular ATP is produced almost exclusively through mitochondrial fat oxidation without accumulating systemic blood lactate (< 2.0 mmol/L). It stimulates mitochondrial biogenesis, enhances capillary density, and upregulates carnitine palmitoyltransferase-1 (CPT-1)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What formula is most accurate for estimating maximum heart rate?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Tanaka formula [HRmax = 208 - (0.7 × Age)] and Gellish formula [HRmax = 207 - (0.7 × Age)] are scientifically superior to the traditional '220 - Age' formula (Fox formula), which significantly overestimates HRmax in young adults and underestimates HRmax in older individuals."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does resting heart rate reflect cardiovascular conditioning?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Resting heart rate reflects stroke volume and autonomic parasympathetic (vagal) tone. Chronic endurance training causes eccentric ventricular hypertrophy, allowing the left ventricle to pump more blood per beat (higher stroke volume), thereby reducing the required resting heart rate to 40-55 bpm in elite athletes versus 65-80 bpm in untrained adults."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="header">
+    <div class="header-container">
+      <div class="header-logo">
+        <a href="index.html" class="logo-link">
+          <span class="logo-icon">🧮</span>
+          <span class="logo-text">CalcHub</span>
+        </a>
+      </div>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="health.html" class="nav-link active">Health & Fitness</a>
+        <a href="finance.html" class="nav-link">Finance</a>
+        <a href="engineering.html" class="nav-link">Engineering</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="calculator-container">
+      <div class="calculator-header">
+        <div class="badge-tag">Exercise Physiology</div>
+        <h1 class="calculator-title">Heart Rate Zone &amp; Karvonen Calculator</h1>
+        <p class="calculator-description">Calculate your personalized 5 training heart rate zones using the Karvonen Heart Rate Reserve (HRR) equation and peer-reviewed Tanaka HRmax algorithms.</p>
+      </div>
+
+      <div class="calculator-grid">
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">Cardiovascular Inputs</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group">
+                <label for="hr-age" class="form-label">Age (Years)</label>
+                <input type="number" id="hr-age" class="form-input" value="35" min="15" max="100" step="1" oninput="calculateZones()">
+              </div>
+              <div class="form-group">
+                <label for="hr-rest" class="form-label">Resting Heart Rate (BPM)</label>
+                <input type="number" id="hr-rest" class="form-input" value="62" min="35" max="120" step="1" oninput="calculateZones()">
+                <span class="form-hint">Measured upon waking in morning</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="hrmax-method" class="form-label">HRmax Estimation Formula</label>
+              <select id="hrmax-method" class="form-select" onchange="calculateZones()">
+                <option value="tanaka" selected>Tanaka Formula: 208 - (0.7 × Age) [Recommended]</option>
+                <option value="gellish">Gellish Formula: 207 - (0.7 × Age)</option>
+                <option value="fox">Fox Formula: 220 - Age [Classic Legacy]</option>
+                <option value="custom">Custom Known Max HR (from laboratory VO2 max test)</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="group-custom-hr" style="display:none;">
+              <label for="custom-hrmax" class="form-label">Known Laboratory Maximum HR (BPM)</label>
+              <input type="number" id="custom-hrmax" class="form-input" value="185" min="120" max="230" step="1" oninput="calculateZones()">
+            </div>
+
+            <div class="form-group">
+              <label for="zone-method" class="form-label">Calculation Methodology</label>
+              <select id="zone-method" class="form-select" onchange="calculateZones()">
+                <option value="karvonen" selected>Karvonen Heart Rate Reserve (Personalized by Resting HR)</option>
+                <option value="percent_max">Standard Percentage of Max HR (% HRmax)</option>
+              </select>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="calculateZones()">Compute Training Zones</button>
+          </div>
+        </div>
+
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <h2 class="calc-card-title">Training Zones &amp; Bioenergetics</h2>
+          </div>
+          <div class="calc-card-body">
+            <div class="result-hero" style="background:#eff6ff;border-color:#bfdbfe;">
+              <span class="hero-label">Mitochondrial Zone 2 (Base Aerobic)</span>
+              <div class="hero-value" id="res-zone2" style="color:#1d4ed8;font-size:2.2rem;">135 – 148 BPM</div>
+              <span class="form-hint">Maximal lipid oxidation (FatMax) &amp; lactate clearance (&lt; 2.0 mmol/L)</span>
+            </div>
+
+            <div class="results-grid" style="margin-top:1.5rem;">
+              <div class="result-item">
+                <span class="result-label">Estimated HRmax</span>
+                <span class="result-value" id="res-hrmax">184 BPM</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Heart Rate Reserve (HRR)</span>
+                <span class="result-value" id="res-hrr">122 BPM</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Zone 1 (Active Recovery)</span>
+                <span class="result-value" id="res-zone1">123 – 135 BPM</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Zone 3 (Aerobic Tempo)</span>
+                <span class="result-value" id="res-zone3">148 – 160 BPM</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Zone 4 (Lactate Threshold)</span>
+                <span class="result-value" id="res-zone4">160 – 172 BPM</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Zone 5 (VO2 Max Interval)</span>
+                <span class="result-value" id="res-zone5">172 – 184 BPM</span>
+              </div>
+            </div>
+
+            <div class="stat-box" style="margin-top:1.5rem;padding:1rem;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+              <h4 style="font-weight:700;margin-bottom:0.5rem;font-size:0.95rem;">Polarized 80/20 Training Distribution:</h4>
+              <p id="res-hr-note" style="font-size:0.875rem;color:#475569;margin:0;">
+                Elite endurance athletes spend approximately 80% of total weekly volume in Zone 2 to build mitochondrial mass and fat oxidation, with 20% in Zones 4-5 to elevate VO2 max and anaerobic buffering capacity.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <article class="article-body">
+        <h2>Cardiovascular Physiology and the Energetics of Heart Rate</h2>
+        <p>
+          During physical exertion, cardiac output ($CO$, in liters per minute) must scale linearly with systemic metabolic demand. According to the <em>Fick Principle</em>, total oxygen consumption ($VO_2$) equals cardiac output multiplied by the arteriovenous oxygen difference ($a\text{-}\bar{v}O_2\text{ diff}$):
+        </p>
+        $$VO_2 = CO \times (C_aO_2 - C_vO_2) = (HR \times SV) \times (C_aO_2 - C_vO_2)$$
+        <p>
+          In healthy adult athletes, <strong>stroke volume ($SV$)</strong>—the volume of oxygenated blood ejected by the left ventricle per beat—reaches its physiological plateau at approximately 40% to 50% of $VO_2\text{max}$. Beyond this threshold, further escalations in cardiac output and tissue oxygen delivery must be driven almost entirely by increases in <strong>Heart Rate ($HR$)</strong>, mediated by sympathetic adrenergic stimulation ($\beta_1$-receptor activation via epinephrine and norepinephrine) and parasympathetic vagal withdrawal.
+        </p>
+        <p>
+          Because heart rate tracks systemic oxygen uptake so reliably across submaximal exercise, monitoring beats per minute (BPM) provides an exceptionally accessible proxy for internal physiological strain, lactate accumulation, and autonomic fatigue.
+        </p>
+
+        <h2>Mathematical Formulations: Fox vs. Tanaka vs. Karvonen</h2>
+
+        <div class="formula-box">
+          <p><strong>1. Maximum Heart Rate (HRmax) Estimation Models:</strong></p>
+          <ul>
+            <li><strong>Tanaka Equation (2001) - Validated Across 18,712 Subjects:</strong>
+              $$HR_{\text{max}} = 208 - (0.7 \times \text{Age})$$
+            </li>
+            <li><strong>Gellish Equation (2007) - Longitudinal Stress-Testing Model:</strong>
+              $$HR_{\text{max}} = 207 - (0.7 \times \text{Age})$$
+            </li>
+            <li><strong>Fox &amp; Haskell Formula (1971) - Legacy Formula:</strong>
+              $$HR_{\text{max}} = 220 - \text{Age}$$
+              <em>Clinical Note:</em> The Fox formula overestimates HRmax in young adults (under 30) and progressively underestimates true HRmax in master athletes over 50 by as much as 10 to 15 bpm.
+            </li>
+          </ul>
+        </div>
+
+        <div class="formula-box">
+          <p><strong>2. The Karvonen Heart Rate Reserve (HRR) Equation:</strong></p>
+          <p>
+            In 1957, Finnish physiologist Dr. Martti Karvonen recognized that simple percentages of $HR_{\text{max}}$ ignore an individual's baseline resting fitness. Two 40-year-old individuals with identical estimated maximum heart rates (180 bpm) have radically different cardiovascular capabilities if one has a resting heart rate of 45 bpm (elite marathoner) while the other has a resting rate of 80 bpm (sedentary desk worker).
+          </p>
+          $$\text{Heart Rate Reserve (HRR)} = HR_{\text{max}} - HR_{\text{rest}}$$
+          $$\text{Target Heart Rate (THR)} = (HRR \times \text{Target Intensity \%}) + HR_{\text{rest}}$$
+        </div>
+
+        <h2>Deconstructing the 5 Cardiovascular Training Zones</h2>
+        <p>
+          The standardized 5-zone cardiovascular training model structures training intensity into specific bioenergetic domains:
+        </p>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Training Zone</th>
+                <th>Intensity Range (% HRR)</th>
+                <th>Physiological Substrate</th>
+                <th>Blood Lactate Level</th>
+                <th>Primary Adaptations &amp; Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Zone 1: Active Recovery</strong></td>
+                <td>50% – 60%</td>
+                <td>90% Fatty Acids</td>
+                <td>&lt; 1.2 mmol/L</td>
+                <td>Post-race recovery; flushing cellular metabolic byproducts; joint mobility.</td>
+              </tr>
+              <tr>
+                <td><strong>Zone 2: Aerobic Base (FatMax)</strong></td>
+                <td>60% – 70%</td>
+                <td>70%–85% Fatty Acids</td>
+                <td>1.2 – 2.0 mmol/L (LT1)</td>
+                <td>Mitochondrial biogenesis, capillary sprouting, CPT-1 enzyme upregulation.</td>
+              </tr>
+              <tr>
+                <td><strong>Zone 3: Aerobic Tempo</strong></td>
+                <td>70% – 80%</td>
+                <td>50% Glycogen, 50% Fat</td>
+                <td>2.0 – 3.5 mmol/L</td>
+                <td>Marathon pace specificity; glycogen economy; cardiac stroke volume max.</td>
+              </tr>
+              <tr>
+                <td><strong>Zone 4: Lactate Threshold</strong></td>
+                <td>80% – 90%</td>
+                <td>85% Glycogen</td>
+                <td>3.5 – 5.0 mmol/L (LT2)</td>
+                <td>Increases maximal lactate steady state (MLSS); fractional $VO_2$ utilization.</td>
+              </tr>
+              <tr>
+                <td><strong>Zone 5: VO2 Max Interval</strong></td>
+                <td>90% – 100%</td>
+                <td>&gt; 95% Glycogen / PCr</td>
+                <td>&gt; 6.0 mmol/L</td>
+                <td>Increases absolute $VO_2\text{max}$; expands stroke volume; neuromuscular motor recruitment.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Zone 2 Bioenergetics: Inigo San Millan's Cellular Paradigm</h2>
+        <p>
+          In modern exercise science, research spearheaded by Dr. Inigo San Millan (metabolic coach to Tour de France champions) underscores that <strong>Zone 2 training</strong> is the single most powerful driver of cellular metabolic health. In Zone 2 (demarcated physiologically at the first lactate turnpoint, $LT1$, typically around $1.5\text{ to }2.0\text{ mmol/L}$ of blood lactate):
+        </p>
+        <ul>
+          <li><strong>Slow-Twitch (Type I) Muscle Fiber Recruitment:</strong> Type I oxidative fibers are packed with high concentrations of mitochondria, myoglobin, and oxidative enzymes. Zone 2 exercise stresses these fibers continuously without activating high-threshold fast-twitch (Type IIa/IIx) fibers that produce massive surges of lactate and hydrogen ions.</li>
+          <li><strong>Mitochondrial Fatty Acid Transport (CPT-1):</strong> Carnitine Palmitoyltransferase-1 ($CPT-1$) is the enzyme responsible for shuttling long-chain fatty acids into the mitochondrial matrix for $\beta$-oxidation. As exercise intensity crosses into Zone 3 and 4, rising intracellular malonyl-CoA and glycolytic flux inhibit CPT-1, turning off fat oxidation completely. Zone 2 maximizes total fatty acid oxidation ($FatMax$).</li>
+          <li><strong>Lactate Clearance Kinetics:</strong> Lactate is not a waste product; it is a high-energy metabolic fuel. Slow-twitch muscle fibers clear and oxidize lactate via <strong>Monocarboxylate Transporter 1 (MCT1)</strong> and mitochondrial lactate dehydrogenase ($mLDH$). Zone 2 training upregulates MCT1 density, transforming the musculoskeletal system into a metabolic sponge that vacuums up lactate produced by fast-twitch fibers during high-intensity surges.</li>
+        </ul>
+
+        <h2>Worked Exercise Physiology Case Study</h2>
+        <div class="worked-example-card">
+          <div class="example-header">
+            <span class="example-badge">Cardiovascular Physiology Case</span>
+            <h3 class="example-title">Karvonen Zone 2 Sizing for an Ultra-Endurance Runner</h3>
+          </div>
+          <div class="example-step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Athlete Profile:</strong> A 42-year-old male trail runner preparing for a 50-mile ultramarathon. Anthropometrics and testing: Resting heart rate ($HR_{\text{rest}}$) measured at <strong>48 BPM</strong> on waking. The coach uses the Tanaka formula to estimate maximum heart rate and sets up his 5 Karvonen training zones.
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Calculate Maximum Heart Rate and Heart Rate Reserve:</strong>
+              $$HR_{\text{max}} = 208 - (0.7 \times 42) = 208 - 29.4 = \mathbf{178.6\text{ BPM}} \implies 179\text{ BPM}$$
+              $$HRR = HR_{\text{max}} - HR_{\text{rest}} = 179 - 48 = \mathbf{131\text{ BPM}}$$
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>Calculate Karvonen Zone 2 Boundaries (60% to 70% HRR):</strong>
+              $$\text{Zone 2 Floor (60\%)} = (131 \times 0.60) + 48 = 78.6 + 48 = \mathbf{127\text{ BPM}}$$
+              $$\text{Zone 2 Ceiling (70\%)} = (131 \times 0.70) + 48 = 91.7 + 48 = \mathbf{140\text{ BPM}}$$
+              Zone 2 Target: <strong>127 to 140 BPM</strong>.
+            </div>
+          </div>
+          <div class="example-step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <strong>Comparison with Standard Straight % HRmax Method:</strong>
+              If calculated solely as 60%–70% of $HR_{\text{max}}$ ($179 \times 0.60 = 107\text{ BPM}$; $179 \times 0.70 = 125\text{ BPM}$), the resulting range (107–125 BPM) would severely under-target the athlete's aerobic capacity due to his elite resting heart rate. The Karvonen formula correctly anchors training zones to true functional physiology.
+            </div>
+          </div>
+        </div>
+      <h2>Cardiovascular Drift and Environmental Thermoregulation</h2>
+        <p>
+          During prolonged, steady-state aerobic exercise lasting beyond 45 to 60 minutes—particularly in warm, humid ambient environments—athletes frequently observe a steady, continuous upward creep in heart rate despite maintaining a completely constant mechanical pace or cycling power output. This physiological phenomenon is termed <strong>Cardiovascular Drift (Cardiac Drift)</strong>.
+        </p>
+        <p>
+          Cardiovascular drift is precipitated by thermoregulatory cutaneovascular adaptations and progressive dehydration:
+        </p>
+        <ul>
+          <li><strong>Cutaneous Vasodilation and Plasma Loss:</strong> To dissipate excessive metabolic heat generated by muscular contraction, the autonomic nervous system shunts blood to peripheral cutaneous capillary beds for evaporative cooling. Concurrently, fluid transudation through active eccrine sweat glands progressively reduces circulating blood plasma volume by 5% to 12%.</li>
+          <li><strong>Compensatory Tachycardia via the Fick Principle:</strong> Reduced central blood volume attenuates venous return (preload) to the right atrium, decreasing end-diastolic ventricular filling and lowering stroke volume ($SV$) by 10% to 15%. Because systemic oxygen consumption ($VO_2$) remains fixed by the steady-state workload, cardiac output ($CO = HR \times SV$) must remain constant. To compensate for the falling stroke volume, the autonomic nervous system reflexively accelerates heart rate:
+          $$\uparrow HR = \frac{CO}{\downarrow SV}$$
+          </li>
+        </ul>
+        <p>
+          Consequently, an athlete running at a steady 8:00 min/mile pace in Zone 2 (e.g., 135 BPM) may find their heart rate drifting into high Zone 3 or Zone 4 (150+ BPM) after 75 minutes. In this situation, the elevated heart rate reflects thermoregulatory and hemodynamic compensation rather than an increase in muscular glycolytic energy demand.
+        </p>
+
+        <h2>Training Intensity Distributions: Polarized (80/20) vs. Pyramidal Models</h2>
+        <p>
+          In contemporary sports science, pioneering observational studies by Dr. Stephen Seiler across world-class Olympic endurance competitors (cross-country skiers, rowers, marathon runners, and pursuit cyclists) have illuminated optimal weekly training intensity distributions:
+        </p>
+        <div class="table-responsive my-4">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Training Distribution Model</th>
+                <th>Low-Intensity Volume (Zone 1 &amp; 2)</th>
+                <th>Threshold Volume (Zone 3 &amp; 4)</th>
+                <th>High-Intensity Volume (Zone 5 / Sprint)</th>
+                <th>Physiological Mechanism &amp; Overtraining Risk</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Polarized Model (80/20 Paradigm)</strong></td>
+                <td>75% – 85% of sessions</td>
+                <td>&lt; 5% of sessions</td>
+                <td>15% – 20% of sessions</td>
+                <td>Maximizes mitochondrial volume without autonomic nervous system exhaustion. Avoids middle-intensity chronic fatigue while maximizing neuromuscular adaptations during hard interval sessions.</td>
+              </tr>
+              <tr>
+                <td><strong>Pyramidal Model</strong></td>
+                <td>70% – 80% of sessions</td>
+                <td>15% – 20% of sessions</td>
+                <td>5% – 10% of sessions</td>
+                <td>Gradual tapering of volume across increasing intensities. Highly effective during race-specific mesocycles (e.g., half-marathon or marathon tempo preparation).</td>
+              </tr>
+              <tr>
+                <td><strong>Threshold Model ("Black Hole" Training)</strong></td>
+                <td>40% – 50% of sessions</td>
+                <td>45% – 55% of sessions</td>
+                <td>&lt; 5% of sessions</td>
+                <td>Chronically stresses sympathetic nervous system; elevates resting cortisol; causes persistent glycogen depletion and autonomic staleness without inducing superior aerobic base gains.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Dr. Seiler identified that recreational athletes frequently fall into the <em>"Threshold Trap"</em> (or "Zone 3 Black Hole"). They perform their easy recovery sessions at too intense a pace (straying into Zone 3 tempo), which induces chronic autonomic nervous system fatigue and prevents them from performing their hard Zone 5 interval sessions with adequate neuromuscular velocity and power output.
+        </p>
+
+        <h2>Autonomic Recovery and Heart Rate Variability (HRV) Biomarkers</h2>
+        <p>
+          Heart rate is not a static metronome; the temporal interval between successive R-waves on an electrocardiogram (the $R\text{-}R$ interval, measured in milliseconds) varies beat-by-beat under the fluctuating balance of the sympathetic and parasympathetic branches of the autonomic nervous system. This variation is quantified as <strong>Heart Rate Variability (HRV)</strong>.
+        </p>
+        <p>
+          During high-intensity Zone 4 and Zone 5 efforts, parasympathetic vagal outflow is completely withdrawn, and sympathetic epinephrine release drives $R\text{-}R$ interval variability close to zero. Post-exercise, <strong>vagal reactivation velocity</strong> determines the rate of cardiovascular recovery. Clinicians and sports physiologists measure <em>Heart Rate Recovery at 1 minute ($HRR_1$)</em> following cessation of exercise. A decline of &gt;25 to 30 beats within the first 60 seconds indicates robust parasympathetic reactivation and low cardiovascular mortality risk, whereas an $HRR_1 &lt; 12\text{ bpm}$ indicates sympathetic hyper-reactivity, cardiac autonomic neuropathy, or severe overtraining syndrome.
+        </p>
+    </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <span class="logo-icon">🧮</span>
+        <span class="logo-text">CalcHub</span>
+        <p class="footer-tagline">Clinical & Engineering Precision Tools for Health and Science.</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">All Calculators</a>
+        <a href="health.html">Health Calculators</a>
+        <a href="finance.html">Financial Tools</a>
+        <a href="engineering.html">Engineering Tools</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function calculateZones() {
+      const age = parseFloat(document.getElementById('hr-age').value) || 0;
+      const rest = parseFloat(document.getElementById('hr-rest').value) || 0;
+      const hrmaxMethod = document.getElementById('hrmax-method').value;
+      const zoneMethod = document.getElementById('zone-method').value;
+
+      const customGroup = document.getElementById('group-custom-hr');
+      if (hrmaxMethod === 'custom') {
+        customGroup.style.display = 'block';
+      } else {
+        customGroup.style.display = 'none';
+      }
+
+      if (age <= 0 || rest <= 0) return;
+
+      let hrmax = 185;
+      if (hrmaxMethod === 'tanaka') {
+        hrmax = Math.round(208 - (0.7 * age));
+      } else if (hrmaxMethod === 'gellish') {
+        hrmax = Math.round(207 - (0.7 * age));
+      } else if (hrmaxMethod === 'fox') {
+        hrmax = Math.round(220 - age);
+      } else if (hrmaxMethod === 'custom') {
+        hrmax = parseFloat(document.getElementById('custom-hrmax').value) || 185;
+      }
+
+      const hrr = Math.max(hrmax - rest, 40);
+
+      function getZoneBPM(lowPct, highPct) {
+        if (zoneMethod === 'karvonen') {
+          const low = Math.round((hrr * lowPct) + rest);
+          const high = Math.round((hrr * highPct) + rest);
+          return `${low} – ${high} BPM`;
+        } else {
+          const low = Math.round(hrmax * lowPct);
+          const high = Math.round(hrmax * highPct);
+          return `${low} – ${high} BPM`;
+        }
+      }
+
+      const z1 = getZoneBPM(0.50, 0.60);
+      const z2 = getZoneBPM(0.60, 0.70);
+      const z3 = getZoneBPM(0.70, 0.80);
+      const z4 = getZoneBPM(0.80, 0.90);
+      const z5 = getZoneBPM(0.90, 1.00);
+
+      document.getElementById('res-hrmax').innerText = `${hrmax} BPM`;
+      document.getElementById('res-hrr').innerText = `${hrr} BPM`;
+      document.getElementById('res-zone1').innerText = z1;
+      document.getElementById('res-zone2').innerText = z2;
+      document.getElementById('res-zone3').innerText = z3;
+      document.getElementById('res-zone4').innerText = z4;
+      document.getElementById('res-zone5').innerText = z5;
+    }
+
+    document.addEventListener('DOMContentLoaded', calculateZones);
+  </script>
+</body>
+</html>

@@ -25,6 +25,14 @@ CATEGORIES = {
             ("calories-burned-calculator.html", "Exercise Calories Burned (METs)", "🏃", "Ainsworth Compendium METs, gross vs net energy & EPOC"),
             ("carbohydrate-intake-calculator.html", "Carbohydrate Intake & Glycogen", "🍞", "ACSM/ISSN endurance g/kg & intra-workout fueling"),
             ("cholesterol-ratio-calculator.html", "Cholesterol Ratio & Castelli Risk", "❤️", "Castelli I & II, Non-HDL & Triglyceride/HDL insulin marker"),
+            ("due-date-calculator.html", "Pregnancy Due Date & Gestation", "👶", "Naegele's rule, ACOG ultrasound dating & embryo transfer"),
+            ("fat-intake-calculator.html", "Dietary Fat Intake (Grams/Day)", "🥑", "Saturated fat limit, essential omega-3/6 & keto/macro"),
+            ("heart-rate-zone-calculator.html", "Heart Rate Zone (Karvonen HRR)", "❤️", "5 cardiovascular training zones & Zone 2 FatMax"),
+            ("lean-body-mass-calculator.html", "Lean Body Mass (Boer & James)", "💪", "Boer, James & Hume equations + normalized FFMI limit"),
+            ("max-heart-rate-calculator.html", "Max Heart Rate (Tanaka & Gulati)", "🫀", "Tanaka, Gellish, Gulati female-specific & Fox HRmax"),
+            ("met-calculator.html", "METs & Activity Caloric Burn", "⚡", "Compendium MET-minutes, VO2 uptake & WHO guidelines"),
+            ("ovulation-calculator.html", "Ovulation & Fertile Window", "🌸", "Ogino-Knaus rhythm method, luteal phase & LH surge"),
+            ("pregnancy-weight-gain-calculator.html", "Pregnancy Weight Gain (IOM/ACOG)", "🤰", "Pre-pregnancy BMI targets, weekly rates & twin curves"),
         ]
     },
     "finance": {
@@ -318,7 +326,7 @@ CATEGORIES = {
 
 def determine_tool_cat(filename):
     f = filename.lower()
-    if any(k in f for k in ["bmi", "calorie", "body-fat", "ideal-weight", "water-intake", "bmr", "macro", "a1c", "bac", "body-surface-area", "bsa", "calorie-deficit", "calories-burned", "carbohydrate", "cholesterol"]):
+    if any(k in f for k in ["bmi", "calorie", "body-fat", "ideal-weight", "water-intake", "bmr", "macro", "a1c", "bac", "body-surface-area", "bsa", "calorie-deficit", "calories-burned", "carbohydrate", "cholesterol", "due-date", "fat-intake", "heart-rate-zone", "lean-body-mass", "max-heart-rate", "met-calculator", "ovulation", "pregnancy-weight-gain"]):
         return "health"
     if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72", "amortization", "apr-apy", "break-even", "capital-gains", "cd-calculator", "credit-card", "debt-to-income", "down-payment", "emergency-fund", "inflation", "net-salary", "net-worth", "sales-tax", "savings"]):
         return "finance"
