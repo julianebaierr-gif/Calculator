@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Z-Score Calculator - Standard Score, Percentiles &amp; P-Value Solver</title>
+  <meta name="description" content="Calculate Z-scores (standard scores), normal distribution percentiles, cumulative probabilities, and p-values from raw score, mean, and standard deviation.">
+  <link rel="canonical" href="https://calchub.org/z-score-calculator.html">
+  <meta property="og:title" content="Z-Score Calculator - Standard Score &amp; Normal Distribution Solver">
+  <meta property="og:description" content="Free Z-score calculator. Compute standard scores Z = (x - mu) / sigma, left and right-tail p-values, two-tailed significance, and percentile rankings.">
+  <meta property="og:url" content="https://calchub.org/z-score-calculator.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Z-Score Calculator - Standard Score &amp; Percentile Tool">
+  <meta name="twitter:description" content="Calculate Z-score, cumulative normal probability, p-value, and percentile ranking with complete step-by-step statistical derivations.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Z-Score Calculator",
+    "url": "https://calchub.org/z-score-calculator.html",
+    "description": "Calculates standard scores Z = (x - mu)/sigma, normal distribution probabilities, percentiles, and p-values with step-by-step mathematical breakdowns.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a Z-score in statistics and how is it calculated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A Z-score (standard score) measures the exact number of standard deviations a raw data point x falls above or below the mean mu. Its formula is Z = (x - mu) / sigma. A positive Z-score indicates a value above the mean, while a negative Z-score indicates a value below the mean."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do you convert a Z-score to a percentile rank?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A Z-score is converted to a percentile rank by evaluating the standard normal cumulative distribution function (CDF) Phi(z). The percentile represents the percentage of observations in a normal distribution falling below that Z-score: Percentile = Phi(z) * 100%."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What Z-score threshold defines a statistical outlier?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "In standard statistical data screening, observations with |Z| > 2.0 (falling outside roughly 95% of the data) are classified as potential outliers. Observations with |Z| > 3.0 (falling outside 99.73% of the distribution) are considered extreme statistical outliers."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between a Z-score and a T-score?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A Z-score is used when the true population standard deviation sigma is known, or when the sample size is very large (n >= 30) following the standard normal distribution. A T-score is used when the population standard deviation is unknown and estimated via sample standard deviation s for smaller samples, following Student's t-distribution."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">CalcHub</a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="math.html" class="active">Math &amp; Statistics</a>
+        <a href="converter.html">Converters</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="calculator-container">
+    <div class="calculator-header">
+      <div class="calc-icon" aria-hidden="true">&#9147;</div>
+      <h1>Z-Score Calculator</h1>
+      <p class="calc-description">Calculate standard score (Z), cumulative normal probability, percentile ranking, and one-tailed/two-tailed p-values from raw score, mean, and standard deviation.</p>
+    </div>
+
+    <div class="calculator-body">
+      <div class="input-group">
+        <label for="z-mode">Calculation Direction</label>
+        <select id="z-mode" class="form-control" onchange="switchZMode()">
+          <option value="raw-to-z" selected>Raw Score to Z-Score: (x, &mu;, &sigma; &rarr; Z, Percentile)</option>
+          <option value="z-to-raw">Z-Score to Raw Score: (Z, &mu;, &sigma; &rarr; x)</option>
+        </select>
+      </div>
+
+      <!-- Mode 1: Raw to Z -->
+      <div id="panel-raw-to-z">
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="raw-x">Raw Score Observation (x)</label>
+            <input type="number" id="raw-x" class="form-control" value="85" step="any">
+            <span class="help-text">Individual data value</span>
+          </div>
+          <div class="input-group">
+            <label for="mean-val">Population / Sample Mean (&mu; or x̄)</label>
+            <input type="number" id="mean-val" class="form-control" value="70" step="any">
+            <span class="help-text">Center of the distribution</span>
+          </div>
+          <div class="input-group">
+            <label for="sd-val">Standard Deviation (&sigma; or s)</label>
+            <input type="number" id="sd-val" class="form-control" value="10" min="0.000001" step="any">
+            <span class="help-text">Measure of dispersion (&sigma; &gt; 0)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 2: Z to Raw -->
+      <div id="panel-z-to-raw" style="display:none;">
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="target-z">Z-Score (Z)</label>
+            <input type="number" id="target-z" class="form-control" value="1.50" step="any">
+            <span class="help-text">Number of standard deviations</span>
+          </div>
+          <div class="input-group">
+            <label for="inv-mean">Mean (&mu;)</label>
+            <input type="number" id="inv-mean" class="form-control" value="70" step="any">
+          </div>
+          <div class="input-group">
+            <label for="inv-sd">Standard Deviation (&sigma;)</label>
+            <input type="number" id="inv-sd" class="form-control" value="10" min="0.000001" step="any">
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="precision-select">Decimal Precision</label>
+        <select id="precision-select" class="form-control" onchange="calculateZ()">
+          <option value="2">2 decimal places</option>
+          <option value="4" selected>4 decimal places</option>
+          <option value="6">6 decimal places</option>
+        </select>
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:16px;">
+        <button id="calc-btn" class="btn-primary" onclick="calculateZ()" style="flex:1;">Compute Z-Score</button>
+        <button id="reset-btn" class="btn-secondary" onclick="resetZ()">Reset</button>
+      </div>
+
+      <div id="result-box" class="result-box" style="margin-top:24px;">
+        <h2 class="result-title">Standardized Distribution Metrics</h2>
+        <div class="result-highlight" style="font-size:1.8rem; font-weight:700; color:var(--primary); margin-bottom:16px;" id="res-zscore">
+          Z-Score: +1.5000
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:16px;">
+          <div><span class="res-label">Percentile Rank:</span> <strong class="res-val" id="res-percentile">93.32%</strong></div>
+          <div><span class="res-label">Left-Tail P(Z &lt; z):</span> <strong class="res-val" id="res-left-p">0.9332</strong></div>
+          <div><span class="res-label">Right-Tail P(Z &gt; z):</span> <strong class="res-val" id="res-right-p">0.0668</strong></div>
+          <div><span class="res-label">Two-Tailed p-value:</span> <strong class="res-val" id="res-two-p">0.1336</strong></div>
+          <div><span class="res-label">Raw Score Equivalent:</span> <strong class="res-val" id="res-raw">85.0000</strong></div>
+          <div><span class="res-label">Statistical Status:</span> <strong class="res-val" id="res-status">Above Average (+1.5&sigma;)</strong></div>
+        </div>
+
+        <h3 style="margin-top:20px; font-size:1.1rem; color:var(--text-dark);">Mathematical Step-by-Step Breakdown</h3>
+        <div id="res-steps" style="background:var(--bg-subtle, #f8fafc); padding:16px; border-radius:8px; font-family:monospace; font-size:0.95rem; white-space:pre-wrap; border:1px solid var(--border-color, #e2e8f0);"></div>
+      </div>
+    </div>
+
+    <article class="article-body">
+      <h2>Comprehensive Theoretical &amp; Engineering Guide to Z-Scores</h2>
+      <p>In parametric mathematical statistics, a Z-score (also termed standard score, normal deviate, or standardized variable) expresses the signed fractional distance of a raw observation from the population mean, measured in units of the standard deviation. By transforming arbitrary measurement scales (such as body weight in kilograms, examination test scores, or financial asset returns) into a dimensionless metric space, the Z-score enables direct objective comparison across diverse distributions.</p>
+
+      <p>Under the Central Limit Theorem, the distribution of sample averages approaches a Gaussian bell curve regardless of the underlying population shape. Standardizing any normal random variable \(X \sim N(\mu, \sigma^2)\) maps it onto the standard normal distribution \(Z \sim N(0, 1)\), which has an exact mean of \(\mu = 0\) and variance of \(\sigma^2 = 1\), as analyzed in our <a href="standard-deviation-calculator.html">Standard Deviation Calculator</a> and <a href="variance-calculator.html">Variance Calculator</a>.</p>
+
+      <h2>Mathematical Formulations &amp; Normal Distribution Calculus</h2>
+      <p>The standard score transformation operates through clean algebraic and integral calculus formulations.</p>
+
+      <h3>1. Primary Z-Score Standardization Formula</h3>
+      <p>For any continuous random variable with known mean \(\mu\) and non-zero standard deviation \(\sigma\), the standard score is defined as:</p>
+      $$Z = \frac{x - \mu}{\sigma}$$
+      <p>Where:</p>
+      <ul>
+        <li>\(x\) is the raw, unstandardized observation.</li>
+        <li>\(\mu\) is the arithmetic mean of the distribution.</li>
+        <li>\(\sigma\) is the positive standard deviation (\(\sigma > 0\)).</li>
+      </ul>
+      <p>Solving inversely for the raw observation yields the inverse transformation:</p>
+      $$x = \mu + Z \cdot \sigma$$
+
+      <h3>2. Cumulative Standard Normal Probability (\(\Phi(z)\)) &amp; Error Function</h3>
+      <p>The probability density function (PDF) of the standard normal distribution is given by:</p>
+      $$\phi(z) = \frac{1}{\sqrt{2\pi}} e^{-\frac{z^2}{2}}$$
+      <p>The cumulative distribution function (CDF) \(\Phi(z)\) evaluates the total area under the Gaussian bell curve to the left of \(z\), expressed via the Gauss error function \(\text{erf}(x)\):</p>
+      $$\Phi(z) = P(Z \le z) = \int_{-\infty}^{z} \frac{1}{\sqrt{2\pi}} e^{-\frac{t^2}{2}} \, dt = \frac{1}{2} \left[ 1 + \text{erf}\left( \frac{z}{\sqrt{2}} \right) \right]$$
+      <p>In software algorithms, \(\text{erf}(x)\) is computed with extreme precision using Abramowitz and Stegun Chebyshev polynomial approximations.</p>
+
+      <h3>3. Hypothesis Testing Tail Probabilities (P-Values)</h3>
+      <p>Depending on the scientific hypothesis being evaluated, three standard p-value areas are derived from \(\Phi(z)\):</p>
+      <div class="formula-box">
+        <h3>Tail Probability Formulas</h3>
+        $$\text{Left-Tail Probability (Cumulative): } P(Z < z) = \Phi(z)$$
+        $$\text{Right-Tail Probability (Upper): } P(Z > z) = 1 - \Phi(z)$$
+        $$\text{Two-Tailed P-Value (Significance): } p = 2 \cdot [1 - \Phi(|z|)]$$
+        $$\text{Percentile Rank: } \text{Percentile} = \Phi(z) \times 100\%$$
+      </div>
+
+      <h2>The Empirical Rule (68-95-99.7 Rule) &amp; Critical Values</h2>
+      <p>For any normally distributed dataset, the Empirical Rule provides immediate benchmark thresholds:</p>
+      <ul>
+        <li>\(68.27\%\) of all observations fall within \(1\) standard deviation of the mean (\(|Z| \le 1.0\)).</li>
+        <li>\(95.45\%\) of all observations fall within \(2\) standard deviations of the mean (\(|Z| \le 2.0\)).</li>
+        <li>\(99.73\%\) of all observations fall within \(3\) standard deviations of the mean (\(|Z| \le 3.0\)). Only \(0.27\%\) (approx. 1 in 370 observations) lie beyond \(\pm 3\sigma\).</li>
+      </ul>
+
+      <h2>Critical Z-Score Values &amp; Hypothesis Benchmark Table</h2>
+      <p>The following reference table outlines standard critical Z-scores (\(Z_{\alpha}\)) used across two-tailed and one-tailed scientific hypothesis tests:</p>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Confidence Level \((1 - \alpha)\)</th>
+            <th>Significance Level \((\alpha)\)</th>
+            <th>Two-Tailed Critical \(Z_{\alpha/2}\)</th>
+            <th>One-Tailed Critical \(Z_{\alpha}\)</th>
+            <th>Cumulative Area \(\Phi(z)\)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>\(90.0\%\)</td>
+            <td>\(0.10\)</td>
+            <td>\(\pm 1.6449\)</td>
+            <td>\(+1.2816\)</td>
+            <td>\(0.9500\)</td>
+          </tr>
+          <tr>
+            <td>\(95.0\%\) (Standard)</td>
+            <td>\(0.05\)</td>
+            <td>\(\pm 1.95996 \approx \pm 1.960\)</td>
+            <td>\(+1.6449\)</td>
+            <td>\(0.9750\)</td>
+          </tr>
+          <tr>
+            <td>\(99.0\%\)</td>
+            <td>\(0.01\)</td>
+            <td>\(\pm 2.5758\)</td>
+            <td>\(+2.3263\)</td>
+            <td>\(0.9950\)</td>
+          </tr>
+          <tr>
+            <td>\(99.9\%\)</td>
+            <td>\(0.001\)</td>
+            <td>\(\pm 3.2905\)</td>
+            <td>\(+3.0902\)</td>
+            <td>\(0.9995\)</td>
+          </tr>
+          <tr>
+            <td>Six Sigma (\(99.99966\%\))</td>
+            <td>\(0.0000034\)</td>
+            <td>\(\pm 4.5000\) to \(\pm 6.0000\)</td>
+            <td>\(+4.7534\)</td>
+            <td>\(0.999999\)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Real-World Engineering, Clinical &amp; Psychometric Case Studies</h2>
+      <p>The following practical case studies illustrate how Z-score standardization solves problems in standardized academic testing, manufacturing anomaly screening, and clinical bone density radiology.</p>
+
+      <div class="worked-example-card">
+        <h3>Case Study 1: Standardized Psychometric Exam Cross-Comparison (SAT vs. ACT)</h3>
+        <p><strong>Scenario:</strong> A university admissions officer compares two applicant exam scores. Candidate A scored \(1380\) on the SAT (nationwide mean \(\mu = 1060\), standard deviation \(\sigma = 210\)). Candidate B scored \(31\) on the ACT (nationwide mean \(\mu = 20.8\), standard deviation \(\sigma = 5.8\)). The officer must determine which student demonstrated a higher relative academic ranking.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Standardize Candidate A's SAT score:
+            $$Z_{\text{SAT}} = \frac{1380 - 1060}{210} = \frac{320}{210} \approx +1.5238$$
+          </li>
+          <li>Evaluate SAT percentile rank:
+            $$\Phi(1.5238) \approx 0.9362 \implies 93.62\text{-th percentile}$$
+          </li>
+          <li>Standardize Candidate B's ACT score:
+            $$Z_{\text{ACT}} = \frac{31 - 20.8}{5.8} = \frac{10.2}{5.8} \approx +1.7586$$
+          </li>
+          <li>Evaluate ACT percentile rank:
+            $$\Phi(1.7586) \approx 0.9607 \implies 96.07\text{-th percentile}$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> Candidate B achieved a higher relative standard score (\(Z = +1.76\) vs. \(Z = +1.52\)), placing in the \(96.07\)-th percentile compared to Candidate A's \(93.62\)-th percentile.</p>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 2: Industrial Manufacturing Anomaly Detection &amp; Six Sigma Quality Control</h3>
+        <p><strong>Scenario:</strong> A semiconductor fabrication line produces microchip wafer die thicknesses with an established population mean of \(\mu = 775.0 \text{ \mu m}\) and process standard deviation of \(\sigma = 2.4 \text{ \mu m}\). An optical interferometer measures a test wafer at \(x = 782.8 \text{ \mu m}\). The factory automation system must calculate the Z-score and flag whether the wafer exceeds the \(3\sigma\) process control limit.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Compute raw deviation from nominal center:
+            $$\Delta x = 782.8 - 775.0 = +7.8 \text{ \mu m}$$
+          </li>
+          <li>Calculate process Z-score:
+            $$Z = \frac{+7.8}{2.4} = +3.2500$$
+          </li>
+          <li>Evaluate right-tail exceedance probability:
+            $$P(Z > 3.25) = 1 - \Phi(3.25) = 1 - 0.999423 = 0.000577 \text{ (approx. 1 in 1,733)}$$
+          </li>
+          <li>Evaluate two-tailed p-value:
+            $$p = 2 \times 0.000577 = 0.001154$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> Because \(Z = +3.2500\) strictly exceeds the \(\pm 3.0\sigma\) upper control limit, the wafer is flagged as a statistically significant out-of-spec anomaly and rejected from the production line.</p>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 3: Clinical DEXA Bone Mineral Density (BMD) Diagnostic Scoring</h3>
+        <p><strong>Scenario:</strong> Dual-energy X-ray absorptiometry (DEXA) scans report bone health using standard scores. A 68-year-old female undergoes a femoral neck bone density scan yielding an areal BMD of \(0.680 \text{ g/cm}^2\). The reference database for age-matched peers has a mean \(\mu = 0.790 \text{ g/cm}^2\) and \(\sigma = 0.095 \text{ g/cm}^2\). The clinical radiologist must calculate the patient's diagnostic Z-score.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Calculate difference from age-matched mean:
+            $$x - \mu = 0.680 - 0.790 = -0.110 \text{ g/cm}^2$$
+          </li>
+          <li>Calculate age-matched Z-score:
+            $$Z = \frac{-0.110}{0.095} \approx -1.1579$$
+          </li>
+          <li>Evaluate cumulative percentile:
+            $$\Phi(-1.1579) \approx 0.1234 \implies 12.34\text{-th percentile}$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> The patient's bone density Z-score is \(-1.16\), indicating bone density falls \(1.16\) standard deviations below the age-matched average, placing her at the \(12.34\)-th percentile.</p>
+      </div>
+
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-item">
+        <div class="faq-question">What does a Z-score of 0 mean?</div>
+        <div class="faq-answer">A Z-score of exactly zero indicates that the raw observation is identical to the arithmetic mean of the distribution (\(x = \mu\)). In a standard normal distribution, a Z-score of 0 corresponds exactly to the 50th percentile (the median).</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">Can a Z-score be greater than 3 or less than -3?</div>
+        <div class="faq-answer">Yes. While \(99.73\%\) of observations in a normal distribution fall between -3 and +3, values outside this interval occur with non-zero probability. Observations with \(|Z| > 3\) represent rare events occurring less than \(0.27\%\) of the time, often signifying special causes or measurement outliers.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">Why must standard deviation be strictly positive?</div>
+        <div class="faq-answer">Standard deviation represents the root mean square distance of data points from their mean. If \(\sigma = 0\), all data points in the set are identical, resulting in zero dispersion. Dividing by \(\sigma = 0\) produces an undefined division by zero.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">How does a Z-score relate to the Altman Z-score in finance?</div>
+        <div class="faq-answer">While a statistical Z-score standardizes a single univariate metric, the Altman Z-score is a multivariate discriminant linear formula combining five financial ratios (working capital, retained earnings, EBIT, market equity, and sales) to predict the statistical probability of corporate bankruptcy.</div>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>Comprehensive mathematical, statistical, and engineering calculation tools.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Discipline Hubs</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="math.html">Mathematics</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed computational algorithms.</p>
+    </div>
+  </footer>
+
+  <script>
+    // High-precision erf approximation (Abramowitz & Stegun formula 7.1.26)
+    function erf(x) {
+      var sign = (x >= 0) ? 1 : -1;
+      x = Math.abs(x);
+      var a1 =  0.254829592;
+      var a2 = -0.284496736;
+      var a3 =  1.421413741;
+      var a4 = -1.453152027;
+      var a5 =  1.061405429;
+      var p  =  0.3275911;
+
+      var t = 1.0 / (1.0 + p * x);
+      var y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+      return sign * y;
+    }
+
+    function normalCdf(z) {
+      return 0.5 * (1.0 + erf(z / Math.sqrt(2.0)));
+    }
+
+    function switchZMode() {
+      var mode = document.getElementById('z-mode').value;
+      if (mode === 'raw-to-z') {
+        document.getElementById('panel-raw-to-z').style.display = 'block';
+        document.getElementById('panel-z-to-raw').style.display = 'none';
+      } else {
+        document.getElementById('panel-raw-to-z').style.display = 'none';
+        document.getElementById('panel-z-to-raw').style.display = 'block';
+      }
+      calculateZ();
+    }
+
+    function calculateZ() {
+      var mode = document.getElementById('z-mode').value;
+      var prec = parseInt(document.getElementById('precision-select').value, 10) || 4;
+
+      var z = 0, x = 0, mu = 0, sigma = 0;
+      var steps = "";
+
+      if (mode === 'raw-to-z') {
+        x = parseFloat(document.getElementById('raw-x').value);
+        mu = parseFloat(document.getElementById('mean-val').value);
+        sigma = parseFloat(document.getElementById('sd-val').value);
+
+        if (isNaN(x) || isNaN(mu) || isNaN(sigma)) {
+          showError("Please enter valid real numbers for score, mean, and standard deviation.");
+          return;
+        }
+
+        if (sigma <= 0) {
+          showError("Standard deviation must be strictly greater than zero.");
+          return;
+        }
+
+        z = (x - mu) / sigma;
+        steps = "Mode: Raw Score to Z-Score Standardization\n" +
+                "Given: Raw Score x = " + x + ", Mean μ = " + mu + ", Standard Deviation σ = " + sigma + "\n\n" +
+                "1. Deviation from Center:\n" +
+                "   Δ = x - μ = " + x + " - " + mu + " = " + (x - mu).toFixed(prec) + "\n\n" +
+                "2. Standard Score Formula:\n" +
+                "   Z = (x - μ) / σ = " + (x - mu).toFixed(prec) + " / " + sigma + " = " + z.toFixed(prec);
+
+      } else {
+        z = parseFloat(document.getElementById('target-z').value);
+        mu = parseFloat(document.getElementById('inv-mean').value);
+        sigma = parseFloat(document.getElementById('inv-sd').value);
+
+        if (isNaN(z) || isNaN(mu) || isNaN(sigma)) {
+          showError("Please enter valid numbers for Z, mean, and standard deviation.");
+          return;
+        }
+
+        if (sigma <= 0) {
+          showError("Standard deviation must be strictly greater than zero.");
+          return;
+        }
+
+        x = mu + z * sigma;
+        steps = "Mode: Inverse Z-Score to Raw Score Transformation\n" +
+                "Given: Z-Score Z = " + z + ", Mean μ = " + mu + ", Standard Deviation σ = " + sigma + "\n\n" +
+                "1. Inverse Formula:\n" +
+                "   x = μ + (Z * σ)\n" +
+                "   x = " + mu + " + (" + z + " * " + sigma + ") = " + mu + " + " + (z * sigma).toFixed(prec) + " = " + x.toFixed(prec);
+      }
+
+      var leftTail = normalCdf(z);
+      var rightTail = 1.0 - leftTail;
+      var twoTail = 2.0 * (1.0 - normalCdf(Math.abs(z)));
+      var percentile = leftTail * 100.0;
+
+      var status = "Near Average";
+      if (z >= 3.0) status = "Extreme High Outlier (+3σ+)";
+      else if (z >= 2.0) status = "Significantly High (+2σ+)";
+      else if (z >= 1.0) status = "Above Average (+1σ)";
+      else if (z <= -3.0) status = "Extreme Low Outlier (-3σ-)";
+      else if (z <= -2.0) status = "Significantly Low (-2σ-)";
+      else if (z <= -1.0) status = "Below Average (-1σ)";
+
+      var signStr = (z >= 0) ? "+" : "";
+      document.getElementById('res-zscore').innerText = "Z-Score: " + signStr + z.toFixed(prec);
+      document.getElementById('res-percentile').innerText = percentile.toFixed(2) + "%";
+      document.getElementById('res-left-p').innerText = leftTail.toFixed(prec);
+      document.getElementById('res-right-p').innerText = rightTail.toFixed(prec);
+      document.getElementById('res-two-p').innerText = twoTail.toFixed(prec);
+      document.getElementById('res-raw').innerText = x.toFixed(prec);
+      document.getElementById('res-status').innerText = status;
+
+      steps += "\n\n3. Cumulative Normal CDF Probabilities:\n" +
+               "   Left-Tail P(Z < z) = " + leftTail.toFixed(prec) + " (Percentile: " + percentile.toFixed(2) + "%)\n" +
+               "   Right-Tail P(Z > z) = 1 - P(Z < z) = " + rightTail.toFixed(prec) + "\n" +
+               "   Two-Tailed p-value = 2 * [1 - Φ(|z|)] = " + twoTail.toFixed(prec);
+
+      document.getElementById('res-steps').innerText = steps;
+    }
+
+    function showError(msg) {
+      document.getElementById('res-zscore').innerText = "Error";
+      document.getElementById('res-percentile').innerText = "N/A";
+      document.getElementById('res-left-p').innerText = "N/A";
+      document.getElementById('res-right-p').innerText = "N/A";
+      document.getElementById('res-two-p').innerText = "N/A";
+      document.getElementById('res-raw').innerText = "N/A";
+      document.getElementById('res-status').innerText = "Invalid Input";
+      document.getElementById('res-steps').innerText = "Error: " + msg;
+    }
+
+    function resetZ() {
+      document.getElementById('z-mode').value = 'raw-to-z';
+      document.getElementById('raw-x').value = '85';
+      document.getElementById('mean-val').value = '70';
+      document.getElementById('sd-val').value = '10';
+      document.getElementById('target-z').value = '1.50';
+      document.getElementById('inv-mean').value = '70';
+      document.getElementById('inv-sd').value = '10';
+      document.getElementById('precision-select').value = '4';
+      switchZMode();
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      calculateZ();
+    });
+  </script>
+</body>
+</html>

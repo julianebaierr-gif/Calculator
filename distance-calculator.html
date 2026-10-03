@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distance Calculator - 2D &amp; 3D Euclidean, Manhattan &amp; Coordinate Solver</title>
+  <meta name="description" content="Calculate 2D and 3D Euclidean distance, Manhattan distance, Chebyshev distance, vector displacement, line slope, and midpoint with step-by-step math.">
+  <link rel="canonical" href="https://calchub.org/distance-calculator.html">
+  <meta property="og:title" content="Distance Calculator - 2D &amp; 3D Coordinate Geometry Solver">
+  <meta property="og:description" content="Free multi-metric distance calculator. Compute Euclidean distance in 2D and 3D space, Manhattan distance, Chebyshev metric, displacement, slope, and midpoints.">
+  <meta property="og:url" content="https://calchub.org/distance-calculator.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Distance Calculator - 2D/3D Euclidean &amp; Coordinate Geometry">
+  <meta name="twitter:description" content="Calculate Euclidean distance, Manhattan distance, 3D space diagonal, midpoint, and vector displacement with complete step-by-step coordinate derivations.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Distance Calculator",
+    "url": "https://calchub.org/distance-calculator.html",
+    "description": "Calculates 2D and 3D Euclidean distance, Manhattan distance, Chebyshev distance, displacement vector, slope, and midpoint between coordinate points.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the Euclidean distance formula in 2D and 3D space?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "In 2D Cartesian space, Euclidean distance between (x1, y1) and (x2, y2) is d = sqrt((x2 - x1)^2 + (y2 - y1)^2). In 3D space with points (x1, y1, z1) and (x2, y2, z2), it expands via the 3D Pythagorean theorem to d = sqrt((x2 - x1)^2 + (y2 - y1)^2 + (z2 - z1)^2)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does Manhattan distance differ from Euclidean distance?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Euclidean distance measures the direct straight-line distance (as the crow flies) through the L2 norm. Manhattan distance (L1 norm or taxicab metric) measures distance along strictly orthogonal grid axes: d_M = |x2 - x1| + |y2 - y1| (+ |z2 - z1| in 3D), representing grid navigation where diagonal travel is prohibited."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the Chebyshev distance and where is it applied?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Chebyshev distance (L-infinity norm) is the maximum coordinate difference along any single axis: d_C = max(|x2 - x1|, |y2 - y1|, |z2 - z1|). It models the number of moves a King makes on a chessboard or crane motion where all orthogonal axes move simultaneously at identical maximum velocity."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can Euclidean distance between two real coordinate points ever be negative?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. In real metric spaces, Euclidean distance satisfies the non-negativity axiom (d(P, Q) >= 0) and the identity of indiscernibles (d(P, Q) = 0 if and only if P = Q). Because distance is the square root of a sum of squared real numbers, it is always non-negative."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">CalcHub</a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="math.html" class="active">Math &amp; Statistics</a>
+        <a href="converter.html">Converters</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="calculator-container">
+    <div class="calculator-header">
+      <div class="calc-icon" aria-hidden="true">&#10138;</div>
+      <h1>Distance Calculator (2D &amp; 3D Coordinates)</h1>
+      <p class="calc-description">Compute Euclidean distance, Manhattan taxicab distance, Chebyshev maximum metric, 3D space diagonal, displacement vector, slope, and midpoint with step-by-step derivations.</p>
+    </div>
+
+    <div class="calculator-body">
+      <div class="input-group">
+        <label for="dim-select">Coordinate Space Dimensionality</label>
+        <select id="dim-select" class="form-control" onchange="switchDimension()">
+          <option value="2d" selected>2D Plane Space (x, y)</option>
+          <option value="3d">3D Volume Space (x, y, z)</option>
+        </select>
+      </div>
+
+      <div class="input-grid">
+        <div class="input-group">
+          <label for="p1-x">Point 1: x₁</label>
+          <input type="number" id="p1-x" class="form-control" value="2" step="any">
+        </div>
+        <div class="input-group">
+          <label for="p1-y">Point 1: y₁</label>
+          <input type="number" id="p1-y" class="form-control" value="3" step="any">
+        </div>
+        <div class="input-group dim-3d-group" id="group-p1-z" style="display:none;">
+          <label for="p1-z">Point 1: z₁</label>
+          <input type="number" id="p1-z" class="form-control" value="1" step="any">
+        </div>
+      </div>
+
+      <div class="input-grid">
+        <div class="input-group">
+          <label for="p2-x">Point 2: x₂</label>
+          <input type="number" id="p2-x" class="form-control" value="7" step="any">
+        </div>
+        <div class="input-group">
+          <label for="p2-y">Point 2: y₂</label>
+          <input type="number" id="p2-y" class="form-control" value="15" step="any">
+        </div>
+        <div class="input-group dim-3d-group" id="group-p2-z" style="display:none;">
+          <label for="p2-z">Point 2: z₂</label>
+          <input type="number" id="p2-z" class="form-control" value="9" step="any">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="precision-select">Decimal Precision</label>
+        <select id="precision-select" class="form-control" onchange="calculateDistance()">
+          <option value="2">2 decimal places</option>
+          <option value="4" selected>4 decimal places</option>
+          <option value="6">6 decimal places</option>
+        </select>
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:16px;">
+        <button id="calc-btn" class="btn-primary" onclick="calculateDistance()" style="flex:1;">Calculate Distance</button>
+        <button id="reset-btn" class="btn-secondary" onclick="resetDistance()">Reset</button>
+      </div>
+
+      <div id="result-box" class="result-box" style="margin-top:24px;">
+        <h2 class="result-title">Metric Distance &amp; Spatial Properties</h2>
+        <div class="result-highlight" style="font-size:1.8rem; font-weight:700; color:var(--primary); margin-bottom:16px;" id="res-euclidean">
+          Euclidean Distance: 13.0000 units
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:16px;">
+          <div><span class="res-label">Manhattan Distance (L₁):</span> <strong class="res-val" id="res-manhattan">17.0000</strong></div>
+          <div><span class="res-label">Chebyshev Distance (L_&infin;):</span> <strong class="res-val" id="res-chebyshev">12.0000</strong></div>
+          <div><span class="res-label">Displacement Vector:</span> <strong class="res-val" id="res-vector">&lang;5, 12&rang;</strong></div>
+          <div><span class="res-label">Midpoint Coordinates:</span> <strong class="res-val" id="res-midpoint">(4.5, 9.0)</strong></div>
+          <div id="box-slope"><span class="res-label">2D Slope (m):</span> <strong class="res-val" id="res-slope">2.4000 (67.38&deg;)</strong></div>
+          <div><span class="res-label">Squared Distance (d&sup2;):</span> <strong class="res-val" id="res-dsq">169.0000</strong></div>
+        </div>
+
+        <h3 style="margin-top:20px; font-size:1.1rem; color:var(--text-dark);">Mathematical Step-by-Step Derivation</h3>
+        <div id="res-steps" style="background:var(--bg-subtle, #f8fafc); padding:16px; border-radius:8px; font-family:monospace; font-size:0.95rem; white-space:pre-wrap; border:1px solid var(--border-color, #e2e8f0);"></div>
+      </div>
+    </div>
+
+    <article class="article-body">
+      <h2>Comprehensive Theoretical &amp; Engineering Guide to Distance Metrics</h2>
+      <p>Distance is the fundamental scalar quantity in analytic geometry, mechanics, physical geodesy, and computer vision that measures the separation between two distinct points in coordinate space. In mathematical analysis, a function \(d(P, Q)\) is formally classified as a distance metric on a set if and only if it satisfies four rigorous metric axioms:</p>
+      <ol>
+        <li><strong>Non-negativity:</strong> \(d(P, Q) \ge 0\) for all points \(P\) and \(Q\).</li>
+        <li><strong>Identity of Indiscernibles:</strong> \(d(P, Q) = 0 \iff P = Q\).</li>
+        <li><strong>Symmetry:</strong> \(d(P, Q) = d(Q, P)\).</li>
+        <li><strong>Triangle Inequality:</strong> \(d(P, R) \le d(P, Q) + d(Q, R)\) for any intermediate point \(Q\).</li>
+      </ol>
+      <p>While the straight-line Euclidean distance remains the standard metric of physical space, modern engineering and computational sciences frequently require non-Euclidean norms such as the Manhattan metric for urban transportation networks, the Chebyshev metric for robotic gantry routing, and the Minkowski generalized \(L_p\) norm for high-dimensional feature spaces in machine learning clustering algorithms.</p>
+
+      <h2>Mathematical Formulations: 2D, 3D &amp; Non-Euclidean Metrics</h2>
+      <p>Depending on the degrees of freedom and spatial constraints of an engineering system, different coordinate formulas apply.</p>
+
+      <h3>1. 2D Euclidean Distance (Planar \(L_2\) Norm)</h3>
+      <p>For any two points \(P_1 = (x_1, y_1)\) and \(P_2 = (x_2, y_2)\) on a two-dimensional Cartesian plane, Euclidean distance derives directly from the <a href="pythagorean-theorem-calculator.html">Pythagorean Theorem</a> by constructing a right-angled triangle with perpendicular legs \(\Delta x = x_2 - x_1\) and \(\Delta y = y_2 - y_1\):</p>
+      $$d = \sqrt{(\Delta x)^2 + (\Delta y)^2} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$$
+      <p>The squared distance \(d^2 = (x_2 - x_1)^2 + (y_2 - y_1)^2\) is often utilized in high-performance computer graphics, collision detection, and spatial database indexing to avoid the computational cost of evaluating radical square roots. You can compute explicit radical evaluations using our <a href="square-root-calculator.html">Square Root Calculator</a>.</p>
+
+      <h3>2. 3D Euclidean Distance (Spatial \(L_2\) Space Diagonal)</h3>
+      <p>In three-dimensional space, points possess altitude or depth coordinates: \(P_1 = (x_1, y_1, z_1)\) and \(P_2 = (x_2, y_2, z_2)\). Extending the Pythagorean theorem across the orthogonal base plane and the vertical elevation axis yields the 3D space diagonal:</p>
+      $$d = \sqrt{(\Delta x)^2 + (\Delta y)^2 + (\Delta z)^2} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2 + (z_2 - z_1)^2}$$
+      <p>This formulation underpins aerospace flight trajectory calculations, orbital mechanics, structural truss member sizing, and 3D computer-aided design (CAD) spatial clearance verifications.</p>
+
+      <h3>3. Manhattan Distance (Taxicab Metric / \(L_1\) Norm)</h3>
+      <p>In city navigation where physical streets form a rigid rectangular grid, diagonal travel through buildings is prohibited. The Manhattan distance \(d_M\), also known as the \(L_1\) norm or taxicab metric, computes the sum of the absolute differences along each orthogonal axis:</p>
+      $$\text{In 2D: } d_M = |\Delta x| + |\Delta y| = |x_2 - x_1| + |y_2 - y_1|$$
+      $$\text{In 3D: } d_M = |\Delta x| + |\Delta y| + |\Delta z| = |x_2 - x_1| + |y_2 - y_1| + |z_2 - z_1|$$
+      <p>Manhattan distance is extensively applied in integrated circuit (IC) routing algorithms, warehouse automated guided vehicle (AGV) pathfinding, and compressed sensing (LASSO \(L_1\) regularization).</p>
+
+      <h3>4. Chebyshev Distance (Chessboard Metric / \(L_\infty\) Norm)</h3>
+      <p>Named after Pafnuty Chebyshev, the Chebyshev distance \(d_C\) measures the greatest absolute difference between coordinate components along any single dimension:</p>
+      $$d_C = \max\left( |\Delta x|, |\Delta y|, |\Delta z| \right)$$
+      <p>On an \(8 \times 8\) chessboard, the King can move one square in any direction (orthogonal or diagonal). The minimum number of moves required for a King to travel between \((x_1, y_1)\) and \((x_2, y_2)\) exactly equals the Chebyshev distance. In industrial gantry robotics where independent stepper motors drive the X, Y, and Z axes simultaneously at identical maximum speeds, the cycle time to complete a motion is governed by the Chebyshev metric.</p>
+
+      <h3>5. Midpoint and Direction Vector Relations</h3>
+      <p>Connecting two points in space defines both a displacement vector and an exact central midpoint. The midpoint \(M\) bisects the line segment into two equal segments, as computed in our <a href="midpoint-calculator.html">Midpoint Calculator</a>:</p>
+      $$\text{Midpoint in 3D: } M = \left( \frac{x_1 + x_2}{2}, \frac{y_1 + y_2}{2}, \frac{z_1 + z_2}{2} \right)$$
+      $$\text{Displacement Vector: } \vec{v} = \langle \Delta x, \Delta y, \Delta z \rangle = \langle x_2 - x_1, y_2 - y_1, z_2 - z_1 \rangle$$
+      $$\text{2D Directional Angle: } \theta = \arctan2(\Delta y, \Delta x)$$
+
+      <h2>Distance Metrics Comparison &amp; Invariants Table</h2>
+      <p>The following technical reference matrix compares the mathematical properties, metric balls, and practical applications of standard coordinate distance norms:</p>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Distance Metric</th>
+            <th>Mathematical Formula</th>
+            <th>Metric Space Norm</th>
+            <th>Unit Ball Geometry</th>
+            <th>Primary Engineering Application</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Euclidean Distance</td>
+            <td>\(\sqrt{\sum (x_i - y_i)^2}\)</td>
+            <td>\(L_2\) Norm</td>
+            <td>Circle / Sphere</td>
+            <td>Straight-line physics, ballistics, radar, surveying, CAD</td>
+          </tr>
+          <tr>
+            <td>Manhattan Distance</td>
+            <td>\(\sum |x_i - y_i|\)</td>
+            <td>\(L_1\) Norm</td>
+            <td>Diamond (rotated square) / Octahedron</td>
+            <td>City street grids, PCB wire routing, LASSO regularization</td>
+          </tr>
+          <tr>
+            <td>Chebyshev Distance</td>
+            <td>\(\max_i |x_i - y_i|\)</td>
+            <td>\(L_\infty\) Norm</td>
+            <td>Square / Cube</td>
+            <td>CNC gantry routers, automated warehousing, King chess moves</td>
+          </tr>
+          <tr>
+            <td>Minkowski Distance</td>
+            <td>\(\left(\sum |x_i - y_i|^p\right)^{1/p}\)</td>
+            <td>\(L_p\) Norm</td>
+            <td>Superellipse / Lam&eacute; curves</td>
+            <td>Machine learning clustering, k-NN classification, data mining</td>
+          </tr>
+          <tr>
+            <td>Squared Euclidean</td>
+            <td>\(\sum (x_i - y_i)^2\)</td>
+            <td>Quadratic Form</td>
+            <td>Paraboloid contour</td>
+            <td>K-means clustering, collision detection (avoids square roots)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Real-World Engineering, Surveying &amp; Robotics Case Studies</h2>
+      <p>The following practical examples demonstrate how these distance formulations solve real-world problems in civil engineering, industrial robotics, and urban logistics.</p>
+
+      <div class="worked-example-card">
+        <h3>Case Study 1: Civil Engineering Land Surveying &amp; Elevation Clearance (3D Space)</h3>
+        <p><strong>Scenario:</strong> A civil surveyor establishes two benchmark survey pins on an inclined hillside for a high-voltage transmission tower. Pin A is recorded at local coordinates \((120.0 \text{ m}, 250.0 \text{ m}, 45.0 \text{ m})\), and Pin B is recorded at \((360.0 \text{ m}, 430.0 \text{ m}, 95.0 \text{ m})\). The project engineer requires the true spatial 3D cable span distance, the flat plan-view 2D distance, and the terrain elevation slope.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Calculate coordinate differentials:
+            $$\Delta x = 360.0 - 120.0 = 240.0 \text{ m}$$
+            $$\Delta y = 430.0 - 250.0 = 180.0 \text{ m}$$
+            $$\Delta z = 95.0 - 45.0 = 50.0 \text{ m}$$
+          </li>
+          <li>Compute horizontal 2D plan-view distance:
+            $$d_{2D} = \sqrt{240.0^2 + 180.0^2} = \sqrt{57600 + 32400} = \sqrt{90000} = 300.0000 \text{ m}$$
+          </li>
+          <li>Compute spatial 3D Euclidean distance:
+            $$d_{3D} = \sqrt{d_{2D}^2 + \Delta z^2} = \sqrt{300.0^2 + 50.0^2} = \sqrt{90000 + 2500} = \sqrt{92500} \approx 304.1381 \text{ m}$$
+          </li>
+          <li>Compute terrain slope percentage:
+            $$\text{Slope} = \frac{\Delta z}{d_{2D}} \times 100\% = \frac{50.0}{300.0} \times 100\% \approx 16.6667\%$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> The true 3D spatial span length is \(304.1381 \text{ m}\), with a horizontal plan-view distance of \(300.0000 \text{ m}\) and a hillside grade of \(16.67\%\).</p>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 2: Industrial Gantry CNC Router Toolpath (Chebyshev vs. Euclidean)</h3>
+        <p><strong>Scenario:</strong> A 3-axis CNC milling machine operates independent servomotors for the X, Y, and Z axes. Each axis has a rapid transit velocity limit of \(200 \text{ mm/s}\). The toolhead must move from rapid position \(P_1 = (50.0, 40.0, 10.0 \text{ mm})\) to cutting start position \(P_2 = (290.0, 160.0, 70.0 \text{ mm})\). The controls engineer must determine the physical Euclidean travel distance and the actual cycle transit time.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Calculate axis displacements:
+            $$|\Delta x| = |290.0 - 50.0| = 240.0 \text{ mm}$$
+            $$|\Delta y| = |160.0 - 40.0| = 120.0 \text{ mm}$$
+            $$|\Delta z| = |70.0 - 10.0| = 60.0 \text{ mm}$$
+          </li>
+          <li>Calculate physical 3D Euclidean straight-line distance:
+            $$d = \sqrt{240.0^2 + 120.0^2 + 60.0^2} = \sqrt{57600 + 14400 + 3600} = \sqrt{75600} \approx 274.9545 \text{ mm}$$
+          </li>
+          <li>Calculate Chebyshev distance governing simultaneous multi-axis transit:
+            $$d_C = \max(240.0, 120.0, 60.0) = 240.0000 \text{ mm}$$
+          </li>
+          <li>Calculate minimum motion cycle time:
+            $$t = \frac{d_C}{v_{\max}} = \frac{240.0 \text{ mm}}{200.0 \text{ mm/s}} = 1.2000 \text{ seconds}$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> While the straight-line physical displacement is \(274.9545 \text{ mm}\), the CNC machine cycle time is strictly governed by the Chebyshev distance of \(240.0000 \text{ mm}\), completing transit in exactly \(1.2000\) seconds.</p>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 3: Urban Automated Delivery Fleet Routing (Manhattan vs. Euclidean)</h3>
+        <p><strong>Scenario:</strong> An autonomous delivery robot navigates a downtown city grid with avenues aligned on a Cartesian coordinate plane (coordinates in blocks, where 1 block = 100 meters). The distribution hub is at \((12, 8)\), and the delivery destination is at \((27, 28)\). The dispatch system must calculate the straight-line line-of-sight distance (for drone delivery) versus the ground wheel travel distance (for sidewalk rover delivery).</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Compute block differentials:
+            $$\Delta x = 27 - 12 = 15 \text{ blocks}$$
+            $$\Delta y = 28 - 8 = 20 \text{ blocks}$$
+          </li>
+          <li>Calculate aerial drone distance (Euclidean metric):
+            $$d_{\text{drone}} = \sqrt{15^2 + 20^2} = \sqrt{225 + 400} = \sqrt{625} = 25.0 \text{ blocks} = 2,500.0 \text{ meters}$$
+          </li>
+          <li>Calculate ground rover distance (Manhattan metric):
+            $$d_{\text{rover}} = |\Delta x| + |\Delta y| = 15 + 20 = 35.0 \text{ blocks} = 3,500.0 \text{ meters}$$
+          </li>
+          <li>Calculate grid detour circuity factor:
+            $$\text{Circuity Factor} = \frac{d_{\text{rover}}}{d_{\text{drone}}} = \frac{35.0}{25.0} = 1.4000$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> The aerial line-of-sight distance is \(2,500.0 \text{ m}\), whereas the sidewalk wheel distance is \(3,500.0 \text{ m}\), representing a \(40\%\) routing detour over straight-line flight.</p>
+      </div>
+
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-item">
+        <div class="faq-question">What is the difference between distance and displacement?</div>
+        <div class="faq-answer">Distance is a scalar quantity representing the absolute spatial magnitude of separation between two locations (\(d \ge 0\)), independent of heading. Displacement is a vector quantity that encompasses both magnitude and directional orientation (\(\vec{v} = \langle \Delta x, \Delta y, \Delta z \rangle\)), indicating the directed path from the initial point to the terminal point.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">Why does the 3D distance formula have three squared terms inside the radical?</div>
+        <div class="faq-answer">The 3D distance formula applies the Pythagorean theorem twice in succession. First, it computes the hypotenuse across the horizontal base plane: \(d_{xy}^2 = \Delta x^2 + \Delta y^2\). Second, it treats this planar diagonal as the base of a vertical right triangle with altitude \(\Delta z\): \(d_{3D}^2 = d_{xy}^2 + \Delta z^2 = \Delta x^2 + \Delta y^2 + \Delta z^2\). Taking the square root yields the complete 3D formula.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">When should I compute Manhattan distance instead of Euclidean distance?</div>
+        <div class="faq-answer">Use Manhattan distance whenever motion is physically constrained to orthogonal grid axes—such as vehicular traffic navigating city street grids, warehouse Automated Guided Vehicles (AGVs) following aisle tape, or integrated circuit trace routing on printed circuit boards (PCBs). In these scenarios, diagonal Euclidean shortcuts cannot physically be traversed.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">How does Chebyshev distance relate to robotic cycle times?</div>
+        <div class="faq-answer">In multi-axis motion controllers where individual servo actuators for the X, Y, and Z axes can accelerate and travel concurrently at equal maximum speeds, all axes operate in parallel. The total travel duration is limited by the single axis that must traverse the greatest distance: \(t = \max(|\Delta x|, |\Delta y|, |\Delta z|) / v_{\max}\). This maximum coordinate differential is the Chebyshev distance.</div>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>Comprehensive mathematical, statistical, and engineering calculation tools.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Discipline Hubs</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="math.html">Mathematics</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed computational algorithms.</p>
+    </div>
+  </footer>
+
+  <script>
+    function switchDimension() {
+      var dim = document.getElementById('dim-select').value;
+      var z1 = document.getElementById('group-p1-z');
+      var z2 = document.getElementById('group-p2-z');
+      var slopeBox = document.getElementById('box-slope');
+
+      if (dim === '3d') {
+        z1.style.display = 'block';
+        z2.style.display = 'block';
+        slopeBox.style.display = 'none';
+      } else {
+        z1.style.display = 'none';
+        z2.style.display = 'none';
+        slopeBox.style.display = 'block';
+      }
+      calculateDistance();
+    }
+
+    function calculateDistance() {
+      var dim = document.getElementById('dim-select').value;
+      var prec = parseInt(document.getElementById('precision-select').value, 10) || 4;
+
+      var x1 = parseFloat(document.getElementById('p1-x').value);
+      var y1 = parseFloat(document.getElementById('p1-y').value);
+      var x2 = parseFloat(document.getElementById('p2-x').value);
+      var y2 = parseFloat(document.getElementById('p2-y').value);
+
+      if ([x1, y1, x2, y2].some(isNaN)) {
+        showError("Please enter valid real numbers for all coordinate inputs.");
+        return;
+      }
+
+      var dx = x2 - x1;
+      var dy = y2 - y1;
+      var dz = 0;
+      var z1 = 0, z2 = 0;
+
+      if (dim === '3d') {
+        z1 = parseFloat(document.getElementById('p1-z').value);
+        z2 = parseFloat(document.getElementById('p2-z').value);
+        if (isNaN(z1) || isNaN(z2)) {
+          showError("Please enter valid real numbers for z-coordinates in 3D mode.");
+          return;
+        }
+        dz = z2 - z1;
+      }
+
+      var dsq = (dim === '3d') ? (dx * dx + dy * dy + dz * dz) : (dx * dx + dy * dy);
+      var euclidean = Math.sqrt(dsq);
+      var manhattan = (dim === '3d') ? (Math.abs(dx) + Math.abs(dy) + Math.abs(dz)) : (Math.abs(dx) + Math.abs(dy));
+      var chebyshev = (dim === '3d') ? Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz)) : Math.max(Math.abs(dx), Math.abs(dy));
+
+      var mx = (x1 + x2) / 2;
+      var my = (y1 + y2) / 2;
+      var mz = (z1 + z2) / 2;
+
+      document.getElementById('res-euclidean').innerText = "Euclidean Distance: " + euclidean.toFixed(prec) + " units";
+      document.getElementById('res-manhattan').innerText = manhattan.toFixed(prec);
+      document.getElementById('res-chebyshev').innerText = chebyshev.toFixed(prec);
+      document.getElementById('res-dsq').innerText = dsq.toFixed(prec);
+
+      if (dim === '3d') {
+        document.getElementById('res-vector').innerHTML = "&lang;" + dx.toFixed(prec) + ", " + dy.toFixed(prec) + ", " + dz.toFixed(prec) + "&rang;";
+        document.getElementById('res-midpoint').innerText = "(" + mx.toFixed(prec) + ", " + my.toFixed(prec) + ", " + mz.toFixed(prec) + ")";
+      } else {
+        document.getElementById('res-vector').innerHTML = "&lang;" + dx.toFixed(prec) + ", " + dy.toFixed(prec) + "&rang;";
+        document.getElementById('res-midpoint').innerText = "(" + mx.toFixed(prec) + ", " + my.toFixed(prec) + ")";
+        
+        var slopeText = "Undefined (Vertical)";
+        if (Math.abs(dx) > 1e-12) {
+          var slope = dy / dx;
+          var angleDeg = Math.atan2(dy, dx) * 180 / Math.PI;
+          slopeText = slope.toFixed(prec) + " (" + angleDeg.toFixed(2) + "°)";
+        }
+        document.getElementById('res-slope').innerText = slopeText;
+      }
+
+      var steps = "";
+      if (dim === '3d') {
+        steps = "Mode: 3D Spatial Cartesian Coordinates\n" +
+                "Point 1: (" + x1 + ", " + y1 + ", " + z1 + ")\n" +
+                "Point 2: (" + x2 + ", " + y2 + ", " + z2 + ")\n\n" +
+                "1. Differentials:\n" +
+                "   Δx = x₂ - x₁ = " + x2 + " - " + x1 + " = " + dx.toFixed(prec) + "\n" +
+                "   Δy = y₂ - y₁ = " + y2 + " - " + y1 + " = " + dy.toFixed(prec) + "\n" +
+                "   Δz = z₂ - z₁ = " + z2 + " - " + z1 + " = " + dz.toFixed(prec) + "\n\n" +
+                "2. Euclidean Distance (L₂ norm):\n" +
+                "   d = sqrt((Δx)² + (Δy)² + (Δz)²)\n" +
+                "   d = sqrt((" + dx.toFixed(prec) + ")² + (" + dy.toFixed(prec) + ")² + (" + dz.toFixed(prec) + ")²)\n" +
+                "   d = sqrt(" + (dx*dx).toFixed(prec) + " + " + (dy*dy).toFixed(prec) + " + " + (dz*dz).toFixed(prec) + ") = sqrt(" + dsq.toFixed(prec) + ")\n" +
+                "   d = " + euclidean.toFixed(prec) + " units\n\n" +
+                "3. Manhattan Distance (L₁ norm):\n" +
+                "   d_M = |Δx| + |Δy| + |Δz| = " + Math.abs(dx).toFixed(prec) + " + " + Math.abs(dy).toFixed(prec) + " + " + Math.abs(dz).toFixed(prec) + " = " + manhattan.toFixed(prec) + "\n\n" +
+                "4. Chebyshev Distance (L_∞ norm):\n" +
+                "   d_C = max(|Δx|, |Δy|, |Δz|) = " + chebyshev.toFixed(prec) + "\n\n" +
+                "5. Midpoint Coordinates:\n" +
+                "   M = ((x₁+x₂)/2, (y₁+y₂)/2, (z₁+z₂)/2) = (" + mx.toFixed(prec) + ", " + my.toFixed(prec) + ", " + mz.toFixed(prec) + ")";
+      } else {
+        steps = "Mode: 2D Planar Cartesian Coordinates\n" +
+                "Point 1: (" + x1 + ", " + y1 + ")\n" +
+                "Point 2: (" + x2 + ", " + y2 + ")\n\n" +
+                "1. Differentials:\n" +
+                "   Δx = x₂ - x₁ = " + x2 + " - " + x1 + " = " + dx.toFixed(prec) + "\n" +
+                "   Δy = y₂ - y₁ = " + y2 + " - " + y1 + " = " + dy.toFixed(prec) + "\n\n" +
+                "2. Euclidean Distance (L₂ norm):\n" +
+                "   d = sqrt((Δx)² + (Δy)²)\n" +
+                "   d = sqrt((" + dx.toFixed(prec) + ")² + (" + dy.toFixed(prec) + ")²)\n" +
+                "   d = sqrt(" + (dx*dx).toFixed(prec) + " + " + (dy*dy).toFixed(prec) + ") = sqrt(" + dsq.toFixed(prec) + ")\n" +
+                "   d = " + euclidean.toFixed(prec) + " units\n\n" +
+                "3. Manhattan Distance (L₁ norm):\n" +
+                "   d_M = |Δx| + |Δy| = " + Math.abs(dx).toFixed(prec) + " + " + Math.abs(dy).toFixed(prec) + " = " + manhattan.toFixed(prec) + "\n\n" +
+                "4. Chebyshev Distance (L_∞ norm):\n" +
+                "   d_C = max(|Δx|, |Δy|) = " + chebyshev.toFixed(prec) + "\n\n" +
+                "5. Midpoint: M = (" + mx.toFixed(prec) + ", " + my.toFixed(prec) + ")";
+      }
+
+      document.getElementById('res-steps').innerText = steps;
+    }
+
+    function showError(msg) {
+      document.getElementById('res-euclidean').innerText = "Error";
+      document.getElementById('res-manhattan').innerText = "N/A";
+      document.getElementById('res-chebyshev').innerText = "N/A";
+      document.getElementById('res-vector').innerText = "N/A";
+      document.getElementById('res-midpoint').innerText = "N/A";
+      document.getElementById('res-slope').innerText = "N/A";
+      document.getElementById('res-dsq').innerText = "N/A";
+      document.getElementById('res-steps').innerText = "Error: " + msg;
+    }
+
+    function resetDistance() {
+      document.getElementById('dim-select').value = '2d';
+      document.getElementById('p1-x').value = '2';
+      document.getElementById('p1-y').value = '3';
+      document.getElementById('p1-z').value = '1';
+      document.getElementById('p2-x').value = '7';
+      document.getElementById('p2-y').value = '15';
+      document.getElementById('p2-z').value = '9';
+      document.getElementById('precision-select').value = '4';
+      switchDimension();
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      calculateDistance();
+    });
+  </script>
+</body>
+</html>

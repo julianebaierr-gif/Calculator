@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Midrange Calculator - Statistical Measure of Center &amp; Range Sizer</title>
+  <meta name="description" content="Calculate the midrange of any statistical dataset with step-by-step arithmetic. Compare midrange vs mean, median, midhinge, trimean, and total range.">
+  <link rel="canonical" href="https://calchub.org/midrange-calculator.html">
+  <meta property="og:title" content="Midrange Calculator - Center of Range &amp; Dispersion Solver">
+  <meta property="og:description" content="Free statistical midrange calculator. Compute midrange (L + S)/2, data range (L - S), arithmetic mean, median, midhinge, and outlier sensitivity.">
+  <meta property="og:url" content="https://calchub.org/midrange-calculator.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Midrange Calculator - Center of Data Range Solver">
+  <meta name="twitter:description" content="Calculate the statistical midrange, minimum, maximum, range, mean, and midhinge for any dataset with complete step-by-step mathematical breakdowns.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Midrange Calculator",
+    "url": "https://calchub.org/midrange-calculator.html",
+    "description": "Calculates the statistical midrange (L + S) / 2, range, minimum, maximum, mean, median, midhinge, and trimean for any numerical dataset.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the midrange in statistics and what is its formula?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The midrange is a measure of central tendency representing the exact arithmetic midpoint between the highest (maximum, L) and lowest (minimum, S) values in a dataset. Its mathematical formula is Midrange = (Maximum + Minimum) / 2 or (L + S) / 2."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does the midrange differ from the mean and median?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The arithmetic mean uses every single observation in the dataset by dividing their sum by n. The median is the physical middle observation in a sorted list and is robust against extreme outliers. The midrange depends solely on the two extreme values (min and max); it ignores all intermediate data points and has a breakdown point of 0%, making it highly sensitive to outliers."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "When is the midrange a useful or optimal statistical estimator?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The midrange is the uniformly minimum-variance unbiased estimator (UMVUE) for the center of a continuous uniform distribution U(a, b). It is also widely used in daily meteorological temperature reporting (averaging daily high and low) and rapid industrial quality control checks where quick range appraisals are required without full data tallying."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between midrange and midhinge?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The midrange averages the extreme values: (Min + Max) / 2. The midhinge averages the first and third quartiles: (Q1 + Q3) / 2. Because the midhinge relies on quartiles rather than the extreme minimum and maximum, it is substantially more resistant to statistical outliers while retaining the symmetry of range-based centering."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">CalcHub</a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="math.html" class="active">Math &amp; Statistics</a>
+        <a href="converter.html">Converters</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="calculator-container">
+    <div class="calculator-header">
+      <div class="calc-icon" aria-hidden="true">&#9878;</div>
+      <h1>Midrange Calculator</h1>
+      <p class="calc-description">Calculate the statistical midrange, minimum, maximum, total range, arithmetic mean, median, midhinge, and trimean for any numerical dataset.</p>
+    </div>
+
+    <div class="calculator-body">
+      <div class="input-group">
+        <label for="dataset-input">Dataset Observations</label>
+        <textarea id="dataset-input" class="form-control" rows="4" placeholder="Enter numbers separated by commas, spaces, or newlines, e.g. 18, 24, 32, 15, 45, 29, 38">18, 24, 32, 15, 45, 29, 38</textarea>
+        <span class="help-text">Accepts positive, negative, and decimal values separated by commas, spaces, tabs, or line breaks.</span>
+      </div>
+
+      <div class="input-group">
+        <label for="precision-select">Decimal Precision</label>
+        <select id="precision-select" class="form-control" onchange="calculateMidrange()">
+          <option value="2">2 decimal places</option>
+          <option value="4" selected>4 decimal places</option>
+          <option value="6">6 decimal places</option>
+        </select>
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:16px;">
+        <button id="calc-btn" class="btn-primary" onclick="calculateMidrange()" style="flex:1;">Compute Midrange</button>
+        <button id="reset-btn" class="btn-secondary" onclick="resetMidrange()">Reset</button>
+      </div>
+
+      <div id="result-box" class="result-box" style="margin-top:24px;">
+        <h2 class="result-title">Central Tendency &amp; Range Analysis</h2>
+        <div class="result-highlight" style="font-size:1.8rem; font-weight:700; color:var(--primary); margin-bottom:16px;" id="res-midrange">
+          Midrange: 30.0000
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:16px;">
+          <div><span class="res-label">Minimum Value (S):</span> <strong class="res-val" id="res-min">15.0000</strong></div>
+          <div><span class="res-label">Maximum Value (L):</span> <strong class="res-val" id="res-max">45.0000</strong></div>
+          <div><span class="res-label">Total Range (L - S):</span> <strong class="res-val" id="res-range">30.0000</strong></div>
+          <div><span class="res-label">Arithmetic Mean (x̄):</span> <strong class="res-val" id="res-mean">28.7143</strong></div>
+          <div><span class="res-label">Median (Q₂):</span> <strong class="res-val" id="res-median">29.0000</strong></div>
+          <div><span class="res-label">Midhinge (Q₁+Q₃)/2:</span> <strong class="res-val" id="res-midhinge">26.5000</strong></div>
+          <div><span class="res-label">Dataset Count (n):</span> <strong class="res-val" id="res-count">7</strong></div>
+        </div>
+
+        <h3 style="margin-top:20px; font-size:1.1rem; color:var(--text-dark);">Step-by-Step Calculation Breakdown</h3>
+        <div id="res-steps" style="background:var(--bg-subtle, #f8fafc); padding:16px; border-radius:8px; font-family:monospace; font-size:0.95rem; white-space:pre-wrap; border:1px solid var(--border-color, #e2e8f0); margin-bottom:16px;"></div>
+
+        <h3 style="margin-top:16px; font-size:1.1rem; color:var(--text-dark);">Sorted Dataset &amp; Order Statistics</h3>
+        <div id="res-sorted" style="background:var(--bg-subtle, #f8fafc); padding:12px; border-radius:6px; font-size:0.95rem; color:var(--text-dark); border:1px solid var(--border-color, #e2e8f0);"></div>
+      </div>
+    </div>
+
+    <article class="article-body">
+      <h2>Comprehensive Theoretical &amp; Statistical Guide to the Midrange</h2>
+      <p>In descriptive and mathematical statistics, the midrange (also referred to as the mid-range or center of range) is a classic measure of central tendency that quantifies the exact arithmetic midpoint between the extreme endpoints of a distribution. While elementary statistics primarily emphasizes the <a href="mean-median-mode-calculator.html">mean, median, and mode</a>, the midrange represents the boundary-based anchor of a sample space. It is defined as the arithmetic mean of the maximum and minimum observations in an ordered dataset.</p>
+
+      <p>Despite being computationally trivial to calculate, the midrange exhibits unique mathematical properties in estimation theory. In classical robust statistics, the midrange has a breakdown point of \(0\%\), meaning a single erroneous outlier can distort its value arbitrarily. However, in statistical physics, industrial quality assurance, and climatology, the midrange serves as an indispensable tool. Most notably, for bounded continuous uniform distributions \(U(a, b)\), the midrange is the uniformly minimum-variance unbiased estimator (UMVUE) of the distribution's true center, outperforming both the sample mean and the sample median in statistical efficiency.</p>
+
+      <h2>Mathematical Formulation &amp; Order Statistics</h2>
+      <p>Let a random sample of size \(n\) be denoted as \(X = \{x_1, x_2, \dots, x_n\}\). Sorting the sample in ascending order yields the sequence of order statistics:</p>
+      $$x_{(1)} \le x_{(2)} \le \dots \le x_{(n-1)} \le x_{(n)}$$
+      <p>Where:</p>
+      <ul>
+        <li>\(x_{(1)} = \min(X) = S\) represents the first order statistic (sample minimum).</li>
+        <li>\(x_{(n)} = \max(X) = L\) represents the \(n\)-th order statistic (sample maximum).</li>
+      </ul>
+
+      <h3>1. Primary Midrange Formulation</h3>
+      <p>The statistical midrange \(M_{\text{mid}}\) is evaluated as:</p>
+      $$M_{\text{mid}} = \frac{x_{(1)} + x_{(n)}}{2} = \frac{\min(X) + \max(X)}{2} = \frac{S + L}{2}$$
+      <p>Geometrically, the midrange divides the total sample range \(R = x_{(n)} - x_{(1)} = L - S\) into two exactly equal halves of width \(\frac{R}{2}\):</p>
+      $$x_{(1)} + \frac{R}{2} = M_{\text{mid}} = x_{(n)} - \frac{R}{2}$$
+
+      <h3>2. Comparison with Related L-Estimators</h3>
+      <p>The midrange is an extreme member of the family of \(L\)-estimators (linear combinations of order statistics). Other prominent members include:</p>
+      <div class="formula-box">
+        <h3>Related Range-Centering Metrics</h3>
+        $$\text{Sample Range: } R = x_{(n)} - x_{(1)} = L - S$$
+        $$\text{Midhinge: } \text{MH} = \frac{Q_1 + Q_3}{2}$$
+        $$\text{Trimean (Tukey): } \text{TM} = \frac{Q_1 + 2Q_2 + Q_3}{4} = \frac{\text{Midhinge} + \text{Median}}{2}$$
+        $$\text{Trimmed Midrange (}\alpha\text{-trimmed): } M_{\alpha} = \frac{x_{(\lfloor \alpha n \rfloor + 1)} + x_{(n - \lfloor \alpha n \rfloor)}}{2}$$
+      </div>
+      <p>While the midrange uses the \(0\%\) and \(100\%\) percentiles, the midhinge uses the \(25\%\) and \(75\%\) quartiles (\(Q_1\) and \(Q_3\)), providing robust center estimation that resists up to \(25\%\) extreme outlier contamination.</p>
+
+      <h2>Statistical Efficiency: Bounded Uniform vs. Normal Distributions</h2>
+      <p>A critical question in estimation theory is determining which measure of central tendency minimizes the mean squared error (MSE) for a given probability distribution:</p>
+      <ul>
+        <li><strong>Continuous Uniform Distribution \(U(a, b)\):</strong> For a uniform distribution where data points are evenly distributed between lower bound \(a\) and upper bound \(b\), the sample mean \(\bar{x}\) converges to the center with a variance of \(\mathcal{O}(1/n)\). However, the midrange converges at a much faster rate of \(\mathcal{O}(1/n^2)\). Consequently, the midrange is the maximum likelihood estimator (MLE) and UMVUE, vastly outperforming the sample mean.</li>
+        <li><strong>Standard Normal Distribution \(N(\mu, \sigma^2)\):</strong> For a Gaussian distribution, the sample mean is the optimal UMVUE with \(100\%\) efficiency. In contrast, the asymptotic relative efficiency of the midrange drops to zero as \(n \to \infty\) because normal distributions have infinite tails where extreme order statistics fluctuate widely, as explored in our <a href="variance-calculator.html">Variance Calculator</a>.</li>
+        <li><strong>Heavy-Tailed Distributions (Cauchy / Pareto):</strong> When data exhibits extreme tail behavior, the midrange is completely destabilized, and the sample median or trimmed mean must be employed.</li>
+      </ul>
+
+      <h2>Central Tendency &amp; Centering Metric Benchmark Matrix</h2>
+      <p>The following multi-column benchmark matrix summarizes how the midrange compares against alternative statistical measures of center across breakdown points, data utilization, and optimal distribution regimes:</p>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Central Metric</th>
+            <th>Formula</th>
+            <th>Data Utilization</th>
+            <th>Breakdown Point</th>
+            <th>Optimal Distribution Regime</th>
+            <th>Sensitivity to Outliers</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Midrange</td>
+            <td>\(\frac{\min + \max}{2}\)</td>
+            <td>2 Extreme points</td>
+            <td>\(0\%\) (Worst)</td>
+            <td>Continuous Uniform \(U(a, b)\)</td>
+            <td>Extremely High (Maximally sensitive)</td>
+          </tr>
+          <tr>
+            <td>Arithmetic Mean</td>
+            <td>\(\frac{\sum x_i}{n}\)</td>
+            <td>All \(n\) observations</td>
+            <td>\(0\%\)</td>
+            <td>Gaussian / Normal \(N(\mu, \sigma^2)\)</td>
+            <td>High (Shifts proportionally with outlier)</td>
+          </tr>
+          <tr>
+            <td>Sample Median</td>
+            <td>\(x_{((n+1)/2)}\)</td>
+            <td>Middle rank(s)</td>
+            <td>\(50\%\) (Optimal)</td>
+            <td>Laplace (Double Exponential)</td>
+            <td>Very Low (Robust against \(50\%\) corruption)</td>
+          </tr>
+          <tr>
+            <td>Midhinge</td>
+            <td>\(\frac{Q_1 + Q_3}{2}\)</td>
+            <td>2 Quartile bounds</td>
+            <td>\(25\%\)</td>
+            <td>Symmetric bounded distributions</td>
+            <td>Moderate (Ignores outer \(25\%\) extremes)</td>
+          </tr>
+          <tr>
+            <td>Trimean</td>
+            <td>\(\frac{Q_1 + 2Q_2 + Q_3}{4}\)</td>
+            <td>3 Quartile points</td>
+            <td>\(25\%\)</td>
+            <td>Skewed exploratory data analysis</td>
+            <td>Low (Tukey exploratory standard)</td>
+          </tr>
+          <tr>
+            <td>Mode</td>
+            <td>\(\arg\max f(x)\)</td>
+            <td>Peak frequency</td>
+            <td>\(N/A\)</td>
+            <td>Categorical / Multimodal data</td>
+            <td>Immune to tail values, sensitive to binning</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Real-World Practical Engineering &amp; Climatology Case Studies</h2>
+      <p>The following real-world case studies illustrate the practical application of the midrange across meteorology, industrial quality engineering, and telecommunications.</p>
+
+      <div class="worked-example-card">
+        <h3>Case Study 1: Climatological Daily Mean Temperature Reporting</h3>
+        <p><strong>Scenario:</strong> The World Meteorological Organization (WMO) and national weather services (such as the US National Weather Service) traditionally record daily climate records using maximum-minimum thermometers. On a given summer day, a weather station logs the following hourly temperatures (\(^\circ\text{C}\)): \(16.2, 18.0, 21.5, 25.8, 29.4, 32.6, 31.0, 27.2, 22.1, 18.5, 17.0\). The station meteorologist must determine the official daily midrange temperature versus the 11-hour arithmetic mean.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Identify the minimum daily temperature (\(S\)):
+            $$S = \min(T) = 16.2^\circ\text{C}$$
+          </li>
+          <li>Identify the maximum daily temperature (\(L\)):
+            $$L = \max(T) = 32.6^\circ\text{C}$$
+          </li>
+          <li>Calculate the official climatological daily midrange:
+            $$M_{\text{mid}} = \frac{S + L}{2} = \frac{16.2 + 32.6}{2} = \frac{48.8}{2} = 24.4000^\circ\text{C}$$
+          </li>
+          <li>Calculate the true 11-observation arithmetic mean for comparison:
+            $$\sum T = 16.2 + 18.0 + 21.5 + 25.8 + 29.4 + 32.6 + 31.0 + 27.2 + 22.1 + 18.5 + 17.0 = 259.3^\circ\text{C}$$
+            $$\bar{T} = \frac{259.3}{11} \approx 23.5727^\circ\text{C}$$
+          </li>
+          <li>Compute discrepancy between midrange and arithmetic mean:
+            $$\Delta = 24.4000 - 23.5727 = +0.8273^\circ\text{C}$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> The official climatological daily midrange is \(24.4000^\circ\text{C}\), differing from the full hourly arithmetic mean by \(0.83^\circ\text{C}\) due to asymmetric afternoon peak warming.</p>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 2: Industrial Manufacturing Tolerance Midrange &amp; Range</h3>
+        <p><strong>Scenario:</strong> An automotive machining facility inspects the outer diameter of precision steel transmission pins (nominal specification \(25.000 \pm 0.050 \text{ mm}\)). A quality control technician samples a subgroup of 5 pins from a production run: \(25.012, 24.988, 25.004, 25.035, 24.995 \text{ mm}\). The technician must evaluate the subgroup midrange and range to populate an \(\bar{X}-R\) Shewhart control chart.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Sort the subgroup in ascending order:
+            $$x_{(1)} = 24.988, \; x_{(2)} = 24.995, \; x_{(3)} = 25.004, \; x_{(4)} = 25.012, \; x_{(5)} = 25.035$$
+          </li>
+          <li>Determine sample minimum and maximum:
+            $$S = 24.988 \text{ mm}, \quad L = 25.035 \text{ mm}$$
+          </li>
+          <li>Calculate subgroup range \(R\):
+            $$R = L - S = 25.035 - 24.988 = 0.0470 \text{ mm}$$
+          </li>
+          <li>Calculate subgroup midrange \(M_{\text{mid}}\):
+            $$M_{\text{mid}} = \frac{24.988 + 25.035}{2} = \frac{50.023}{2} = 25.0115 \text{ mm}$$
+          </li>
+          <li>Compare against nominal target:
+            $$\text{Offset from nominal } 25.000 = 25.0115 - 25.000 = +0.0115 \text{ mm}$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> The subgroup exhibits a total range of \(0.0470 \text{ mm}\) and a midrange of \(25.0115 \text{ mm}\), confirming the cutting tool is centered within the allowable \(\pm 0.050 \text{ mm}\) design boundaries.</p>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 3: Analog-to-Digital Converter Dynamic Range Midpoint</h3>
+        <p><strong>Scenario:</strong> An embedded systems firmware engineer calibrates a 12-bit Analog-to-Digital Converter (ADC) input channel. Over a continuous test scan of a sensor input signal, the lowest digital raw code observed is \(S = 420\) and the highest code observed is \(L = 3680\). The firmware calibration table requires the midrange zero-bias centerpoint and the midhinge calculated from the first quartile \(Q_1 = 1240\) and third quartile \(Q_3 = 2860\).</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Compute raw digital code midrange:
+            $$M_{\text{mid}} = \frac{420 + 3680}{2} = \frac{4100}{2} = 2050.0000 \text{ ADC codes}$$
+          </li>
+          <li>Compute interquartile midhinge:
+            $$\text{MH} = \frac{Q_1 + Q_3}{2} = \frac{1240 + 2860}{2} = \frac{4100}{2} = 2050.0000 \text{ ADC codes}$$
+          </li>
+          <li>Convert code midrange to physical analog voltage on a \(3.3 \text{ V}\) reference scale:
+            $$V_{\text{mid}} = \frac{M_{\text{mid}}}{4095} \times 3.3 \text{ V} = \frac{2050}{4095} \times 3.3 \approx 1.6520 \text{ V}$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> Because the midrange and midhinge are identical at \(2050.0000\) codes (\(1.6520 \text{ V}\)), the sensor dynamic range is highly symmetric around the \(1.650 \text{ V}\) half-rail analog reference bias.</p>
+      </div>
+
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-item">
+        <div class="faq-question">Why is the midrange considered an L-estimator?</div>
+        <div class="faq-answer">An L-estimator is any statistical estimator formed as a linear combination of order statistics: \(L = \sum c_i x_{(i)}\). The midrange sets the coefficient weights of the first and last order statistics to \(c_1 = 0.5\) and \(c_n = 0.5\), while assigning \(c_i = 0\) to all intermediate data points. It is therefore a boundary-weighted L-estimator.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">Why does the midrange have a 0% breakdown point?</div>
+        <div class="faq-answer">The breakdown point measures the smallest fraction of observations that can arbitrarily alter an estimator's value. In a sample of size n, replacing just one single observation with infinity (\(+\infty\) or \(-\infty\)) replaces either the maximum or the minimum, driving the midrange to infinity. Because \(1/n \to 0\%\) as sample size grows, the midrange has a zero breakdown point.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">Can the midrange equal the median and the mean?</div>
+        <div class="faq-answer">Yes. In any perfectly symmetric distribution without skewness (such as a uniform, triangular, or standard normal distribution), the expected values of the midrange, mean, and median are identical. In empirical samples, if the data is symmetrically spaced around its center, all three metrics will coincide.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">How does Tukey's Trimean improve upon the midrange?</div>
+        <div class="faq-answer">John Tukey introduced the Trimean \(\text{TM} = (Q_1 + 2Q_2 + Q_3) / 4\) to retain the intuitive centering structure of range-based L-estimators while overcoming the zero-breakdown vulnerability of the midrange. By weighting the median at \(50\%\) and the quartiles at \(25\%\) each, the trimean achieves a robust \(25\%\) breakdown point.</div>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>Comprehensive mathematical, statistical, and engineering calculation tools.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Discipline Hubs</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="math.html">Mathematics</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed computational algorithms.</p>
+    </div>
+  </footer>
+
+  <script>
+    function parseNumbers(text) {
+      if (!text) return [];
+      var parts = text.split(/[\s,;\n\r\t]+/);
+      var nums = [];
+      for (var i = 0; i < parts.length; i++) {
+        var str = parts[i].trim();
+        if (str !== "") {
+          var val = parseFloat(str);
+          if (!isNaN(val)) nums.push(val);
+        }
+      }
+      return nums;
+    }
+
+    function calculateMidrange() {
+      var raw = document.getElementById('dataset-input').value;
+      var data = parseNumbers(raw);
+      var prec = parseInt(document.getElementById('precision-select').value, 10) || 4;
+
+      if (data.length === 0) {
+        showError("Please enter at least one valid numerical observation.");
+        return;
+      }
+
+      var sorted = data.slice().sort(function(a, b) { return a - b; });
+      var n = sorted.length;
+      var minVal = sorted[0];
+      var maxVal = sorted[n - 1];
+      var rangeVal = maxVal - minVal;
+      var midrange = (minVal + maxVal) / 2;
+
+      var sum = 0;
+      for (var i = 0; i < n; i++) sum += sorted[i];
+      var mean = sum / n;
+
+      var median = 0;
+      if (n % 2 === 1) {
+        median = sorted[Math.floor(n / 2)];
+      } else {
+        median = (sorted[n / 2 - 1] + sorted[n / 2]) / 2;
+      }
+
+      // Quartiles for midhinge
+      function getQuartile(arr, q) {
+        var pos = (arr.length - 1) * q;
+        var base = Math.floor(pos);
+        var rest = pos - base;
+        if (arr[base + 1] !== undefined) {
+          return arr[base] + rest * (arr[base + 1] - arr[base]);
+        } else {
+          return arr[base];
+        }
+      }
+
+      var q1 = getQuartile(sorted, 0.25);
+      var q3 = getQuartile(sorted, 0.75);
+      var midhinge = (q1 + q3) / 2;
+
+      document.getElementById('res-midrange').innerText = "Midrange: " + midrange.toFixed(prec);
+      document.getElementById('res-min').innerText = minVal.toFixed(prec);
+      document.getElementById('res-max').innerText = maxVal.toFixed(prec);
+      document.getElementById('res-range').innerText = rangeVal.toFixed(prec);
+      document.getElementById('res-mean').innerText = mean.toFixed(prec);
+      document.getElementById('res-median').innerText = median.toFixed(prec);
+      document.getElementById('res-midhinge').innerText = midhinge.toFixed(prec);
+      document.getElementById('res-count').innerText = n.toString();
+
+      var steps = "Dataset Analysis (Sample Size n = " + n + "):\n" +
+                  "1. Identify Extremes:\n" +
+                  "   Minimum (S) = " + minVal.toFixed(prec) + "\n" +
+                  "   Maximum (L) = " + maxVal.toFixed(prec) + "\n\n" +
+                  "2. Midrange Formula:\n" +
+                  "   Midrange = (Minimum + Maximum) / 2\n" +
+                  "   Midrange = (" + minVal.toFixed(prec) + " + " + maxVal.toFixed(prec) + ") / 2 = " + (minVal + maxVal).toFixed(prec) + " / 2\n" +
+                  "   Midrange = " + midrange.toFixed(prec) + "\n\n" +
+                  "3. Range: L - S = " + maxVal.toFixed(prec) + " - " + minVal.toFixed(prec) + " = " + rangeVal.toFixed(prec) + "\n" +
+                  "4. Comparisons:\n" +
+                  "   Arithmetic Mean = " + mean.toFixed(prec) + "\n" +
+                  "   Median (Q₂) = " + median.toFixed(prec) + "\n" +
+                  "   Midhinge (Q₁+Q₃)/2 = (" + q1.toFixed(prec) + " + " + q3.toFixed(prec) + ") / 2 = " + midhinge.toFixed(prec);
+
+      document.getElementById('res-steps').innerText = steps;
+      document.getElementById('res-sorted').innerText = "Sorted Data: " + sorted.join(", ");
+    }
+
+    function showError(msg) {
+      document.getElementById('res-midrange').innerText = "Error";
+      document.getElementById('res-min').innerText = "N/A";
+      document.getElementById('res-max').innerText = "N/A";
+      document.getElementById('res-range').innerText = "N/A";
+      document.getElementById('res-mean').innerText = "N/A";
+      document.getElementById('res-median').innerText = "N/A";
+      document.getElementById('res-midhinge').innerText = "N/A";
+      document.getElementById('res-count').innerText = "0";
+      document.getElementById('res-steps').innerText = "Error: " + msg;
+      document.getElementById('res-sorted').innerText = "No data available";
+    }
+
+    function resetMidrange() {
+      document.getElementById('dataset-input').value = "18, 24, 32, 15, 45, 29, 38";
+      document.getElementById('precision-select').value = "4";
+      calculateMidrange();
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      calculateMidrange();
+    });
+  </script>
+</body>
+</html>

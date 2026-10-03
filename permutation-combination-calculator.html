@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Permutation and Combination Calculator - nPr &amp; nCr Combinatorics Solver</title>
+  <meta name="description" content="Calculate permutations (nPr) and combinations (nCr) with and without repetition. Includes factorials, stars and bars, step-by-step math, and formulas.">
+  <link rel="canonical" href="https://calchub.org/permutation-combination-calculator.html">
+  <meta property="og:title" content="Permutation and Combination Calculator - nPr &amp; nCr Solver">
+  <meta property="og:description" content="Free combinatorics calculator. Compute permutations nPr, combinations nCr, permutations with repetition n^r, and multiset combinations with step-by-step proofs.">
+  <meta property="og:url" content="https://calchub.org/permutation-combination-calculator.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Permutation &amp; Combination Calculator - nPr and nCr">
+  <meta name="twitter:description" content="Calculate permutations and combinations with or without replacement. Full step-by-step factorial breakdowns, worked examples, and formulas.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Permutation and Combination Calculator",
+    "url": "https://calchub.org/permutation-combination-calculator.html",
+    "description": "Calculates permutations nPr, combinations nCr, arrangements with repetition, and multiset combinations with complete step-by-step factorial evaluations.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the core difference between a permutation and a combination?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The fundamental difference is whether arrangement order matters. In permutations, sequence and order are critical (e.g., lock codes where 1-2-3 differs from 3-2-1). In combinations, order is irrelevant; only the composition of the selected subset matters (e.g., a hand of cards or a committee)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the formulas for nPr and nCr without repetition?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The permutation formula is P(n, r) = n! / (n - r)!. The combination formula is C(n, r) = n! / [r! * (n - r)!]. Notice that C(n, r) = P(n, r) / r!, dividing out the r! redundant internal permutations of the selected items."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do you calculate combinations when repetition or replacement is allowed?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "When items can be chosen multiple times without regard to order (multisets), use the stars and bars formula: C_rep(n, r) = (n + r - 1)! / [r! * (n - 1)!] = C(n + r - 1, r)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can r be greater than n in permutations and combinations?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Without repetition, r cannot exceed n because you cannot select more unique items than exist in the pool; C(n, r) = P(n, r) = 0 when r > n. However, with repetition allowed, r can be arbitrarily larger than n (for example, rolling a 6-sided die 20 times yields 6^20 permutations)."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">CalcHub</a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="math.html" class="active">Math &amp; Statistics</a>
+        <a href="converter.html">Converters</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="calculator-container">
+    <div class="calculator-header">
+      <div class="calc-icon" aria-hidden="true">&#9881;</div>
+      <h1>Permutation and Combination Calculator</h1>
+      <p class="calc-description">Compute permutations (nPr), combinations (nCr), arrangements with repetition, and multiset selections with step-by-step factorial expansions.</p>
+    </div>
+
+    <div class="calculator-body">
+      <div class="input-grid">
+        <div class="input-group">
+          <label for="n-val">Total Number of Items (n)</label>
+          <input type="number" id="n-val" class="form-control" value="8" min="0" max="100" step="1">
+          <span class="help-text">Size of the universal set (integer &ge; 0)</span>
+        </div>
+        <div class="input-group">
+          <label for="r-val">Items Selected / Subgroup (r)</label>
+          <input type="number" id="r-val" class="form-control" value="3" min="0" max="100" step="1">
+          <span class="help-text">Number of items chosen (integer &ge; 0)</span>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:16px;">
+        <button id="calc-btn" class="btn-primary" onclick="calculatePermComb()" style="flex:1;">Compute Combinatorics</button>
+        <button id="reset-btn" class="btn-secondary" onclick="resetPermComb()">Reset</button>
+      </div>
+
+      <div id="result-box" class="result-box" style="margin-top:24px;">
+        <h2 class="result-title">Combinatorial Solutions Summary</h2>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin-bottom:20px;">
+          <div style="background:var(--bg-subtle, #f8fafc); border:1px solid #BFDBFE; border-radius:8px; padding:16px; text-align:center;">
+            <div style="font-size:0.85rem; font-weight:600; color:var(--text-muted, #64748B); text-transform:uppercase;">Combinations (nCr)</div>
+            <div style="font-size:1.8rem; font-weight:800; color:var(--primary, #2563EB); margin:8px 0;" id="res-ncr">56</div>
+            <div style="font-size:0.8rem; color:var(--text-muted, #64748B);">Order does NOT matter, No repetition</div>
+          </div>
+          <div style="background:var(--bg-subtle, #f8fafc); border:1px solid #BFDBFE; border-radius:8px; padding:16px; text-align:center;">
+            <div style="font-size:0.85rem; font-weight:600; color:var(--text-muted, #64748B); text-transform:uppercase;">Permutations (nPr)</div>
+            <div style="font-size:1.8rem; font-weight:800; color:var(--primary, #2563EB); margin:8px 0;" id="res-npr">336</div>
+            <div style="font-size:0.8rem; color:var(--text-muted, #64748B);">Order MATTERS, No repetition</div>
+          </div>
+          <div style="background:var(--bg-subtle, #f8fafc); border:1px solid var(--border-color, #e2e8f0); border-radius:8px; padding:16px; text-align:center;">
+            <div style="font-size:0.85rem; font-weight:600; color:var(--text-muted, #64748B); text-transform:uppercase;">Permutations with Repetition (nʳ)</div>
+            <div style="font-size:1.8rem; font-weight:800; color:var(--text-dark, #0F172A); margin:8px 0;" id="res-npr-rep">512</div>
+            <div style="font-size:0.8rem; color:var(--text-muted, #64748B);">Order MATTERS, Repetition allowed</div>
+          </div>
+          <div style="background:var(--bg-subtle, #f8fafc); border:1px solid var(--border-color, #e2e8f0); border-radius:8px; padding:16px; text-align:center;">
+            <div style="font-size:0.85rem; font-weight:600; color:var(--text-muted, #64748B); text-transform:uppercase;">Combinations with Repetition</div>
+            <div style="font-size:1.8rem; font-weight:800; color:var(--text-dark, #0F172A); margin:8px 0;" id="res-ncr-rep">120</div>
+            <div style="font-size:0.8rem; color:var(--text-muted, #64748B);">Order does NOT matter, Repetition allowed</div>
+          </div>
+        </div>
+
+        <h3 style="margin-top:20px; font-size:1.1rem; color:var(--text-dark);">Step-by-Step Mathematical Factorial Expansions</h3>
+        <div id="res-steps" style="background:var(--bg-subtle, #f8fafc); padding:16px; border-radius:8px; font-family:monospace; font-size:0.95rem; white-space:pre-wrap; border:1px solid var(--border-color, #e2e8f0);"></div>
+      </div>
+    </div>
+
+    <article class="article-body">
+      <h2>Comprehensive Engineering &amp; Mathematical Guide to Combinatorics</h2>
+      <p>Combinatorics is the fundamental branch of pure mathematics and theoretical computer science that studies the enumeration, arrangement, and operational grouping of elements from finite sets. Whether designing fault-tolerant cryptographic keys, estimating lottery odds in actuarial risk models, allocating computing threads in distributed clusters, or designing randomized clinical trials, the twin concepts of permutations and combinations govern the combinatorial state space.</p>
+
+      <p>The core distinction in combinatorics answers a single essential question: <em>Does the sequential order of selection matter?</em> If altering the order produces a distinct outcome (such as a keypad passcode or a race podium ranking), the problem is a <strong>permutation</strong>. If changing the order results in the identical physical collection (such as a poker hand, a lottery draw, or a legislative committee), the problem is a <strong>combination</strong>. Related factorial principles are also explored in our <a href="factorial-calculator.html">Factorial Calculator</a>.</p>
+
+      <h2>The Four Fundamental Combinatorial Regimes</h2>
+      <p>Depending on whether order matters and whether replacement is permitted, all discrete selection problems fall into one of four mathematical frameworks:</p>
+
+      <h3>1. Permutations Without Repetition (\(nPr\))</h3>
+      <p>When selecting \(r\) items from a pool of \(n\) distinct items where each item can only be picked once and order matters, the first position can be filled in \(n\) ways, the second in \(n - 1\) ways, and so on until the \(r\)-th position, which has \(n - r + 1\) options. By the Fundamental Counting Principle, the product is expressed concisely using <a href="factorial-calculator.html">factorials</a>:</p>
+      $$P(n, r) = n \times (n - 1) \times (n - 2) \times \dots \times (n - r + 1) = \frac{n!}{(n - r)!}$$
+      <p>Where \(n \ge r \ge 0\). When all \(n\) items are arranged (\(r = n\)), \(P(n, n) = \frac{n!}{0!} = n!\) (since \(0! = 1\) by definition).</p>
+
+      <h3>2. Combinations Without Repetition (\(nCr\))</h3>
+      <p>In combinations, we seek the number of unique subsets of size \(r\) that can be formed from \(n\) items without regard to order. Because every subset of size \(r\) can be internally ordered in \(r!\) different ways, the number of permutations \(P(n, r)\) overcounts each unique combination exactly \(r!\) times. Dividing out this redundancy yields the binomial coefficient \(\binom{n}{r}\):</p>
+      $$C(n, r) = \binom{n}{r} = \frac{P(n, r)}{r!} = \frac{n!}{r!(n - r)!}$$
+      <p>Combinations exhibit fundamental algebraic symmetry: \(\binom{n}{r} = \binom{n}{n - r}\). Choosing \(r\) items to include is mathematically identical to choosing \(n - r\) items to exclude.</p>
+
+      <h3>3. Permutations With Repetition (\(n^r\))</h3>
+      <p>When an item can be chosen repeatedly across \(r\) positions and sequential order matters (such as generating an \(r\)-digit alphanumeric password from an alphabet of \(n\) characters), each position independently has \(n\) possibilities:</p>
+      $$P_{\text{rep}}(n, r) = \underbrace{n \times n \times \dots \times n}_{r \text{ factors}} = n^r$$
+      <p>Unlike non-repeating permutations, there is no restriction that \(r \le n\); \(r\) can be arbitrarily large.</p>
+
+      <h3>4. Combinations With Repetition (Multisets &amp; Stars and Bars)</h3>
+      <p>When selecting \(r\) items from \(n\) categories where each category has an unlimited supply of identical items and order does not matter (e.g., purchasing 10 scoops of ice cream from 4 available flavors), we apply the Stars and Bars theorem formulated by William Feller. The problem maps to arranging \(r\) identical items ("stars") and \(n - 1\) category dividers ("bars") in a sequence of length \(r + n - 1\):</p>
+      $$C_{\text{rep}}(n, r) = \binom{n + r - 1}{r} = \frac{(n + r - 1)!}{r!(n - 1)!}$$
+
+      <h2>Algebraic Identities &amp; Algorithmic Stability</h2>
+      <p>In software implementations, computing \(n!\) directly for values like \(n = 50\) results in numbers exceeding \(10^{64}\), instantly causing 64-bit integer overflow. To compute combinations with absolute precision, modern software evaluates the multiplicative formula:</p>
+      $$\binom{n}{r} = \prod_{i=1}^{r} \frac{n - r + i}{i} = \frac{n - r + 1}{1} \times \frac{n - r + 2}{2} \times \dots \times \frac{n}{r}$$
+      <p>By dividing by \(i\) at each iterative step, every intermediate product remains an exact integer, eliminating both overflow and floating-point rounding errors. Combinations also satisfy Pascal's Identity:</p>
+      $$\binom{n}{r} = \binom{n - 1}{r - 1} + \binom{n - 1}{r}$$
+
+      <h2>Combinatorial Metrics &amp; Formula Benchmark Reference</h2>
+      <p>The following technical reference table synthesizes the four combinatorial paradigms, their mathematical expressions, order constraints, and typical applications:</p>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Combinatorial Framework</th>
+            <th>Notation</th>
+            <th>Closed-Form Formula</th>
+            <th>Order Sensitivity</th>
+            <th>Repetition Allowed?</th>
+            <th>Typical Real-World Use Case</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Permutation (No Repetition)</td>
+            <td>\(nPr\) or \(P(n, r)\)</td>
+            <td>\(\frac{n!}{(n - r)!}\)</td>
+            <td>Yes (Strict)</td>
+            <td>No</td>
+            <td>Podium finishes, password permutations, task schedules</td>
+          </tr>
+          <tr>
+            <td>Combination (No Repetition)</td>
+            <td>\(nCr\) or \(\binom{n}{r}\)</td>
+            <td>\(\frac{n!}{r!(n - r)!}\)</td>
+            <td>No (Ignored)</td>
+            <td>No</td>
+            <td>Lottery numbers, poker hands, committee selection</td>
+          </tr>
+          <tr>
+            <td>Permutation With Repetition</td>
+            <td>\(n^r\)</td>
+            <td>\(n^r\)</td>
+            <td>Yes (Strict)</td>
+            <td>Yes</td>
+            <td>PIN codes, IP address octets, DNA sequence strings</td>
+          </tr>
+          <tr>
+            <td>Combination With Repetition</td>
+            <td>\(\left(\!\binom{n}{r}\!\right)\)</td>
+            <td>\(\frac{(n + r - 1)!}{r!(n - 1)!}\)</td>
+            <td>No (Ignored)</td>
+            <td>Yes</td>
+            <td>Inventory stocking, coin change combinations, multisets</td>
+          </tr>
+          <tr>
+            <td>Circular Permutation</td>
+            <td>\(P_{\text{circ}}(n)\)</td>
+            <td>\((n - 1)!\)</td>
+            <td>Relative only</td>
+            <td>No</td>
+            <td>Seating arrangements around a circular table, bead necklaces</td>
+          </tr>
+          <tr>
+            <td>Multinomial Permutation</td>
+            <td>\(\binom{n}{k_1, \dots, k_m}\)</td>
+            <td>\(\frac{n!}{k_1! k_2! \dots k_m!}\)</td>
+            <td>Yes (Strict)</td>
+            <td>Specified counts</td>
+            <td>Anagrams of words with repeated letters (e.g., MISSISSIPPI)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Real-World Engineering, Cybersecurity &amp; Actuarial Case Studies</h2>
+      <p>The following worked case studies demonstrate how combinatorial algorithms solve practical problems in cryptography, game theory, and software test engineering.</p>
+
+      <div class="worked-example-card">
+        <h3>Case Study 1: Cryptographic Entropy &amp; Alphanumeric Password Search Space</h3>
+        <p><strong>Scenario:</strong> A cybersecurity architect defines authentication policies for a banking portal. Passwords must be exactly 8 characters long chosen from a character pool consisting of lowercase letters (26), uppercase letters (26), and digits (10), totaling \(n = 62\) available characters. The architect must calculate the total search space when characters can repeat versus a restricted policy where characters cannot repeat.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Identify pool size \(n = 62\) and password length \(r = 8\).</li>
+          <li>Calculate password permutations with repetition allowed (\(n^r\)):
+            $$P_{\text{rep}} = 62^8 \approx 2.1834 \times 10^{14} \text{ combinations}$$
+          </li>
+          <li>Calculate password permutations without repetition (\(nPr\)):
+            $$P(62, 8) = \frac{62!}{(62 - 8)!} = \frac{62!}{54!} = 62 \times 61 \times 60 \times 59 \times 58 \times 57 \times 56 \times 55$$
+            $$P(62, 8) \approx 1.3632 \times 10^{14} \text{ combinations}$$
+          </li>
+          <li>Calculate search space reduction factor:
+            $$\text{Reduction} = \frac{2.1834 \times 10^{14} - 1.3632 \times 10^{14}}{2.1834 \times 10^{14}} \times 100\% \approx 37.56\%$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> Permitting repetition yields \(2.1834 \times 10^{14}\) permutations. Restricting passwords to unique non-repeating characters reduces brute-force search complexity by over \(37.5\%\), demonstrating why modern security standards advise against disallowing repeated characters.</p>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 2: Actuarial Lottery Jackpot Odds Calculation</h3>
+        <p><strong>Scenario:</strong> A state lottery requires players to select 6 numbers from a pool of 49 distinct integers (1 to 49) without repetition, where order of selection does not matter. An actuarial risk analyst must compute the total number of possible combinations to verify the exact probability of winning the jackpot.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Identify total pool \(n = 49\) and selection size \(r = 6\).</li>
+          <li>Apply the combination formula without repetition:
+            $$C(49, 6) = \frac{49!}{6!(49 - 6)!} = \frac{49!}{6! \times 43!}$$
+          </li>
+          <li>Expand factorials and simplify by canceling \(43!\):
+            $$C(49, 6) = \frac{49 \times 48 \times 47 \times 46 \times 45 \times 44}{6 \times 5 \times 4 \times 3 \times 2 \times 1}$$
+          </li>
+          <li>Perform sequential integer divisions:
+            $$C(49, 6) = \frac{10,068,347,520}{720} = 13,983,816$$
+          </li>
+          <li>Compute single-ticket win probability:
+            $$P(\text{Jackpot}) = \frac{1}{13,983,816} \approx 7.1511 \times 10^{-8}$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> There are exactly \(13,983,816\) possible lottery combinations, resulting in an exact individual winning probability of \(1\) in \(13,983,816\).</p>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 3: Software QA Pairwise Test Configuration Combinations</h3>
+        <p><strong>Scenario:</strong> A software QA automation engineer designs an integration test suite across 5 independent microservices. A complete system test requires forming test clusters consisting of exactly 3 microservices at a time. The engineer must determine how many unique 3-service test environments must be provisioned.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Identify total microservices \(n = 5\) and cluster size \(r = 3\).</li>
+          <li>Apply the combinations formula:
+            $$C(5, 3) = \frac{5!}{3!(5 - 3)!} = \frac{5!}{3! \times 2!} = \frac{120}{6 \times 2} = 10$$
+          </li>
+          <li>Verify using binomial symmetry:
+            $$C(5, 3) = C(5, 5 - 3) = C(5, 2) = \frac{5 \times 4}{2 \times 1} = 10$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> Exactly 10 unique 3-service test environments must be configured to achieve full combinatorial coverage across the system.</p>
+      </div>
+
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-item">
+        <div class="faq-question">Why is 0 factorial equal to 1 (0! = 1)?</div>
+        <div class="faq-answer">In combinatorics, \(0!\) represents the number of ways to arrange zero items, and there is exactly one way to do nothing (the empty set). Algebraically, the recurrence relation \(n! = n \times (n - 1)!\) for \(n = 1\) states \(1! = 1 \times 0!\), which necessitates \(0! = 1\). This definition also preserves the consistency of formulas like \(P(n, n) = n! / 0! = n!\).</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">How does nCr relate to the binomial expansion theorem?</div>
+        <div class="faq-answer">The coefficients in the binomial expansion of \((x + y)^n = \sum_{r=0}^n \binom{n}{r} x^{n-r} y^r\) are exactly the combination values \(nCr\). When multiplying \(n\) identical factors of \((x + y)\), the term \(x^{n-r}y^r\) is generated by choosing \(y\) from \(r\) of the factors and \(x\) from the remaining \(n - r\) factors. There are \(\binom{n}{r}\) ways to make this selection.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">Why is C(n, r) always an integer?</div>
+        <div class="faq-answer">\(C(n, r)\) is always an exact integer because it counts the number of distinct subsets in a physical set, which cannot be fractional. Mathematically, in the product of any \(r\) consecutive integers \(n(n - 1)\dots(n - r + 1)\), there is guaranteed to be at least one multiple of 2, one multiple of 3, up to a multiple of \(r\), ensuring that \(r!\) divides the numerator evenly.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">What is a multiset and how does it relate to combinations with repetition?</div>
+        <div class="faq-answer">In standard set theory, sets cannot contain duplicate elements. A multiset is a generalized set that allows elements to appear with multiplicities. Choosing a sub-multiset of size \(r\) from \(n\) available types corresponds precisely to combinations with repetition, evaluated via the formula \(\binom{n + r - 1}{r}\).</div>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>Comprehensive mathematical, statistical, and engineering calculation tools.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Discipline Hubs</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="math.html">Mathematics</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed computational algorithms.</p>
+    </div>
+  </footer>
+
+  <script>
+    // BigInt factorial implementation for large n up to 100
+    function bigFactorial(num) {
+      var res = BigInt(1);
+      for (var i = BigInt(2); i <= BigInt(num); i++) {
+        res *= i;
+      }
+      return res;
+    }
+
+    function bigNpr(n, r) {
+      if (r < 0 || r > n) return BigInt(0);
+      var res = BigInt(1);
+      for (var i = BigInt(n); i > BigInt(n - r); i--) {
+        res *= i;
+      }
+      return res;
+    }
+
+    function bigNcr(n, r) {
+      if (r < 0 || r > n) return BigInt(0);
+      if (r === 0 || r === n) return BigInt(1);
+      if (r > n / 2) r = n - r;
+      var num = BigInt(1);
+      var den = BigInt(1);
+      for (var i = 1; i <= r; i++) {
+        num *= BigInt(n - r + i);
+        den *= BigInt(i);
+      }
+      return num / den;
+    }
+
+    function bigPow(base, exp) {
+      var res = BigInt(1);
+      var b = BigInt(base);
+      for (var i = 0; i < exp; i++) {
+        res *= b;
+      }
+      return res;
+    }
+
+    function formatBig(val) {
+      var str = val.toString();
+      if (str.length > 18) {
+        var exp = str.length - 1;
+        var mantissa = str[0] + "." + str.substring(1, 5);
+        return mantissa + " × 10<sup>" + exp + "</sup>";
+      }
+      return val.toLocaleString();
+    }
+
+    function calculatePermComb() {
+      var n = parseInt(document.getElementById('n-val').value, 10);
+      var r = parseInt(document.getElementById('r-val').value, 10);
+
+      if (isNaN(n) || isNaN(r) || n < 0 || r < 0) {
+        showError("Please enter non-negative integers for both n and r.");
+        return;
+      }
+
+      if (n > 100 || r > 100) {
+        showError("Values of n and r must be 100 or less to ensure numerical safety.");
+        return;
+      }
+
+      var ncrVal = bigNcr(n, r);
+      var nprVal = bigNpr(n, r);
+      var nprRep = bigPow(n, r);
+      var ncrRep = (n === 0 && r > 0) ? BigInt(0) : bigNcr(n + r - 1, r);
+
+      document.getElementById('res-ncr').innerHTML = (r > n) ? "0 (r &gt; n)" : formatBig(ncrVal);
+      document.getElementById('res-npr').innerHTML = (r > n) ? "0 (r &gt; n)" : formatBig(nprVal);
+      document.getElementById('res-npr-rep').innerHTML = formatBig(nprRep);
+      document.getElementById('res-ncr-rep').innerHTML = (n === 0 && r > 0) ? "0" : formatBig(ncrRep);
+
+      var steps = "Parameters: Universal Pool n = " + n + ", Selected Items r = " + r + "\n\n" +
+                  "1. Combinations (Order irrelevant, No repetition):\n" +
+                  "   Formula: C(n, r) = n! / [r! * (n - r)!]\n";
+      if (r <= n) {
+        steps += "   C(" + n + ", " + r + ") = " + n + "! / [" + r + "! * (" + n + " - " + r + ")!]\n" +
+                 "   C(" + n + ", " + r + ") = " + n + "! / [" + r + "! * " + (n - r) + "!] = " + ncrVal.toString() + "\n\n";
+      } else {
+        steps += "   Result: 0 (Cannot select " + r + " unique items from a set of size " + n + ")\n\n";
+      }
+
+      steps += "2. Permutations (Order matters, No repetition):\n" +
+               "   Formula: P(n, r) = n! / (n - r)!\n";
+      if (r <= n) {
+        steps += "   P(" + n + ", " + r + ") = " + n + "! / (" + (n - r) + "!) = " + nprVal.toString() + "\n\n";
+      } else {
+        steps += "   Result: 0 (r exceeds n without repetition)\n\n";
+      }
+
+      steps += "3. Permutations with Repetition (Order matters, Repetition allowed):\n" +
+               "   Formula: n^r = " + n + "^" + r + " = " + nprRep.toString() + "\n\n" +
+               "4. Combinations with Repetition (Multiset selection):\n" +
+               "   Formula: C(n + r - 1, r) = (" + n + " + " + r + " - 1)! / [" + r + "! * (" + n + " - 1)!]\n" +
+               "   C(" + (n + r - 1) + ", " + r + ") = " + ncrRep.toString();
+
+      document.getElementById('res-steps').innerText = steps;
+    }
+
+    function showError(msg) {
+      document.getElementById('res-ncr').innerText = "Error";
+      document.getElementById('res-npr').innerText = "Error";
+      document.getElementById('res-npr-rep').innerText = "Error";
+      document.getElementById('res-ncr-rep').innerText = "Error";
+      document.getElementById('res-steps').innerText = "Error: " + msg;
+    }
+
+    function resetPermComb() {
+      document.getElementById('n-val').value = '8';
+      document.getElementById('r-val').value = '3';
+      calculatePermComb();
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      calculatePermComb();
+    });
+  </script>
+</body>
+</html>

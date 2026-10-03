@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Probability Calculator - Single, Compound Events &amp; Bayes' Theorem</title>
+  <meta name="description" content="Calculate single event probability, compound probabilities (AND, OR, NOT), conditional probability P(A|B), and Bayes' theorem with step-by-step math.">
+  <link rel="canonical" href="https://calchub.org/probability-calculator.html">
+  <meta property="og:title" content="Probability Calculator - Single &amp; Compound Events Solver">
+  <meta property="og:description" content="Free statistical probability calculator. Compute union P(A U B), intersection P(A and B), conditional P(A|B), odds ratios, and Bayes' theorem updates.">
+  <meta property="og:url" content="https://calchub.org/probability-calculator.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Probability Calculator - Multi-Event &amp; Bayesian Solver">
+  <meta name="twitter:description" content="Calculate probability of single events, independent/dependent events, complement, union, intersection, and Bayes' rule with complete step-by-step proofs.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Probability Calculator",
+    "url": "https://calchub.org/probability-calculator.html",
+    "description": "Calculates probability of single events, independent and mutually exclusive compound events, conditional probabilities, odds, and Bayes' theorem.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the formula for the probability of A OR B occurring?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "By the general addition rule of probability, P(A or B) = P(A union B) = P(A) + P(B) - P(A and B). If events A and B are mutually exclusive (cannot occur simultaneously), P(A and B) = 0, simplifying to P(A or B) = P(A) + P(B)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do you calculate the probability of two independent events both occurring?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "By the multiplication rule for independent events, the probability of both events occurring is the product of their individual probabilities: P(A and B) = P(A intersect B) = P(A) * P(B)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is Bayes' Theorem and what is its mathematical formula?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Bayes' Theorem updates the conditional probability of an event given prior knowledge of related conditions: P(A|B) = [P(B|A) * P(A)] / P(B). By the law of total probability, P(B) = P(B|A)*P(A) + P(B|not A)*P(not A)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the relationship between probability and odds in favor of an event?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Probability expresses favorable outcomes relative to all possible outcomes: P = F / (F + U). Odds in favor express favorable outcomes directly relative to unfavorable outcomes: Odds = P / (1 - P) or F : U."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">CalcHub</a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="math.html" class="active">Math &amp; Statistics</a>
+        <a href="converter.html">Converters</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="calculator-container">
+    <div class="calculator-header">
+      <div class="calc-icon" aria-hidden="true">&#127922;</div>
+      <h1>Probability Calculator</h1>
+      <p class="calc-description">Compute single event probability, compound probabilities (A or B, A and B), conditional probability, odds ratios, and Bayes' Theorem updates.</p>
+    </div>
+
+    <div class="calculator-body">
+      <div class="input-group">
+        <label for="prob-mode">Probability Model</label>
+        <select id="prob-mode" class="form-control" onchange="switchProbMode()">
+          <option value="two-events" selected>Two Events A &amp; B (Union, Intersection &amp; Conditional)</option>
+          <option value="single-event">Single Event P(A) (Favorable vs Total Outcomes)</option>
+          <option value="bayes">Bayes' Theorem (Prior, Likelihood &amp; Posterior)</option>
+        </select>
+      </div>
+
+      <!-- Mode 1: Two Events A & B -->
+      <div id="panel-two-events" class="prob-panel">
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="p-a">Probability of Event A: P(A)</label>
+            <input type="number" id="p-a" class="form-control" value="0.40" min="0" max="1" step="0.01">
+            <span class="help-text">Decimal between 0.0 and 1.0 (or %)</span>
+          </div>
+          <div class="input-group">
+            <label for="p-b">Probability of Event B: P(B)</label>
+            <input type="number" id="p-b" class="form-control" value="0.50" min="0" max="1" step="0.01">
+            <span class="help-text">Decimal between 0.0 and 1.0 (or %)</span>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="rel-type">Relationship Between Event A and Event B</label>
+          <select id="rel-type" class="form-control" onchange="toggleIntersectionInput()">
+            <option value="independent" selected>Independent Events: P(A &cap; B) = P(A) &times; P(B)</option>
+            <option value="mutually-exclusive">Mutually Exclusive: P(A &cap; B) = 0</option>
+            <option value="custom">Custom Intersection: Specify P(A &cap; B)</option>
+          </select>
+        </div>
+
+        <div class="input-group" id="group-custom-intersection" style="display:none;">
+          <label for="p-ab">Joint Probability: P(A &cap; B)</label>
+          <input type="number" id="p-ab" class="form-control" value="0.10" min="0" max="1" step="0.01">
+          <span class="help-text">Must satisfy P(A &cap; B) &le; min(P(A), P(B))</span>
+        </div>
+      </div>
+
+      <!-- Mode 2: Single Event -->
+      <div id="panel-single-event" class="prob-panel" style="display:none;">
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="single-fav">Number of Favorable Outcomes: n(A)</label>
+            <input type="number" id="single-fav" class="form-control" value="3" min="0" step="1">
+          </div>
+          <div class="input-group">
+            <label for="single-total">Total Sample Space Outcomes: n(S)</label>
+            <input type="number" id="single-total" class="form-control" value="12" min="1" step="1">
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 3: Bayes' Theorem -->
+      <div id="panel-bayes" class="prob-panel" style="display:none;">
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="bayes-prior">Prior Probability: P(A)</label>
+            <input type="number" id="bayes-prior" class="form-control" value="0.01" min="0" max="1" step="0.001">
+            <span class="help-text">Base rate / prior belief</span>
+          </div>
+          <div class="input-group">
+            <label for="bayes-sens">True Positive Rate / Likelihood: P(B|A)</label>
+            <input type="number" id="bayes-sens" class="form-control" value="0.95" min="0" max="1" step="0.01">
+            <span class="help-text">Probability of test positive given condition</span>
+          </div>
+          <div class="input-group">
+            <label for="bayes-fp">False Positive Rate: P(B|not A)</label>
+            <input type="number" id="bayes-fp" class="form-control" value="0.05" min="0" max="1" step="0.01">
+            <span class="help-text">Probability of positive given no condition</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="precision-select">Decimal Precision</label>
+        <select id="precision-select" class="form-control" onchange="calculateProbability()">
+          <option value="2">2 decimal places</option>
+          <option value="4" selected>4 decimal places</option>
+          <option value="6">6 decimal places</option>
+        </select>
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:16px;">
+        <button id="calc-btn" class="btn-primary" onclick="calculateProbability()" style="flex:1;">Compute Probability</button>
+        <button id="reset-btn" class="btn-secondary" onclick="resetProbability()">Reset</button>
+      </div>
+
+      <div id="result-box" class="result-box" style="margin-top:24px;">
+        <h2 class="result-title">Probability Solutions &amp; Metrics</h2>
+        <div class="result-highlight" style="font-size:1.8rem; font-weight:700; color:var(--primary); margin-bottom:16px;" id="res-main">
+          P(A &cup; B) = 0.7000 (70.00%)
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:16px;" id="res-grid">
+          <div><span class="res-label">P(A and B) / Intersection:</span> <strong class="res-val" id="res-intersection">0.2000 (20.00%)</strong></div>
+          <div><span class="res-label">P(A only) / A \ B:</span> <strong class="res-val" id="res-a-only">0.2000 (20.00%)</strong></div>
+          <div><span class="res-label">P(B only) / B \ A:</span> <strong class="res-val" id="res-b-only">0.3000 (30.00%)</strong></div>
+          <div><span class="res-label">P(Neither A nor B):</span> <strong class="res-val" id="res-neither">0.3000 (30.00%)</strong></div>
+          <div><span class="res-label">Conditional P(A|B):</span> <strong class="res-val" id="res-cond-ab">0.4000 (40.00%)</strong></div>
+          <div><span class="res-label">Conditional P(B|A):</span> <strong class="res-val" id="res-cond-ba">0.5000 (50.00%)</strong></div>
+        </div>
+
+        <h3 style="margin-top:20px; font-size:1.1rem; color:var(--text-dark);">Step-by-Step Mathematical Derivation</h3>
+        <div id="res-steps" style="background:var(--bg-subtle, #f8fafc); padding:16px; border-radius:8px; font-family:monospace; font-size:0.95rem; white-space:pre-wrap; border:1px solid var(--border-color, #e2e8f0);"></div>
+      </div>
+    </div>
+
+    <article class="article-body">
+      <h2>Comprehensive Engineering &amp; Statistical Guide to Probability</h2>
+      <p>Probability is the mathematical calculus of uncertainty, measuring the likelihood that an uncertain event or proposition will occur. Formally codified by Andrey Kolmogorov in 1933 through axiomatic probability theory, modern probability forms the bedrock of quantum physics, actuarial insurance pricing, machine learning algorithms, statistical hypothesis testing, and mission-critical reliability engineering.</p>
+
+      <p>Every probabilistic calculation operates within a defined <strong>sample space (\(S\))</strong>—the complete set of all possible mutually exclusive outcomes of a random trial. An <strong>event (\(A\))</strong> represents any defined subset of the sample space. Kolmogorov's three fundamental axioms establish the mathematical boundaries of probability:</p>
+      <ol>
+        <li><strong>Axiom of Non-negativity:</strong> For any event \(A\), \(0 \le P(A) \le 1\). An impossible event has \(P(\emptyset) = 0\), while an absolute certainty has \(P(S) = 1\).</li>
+        <li><strong>Axiom of Unit Measure:</strong> The probability of the entire sample space equals unity: \(P(S) = 1\).</li>
+        <li><strong>Axiom of Additivity:</strong> For any sequence of mutually exclusive (disjoint) events \(A_1, A_2, \dots\), the probability of their union is the sum of their individual probabilities: \(P(\bigcup A_i) = \sum P(A_i)\).</li>
+      </ol>
+
+      <h2>Mathematical Formulations for Single &amp; Compound Events</h2>
+      <p>Depending on the causal relationship and dependence between events, different fundamental algebraic rules govern their joint probabilities.</p>
+
+      <h3>1. Single Event &amp; Classical Complement Rule</h3>
+      <p>In discrete sample spaces with equally likely outcomes (the Laplace classical model), the probability of event \(A\) is the ratio of favorable outcomes \(n(A)\) to total possible outcomes \(n(S)\):</p>
+      $$P(A) = \frac{n(A)}{n(S)}$$
+      <p>The probability of the complement event \(A'\) (the event that \(A\) does NOT happen) follows directly from unit measure:</p>
+      $$P(A') = P(\text{not } A) = 1 - P(A)$$
+      <p>The odds in favor of event \(A\) express the ratio of favorable outcomes to unfavorable outcomes: \(\text{Odds} = \frac{P(A)}{1 - P(A)}\).</p>
+
+      <h3>2. General Addition Rule (Probability of A OR B: \(P(A \cup B)\))</h3>
+      <p>When evaluating the probability that at least one of two events \(A\) or \(B\) occurs, summing \(P(A) + P(B)\) counts the overlap region (where both events occur simultaneously) twice. Subtracting the intersection corrects for this double-counting:</p>
+      $$P(A \cup B) = P(A) + P(B) - P(A \cap B)$$
+      <p>If events \(A\) and \(B\) are <strong>mutually exclusive</strong> (disjoint), they cannot occur concurrently: \(P(A \cap B) = 0\). The formula simplifies to: \(P(A \cup B) = P(A) + P(B)\).</p>
+
+      <h3>3. General Multiplication Rule &amp; Conditional Probability</h3>
+      <p>The conditional probability \(P(A|B)\) represents the updated probability of event \(A\) occurring given that event \(B\) has already occurred. Restricting the effective sample space to event \(B\) yields:</p>
+      $$P(A|B) = \frac{P(A \cap B)}{P(B)} \quad (\text{for } P(B) > 0)$$
+      <p>Rearranging this definition produces the General Multiplication Rule for joint probability:</p>
+      $$P(A \cap B) = P(B) \times P(A|B) = P(A) \times P(B|A)$$
+      <p>Two events are formally defined as <strong>statistically independent</strong> if and only if knowledge of one provides zero information about the likelihood of the other: \(P(A|B) = P(A)\). For independent events, the intersection simplifies to the direct product:</p>
+      $$P(A \cap B) = P(A) \times P(B)$$
+
+      <h3>4. Bayes' Theorem &amp; Bayesian Updating</h3>
+      <p>Named after Reverend Thomas Bayes (1701&ndash;1761), Bayes' Theorem provides a rigorous mathematical bridge between prior knowledge and observed evidence. It reverses conditional probabilities, calculating the posterior probability \(P(A|B)\) from the likelihood \(P(B|A)\) and prior probability \(P(A)\):</p>
+      $$P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}$$
+      <p>By the Law of Total Probability, the marginal evidence \(P(B)\) is expanded across all mutually exclusive hypotheses (partition of sample space):</p>
+      $$P(B) = P(B|A) \cdot P(A) + P(B|A') \cdot P(A')$$
+      <p>Bayes' Theorem is the cornerstone of spam filtering algorithms, clinical medical diagnostics, robotic Bayesian SLAM navigation, and statistical machine learning.</p>
+
+      <h2>Probability Rules &amp; Operations Reference Matrix</h2>
+      <p>The following technical reference matrix compares standard probabilistic operators, Venn diagram interpretations, mathematical formulas, and sample constraints:</p>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Probabilistic Operator</th>
+            <th>Venn Diagram Region</th>
+            <th>General Formula</th>
+            <th>Independent Events Simplification</th>
+            <th>Mutually Exclusive Simplification</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Union (\(A\) or \(B\))</td>
+            <td>Entire shaded area of \(A\) and \(B\)</td>
+            <td>\(P(A) + P(B) - P(A \cap B)\)</td>
+            <td>\(P(A) + P(B) - P(A)P(B)\)</td>
+            <td>\(P(A) + P(B)\)</td>
+          </tr>
+          <tr>
+            <td>Intersection (\(A\) and \(B\))</td>
+            <td>Overlap lens between \(A\) and \(B\)</td>
+            <td>\(P(A) \cdot P(B|A)\)</td>
+            <td>\(P(A) \cdot P(B)\)</td>
+            <td>\(0.0000\) (Impossible)</td>
+          </tr>
+          <tr>
+            <td>Difference (\(A\) only)</td>
+            <td>Crescent of \(A\) excluding overlap</td>
+            <td>\(P(A) - P(A \cap B)\)</td>
+            <td>\(P(A)(1 - P(B))\)</td>
+            <td>\(P(A)\)</td>
+          </tr>
+          <tr>
+            <td>Joint Complement (Neither)</td>
+            <td>Background area outside \(A\) and \(B\)</td>
+            <td>\(1 - P(A \cup B)\)</td>
+            <td>\((1 - P(A))(1 - P(B))\)</td>
+            <td>\(1 - [P(A) + P(B)]\)</td>
+          </tr>
+          <tr>
+            <td>Conditional (\(A\) given \(B\))</td>
+            <td>Fraction of circle \(B\) inside \(A\)</td>
+            <td>\(\frac{P(A \cap B)}{P(B)}\)</td>
+            <td>\(P(A)\)</td>
+            <td>\(0.0000\)</td>
+          </tr>
+          <tr>
+            <td>Bayes' Posterior (\(A\) given evidence \(B\))</td>
+            <td>Evidence normalization</td>
+            <td>\(\frac{P(B|A)P(A)}{P(B)}\)</td>
+            <td>\(P(A)\)</td>
+            <td>\(0.0000\)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Real-World Engineering, Clinical &amp; Actuarial Case Studies</h2>
+      <p>The following worked case studies demonstrate how probability formulas govern decisions in clinical diagnostics, aerospace redundancy engineering, and industrial quality control.</p>
+
+      <div class="worked-example-card">
+        <h3>Case Study 1: Medical Diagnostic Screening &amp; The Base Rate Fallacy (Bayes' Rule)</h3>
+        <p><strong>Scenario:</strong> A clinical screening assay for a rare metabolic condition is evaluated in a general population. The disease prevalence (prior probability) is \(P(D) = 0.5\% = 0.005\). The assay has a sensitivity (true positive rate) of \(P(+|D) = 98.0\% = 0.98\), and a false positive rate of \(P(+|D') = 3.0\% = 0.03\). A patient receives a positive test result. The clinical director must calculate the true probability that the patient actually has the disease.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>State the known priors and likelihoods:
+            $$P(D) = 0.005, \quad P(D') = 1 - 0.005 = 0.995$$
+            $$P(+|D) = 0.98, \quad P(+|D') = 0.03$$
+          </li>
+          <li>Apply the Law of Total Probability to compute the total probability of a positive test \(P(+)\):
+            $$P(+) = P(+|D)P(D) + P(+|D')P(D')$$
+            $$P(+) = (0.98 \times 0.005) + (0.03 \times 0.995) = 0.0049 + 0.02985 = 0.03475$$
+          </li>
+          <li>Apply Bayes' Theorem to compute the posterior probability \(P(D|+)\):
+            $$P(D|+) = \frac{P(+|D) \times P(D)}{P(+)} = \frac{0.0049}{0.03475} \approx 0.141007$$
+          </li>
+          <li>Express as a percentage:
+            $$P(D|+) \approx 14.10\%$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> Despite the test being \(98\%\) accurate, a patient testing positive has only a \(14.10\%\) probability of actually having the condition. This counterintuitive result is the famous base rate fallacy: because the disease is rare (\(0.5\%\)), false positives from the large healthy population (\(0.02985\)) outnumber true positives (\(0.0049\)) by roughly 6 to 1.</p>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 2: Aerospace Triply Redundant Flight Computer Reliability (Independence)</h3>
+        <p><strong>Scenario:</strong> A commercial airliner utilizes three independent redundant flight control computers running identical flight management software. The probability of any single computer experiencing a hardware failure during a transatlantic flight is \(P(F) = 0.002\) (\(0.2\%\)). Hardware failures occur independently. The aerospace engineer must compute the probability that all three computers fail, and the probability that at least one computer remains operational.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Identify single computer failure probability \(P(F_1) = P(F_2) = P(F_3) = 0.002\).</li>
+          <li>Calculate joint probability of total system failure (all three failing independently):
+            $$P(\text{All 3 Fail}) = P(F_1 \cap F_2 \cap F_3) = 0.002 \times 0.002 \times 0.002 = 0.002^3$$
+            $$P(\text{All 3 Fail}) = 8.0 \times 10^{-9} = 0.000000008$$
+          </li>
+          <li>Calculate probability that at least one computer survives (complement rule):
+            $$P(\text{At least 1 Survives}) = 1 - P(\text{All 3 Fail}) = 1 - 8.0 \times 10^{-9} = 0.999999992$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> Triple modular redundancy reduces catastrophic flight computer failure risk to \(8\) in \(1\) billion (\(0.0000008\%\)), achieving FAA aircraft airworthiness safety standards.</p>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 3: Manufacturing QA Dual-Defect Inspection (Union Rule)</h3>
+        <p><strong>Scenario:</strong> An electronics assembly line inspects circuit boards for two independent defects: soldering bridges (Defect A) with probability \(P(A) = 0.04\) (\(4.0\%\)), and component misalignment (Defect B) with probability \(P(B) = 0.06\) (\(6.0\%\)). A board is rejected if it has either defect or both. The QA engineer must calculate the overall rejection rate.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Since defects occur independently, compute joint defect rate:
+            $$P(A \cap B) = P(A) \times P(B) = 0.04 \times 0.06 = 0.0024$$
+          </li>
+          <li>Apply the General Addition Rule:
+            $$P(A \cup B) = P(A) + P(B) - P(A \cap B)$$
+            $$P(A \cup B) = 0.04 + 0.06 - 0.0024 = 0.10 - 0.0024 = 0.0976$$
+          </li>
+          <li>Convert to percentage:
+            $$\text{Rejection Rate} = 9.76\%$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> The manufacturing rejection rate is exactly \(9.76\%\), with \(90.24\%\) of boards passing inspection with zero defects.</p>
+      </div>
+
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-item">
+        <div class="faq-question">Why can't probabilities be added directly when events are not mutually exclusive?</div>
+        <div class="faq-answer">When events are not mutually exclusive, they share overlapping outcomes where both events occur simultaneously (\(A \cap B\)). If you simply add \(P(A) + P(B)\), the outcomes in the intersection are added twice—once within \(P(A)\) and once within \(P(B)\). Subtracting \(P(A \cap B)\) ensures every outcome in the union is counted exactly once.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">What is the difference between independent events and mutually exclusive events?</div>
+        <div class="faq-answer">They are polar opposites. Mutually exclusive events CANNOT happen together (\(P(A \cap B) = 0\)); if one occurs, the other is guaranteed not to occur. Independent events CAN happen together, and the occurrence of one provides zero information about the likelihood of the other (\(P(A \cap B) = P(A) \times P(B)\)). In fact, two non-zero events cannot be both independent and mutually exclusive.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">What is the Gambler's Fallacy?</div>
+        <div class="faq-answer">The Gambler's Fallacy is the mistaken belief that past random outcomes affect the probability of future independent events. For example, if a fair coin lands on Heads 5 times in a row, the probability of Tails on the 6th flip remains exactly \(0.5\) (\(50\%\)). Independent trials have no memory.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">How do conditional probability and Bayes' Theorem differ?</div>
+        <div class="faq-answer">Conditional probability is the general definition of updating a probability given new information: \(P(A|B) = P(A \cap B) / P(B)\). Bayes' Theorem is a specific algebraic formulation of conditional probability that expresses \(P(A|B)\) in terms of the reverse conditional probability \(P(B|A)\) and prior probabilities, enabling inference from evidence to hypothesis.</div>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>Comprehensive mathematical, statistical, and engineering calculation tools.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Discipline Hubs</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="math.html">Mathematics</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed computational algorithms.</p>
+    </div>
+  </footer>
+
+  <script>
+    function switchProbMode() {
+      var mode = document.getElementById('prob-mode').value;
+      var panels = document.querySelectorAll('.prob-panel');
+      panels.forEach(function(p) { p.style.display = 'none'; });
+
+      if (mode === 'two-events') document.getElementById('panel-two-events').style.display = 'block';
+      else if (mode === 'single-event') document.getElementById('panel-single-event').style.display = 'block';
+      else if (mode === 'bayes') document.getElementById('panel-bayes').style.display = 'block';
+
+      calculateProbability();
+    }
+
+    function toggleIntersectionInput() {
+      var rel = document.getElementById('rel-type').value;
+      var grp = document.getElementById('group-custom-intersection');
+      if (rel === 'custom') grp.style.display = 'block';
+      else grp.style.display = 'none';
+      calculateProbability();
+    }
+
+    function calculateProbability() {
+      var mode = document.getElementById('prob-mode').value;
+      var prec = parseInt(document.getElementById('precision-select').value, 10) || 4;
+
+      if (mode === 'two-events') {
+        var pa = parseFloat(document.getElementById('p-a').value);
+        var pb = parseFloat(document.getElementById('p-b').value);
+        var rel = document.getElementById('rel-type').value;
+
+        if (isNaN(pa) || isNaN(pb) || pa < 0 || pa > 1 || pb < 0 || pb > 1) {
+          showError("Probabilities P(A) and P(B) must be between 0.0 and 1.0.");
+          return;
+        }
+
+        var pab = 0;
+        if (rel === 'independent') {
+          pab = pa * pb;
+        } else if (rel === 'mutually-exclusive') {
+          pab = 0;
+          if (pa + pb > 1) {
+            showError("Mutually exclusive events cannot have P(A) + P(B) > 1.0.");
+            return;
+          }
+        } else if (rel === 'custom') {
+          pab = parseFloat(document.getElementById('p-ab').value);
+          if (isNaN(pab) || pab < 0 || pab > Math.min(pa, pb) || pab < Math.max(0, pa + pb - 1)) {
+            showError("Joint probability P(A and B) must satisfy max(0, P(A)+P(B)-1) <= P(A and B) <= min(P(A), P(B)).");
+            return;
+          }
+        }
+
+        var pUnion = pa + pb - pab;
+        var pAonly = pa - pab;
+        var pBonly = pb - pab;
+        var pNeither = 1 - pUnion;
+        var pCondAB = (pb > 0) ? (pab / pb) : 0;
+        var pCondBA = (pa > 0) ? (pab / pa) : 0;
+
+        document.getElementById('res-main').innerText = "P(A ∪ B) = " + pUnion.toFixed(prec) + " (" + (pUnion * 100).toFixed(2) + "%)";
+        document.getElementById('res-intersection').innerText = pab.toFixed(prec) + " (" + (pab * 100).toFixed(2) + "%)";
+        document.getElementById('res-a-only').innerText = pAonly.toFixed(prec) + " (" + (pAonly * 100).toFixed(2) + "%)";
+        document.getElementById('res-b-only').innerText = pBonly.toFixed(prec) + " (" + (pBonly * 100).toFixed(2) + "%)";
+        document.getElementById('res-neither').innerText = pNeither.toFixed(prec) + " (" + (pNeither * 100).toFixed(2) + "%)";
+        document.getElementById('res-cond-ab').innerText = (pb > 0) ? pCondAB.toFixed(prec) + " (" + (pCondAB * 100).toFixed(2) + "%)" : "Undefined";
+        document.getElementById('res-cond-ba').innerText = (pa > 0) ? pCondBA.toFixed(prec) + " (" + (pCondBA * 100).toFixed(2) + "%)" : "Undefined";
+        document.getElementById('res-grid').style.display = 'grid';
+
+        var steps = "Mode: Two Events A & B (Relationship: " + rel + ")\n" +
+                    "Input Probabilities: P(A) = " + pa.toFixed(prec) + ", P(B) = " + pb.toFixed(prec) + "\n\n" +
+                    "1. Joint Probability (Intersection):\n" +
+                    "   P(A ∩ B) = " + pab.toFixed(prec) + "\n\n" +
+                    "2. General Addition Rule (Union: A or B):\n" +
+                    "   P(A ∪ B) = P(A) + P(B) - P(A ∩ B)\n" +
+                    "   P(A ∪ B) = " + pa.toFixed(prec) + " + " + pb.toFixed(prec) + " - " + pab.toFixed(prec) + " = " + pUnion.toFixed(prec) + "\n\n" +
+                    "3. Component Breakdown:\n" +
+                    "   P(A only) = P(A) - P(A ∩ B) = " + pAonly.toFixed(prec) + "\n" +
+                    "   P(B only) = P(B) - P(A ∩ B) = " + pBonly.toFixed(prec) + "\n" +
+                    "   P(Neither A nor B) = 1 - P(A ∪ B) = " + pNeither.toFixed(prec) + "\n\n" +
+                    "4. Conditional Probabilities:\n" +
+                    "   P(A|B) = P(A ∩ B) / P(B) = " + (pb > 0 ? (pab.toFixed(prec) + " / " + pb.toFixed(prec) + " = " + pCondAB.toFixed(prec)) : "Undefined") + "\n" +
+                    "   P(B|A) = P(A ∩ B) / P(A) = " + (pa > 0 ? (pab.toFixed(prec) + " / " + pa.toFixed(prec) + " = " + pCondBA.toFixed(prec)) : "Undefined");
+
+        document.getElementById('res-steps').innerText = steps;
+
+      } else if (mode === 'single-event') {
+        var fav = parseFloat(document.getElementById('single-fav').value);
+        var total = parseFloat(document.getElementById('single-total').value);
+
+        if (isNaN(fav) || isNaN(total) || fav < 0 || total <= 0 || fav > total) {
+          showError("Favorable outcomes must be between 0 and total sample space outcomes.");
+          return;
+        }
+
+        var pSingle = fav / total;
+        var pComp = 1 - pSingle;
+        var oddsFav = (pComp > 0) ? (pSingle / pComp) : Infinity;
+
+        document.getElementById('res-main').innerText = "P(A) = " + pSingle.toFixed(prec) + " (" + (pSingle * 100).toFixed(2) + "%)";
+        document.getElementById('res-grid').style.display = 'none';
+
+        var steps = "Mode: Single Classical Event\n" +
+                    "Favorable Outcomes n(A) = " + fav + "\n" +
+                    "Total Outcomes n(S) = " + total + "\n\n" +
+                    "1. Classical Probability Formula:\n" +
+                    "   P(A) = n(A) / n(S) = " + fav + " / " + total + " = " + pSingle.toFixed(prec) + " (" + (pSingle * 100).toFixed(2) + "%)\n\n" +
+                    "2. Complement Probability (A does not occur):\n" +
+                    "   P(A') = 1 - P(A) = 1 - " + pSingle.toFixed(prec) + " = " + pComp.toFixed(prec) + " (" + (pComp * 100).toFixed(2) + "%)\n\n" +
+                    "3. Odds in Favor:\n" +
+                    "   Odds = " + fav + " : " + (total - fav) + (pComp > 0 ? (" (Ratio: " + oddsFav.toFixed(prec) + " to 1)") : " (Absolute Certainty)");
+
+        document.getElementById('res-steps').innerText = steps;
+
+      } else if (mode === 'bayes') {
+        var prior = parseFloat(document.getElementById('bayes-prior').value);
+        var sens = parseFloat(document.getElementById('bayes-sens').value);
+        var fp = parseFloat(document.getElementById('bayes-fp').value);
+
+        if ([prior, sens, fp].some(function(v) { return isNaN(v) || v < 0 || v > 1; })) {
+          showError("All Bayesian probabilities must be real numbers between 0.0 and 1.0.");
+          return;
+        }
+
+        var priorNotA = 1 - prior;
+        var totalEvidence = (sens * prior) + (fp * priorNotA);
+        var posterior = (totalEvidence > 0) ? ((sens * prior) / totalEvidence) : 0;
+
+        document.getElementById('res-main').innerText = "Posterior P(A|B) = " + posterior.toFixed(prec) + " (" + (posterior * 100).toFixed(2) + "%)";
+        document.getElementById('res-grid').style.display = 'none';
+
+        var steps = "Mode: Bayes' Theorem Posterior Update\n" +
+                    "Prior Probability P(A) = " + prior.toFixed(prec) + "\n" +
+                    "Likelihood / Sensitivity P(B|A) = " + sens.toFixed(prec) + "\n" +
+                    "False Positive Rate P(B|not A) = " + fp.toFixed(prec) + "\n\n" +
+                    "1. Marginal Total Evidence P(B):\n" +
+                    "   P(B) = P(B|A)*P(A) + P(B|not A)*P(not A)\n" +
+                    "   P(B) = (" + sens.toFixed(prec) + " * " + prior.toFixed(prec) + ") + (" + fp.toFixed(prec) + " * " + priorNotA.toFixed(prec) + ")\n" +
+                    "   P(B) = " + (sens * prior).toFixed(prec) + " + " + (fp * priorNotA).toFixed(prec) + " = " + totalEvidence.toFixed(prec) + "\n\n" +
+                    "2. Posterior Probability P(A|B):\n" +
+                    "   P(A|B) = [P(B|A) * P(A)] / P(B)\n" +
+                    "   P(A|B) = " + (sens * prior).toFixed(prec) + " / " + totalEvidence.toFixed(prec) + " = " + posterior.toFixed(prec) + " (" + (posterior * 100).toFixed(2) + "%)";
+
+        document.getElementById('res-steps').innerText = steps;
+      }
+    }
+
+    function showError(msg) {
+      document.getElementById('res-main').innerText = "Error";
+      document.getElementById('res-steps').innerText = "Error: " + msg;
+      document.getElementById('res-grid').style.display = 'none';
+    }
+
+    function resetProbability() {
+      document.getElementById('prob-mode').value = 'two-events';
+      document.getElementById('p-a').value = '0.40';
+      document.getElementById('p-b').value = '0.50';
+      document.getElementById('rel-type').value = 'independent';
+      document.getElementById('single-fav').value = '3';
+      document.getElementById('single-total').value = '12';
+      document.getElementById('bayes-prior').value = '0.01';
+      document.getElementById('bayes-sens').value = '0.95';
+      document.getElementById('bayes-fp').value = '0.05';
+      document.getElementById('precision-select').value = '4';
+      switchProbMode();
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      calculateProbability();
+    });
+  </script>
+</body>
+</html>

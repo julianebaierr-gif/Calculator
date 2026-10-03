@@ -115,6 +115,14 @@ CAT_MAP = {
             ("sum-of-integers-calculator.html", "Sum of Integers & Series Calculator", "∑", "Gauss consecutive sum, squared sums & range summation", "S = n(n+1)/2 | ∑k² = n(n+1)(2n+1)/6"),
             ("triangle-area-calculator.html", "Triangle Area Calculator", "🔺", "Heron's formula, SAS, base-height & Shoelace coordinates", "A = ½bh | A = √[s(s-a)(s-b)(s-c)] | A = ½ab·sin(γ)"),
             ("variance-calculator.html", "Variance Calculator (Sample & Population)", "📊", "Sample s² (n-1), population σ² (N) & deviation table", "s² = ∑(x - x̄)² / (n - 1) | σ² = ∑(x - μ)² / N"),
+            ("distance-calculator.html", "Distance Calculator (2D & 3D)", "📍", "Euclidean, Manhattan & Chebyshev coordinate distance", "d = √[(Δx)² + (Δy)² + (Δz)²] | d_M = ∑|Δx_i|"),
+            ("midrange-calculator.html", "Midrange & Center of Range", "⚖️", "Midrange (L+S)/2, range L-S & midhinge analysis", "M = (Min + Max) / 2 | Range = Max - Min"),
+            ("permutation-combination-calculator.html", "Permutation & Combination (nPr, nCr)", "⚙️", "nPr, nCr, permutations & combinations with repetition", "P = n!/(n-r)! | C = n!/[r!(n-r)!] | Stars & Bars"),
+            ("probability-calculator.html", "Probability Calculator (Union, Bayes)", "🎲", "Single events, compound A or B, conditional & Bayes", "P(A∪B) = P(A)+P(B)-P(AB) | P(A|B) = P(B|A)P(A)/P(B)"),
+            ("proportion-calculator.html", "Proportion Calculator (Solve for X)", "∷", "Direct & inverse variation, cross-multiplication", "A/B = C/D ⇔ AD = BC | y = kx | y = k/x"),
+            ("quotient-and-remainder-calculator.html", "Quotient and Remainder (Divmod)", "➗", "Euclidean integer division, mixed fractions & decimals", "A = B·Q + R (0 ≤ R < |B|) | Python divmod"),
+            ("z-score-calculator.html", "Z-Score & Normal Distribution", "⎶", "Standard score, percentiles, normal CDF & p-values", "Z = (x - μ) / σ | Percentile = Φ(z) × 100%"),
+            ("average-calculator.html", "Average Calculator (All Means & Weighted)", "📊", "Arithmetic, geometric, harmonic & RMS quadratic means", "HM ≤ GM ≤ AM ≤ RMS | Weighted x̄_w = ∑wx/∑w"),
         ]
     },
     "engineering.html": {
