@@ -73,6 +73,7 @@ CATEGORIES = {
             ("sales-tax-calculator.html", "Sales Tax & Reverse Pre-Tax", "🏷️", "Combined state & local rate + gross receipt extraction"),
             ("savings-calculator.html", "Compound Savings Growth", "📈", "Initial deposit + monthly contributions compounder"),
             ("savings-goal-calculator.html", "Savings Goal Target Sizer", "🎯", "Required monthly contribution to hit wealth target"),
+            ("markup-calculator.html", "Markup & Margin Calculator", "🏷️", "Retail selling price, profit multiplier, markup & margin %"),
         ]
     },
     "math": {
@@ -123,6 +124,10 @@ CATEGORIES = {
             ("quotient-and-remainder-calculator.html", "Quotient and Remainder (Divmod)", "➗", "Euclidean integer division, mixed fractions & decimals"),
             ("z-score-calculator.html", "Z-Score & Normal Distribution", "⎶", "Standard score, percentiles, normal CDF & p-values"),
             ("average-calculator.html", "Average Calculator (All Means & Weighted)", "📊", "Arithmetic, geometric, harmonic & RMS quadratic means"),
+            ("perimeter-calculator.html", "Perimeter Calculator (2D Polygons)", "📐", "Perimeter of rectangles, triangles, circles & polygons"),
+            ("surface-area-calculator.html", "Surface Area (3D Polyhedra & Solids)", "📦", "Total surface area of prisms, cylinders, spheres & cones"),
+            ("volume-calculator.html", "Volume Calculator (3D Solids)", "🧊", "Volumetric capacity of cylinders, prisms, spheres & cones"),
+            ("percentage-change-calculator.html", "Percentage Change (Growth & Decay)", "📈", "Relative difference, % increase/decrease & multipliers"),
         ]
     },
     "engineering": {
@@ -316,6 +321,9 @@ CATEGORIES = {
             ("snells-law-calculator.html", "Snell's Law (Refraction)", "🔍", "Refraction angle, critical angle & optical fiber TIR"),
             ("specific-heat-calculator.html", "Specific Heat Capacity", "🔥", "Sensible heat Q = mcΔT & thermal equilibrium"),
             ("acceleration-converter.html", "Acceleration Converter", "🚀", "m/s², g₀, ft/s², Gal & automotive 0-60 mph metrics"),
+            ("density-calculator.html", "Density & Specific Gravity (ρ = m/V)", "⚖️", "Volumetric mass density, buoyant force & API gravity"),
+            ("pressure-calculator.html", "Pressure Calculator (Fluid & Mechanical)", "⚙️", "Mechanical contact stress P=F/A & hydrostatic head P=ρgh"),
+            ("speed-calculator.html", "Speed & Velocity Kinematics (v = d/t)", "⏱️", "Scalar velocity, running pace min/km & kinematic acceleration"),
         ]
     },
     "fire": {
@@ -397,7 +405,7 @@ def determine_tool_cat(filename):
     f = filename.lower()
     if any(k in f for k in ["bmi", "calorie", "body-fat", "ideal-weight", "water-intake", "bmr", "macro", "a1c", "bac", "body-surface-area", "bsa", "calorie-deficit", "calories-burned", "carbohydrate", "cholesterol", "due-date", "fat-intake", "heart-rate-zone", "lean-body-mass", "max-heart-rate", "met-calculator", "ovulation", "pregnancy-weight-gain", "protein-intake", "sleep-calculator", "sodium-intake", "target-heart-rate", "tdee", "waist-to-height", "waist-to-hip"]):
         return "health"
-    if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72", "amortization", "apr-apy", "break-even", "capital-gains", "cd-calculator", "credit-card", "debt-to-income", "down-payment", "emergency-fund", "inflation", "net-salary", "net-worth", "sales-tax", "savings"]):
+    if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72", "amortization", "apr-apy", "break-even", "capital-gains", "cd-calculator", "credit-card", "debt-to-income", "down-payment", "emergency-fund", "inflation", "net-salary", "net-worth", "sales-tax", "savings", "markup"]):
         return "finance"
     if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity", "power-factor", "parallel-resistor", "battery-life", "555-timer", "led-resistor", "capacitive-reactance", "inductive-reactance", "op-amp-gain", "three-phase-power", "adc-dac", "antenna-length", "battery-short-circuit", "bjt-transistor", "breaker-size", "decibel", "earth-pit", "electrical-power", "microstrip", "busbar", "fault-current", "filter", "generator", "heatsink", "copper-cable", "earthing", "kw-to-cable", "single-phase", "three-phase", "wire-gauge"]):
         return "engineering"
@@ -409,7 +417,7 @@ def determine_tool_cat(filename):
         return "civil"
     if any(k in f for k in ["chemical", "chlorine", "alum", "boyle", "calcium-hypochlorite", "caustic", "charles", "chlorine-dioxide", "coagulant", "combined-gas", "dilution", "gay-lussac", "half-life", "henderson", "hydrazine", "ideal-gas", "lime-dosing", "molar-mass", "molarity", "ph-calculator", "ph-poh", "phosphate", "polymer", "ro-antiscalant", "sulphuric", "titration"]):
         return "chemical"
-    if any(k in f for k in ["acceleration", "angular-velocity", "centripetal-force", "doppler-effect", "escape-velocity", "free-fall", "friction", "gravitational-force", "hookes-law", "kinetic-energy", "photon-energy", "simple-pendulum", "snells-law", "specific-heat"]):
+    if any(k in f for k in ["acceleration", "angular-velocity", "centripetal-force", "doppler-effect", "escape-velocity", "free-fall", "friction", "gravitational-force", "hookes-law", "kinetic-energy", "photon-energy", "simple-pendulum", "snells-law", "specific-heat", "density-calculator", "pressure-calculator", "speed-calculator"]):
         return "physics"
     if any(k in f for k in ["sprinkler", "smoke", "fire-alarm", "hydrant", "fire-pump", "nac", "strobe"]):
         return "fire"
@@ -419,7 +427,7 @@ def determine_tool_cat(filename):
         return "datetime"
     if any(k in f for k in ["unit-converter", "length-converter", "weight-converter", "temperature-converter", "area-converter", "volume-converter", "pressure-converter", "speed-converter", "energy-converter", "power-converter", "force-converter", "data-storage-converter", "data-transfer-rate-converter", "frequency-converter", "flow-rate-converter", "fuel-economy-converter", "angle-converter", "density-converter", "illuminance-converter", "thermal-conductivity-converter", "viscosity-converter", "cooking-converter", "number-base-converter", "roman-numeral-converter", "time-converter", "time-zone", "unix-timestamp"]):
         return "converter"
-    if any(k in f for k in ["percentage", "fraction", "ratio", "gpa", "standard-deviation", "gcd-lcm", "quadratic-equation", "pythagorean", "scientific-notation", "significant-figures", "prime-number", "absolute-value", "area-calculator", "arithmetic-sequence", "circle-calculator", "cube-root", "decimal-to-fraction", "exponent", "factorial", "fraction-to-percent", "geometric-sequence", "logarithm", "long-division", "mean-median-mode", "midpoint", "modulo", "nth-root", "square-root", "percent-to-fraction", "percent-error", "rounding", "factors", "sum-of-integers", "triangle-area", "variance", "distance", "midrange", "permutation", "probability", "proportion", "quotient", "z-score", "average"]):
+    if any(k in f for k in ["percentage", "fraction", "ratio", "gpa", "standard-deviation", "gcd-lcm", "quadratic-equation", "pythagorean", "scientific-notation", "significant-figures", "prime-number", "absolute-value", "area-calculator", "arithmetic-sequence", "circle-calculator", "cube-root", "decimal-to-fraction", "exponent", "factorial", "fraction-to-percent", "geometric-sequence", "logarithm", "long-division", "mean-median-mode", "midpoint", "modulo", "nth-root", "square-root", "percent-to-fraction", "percent-error", "rounding", "factors", "sum-of-integers", "triangle-area", "variance", "distance", "midrange", "permutation", "probability", "proportion", "quotient", "z-score", "average", "perimeter", "surface-area", "volume-calculator", "percentage-change"]):
         return "math"
     return "math"
 

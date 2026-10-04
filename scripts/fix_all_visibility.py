@@ -74,6 +74,7 @@ CAT_MAP = {
             ("sales-tax-calculator.html", "Sales Tax & Reverse Pre-Tax", "🏷️", "Combined state & local rate + gross receipt extraction", "Tax = Net × Rate | Pre-Tax = Gross / (1 + Rate)"),
             ("savings-calculator.html", "Compound Savings Growth", "📈", "Initial deposit + monthly contributions compounder", "FV = P(1+r/n)ⁿᵗ + PMT·[((1+r/n)ⁿᵗ - 1)/(r/n)]"),
             ("savings-goal-calculator.html", "Savings Goal Target Sizer", "🎯", "Required monthly contribution to hit wealth target", "PMT = [FV - P(1+r/n)ⁿᵗ] / [((1+r/n)ⁿᵗ - 1)/(r/n)]"),
+            ("markup-calculator.html", "Markup & Margin Calculator", "🏷️", "Retail selling price, profit multiplier, markup & margin %", "P = C/(1-G) | M = G/(1-G) | Keystone 2.0x"),
         ]
     },
     "math.html": {
@@ -123,6 +124,10 @@ CAT_MAP = {
             ("quotient-and-remainder-calculator.html", "Quotient and Remainder (Divmod)", "➗", "Euclidean integer division, mixed fractions & decimals", "A = B·Q + R (0 ≤ R < |B|) | Python divmod"),
             ("z-score-calculator.html", "Z-Score & Normal Distribution", "⎶", "Standard score, percentiles, normal CDF & p-values", "Z = (x - μ) / σ | Percentile = Φ(z) × 100%"),
             ("average-calculator.html", "Average Calculator (All Means & Weighted)", "📊", "Arithmetic, geometric, harmonic & RMS quadratic means", "HM ≤ GM ≤ AM ≤ RMS | Weighted x̄_w = ∑wx/∑w"),
+            ("perimeter-calculator.html", "Perimeter Calculator (2D Polygons)", "📐", "Perimeter of rectangles, triangles, circles & polygons", "P = 2(l+w) | C = 2πr | P = ∑a_i"),
+            ("surface-area-calculator.html", "Surface Area (3D Polyhedra & Solids)", "📦", "Total surface area of prisms, cylinders, spheres & cones", "SA = 2πr(r+h) | 4πr² | 2(lw+lh+wh)"),
+            ("volume-calculator.html", "Volume Calculator (3D Solids)", "🧊", "Volumetric capacity of cylinders, prisms, spheres & cones", "V = πr²h | l·w·h | (4/3)πr³ | (1/3)πr²h"),
+            ("percentage-change-calculator.html", "Percentage Change (Growth & Decay)", "📈", "Relative difference, % increase/decrease & multipliers", "Δ% = [(V2 - V1)/V1] × 100% | k = V2/V1"),
         ]
     },
     "engineering.html": {
@@ -302,6 +307,9 @@ CAT_MAP = {
             ("snells-law-calculator.html", "Snell's Law (Refraction & TIR)", "🔍", "Refraction angle, critical angle for total internal reflection & fiber", "n₁·sin(θ₁) = n₂·sin(θ₂) | θ_c = arcsin(n₂/n₁)"),
             ("specific-heat-calculator.html", "Specific Heat (Heat Transfer Q)", "🔥", "Sensible heat Q = mcΔT, calorimetry equilibrium & heating time", "Q = m·c·ΔT | T_eq = (m₁c₁T₁ + m₂c₂T₂)/(m₁c₁ + m₂c₂)"),
             ("acceleration-converter.html", "Acceleration Converter", "🚀", "m/s², g₀, ft/s², Gal & automotive 0-60 mph metrics", "a = Δv/Δt | 1 g₀ = 9.80665 m/s² = 32.174 ft/s²"),
+            ("density-calculator.html", "Density & Specific Gravity (ρ = m/V)", "⚖️", "Volumetric mass density, buoyant force & API gravity", "ρ = m/V | SG = ρ/1000 | F_b = ρ_fluid·V_sub·g"),
+            ("pressure-calculator.html", "Pressure Calculator (Fluid & Mechanical)", "⚙️", "Mechanical contact stress P=F/A & hydrostatic head P=ρgh", "P = F/A | P = ρgh | P_abs = P_atm + P_gauge"),
+            ("speed-calculator.html", "Speed & Velocity Kinematics (v = d/t)", "⏱️", "Scalar velocity, running pace min/km & kinematic acceleration", "v = d/t | Pace = 1/v | v_f² = v_0² + 2ad"),
         ]
     },
     "fire-safety.html": {

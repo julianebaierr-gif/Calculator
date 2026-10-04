@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perimeter Calculator - 2D Shapes, Polygons &amp; Ellipse Solver</title>
+  <meta name="description" content="Calculate the perimeter and circumference of rectangles, triangles, circles, trapezoids, regular polygons, and ellipses with Ramanujan formulas and step-by-step math.">
+  <link rel="canonical" href="https://calchub.org/perimeter-calculator.html">
+  <meta property="og:title" content="Perimeter Calculator - 2D Geometric Perimeter &amp; Circumference Solver">
+  <meta property="og:description" content="Free multi-shape perimeter calculator. Compute boundary perimeters for rectangles, circles, triangles, trapezoids, polygons, and ellipses with exact derivations.">
+  <meta property="og:url" content="https://calchub.org/perimeter-calculator.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Perimeter Calculator - Accurate 2D Boundary Solver">
+  <meta name="twitter:description" content="Calculate perimeter of rectangles, circles, triangles, trapezoids, and ellipses with Ramanujan approximations, worked examples, and formulas.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Perimeter Calculator",
+    "url": "https://calchub.org/perimeter-calculator.html",
+    "description": "Calculates perimeter and circumference for rectangles, squares, circles, triangles, trapezoids, regular polygons, and ellipses with step-by-step geometry.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the perimeter of a 2D geometric shape?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The perimeter of a two-dimensional closed shape is the total continuous distance or path length around its outer boundary. For rectilinear polygons, it is the sum of all edge lengths. For circular shapes, it is termed the circumference."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why does an ellipse lack a simple elementary perimeter formula?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Unlike a circle where curvature is uniform, an ellipse has continuously varying curvature along its semi-major and semi-minor axes. The exact arc length integral cannot be expressed in elementary algebraic functions, requiring incomplete elliptic integrals of the second kind. Ramanujan developed high-accuracy approximations for practical computation."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is Ramanujan's formula for the perimeter of an ellipse?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Srinivasa Ramanujan's first approximation states: P approx pi * [3(a + b) - sqrt((3a + b)(a + 3b))], where a is the semi-major axis and b is the semi-minor axis. It achieves less than 0.05% error across all realistic ellipse aspect ratios."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is the perimeter of any regular n-sided polygon calculated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "For any regular polygon with n equal sides of side length s, the perimeter is simply P = n * s. If the circumradius R is known instead, the perimeter is given by P = 2 * n * R * sin(pi / n)."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">CalcHub</a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="math.html" class="active">Math &amp; Statistics</a>
+        <a href="converter.html">Converters</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="calculator-container">
+    <div class="calculator-header">
+      <div class="calc-icon" aria-hidden="true">&#9645;</div>
+      <h1>Perimeter Calculator</h1>
+      <p class="calc-description">Compute boundary perimeter and circumference for rectangles, circles, triangles, trapezoids, regular polygons, and ellipses with exact mathematical formulas.</p>
+    </div>
+
+    <div class="calculator-body">
+      <div class="input-group">
+        <label for="shape-select">Geometric Shape</label>
+        <select id="shape-select" class="form-control" onchange="switchShape()">
+          <option value="rectangle" selected>Rectangle (Length &amp; Width)</option>
+          <option value="circle">Circle / Circumference (Radius or Diameter)</option>
+          <option value="triangle">Triangle (Three Boundary Sides a, b, c)</option>
+          <option value="trapezoid">Trapezoid (Four Bases &amp; Legs)</option>
+          <option value="regular-polygon">Regular Polygon (Side Count &amp; Edge Length)</option>
+          <option value="ellipse">Ellipse (Semi-Major &amp; Semi-Minor Axes)</option>
+        </select>
+      </div>
+
+      <!-- Panel 1: Rectangle -->
+      <div id="panel-rectangle" class="shape-panel">
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="rect-l">Length (l)</label>
+            <input type="number" id="rect-l" class="form-control" value="12" step="any" min="0">
+          </div>
+          <div class="input-group">
+            <label for="rect-w">Width (w)</label>
+            <input type="number" id="rect-w" class="form-control" value="8" step="any" min="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 2: Circle -->
+      <div id="panel-circle" class="shape-panel" style="display:none;">
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="circle-r">Radius (r)</label>
+            <input type="number" id="circle-r" class="form-control" value="7" step="any" min="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 3: Triangle -->
+      <div id="panel-triangle" class="shape-panel" style="display:none;">
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="tri-a">Side a</label>
+            <input type="number" id="tri-a" class="form-control" value="5" step="any" min="0">
+          </div>
+          <div class="input-group">
+            <label for="tri-b">Side b</label>
+            <input type="number" id="tri-b" class="form-control" value="6" step="any" min="0">
+          </div>
+          <div class="input-group">
+            <label for="tri-c">Side c</label>
+            <input type="number" id="tri-c" class="form-control" value="7" step="any" min="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 4: Trapezoid -->
+      <div id="panel-trapezoid" class="shape-panel" style="display:none;">
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="trap-a">Base a</label>
+            <input type="number" id="trap-a" class="form-control" value="10" step="any" min="0">
+          </div>
+          <div class="input-group">
+            <label for="trap-b">Base b</label>
+            <input type="number" id="trap-b" class="form-control" value="16" step="any" min="0">
+          </div>
+          <div class="input-group">
+            <label for="trap-c">Leg c</label>
+            <input type="number" id="trap-c" class="form-control" value="6" step="any" min="0">
+          </div>
+          <div class="input-group">
+            <label for="trap-d">Leg d</label>
+            <input type="number" id="trap-d" class="form-control" value="7" step="any" min="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 5: Regular Polygon -->
+      <div id="panel-regular-polygon" class="shape-panel" style="display:none;">
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="poly-n">Number of Sides (n)</label>
+            <input type="number" id="poly-n" class="form-control" value="6" step="1" min="3">
+            <span class="help-text">Integer &ge; 3 (e.g. 5=Pentagon, 6=Hexagon, 8=Octagon)</span>
+          </div>
+          <div class="input-group">
+            <label for="poly-s">Side Length (s)</label>
+            <input type="number" id="poly-s" class="form-control" value="5" step="any" min="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 6: Ellipse -->
+      <div id="panel-ellipse" class="shape-panel" style="display:none;">
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="el-a">Semi-Major Axis (a)</label>
+            <input type="number" id="el-a" class="form-control" value="9" step="any" min="0">
+          </div>
+          <div class="input-group">
+            <label for="el-b">Semi-Minor Axis (b)</label>
+            <input type="number" id="el-b" class="form-control" value="5" step="any" min="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="precision-select">Decimal Precision</label>
+        <select id="precision-select" class="form-control" onchange="calculatePerimeter()">
+          <option value="2">2 decimal places</option>
+          <option value="4" selected>4 decimal places</option>
+          <option value="6">6 decimal places</option>
+        </select>
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:16px;">
+        <button id="calc-btn" class="btn-primary" onclick="calculatePerimeter()" style="flex:1;">Calculate Perimeter</button>
+        <button id="reset-btn" class="btn-secondary" onclick="resetPerimeter()">Reset</button>
+      </div>
+
+      <div id="result-box" class="result-box" style="margin-top:24px;">
+        <h2 class="result-title">Perimeter &amp; Boundary Dimensions</h2>
+        <div class="result-highlight" style="font-size:1.8rem; font-weight:700; color:var(--primary); margin-bottom:16px;" id="res-perimeter">
+          Perimeter: 40.0000 units
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:16px;">
+          <div><span class="res-label">Enclosed Area:</span> <strong class="res-val" id="res-area">96.0000 sq units</strong></div>
+          <div><span class="res-label">Semi-Perimeter (s):</span> <strong class="res-val" id="res-semi">20.0000 units</strong></div>
+          <div><span class="res-label">Boundary Formula:</span> <strong class="res-val" id="res-formula">P = 2(l + w)</strong></div>
+          <div><span class="res-label">Geometric Shape:</span> <strong class="res-val" id="res-shape-name">Rectangle</strong></div>
+        </div>
+
+        <h3 style="margin-top:20px; font-size:1.1rem; color:var(--text-dark);">Step-by-Step Mathematical Derivation</h3>
+        <div id="res-steps" style="background:var(--bg-subtle, #f8fafc); padding:16px; border-radius:8px; font-family:monospace; font-size:0.95rem; white-space:pre-wrap; border:1px solid var(--border-color, #e2e8f0);"></div>
+      </div>
+    </div>
+
+    <article class="article-body">
+      <h2>Comprehensive Engineering &amp; Geometric Guide to Perimeter</h2>
+      <p>In two-dimensional Euclidean geometry, the perimeter (from Greek <em>peri</em> meaning "around" and <em>metron</em> meaning "measure") represents the continuous linear path length that encloses a two-dimensional planar figure. Computing the boundary perimeter is one of the most fundamental operations in civil engineering, architectural drafting, agricultural land management, material estimating, and manufacturing CNC toolpath programming.</p>
+
+      <p>Whether calculating the linear feet of baseboard molding needed for a residential room, the perimeter fencing required to secure an industrial lot, the circumferential perimeter of a water storage tank, or the perimeter weld bead around an elliptical pressure vessel dome, exact boundary measurement determines physical material costs and structural integrity. Boundary dimensions connect directly to enclosed surface areas, as computed in our <a href="area-calculator.html">Area Calculator</a> and <a href="triangle-area-calculator.html">Triangle Area Calculator</a>.</p>
+
+      <h2>Mathematical Formulations Across Standard 2D Geometries</h2>
+      <p>Depending on the curvature and edge symmetry of the boundary, different geometric formulas govern the perimeter.</p>
+
+      <h3>1. Rectangle &amp; Square</h3>
+      <p>For a rectangle with length \(l\) and width \(w\), opposite edges are strictly equal and orthogonal:</p>
+      $$P = 2(l + w) = 2l + 2w$$
+      <p>For a square of side length \(s\), where all four edges are identical, \(P = 4s\). The isoperimetric theorem proves that among all rectangles of a fixed perimeter, the square encloses the maximum possible area.</p>
+
+      <h3>2. Circle (Circumference)</h3>
+      <p>For a circle of radius \(r\) or diameter \(d = 2r\), the ratio of circumference to diameter is the transcendental constant \(\pi \approx 3.1415926535\dots\):</p>
+      $$C = 2\pi r = \pi d$$
+      <p>The circle represents the global isoperimetric optimum in planar geometry: among all possible two-dimensional shapes of a given perimeter, the circle encloses the maximum conceivable surface area, as explored in our <a href="circle-calculator.html">Circle Calculator</a>.</p>
+
+      <h3>3. Triangle</h3>
+      <p>For any triangle with side lengths \(a\), \(b\), and \(c\), the perimeter is simply the scalar sum of its three bounding edges:</p>
+      $$P = a + b + c$$
+      <p>The semi-perimeter \(s = \frac{P}{2} = \frac{a + b + c}{2}\) serves as the foundational parameter in Heron's formula for triangle area: \(A = \sqrt{s(s-a)(s-b)(s-c)}\).</p>
+
+      <h3>4. Trapezoid (Trapezium)</h3>
+      <p>For a trapezoid with parallel bases \(a\) and \(b\) and non-parallel lateral legs \(c\) and \(d\):</p>
+      $$P = a + b + c + d$$
+      <p>In an isosceles trapezoid where the non-parallel legs are identical (\(c = d\)), the formula simplifies to \(P = a + b + 2c\).</p>
+
+      <h3>5. Regular \(n\)-Sided Polygon</h3>
+      <p>For any regular polygon comprising \(n\) congruent sides of equal edge length \(s\):</p>
+      $$P = n \cdot s$$
+      <p>If the circumradius \(R\) (distance from center to vertex) is known instead, trigonometry provides the perimeter:</p>
+      $$P = 2 n R \sin\left(\frac{\pi}{n}\right)$$
+      <p>As the number of sides \(n \to \infty\), the polygon perimeter converges precisely to the circumference of the circumscribed circle: \(\lim_{n \to \infty} 2nR\sin(\pi/n) = 2\pi R\).</p>
+
+      <h3>6. Ellipse (Ramanujan Approximation)</h3>
+      <p>An ellipse with semi-major axis \(a\) and semi-minor axis \(b\) possesses continuously changing curvature. The exact perimeter can only be expressed via an incomplete elliptic integral of the second kind:</p>
+      $$P = 4a \int_{0}^{\pi/2} \sqrt{1 - e^2 \sin^2(\theta)} \, d\theta \quad \text{where } e = \sqrt{1 - \frac{b^2}{a^2}}$$
+      <p>Because this integral cannot be evaluated in elementary functions, the mathematical genius Srinivasa Ramanujan formulated two extraordinarily accurate algebraic approximations:</p>
+      <div class="formula-box">
+        <h3>Ramanujan's First Approximation (1914)</h3>
+        $$P \approx \pi \left[ 3(a + b) - \sqrt{(3a + b)(a + 3b)} \right]$$
+        <h3>Ramanujan's Second Approximation</h3>
+        $$h = \frac{(a - b)^2}{(a + b)^2}, \quad P \approx \pi (a + b) \left( 1 + \frac{3h}{10 + \sqrt{4 - 3h}} \right)$$
+      </div>
+      <p>Ramanujan's first formula—utilized in this calculator—yields relative errors below \(0.05\%\) even for highly elongated eccentric ellipses.</p>
+
+      <h2>Perimeter Formulas &amp; Geometric Invariants Table</h2>
+      <p>The following technical reference matrix summarizes standard 2D shapes, their governing perimeter equations, and isoperimetric quotient properties:</p>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Geometric Shape</th>
+            <th>Perimeter Formula</th>
+            <th>Required Parameters</th>
+            <th>Enclosed Area Formula</th>
+            <th>Isoperimetric Efficiency \((4\pi A / P^2)\)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Circle</td>
+            <td>\(C = 2\pi r\)</td>
+            <td>Radius \(r\)</td>
+            <td>\(A = \pi r^2\)</td>
+            <td>\(1.0000\) (Theoretical Maximum)</td>
+          </tr>
+          <tr>
+            <td>Regular Hexagon</td>
+            <td>\(P = 6s\)</td>
+            <td>Side length \(s\)</td>
+            <td>\(A = \frac{3\sqrt{3}}{2} s^2\)</td>
+            <td>\(0.9069\)</td>
+          </tr>
+          <tr>
+            <td>Square</td>
+            <td>\(P = 4s\)</td>
+            <td>Side length \(s\)</td>
+            <td>\(A = s^2\)</td>
+            <td>\(0.7854\) (\(\pi/4\))</td>
+          </tr>
+          <tr>
+            <td>Rectangle</td>
+            <td>\(P = 2(l + w)\)</td>
+            <td>Length \(l\), Width \(w\)</td>
+            <td>\(A = l \cdot w\)</td>
+            <td>Varies (\(< 0.7854\))</td>
+          </tr>
+          <tr>
+            <td>Equilateral Triangle</td>
+            <td>\(P = 3s\)</td>
+            <td>Side length \(s\)</td>
+            <td>\(A = \frac{\sqrt{3}}{4} s^2\)</td>
+            <td>\(0.6046\)</td>
+          </tr>
+          <tr>
+            <td>Ellipse</td>
+            <td>Ramanujan approx</td>
+            <td>Semi-axes \(a, b\)</td>
+            <td>\(A = \pi a b\)</td>
+            <td>Decreases with eccentricity \(e\)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Real-World Engineering, Construction &amp; Manufacturing Case Studies</h2>
+      <p>The following worked case studies demonstrate how perimeter calculations govern physical procurement and design in architecture, civil fencing, and manufacturing.</p>
+
+      <div class="worked-example-card">
+        <h3>Case Study 1: Commercial Security Chain-Link Perimeter Fencing</h3>
+        <p><strong>Scenario:</strong> A logistics center is constructed on a trapezoidal commercial parcel. The surveyed boundary dimensions are: North Base \(a = 185.0 \text{ m}\), South Base \(b = 260.0 \text{ m}\), East Leg \(c = 115.0 \text{ m}\), and West Leg \(d = 130.0 \text{ m}\). Two security gates measuring \(6.0 \text{ m}\) each are installed. The project manager must calculate the net linear meters of chain-link fence fabric required.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Compute gross property perimeter:
+            $$P_{\text{gross}} = a + b + c + d = 185.0 + 260.0 + 115.0 + 130.0 = 690.0000 \text{ meters}$$
+          </li>
+          <li>Subtract gate opening deductions:
+            $$\text{Gate Deduction} = 2 \times 6.0 \text{ m} = 12.0 \text{ meters}$$
+          </li>
+          <li>Calculate net fence fabric requirement:
+            $$P_{\text{net}} = 690.0 - 12.0 = 678.0000 \text{ meters}$$
+          </li>
+          <li>Add a \(5\%\) field splicing allowance:
+            $$P_{\text{procure}} = 678.0 \times 1.05 = 711.9000 \text{ meters}$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> The net boundary perimeter is \(678.0000 \text{ m}\), requiring \(711.9000 \text{ m}\) of fencing rolls for procurement.</p>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 2: Civil Highway Circular Roundabout Concrete Curbing</h3>
+        <p><strong>Scenario:</strong> A highway interchange features a central circular traffic roundabout island with a surveyed outer diameter of \(D = 42.0 \text{ meters}\) (radius \(r = 21.0 \text{ m}\)). Precast concrete curbing sections measure \(1.50 \text{ meters}\) each. The civil contractor must compute the exact circumferential curb perimeter and determine the total number of curb blocks needed.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Compute roundabout circumference:
+            $$C = 2\pi r = 2 \times \pi \times 21.0 \text{ m} \approx 131.9469 \text{ meters}$$
+          </li>
+          <li>Divide by individual curb block length:
+            $$N = \frac{131.9469 \text{ m}}{1.50 \text{ m/block}} \approx 87.9646 \text{ blocks}$$
+          </li>
+          <li>Round up to the nearest integer block:
+            $$N_{\text{ordered}} = 88 \text{ precast blocks}$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> The roundabout has an outer circumferential perimeter of \(131.9469 \text{ meters}\), requiring exactly \(88\) precast curb blocks.</p>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 3: CNC Laser Cutting of Elliptical Vessel Flanges</h3>
+        <p><strong>Scenario:</strong> A CNC laser cutter machines an elliptical inspection flange for a pressure vessel. The semi-major axis is \(a = 450 \text{ mm}\) and the semi-minor axis is \(b = 250 \text{ mm}\). The machine cuts at a feed rate of \(35 \text{ mm/s}\). The manufacturing engineer must compute the cutting path perimeter and the cutting cycle duration.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Apply Ramanujan's perimeter approximation:
+            $$P \approx \pi \left[ 3(450 + 250) - \sqrt{(3 \times 450 + 250)(450 + 3 \times 250)} \right]$$
+          </li>
+          <li>Evaluate inner terms:
+            $$3(a + b) = 3(700) = 2100$$
+            $$(3a + b) = 1350 + 250 = 1600$$
+            $$(a + 3b) = 450 + 750 = 1200$$
+            $$\sqrt{1600 \times 1200} = \sqrt{1,920,000} \approx 1385.6406$$
+          </li>
+          <li>Compute perimeter:
+            $$P \approx \pi [2100 - 1385.6406] = \pi \times 714.3594 \approx 2244.2255 \text{ mm}$$
+          </li>
+          <li>Calculate cutting cycle time:
+            $$t = \frac{2244.2255 \text{ mm}}{35 \text{ mm/s}} \approx 64.1207 \text{ seconds}$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> The elliptical flange perimeter path length is \(2,244.2255 \text{ mm}\), requiring a laser cut cycle time of \(64.12\) seconds.</p>
+      </div>
+
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-item">
+        <div class="faq-question">What is the Isoperimetric Inequality?</div>
+        <div class="faq-answer">The Isoperimetric Inequality states that for any planar shape with perimeter \(P\) and enclosed area \(A\), the relationship \(4\pi A \le P^2\) strictly holds. Equality (\(4\pi A = P^2\)) is attained if and only if the figure is a perfect circle. This mathematical principle proves that circles enclose the greatest possible surface area for any given boundary perimeter.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">How does semi-perimeter differ from perimeter?</div>
+        <div class="faq-answer">The semi-perimeter is simply half of the total perimeter: \(s = P / 2\). While perimeter measures the full closed boundary path, the semi-perimeter is widely used in geometric formulas—most notably Heron's formula for triangle areas, Brahmagupta's formula for cyclic quadrilaterals, and computing the inradius of polygons (\(r = A / s\)).</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">Why does scaling side lengths double the perimeter but quadruple the area?</div>
+        <div class="faq-answer">Perimeter is a one-dimensional linear measure (\(\text{meters}\)), so multiplying all linear dimensions by a scale factor \(k\) scales the perimeter linearly by \(k^1 = k\). Area is a two-dimensional measure (\(\text{meters}^2\)), so scaling linear dimensions by \(k\) scales the enclosed area quadratically by \(k^2\). For \(k = 2\), the perimeter doubles while the area quadruples.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">Can an irregular polygon's perimeter be determined without measuring every side?</div>
+        <div class="faq-answer">No. For irregular polygons where edges lack symmetry or parallel constraints, every single boundary edge must be measured and summed. However, if the Cartesian coordinates of all vertices are known, the Euclidean distance formula can be used to compute each edge sequentially via the Shoelace boundary traversal.</div>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>Comprehensive mathematical, statistical, and engineering calculation tools.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Discipline Hubs</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="math.html">Mathematics</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed computational algorithms.</p>
+    </div>
+  </footer>
+
+  <script>
+    function switchShape() {
+      var shape = document.getElementById('shape-select').value;
+      var panels = document.querySelectorAll('.shape-panel');
+      panels.forEach(function(p) { p.style.display = 'none'; });
+
+      var active = document.getElementById('panel-' + shape);
+      if (active) active.style.display = 'block';
+      calculatePerimeter();
+    }
+
+    function calculatePerimeter() {
+      var shape = document.getElementById('shape-select').value;
+      var prec = parseInt(document.getElementById('precision-select').value, 10) || 4;
+
+      var p = 0, a = 0;
+      var formulaStr = "";
+      var shapeName = "";
+      var steps = "";
+
+      if (shape === 'rectangle') {
+        var l = parseFloat(document.getElementById('rect-l').value);
+        var w = parseFloat(document.getElementById('rect-w').value);
+        if (isNaN(l) || isNaN(w) || l <= 0 || w <= 0) {
+          showError("Length and width must be positive real numbers.");
+          return;
+        }
+        p = 2 * (l + w);
+        a = l * w;
+        formulaStr = "P = 2(l + w)";
+        shapeName = "Rectangle";
+        steps = "Shape: Rectangle\n" +
+                "Length l = " + l + ", Width w = " + w + "\n\n" +
+                "1. Perimeter Formula: P = 2 * (l + w)\n" +
+                "   P = 2 * (" + l + " + " + w + ") = 2 * " + (l + w) + " = " + p.toFixed(prec) + " units\n\n" +
+                "2. Enclosed Area: A = l * w = " + l + " * " + w + " = " + a.toFixed(prec) + " sq units";
+
+      } else if (shape === 'circle') {
+        var r = parseFloat(document.getElementById('circle-r').value);
+        if (isNaN(r) || r <= 0) {
+          showError("Circle radius must be a positive real number.");
+          return;
+        }
+        p = 2 * Math.PI * r;
+        a = Math.PI * r * r;
+        formulaStr = "C = 2πr";
+        shapeName = "Circle";
+        steps = "Shape: Circle\n" +
+                "Radius r = " + r + "\n\n" +
+                "1. Circumference Formula: C = 2 * π * r\n" +
+                "   C = 2 * π * " + r + " = " + p.toFixed(prec) + " units\n\n" +
+                "2. Enclosed Area: A = π * r² = π * (" + r + ")² = " + a.toFixed(prec) + " sq units";
+
+      } else if (shape === 'triangle') {
+        var s1 = parseFloat(document.getElementById('tri-a').value);
+        var s2 = parseFloat(document.getElementById('tri-b').value);
+        var s3 = parseFloat(document.getElementById('tri-c').value);
+        if (isNaN(s1) || isNaN(s2) || isNaN(s3) || s1 <= 0 || s2 <= 0 || s3 <= 0) {
+          showError("All three side lengths must be positive real numbers.");
+          return;
+        }
+        if (s1 + s2 <= s3 || s1 + s3 <= s2 || s2 + s3 <= s1) {
+          showError("Triangle Inequality Violated: Sum of any two sides must exceed the third.");
+          return;
+        }
+        p = s1 + s2 + s3;
+        var sHalf = p / 2;
+        a = Math.sqrt(Math.max(0, sHalf * (sHalf - s1) * (sHalf - s2) * (sHalf - s3)));
+        formulaStr = "P = a + b + c";
+        shapeName = "Triangle";
+        steps = "Shape: Triangle\n" +
+                "Side a = " + s1 + ", Side b = " + s2 + ", Side c = " + s3 + "\n\n" +
+                "1. Perimeter: P = a + b + c = " + s1 + " + " + s2 + " + " + s3 + " = " + p.toFixed(prec) + " units\n\n" +
+                "2. Semi-perimeter s = P / 2 = " + sHalf.toFixed(prec) + "\n\n" +
+                "3. Heron's Area: A = sqrt(s(s-a)(s-b)(s-c)) = " + a.toFixed(prec) + " sq units";
+
+      } else if (shape === 'trapezoid') {
+        var ta = parseFloat(document.getElementById('trap-a').value);
+        var tb = parseFloat(document.getElementById('trap-b').value);
+        var tc = parseFloat(document.getElementById('trap-c').value);
+        var td = parseFloat(document.getElementById('trap-d').value);
+        if ([ta, tb, tc, td].some(function(v) { return isNaN(v) || v <= 0; })) {
+          showError("All four edges of the trapezoid must be positive real numbers.");
+          return;
+        }
+        p = ta + tb + tc + td;
+        formulaStr = "P = a + b + c + d";
+        shapeName = "Trapezoid";
+        steps = "Shape: Trapezoid\n" +
+                "Base a = " + ta + ", Base b = " + tb + ", Leg c = " + tc + ", Leg d = " + td + "\n\n" +
+                "1. Perimeter: P = a + b + c + d\n" +
+                "   P = " + ta + " + " + tb + " + " + tc + " + " + td + " = " + p.toFixed(prec) + " units";
+
+      } else if (shape === 'regular-polygon') {
+        var n = parseInt(document.getElementById('poly-n').value, 10);
+        var sPoly = parseFloat(document.getElementById('poly-s').value);
+        if (isNaN(n) || isNaN(sPoly) || n < 3 || sPoly <= 0) {
+          showError("Polygon requires at least 3 sides and a positive edge length.");
+          return;
+        }
+        p = n * sPoly;
+        a = (n * sPoly * sPoly) / (4 * Math.tan(Math.PI / n));
+        formulaStr = "P = n * s";
+        shapeName = "Regular " + n + "-gon";
+        steps = "Shape: Regular " + n + "-sided Polygon\n" +
+                "Sides n = " + n + ", Edge length s = " + sPoly + "\n\n" +
+                "1. Perimeter: P = n * s = " + n + " * " + sPoly + " = " + p.toFixed(prec) + " units\n\n" +
+                "2. Enclosed Area: A = (n * s²) / [4 * tan(π / n)] = " + a.toFixed(prec) + " sq units";
+
+      } else if (shape === 'ellipse') {
+        var ea = parseFloat(document.getElementById('el-a').value);
+        var eb = parseFloat(document.getElementById('el-b').value);
+        if (isNaN(ea) || isNaN(eb) || ea <= 0 || eb <= 0) {
+          showError("Semi-major and semi-minor axes must be positive real numbers.");
+          return;
+        }
+        // Ramanujan first approximation
+        p = Math.PI * (3 * (ea + eb) - Math.sqrt((3 * ea + eb) * (ea + 3 * eb)));
+        a = Math.PI * ea * eb;
+        formulaStr = "Ramanujan Approx";
+        shapeName = "Ellipse";
+        steps = "Shape: Ellipse\n" +
+                "Semi-major a = " + ea + ", Semi-minor b = " + eb + "\n\n" +
+                "1. Ramanujan Perimeter Formula:\n" +
+                "   P ≈ π * [3(a + b) - sqrt((3a + b)(a + 3b))]\n" +
+                "   P ≈ " + p.toFixed(prec) + " units\n\n" +
+                "2. Enclosed Area: A = π * a * b = " + a.toFixed(prec) + " sq units";
+      }
+
+      var semi = p / 2;
+
+      document.getElementById('res-perimeter').innerText = "Perimeter: " + p.toFixed(prec) + " units";
+      document.getElementById('res-area').innerText = (a > 0 ? a.toFixed(prec) + " sq units" : "Requires height");
+      document.getElementById('res-semi').innerText = semi.toFixed(prec) + " units";
+      document.getElementById('res-formula').innerText = formulaStr;
+      document.getElementById('res-shape-name').innerText = shapeName;
+      document.getElementById('res-steps').innerText = steps;
+    }
+
+    function showError(msg) {
+      document.getElementById('res-perimeter').innerText = "Error";
+      document.getElementById('res-area').innerText = "N/A";
+      document.getElementById('res-semi').innerText = "N/A";
+      document.getElementById('res-formula').innerText = "N/A";
+      document.getElementById('res-shape-name').innerText = "Invalid Shape";
+      document.getElementById('res-steps').innerText = "Error: " + msg;
+    }
+
+    function resetPerimeter() {
+      document.getElementById('shape-select').value = 'rectangle';
+      document.getElementById('rect-l').value = '12';
+      document.getElementById('rect-w').value = '8';
+      document.getElementById('circle-r').value = '7';
+      document.getElementById('tri-a').value = '5';
+      document.getElementById('tri-b').value = '6';
+      document.getElementById('tri-c').value = '7';
+      document.getElementById('trap-a').value = '10';
+      document.getElementById('trap-b').value = '16';
+      document.getElementById('trap-c').value = '6';
+      document.getElementById('trap-d').value = '7';
+      document.getElementById('poly-n').value = '6';
+      document.getElementById('poly-s').value = '5';
+      document.getElementById('el-a').value = '9';
+      document.getElementById('el-b').value = '5';
+      document.getElementById('precision-select').value = '4';
+      switchShape();
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      calculatePerimeter();
+    });
+  </script>
+</body>
+</html>

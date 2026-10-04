@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Percentage Change Calculator - Increase, Decrease &amp; Growth Rates</title>
+  <meta name="description" content="Calculate percentage increase, percentage decrease, relative difference, and growth rate between two values with step-by-step math and formulas.">
+  <link rel="canonical" href="https://calchub.org/percentage-change-calculator.html">
+  <meta property="og:title" content="Percentage Change Calculator - Increase &amp; Decrease Solver">
+  <meta property="og:description" content="Free percentage change calculator. Compute percent increase, percent decrease, absolute difference, and growth factor multipliers with step-by-step proofs.">
+  <meta property="og:url" content="https://calchub.org/percentage-change-calculator.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Percentage Change Calculator - Percent Growth Solver">
+  <meta name="twitter:description" content="Calculate percentage change, relative difference, and new values from percentage adjustments. Full step-by-step mathematical breakdowns.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Percentage Change Calculator",
+    "url": "https://calchub.org/percentage-change-calculator.html",
+    "description": "Calculates percentage increase, percentage decrease, relative change, absolute difference, and growth multiplier between initial and final values.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the formula for percentage change?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The formula for percentage change is: Percentage Change = [(Final Value - Initial Value) / |Initial Value|] * 100%. If the result is positive, it represents a percentage increase; if negative, it represents a percentage decrease."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why is a 50% drop not restored by a 50% increase?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "This asymmetry occurs because the baseline denominator changes. If a $100 stock drops 50%, it falls to $50. A subsequent 50% increase from $50 only adds $25, reaching $75. To return from $50 back to $100 requires a 100% increase (doubling)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between percentage change and percentage points?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Percentage change measures relative growth compared to the initial level. Percentage points measure the arithmetic difference between two percentages. For instance, if an interest rate moves from 4% to 5%, it increased by 1 percentage point, but represents a 25% relative percentage change."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the percentage difference between two non-directional numbers?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "When neither number is designated as the initial reference point, percentage difference divides the absolute difference by the average of the two numbers: Percent Difference = [|A - B| / ((A + B) / 2)] * 100%."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">CalcHub</a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="math.html" class="active">Math &amp; Statistics</a>
+        <a href="converter.html">Converters</a>
+        <a href="engineering.html">Engineering</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="calculator-container">
+    <div class="calculator-header">
+      <div class="calc-icon" aria-hidden="true">&#916;%</div>
+      <h1>Percentage Change Calculator</h1>
+      <p class="calc-description">Calculate percent increase, percent decrease, relative difference, absolute change, and growth multiplier between initial and final values.</p>
+    </div>
+
+    <div class="calculator-body">
+      <div class="input-group">
+        <label for="change-mode">Calculation Mode</label>
+        <select id="change-mode" class="form-control" onchange="switchChangeMode()">
+          <option value="change" selected>Percentage Change: (Initial Value V₁ &rarr; Final Value V₂)</option>
+          <option value="difference">Percentage Difference: (Compare Two Numbers A and B)</option>
+          <option value="apply">Apply Percentage: (Initial Value &plusmn; X% &rarr; Final Value)</option>
+        </select>
+      </div>
+
+      <!-- Mode 1: Change -->
+      <div id="panel-change">
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="val-v1">Initial Value (V₁)</label>
+            <input type="number" id="val-v1" class="form-control" value="80" step="any">
+            <span class="help-text">Starting reference benchmark</span>
+          </div>
+          <div class="input-group">
+            <label for="val-v2">Final Value (V₂)</label>
+            <input type="number" id="val-v2" class="form-control" value="120" step="any">
+            <span class="help-text">New resulting value</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 2: Difference -->
+      <div id="panel-difference" style="display:none;">
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="diff-a">Value A</label>
+            <input type="number" id="diff-a" class="form-control" value="25" step="any">
+          </div>
+          <div class="input-group">
+            <label for="diff-b">Value B</label>
+            <input type="number" id="diff-b" class="form-control" value="35" step="any">
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 3: Apply -->
+      <div id="panel-apply" style="display:none;">
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="apply-base">Base Initial Value</label>
+            <input type="number" id="apply-base" class="form-control" value="150" step="any">
+          </div>
+          <div class="input-group">
+            <label for="apply-pct">Percentage (% Change)</label>
+            <input type="number" id="apply-pct" class="form-control" value="25" step="any">
+            <span class="help-text">Positive for increase (+), negative for decrease (-)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="precision-select">Decimal Precision</label>
+        <select id="precision-select" class="form-control" onchange="calculatePercentChange()">
+          <option value="2">2 decimal places</option>
+          <option value="4" selected>4 decimal places</option>
+          <option value="6">6 decimal places</option>
+        </select>
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:16px;">
+        <button id="calc-btn" class="btn-primary" onclick="calculatePercentChange()" style="flex:1;">Compute Percentage</button>
+        <button id="reset-btn" class="btn-secondary" onclick="resetPercentChange()">Reset</button>
+      </div>
+
+      <div id="result-box" class="result-box" style="margin-top:24px;">
+        <h2 class="result-title">Relative Change &amp; Growth Analysis</h2>
+        <div class="result-highlight" style="font-size:1.8rem; font-weight:700; color:var(--primary); margin-bottom:16px;" id="res-main">
+          +50.0000% Increase
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:16px;">
+          <div><span class="res-label">Absolute Difference (&Delta;):</span> <strong class="res-val" id="res-abs">+40.0000</strong></div>
+          <div><span class="res-label">Growth Multiplier:</span> <strong class="res-val" id="res-mult">1.5000&times;</strong></div>
+          <div><span class="res-label">Reverse Needed to Reset:</span> <strong class="res-val" id="res-rev">-33.3333%</strong></div>
+          <div><span class="res-label">Directional Status:</span> <strong class="res-val" id="res-status">Net Expansion</strong></div>
+        </div>
+
+        <h3 style="margin-top:20px; font-size:1.1rem; color:var(--text-dark);">Mathematical Step-by-Step Breakdown</h3>
+        <div id="res-steps" style="background:var(--bg-subtle, #f8fafc); padding:16px; border-radius:8px; font-family:monospace; font-size:0.95rem; white-space:pre-wrap; border:1px solid var(--border-color, #e2e8f0);"></div>
+      </div>
+    </div>
+
+    <article class="article-body">
+      <h2>Comprehensive Engineering &amp; Financial Guide to Percentage Change</h2>
+      <p>Percentage change is the standard mathematical operator that normalizes the difference between an initial benchmark value \(V_1\) and a subsequent final value \(V_2\) into a relative dimensionless percentage. Unlike absolute differences (such as an increase of \(50 \text{ dollars}\) or \(12 \text{ kilograms}\)), percentage change expresses growth or contraction relative to the initial starting scale, enabling standardized comparisons across companies, engineering systems, and historical eras.</p>
+
+      <p>Percentage change calculations govern critical performance indicators across financial markets (portfolio returns, quarterly revenue shifts), epidemiology (viral transmission growth rates), manufacturing (tolerance dimensional shifts), and macroeconomic analysis (inflation indices, gross domestic product growth). Related fractional and percentage foundations are detailed in our <a href="percentage-calculator.html">Percentage Calculator</a> and <a href="percent-error-calculator.html">Percent Error Calculator</a>.</p>
+
+      <h2>Mathematical Formulations for Relative &amp; Percentage Change</h2>
+      <p>Depending on whether a temporal sequence exists and whether directional polarity is defined, different formulas apply.</p>
+
+      <h3>1. Standard Directional Percentage Change Formulation</h3>
+      <p>When an initial observation \(V_1\) transitions to a final observation \(V_2\), the percentage change \(\Delta\%\) is given by:</p>
+      $$\Delta\% = \frac{V_2 - V_1}{|V_1|} \times 100\%$$
+      <p>Where:</p>
+      <ul>
+        <li>\(V_1\) is the initial baseline value (\(V_1 \neq 0\)). The absolute value in the denominator \(|V_1|\) ensures that transitions from negative baselines preserve correct growth polarity.</li>
+        <li>\(V_2\) is the final resulting value.</li>
+        <li>\(V_2 - V_1\) represents the signed absolute change (\(\Delta V\)).</li>
+      </ul>
+      <p>If \(\Delta\% > 0\), the transition represents a <strong>percentage increase</strong>. If \(\Delta\% < 0\), it represents a <strong>percentage decrease</strong>.</p>
+
+      <h3>2. Non-Directional Percentage Difference</h3>
+      <p>When comparing two independent physical measurements \(A\) and \(B\) where neither value serves as an initial chronological starting point (such as comparing two laboratory instruments or two competing products), dividing by either \(A\) or \(B\) arbitrarily biases the result. The standard solution divides the absolute difference by their arithmetic average:</p>
+      $$\text{Percent Difference} = \frac{|A - B|}{\frac{A + B}{2}} \times 100\% = \frac{2 \cdot |A - B|}{A + B} \times 100\%$$
+
+      <h3>3. The Fundamental Asymmetry of Percentage Changes</h3>
+      <p>A classic cognitive pitfall in investment and risk management is the mathematical asymmetry between percentage gains and percentage losses. Because losses reduce the capital base while gains build upon an already depressed base, a percentage loss requires a strictly larger percentage gain to restore the original value:</p>
+      $$\text{Required Gain to Break Even} = \left( \frac{1}{1 - L} - 1 \right) \times 100\%$$
+      <p>Where \(L\) is the fractional loss (\(0 < L < 1\)):</p>
+      <ul>
+        <li>A \(10\%\) loss requires an \(11.11\%\) gain to break even.</li>
+        <li>A \(25\%\) loss requires a \(33.33\%\) gain to break even.</li>
+        <li>A \(50\%\) loss requires a \(100.00\%\) gain (doubling) to break even.</li>
+        <li>A \(90\%\) loss requires a \(900.00\%\) gain (\(10\times\)) to break even.</li>
+      </ul>
+
+      <h3>4. Percentage Change vs. Percentage Points</h3>
+      <p>Confusion between percentage change and percentage points is frequent in public discourse:</p>
+      <ul>
+        <li><strong>Percentage Points:</strong> The simple arithmetic difference between two percentage values: \(\Delta_{\text{pp}} = P_2 - P_1\).</li>
+        <li><strong>Percentage Change:</strong> The relative percentage increase of the initial percentage: \(\Delta\% = \frac{P_2 - P_1}{P_1} \times 100\%\).</li>
+      </ul>
+      <p>For example, if a central bank increases interest rates from \(4.0\%\) to \(5.0\%\), the rate increased by \(1.0 \text{ percentage point}\), but the cost of borrowing rose by a relative \(\frac{5.0 - 4.0}{4.0} \times 100\% = 25.0\%\).</p>
+
+      <h2>Loss vs. Required Break-Even Recovery Matrix</h2>
+      <p>The following benchmark reference table illustrates the mathematical asymmetry between drawdowns and required recovery gains:</p>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Drawdown / Loss Percentage</th>
+            <th>Residual Capital Factor</th>
+            <th>Required Gain to Break Even</th>
+            <th>Capital Multiplier Needed</th>
+            <th>Risk Implication</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>\(-5.0\%\)</td>
+            <td>\(0.9500\)</td>
+            <td>\(+5.26\%\)</td>
+            <td>\(1.0526\times\)</td>
+            <td>Minimal portfolio impact</td>
+          </tr>
+          <tr>
+            <td>\(-10.0\%\)</td>
+            <td>\(0.9000\)</td>
+            <td>\(+11.11\%\)</td>
+            <td>\(1.1111\times\)</td>
+            <td>Typical market correction</td>
+          </tr>
+          <tr>
+            <td>\(-20.0\%\)</td>
+            <td>\(0.8000\)</td>
+            <td>\(+25.00\%\)</td>
+            <td>\(1.2500\times\)</td>
+            <td>Bear market threshold</td>
+          </tr>
+          <tr>
+            <td>\(-33.33\%\)</td>
+            <td>\(0.6667\)</td>
+            <td>\(+50.00\%\)</td>
+            <td>\(1.5000\times\)</td>
+            <td>Severe recession drawdown</td>
+          </tr>
+          <tr>
+            <td>\(-50.0\%\)</td>
+            <td>\(0.5000\)</td>
+            <td>\(+100.00\%\)</td>
+            <td>\(2.0000\times\)</td>
+            <td>Requires doubling portfolio</td>
+          </tr>
+          <tr>
+            <td>\(-75.0\%\)</td>
+            <td>\(0.2500\)</td>
+            <td>\(+300.00\%\)</td>
+            <td>\(4.0000\times\)</td>
+            <td>Catastrophic asset impairment</td>
+          </tr>
+          <tr>
+            <td>\(-90.0\%\)</td>
+            <td>\(0.1000\)</td>
+            <td>\(+900.00\%\)</td>
+            <td>\(10.0000\times\)</td>
+            <td>Total restructuring required</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Real-World Financial, Industrial &amp; Clinical Case Studies</h2>
+      <p>The following worked case studies demonstrate how percentage change formulations govern performance evaluations in corporate finance, manufacturing yield, and clinical diagnostics.</p>
+
+      <div class="worked-example-card">
+        <h3>Case Study 1: Corporate Revenue Year-over-Year (YoY) Growth Analysis</h3>
+        <p><strong>Scenario:</strong> A SaaS technology company reports fourth-quarter subscription revenue of \(V_1 = \$4.25 \text{ million}\) in fiscal year 2024. In the fourth quarter of fiscal year 2025, revenue reaches \(V_2 = \$6.80 \text{ million}\). The Chief Financial Officer (CFO) must compute the annual Year-over-Year percentage change and the revenue growth multiplier.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Identify initial and final values: \(V_1 = \$4.25\text{M}, \; V_2 = \$6.80\text{M}\).</li>
+          <li>Calculate absolute dollar expansion:
+            $$\Delta V = V_2 - V_1 = 6.80 - 4.25 = +\$2.55 \text{ million}$$
+          </li>
+          <li>Apply directional percentage change formula:
+            $$\Delta\% = \frac{V_2 - V_1}{V_1} \times 100\% = \frac{2.55}{4.25} \times 100\% = 0.6000 \times 100\% = +60.0000\%$$
+          </li>
+          <li>Compute revenue growth multiplier:
+            $$M = \frac{V_2}{V_1} = \frac{6.80}{4.25} = 1.6000\times$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> The company achieved a \(+60.0000\%\) YoY revenue expansion, representing a \(1.60\times\) growth factor.</p>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 2: Industrial Scrap Reduction Quality Improvement</h3>
+        <p><strong>Scenario:</strong> An automotive stamping plant implements Six Sigma lean initiatives to reduce scrap metal generation. Before process optimization, the stamping line generated \(V_1 = 18.4 \text{ metric tons}\) of scrap per month. Six months after installing automated vision sorting, monthly scrap fell to \(V_2 = 11.5 \text{ metric tons}\). The plant quality manager must report the net percentage scrap reduction.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Identify values: \(V_1 = 18.4 \text{ tons}, \; V_2 = 11.5 \text{ tons}\).</li>
+          <li>Calculate signed absolute change:
+            $$\Delta V = V_2 - V_1 = 11.5 - 18.4 = -6.9 \text{ metric tons}$$
+          </li>
+          <li>Calculate percentage change:
+            $$\Delta\% = \frac{-6.9}{18.4} \times 100\% \approx -0.3750 \times 100\% = -37.5000\%$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> The manufacturing facility achieved a \(37.5000\%\) reduction in scrap generation.</p>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 3: Clinical Blood Analyte Cholesterol Reduction (Statin Therapy)</h3>
+        <p><strong>Scenario:</strong> A cardiology patient with hyperlipidemia has an initial baseline serum LDL cholesterol level of \(V_1 = 192.0 \text{ mg/dL}\). After 12 weeks of high-intensity statin therapy, follow-up lipid panels show an LDL concentration of \(V_2 = 86.4 \text{ mg/dL}\). The clinical cardiologist must evaluate whether the treatment satisfied the AHA/ACC guideline target of at least a \(50\%\) LDL reduction.</p>
+        <p><strong>Step-by-step Solution:</strong></p>
+        <ol>
+          <li>Compute absolute LDL decline:
+            $$\Delta = 86.4 - 192.0 = -105.6 \text{ mg/dL}$$
+          </li>
+          <li>Apply percentage change formula:
+            $$\Delta\% = \frac{-105.6}{192.0} \times 100\% = -0.5500 \times 100\% = -55.0000\%$$
+          </li>
+        </ol>
+        <p><strong>Conclusion:</strong> The patient achieved a \(55.0000\%\) relative reduction in serum LDL cholesterol, successfully exceeding the \(50\%\) clinical therapeutic threshold.</p>
+      </div>
+
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-item">
+        <div class="faq-question">Can percentage change exceed 100%?</div>
+        <div class="faq-answer">Yes, for percentage increases. If a value doubles (e.g., from 10 to 20), the percentage increase is exactly \(100\%\). If it triples (e.g., from 10 to 30), the increase is \(200\%\). However, for positive physical quantities, a percentage decrease cannot exceed \(100\%\), because a \(100\%\) decrease reduces the value completely to zero.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">What happens if the initial value is zero (V1 = 0)?</div>
+        <div class="faq-answer">If the initial value is zero, percentage change is mathematically undefined because division by zero is impossible. Going from 0 to any positive number represents an infinite relative increase. In practical business reporting, analysts state "not meaningful" (N/M) or report the absolute difference instead.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">How does percentage change work with negative numbers?</div>
+        <div class="faq-answer">By using the absolute value of the initial value in the denominator (\(|V_1|\)), correct directional polarity is preserved. For example, moving from a profit of -\$50 (a \$50 loss) to +\$50 profit yields \([50 - (-50)] / |-50| = 100 / 50 = +200\%\), accurately showing a positive financial improvement.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">How do you calculate compound percentage change across multiple periods?</div>
+        <div class="faq-answer">You cannot simply add percentage changes together. Instead, convert each percentage change into a growth multiplier (\(1 + r_i\)), multiply the factors together, and subtract 1: \(\Delta_{\text{total}} = [(1 + r_1)(1 + r_2)\dots(1 + r_n) - 1] \times 100\%\). For equal periods, the Compound Annual Growth Rate (CAGR) computes the geometric mean rate.</div>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>CalcHub</h4>
+        <p>Comprehensive mathematical, statistical, and engineering calculation tools.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Discipline Hubs</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="math.html">Mathematics</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed computational algorithms.</p>
+    </div>
+  </footer>
+
+  <script>
+    function switchChangeMode() {
+      var mode = document.getElementById('change-mode').value;
+      document.getElementById('panel-change').style.display = (mode === 'change') ? 'block' : 'none';
+      document.getElementById('panel-difference').style.display = (mode === 'difference') ? 'block' : 'none';
+      document.getElementById('panel-apply').style.display = (mode === 'apply') ? 'block' : 'none';
+      calculatePercentChange();
+    }
+
+    function calculatePercentChange() {
+      var mode = document.getElementById('change-mode').value;
+      var prec = parseInt(document.getElementById('precision-select').value, 10) || 4;
+
+      if (mode === 'change') {
+        var v1 = parseFloat(document.getElementById('val-v1').value);
+        var v2 = parseFloat(document.getElementById('val-v2').value);
+
+        if (isNaN(v1) || isNaN(v2)) {
+          showError("Initial and final values must be valid real numbers.");
+          return;
+        }
+
+        if (v1 === 0) {
+          showError("Initial value cannot be zero (division by zero is undefined).");
+          return;
+        }
+
+        var diff = v2 - v1;
+        var pctChange = (diff / Math.abs(v1)) * 100;
+        var mult = v2 / v1;
+
+        // Reset needed to reverse back to v1
+        var revPct = (v2 !== 0) ? ((v1 - v2) / Math.abs(v2) * 100) : 0;
+
+        var typeStr = (pctChange >= 0) ? "Increase" : "Decrease";
+        var signStr = (pctChange >= 0) ? "+" : "";
+        var statusStr = (pctChange >= 0) ? "Net Expansion" : "Net Contraction";
+
+        document.getElementById('res-main').innerText = signStr + pctChange.toFixed(prec) + "% " + typeStr;
+        document.getElementById('res-abs').innerText = (diff >= 0 ? "+" : "") + diff.toFixed(prec);
+        document.getElementById('res-mult').innerText = mult.toFixed(prec) + "×";
+        document.getElementById('res-rev').innerText = (revPct >= 0 ? "+" : "") + revPct.toFixed(prec) + "%";
+        document.getElementById('res-status').innerText = statusStr;
+
+        var steps = "Mode: Directional Percentage Change\n" +
+                    "Initial Value V₁ = " + v1 + ", Final Value V₂ = " + v2 + "\n\n" +
+                    "1. Absolute Difference: ΔV = V₂ - V₁\n" +
+                    "   ΔV = " + v2 + " - " + v1 + " = " + diff.toFixed(prec) + "\n\n" +
+                    "2. Percentage Change Formula: Δ% = (ΔV / |V₁|) * 100%\n" +
+                    "   Δ% = (" + diff.toFixed(prec) + " / " + Math.abs(v1) + ") * 100% = " + pctChange.toFixed(prec) + "%\n\n" +
+                    "3. Growth Multiplier: V₂ / V₁ = " + v2 + " / " + v1 + " = " + mult.toFixed(prec) + "×\n\n" +
+                    "4. Break-Even Reversal: To return from " + v2 + " back to " + v1 + " requires " + revPct.toFixed(prec) + "% change.";
+
+        document.getElementById('res-steps').innerText = steps;
+
+      } else if (mode === 'difference') {
+        var a = parseFloat(document.getElementById('diff-a').value);
+        var b = parseFloat(document.getElementById('diff-b').value);
+
+        if (isNaN(a) || isNaN(b)) {
+          showError("Both values must be valid real numbers.");
+          return;
+        }
+
+        var avg = (a + b) / 2;
+        if (avg === 0) {
+          showError("Average of the two values cannot be zero.");
+          return;
+        }
+
+        var absDiff = Math.abs(a - b);
+        var pctDiff = (absDiff / Math.abs(avg)) * 100;
+
+        document.getElementById('res-main').innerText = pctDiff.toFixed(prec) + "% Difference";
+        document.getElementById('res-abs').innerText = absDiff.toFixed(prec);
+        document.getElementById('res-mult').innerText = (a !== 0 ? (b / a).toFixed(prec) + "×" : "N/A");
+        document.getElementById('res-rev').innerText = "Average: " + avg.toFixed(prec);
+        document.getElementById('res-status').innerText = "Non-Directional Comparison";
+
+        var steps = "Mode: Non-Directional Percentage Difference\n" +
+                    "Value A = " + a + ", Value B = " + b + "\n\n" +
+                    "1. Absolute Discrepancy: |A - B| = |" + a + " - " + b + "| = " + absDiff.toFixed(prec) + "\n\n" +
+                    "2. Average of Values: (A + B) / 2 = (" + a + " + " + b + ") / 2 = " + avg.toFixed(prec) + "\n\n" +
+                    "3. Percentage Difference: [|A - B| / |Average|] * 100%\n" +
+                    "   Diff% = (" + absDiff.toFixed(prec) + " / " + Math.abs(avg).toFixed(prec) + ") * 100% = " + pctDiff.toFixed(prec) + "%";
+
+        document.getElementById('res-steps').innerText = steps;
+
+      } else if (mode === 'apply') {
+        var base = parseFloat(document.getElementById('apply-base').value);
+        var pct = parseFloat(document.getElementById('apply-pct').value);
+
+        if (isNaN(base) || isNaN(pct)) {
+          showError("Base and percentage values must be valid numbers.");
+          return;
+        }
+
+        var changeAmount = base * (pct / 100);
+        var finalVal = base + changeAmount;
+        var factor = 1 + (pct / 100);
+
+        document.getElementById('res-main').innerText = "Result: " + finalVal.toFixed(prec);
+        document.getElementById('res-abs').innerText = (changeAmount >= 0 ? "+" : "") + changeAmount.toFixed(prec);
+        document.getElementById('res-mult').innerText = factor.toFixed(prec) + "×";
+        document.getElementById('res-rev').innerText = (- (pct / (100 + pct)) * 100).toFixed(prec) + "% to reset";
+        document.getElementById('res-status').innerText = (pct >= 0 ? "Applied Increase" : "Applied Decrease");
+
+        var steps = "Mode: Apply Percentage to Initial Base\n" +
+                    "Base = " + base + ", Adjustment = " + pct + "%\n\n" +
+                    "1. Change Amount: Base * (% / 100)\n" +
+                    "   Δ = " + base + " * (" + pct + " / 100) = " + changeAmount.toFixed(prec) + "\n\n" +
+                    "2. Final Result: Base + Δ\n" +
+                    "   Result = " + base + " + (" + changeAmount.toFixed(prec) + ") = " + finalVal.toFixed(prec);
+
+        document.getElementById('res-steps').innerText = steps;
+      }
+    }
+
+    function showError(msg) {
+      document.getElementById('res-main').innerText = "Error";
+      document.getElementById('res-abs').innerText = "N/A";
+      document.getElementById('res-mult').innerText = "N/A";
+      document.getElementById('res-rev').innerText = "N/A";
+      document.getElementById('res-status').innerText = "Invalid Input";
+      document.getElementById('res-steps').innerText = "Error: " + msg;
+    }
+
+    function resetPercentChange() {
+      document.getElementById('change-mode').value = 'change';
+      document.getElementById('val-v1').value = '80';
+      document.getElementById('val-v2').value = '120';
+      document.getElementById('diff-a').value = '25';
+      document.getElementById('diff-b').value = '35';
+      document.getElementById('apply-base').value = '150';
+      document.getElementById('apply-pct').value = '25';
+      document.getElementById('precision-select').value = '4';
+      switchChangeMode();
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      calculatePercentChange();
+    });
+  </script>
+</body>
+</html>
