@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day of the Week Calculator | Zeller's Congruence & Doomsday Algorithm</title>
+    <meta name="description" content="Find the exact day of the week for any past, present, or future date using Zeller's Congruence. Discover what day of the week you were born and historical weekdays.">
+    <link rel="canonical" href="https://calchub.com/day-of-week-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Day of the Week Calculator",
+      "url": "https://calchub.com/day-of-week-calculator.html",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "Calculates the exact day of the week for any calendar date using Zeller's congruence algorithm."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is Zeller's Congruence algorithm?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Zeller's Congruence is an algebraic formula devised by German mathematician Christian Zeller in 1882 to calculate the day of the week for any Gregorian or Julian calendar date based on day, month, century, and year components."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why are January and February treated as months 13 and 14?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In Zeller's Congruence, the astronomical year is defined as starting in March. Treating January and February as months 13 and 14 of the preceding year places the intercalary leap day (February 29th) at the very end of the year, preventing leap day shifts from disrupting the formula for the remaining ten months."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is John Conway's Doomsday rule?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Doomsday rule is a mental arithmetic algorithm invented by mathematician John Horton Conway. It relies on the fact that certain memorable calendar dates (such as 4/4, 6/6, 8/8, 10/10, and 12/12) always fall on the exact same day of the week (the 'Doomsday') in any given year."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What was the day of the week on July 4, 1776?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Applying Zeller's Congruence, July 4, 1776 (the day the United States Declaration of Independence was adopted) fell on a Thursday."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="datetime.html">Date &amp; Time</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="finance.html">Finance</a>
+                <a href="converter.html">Converters</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="datetime.html">Date &amp; Time Utility</a> &gt; <span>Day of the Week Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Day of the Week Calculator</h1>
+                        <p class="calc-desc">Determine the exact weekday for any Gregorian calendar date using Christian Zeller's congruence algorithm and John Conway's Doomsday rule.</p>
+                    </div>
+                    <div class="calc-grid">
+    <div class="calc-inputs">
+        <div class="input-group">
+            <label for="dowDate">Select Calendar Date</label>
+            <input type="date" id="dowDate" class="input-field">
+            <span class="input-hint">Select any date (e.g., your birthdate or historical event)</span>
+        </div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+            <button type="button" class="btn-outline" onclick="setDowPreset('today')">Today</button>
+            <button type="button" class="btn-outline" onclick="setDowPreset('1776-07-04')">US Indep (1776)</button>
+            <button type="button" class="btn-outline" onclick="setDowPreset('1969-07-20')">Apollo 11 (1969)</button>
+            <button type="button" class="btn-outline" onclick="setDowPreset('2000-01-01')">Y2K (2000)</button>
+        </div>
+    </div>
+    <div class="calc-results">
+        <div class="result-card primary-result">
+            <div class="result-label">Computed Day of the Week</div>
+            <div class="result-value" id="resDayName" style="font-size:2.25rem;color:var(--brand-primary, #2563eb);">Sunday</div>
+            <div class="result-sub" id="resIsoDay">ISO-8601 Day 7 • Weekend Day</div>
+        </div>
+        <div class="result-grid-mini" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem;">
+            <div class="result-card">
+                <div class="result-label">Zeller Remainder ($h$)</div>
+                <div class="result-value-sm" id="resZellerH">h = 1 (Sunday)</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Conway Doomsday</div>
+                <div class="result-value-sm" id="resDoomsday">Sunday for 2026</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Day of Year</div>
+                <div class="result-value-sm" id="resDoyVal">Day 278 of 365</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Leap Year Status</div>
+                <div class="result-value-sm" id="resLeapStatus">Common Year (365 d)</div>
+            </div>
+        </div>
+        <div class="result-card" style="margin-top:1rem;background:var(--bg-accent, #eff6ff);border-left:4px solid var(--brand-primary, #2563eb);">
+            <div class="result-label">Cultural &amp; Astrological Context</div>
+            <div class="result-value" id="resPlanetary" style="color:var(--brand-primary, #2563eb);font-size:1.25rem;">Sun's Day (Dominica / Sol)</div>
+            <div class="result-sub" id="resRomanName">Classical Latin: Dies Solis • Traditional rest day</div>
+        </div>
+    </div>
+</div>
+<script>
+function zellerDayOfWeek(y, m, q) {
+    if (m <= 2) {
+        m += 12;
+        y -= 1;
+    }
+    const K = y % 100;
+    const J = Math.floor(y / 100);
+    // Zeller Gregorian: h = (q + floor(13(m+1)/5) + K + floor(K/4) + floor(J/4) - 2J) mod 7
+    // h: 0=Sat, 1=Sun, 2=Mon, 3=Tue, 4=Wed, 5=Thu, 6=Fri
+    let h = (q + Math.floor((13 * (m + 1)) / 5) + K + Math.floor(K / 4) + Math.floor(J / 4) - (2 * J)) % 7;
+    if (h < 0) h += 7;
+    return h;
+}
+
+function calculateDayOfWeek() {
+    const dateStr = document.getElementById('dowDate').value;
+    if (!dateStr) return;
+
+    const [y, m, q] = dateStr.split('-').map(Number);
+    const h = zellerDayOfWeek(y, m, q);
+
+    const zellerDays = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    const dayName = zellerDays[h];
+
+    // ISO day: Mon=1 ... Sun=7
+    const isoDays = { 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6, 'Sunday': 7 };
+    const isoNum = isoDays[dayName];
+    const isWeekend = (dayName === 'Saturday' || dayName === 'Sunday');
+
+    // Doomsday anchor for year
+    // Anchor for century: 1800=Fri(5), 1900=Wed(3), 2000=Tue(2), 2100=Sun(0)
+    const c = Math.floor(y / 100);
+    const anchorMap = { 0: 2, 1: 0, 2: 5, 3: 3 }; // mod 4 from 2000
+    const anchor = anchorMap[((c % 4) + 4) % 4];
+    const yPart = y % 100;
+    const doomsdayVal = (anchor + yPart + Math.floor(yPart / 4)) % 7;
+    const conwayDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const doomsdayName = conwayDays[doomsdayVal];
+
+    // Day of Year
+    const startOfYear = new Date(y, 0, 1);
+    const curDate = new Date(y, m - 1, q);
+    const isLeap = (y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0));
+    const totalDays = isLeap ? 366 : 365;
+    const doy = Math.floor((curDate - startOfYear) / 86400000) + 1;
+
+    // Planetary / Etymological details
+    const planetaryInfo = {
+        'Monday': { name: "Moon's Day (Dies Lunae)", sub: "Associated with silver, tides, and maternal renewal" },
+        'Tuesday': { name: "Tiw's / Mars' Day (Dies Martis)", sub: "Associated with iron, vigor, and courageous action" },
+        'Wednesday': { name: "Woden's / Mercury's Day (Dies Mercurii)", sub: "Associated with communication, commerce, and intellect" },
+        'Thursday': { name: "Thor's / Jupiter's Day (Dies Iovis)", sub: "Associated with tin, expansion, and benevolent wisdom" },
+        'Friday': { name: "Frigg's / Venus' Day (Dies Veneris)", sub: "Associated with copper, harmony, beauty, and social warmth" },
+        'Saturday': { name: "Saturn's Day (Dies Saturni)", sub: "Associated with lead, discipline, boundaries, and endurance" },
+        'Sunday': { name: "Sun's Day (Dies Solis)", sub: "Associated with gold, vitality, solar radiance, and enlightenment" }
+    };
+
+    document.getElementById('resDayName').innerText = dayName;
+    document.getElementById('resIsoDay').innerText = `ISO-8601 Day ${isoNum} • ${isWeekend ? 'Weekend Day' : 'Standard Working Weekday'}`;
+    document.getElementById('resZellerH').innerText = `h = ${h} (${dayName})`;
+    document.getElementById('resDoomsday').innerText = `${doomsdayName} for Year ${y}`;
+    document.getElementById('resDoyVal').innerText = `Day ${doy} of ${totalDays}`;
+    document.getElementById('resLeapStatus').innerText = isLeap ? 'Leap Year (366 days)' : 'Common Year (365 days)';
+    document.getElementById('resPlanetary').innerText = planetaryInfo[dayName].name;
+    document.getElementById('resRomanName').innerText = planetaryInfo[dayName].sub;
+}
+
+function setDowPreset(val) {
+    if (val === 'today') {
+        const today = new Date();
+        const y = today.getFullYear();
+        const m = String(today.getMonth() + 1).padStart(2, '0');
+        const d = String(today.getDate()).padStart(2, '0');
+        document.getElementById('dowDate').value = `${y}-${m}-${d}`;
+    } else {
+        document.getElementById('dowDate').value = val;
+    }
+    calculateDayOfWeek();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = String(today.getDate()).padStart(2, '0');
+    document.getElementById('dowDate').value = `${y}-${m}-${d}`;
+
+    document.getElementById('dowDate').addEventListener('change', calculateDayOfWeek);
+    document.getElementById('dowDate').addEventListener('input', calculateDayOfWeek);
+    calculateDayOfWeek();
+});
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>Mathematical Formulation of Zeller's Congruence</h2>
+<p>Determining the day of the week corresponding to any arbitrary historical, contemporary, or future calendar date is one of the classic problems in discrete calendrical mathematics. While naive human computation requires counting elapsed days across varying monthly lengths and leap years, analytical number theory provides exact closed-form algebraic solutions. The most famous and mathematically rigorous formulation is <strong>Zeller's Congruence</strong>, published in 1882 by the German mathematician and theologian Christian Zeller.</p>
+
+<p>For the Gregorian calendar, Zeller's Congruence evaluates an integer index $h$ corresponding to the day of the week according to the following equation:</p>
+
+$$h = \left( q + \left\lfloor rac{13(m + 1)}{5} 
+ight
+floor + K + \left\lfloor rac{K}{4} 
+ight
+floor + \left\lfloor rac{J}{4} 
+ight
+floor - 2J 
+ight) mod 7$$
+
+<p>Where the algebraic variables are strictly defined as follows:</p>
+<ul>
+    <li>$q$: The day of the month ($1 \le q \le 31$).</li>
+    <li>$m$: The month of the year, transformed so that the year begins in March:
+        <ul>
+            <li>March = 3, April = 4, May = 5, ..., December = 12.</li>
+            <li><strong>January = 13 and February = 14 of the preceding year ($Y - 1$).</strong></li>
+        </ul>
+    </li>
+    <li>$K$: The year of the century ($K = Y mod 100$).</li>
+    <li>$J$: The zero-based century index ($J = \lfloor Y / 100 
+floor$).</li>
+</ul>
+
+<p>The resulting integer $h$ maps directly to the classical days of the week: $h = 0 \implies 	ext{Saturday}$, $h = 1 \implies 	ext{Sunday}$, $h = 2 \implies 	ext{Monday}$, $h = 3 \implies 	ext{Tuesday}$, $h = 4 \implies 	ext{Wednesday}$, $h = 5 \implies 	ext{Thursday}$, and $h = 6 \implies 	ext{Friday}$.</p>
+
+<h3>The March Month Re-Indexing Principle</h3>
+<p>The brilliant innovation of Zeller's formulation lies in treating January and February as months 13 and 14 of the previous year. In the astronomical Gregorian calendar, leap day intercalations occur exclusively on February 29th. By placing the leap day at the very end of the mathematical year (as the terminal day of Month 14), leap years exert zero disruptive offset on the progression of the subsequent ten months (March through December), preserving a perfectly uniform linear term $\lfloor 13(m+1)/5 
+floor$.</p>
+
+<h2>John Conway's Doomsday Mental Calculation Rule</h2>
+<p>In 1973, Princeton mathematician John Horton Conway formulated the <strong>Doomsday Rule</strong>, a mental arithmetic algorithm designed to enable humans to calculate the day of the week for any date in seconds without writing code or equations.</p>
+
+<p>The Doomsday rule is founded on the mathematical invariance that in any given year, a specific set of memorable calendar dates always fall on the exact same day of the week, known as the year's <strong>Doomsday</strong>:</p>
+
+<ul>
+    <li><strong>Even Months:</strong> $4/4$ (April 4), $6/6$ (June 6), $8/8$ (August 8), $10/10$ (October 10), and $12/12$ (December 12).</li>
+    <li><strong>Odd Months (Mnemonic "Work 9 to 5 at 7-11"):</strong> $5/9$ (May 9), $9/5$ (September 5), $7/11$ (July 11), and $11/7$ (November 7).</li>
+    <li><strong>Terminal February Day:</strong> The last day of February (February 28 in common years, February 29 in leap years).</li>
+    <li><strong>Independence Day:</strong> July 4th.</li>
+    <li><strong>Halloween:</strong> October 31st.</li>
+</ul>
+
+<p>To determine the Doomsday for a year $Y$, calculate the Century Anchor $C$ (where $1800	ext{s} = 	ext{Friday}$, $1900	ext{s} = 	ext{Wednesday}$, $2000	ext{s} = 	ext{Tuesday}$, $2100	ext{s} = 	ext{Sunday}$) and evaluate the year's two-digit offset $y = Y mod 100$:</p>
+
+$$	ext{Doomsday} = \left( C + \left\lfloor rac{y}{12} 
+ight
+floor + (y mod 12) + \left\lfloor rac{y mod 12}{4} 
+ight
+floor 
+ight) mod 7$$
+
+<h3>Seven-Day Planetary and Etymological Reference Matrix</h3>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Day Name</th>
+            <th>ISO-8601 Index</th>
+            <th>Zeller Remainder ($h$)</th>
+            <th>Classical Latin Name</th>
+            <th>Celestial Archetype</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>Monday</td><td>Day 1</td><td>$h = 2$</td><td>Dies Lunae</td><td>Moon (Silver, Tides)</td></tr>
+        <tr><td>Tuesday</td><td>Day 2</td><td>$h = 3$</td><td>Dies Martis</td><td>Mars (Iron, Strength)</td></tr>
+        <tr><td>Wednesday</td><td>Day 3</td><td>$h = 4$</td><td>Dies Mercurii</td><td>Mercury (Quicksilver, Intellect)</td></tr>
+        <tr><td>Thursday</td><td>Day 4</td><td>$h = 5$</td><td>Dies Iovis</td><td>Jupiter (Tin, Expansion)</td></tr>
+        <tr><td>Friday</td><td>Day 5</td><td>$h = 6$</td><td>Dies Veneris</td><td>Venus (Copper, Harmony)</td></tr>
+        <tr><td>Saturday</td><td>Day 6</td><td>$h = 0$</td><td>Dies Saturni</td><td>Saturn (Lead, Structure)</td></tr>
+        <tr><td>Sunday</td><td>Day 7</td><td>$h = 1$</td><td>Dies Solis</td><td>Sun (Gold, Vitality)</td></tr>
+    </tbody>
+</table>
+
+<div class="worked-example-card">
+    <h3>Worked Historical Case Study: The Apollo 11 Lunar Landing</h3>
+    <p><strong>Scenario:</strong> On <strong>July 20, 1969</strong>, Apollo 11 astronaut Neil Armstrong stepped onto the lunar surface at 02:56 UTC. Calculate the exact day of the week for July 20, 1969 using Zeller's Congruence.</p>
+    
+    <div class="step-solution">
+        <h4>Step 1: Extract and Normalize Zeller Variables</h4>
+        <p>Day: $q = 20$.</p>
+        <p>Month: July is Month 7 ($m = 7$). Since $m > 2$, year remains 1969.</p>
+        <p>Century Index: $J = \lfloor 1969 / 100 
+floor = 19$.</p>
+        <p>Century Year: $K = 1969 mod 100 = 69$.</p>
+
+        <h4>Step 2: Evaluate the Algebraic Terms</h4>
+        $$\left\lfloor rac{13(m + 1)}{5} 
+ight
+floor = \left\lfloor rac{13(8)}{5} 
+ight
+floor = \left\lfloor rac{104}{5} 
+ight
+floor = 20$$
+        $$\left\lfloor rac{K}{4} 
+ight
+floor = \left\lfloor rac{69}{4} 
+ight
+floor = 17$$
+        $$\left\lfloor rac{J}{4} 
+ight
+floor = \left\lfloor rac{19}{4} 
+ight
+floor = 4$$
+        $$-2J = -2(19) = -38$$
+
+        <h4>Step 3: Sum the Terms</h4>
+        $$	ext{Sum} = q + 20 + K + 17 + 4 - 38 = 20 + 20 + 69 + 17 + 4 - 38 = 92$$
+
+        <h4>Step 4: Compute the Modulo 7 Remainder</h4>
+        $$h = 92 mod 7$$
+        <p>Since $92 = (13 	imes 7) + 1$, the remainder is $h = 1$.</p>
+        <p><strong>Conclusion:</strong> In Zeller's table, $h = 1$ corresponds precisely to <strong>Sunday</strong>! The Apollo 11 moon landing occurred on a Sunday evening in US timezones.</p>
+    </div>
+</div>
+
+<h2>Common Calculation Errors and Historical Anomalies</h2>
+<ol>
+    <li><strong>The Gregorian Calendar Reform Shift (October 1582):</strong> Applying the Gregorian formula to dates prior to October 15, 1582 produces invalid results because European nations utilized the Julian calendar. During the reform, Pope Gregory XIII excised 10 full days: Thursday, October 4, 1582 was immediately followed by Friday, October 15, 1582.</li>
+    <li><strong>British and American Adoption (September 1752):</strong> Great Britain and its American colonies did not adopt the Gregorian calendar until September 1752, when 11 days were dropped (Wednesday, September 2, 1752 was followed by Thursday, September 14, 1752). Historical American dates before 1752 require Julian Zeller math.</li>
+    <li><strong>Negative Modulo Operations in Software:</strong> In languages such as C, C++, and JavaScript, the remainder operator <code>%</code> can return negative values for negative dividends (e.g., <code>-3 % 7 = -3</code> instead of $+4$). Software implementations must add 7 to negative remainders to guarantee non-negative mathematical congruence.</li>
+</ol>
+<h2>Perpetual Calendar Cycles and the 400-Year Gregorian Periodicity</h2>
+<p>Because the Gregorian calendar introduces 97 leap days across every 400-year cycle, the total number of days in 400 Gregorian years is exactly:
+$$400 	imes 365 + 97 = 146,097 	ext{ days}$$
+Dividing 146,097 by 7 yields:
+$$rac{146,097}{7} = 20,871 	ext{ weeks exactly with 0 remainder!}$$
+This remarkable mathematical identity means that the Gregorian calendar repeats in an exact, unbroken cycle every 400 years. October 5, 2026 will fall on the exact same weekday as October 5, 2426, and fell on the same day in 1626. Furthermore, within any single century, days of the week shift forward by 1 day in standard years ($365 mod 7 = 1$) and by 2 days in leap years ($366 mod 7 = 2$). This simple modular shift governs all perpetual calendar mechanical wheels and digital perpetual clock algorithms.</p>
+
+<section class="faq-section">
+    <h2>Frequently Asked Questions About Day of the Week Calculations</h2>
+    <div class="faq-item">
+        <h3>How does Zeller's Congruence handle leap years?</h3>
+        <p>Zeller's congruence handles leap years by re-indexing January and February as months 13 and 14 of the preceding year. Because February is treated as the final month of the year, leap day adjustments (February 29th) are naturally captured by the term $\lfloor K/4 
+floor$ and $\lfloor J/4 
+floor$ without perturbing March through December calculations.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Why did October 1582 lose 10 days?</h3>
+        <p>In October 1582, Pope Gregory XIII implemented the Gregorian calendar reform to correct the 10-day drift accumulated by the Julian calendar's assumption that an astronomical solar year was exactly 365.25 days (rather than approximately 365.2422 days). To re-align the vernal equinox with March 21 for Easter computations, October 4, 1582 was immediately followed by October 15, 1582.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is the Doomsday rule mnemonic for months?</h3>
+        <p>John Conway's Doomsday rule uses memorable calendar anchors that always share the identical day of the week within any given year: 4/4, 6/6, 8/8, 10/10, 12/12 for even months, and the mnemonic "I work 9-to-5 at 7-11" for odd months (9/5, 5/9, 7/11, 11/7).</p>
+    </div>
+    <div class="faq-item">
+        <h3>Can Zeller's Congruence be used for dates BC / BCE?</h3>
+        <p>Standard Zeller's congruence requires astronomical year numbering where 1 BC is Year 0, 2 BC is Year -1, etc. In software, negative modulo operations must also be carefully normalized to prevent incorrect weekday mappings.</p>
+    </div>
+</section>
+
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">📅</span>
+            <h3 class="widget-title">Related Date & Time Utility</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="date-difference-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Date Difference & Business Days</a></li>
+            <li><a href="hours-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Work Hours Calculator</a></li>
+            <li><a href="week-number-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ISO Week Number</a></li>
+            <li><a href="add-days-to-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Add Days to Date</a></li>
+            <li><a href="add-time-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Add Time Calculator</a></li>
+            <li><a href="business-days-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Business Days Calculator</a></li>
+            <li><a href="countdown-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Countdown Calculator</a></li>
+            <li><a href="date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calendar Date Calculator</a></li>
+            <li><a href="day-of-week-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Day of the Week Calculator</a></li>
+            <li><a href="day-of-year-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Day of the Year Calculator</a></li>
+            <li><a href="decimal-time-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Decimal Time Calculator</a></li>
+            <li><a href="leap-year-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Leap Year Calculator</a></li>
+            <li><a href="months-between-dates-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Months Between Dates</a></li>
+            <li><a href="quarter-of-year-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Quarter of Year Calculator</a></li>
+            <li><a href="time-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Time Calculator (Sexagesimal)</a></li>
+            <li><a href="age-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exact Age Calculator</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck Calculator</a></li>
+            <li><a href="unit-converter.html" class="sidebar-link-item"><span class="link-bullet">›</span> Universal Multi-Unit Converter</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="datetime.html" class="sidebar-category-link">View All Date & Time Utility Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers peer-reviewed chronometric computing algorithms, astronomical date conversion systems, and calendrical engines compliant with ISO 8601, Gregorian, and Zeller algebraic formulations.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Chronometric &amp; Time Suites</h4>
+                    <ul>
+                        <li><a href="datetime.html">Date &amp; Time Utilities</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="finance.html">Financial Planning</a></li>
+                        <li><a href="converter.html">Unit &amp; Chrono Converters</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Core Calendrical Tools</h4>
+                    <ul>
+                        <li><a href="day-of-week-calculator.html">Day of Week Calculator</a></li>
+                        <li><a href="day-of-year-calculator.html">Day of Year Calculator</a></li>
+                        <li><a href="week-number-calculator.html">ISO Week Number</a></li>
+                        <li><a href="date-calculator.html">Date Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Metric Converters</a></li>
+                        <li><a href="engineering.html">Engineering Tools</a></li>
+                        <li><a href="health.html">Health &amp; Fitness</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precision astronomical chronometry and calendar algorithms.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

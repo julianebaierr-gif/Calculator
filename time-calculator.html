@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Calculator | Add, Subtract, Multiply & Divide Durations</title>
+    <meta name="description" content="Add, subtract, multiply, and divide time durations in hours, minutes, and seconds (HH:MM:SS). Calculate cumulative time, decimal conversions, and manufacturing takt time.">
+    <link rel="canonical" href="https://calchub.com/time-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Time Calculator",
+      "url": "https://calchub.com/time-calculator.html",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "Performs addition, subtraction, multiplication, and division on time durations in hours, minutes, and seconds."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do you add two time durations together?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Convert both durations to total seconds, add the seconds together, then convert back to hours, minutes, and seconds by dividing by 3600 and 60 using modulo arithmetic."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does subtraction work when Time 2 is larger than Time 1?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For clock times wrapping past midnight, 24 hours (86,400 seconds) is added to the difference. For raw mathematical durations, the result represents a negative duration."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do you multiply or divide a time duration by a number?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Convert the duration into total seconds, multiply or divide by the scalar factor, then re-format into sexagesimal hours, minutes, and seconds."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is takt time in manufacturing engineering?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Takt time is the maximum allowable time per unit to produce a product in order to meet customer demand, evaluated as Net Available Production Time divided by Customer Demand Units."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="datetime.html">Date &amp; Time</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="finance.html">Finance</a>
+                <a href="converter.html">Converters</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="datetime.html">Date &amp; Time Utility</a> &gt; <span>Time Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Time Calculator</h1>
+                        <p class="calc-desc">Precision arithmetic computational engine for adding, subtracting, multiplying, and dividing time durations expressed in sexagesimal hours, minutes, and seconds.</p>
+                    </div>
+                    <div class="calc-body">
+    <!-- Operation Selector Tabs -->
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; border-bottom: 2px solid #e2e8f0; margin-bottom: 1.5rem; padding-bottom: 0.5rem;">
+        <button type="button" id="tabAdd" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="setTimeOp('add')">Add (+)</button>
+        <button type="button" id="tabSub" class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="setTimeOp('sub')">Subtract (-)</button>
+        <button type="button" id="tabMult" class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="setTimeOp('mult')">Multiply (&times;)</button>
+        <button type="button" id="tabDiv" class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="setTimeOp('div')">Divide (&divide;)</button>
+    </div>
+
+    <!-- Time 1 Input -->
+    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 6px; padding: 1rem; margin-bottom: 1rem;">
+        <h4 style="margin-top: 0; margin-bottom: 0.75rem; font-size: 0.9rem; color: #475569;">Time Duration 1:</h4>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
+            <div>
+                <label for="t1Hours" style="font-size: 0.75rem; font-weight: 600;">Hours:</label>
+                <input type="number" id="t1Hours" class="input-field" value="5" min="0" step="1">
+            </div>
+            <div>
+                <label for="t1Mins" style="font-size: 0.75rem; font-weight: 600;">Minutes:</label>
+                <input type="number" id="t1Mins" class="input-field" value="45" min="0" max="59" step="1">
+            </div>
+            <div>
+                <label for="t1Secs" style="font-size: 0.75rem; font-weight: 600;">Seconds:</label>
+                <input type="number" id="t1Secs" class="input-field" value="30" min="0" max="59" step="1">
+            </div>
+        </div>
+    </div>
+
+    <!-- Time 2 / Factor Input -->
+    <div id="t2Wrapper" style="background: white; border: 1px solid #e2e8f0; border-radius: 6px; padding: 1rem; margin-bottom: 1.25rem;">
+        <h4 id="t2Heading" style="margin-top: 0; margin-bottom: 0.75rem; font-size: 0.9rem; color: #475569;">Time Duration 2:</h4>
+        <div id="t2Inputs" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
+            <div>
+                <label for="t2Hours" style="font-size: 0.75rem; font-weight: 600;">Hours:</label>
+                <input type="number" id="t2Hours" class="input-field" value="2" min="0" step="1">
+            </div>
+            <div>
+                <label for="t2Mins" style="font-size: 0.75rem; font-weight: 600;">Minutes:</label>
+                <input type="number" id="t2Mins" class="input-field" value="35" min="0" max="59" step="1">
+            </div>
+            <div>
+                <label for="t2Secs" style="font-size: 0.75rem; font-weight: 600;">Seconds:</label>
+                <input type="number" id="t2Secs" class="input-field" value="15" min="0" max="59" step="1">
+            </div>
+        </div>
+        <div id="scalarInputWrapper" style="display: none;">
+            <label for="scalarFactor" style="font-size: 0.75rem; font-weight: 600;">Factor / Divisor:</label>
+            <input type="number" id="scalarFactor" class="input-field" value="4" min="0.001" step="0.5">
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
+        <button type="button" class="btn btn-primary" onclick="calculateTimeArithmetic()">Calculate Result</button>
+        <button type="button" class="btn btn-outline" onclick="resetTimeInputs()">Reset</button>
+    </div>
+
+    <div class="result-box" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 1.25rem;">
+        <h3 style="margin-top: 0; color: #1e293b; font-size: 1.1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">Time Arithmetic Output</h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Formatted Sexagesimal</div>
+                <div id="resSexaTime" style="font-size: 1.4rem; font-weight: 700; color: #2563eb;">08:20:45</div>
+                <div id="resWordsTime" style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">8h 20m 45s</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Decimal Hours</div>
+                <div id="resDecHours" style="font-size: 1.4rem; font-weight: 700; color: #0f172a;">8.3458 hr</div>
+                <div id="resDecMinutes" style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">500.75 mins</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Total Net Seconds</div>
+                <div id="resTotalSec" style="font-size: 1.4rem; font-weight: 700; color: #059669;">30,045 s</div>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">SI Standard Base Unit</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Days &amp; Fraction</div>
+                <div id="resDaysPortion" style="font-size: 1.2rem; font-weight: 700; color: #7c3aed;">0.3477 Days</div>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">Of standard 24-hr day</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed #cbd5e1; font-size: 0.875rem;">
+            <span style="font-weight: 600; color: #475569;">Operation Equation Summary:</span>
+            <div id="equationSummary" style="font-weight: 700; color: #1e293b; font-size: 1rem; margin-top: 0.25rem;">
+                5h 45m 30s + 2h 35m 15s = 8h 20m 45s
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentOp = 'add';
+
+function setTimeOp(op) {
+    currentOp = op;
+    const ops = ['add', 'sub', 'mult', 'div'];
+    ops.forEach(o => {
+        const tab = document.getElementById('tab' + o.charAt(0).toUpperCase() + o.slice(1));
+        if (tab) {
+            tab.className = (o === op) ? 'btn btn-primary' : 'btn btn-outline';
+        }
+    });
+
+    const isScalar = (op === 'mult' || op === 'div');
+    document.getElementById('t2Inputs').style.display = isScalar ? 'none' : 'grid';
+    document.getElementById('scalarInputWrapper').style.display = isScalar ? 'block' : 'none';
+    document.getElementById('t2Heading').innerText = isScalar ? (op === 'mult' ? 'Multiplication Factor:' : 'Divisor:') : 'Time Duration 2:';
+
+    calculateTimeArithmetic();
+}
+
+function resetTimeInputs() {
+    document.getElementById('t1Hours').value = '5';
+    document.getElementById('t1Mins').value = '45';
+    document.getElementById('t1Secs').value = '30';
+    document.getElementById('t2Hours').value = '2';
+    document.getElementById('t2Mins').value = '35';
+    document.getElementById('t2Secs').value = '15';
+    document.getElementById('scalarFactor').value = '4';
+    setTimeOp('add');
+}
+
+function calculateTimeArithmetic() {
+    const h1 = parseFloat(document.getElementById('t1Hours').value) || 0;
+    const m1 = parseFloat(document.getElementById('t1Mins').value) || 0;
+    const s1 = parseFloat(document.getElementById('t1Secs').value) || 0;
+    const sec1 = (h1 * 3600) + (m1 * 60) + s1;
+
+    let resSec = 0;
+    let eqStr = "";
+
+    const formatT = (h, m, s) => `${h}h ${m}m ${s}s`;
+
+    if (currentOp === 'add' || currentOp === 'sub') {
+        const h2 = parseFloat(document.getElementById('t2Hours').value) || 0;
+        const m2 = parseFloat(document.getElementById('t2Mins').value) || 0;
+        const s2 = parseFloat(document.getElementById('t2Secs').value) || 0;
+        const sec2 = (h2 * 3600) + (m2 * 60) + s2;
+
+        if (currentOp === 'add') {
+            resSec = sec1 + sec2;
+            eqStr = `${formatT(h1, m1, s1)} + ${formatT(h2, m2, s2)}`;
+        } else {
+            resSec = sec1 - sec2;
+            eqStr = `${formatT(h1, m1, s1)} - ${formatT(h2, m2, s2)}`;
+        }
+    } else {
+        const factor = parseFloat(document.getElementById('scalarFactor').value) || 1;
+        if (currentOp === 'mult') {
+            resSec = sec1 * factor;
+            eqStr = `${formatT(h1, m1, s1)} &times; ${factor}`;
+        } else {
+            resSec = factor !== 0 ? (sec1 / factor) : 0;
+            eqStr = `${formatT(h1, m1, s1)} &divide; ${factor}`;
+        }
+    }
+
+    const isNeg = resSec < 0;
+    const absSec = Math.abs(resSec);
+
+    const outH = Math.floor(absSec / 3600);
+    const rem = absSec % 3600;
+    const outM = Math.floor(rem / 60);
+    const outS = Math.round(rem % 60);
+
+    const sign = isNeg ? "-" : "";
+    const pad = (n) => String(n).padStart(2, '0');
+    const sexaFormatted = `${sign}${pad(outH)}:${pad(outM)}:${pad(outS)}`;
+    const wordsFormatted = `${sign}${outH}h ${outM}m ${outS}s`;
+
+    const decHours = (resSec / 3600).toFixed(4);
+    const decMins = (resSec / 60).toFixed(2);
+    const daysPortion = (resSec / 86400).toFixed(4);
+
+    document.getElementById('resSexaTime').innerText = sexaFormatted;
+    document.getElementById('resWordsTime').innerText = wordsFormatted;
+    document.getElementById('resDecHours').innerText = `${decHours} hr`;
+    document.getElementById('resDecMinutes').innerText = `${decMins} mins`;
+    document.getElementById('resTotalSec').innerText = `${Math.round(resSec).toLocaleString()} s`;
+    document.getElementById('resDaysPortion').innerText = `${daysPortion} Days`;
+    document.getElementById('equationSummary').innerHTML = `${eqStr} = <strong>${wordsFormatted}</strong> (${decHours} hrs)`;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    ['t1Hours', 't1Mins', 't1Secs', 't2Hours', 't2Mins', 't2Secs', 'scalarFactor'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', calculateTimeArithmetic);
+            el.addEventListener('change', calculateTimeArithmetic);
+        }
+    });
+    calculateTimeArithmetic();
+});
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>Mathematical Principles of Sexagesimal Time Arithmetic</h2>
+<p>Unlike standard base-10 decimal mathematics, time intervals are evaluated using the ancient Babylonian <strong>sexagesimal (base-60)</strong> numeral system. Because an hour contains 60 minutes and a minute contains 60 seconds, operations such as addition, subtraction, multiplication, and division cannot be performed by direct columnar decimal arithmetic without systematic base-60 carry and borrow transformations.</p>
+
+<p>The universal algebraic algorithm for computing arbitrary arithmetic across sexagesimal time durations converts all input vectors into total SI base seconds $T_{	ext{sec}}$:</p>
+
+$$T_{	ext{sec}} = (H 	imes 3600) + (M 	imes 60) + S$$
+
+<p>Once translated into continuous integer seconds, standard linear algebraic operations are applied:</p>
+
+<ul>
+    <li><strong>Duration Addition:</strong> $T_{	ext{sum}} = T_{	ext{sec}, 1} + T_{	ext{sec}, 2}$</li>
+    <li><strong>Duration Subtraction:</strong> $T_{	ext{diff}} = T_{	ext{sec}, 1} - T_{	ext{sec}, 2}$</li>
+    <li><strong>Scalar Multiplication:</strong> $T_{	ext{product}} = T_{	ext{sec}, 1} 	imes k$ (where $k \in \mathbb{R}$ represents cycle frequency or batches)</li>
+    <li><strong>Scalar Division:</strong> $T_{	ext{quotient}} = rac{T_{	ext{sec}, 1}}{N}$ (where $N \in \mathbb{R}$ represents units produced or sub-intervals)</li>
+</ul>
+
+<p>Following scalar evaluation, the resulting aggregate seconds $T_{	ext{result}}$ are partitioned back into canonical sexagesimal components via successive floor division and modulo arithmetic:</p>
+
+$$H_{	ext{out}} = \left\lfloor rac{|T_{	ext{result}}|}{3600} 
+ight
+floor$$
+$$M_{	ext{out}} = \left\lfloor rac{|T_{	ext{result}}| mod 3600}{60} 
+ight
+floor$$
+$$S_{	ext{out}} = |T_{	ext{result}}| mod 60$$
+
+<h2>Industrial Engineering: Takt Time and Cycle Time Formulation</h2>
+<p>In manufacturing engineering and Lean Six Sigma methodology, time duration division forms the cornerstone of synchronous assembly line design through the concept of <strong>Takt Time</strong>. Derived from the German word <em>Taktzeit</em> (meter or pulse), takt time defines the precise cadence at which a manufacturing facility must complete individual units to satisfy customer demand.</p>
+
+<p>Takt time is evaluated as the net available production operating time divided by total customer demand over that identical timeframe:</p>
+
+$$	ext{Takt Time} = rac{T_{	ext{available, net}}}{D_{	ext{customer}}}$$
+
+<p>Where $T_{	ext{available, net}}$ represents gross shift duration minus planned maintenance, safety briefings, and statutory employee meal breaks:</p>
+
+$$T_{	ext{available, net}} = T_{	ext{gross}} - (T_{	ext{breaks}} + T_{	ext{maintenance}})$$
+
+<p>For example, if an automotive powertrain assembly line operates for 8 hours (480 minutes) with two 15-minute scheduled breaks ($T_{	ext{available}} = 450 	ext{ minutes} = 27,000 	ext{ seconds}$) and the customer demands 450 engine units per shift:</p>
+
+$$	ext{Takt Time} = rac{27,000 	ext{ seconds}}{450 	ext{ units}} = 60.0 	ext{ seconds per unit}$$
+
+<p>If the workstation's actual cycle time exceeds 60 seconds, the line creates production bottlenecks; if cycle time is under 60 seconds, the station produces costly excess inventory.</p>
+
+<h3>Sexagesimal Time Units and Equivalence Matrix</h3>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Time Unit</th>
+            <th>Equivalence in Seconds (SI)</th>
+            <th>Equivalence in Minutes</th>
+            <th>Equivalence in Hours</th>
+            <th>Equivalence in Days</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>1 Second (s)</td><td>1.0 s</td><td>0.01667 min</td><td>0.000278 hr</td><td>0.0000116 days</td></tr>
+        <tr><td>1 Minute (min)</td><td>60.0 s</td><td>1.0 min</td><td>0.016667 hr</td><td>0.000694 days</td></tr>
+        <tr><td>1 Hobbs Tenth (0.1 hr)</td><td>360.0 s</td><td>6.0 min</td><td>0.1000 hr</td><td>0.004167 days</td></tr>
+        <tr><td>1 Centihour (c-hr)</td><td>36.0 s</td><td>0.6 min</td><td>0.0100 hr</td><td>0.000417 days</td></tr>
+        <tr><td>1 Quarter Hour</td><td>900.0 s</td><td>15.0 min</td><td>0.2500 hr</td><td>0.010417 days</td></tr>
+        <tr><td>1 Hour (hr)</td><td>3,600.0 s</td><td>60.0 min</td><td>1.0 hr</td><td>0.041667 days</td></tr>
+        <tr><td>1 Solar Day</td><td>86,400.0 s</td><td>1,440.0 min</td><td>24.0 hr</td><td>1.000000 days</td></tr>
+    </tbody>
+</table>
+
+<h2>Audio, Video, and Media Production Runtime Summation</h2>
+<p>In digital media mastering, film post-production, and podcast broadcasting, audio engineers must sum discrete multi-track cue durations to comply with broadcast commercial insertion limits or physical CD/vinyl disc maximum capacities (e.g., Red Book CD-DA audio maximum of 74 or 80 minutes).</p>
+
+<p>Because non-linear editing (NLE) timelines operate in frame rates ($24	ext{ fps}$, $29.97	ext{ fps SMPTE drop-frame}$, or $60	ext{ fps}$), summing sexagesimal durations requires converting frames to sub-second rational coefficients:</p>
+
+$$S_{	ext{total}} = S_{	ext{integer}} + rac{	ext{Frames}}{	ext{Frame Rate}}$$
+
+<div class="worked-example-card">
+    <h3>Worked Engineering Case Study: Lean Six Sigma Production Run</h3>
+    <p><strong>Scenario:</strong> A medical device manufacturer produces robotic surgical instruments. The plant operates a single shift of 8 hours and 30 minutes ($08:30:00$). Planned unpaid lunch is 45 minutes ($00:45:00$) and two paid operator rest breaks total 30 minutes ($00:30:00$, which counts as production time). Daily customer order demand is 155 finished surgical instruments. Calculate: (1) net available operating time in sexagesimal and seconds, (2) required takt time per unit, and (3) total time to produce a specialized sub-batch of 28 units if cycle time is 2 minutes and 45 seconds per unit.</p>
+    
+    <div class="step-solution">
+        <h4>Step 1: Compute Net Available Operating Time</h4>
+        <p>Gross shift: $8	ext{h } 30	ext{m } 00	ext{s} = (8 	imes 3600) + (30 	imes 60) = 28,800 + 1,800 = 30,600 	ext{ seconds}$.</p>
+        <p>Unpaid meal deduction: $45 	ext{ minutes} = 2,700 	ext{ seconds}$.</p>
+        $$T_{	ext{net}} = 30,600 - 2,700 = 27,900 	ext{ seconds} = 7 	ext{ hours and } 45 	ext{ minutes}$$
+
+        <h4>Step 2: Calculate Required Takt Time</h4>
+        $$	ext{Takt Time} = rac{27,900 	ext{ seconds}}{155 	ext{ units}} = 180.0 	ext{ seconds per unit}$$
+        <p>In sexagesimal: $180 / 60 = 3 	ext{ minutes and } 0 	ext{ seconds per unit}$.</p>
+
+        <h4>Step 3: Calculate Sub-Batch Production Time</h4>
+        <p>Unit cycle time: $2	ext{m } 45	ext{s} = (2 	imes 60) + 45 = 165 	ext{ seconds}$.</p>
+        $$T_{	ext{batch}} = 28 	ext{ units} 	imes 165 	ext{ seconds} = 4,620 	ext{ seconds}$$
+        <p>Partitioning into sexagesimal:</p>
+        $$H = \lfloor 4620 / 3600 
+floor = 1 	ext{ hour}$$
+        $$M = \lfloor (4620 mod 3600) / 60 
+floor = \lfloor 1020 / 60 
+floor = 17 	ext{ minutes}$$
+        $$S = 1020 mod 60 = 0 	ext{ seconds}$$
+        <p><strong>Sub-Batch Duration:</strong> <strong>1 hour, 17 minutes, and 0 seconds</strong> ($1.2833$ decimal hours).</p>
+    </div>
+</div>
+
+<h2>Common Calculation Errors in Time Arithmetic</h2>
+<ol>
+    <li><strong>Treating Minutes and Seconds as Decimals:</strong> Adding $4.45 	ext{ hours}$ and $2.35 	ext{ hours}$ as standard decimal numbers yields $6.80$, whereas adding $4	ext{h } 45	ext{m}$ and $2	ext{h } 35	ext{m}$ yields $7	ext{h } 20	ext{m}$ ($7.333 	ext{ hours}$). Failing to convert base-60 produces massive compounding errors.</li>
+    <li><strong>Negative Duration Underflow:</strong> In subtraction when subtracting a larger duration from a smaller duration, naive code often produces outputs like <code>-2 hours and +40 minutes</code>. The sign must distribute across the entire scalar: $-1	ext{h } 20	ext{m}$ ($-80 	ext{ minutes}$).</li>
+    <li><strong>Daylight Saving Transition Drift:</strong> When computing elapsed time between clock timestamps spanning the spring or autumn DST transition, civil clocks jump forward by 1 hour (a 23-hour day) or fall back 1 hour (a 25-hour day). Physical time arithmetic must reference UTC epoch timestamps rather than wall-clock strings.</li>
+</ol>
+
+<section class="faq-section">
+    <h2>Frequently Asked Questions About Time Calculations</h2>
+    <div class="faq-item">
+        <h3>How do you add two time durations together?</h3>
+        <p>Convert both durations to total seconds, add the seconds together, then convert back to hours, minutes, and seconds by dividing by 3600 and 60 using modulo arithmetic.</p>
+    </div>
+    <div class="faq-item">
+        <h3>How does subtraction work when Time 2 is larger than Time 1?</h3>
+        <p>For clock times wrapping past midnight, 24 hours (86,400 seconds) is added to the difference. For raw mathematical durations, the result represents a negative duration.</p>
+    </div>
+    <div class="faq-item">
+        <h3>How do you multiply or divide a time duration by a number?</h3>
+        <p>Convert the duration into total seconds, multiply or divide by the scalar factor, then re-format into sexagesimal hours, minutes, and seconds.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is takt time in manufacturing engineering?</h3>
+        <p>Takt time is the maximum allowable time per unit to produce a product in order to meet customer demand, evaluated as Net Available Production Time divided by Customer Demand Units.</p>
+    </div>
+</section>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">📅</span>
+            <h3 class="widget-title">Related Date & Time Utility</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="date-difference-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Date Difference & Business Days</a></li>
+            <li><a href="hours-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Work Hours Calculator</a></li>
+            <li><a href="week-number-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ISO Week Number</a></li>
+            <li><a href="add-days-to-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Add Days to Date</a></li>
+            <li><a href="add-time-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Add Time Calculator</a></li>
+            <li><a href="business-days-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Business Days Calculator</a></li>
+            <li><a href="countdown-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Countdown Calculator</a></li>
+            <li><a href="date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calendar Date Calculator</a></li>
+            <li><a href="day-of-week-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Day of the Week Calculator</a></li>
+            <li><a href="day-of-year-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Day of the Year Calculator</a></li>
+            <li><a href="decimal-time-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Decimal Time Calculator</a></li>
+            <li><a href="leap-year-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Leap Year Calculator</a></li>
+            <li><a href="months-between-dates-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Months Between Dates</a></li>
+            <li><a href="quarter-of-year-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Quarter of Year Calculator</a></li>
+            <li><a href="time-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Time Calculator (Sexagesimal)</a></li>
+            <li><a href="age-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exact Age Calculator</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck Calculator</a></li>
+            <li><a href="unit-converter.html" class="sidebar-link-item"><span class="link-bullet">›</span> Universal Multi-Unit Converter</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="datetime.html" class="sidebar-category-link">View All Date & Time Utility Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers peer-reviewed chronometric computing algorithms, astronomical date conversion systems, and enterprise financial calendar engines compliant with ISO 8601, SEC, and IRS reporting standards.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Chronometric &amp; Time Suites</h4>
+                    <ul>
+                        <li><a href="datetime.html">Date &amp; Time Utilities</a></li>
+                        <li><a href="finance.html">Financial Planning</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="converter.html">Unit &amp; Chrono Converters</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Core Calendrical Tools</h4>
+                    <ul>
+                        <li><a href="quarter-of-year-calculator.html">Quarter of Year Calculator</a></li>
+                        <li><a href="time-calculator.html">Time Calculator</a></li>
+                        <li><a href="hours-calculator.html">Work Hours Calculator</a></li>
+                        <li><a href="months-between-dates-calculator.html">Months Between Dates</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Metric Converters</a></li>
+                        <li><a href="engineering.html">Engineering Tools</a></li>
+                        <li><a href="health.html">Health &amp; Fitness</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precision chronological and fiscal quarter calculation algorithms.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

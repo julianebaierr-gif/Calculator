@@ -80,6 +80,7 @@ CAT_MAP = {
             ("markup-calculator.html", "Markup & Margin Calculator", "🏷️", "Retail selling price, profit multiplier, markup & margin %", "P = C/(1-G) | M = G/(1-G) | Keystone 2.0x"),
             ("smoking-cost-calculator.html", "Smoking Cost & Opportunity", "🚬", "Cash outlays, S&P 500 compound loss & 11-min life loss", "FV = PMT·[((1+r)ⁿ - 1)/r] | 11 mins lost/cigarette"),
             ("retirement-calculator.html", "Retirement & FIRE Planner", "🏖️", "Trinity study 4% rule, nest egg sizing & inflation", "Nest Egg = (Spend - Pension)/SWR | FIRE = 25×Expenses"),
+            ("overtime-calculator.html", "Overtime Pay Calculator", "💼", "FLSA time-and-a-half, regular rate & CA double time", "W_ot = 1.5·R_reg | CA Daily 2.0x Double Time"),
         ]
     },
     "math.html": {
@@ -391,6 +392,13 @@ CAT_MAP = {
             ("business-days-calculator.html", "Business Days Calculator", "💼", "Working days between dates, weekend & holiday exclusion", "Net Days = Total Days - Weekends(Sat/Sun) - Holidays"),
             ("countdown-calculator.html", "Event Countdown Timer", "⏳", "Days, hours, minutes, seconds to target date & milestones", "Remaining = Target - Current | d, h, m, s breakdown"),
             ("date-calculator.html", "Calendar Date Calculator", "📅", "Date intervals, duration between dates, years/months/days", "Δ = Date2 - Date1 | Gregorian calendar algorithm"),
+            ("day-of-week-calculator.html", "Day of the Week Calculator", "📅", "Zeller's congruence, Doomsday rule & birth weekday", "Zeller's Congruence & Conway Doomsday"),
+            ("day-of-year-calculator.html", "Day of the Year Calculator", "🗓️", "Ordinal date YYYY-DDD, solar declination & year percent", "ISO 8601 YYYY-DDD | Cooper Declination"),
+            ("decimal-time-calculator.html", "Decimal Time Calculator", "⏱️", "Payroll hours, French metric time & Swatch .beats", "T_dec = H + M/60 + S/3600 | French & .beat"),
+            ("leap-year-calculator.html", "Leap Year Calculator", "🌍", "Gregorian 400-year cycle, astronomical tropical year", "IsLeap = (Y%4==0 && Y%100!=0) || (Y%400==0)"),
+            ("months-between-dates-calculator.html", "Months Between Dates", "📅", "Calendar month diff, fractional months & 30/360 basis", "ΔM = (Y2-Y1)·12 + (M2-M1) | 30/360 & Actual"),
+            ("quarter-of-year-calculator.html", "Quarter of Year Calculator", "📊", "Q1-Q4 calendar, fiscal government & retail 4-4-5", "Q = ⌈M/3⌉ | US Federal & NRF 4-4-5"),
+            ("time-calculator.html", "Time Calculator (Sexagesimal)", "⏰", "Add, subtract, multiply, divide durations & takt time", "T_sec = H·3600 + M·60 + S | Takt = T_avail/D"),
         ]
     },
     "converter.html": {

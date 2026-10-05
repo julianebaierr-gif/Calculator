@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leap Year Calculator | Gregorian Algorithm & Astronomical Drift</title>
+    <meta name="description" content="Check if any year is a leap year using the Gregorian 400-year algorithmic rules. Discover upcoming leap years, tropical solar year physics, and calendar history.">
+    <link rel="canonical" href="https://calchub.com/leap-year-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Leap Year Calculator",
+      "url": "https://calchub.com/leap-year-calculator.html",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "Calculates whether a year is a leap year, explains the 400-year Gregorian cycle, and lists upcoming leap years."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the exact 3-step Gregorian rule for leap years?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A year is a leap year if: (1) it is evenly divisible by 4, EXCEPT (2) if it is divisible by 100, it is NOT a leap year, UNLESS (3) it is also divisible by 400, in which case it IS a leap year."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why was the year 2000 a leap year but 1900 was not?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Both 1900 and 2000 are century years divisible by 100. However, 1900 is not divisible by 400 (1900 / 400 = 4.75), making it a common year. Year 2000 is evenly divisible by 400 (2000 / 400 = 5), making it a rare quadricenturial leap year."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the next leap year after 2024?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The next leap year after 2024 is 2028, followed by 2032, 2036, and 2040."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why do leap years exist in astronomy?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The astronomical tropical year (the time it takes Earth to orbit the Sun from equinox to equinox) is approximately 365.2422 solar days. Without intercalary leap days, the calendar would drift approximately 1 day every 4 years, causing seasons to shift completely over centuries."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="datetime.html">Date &amp; Time</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="finance.html">Finance</a>
+                <a href="converter.html">Converters</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="datetime.html">Date &amp; Time Utility</a> &gt; <span>Leap Year Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Leap Year Calculator</h1>
+                        <p class="calc-desc">Verify whether any year in the past, present, or future is an intercalary leap year using the Gregorian quadrennial, centurial, and quadricenturial algorithmic rules.</p>
+                    </div>
+                    <div class="calc-body">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
+        <div>
+            <label for="yearInput" style="font-weight: 600; font-size: 0.875rem;">Year to Check (YYYY):</label>
+            <input type="number" id="yearInput" class="input-field" value="2024" min="1" max="9999" step="1">
+            <span class="input-hint">Enter any CE / AD calendar year (e.g. 1900, 2000, 2024, 2028)</span>
+        </div>
+        <div style="display: flex; align-items: flex-end; gap: 0.5rem;">
+            <button type="button" class="btn btn-primary" onclick="checkLeapYear()">Check Year</button>
+            <button type="button" class="btn btn-outline" onclick="setCurrentYear()">Current Year</button>
+        </div>
+    </div>
+
+    <div class="result-box" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 1.25rem;">
+        <div id="statusBanner" style="padding: 1rem; border-radius: 6px; margin-bottom: 1.25rem; font-weight: 700; font-size: 1.2rem; text-align: center; background: #dcfce7; color: #15803d; border: 1px solid #86efac;">
+            2024 IS A LEAP YEAR! (366 Days)
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Total Days in Year</div>
+                <div id="resTotalDays" style="font-size: 1.4rem; font-weight: 700; color: #2563eb;">366 Days</div>
+                <div id="resTotalHours" style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">8,784 Hours</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Days in February</div>
+                <div id="resFebDays" style="font-size: 1.4rem; font-weight: 700; color: #0f172a;">29 Days</div>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">February 29 Present</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Previous Leap Year</div>
+                <div id="resPrevLeap" style="font-size: 1.2rem; font-weight: 700; color: #475569;">2020</div>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">4 years prior</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Next Leap Year</div>
+                <div id="resNextLeap" style="font-size: 1.2rem; font-weight: 700; color: #16a34a;">2028</div>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">4 years ahead</div>
+            </div>
+        </div>
+
+        <h4 style="margin: 1rem 0 0.5rem 0; font-size: 0.95rem; color: #334155;">Gregorian 3-Step Algorithmic Verification:</h4>
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0.75rem; font-size: 0.875rem;">
+            <div id="ruleStep1" style="margin-bottom: 0.35rem; color: #16a34a;">&#x2714; Divisible by 4? 2024 / 4 = 506 (Remainder 0) &rarr; YES</div>
+            <div id="ruleStep2" style="margin-bottom: 0.35rem; color: #2563eb;">&#x2714; Divisible by 100? 2024 / 100 = 20.24 (Remainder 24) &rarr; NOT A CENTURY YEAR</div>
+            <div id="ruleStep3" style="color: #64748b;">&bull; Divisible by 400? N/A (Standard quadrennial leap year)</div>
+        </div>
+
+        <h4 style="margin: 1.25rem 0 0.5rem 0; font-size: 0.95rem; color: #334155;">Surrounding Leap Years Sequence:</h4>
+        <div id="surroundingYears" style="display: flex; flex-wrap: wrap; gap: 0.5rem; font-size: 0.85rem;">
+            <!-- Generated dynamically -->
+        </div>
+    </div>
+</div>
+
+<script>
+function isLeap(y) {
+    return (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0);
+}
+
+function setCurrentYear() {
+    document.getElementById('yearInput').value = new Date().getFullYear();
+    checkLeapYear();
+}
+
+function checkLeapYear() {
+    const y = parseInt(document.getElementById('yearInput').value, 10);
+    if (isNaN(y) || y < 1) return;
+
+    const div4 = (y % 4 === 0);
+    const div100 = (y % 100 === 0);
+    const div400 = (y % 400 === 0);
+    const leap = isLeap(y);
+
+    const banner = document.getElementById('statusBanner');
+    if (leap) {
+        banner.style.background = '#dcfce7';
+        banner.style.color = '#15803d';
+        banner.style.border = '1px solid #86efac';
+        banner.innerHTML = `${y} IS A LEAP YEAR! (366 Days)`;
+    } else {
+        banner.style.background = '#fef2f2';
+        banner.style.color = '#b91c1c';
+        banner.style.border = '1px solid #fca5a5';
+        banner.innerHTML = `${y} IS A COMMON YEAR (365 Days)`;
+    }
+
+    document.getElementById('resTotalDays').innerText = leap ? '366 Days' : '365 Days';
+    document.getElementById('resTotalHours').innerText = leap ? '8,784 Hours' : '8,760 Hours';
+    document.getElementById('resFebDays').innerText = leap ? '29 Days' : '28 Days';
+
+    // Rule explanation
+    const s1 = document.getElementById('ruleStep1');
+    const s2 = document.getElementById('ruleStep2');
+    const s3 = document.getElementById('ruleStep3');
+
+    if (div4) {
+        s1.style.color = '#16a34a';
+        s1.innerHTML = `&#x2714; Divisible by 4? ${y} &divide; 4 = ${y / 4} (Remainder 0) &rarr; YES`;
+    } else {
+        s1.style.color = '#dc2626';
+        s1.innerHTML = `&#x2718; Divisible by 4? ${y} &divide; 4 = ${(y / 4).toFixed(2)} (Remainder ${y % 4}) &rarr; NO (Immediately Common Year)`;
+    }
+
+    if (div100) {
+        s2.style.color = '#ea580c';
+        s2.innerHTML = `&#x26A0; Divisible by 100? ${y} &divide; 100 = ${y / 100} &rarr; CENTURY YEAR (Requires 400-year check)`;
+        if (div400) {
+            s3.style.color = '#16a34a';
+            s3.innerHTML = `&#x2714; Divisible by 400? ${y} &divide; 400 = ${y / 400} (Remainder 0) &rarr; QUADRICENTURIAL LEAP YEAR!`;
+        } else {
+            s3.style.color = '#dc2626';
+            s3.innerHTML = `&#x2718; Divisible by 400? ${y} &divide; 400 = ${(y / 400).toFixed(2)} &rarr; NOT divisible by 400 &rarr; COMMON CENTURY YEAR`;
+        }
+    } else {
+        s2.style.color = '#2563eb';
+        s2.innerHTML = `&#x2714; Divisible by 100? ${y} &divide; 100 = ${(y / 100).toFixed(2)} &rarr; NOT A CENTURY YEAR (Rule 1 holds)`;
+        s3.style.color = '#64748b';
+        s3.innerHTML = `&bull; Divisible by 400? Skipped (Century rule does not apply)`;
+    }
+
+    // Previous and next leap years
+    let prev = y - 1;
+    while (prev > 0 && !isLeap(prev)) prev--;
+    let next = y + 1;
+    while (!isLeap(next)) next++;
+
+    document.getElementById('resPrevLeap').innerText = prev > 0 ? prev : 'N/A';
+    document.getElementById('resNextLeap').innerText = next;
+
+    // Surrounding 5 leap years
+    const surrounding = [];
+    let cur = y - 12;
+    while (surrounding.length < 7 && cur < y + 25) {
+        if (cur > 0 && isLeap(cur)) {
+            surrounding.push(cur);
+        }
+        cur++;
+    }
+
+    const pillsHtml = surrounding.map(yr => {
+        const isCurrent = (yr === y);
+        const bg = isCurrent ? '#2563eb' : '#e2e8f0';
+        const color = isCurrent ? '#ffffff' : '#1e293b';
+        return `<span style="background: ${bg}; color: ${color}; padding: 0.25rem 0.6rem; border-radius: 9999px; font-weight: 600;">${yr}</span>`;
+    }).join(' ');
+
+    document.getElementById('surroundingYears').innerHTML = pillsHtml;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('yearInput').addEventListener('input', checkLeapYear);
+    document.getElementById('yearInput').addEventListener('change', checkLeapYear);
+    checkLeapYear();
+});
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>Astronomical Foundations of the Tropical Year</h2>
+<p>A calendar year is fundamentally an attempt to synchronize civil human society with the orbital mechanics of our solar system. An astronomical <strong>Tropical Year</strong> (also known as the solar year) is defined as the precise duration required for the Earth to complete one full revolution around the Sun relative to the vernal equinox ($0^\circ$ ecliptic longitude). In modern ephemeris astronomy (J2000.0 epoch), the mean tropical year evaluates to:</p>
+
+$$T_{	ext{tropical}} pprox 365.242189 	ext{ ephemeris solar days} pprox 365 	ext{ days, } 5 	ext{ hours, } 48 	ext{ minutes, and } 45.19 	ext{ seconds}$$
+
+<p>Because an integer civil year consists of exactly 365 calendar days ($8,760 	ext{ hours}$), an unadjusted calendar accumulates a deficit of approximately $0.242189 	ext{ days}$ (nearly six hours) each year. Without systematic intercalation (adding extra days), seasonal events—such as the summer solstice, autumn harvest, and winter freezes—would slowly drift through the calendar at a rate of roughly 24 days per century, completely inverting the agricultural calendar across several hundred years.</p>
+
+<h2>The Gregorian 400-Year Cycle Algorithm</h2>
+<p>To eliminate calendar drift, Julius Caesar instituted the Julian calendar in 45 BCE, introducing an intercalary day every four years ($365.25 	ext{ days}$ average). However, because $365.25 > 365.2422$, the Julian calendar overcorrected by approximately 11 minutes and 14 seconds annually. By 1582 CE, the calendar had drifted out of synchronization with the vernal equinox by 10 full days.</p>
+
+<p>To rectify this error, Pope Gregory XIII promulgated the papal bull <em>Inter gravissimas</em> in October 1582, introducing the <strong>Gregorian Calendar Algorithm</strong>. The modern algorithm enforces three sequential mathematical tests:</p>
+
+$$	ext{IsLeapYear}(Y) = egin{cases} 
+	ext{True} & 	ext{if } (Y mod 4 = 0 \land Y mod 100 
+eq 0) \lor (Y mod 400 = 0) \ 
+	ext{False} & 	ext{otherwise} 
+\end{cases}$$
+
+<p>This formulation establishes three strict hierarchical rules:</p>
+<ol>
+    <li><strong>The Quadrennial Rule:</strong> Every year evenly divisible by 4 is a leap year (e.g., 2024, 2028, 2032).</li>
+    <li><strong>The Centurial Exception:</strong> If a year is evenly divisible by 100, it is <strong>not</strong> a leap year (e.g., 1700, 1800, 1900, 2100).</li>
+    <li><strong>The Quadricenturial Exception:</strong> If a year is evenly divisible by 400, it <strong>is</strong> a leap year despite ending in double zeroes (e.g., 1600, 2000, 2400).</li>
+</ol>
+
+<h3>Mathematical Analysis of the 400-Year Cycle</h3>
+<p>Across a complete 400-year Gregorian cycle, the distribution of common and leap years is evaluated as follows:</p>
+
+$$	ext{Total Years} = 400$$
+$$	ext{Quadrennial Candidates} = rac{400}{4} = 100$$
+$$	ext{Centurial Exclusions} = rac{400}{100} = 4$$
+$$	ext{Quadricenturial Inclusions} = rac{400}{400} = 1$$
+$$	ext{Net Leap Years} = 100 - 4 + 1 = 97 	ext{ leap years}$$
+
+<p>The average length of a Gregorian calendar year over the 400-year cycle evaluates to:</p>
+
+$$ar{T}_{	ext{Gregorian}} = rac{(303 	imes 365) + (97 	imes 366)}{400} = rac{110,595 + 35,502}{400} = rac{146,097}{400} = 365.2425 	ext{ days}$$
+
+<p>Comparing the Gregorian average ($365.242500$) with the astronomical tropical year ($365.242189$) reveals an annual discrepancy of just $+0.000311 	ext{ days}$ (approximately 26.8 seconds per year). The Gregorian calendar requires approximately <strong>3,215 years</strong> to accumulate a single day of error!</p>
+
+<h3>Comparative Planetary &amp; Calendrical Intercalation Matrix</h3>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Calendar System</th>
+            <th>Cycle Length</th>
+            <th>Leap Years in Cycle</th>
+            <th>Mean Year Length</th>
+            <th>Annual Drift vs. Tropical Year</th>
+            <th>Time to Accumulate 1 Day Error</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>Egyptian Civil</td><td>1 Year</td><td>0</td><td>365.0000 days</td><td>-0.242189 days</td><td>~4.1 years</td></tr>
+        <tr><td>Julian (45 BCE)</td><td>4 Years</td><td>1</td><td>365.2500 days</td><td>+0.007811 days</td><td>~128 years</td></tr>
+        <tr><td>Gregorian (1582)</td><td>400 Years</td><td>97</td><td>365.2425 days</td><td>+0.000311 days</td><td>~3,215 years</td></tr>
+        <tr><td>Revised Julian (Milanković)</td><td>900 Years</td><td>218</td><td>365.242222 days</td><td>+0.000033 days</td><td>~30,300 years</td></tr>
+        <tr><td>Persian Jalali (Solar Hijri)</td><td>2,820 Years</td><td>683</td><td>365.242198 days</td><td>+0.000009 days</td><td>~110,000 years</td></tr>
+    </tbody>
+</table>
+
+<h2>Financial and Algorithmic Implications of Leap Years</h2>
+
+<h3>1. Bond Accrual and Day-Count Conventions</h3>
+<p>In fixed-income financial engineering, interest accrual between payment dates depends strictly on legal day-count conventions. Under the <strong>Actual/Actual ICMA</strong> standard, the annual coupon is divided by 366 during a leap year and 365 in common years. Under <strong>Actual/360</strong> (prevalent in US money markets and commercial loans), the extra day in February adds a 366th day of accrued interest, yielding an annualized excess cost of $1/360 pprox 0.278\%$ on outstanding principal.</p>
+
+<h3>2. The Infamous Zune Leap Year Bug (December 31, 2008)</h3>
+<p>On December 31, 2008 (a leap year), millions of Microsoft Zune 30GB media players froze simultaneously across the globe. The root cause was an infinite loop in the driver clock routine <code>SetTimes()</code>. The algorithm repeatedly decremented elapsed days by 366 for leap years and 365 for common years. On day 366, the loop checked <code>days > 365</code>, saw <code>days = 366</code> in a leap year, but failed to exit because the condition deducted 366 only if <code>days > 366</code>, locking the device into an infinite loop until the battery drained or midnight struck.</p>
+
+<div class="worked-example-card">
+    <h3>Worked Mathematical Case Study: Century Boundary Verification (1900 vs 2000 vs 2100)</h3>
+    <p><strong>Scenario:</strong> An enterprise database architect is auditing legacy chronological stored procedures to verify date handling across century boundaries. Evaluate the leap year status of years <strong>1900</strong>, <strong>2000</strong>, and <strong>2100</strong> using the Gregorian algorithm.</p>
+    
+    <div class="step-solution">
+        <h4>Audit 1: Year 1900</h4>
+        <p>Step 1: $1900 mod 4 = 0$ (Passes quadrennial check).</p>
+        <p>Step 2: $1900 mod 100 = 0$ (Century year exception triggered).</p>
+        <p>Step 3: $1900 mod 400 = 300 
+eq 0$ ($1900 / 400 = 4.75$).</p>
+        <p><strong>Result:</strong> <strong>Common Year (365 Days)</strong>. February 1900 had only 28 days.</p>
+
+        <h4>Audit 2: Year 2000</h4>
+        <p>Step 1: $2000 mod 4 = 0$ (Passes quadrennial check).</p>
+        <p>Step 2: $2000 mod 100 = 0$ (Century year exception triggered).</p>
+        <p>Step 3: $2000 mod 400 = 0$ ($2000 / 400 = 5.0$).</p>
+        <p><strong>Result:</strong> <strong>Leap Year (366 Days)</strong>! Year 2000 was a rare quadricenturial leap year with February 29 present.</p>
+
+        <h4>Audit 3: Year 2100</h4>
+        <p>Step 1: $2100 mod 4 = 0$ (Passes quadrennial check).</p>
+        <p>Step 2: $2100 mod 100 = 0$ (Century year exception triggered).</p>
+        <p>Step 3: $2100 mod 400 = 100 
+eq 0$ ($2100 / 400 = 5.25$).</p>
+        <p><strong>Result:</strong> <strong>Common Year (365 Days)</strong>. February 2100 will have only 28 days.</p>
+    </div>
+</div>
+
+<h2>Common Implementation Pitfalls in Software Development</h2>
+<ol>
+    <li><strong>Assuming Divisible by 4 is Sufficient:</strong> The most frequent bug in junior developer code is writing <code>if (year % 4 == 0) return true;</code> without checking the century and 400-year exceptions. This incorrectly marks 1900, 2100, 2200, and 2300 as leap years.</li>
+    <li><strong>Leap Seconds vs. Leap Years:</strong> Leap years adjust for the Earth's orbital period around the Sun ($~365.2422 	ext{ days}$). In contrast, <strong>Leap Seconds</strong> adjust UTC atomic clocks for variations in Earth's axial rotation speed (tidal friction slowing the day by milliseconds). Leap years occur predictably in February; leap seconds are announced by the International Earth Rotation and Reference Systems Service (IERS) in June or December.</li>
+    <li><strong>Historical Retroactivity (Proleptic Calendar):</strong> Applying the Gregorian algorithm to dates prior to October 15, 1582 creates a "Proleptic Gregorian Calendar," which does not match real historical records of the Roman, Byzantine, or medieval European eras.</li>
+</ol>
+
+<section class="faq-section">
+    <h2>Frequently Asked Questions About Leap Years</h2>
+    <div class="faq-item">
+        <h3>What is the exact 3-step Gregorian rule for leap years?</h3>
+        <p>A year is a leap year if: (1) it is evenly divisible by 4, EXCEPT (2) if it is divisible by 100, it is NOT a leap year, UNLESS (3) it is also divisible by 400, in which case it IS a leap year.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Why was the year 2000 a leap year but 1900 was not?</h3>
+        <p>Both 1900 and 2000 are century years divisible by 100. However, 1900 is not divisible by 400 (1900 / 400 = 4.75), making it a common year. Year 2000 is evenly divisible by 400 (2000 / 400 = 5), making it a rare quadricenturial leap year.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is the next leap year after 2024?</h3>
+        <p>The next leap year after 2024 is 2028, followed by 2032, 2036, and 2040.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Why do leap years exist in astronomy?</h3>
+        <p>The astronomical tropical year (the time it takes Earth to orbit the Sun from equinox to equinox) is approximately 365.2422 solar days. Without intercalary leap days, the calendar would drift approximately 1 day every 4 years, causing seasons to shift completely over centuries.</p>
+    </div>
+</section>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">📅</span>
+            <h3 class="widget-title">Related Date & Time Utility</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="date-difference-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Date Difference & Business Days</a></li>
+            <li><a href="hours-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Work Hours Calculator</a></li>
+            <li><a href="week-number-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ISO Week Number</a></li>
+            <li><a href="add-days-to-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Add Days to Date</a></li>
+            <li><a href="add-time-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Add Time Calculator</a></li>
+            <li><a href="business-days-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Business Days Calculator</a></li>
+            <li><a href="countdown-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Countdown Calculator</a></li>
+            <li><a href="date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calendar Date Calculator</a></li>
+            <li><a href="day-of-week-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Day of the Week Calculator</a></li>
+            <li><a href="day-of-year-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Day of the Year Calculator</a></li>
+            <li><a href="decimal-time-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Decimal Time Calculator</a></li>
+            <li><a href="leap-year-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Leap Year Calculator</a></li>
+            <li><a href="months-between-dates-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Months Between Dates</a></li>
+            <li><a href="quarter-of-year-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Quarter of Year Calculator</a></li>
+            <li><a href="time-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Time Calculator (Sexagesimal)</a></li>
+            <li><a href="age-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exact Age Calculator</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck Calculator</a></li>
+            <li><a href="unit-converter.html" class="sidebar-link-item"><span class="link-bullet">›</span> Universal Multi-Unit Converter</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="datetime.html" class="sidebar-category-link">View All Date & Time Utility Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers peer-reviewed chronometric computing algorithms, astronomical date conversion systems, and calendrical engines compliant with ISO 8601, Gregorian, and Zeller algebraic formulations.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Chronometric &amp; Time Suites</h4>
+                    <ul>
+                        <li><a href="datetime.html">Date &amp; Time Utilities</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="finance.html">Financial Planning</a></li>
+                        <li><a href="converter.html">Unit &amp; Chrono Converters</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Core Calendrical Tools</h4>
+                    <ul>
+                        <li><a href="decimal-time-calculator.html">Decimal Time Calculator</a></li>
+                        <li><a href="leap-year-calculator.html">Leap Year Calculator</a></li>
+                        <li><a href="hours-calculator.html">Work Hours Calculator</a></li>
+                        <li><a href="day-of-week-calculator.html">Day of Week Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Metric Converters</a></li>
+                        <li><a href="engineering.html">Engineering Tools</a></li>
+                        <li><a href="health.html">Health &amp; Fitness</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precision astronomical chronometry and calendar algorithms.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

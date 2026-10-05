@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overtime Pay Calculator | FLSA Regular Rate, Time-and-a-Half & Double Time</title>
+    <meta name="description" content="Calculate overtime pay under FLSA rules, including time-and-a-half (1.5x), California daily double time (2.0x), non-discretionary bonuses, and blended hourly rates.">
+    <link rel="canonical" href="https://calchub.com/overtime-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Overtime Pay Calculator",
+      "url": "https://calchub.com/overtime-calculator.html",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "Calculates overtime pay, regular rate of pay, time-and-a-half, California double time, and blended bonus earnings."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How is time-and-a-half overtime calculated under the FLSA?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Under the federal Fair Labor Standards Act (FLSA), overtime is paid at 1.5 times the employee's regular rate of pay for all hours worked exceeding 40 in a single standard 7-day workweek."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the Regular Rate of Pay when bonuses or commissions are included?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The regular rate of pay is calculated by dividing total remuneration (base wages plus non-discretionary bonuses, commissions, and shift differentials) by total hours worked in the workweek. Overtime is then paid on this higher blended rate."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does California daily overtime and double time work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Under California Labor Code 510, non-exempt employees earn 1.5x pay for hours worked over 8 up to 12 in a single day, and 2.0x (double time) for all hours worked beyond 12 in a single workday."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can an employer waive overtime pay by paying a flat salary?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. An employee is only exempt from overtime if they satisfy both the statutory salary threshold and specific administrative, professional, or executive duties tests mandated by the Department of Labor."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="datetime.html">Date &amp; Time</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="finance.html">Finance</a>
+                <a href="converter.html">Converters</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="finance.html">Finance &amp; Payroll</a> &gt; <span>Overtime Pay Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Overtime Pay Calculator</h1>
+                        <p class="calc-desc">Precision payroll computation for overtime wages under US FLSA statutory guidelines, California daily double-time labor codes, and weighted regular rates of pay.</p>
+                    </div>
+                    <div class="calc-body">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
+        <div>
+            <label for="baseHourlyRate" style="font-weight: 600; font-size: 0.875rem;">Base Hourly Rate ($):</label>
+            <input type="number" id="baseHourlyRate" class="input-field" value="28.50" min="0" step="0.50">
+            <span class="input-hint">Contractual base straight-time rate</span>
+        </div>
+        <div>
+            <label for="totalHoursWorked" style="font-weight: 600; font-size: 0.875rem;">Total Workweek Hours:</label>
+            <input type="number" id="totalHoursWorked" class="input-field" value="48.5" min="0" max="168" step="0.25">
+            <span class="input-hint">Total clock hours in the 7-day workweek</span>
+        </div>
+        <div>
+            <label for="nondiscBonus" style="font-weight: 600; font-size: 0.875rem;">Weekly Bonus / Commission ($):</label>
+            <input type="number" id="nondiscBonus" class="input-field" value="150.00" min="0" step="10.00">
+            <span class="input-hint">Non-discretionary bonus or incentive pay</span>
+        </div>
+        <div>
+            <label for="calcMode" style="font-weight: 600; font-size: 0.875rem;">Overtime Jurisdiction Standard:</label>
+            <select id="calcMode" class="input-field">
+                <option value="flsa">Federal FLSA Standard (> 40 hrs/wk @ 1.5x)</option>
+                <option value="ca_daily">California Daily (> 8h @ 1.5x, > 12h @ 2.0x)</option>
+                <option value="custom_double">Custom Overtime + Double Time</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Specific Daily Inputs for California Mode -->
+    <div id="caDailyWrapper" style="display: none; background: white; border: 1px solid #e2e8f0; border-radius: 6px; padding: 1rem; margin-bottom: 1.5rem;">
+        <h4 style="margin-top: 0; font-size: 0.95rem; color: #1e293b;">Daily Hours Distribution (Past 7 Days):</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 0.5rem;">
+            <div><label style="font-size: 0.75rem;">Mon</label><input type="number" id="dMon" class="input-field" value="10" min="0" max="24" step="0.5"></div>
+            <div><label style="font-size: 0.75rem;">Tue</label><input type="number" id="dTue" class="input-field" value="13" min="0" max="24" step="0.5"></div>
+            <div><label style="font-size: 0.75rem;">Wed</label><input type="number" id="dWed" class="input-field" value="9" min="0" max="24" step="0.5"></div>
+            <div><label style="font-size: 0.75rem;">Thu</label><input type="number" id="dThu" class="input-field" value="8.5" min="0" max="24" step="0.5"></div>
+            <div><label style="font-size: 0.75rem;">Fri</label><input type="number" id="dFri" class="input-field" value="8" min="0" max="24" step="0.5"></div>
+            <div><label style="font-size: 0.75rem;">Sat</label><input type="number" id="dSat" class="input-field" value="0" min="0" max="24" step="0.5"></div>
+            <div><label style="font-size: 0.75rem;">Sun</label><input type="number" id="dSun" class="input-field" value="0" min="0" max="24" step="0.5"></div>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
+        <button type="button" class="btn btn-primary" onclick="calculateOvertime()">Calculate Overtime</button>
+        <button type="button" class="btn btn-outline" onclick="setOvertimePreset(45)">45 Hours Shift</button>
+        <button type="button" class="btn btn-outline" onclick="setOvertimePreset(55)">55 Hours Shift</button>
+    </div>
+
+    <div class="result-box" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 1.25rem;">
+        <h3 style="margin-top: 0; color: #1e293b; font-size: 1.1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">Gross Wage &amp; Overtime Breakdown</h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Total Gross Pay</div>
+                <div id="resTotalGross" style="font-size: 1.5rem; font-weight: 700; color: #16a34a;">$1,678.96</div>
+                <div id="resBlendedRate" style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">Blended Regular Rate: $31.59/hr</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Regular Wages</div>
+                <div id="resRegWages" style="font-size: 1.4rem; font-weight: 700; color: #0f172a;">$1,140.00</div>
+                <div id="resRegHours" style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">40.0 hrs @ $28.50/hr</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Overtime Wages (1.5x)</div>
+                <div id="resOtWages" style="font-size: 1.4rem; font-weight: 700; color: #2563eb;">$388.96</div>
+                <div id="resOtHours" style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">8.5 hrs @ $45.76/hr</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Double Time Wages (2.0x)</div>
+                <div id="resDtWages" style="font-size: 1.4rem; font-weight: 700; color: #7c3aed;">$0.00</div>
+                <div id="resDtHours" style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">0.0 hrs @ $0.00/hr</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed #cbd5e1; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.875rem;">
+            <div>
+                <span style="font-weight: 600; color: #475569;">Incentive / Bonus Pay Included:</span>
+                <div id="resBonusEcho" style="font-weight: 700; color: #1e293b; font-size: 1rem;">$150.00</div>
+            </div>
+            <div>
+                <span style="font-weight: 600; color: #475569;">Effective Average Pay Rate:</span>
+                <div id="resEffectiveAvg" style="font-weight: 700; color: #1e293b; font-size: 1rem;">$34.62 / hour worked</div>
+            </div>
+            <div>
+                <span style="font-weight: 600; color: #475569;">Overtime Premium Lift:</span>
+                <div id="resPremiumLift" style="font-weight: 700; color: #1e293b; font-size: 1rem;">+$134.28 above straight time</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function setOvertimePreset(hrs) {
+    document.getElementById('totalHoursWorked').value = hrs;
+    calculateOvertime();
+}
+
+function calculateOvertime() {
+    const baseRate = parseFloat(document.getElementById('baseHourlyRate').value) || 0;
+    const bonus = parseFloat(document.getElementById('nondiscBonus').value) || 0;
+    const mode = document.getElementById('calcMode').value;
+
+    const caWrapper = document.getElementById('caDailyWrapper');
+    caWrapper.style.display = (mode === 'ca_daily') ? 'block' : 'none';
+
+    let totalHrs = 0;
+    let regHrs = 0;
+    let otHrs = 0;
+    let dtHrs = 0;
+
+    if (mode === 'ca_daily') {
+        const days = ['dMon', 'dTue', 'dWed', 'dThu', 'dFri', 'dSat', 'dSun'];
+        days.forEach(id => {
+            const h = parseFloat(document.getElementById(id).value) || 0;
+            totalHrs += h;
+            if (h <= 8) {
+                regHrs += h;
+            } else if (h <= 12) {
+                regHrs += 8;
+                otHrs += (h - 8);
+            } else {
+                regHrs += 8;
+                otHrs += 4;
+                dtHrs += (h - 12);
+            }
+        });
+        document.getElementById('totalHoursWorked').value = totalHrs.toFixed(1);
+    } else {
+        totalHrs = parseFloat(document.getElementById('totalHoursWorked').value) || 0;
+        if (totalHrs <= 40) {
+            regHrs = totalHrs;
+            otHrs = 0;
+            dtHrs = 0;
+        } else {
+            regHrs = 40;
+            otHrs = totalHrs - 40;
+            dtHrs = 0;
+        }
+    }
+
+    if (totalHrs <= 0) {
+        document.getElementById('resTotalGross').innerText = '$0.00';
+        return;
+    }
+
+    // FLSA Regular Rate of Pay formulation
+    // Straight time total earnings = (Total Hours * Base Rate) + Bonus
+    const straightTimeEarnings = (totalHrs * baseRate) + bonus;
+    const regularRateOfPay = straightTimeEarnings / totalHrs;
+
+    // Overtime premiums (0.5x regular rate for OT, 1.0x for DT because straight time is already counted)
+    const otPremiumRate = regularRateOfPay * 1.5;
+    const dtPremiumRate = regularRateOfPay * 2.0;
+
+    const regPay = regHrs * baseRate;
+    const otPay = otHrs * (baseRate * 1.5) + (otHrs * (bonus / totalHrs) * 0.5);
+    const dtPay = dtHrs * (baseRate * 2.0) + (dtHrs * (bonus / totalHrs) * 1.0);
+
+    const totalGross = (regHrs * baseRate) + (otHrs * baseRate * 1.5) + (dtHrs * baseRate * 2.0) + bonus + ((otHrs * 0.5 + dtHrs * 1.0) * (bonus / totalHrs));
+    const effectiveAvg = totalGross / totalHrs;
+    const straightNoBonus = totalHrs * baseRate;
+    const premiumLift = totalGross - straightNoBonus - bonus;
+
+    document.getElementById('resTotalGross').innerText = `$${totalGross.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    document.getElementById('resBlendedRate').innerText = `Blended Regular Rate: $${regularRateOfPay.toFixed(2)}/hr`;
+    document.getElementById('resRegWages').innerText = `$${regPay.toFixed(2)}`;
+    document.getElementById('resRegHours').innerText = `${regHrs.toFixed(1)} hrs @ $${baseRate.toFixed(2)}/hr`;
+    document.getElementById('resOtWages').innerText = `$${otPay.toFixed(2)}`;
+    document.getElementById('resOtHours').innerText = `${otHrs.toFixed(1)} hrs @ $${(baseRate * 1.5 + (bonus/totalHrs)*0.5).toFixed(2)}/hr`;
+    document.getElementById('resDtWages').innerText = `$${dtPay.toFixed(2)}`;
+    document.getElementById('resDtHours').innerText = `${dtHrs.toFixed(1)} hrs @ $${(baseRate * 2.0 + (bonus/totalHrs)*1.0).toFixed(2)}/hr`;
+
+    document.getElementById('resBonusEcho').innerText = `$${bonus.toFixed(2)}`;
+    document.getElementById('resEffectiveAvg').innerText = `$${effectiveAvg.toFixed(2)} / hr worked`;
+    document.getElementById('resPremiumLift').innerText = `+$${premiumLift.toFixed(2)} premium above straight`;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    ['baseHourlyRate', 'totalHoursWorked', 'nondiscBonus', 'calcMode', 'dMon', 'dTue', 'dWed', 'dThu', 'dFri', 'dSat', 'dSun'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', calculateOvertime);
+            el.addEventListener('change', calculateOvertime);
+        }
+    });
+    calculateOvertime();
+});
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>Statutory Foundations of Overtime Compensation Under the FLSA</h2>
+<p>The legal framework governing employee overtime compensation in the United States was established by Congress under the <strong>Fair Labor Standards Act (FLSA)</strong> of 1938 (29 U.S.C. § 207). Under federal law, non-exempt employees must receive overtime compensation for all hours worked in excess of 40 hours during a designated seven-day workweek at a rate not less than <strong>one and one-half times ($1.5	imes$)</strong> their regular rate of pay.</p>
+
+<p>The primary statutory objective of the FLSA was twofold: to discourage employers from imposing excessively burdensome hours on individual workers, and to financially incentivize the hiring of additional labor across the national workforce.</p>
+
+<h2>The Regular Rate of Pay Formulation (29 U.S.C. § 207(e))</h2>
+<p>The single most contentious and legally litigated area of payroll compliance involves determining the true <strong>Regular Rate of Pay ($R_{	ext{reg}}$)</strong>. Many employers mistakenly compute overtime simply by multiplying the contractual base hourly wage $R_{	ext{base}}$ by 1.5. However, under Section 207(e) of the FLSA and 29 CFR Part 778, the regular rate must encompass <em>all remuneration for employment paid to, or on behalf of, the employee</em>.</p>
+
+<p>When an employee earns non-discretionary bonuses (e.g., attendance bonuses, safety awards, production quotas), commission payments, or shift differentials ($B_{	ext{nondisc}}$), the regular rate must be recalculated as a weighted blended rate across all hours worked during that workweek ($H_{	ext{total}}$):</p>
+
+$$R_{	ext{reg}} = rac{(H_{	ext{total}} 	imes R_{	ext{base}}) + B_{	ext{nondisc}}}{H_{	ext{total}}} = R_{	ext{base}} + rac{B_{	ext{nondisc}}}{H_{	ext{total}}}$$
+
+<p>Because the straight-time portion of the employee's compensation is already captured in the initial wage and bonus summation, the employer must pay an additional <strong>overtime premium</strong> of half-time ($0.5 	imes R_{	ext{reg}}$) for each overtime hour $H_{	ext{ot}}$:</p>
+
+$$W_{	ext{ot\_premium}} = H_{	ext{ot}} 	imes 0.5 	imes R_{	ext{reg}}$$
+
+$$	ext{Gross Pay} = (H_{	ext{total}} 	imes R_{	ext{base}}) + B_{	ext{nondisc}} + \left( H_{	ext{ot}} 	imes 0.5 	imes R_{	ext{reg}} 
+ight)$$
+
+<h2>State-Specific Daily Overtime and Double-Time Statutes</h2>
+<p>While federal FLSA regulations impose overtime exclusively on weekly aggregates exceeding 40 hours, several state jurisdictions enforce strict daily overtime thresholds:</p>
+
+<h3>1. California Labor Code § 510</h3>
+<p>California maintains the most rigorous statutory overtime scheme in the United States. Under California Labor Code Section 510:</p>
+<ul>
+    <li><strong>Daily Overtime (1.5x):</strong> Any work beyond 8 hours up to and including 12 hours in any single workday, and the first 8 hours worked on the seventh consecutive day of work in a workweek.</li>
+    <li><strong>Daily Double Time (2.0x):</strong> Any work beyond 12 hours in any single workday, and all hours worked beyond 8 hours on the seventh consecutive day of work in a workweek.</li>
+    <li><strong>Weekly Overtime (1.5x):</strong> Any work beyond 40 hours in a workweek.</li>
+</ul>
+
+<h3>2. Alaska, Colorado, and Nevada Daily Thresholds</h3>
+<p>Alaska requires overtime ($1.5	imes$) for work exceeding 8 hours per day for employers with four or more employees. Colorado enforces overtime after 12 hours per workday or 12 consecutive hours regardless of the start of the workday. Nevada mandates daily overtime after 8 hours (or 10 hours for 4-day compressed workweeks) for employees whose base wage is less than 1.5 times the state minimum wage.</p>
+
+<h3>State-by-State Overtime Statutory Comparison Matrix</h3>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Jurisdiction</th>
+            <th>Weekly OT Threshold</th>
+            <th>Daily OT Threshold (1.5x)</th>
+            <th>Daily Double Time (2.0x)</th>
+            <th>7th Consecutive Day Rule</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>Federal (FLSA)</td><td>40 Hours</td><td>None</td><td>None</td><td>None</td></tr>
+        <tr><td>California</td><td>40 Hours</td><td>&gt; 8 to 12 Hours</td><td>&gt; 12 Hours</td><td>First 8h @ 1.5x; &gt; 8h @ 2.0x</td></tr>
+        <tr><td>Alaska</td><td>40 Hours</td><td>&gt; 8 Hours</td><td>None</td><td>None</td></tr>
+        <tr><td>Colorado</td><td>40 Hours</td><td>&gt; 12 Hours</td><td>None</td><td>None</td></tr>
+        <tr><td>Nevada</td><td>40 Hours</td><td>&gt; 8 Hours (if &lt; 1.5x Min Wage)</td><td>None</td><td>None</td></tr>
+        <tr><td>New York</td><td>40 Hours</td><td>None</td><td>None</td><td>None</td></tr>
+    </tbody>
+</table>
+
+<h2>Exempt vs. Non-Exempt Classification Rules</h2>
+<p>Employees are not automatically exempt from overtime simply by receiving a fixed salary or possessing a managerial title. To be classified as exempt from overtime under the FLSA, an employee must satisfy both the <strong>Salary Basis Test</strong> and the specific <strong>Duties Test</strong> defined by Department of Labor (DOL) regulations:</p>
+<ul>
+    <li><strong>Salary Level Test:</strong> The employee must receive a guaranteed, pre-determined salary meeting the federal statutory minimum threshold (annually adjusted under DOL regulations).</li>
+    <li><strong>Executive Exemption:</strong> Primary duty must be management of the enterprise or a recognized subdivision, regularly directing the work of two or more full-time employees, with authority to hire or fire.</li>
+    <li><strong>Administrative Exemption:</strong> Primary duty must be performance of office or non-manual work directly related to the management or general business operations, requiring the exercise of discretion and independent judgment.</li>
+    <li><strong>Professional Exemption:</strong> Primary duty requires advanced knowledge in a field of science or learning acquired by a prolonged course of specialized intellectual instruction (e.g., engineers, physicians, certified accountants).</li>
+</ul>
+
+<div class="worked-example-card">
+    <h3>Worked Corporate Payroll Case Study: Industrial Technician with Nondiscretionary Production Bonus</h3>
+    <p><strong>Scenario:</strong> A precision turbine technician in Texas earns a base hourly wage of $28.50. During an emergency plant turnaround, the technician works <strong>48.5 hours</strong> in a single workweek and earns an additional <strong>$150.00</strong> non-discretionary safety and turnaround completion bonus. Calculate: (1) straight-time earnings, (2) regular rate of pay ($R_{	ext{reg}}$), (3) overtime premium due, and (4) total gross compensation.</p>
+    
+    <div class="step-solution">
+        <h4>Step 1: Compute Total Straight-Time Earnings</h4>
+        $$	ext{Hourly Straight Pay} = 48.5 	imes \$28.50 = \$1,382.25$$
+        $$	ext{Total Straight Earnings} = \$1,382.25 + \$150.00 = \$1,532.25$$
+
+        <h4>Step 2: Calculate Regular Rate of Pay ($R_{	ext{reg}}$)</h4>
+        $$R_{	ext{reg}} = rac{\$1,532.25}{48.5 	ext{ hours}} pprox \$31.5928 	ext{ per hour}$$
+
+        <h4>Step 3: Evaluate Overtime Hours and Premium</h4>
+        $$H_{	ext{ot}} = 48.5 - 40.0 = 8.5 	ext{ overtime hours}$$
+        $$	ext{Half-Time Overtime Premium Rate} = 0.5 	imes \$31.5928 pprox \$15.7964 	ext{ per hour}$$
+        $$	ext{Overtime Premium Amount} = 8.5 	imes \$15.7964 pprox \$134.27$$
+
+        <h4>Step 4: Compute Total Gross Pay</h4>
+        $$	ext{Total Gross Pay} = 	ext{Total Straight Earnings} + 	ext{Overtime Premium}$$
+        $$	ext{Total Gross Pay} = \$1,532.25 + \$134.27 = \$1,666.52$$
+        <p><strong>Compliance Insight:</strong> If the employer had unlawfully excluded the $150 bonus from the regular rate, the technician would have received only $8.5 	imes (0.5 	imes 28.50) = \$121.13$ in overtime premium, resulting in a statutory wage violation and liability for back-wages plus liquidated damages.</p>
+    </div>
+</div>
+
+<h2>Common Payroll Compliance Pitfalls in Overtime Computation</h2>
+<ol>
+    <li><strong>Excluding Non-Discretionary Incentive Bonuses from Regular Rate:</strong> By far the most frequent source of multi-million dollar class-action wage lawsuits. Discretionary bonuses (such as unexpected holiday gifts not tied to contracts or hours) can be excluded, but any bonus tied to production, attendance, safety, or quality must be folded into the regular rate.</li>
+    <li><strong>Compensatory ("Comp") Time Off in Private Sector:</strong> Private employers cannot offer compensatory time off in lieu of paying cash overtime wages. Comp time agreements are legal exclusively for public sector government agencies under strict FLSA limitations.</li>
+    <li><strong>Averaging Hours Across Multi-Week Pay Periods:</strong> Employers on biweekly pay periods cannot average hours across the two-week cycle (e.g., working 50 hours in Week 1 and 30 hours in Week 2 is NOT 80 regular hours; the employee is legally owed 10 hours of overtime pay for Week 1).</li>
+</ol>
+
+<section class="faq-section">
+    <h2>Frequently Asked Questions About Overtime Pay</h2>
+    <div class="faq-item">
+        <h3>How is time-and-a-half overtime calculated under the FLSA?</h3>
+        <p>Under the federal Fair Labor Standards Act (FLSA), overtime is paid at 1.5 times the employee's regular rate of pay for all hours worked exceeding 40 in a single standard 7-day workweek.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is the Regular Rate of Pay when bonuses or commissions are included?</h3>
+        <p>The regular rate of pay is calculated by dividing total remuneration (base wages plus non-discretionary bonuses, commissions, and shift differentials) by total hours worked in the workweek. Overtime is then paid on this higher blended rate.</p>
+    </div>
+    <div class="faq-item">
+        <h3>How does California daily overtime and double time work?</h3>
+        <p>Under California Labor Code 510, non-exempt employees earn 1.5x pay for hours worked over 8 up to 12 in a single day, and 2.0x (double time) for all hours worked beyond 12 in a single workday.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Can an employer waive overtime pay by paying a flat salary?</h3>
+        <p>No. An employee is only exempt from overtime if they satisfy both the statutory salary threshold and specific administrative, professional, or executive duties tests mandated by the Department of Labor.</p>
+    </div>
+</section>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏦</span>
+            <h3 class="widget-title">Related Finance & Investment</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="rule-of-72-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rule of 72 Doubling Time</a></li>
+            <li><a href="car-loan-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Car Loan Financing</a></li>
+            <li><a href="roi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ROI & Annualized CAGR</a></li>
+            <li><a href="loan-emi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan EMI Calculator</a></li>
+            <li><a href="mortgage-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Mortgage & PITI</a></li>
+            <li><a href="compound-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Compound Interest</a></li>
+            <li><a href="simple-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Simple Interest</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck</a></li>
+            <li><a href="discount-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Discount & Sale</a></li>
+            <li><a href="tip-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Tip & Bill Splitter</a></li>
+            <li><a href="amortization-schedule-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan Amortization Schedule</a></li>
+            <li><a href="apr-apy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> APR to APY Compounding Converter</a></li>
+            <li><a href="break-even-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Break-Even Point (Units & Sales)</a></li>
+            <li><a href="capital-gains-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capital Gains Tax (Short & Long)</a></li>
+            <li><a href="cd-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Certificate of Deposit (CD) Yield</a></li>
+            <li><a href="credit-card-payoff-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Credit Card Payoff (Debt Freedom)</a></li>
+            <li><a href="debt-to-income-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Debt-to-Income (DTI) Ratios</a></li>
+            <li><a href="down-payment-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Down Payment & LTV Sizer</a></li>
+            <li><a href="emergency-fund-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Emergency Fund (3-6 Months)</a></li>
+            <li><a href="inflation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Inflation & Purchasing Power</a></li>
+            <li><a href="net-salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Net Salary & Take-Home Pay</a></li>
+            <li><a href="net-worth-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Personal Net Worth & Solvency</a></li>
+            <li><a href="sales-tax-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sales Tax & Reverse Pre-Tax</a></li>
+            <li><a href="savings-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Compound Savings Growth</a></li>
+            <li><a href="savings-goal-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Savings Goal Target Sizer</a></li>
+            <li><a href="markup-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Markup & Margin Calculator</a></li>
+            <li><a href="smoking-cost-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Smoking Cost & Opportunity</a></li>
+            <li><a href="retirement-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Retirement & FIRE Planner</a></li>
+            <li><a href="overtime-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Overtime Pay Calculator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="finance.html" class="sidebar-category-link">View All Finance & Investment Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers peer-reviewed chronometric computing algorithms, astronomical date conversion systems, and payroll engines compliant with FLSA, ISO 8601, and statutory accounting standards.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Chronometric &amp; Payroll Suites</h4>
+                    <ul>
+                        <li><a href="datetime.html">Date &amp; Time Utilities</a></li>
+                        <li><a href="finance.html">Payroll &amp; Compensation</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="converter.html">Unit &amp; Chrono Converters</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Core Calculators</h4>
+                    <ul>
+                        <li><a href="months-between-dates-calculator.html">Months Between Dates</a></li>
+                        <li><a href="overtime-calculator.html">Overtime Pay Calculator</a></li>
+                        <li><a href="hours-calculator.html">Work Hours Calculator</a></li>
+                        <li><a href="date-calculator.html">Date Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Metric Converters</a></li>
+                        <li><a href="engineering.html">Engineering Tools</a></li>
+                        <li><a href="health.html">Health &amp; Fitness</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precision chronological and statutory compensation calculation algorithms.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
