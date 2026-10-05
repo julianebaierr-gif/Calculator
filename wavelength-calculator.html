@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wavelength Calculator | Frequency to Wavelength (λ = v/f) & RF Antennas</title>
+    <meta name="description" content="Calculate electromagnetic and acoustic wavelength (λ = v/f), quarter-wave antenna length, phase constant (β), velocity factor, and photon energy across radio, microwave and audio frequencies.">
+    <link rel="canonical" href="https://calchub.com/wavelength-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Wavelength Calculator",
+      "url": "https://calchub.com/wavelength-calculator.html",
+      "applicationCategory": "EngineeringApplication",
+      "operatingSystem": "All",
+      "description": "Calculate electromagnetic and sound wavelength from frequency, propagation medium velocity factor, antenna resonant lengths, and phase constant.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the universal wave equation relating wavelength, frequency, and wave speed?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The universal wave equation is: λ = v / f, where λ (lambda) is wavelength in meters, v is the propagation velocity of the wave in the transmission medium in meters per second (m/s), and f is the oscillation frequency in Hertz (Hz). For electromagnetic waves in vacuum, v equals the speed of light: c = 299,792,458 m/s."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the Velocity Factor (VF) of a transmission line and why does it shorten wavelength?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Velocity factor (VF) is the ratio of wave propagation speed inside a dielectric medium to the speed of light in vacuum: VF = v / c = 1 / sqrt(ε_r), where ε_r is the relative dielectric permittivity. In coaxial cables with solid polyethylene (ε_r ≈ 2.25, VF ≈ 0.66), electromagnetic waves travel 34% slower than in air, shortening physical wavelength by exactly the same factor."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why are quarter-wavelength (λ/4) and half-wavelength (λ/2) dimensions critical in antenna design?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "At integer fractions of a wavelength (specifically λ/4 for monopoles and λ/2 for center-fed dipoles), constructive interference between incident and reflected standing waves creates pure electrical resonance. At resonance, reactive inductive and capacitive impedances cancel out, leaving purely resistive radiation resistance and maximizing radiated electromagnetic power."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does temperature affect acoustic wavelength in air?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The speed of sound in air is proportional to the square root of absolute thermodynamic temperature: v_sound ≈ 331.3 * sqrt(1 + T_c / 273.15) m/s (or approximately 331.3 + 0.606 * T_c). As air warms, sound speed increases, which lengthens acoustic wavelength for a constant audio frequency."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="converter.html">Converters</a>
+                <a href="engineering.html">Engineering</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="physics.html">Physics & RF</a> &gt; <span>Wavelength Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Wavelength Calculator</h1>
+                        <p class="calc-desc">Compute wavelength (λ), half-wave and quarter-wave resonant antenna dimensions, wave number, phase constant, and photon energy across electromagnetic and acoustic spectrums.</p>
+                    </div>
+                    <div class="calculator-form">
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="wl_type">Wave Physical Domain:</label>
+            <select id="wl_type">
+                <option value="em" selected>Electromagnetic (Radio, Microwave, Light, Laser)</option>
+                <option value="sound">Acoustic / Sound (Air, Water, Solids)</option>
+            </select>
+        </div>
+        <div class="calc-field">
+            <label for="wl_medium">Propagation Medium / Transmission Line:</label>
+            <select id="wl_medium">
+                <option value="vacuum" selected>Vacuum / Free Air Space (c = 299,792,458 m/s)</option>
+                <option value="coax_pe">Coaxial Cable - Solid PE (VF = 0.66)</option>
+                <option value="coax_foam">Coaxial Cable - Foam PE (VF = 0.82)</option>
+                <option value="coax_ptfe">Coaxial Cable - PTFE / Teflon (VF = 0.70)</option>
+                <option value="pcb_fr4">PCB Microstrip - FR4 Substrate (VF ≈ 0.50)</option>
+                <option value="custom_vf">Custom Dielectric Velocity Factor</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="wl_freq_val">Frequency Value:</label>
+            <input type="number" id="wl_freq_val" value="2.4" step="0.001" min="0.0001">
+        </div>
+        <div class="calc-field">
+            <label for="wl_freq_unit">Frequency Unit:</label>
+            <select id="wl_freq_unit">
+                <option value="1">Hertz (Hz)</option>
+                <option value="1e3">Kilohertz (kHz)</option>
+                <option value="1e6">Megahertz (MHz)</option>
+                <option value="1e9" selected>Gigahertz (GHz - e.g., 2.4 GHz WiFi)</option>
+                <option value="1e12">Terahertz (THz)</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-row" id="box_wl_custom_vf" style="display:none;">
+        <div class="calc-field">
+            <label for="wl_custom_vf_val">Custom Velocity Factor (0.1 to 1.0):</label>
+            <input type="number" id="wl_custom_vf_val" value="0.75" step="0.01" min="0.05" max="1.0">
+            <small class="field-hint">VF = 1 / sqrt(dielectric constant ε_r)</small>
+        </div>
+    </div>
+    <div class="calc-row" id="box_wl_sound_temp" style="display:none;">
+        <div class="calc-field">
+            <label for="wl_temp_c">Air Temperature (°C):</label>
+            <input type="number" id="wl_temp_c" value="20" step="1" min="-40" max="60">
+            <small class="field-hint">20°C standard room temperature (v = 343.4 m/s)</small>
+        </div>
+        <div class="calc-field">
+            <label for="wl_sound_mat">Acoustic Medium:</label>
+            <select id="wl_sound_mat">
+                <option value="air" selected>Air (Gas)</option>
+                <option value="water_fresh">Fresh Water (v = 1,482 m/s)</option>
+                <option value="water_sea">Seawater (v = 1,522 m/s)</option>
+                <option value="steel">Structural Steel (v = 5,960 m/s)</option>
+            </select>
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary" id="btn_calc_wl" style="width:100%; margin-top:1rem;">Calculate Wavelength &amp; Resonance</button>
+
+    <div class="calc-results" id="wl_results" style="margin-top:1.5rem;">
+        <h3>Wave Mechanics &amp; Antenna Geometry</h3>
+        <div class="results-grid">
+            <div class="result-item">
+                <span class="result-label">Full Wavelength (\(\lambda\)):</span>
+                <span class="result-value" id="res_wl_lambda_m">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Wavelength in Imperial:</span>
+                <span class="result-value" id="res_wl_lambda_imp">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Half-Wave (\(\lambda/2\) Dipole):</span>
+                <span class="result-value" id="res_wl_half">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Quarter-Wave (\(\lambda/4\) Monopole):</span>
+                <span class="result-value" id="res_wl_quarter">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Phase Constant / Wave Number (\(\beta\)):</span>
+                <span class="result-value" id="res_wl_beta">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Wave Period (\(T\)):</span>
+                <span class="result-value" id="res_wl_period">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Propagation Velocity (\(v\)):</span>
+                <span class="result-value" id="res_wl_velocity">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Photon Energy (\(E = hf\)):</span>
+                <span class="result-value" id="res_wl_photon">--</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const typeSelect = document.getElementById('wl_type');
+    const medSelect = document.getElementById('wl_medium');
+    const boxVf = document.getElementById('box_wl_custom_vf');
+    const boxSound = document.getElementById('box_wl_sound_temp');
+
+    typeSelect.addEventListener('change', function() {
+        if (typeSelect.value === 'sound') {
+            medSelect.parentElement.style.display = 'none';
+            boxVf.style.display = 'none';
+            boxSound.style.display = 'flex';
+        } else {
+            medSelect.parentElement.style.display = 'flex';
+            boxSound.style.display = 'none';
+            if (medSelect.value === 'custom_vf') boxVf.style.display = 'flex';
+        }
+    });
+
+    medSelect.addEventListener('change', function() {
+        if (medSelect.value === 'custom_vf') {
+            boxVf.style.display = 'flex';
+        } else {
+            boxVf.style.display = 'none';
+        }
+    });
+
+    function calculateWavelength() {
+        const isSound = (typeSelect.value === 'sound');
+        const freqVal = parseFloat(document.getElementById('wl_freq_val').value) || 1;
+        const multiplier = parseFloat(document.getElementById('wl_freq_unit').value) || 1;
+        const freqHz = freqVal * multiplier;
+        if (freqHz <= 0) return;
+
+        let velocity = 299792458; // c in m/s
+
+        if (!isSound) {
+            const med = medSelect.value;
+            let vf = 1.0;
+            if (med === 'coax_pe') vf = 0.66;
+            else if (med === 'coax_foam') vf = 0.82;
+            else if (med === 'coax_ptfe') vf = 0.70;
+            else if (med === 'pcb_fr4') vf = 0.50;
+            else if (med === 'custom_vf') {
+                vf = parseFloat(document.getElementById('wl_custom_vf_val').value) || 0.75;
+            }
+            velocity = 299792458 * vf;
+        } else {
+            const mat = document.getElementById('wl_sound_mat').value;
+            if (mat === 'air') {
+                const tempC = parseFloat(document.getElementById('wl_temp_c').value) || 20;
+                velocity = 331.3 * Math.sqrt(1 + (tempC / 273.15));
+            } else if (mat === 'water_fresh') {
+                velocity = 1482;
+            } else if (mat === 'water_sea') {
+                velocity = 1522;
+            } else if (mat === 'steel') {
+                velocity = 5960;
+            }
+        }
+
+        // Wavelength lambda = v / f
+        const lambdaM = velocity / freqHz;
+        const lambdaMm = lambdaM * 1000;
+        const lambdaCm = lambdaM * 100;
+        const lambdaIn = lambdaM * 39.3701;
+        const lambdaFt = lambdaM * 3.28084;
+
+        // Formatted metric lambda
+        let lambdaMetricStr = '';
+        if (lambdaM >= 1000) lambdaMetricStr = (lambdaM / 1000).toFixed(3) + ' km';
+        else if (lambdaM >= 1) lambdaMetricStr = lambdaM.toFixed(4) + ' m';
+        else if (lambdaM >= 0.01) lambdaMetricStr = lambdaCm.toFixed(2) + ' cm (' + lambdaMm.toFixed(1) + ' mm)';
+        else if (lambdaM >= 1e-6) lambdaMetricStr = (lambdaM * 1e6).toFixed(2) + ' µm (' + lambdaMm.toFixed(3) + ' mm)';
+        else lambdaMetricStr = (lambdaM * 1e9).toFixed(1) + ' nm';
+
+        // Formatted imperial lambda
+        let lambdaImpStr = '';
+        if (lambdaFt >= 1) lambdaImpStr = lambdaFt.toFixed(2) + ' ft (' + lambdaIn.toFixed(1) + ' in)';
+        else lambdaImpStr = lambdaIn.toFixed(3) + ' inches';
+
+        // Half-wave & quarter-wave
+        const halfM = lambdaM / 2;
+        const quarterM = lambdaM / 4;
+        const halfIn = lambdaIn / 2;
+        const quarterIn = lambdaIn / 4;
+
+        const halfStr = (halfM >= 1 ? halfM.toFixed(3) + ' m' : (halfM * 100).toFixed(2) + ' cm') + ' (' + halfIn.toFixed(2) + '")';
+        const quarterStr = (quarterM >= 1 ? quarterM.toFixed(3) + ' m' : (quarterM * 100).toFixed(2) + ' cm') + ' (' + quarterIn.toFixed(2) + '")';
+
+        // Phase constant beta = 2 * pi / lambda
+        const beta = (2 * Math.PI) / lambdaM;
+        const periodSec = 1 / freqHz;
+
+        let periodStr = '';
+        if (periodSec >= 1e-3) periodStr = (periodSec * 1000).toFixed(2) + ' ms';
+        else if (periodSec >= 1e-6) periodStr = (periodSec * 1e6).toFixed(2) + ' µs';
+        else if (periodSec >= 1e-9) periodStr = (periodSec * 1e9).toFixed(3) + ' ns';
+        else periodStr = (periodSec * 1e12).toFixed(3) + ' ps';
+
+        // Photon energy E = h * f (h = 6.62607015e-34 J*s, 1 eV = 1.602176634e-19 J)
+        const hPlanck = 6.62607015e-34;
+        const eJoules = hPlanck * freqHz;
+        const eEv = eJoules / 1.602176634e-19;
+
+        let photonStr = '';
+        if (isSound) {
+            photonStr = 'N/A (Mechanical Wave)';
+        } else {
+            if (eEv >= 1e6) photonStr = (eEv / 1e6).toFixed(2) + ' MeV';
+            else if (eEv >= 1e3) photonStr = (eEv / 1e3).toFixed(2) + ' keV';
+            else if (eEv >= 1) photonStr = eEv.toFixed(3) + ' eV';
+            else if (eEv >= 1e-6) photonStr = (eEv * 1e6).toFixed(2) + ' µeV';
+            else photonStr = (eEv * 1e9).toFixed(2) + ' neV';
+        }
+
+        document.getElementById('res_wl_lambda_m').textContent = lambdaMetricStr;
+        document.getElementById('res_wl_lambda_imp').textContent = lambdaImpStr;
+        document.getElementById('res_wl_half').textContent = halfStr;
+        document.getElementById('res_wl_quarter').textContent = quarterStr;
+        document.getElementById('res_wl_beta').textContent = beta.toFixed(3) + ' rad/m';
+        document.getElementById('res_wl_period').textContent = periodStr;
+        document.getElementById('res_wl_velocity').textContent = Math.round(velocity).toLocaleString() + ' m/s';
+        document.getElementById('res_wl_photon').textContent = photonStr;
+    }
+
+    document.getElementById('btn_calc_wl').addEventListener('click', calculateWavelength);
+    document.getElementById('wl_freq_val').addEventListener('input', calculateWavelength);
+    document.getElementById('wl_freq_unit').addEventListener('change', calculateWavelength);
+    medSelect.addEventListener('change', calculateWavelength);
+    calculateWavelength();
+});
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>1. Fundamental Physics of Wave Mechanics and Wavelength</h2>
+<p>In classical electrodynamics, quantum mechanics, and physical acoustics, a <strong>wave</strong> represents the propagation of a dynamic disturbance or oscillatory energy perturbation through spacetime or physical matter without transporting net bulk mass. The <strong>wavelength (\(\lambda\))</strong> is the spatial period of the wave—the physical Euclidean distance measured between two consecutive spatial points that occupy identical vibrational phase (such as two successive crests, troughs, or zero-crossings):</p>
+
+<p>Every wave phenomenon is governed by the universal kinematic relation linking spatial wavelength \(\lambda\), temporal oscillation frequency \(f\), and phase propagation velocity \(v\):</p>
+
+$$\lambda = rac{v}{f}$$
+
+<p>where:</p>
+<ul>
+    <li>\(\lambda\) (lambda) is wavelength measured in meters (\(	ext{m}\)).</li>
+    <li>\(v\) is the phase velocity of the wave in the transmission medium in meters per second (\(	ext{m/s}\)).</li>
+    <li>\(f\) is the temporal frequency measured in Hertz (\(	ext{Hz} = 	ext{s}^{-1}\)).</li>
+</ul>
+
+<p>In vacuum, electromagnetic radiation (radio waves, microwaves, infrared, visible light, ultraviolet, X-rays, and gamma rays) propagates at the universal invariant physical constant—the <strong>speed of light (\(c\))</strong>, defined by the International Bureau of Weights and Measures (BIPM) as exactly:</p>
+
+$$c = 299{,}792{,}458	ext{ m/s} pprox 3.00 	imes 10^8	ext{ m/s}$$
+
+<h2>2. Dielectric Permittivity &amp; Velocity Factor (VF) in RF Media</h2>
+<p>When an electromagnetic wave transitions from free space into a physical dielectric transmission line (such as a coaxial cable, twisted pair, or printed circuit board stripline), its electric and magnetic fields polarize the bound orbital electrons of the insulating atoms. This dielectric polarization impedes wave propagation, slowing phase velocity below the vacuum speed of light:</p>
+
+$$v = rac{c}{\sqrt{\mu_r \cdot \epsilon_r}}$$
+
+<p>where \(\epsilon_r\) is relative dielectric permittivity and \(\mu_r\) is relative magnetic permeability (for non-magnetic plastics, \(\mu_r pprox 1.0\)). The dimensionless ratio \(v / c\) is termed the <strong>Velocity Factor (\(VF\))</strong>:</p>
+
+$$VF = rac{v}{c} = rac{1}{\sqrt{\epsilon_r}} \quad \implies \quad \lambda_{dielectric} = \lambda_0 	imes VF$$
+
+<p>Consequently, an RF signal traveling inside a coaxial cable with solid polyethylene insulation (\(\epsilon_r = 2.25, VF = 0.66\)) travels <strong>34% slower</strong> than in air, shortening its physical wavelength by 34%. Sizing antenna matching stubs or resonant PCB traces without factoring in the velocity factor causes catastrophic center-frequency mistuning.</p>
+
+<h2>3. Acoustic Waves and Temperature Dependence in Compressible Fluid Media</h2>
+<p>Unlike electromagnetic waves which oscillate without a physical medium, acoustic sound waves are mechanical longitudinal pressure waves requiring molecular collisions in compressible matter. In dry atmospheric air, the speed of sound is governed by thermodynamic gas kinetics and absolute Kelvin temperature (\(T\)):</p>
+
+$$v_{sound} = \sqrt{\gamma \cdot R_{specific} \cdot T} = \sqrt{1.40 	imes 287.05 	imes (T_c + 273.15)}$$
+
+<p>For ambient terrestrial temperatures between \(-20^\circ	ext{C}\) and \(+40^\circ	ext{C}\), this simplifies to the standard acoustic linear approximation:</p>
+
+$$v_{sound} pprox 331.3 + 0.606 	imes T_c \quad [	ext{m/s}]$$
+
+<p>At standard room temperature (\(20^\circ	ext{C}\) / \(68^\circ	ext{F}\)), sound travels at \(343.4	ext{ m/s}\) (\(1{,}126	ext{ ft/s}\)). A low-frequency \(40	ext{ Hz}\) deep bass note from a concert subwoofer has a physical acoustic wavelength of \(8.58	ext{ meters}\) (\(28.2	ext{ feet}\)), necessitating large physical acoustic quarter-wave bass reflex port dimensions.</p>
+
+<h2>4. Comprehensive Electromagnetic Spectrum &amp; Wavelength Benchmark Table</h2>
+<p>The following physics reference table outlines the electromagnetic spectrum, frequency bands, physical wavelengths, photon energies (\(E = hf\)), and dominant technologies:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Spectral Band</th>
+            <th>Frequency Range</th>
+            <th>Wavelength in Vacuum (\(\lambda_0\))</th>
+            <th>Photon Energy (\(E\))</th>
+            <th>Primary Scientific &amp; Industrial Utilization</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>ELF / VLF Radio</strong></td>
+            <td>3 Hz – 30 kHz</td>
+            <td>100,000 km – 10 km</td>
+            <td>12 feV – 124 peV</td>
+            <td>Submarine naval communication through deep ocean</td>
+        </tr>
+        <tr>
+            <td><strong>HF (High Frequency)</strong></td>
+            <td>3 MHz – 30 MHz</td>
+            <td>100 m – 10 m</td>
+            <td>12.4 neV – 124 neV</td>
+            <td>Amateur shortwave radio, skywave ionospheric bounce</td>
+        </tr>
+        <tr>
+            <td><strong>VHF Radio</strong></td>
+            <td>30 MHz – 300 MHz</td>
+            <td>10 m – 1.0 m</td>
+            <td>124 neV – 1.24 µeV</td>
+            <td>FM broadcast radio, aviation VHF airband, marine radio</td>
+        </tr>
+        <tr>
+            <td><strong>UHF Radio</strong></td>
+            <td>300 MHz – 3 GHz</td>
+            <td>1.0 m – 10 cm</td>
+            <td>1.24 µeV – 12.4 µeV</td>
+            <td>Cellular 4G/5G, Wi-Fi 2.4 GHz, GPS L1 (1575.42 MHz)</td>
+        </tr>
+        <tr>
+            <td><strong>SHF Microwave</strong></td>
+            <td>3 GHz – 30 GHz</td>
+            <td>10 cm – 1.0 cm</td>
+            <td>12.4 µeV – 124 µeV</td>
+            <td>Wi-Fi 5/6 (5 GHz), satellite TV, radar, satellite uplink</td>
+        </tr>
+        <tr>
+            <td><strong>EHF Millimeter Wave</strong></td>
+            <td>30 GHz – 300 GHz</td>
+            <td>10 mm – 1.0 mm</td>
+            <td>124 µeV – 1.24 meV</td>
+            <td>5G mmWave cellular, automotive anti-collision radar</td>
+        </tr>
+        <tr>
+            <td><strong>Infrared (IR)</strong></td>
+            <td>300 GHz – 430 THz</td>
+            <td>1.0 mm – 700 nm</td>
+            <td>1.24 meV – 1.77 eV</td>
+            <td>Fiber optic telecom (1310/1550 nm), thermal imaging</td>
+        </tr>
+        <tr>
+            <td><strong>Visible Light</strong></td>
+            <td>430 THz – 750 THz</td>
+            <td>700 nm – 400 nm</td>
+            <td>1.77 eV – 3.10 eV</td>
+            <td>Human vision, optical microscopy, photonics</td>
+        </tr>
+        <tr>
+            <td><strong>Ultraviolet (UV)</strong></td>
+            <td>750 THz – 30 PHz</td>
+            <td>400 nm – 10 nm</td>
+            <td>3.1 eV – 124 eV</td>
+            <td>Semiconductor photolithography, germicidal sterilization</td>
+        </tr>
+        <tr>
+            <td><strong>X-Rays &amp; Gamma</strong></td>
+            <td>&gt; 30 PHz</td>
+            <td>&lt; 10 nm (&lt; 0.01 nm)</td>
+            <td>&gt; 124 eV (&gt; 100 keV)</td>
+            <td>Medical diagnostic radiography, oncology radiotherapy</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>5. Antenna Resonance: Half-Wave Dipoles &amp; Quarter-Wave Monopoles</h2>
+<p>Antenna geometry is dictated strictly by wavelength fractions. When an alternating RF current drives an antenna element whose physical length matches an odd harmonic fraction of the signal's electrical wavelength, <strong>standing wave resonance</strong> occurs:</p>
+
+<h3>Half-Wave (\(\lambda/2\)) Center-Fed Dipole</h3>
+<p>The fundamental dipole antenna comprises two symmetrical wire legs each measuring a quarter-wavelength (\(\lambda/4\)), totaling one half-wavelength end-to-end. At resonance, the terminal feedpoint impedance exhibits zero reactance and a pure radiation resistance of approximately <strong>\(73.13	ext{ }\Omega\)</strong>, presenting a near-ideal match to standard \(75	ext{ }\Omega\) or \(50	ext{ }\Omega\) coaxial feedlines:</p>
+
+$$L_{dipole} = rac{\lambda_0}{2} 	imes k_{end}$$
+
+<p>where \(k_{end} pprox 0.95\) is the antenna wire end-effect capacitive fringing velocity correction factor.</p>
+
+<h3>Quarter-Wave (\(\lambda/4\)) Monopole Ground-Plane Antenna</h3>
+<p>Mounted perpendicularly over an infinite conducting ground plane (or a vehicle roof), a quarter-wave vertical radiator mirrors itself in the ground plane to replicate half-wave dipole behavior. Its radiation resistance is exactly half that of a dipole: \(R_{rad} pprox 36.5	ext{ }\Omega\):</p>
+
+$$L_{monopole} = rac{\lambda_0}{4} 	imes 0.95$$
+
+<h2>6. Worked Engineering Case Study: Designing a 2.45 GHz Wi-Fi Monopole</h2>
+<div class="worked-example-card">
+    <h3>RF Engineering Specification: 2.45 GHz IoT Antenna Design</h3>
+    <p>An embedded electronics engineer is designing a quarter-wave (\(\lambda/4\)) PCB trace antenna for a 2.45 GHz (\(2{,}450	ext{ MHz}\)) Wi-Fi / Bluetooth IoT microcontroller. The engineer must calculate the free-space wavelength, determine the physical quarter-wave antenna trace length with an end-effect velocity factor \(k = 0.95\), and evaluate the phase constant \(eta\).</p>
+
+    <div class="step-solution">
+        <h4>Step 1: Compute Vacuum Wavelength (\(\lambda_0\))</h4>
+        $$f = 2.45	ext{ GHz} = 2.45 	imes 10^9	ext{ Hz}$$
+        $$\lambda_0 = rac{c}{f} = rac{299{,}792{,}458	ext{ m/s}}{2.45 	imes 10^9	ext{ s}^{-1}} pprox 0.12236	ext{ meters} pprox 12.24	ext{ cm} pprox 122.4	ext{ mm}$$
+
+        <h4>Step 2: Calculate Quarter-Wave Radiator Length</h4>
+        $$rac{\lambda_0}{4} = rac{122.36	ext{ mm}}{4} = 30.59	ext{ mm}$$
+        <p>Applying the standard antenna end-effect velocity correction factor \(k = 0.95\):</p>
+        $$L_{trace} = 30.59	ext{ mm} 	imes 0.95 = 29.06	ext{ mm} pprox 1.144	ext{ inches}$$
+        <p>A straight or meandered PCB trace measuring <strong>\(29.1	ext{ mm}\)</strong> routed over a ground plane will resonate at \(2.45	ext{ GHz}\).</p>
+
+        <h4>Step 3: Compute Phase Constant (\(eta\)) and Wave Period</h4>
+        $$eta = rac{2\pi}{\lambda_0} = rac{2\pi}{0.12236	ext{ m}} pprox 51.35	ext{ radians/meter}$$
+        $$T = rac{1}{f} = rac{1}{2.45 	imes 10^9	ext{ Hz}} pprox 0.408 	imes 10^{-9}	ext{ seconds} = 408	ext{ picoseconds}$$
+
+        <h4>Step 4: Quantum Photon Energy</h4>
+        $$E = h \cdot f = (6.626 	imes 10^{-34}	ext{ J}\cdot	ext{s}) 	imes (2.45 	imes 10^9	ext{ s}^{-1}) = 1.623 	imes 10^{-24}	ext{ Joules}$$
+        $$E(eV) = rac{1.623 	imes 10^{-24}	ext{ J}}{1.602 	imes 10^{-19}	ext{ J/eV}} pprox 10.13	ext{ }\mu	ext{eV}$$
+        <p>Because \(10.13	ext{ }\mu	ext{eV}\) is vastly lower than the \(12.4	ext{ eV}\) ionizing threshold of chemical molecular bonds, 2.45 GHz RF radiation is strictly non-ionizing.</p>
+    </div>
+</div>
+
+<h2>7. Frequently Asked Questions</h2>
+<div class="faq-accordion">
+    <div class="faq-item">
+        <h3>What is the universal wave equation relating wavelength, frequency, and wave speed?</h3>
+        <p>The universal wave equation is: \(\lambda = v / f\), where \(\lambda\) (lambda) is wavelength in meters, \(v\) is the propagation velocity of the wave in the transmission medium in meters per second (m/s), and \(f\) is the oscillation frequency in Hertz (Hz). For electromagnetic waves in vacuum, \(v\) equals the speed of light: \(c = 299{,}792{,}458	ext{ m/s}\).</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is the Velocity Factor (VF) of a transmission line and why does it shorten wavelength?</h3>
+        <p>Velocity factor (VF) is the ratio of wave propagation speed inside a dielectric medium to the speed of light in vacuum: \(VF = v / c = 1 / \sqrt{\epsilon_r}\), where \(\epsilon_r\) is relative dielectric permittivity. In coaxial cables with solid polyethylene (\(\epsilon_r pprox 2.25, VF pprox 0.66\)), electromagnetic waves travel 34% slower than in air, shortening physical wavelength by exactly the same factor.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Why are quarter-wavelength (λ/4) and half-wavelength (λ/2) dimensions critical in antenna design?</h3>
+        <p>At integer fractions of a wavelength (specifically \(\lambda/4\) for monopoles and \(\lambda/2\) for center-fed dipoles), constructive interference between incident and reflected standing waves creates pure electrical resonance. At resonance, reactive inductive and capacitive impedances cancel out, leaving purely resistive radiation resistance and maximizing radiated electromagnetic power.</p>
+    </div>
+    <div class="faq-item">
+        <h3>How does temperature affect acoustic wavelength in air?</h3>
+        <p>The speed of sound in air is proportional to the square root of absolute thermodynamic temperature: \(v_{sound} pprox 331.3 	imes \sqrt{1 + T_c / 273.15}	ext{ m/s}\) (or approximately \(331.3 + 0.606 	imes T_c\)). As air warms, sound speed increases, which lengthens acoustic wavelength for a constant audio frequency.</p>
+    </div>
+</div>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🔬</span>
+            <h3 class="widget-title">Related Physics & Applied Mechanics</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="acceleration-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Acceleration (SUVAT)</a></li>
+            <li><a href="angular-velocity-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Angular Velocity</a></li>
+            <li><a href="centripetal-force-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Centripetal Force</a></li>
+            <li><a href="doppler-effect-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Doppler Effect</a></li>
+            <li><a href="escape-velocity-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Escape Velocity</a></li>
+            <li><a href="free-fall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Free Fall Calculator</a></li>
+            <li><a href="friction-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Friction (Static & Kinetic)</a></li>
+            <li><a href="gravitational-force-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Gravitational Force</a></li>
+            <li><a href="hookes-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Hooke's Law (Springs)</a></li>
+            <li><a href="kinetic-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Kinetic Energy</a></li>
+            <li><a href="photon-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Photon Energy</a></li>
+            <li><a href="simple-pendulum-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Simple Pendulum</a></li>
+            <li><a href="snells-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Snell's Law (Refraction)</a></li>
+            <li><a href="specific-heat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Specific Heat Capacity</a></li>
+            <li><a href="acceleration-converter.html" class="sidebar-link-item"><span class="link-bullet">›</span> Acceleration Converter</a></li>
+            <li><a href="density-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Density & Specific Gravity (ρ = m/V)</a></li>
+            <li><a href="pressure-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pressure Calculator (Fluid & Mechanical)</a></li>
+            <li><a href="speed-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Speed & Velocity Kinematics (v = d/t)</a></li>
+            <li><a href="force-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Force Calculator (F = ma)</a></li>
+            <li><a href="momentum-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Momentum & Collisions (p = mv)</a></li>
+            <li><a href="impulse-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Impulse & Impact Force</a></li>
+            <li><a href="potential-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Potential Energy (mgh & ½kx²)</a></li>
+            <li><a href="work-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Work & Power (W = Fd, P = W/t)</a></li>
+            <li><a href="stress-strain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Stress & Strain (Hooke's Law)</a></li>
+            <li><a href="terminal-velocity-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Terminal Velocity</a></li>
+            <li><a href="specific-gravity-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Specific Gravity & Hydrometer</a></li>
+            <li><a href="wavelength-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Wavelength (λ = v/f)</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="physics.html" class="sidebar-category-link">View All Physics & Applied Mechanics Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub provides free, high-precision engineering calculators, unit converters, and analytical tools designed for practicing engineers, physicists, architects, and interior designers worldwide.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Engineering &amp; Science Categories</h4>
+                    <ul>
+                        <li><a href="physics.html">Physics &amp; Electromagnetics</a></li>
+                        <li><a href="civil.html">Civil &amp; Architectural Finishing</a></li>
+                        <li><a href="engineering.html">Electrical &amp; RF Engineering</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Popular Calculators</h4>
+                    <ul>
+                        <li><a href="wallpaper-calculator.html">Wallpaper Roll Calculator</a></li>
+                        <li><a href="wavelength-calculator.html">Wavelength Calculator</a></li>
+                        <li><a href="stair-calculator.html">Stair Framing</a></li>
+                        <li><a href="stud-wall-calculator.html">Stud Wall Framing</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                        <li><a href="math.html">Math Tools</a></li>
+                        <li><a href="finance.html">Finance Tools</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed analytical calculation models.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

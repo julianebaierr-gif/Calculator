@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Rep Max (1RM) Calculator | Brzycki, Epley & NSCA Strength Formulas</title>
+    <meta name="description" content="Calculate your one-rep maximum (1RM) strength using Brzycki, Epley, Lombardi, O'Conner, Wathan, and Mayhew formulas with training percentage tables and RPE conversion.">
+    <link rel="canonical" href="https://calchub.com/one-rep-max-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "One Rep Max (1RM) Calculator",
+      "url": "https://calchub.com/one-rep-max-calculator.html",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "All",
+      "description": "Calculate 1-rep max strength, load percentages, and multi-rep capacities using validated Brzycki, Epley, Lombardi, and NSCA algorithms.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Which 1RM formula is the most accurate: Epley or Brzycki?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For moderate repetition ranges (3 to 8 repetitions), both the Epley and Brzycki equations demonstrate high statistical validity (r > 0.97). The Brzycki formula is generally preferred for lower reps (under 6) and upper-body pressing movements like the bench press. The Epley formula performs exceptionally well on lower-body compound movements like squats and deadlifts between 5 and 10 repetitions."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why do submaximal 1RM calculations become inaccurate above 10 to 12 repetitions?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Above 10 repetitions, performance is increasingly dictated by muscular endurance, lactate clearance, slow-twitch Type I fiber distribution, and mental tolerance rather than pure maximal neuromuscular motor unit recruitment and myofibrillar cross-sectional tension. Submaximal tests performed between 3 and 6 reps yield the highest predictive accuracy."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Rate of Perceived Exertion (RPE) adjust 1RM calculations?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "RPE (Borg CR10 scale modified by Mike Tuchscherer) estimates Reps in Reserve (RIR). If an athlete completes 5 reps at RPE 8, they had 2 reps in reserve, meaning their capacity was actually 7 repetitions (5 completed + 2 RIR) with that load. Sizing the 1RM using 7 total reps reflects true underlying neurological readiness."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are standard percentage training zones based on 1RM?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Strength training periodization utilizes standard percentage zones: 90-100% 1RM for absolute maximal strength and neural drive (1-3 reps); 80-88% 1RM for strength-hypertrophy (4-6 reps); 70-79% 1RM for classic hypertrophy and mechanical tension (8-12 reps); and 50-65% 1RM for explosive speed-strength, power development, and dynamic effort training."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="converter.html">Converters</a>
+                <a href="engineering.html">Engineering</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="health.html">Health & Fitness</a> &gt; <span>One Rep Max (1RM) Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>One Rep Max (1RM) Calculator</h1>
+                        <p class="calc-desc">Compute your maximal lifting capacity (1RM), percentage training zones (50% to 95%), and multi-rep maxes from submaximal lifting performance.</p>
+                    </div>
+                    <div class="calculator-form">
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="orm_weight">Weight Lifted:</label>
+            <input type="number" id="orm_weight" value="225" step="2.5" min="1">
+            <small class="field-hint">Barbell, dumbbell, or machine load</small>
+        </div>
+        <div class="calc-field">
+            <label for="orm_unit">Unit of Weight:</label>
+            <select id="orm_unit">
+                <option value="lbs" selected>Pounds (lbs)</option>
+                <option value="kg">Kilograms (kg)</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="orm_reps">Repetitions Performed (1 to 15):</label>
+            <input type="number" id="orm_reps" value="5" step="1" min="1" max="15">
+            <small class="field-hint">Submaximal accuracy is highest between 2 and 8 reps</small>
+        </div>
+        <div class="calc-field">
+            <label for="orm_rpe">Rate of Perceived Exertion (RPE / RIR):</label>
+            <select id="orm_rpe">
+                <option value="10" selected>RPE 10 (0 Reps in Reserve - True Failure)</option>
+                <option value="9.5">RPE 9.5 (Maybe 1 rep left / slight grind)</option>
+                <option value="9.0">RPE 9 (1 Rep in Reserve)</option>
+                <option value="8.5">RPE 8.5 (1 to 2 Reps in Reserve)</option>
+                <option value="8.0">RPE 8 (2 Reps in Reserve)</option>
+                <option value="7.5">RPE 7.5 (2 to 3 Reps in Reserve)</option>
+                <option value="7.0">RPE 7 (3 Reps in Reserve - Fast Bar Speed)</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="orm_formula">Algorithm / Formula:</label>
+            <select id="orm_formula">
+                <option value="avg" selected>Consensus Average (Epley, Brzycki &amp; Lombardi)</option>
+                <option value="epley">Epley Formula (NSCA Workhorse)</option>
+                <option value="brzycki">Brzycki Formula (Upper Body Gold Standard)</option>
+                <option value="lombardi">Lombardi Power Function</option>
+                <option value="oconner">O'Conner Exponential</option>
+                <option value="wathan">Wathan Non-Linear Curve</option>
+                <option value="mayhew">Mayhew Regression</option>
+            </select>
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary" id="btn_calc_orm" style="width:100%; margin-top:1rem;">Calculate 1RM &amp; Training Percentages</button>
+
+    <div class="calc-results" id="orm_results" style="margin-top:1.5rem;">
+        <h3>Maximal Strength Analysis</h3>
+        <div class="results-grid">
+            <div class="result-item">
+                <span class="result-label">Calculated One-Rep Max (1RM):</span>
+                <span class="result-value" id="res_orm_1rm">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Effective Rep Capacity (w/ RIR):</span>
+                <span class="result-value" id="res_orm_eff_reps">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">95% Heavy Strength (2-3 reps):</span>
+                <span class="result-value" id="res_orm_95">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">90% Peak Power (3-4 reps):</span>
+                <span class="result-value" id="res_orm_90">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">85% Strength-Hypertrophy (5-6 reps):</span>
+                <span class="result-value" id="res_orm_85">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">80% Work Sets (7-8 reps):</span>
+                <span class="result-value" id="res_orm_80">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">75% Volume Hypertrophy (9-10 reps):</span>
+                <span class="result-value" id="res_orm_75">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">70% Endurance Hypertrophy (11-12 reps):</span>
+                <span class="result-value" id="res_orm_70">--</span>
+            </div>
+        </div>
+
+        <div style="margin-top:1.5rem; overflow-x:auto;">
+            <h4 style="margin-bottom:0.75rem; color:#0F172A;">Multi-Repetition Maximum Projections</h4>
+            <table class="data-table" style="margin:0;">
+                <thead>
+                    <tr>
+                        <th>Goal Reps</th>
+                        <th>Estimated Load</th>
+                        <th>% of 1RM</th>
+                        <th>Target Training Adaptations</th>
+                    </tr>
+                </thead>
+                <tbody id="orm_reps_table">
+                    <!-- Populated via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function calculate1RM() {
+        const weight = parseFloat(document.getElementById('orm_weight').value) || 225;
+        const rawReps = parseFloat(document.getElementById('orm_reps').value) || 5;
+        const rpe = parseFloat(document.getElementById('orm_rpe').value) || 10;
+        const unit = document.getElementById('orm_unit').value;
+        const formula = document.getElementById('orm_formula').value;
+
+        // Effective repetitions taking into account RPE / RIR
+        // RPE 10 => 0 RIR, RPE 9 => 1 RIR, RPE 8 => 2 RIR, etc.
+        const rir = 10 - rpe;
+        const reps = rawReps + rir;
+
+        let oneRm = weight;
+
+        if (reps === 1) {
+            oneRm = weight;
+        } else {
+            const epley = weight * (1 + reps / 30);
+            const brzycki = weight * (36 / (37 - reps));
+            const lombardi = weight * Math.pow(reps, 0.10);
+            const oconner = weight * (1 + reps / 40);
+            const wathan = (100 * weight) / (48.8 + 53.8 * Math.exp(-0.075 * reps));
+            const mayhew = (100 * weight) / (52.2 + 41.9 * Math.exp(-0.055 * reps));
+
+            if (formula === 'epley') oneRm = epley;
+            else if (formula === 'brzycki') oneRm = brzycki;
+            else if (formula === 'lombardi') oneRm = lombardi;
+            else if (formula === 'oconner') oneRm = oconner;
+            else if (formula === 'wathan') oneRm = wathan;
+            else if (formula === 'mayhew') oneRm = mayhew;
+            else {
+                // Consensus Average
+                oneRm = (epley + brzycki + lombardi) / 3;
+            }
+        }
+
+        const roundVal = (v) => Math.round(v * 10) / 10;
+        const fmt = (v) => roundVal(v) + ' ' + unit;
+
+        document.getElementById('res_orm_1rm').textContent = fmt(oneRm);
+        document.getElementById('res_orm_eff_reps').textContent = rawReps + ' completed + ' + rir.toFixed(1) + ' RIR = ' + reps.toFixed(1) + ' reps';
+        document.getElementById('res_orm_95').textContent = fmt(oneRm * 0.95);
+        document.getElementById('res_orm_90').textContent = fmt(oneRm * 0.90);
+        document.getElementById('res_orm_85').textContent = fmt(oneRm * 0.85);
+        document.getElementById('res_orm_80').textContent = fmt(oneRm * 0.80);
+        document.getElementById('res_orm_75').textContent = fmt(oneRm * 0.75);
+        document.getElementById('res_orm_70').textContent = fmt(oneRm * 0.70);
+
+        // Reps Table
+        const repTableBody = document.getElementById('orm_reps_table');
+        repTableBody.innerHTML = '';
+        const repPercentages = [
+            {r: 1, p: 1.00, goal: "Maximal Neuromuscular Strength / Testing"},
+            {r: 2, p: 0.97, goal: "Peak Force Production / Heavy Overload"},
+            {r: 3, p: 0.94, goal: "Absolute Strength Accumulation"},
+            {r: 4, p: 0.92, goal: "Powerlifting Peaking / Myofibrillar Strain"},
+            {r: 5, p: 0.89, goal: "Strength-Hypertrophy Baseline (5x5 Programs)"},
+            {r: 6, p: 0.86, goal: "Heavy Hypertrophy / Motor Unit Fatigue"},
+            {r: 8, p: 0.80, goal: "Classic Muscle Hypertrophy Work Sets"},
+            {r: 10, p: 0.75, goal: "Metabolic Stress & Sarcoplasmic Volume"},
+            {r: 12, p: 0.70, goal: "Local Muscular Endurance / Capillarization"}
+        ];
+
+        repPercentages.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><strong>${row.r} RM</strong></td><td>${fmt(oneRm * row.p)}</td><td>${(row.p * 100).toFixed(0)}%</td><td>${row.goal}</td>`;
+            repTableBody.appendChild(tr);
+        });
+    }
+
+    document.getElementById('btn_calc_orm').addEventListener('click', calculate1RM);
+    document.getElementById('orm_weight').addEventListener('input', calculate1RM);
+    document.getElementById('orm_reps').addEventListener('input', calculate1RM);
+    document.getElementById('orm_rpe').addEventListener('change', calculate1RM);
+    document.getElementById('orm_formula').addEventListener('change', calculate1RM);
+    document.getElementById('orm_unit').addEventListener('change', calculate1RM);
+    calculate1RM();
+});
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>1. Neuromuscular Physiology of Maximal Voluntary Contraction</h2>
+<p>In exercise physiology and sports science, a <strong>One-Repetition Maximum (1RM)</strong> is defined as the maximum gravitational mass a human athlete can lift through the full biomechanical range of motion for a single repetition while maintaining strict technical execution. A true 1RM represents the ultimate empirical benchmark of absolute dynamic concentric muscular strength.</p>
+
+<p>Generating maximal muscular force relies on complex physiological interactions governed by the <strong>Henneman Size Principle</strong>. Muscle fibers are organized into motor units ranging from low-threshold, fatigue-resistant slow-twitch Type I fibers to high-threshold, highly fatigable fast-twitch Type IIx fibers. During low-load endurance activities, the central nervous system (CNS) activates only smaller motor units. However, as load approaches 90% to 100% of 1RM, the brain discharges high-frequency action potentials (\(40	ext{ to } 60	ext{ Hz}\)) that recruit all available fast-twitch motor units simultaneously, maximizing myofibrillar cross-bridge tension and actin-myosin force production.</p>
+
+<h2>2. Submaximal Predictive Formulations &amp; Mathematical Models</h2>
+<p>Testing a true 1RM to absolute muscular failure introduces significant risks: severe joint shear stress, tendon avulsion danger, and acute central nervous system fatigue requiring days of recovery. Consequently, strength coaches utilize validated submaximal mathematical equations to predict 1RM from submaximal repetitions to failure (\(2	ext{ to } 10	ext{ reps}\)):</p>
+
+<h3>1. Epley Formula (NSCA Industry Standard)</h3>
+<p>Developed in 1985 by Boyd Epley, founder of the National Strength and Conditioning Association (NSCA), this linear equation is widely considered the gold standard for compound multi-joint movements like squats and deadlifts:</p>
+
+$$1RM = w \cdot \left(1 + rac{r}{30}
+ight) = w \cdot (1 + 0.0333 \cdot r)$$
+
+<p>where \(w\) is the submaximal weight lifted and \(r\) is the number of completed repetitions.</p>
+
+<h3>2. Brzycki Formula (Upper Body Bench Press Standard)</h3>
+<p>Formulated by Matt Brzycki in 1993, this reciprocal equation provides exceptional predictive fidelity for upper-body movements and repetition ranges between 2 and 6 reps:</p>
+
+$$1RM = w \cdot rac{36}{37 - r}$$
+
+<h3>3. Lombardi Power Function</h3>
+<p>Formulated by V.P. Lombardi in 1989, this power model accounts for non-linear fatigue curves during high-effort testing:</p>
+
+$$1RM = w \cdot r^{0.10}$$
+
+<h3>4. O'Conner et al. Formula</h3>
+<p>A conservative linear equation commonly utilized in collegiate athletic strength screening:</p>
+
+$$1RM = w \cdot \left(1 + rac{r}{40}
+ight) = w \cdot (1 + 0.025 \cdot r)$$
+
+<h3>5. Wathan Exponential Curve</h3>
+<p>An advanced non-linear regression model formulated to accommodate higher repetition fatigue kinetics:</p>
+
+$$1RM = rac{100 \cdot w}{48.8 + 53.8 \cdot e^{-0.075 \cdot r}}$$
+
+<h3>6. Mayhew et al. Empirical Regression</h3>
+<p>Validated specifically on resistance-trained collegiate athletes performing the bench press:</p>
+
+$$1RM = rac{100 \cdot w}{52.2 + 41.9 \cdot e^{-0.055 \cdot r}}$$
+
+<h2>3. Empirical Repetition-Percentage Matrix Table</h2>
+<p>The following sports science data table provides standard NSCA repetition maximum (RM) load relationships, neuromuscular adaptation targets, and optimal rest interval guidelines:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Intensity (% 1RM)</th>
+            <th>Max Repetitions (RM)</th>
+            <th>Neuromuscular Stimulus</th>
+            <th>Optimal Rest Period</th>
+            <th>Target Sports Application</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>100%</strong></td>
+            <td>1 Rep</td>
+            <td>Absolute Maximal Strength</td>
+            <td>3 to 5 minutes</td>
+            <td>Powerlifting, Olympic Weightlifting</td>
+        </tr>
+        <tr>
+            <td><strong>95%</strong></td>
+            <td>2 Reps</td>
+            <td>Peak Neural Drive / Intra-muscular</td>
+            <td>3 to 5 minutes</td>
+            <td>Strength Peaking Phases</td>
+        </tr>
+        <tr>
+            <td><strong>90%</strong></td>
+            <td>3 to 4 Reps</td>
+            <td>High-Threshold Motor Unit Recruitment</td>
+            <td>3 to 4 minutes</td>
+            <td>Strength &amp; Acceleration Dynamics</td>
+        </tr>
+        <tr>
+            <td><strong>85%</strong></td>
+            <td>5 to 6 Reps</td>
+            <td>Myofibrillar Hypertrophy &amp; Strength</td>
+            <td>2 to 3 minutes</td>
+            <td>Classic 5x5 Strength Foundation</td>
+        </tr>
+        <tr>
+            <td><strong>80%</strong></td>
+            <td>7 to 8 Reps</td>
+            <td>Mechanical Tension &amp; Muscle Growth</td>
+            <td>2 minutes</td>
+            <td>Bodybuilding Work Sets, Hypertrophy</td>
+        </tr>
+        <tr>
+            <td><strong>75%</strong></td>
+            <td>9 to 10 Reps</td>
+            <td>Sarcoplasmic &amp; Myofibrillar Balance</td>
+            <td>90 seconds</td>
+            <td>Mass Building, Volume Accumulation</td>
+        </tr>
+        <tr>
+            <td><strong>70%</strong></td>
+            <td>11 to 12 Reps</td>
+            <td>Metabolic Stress &amp; Capillarization</td>
+            <td>60 to 90 seconds</td>
+            <td>Endurance Hypertrophy, Auxiliary Work</td>
+        </tr>
+        <tr>
+            <td><strong>60% – 65%</strong></td>
+            <td>15 to 20 Reps</td>
+            <td>Local Muscular Endurance / Lactate</td>
+            <td>30 to 60 seconds</td>
+            <td>Conditioning, Re-sensitization Cycles</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>4. Rate of Perceived Exertion (RPE) and Reps in Reserve (RIR)</h2>
+<p>In modern autoregulated strength training, lifters rarely perform sets to catastrophic failure. Instead, sets are terminated with known safety margins quantified using <strong>Reps in Reserve (RIR)</strong>, formalized via Mike Tuchscherer's modified <strong>Borg CR10 Rate of Perceived Exertion (RPE)</strong> scale:</p>
+<ul>
+    <li><strong>RPE 10 (0 RIR):</strong> Absolute maximal effort; no additional repetitions could be completed.</li>
+    <li><strong>RPE 9.5 (0 to 1 RIR):</strong> No full rep left, but could have completed a small partial repetition or ground slightly longer.</li>
+    <li><strong>RPE 9.0 (1 RIR):</strong> Exactly one solid repetition remained in reserve before technical failure.</li>
+    <li><strong>RPE 8.0 (2 RIR):</strong> Two full repetitions left; bar moved with moderate, crisp speed.</li>
+    <li><strong>RPE 7.0 (3 RIR):</strong> Dynamic speed-strength effort; three reps in reserve.</li>
+</ul>
+
+<p>When calculating 1RM from an autoregulated training set, the effective repetitions are adjusted: \(	ext{Reps}_{effective} = 	ext{Completed Reps} + (10 - 	ext{RPE})\). Sizing 1RM with effective reps ensures that a submaximal set performed with high bar velocity accurately predicts peak capacity without requiring lifters to burn out on grinding failure sets.</p>
+
+<h2>5. Worked Sports Science Case Study: Powerlifter Barbell Squat Sizing</h2>
+<div class="worked-example-card">
+    <h3>Training Performance Data: Back Squat Assessment</h3>
+    <p>A competitive powerlifter performs an autoregulated heavy top set of barbell back squats. The athlete completes <strong>5 repetitions with 405 lbs (183.7 kg)</strong>. Video review and athlete feedback establish an exertion level of <strong>RPE 8.5</strong> (representing approximately 1.5 Reps in Reserve). The coach needs to calculate the predicted 1RM, determine the variance across the major predictive formulas, and generate training loads for an upcoming 80% volume wave.</p>
+
+    <div class="step-solution">
+        <h4>Step 1: Compute Effective Repetitions Incorporating RPE</h4>
+        $$	ext{RIR} = 10 - 8.5 = 1.5	ext{ reps in reserve}$$
+        $$	ext{Reps}_{eff} = 5.0 + 1.5 = 6.5	ext{ repetitions}$$
+
+        <h4>Step 2: Calculate 1RM Using the Epley Equation</h4>
+        $$1RM_{Epley} = 405 	imes \left(1 + rac{6.5}{30}
+ight) = 405 	imes (1 + 0.2167) = 405 	imes 1.2167 pprox 492.7	ext{ lbs}$$
+
+        <h4>Step 3: Calculate 1RM Using the Brzycki Equation</h4>
+        $$1RM_{Brzycki} = 405 	imes \left(rac{36}{37 - 6.5}
+ight) = 405 	imes \left(rac{36}{30.5}
+ight) = 405 	imes 1.1803 pprox 478.0	ext{ lbs}$$
+
+        <h4>Step 4: Calculate 1RM Using the Lombardi Power Function</h4>
+        $$1RM_{Lombardi} = 405 	imes (6.5)^{0.10} = 405 	imes 1.2060 pprox 488.4	ext{ lbs}$$
+
+        <h4>Step 5: Consensus Synthesis and 80% Work Set Sizing</h4>
+        <p>Averaging the three validated equations yields:</p>
+        $$1RM_{consensus} = rac{492.7 + 478.0 + 488.4}{3} = rac{1459.1}{3} pprox 486.4	ext{ lbs } (220.6	ext{ kg})$$
+        <p>For the subsequent volume cycle at 80% 1RM:</p>
+        $$	ext{Load}_{80\%} = 486.4	ext{ lbs} 	imes 0.80 = 389.1	ext{ lbs} pprox 390	ext{ lbs (177.5 kg)}$$
+        <p>The lifter programs 4 sets of 6 to 8 repetitions with 390 lbs, guaranteeing high hypertrophic tension while staying safely below the neurological fatigue ceiling.</p>
+    </div>
+</div>
+
+<h2>6. Frequently Asked Questions</h2>
+<div class="faq-accordion">
+    <div class="faq-item">
+        <h3>Which 1RM formula is the most accurate: Epley or Brzycki?</h3>
+        <p>For moderate repetition ranges (3 to 8 repetitions), both the Epley and Brzycki equations demonstrate high statistical validity (\(r &gt; 0.97\)). The Brzycki formula is generally preferred for lower reps (under 6) and upper-body pressing movements like the bench press. The Epley formula performs exceptionally well on lower-body compound movements like squats and deadlifts between 5 and 10 repetitions.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Why do submaximal 1RM calculations become inaccurate above 10 to 12 repetitions?</h3>
+        <p>Above 10 repetitions, performance is increasingly dictated by muscular endurance, lactate clearance, slow-twitch Type I fiber distribution, and mental tolerance rather than pure maximal neuromuscular motor unit recruitment and myofibrillar cross-sectional tension. Submaximal tests performed between 3 and 6 reps yield the highest predictive accuracy.</p>
+    </div>
+    <div class="faq-item">
+        <h3>How does Rate of Perceived Exertion (RPE) adjust 1RM calculations?</h3>
+        <p>RPE (Borg CR10 scale modified by Mike Tuchscherer) estimates Reps in Reserve (RIR). If an athlete completes 5 reps at RPE 8, they had 2 reps in reserve, meaning their capacity was actually 7 repetitions (5 completed + 2 RIR) with that load. Sizing the 1RM using 7 total reps reflects true underlying neurological readiness.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What are standard percentage training zones based on 1RM?</h3>
+        <p>Strength training periodization utilizes standard percentage zones: 90-100% 1RM for absolute maximal strength and neural drive (1-3 reps); 80-88% 1RM for strength-hypertrophy (4-6 reps); 70-79% 1RM for classic hypertrophy and mechanical tension (8-12 reps); and 50-65% 1RM for explosive speed-strength, power development, and dynamic effort training.</p>
+    </div>
+</div>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚖️</span>
+            <h3 class="widget-title">Related Health & Fitness</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bmr-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMR Calculator</a></li>
+            <li><a href="macro-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Macro Split Calculator</a></li>
+            <li><a href="calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Calculator (TDEE)</a></li>
+            <li><a href="bmi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Daily Water Intake</a></li>
+            <li><a href="a1c-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> HbA1c to eAG Glucose Sizer</a></li>
+            <li><a href="bac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Blood Alcohol (BAC) Clearance</a></li>
+            <li><a href="body-surface-area-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Surface Area (Mosteller)</a></li>
+            <li><a href="bsa-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Oncology BSA & Calvert Dosing</a></li>
+            <li><a href="calorie-deficit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Deficit & Fat Loss Planner</a></li>
+            <li><a href="calories-burned-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exercise Calories Burned (METs)</a></li>
+            <li><a href="carbohydrate-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Carbohydrate Intake & Glycogen</a></li>
+            <li><a href="cholesterol-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cholesterol Ratio & Castelli Risk</a></li>
+            <li><a href="due-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Due Date & Gestation</a></li>
+            <li><a href="fat-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Dietary Fat Intake (Grams/Day)</a></li>
+            <li><a href="heart-rate-zone-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heart Rate Zone (Karvonen HRR)</a></li>
+            <li><a href="lean-body-mass-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lean Body Mass (Boer & James)</a></li>
+            <li><a href="max-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Max Heart Rate (Tanaka & Gulati)</a></li>
+            <li><a href="met-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> METs & Activity Caloric Burn</a></li>
+            <li><a href="ovulation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ovulation & Fertile Window</a></li>
+            <li><a href="pregnancy-weight-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Weight Gain (IOM/ACOG)</a></li>
+            <li><a href="protein-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Protein Intake (ISSN/DRI Optimum)</a></li>
+            <li><a href="sleep-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sleep Cycle (90-Min REM Ultradian)</a></li>
+            <li><a href="sodium-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sodium to Salt & AHA Dietary Cap</a></li>
+            <li><a href="target-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Target Heart Rate (Karvonen HRR)</a></li>
+            <li><a href="tdee-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> TDEE & Calorie Burn (Total Daily)</a></li>
+            <li><a href="waist-to-height-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio (WHtR)</a></li>
+            <li><a href="waist-to-height-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio Sizer</a></li>
+            <li><a href="waist-to-hip-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Hip Ratio (WHR Risk)</a></li>
+            <li><a href="one-rep-max-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> One Rep Max (1RM)</a></li>
+            <li><a href="vo2-max-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> VO2 Max Calculator</a></li>
+            <li><a href="pace-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Running Pace & Race Splits</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="health.html" class="sidebar-category-link">View All Health & Fitness Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub provides free, high-precision scientific calculators, physiological algorithms, and engineering tools designed for sports scientists, clinicians, strength coaches, and athletes worldwide.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Fitness &amp; Health Categories</h4>
+                    <ul>
+                        <li><a href="health.html">Cardiorespiratory &amp; Fitness</a></li>
+                        <li><a href="health.html">Body Composition &amp; Nutrition</a></li>
+                        <li><a href="engineering.html">Biomechanics &amp; Ergonomics</a></li>
+                        <li><a href="math.html">Statistical Analysis</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Popular Training Tools</h4>
+                    <ul>
+                        <li><a href="one-rep-max-calculator.html">One Rep Max (1RM)</a></li>
+                        <li><a href="vo2-max-calculator.html">VO2 Max Calculator</a></li>
+                        <li><a href="target-heart-rate-calculator.html">Target Heart Rate</a></li>
+                        <li><a href="tdee-calculator.html">TDEE Daily Energy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                        <li><a href="math.html">Math Tools</a></li>
+                        <li><a href="finance.html">Finance Tools</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed analytical calculation models.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

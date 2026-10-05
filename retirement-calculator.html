@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retirement Calculator | 4% Rule, Nest Egg Sizer & FIRE Planner</title>
+    <meta name="description" content="Calculate how much money you need to retire: simulates investment compounding, inflation, Social Security offsets, the Trinity 4% Safe Withdrawal Rate, and FIRE targets.">
+    <link rel="canonical" href="https://calchub.com/retirement-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Retirement Calculator",
+      "url": "https://calchub.com/retirement-calculator.html",
+      "applicationCategory": "FinancialApplication",
+      "operatingSystem": "All",
+      "description": "Calculate retirement nest egg sizing, monthly savings requirements, safe withdrawal rates, and FIRE numbers based on the Trinity study.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the 4% Safe Withdrawal Rate (Trinity Study rule)?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The 4% rule originated from a 1994 research paper by financial planner William Bengen and was expanded by the 1998 Trinity Study (Cooley, Hubbard, and Walz). It demonstrates that an investor can withdraw 4.0% of their initial portfolio value in the first year of retirement, adjust that dollar amount annually for inflation, and have a 95%+ historical probability of not exhausting capital over a 30-year retirement horizon using a 50/50 to 75/25 stock/bond asset allocation."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a FIRE Number and how is it calculated?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In the Financial Independence, Retire Early (FIRE) movement, your FIRE Number is the total invested capital required to generate sufficient annual passive income to cover 100% of your living expenses without touching principal. It is calculated by multiplying your desired annual retirement expenditures by 25 (the mathematical reciprocal of the 4% withdrawal rate: 1 / 0.04 = 25)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is Sequence of Returns Risk (SRR) in retirement planning?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sequence of Returns Risk refers to the danger that a retiree experiences severe market downturns in the first 3 to 5 years after beginning portfolio decumulation. Liquidating depreciated shares during a bear market permanently damages the compounding base of the portfolio, drastically increasing the probability of premature capital exhaustion compared to experiencing a bear market later in retirement."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does inflation impact retirement nest egg requirements?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Inflation continuously erodes the purchasing power of cash. At an average inflation rate of 2.5% to 3.0%, living costs double approximately every 24 to 28 years. Consequently, retirement calculators must either calculate real inflation-adjusted rates of return (r_real ≈ r_nominal - inflation) or compound future living expenses upward to preserve constant purchasing power."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="converter.html">Converters</a>
+                <a href="engineering.html">Engineering</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="finance.html">Finance & Investment</a> &gt; <span>Retirement Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Retirement Calculator</h1>
+                        <p class="calc-desc">Calculate your required retirement nest egg, monthly savings target, and sustainable annual withdrawal income using the Trinity Study 4% rule and inflation modeling.</p>
+                    </div>
+                    <div class="calculator-form">
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="ret_cur_age">Current Age:</label>
+            <input type="number" id="ret_cur_age" value="32" step="1" min="18" max="75">
+        </div>
+        <div class="calc-field">
+            <label for="ret_ret_age">Target Retirement Age:</label>
+            <input type="number" id="ret_ret_age" value="65" step="1" min="30" max="80">
+            <small class="field-hint">Traditional: 65; Early FIRE: 40-55</small>
+        </div>
+    </div>
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="ret_cur_savings">Current Retirement Savings ($):</label>
+            <input type="number" id="ret_cur_savings" value="50000" step="5000" min="0">
+            <small class="field-hint">401k, IRA, taxable brokerage &amp; savings</small>
+        </div>
+        <div class="calc-field">
+            <label for="ret_monthly_contrib">Monthly Savings Contribution ($):</label>
+            <input type="number" id="ret_monthly_contrib" value="1000" step="100" min="0">
+            <small class="field-hint">Total employee + employer 401(k) match</small>
+        </div>
+    </div>
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="ret_des_income">Desired Annual Retirement Income (Today's $):</label>
+            <input type="number" id="ret_des_income" value="60000" step="2500" min="10000">
+            <small class="field-hint">Expected annual living expenses</small>
+        </div>
+        <div class="calc-field">
+            <label for="ret_pension">Social Security / Pension at Retirement ($/yr):</label>
+            <input type="number" id="ret_pension" value="22000" step="1000" min="0">
+            <small class="field-hint">Estimated annual guaranteed benefit</small>
+        </div>
+    </div>
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="ret_rate_pre">Pre-Retirement Investment Return (%):</label>
+            <input type="number" id="ret_rate_pre" value="7.5" step="0.5" min="2" max="15">
+            <small class="field-hint">Nominal annual growth rate (typical: 7% - 9%)</small>
+        </div>
+        <div class="calc-field">
+            <label for="ret_inflation">Expected Inflation Rate (%):</label>
+            <input type="number" id="ret_inflation" value="2.5" step="0.25" min="1" max="8">
+            <small class="field-hint">Long-term CPI average (2.0% - 3.0%)</small>
+        </div>
+    </div>
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="ret_swr">Safe Withdrawal Rate (%):</label>
+            <select id="ret_swr">
+                <option value="4.0" selected>4.0% (Classic Bengen / Trinity 30-Year Rule)</option>
+                <option value="3.5">3.5% (Conservative / Early FIRE 40+ Year Horizon)</option>
+                <option value="3.0">3.0% (Ultra-Safe Perpetual Capital Preservation)</option>
+                <option value="4.5">4.5% (Aggressive / Shorter 20-Year Horizon)</option>
+            </select>
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary" id="btn_calc_ret" style="width:100%; margin-top:1rem;">Analyze Retirement Feasibility &amp; Nest Egg</button>
+
+    <div class="calc-results" id="ret_results" style="margin-top:1.5rem;">
+        <h3>Retirement Readiness &amp; Capital Projection</h3>
+        <div class="results-grid">
+            <div class="result-item">
+                <span class="result-label">Accumulation Horizon:</span>
+                <span class="result-value" id="res_ret_years">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Projected Nest Egg at Retirement:</span>
+                <span class="result-value" id="res_ret_projected_egg">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Target Nest Egg Required:</span>
+                <span class="result-value" id="res_ret_target_egg">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Retirement Readiness Status:</span>
+                <span class="result-value" id="res_ret_status">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Sustainable Annual Portfolio Income:</span>
+                <span class="result-value" id="res_ret_port_income">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Total Annual Retirement Income:</span>
+                <span class="result-value" id="res_ret_total_income">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">FIRE Number (at 4% Rule):</span>
+                <span class="result-value" id="res_ret_fire_num">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Required Monthly Savings to Hit Goal:</span>
+                <span class="result-value" id="res_ret_req_savings">--</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function calculateRetirement() {
+        const curAge = parseFloat(document.getElementById('ret_cur_age').value) || 32;
+        const retAge = parseFloat(document.getElementById('ret_ret_age').value) || 65;
+        const curSavings = parseFloat(document.getElementById('ret_cur_savings').value) || 50000;
+        const monthlyContrib = parseFloat(document.getElementById('ret_monthly_contrib').value) || 1000;
+        const desIncome = parseFloat(document.getElementById('ret_des_income').value) || 60000;
+        const pension = parseFloat(document.getElementById('ret_pension').value) || 22000;
+        const rateNom = parseFloat(document.getElementById('ret_rate_pre').value) || 7.5;
+        const infl = parseFloat(document.getElementById('ret_inflation').value) || 2.5;
+        const swrPct = parseFloat(document.getElementById('ret_swr').value) || 4.0;
+
+        const yearsToRetire = Math.max(1, retAge - curAge);
+
+        // Real rate of return using Fisher equation: (1 + r_nom) / (1 + i) - 1
+        const rNom = rateNom / 100;
+        const iInf = infl / 100;
+        const rReal = (1 + rNom) / (1 + iInf) - 1;
+        const rRealMonthly = rReal / 12;
+        const months = yearsToRetire * 12;
+
+        // 1. Projected nest egg in today's constant purchasing power dollars:
+        // FV = curSavings * (1 + rReal)^years + PMT * [((1 + rRealMonthly)^months - 1) / rRealMonthly]
+        const fvLump = curSavings * Math.pow(1 + rReal, yearsToRetire);
+        const fvAnnuity = monthlyContrib * ((Math.pow(1 + rRealMonthly, months) - 1) / rRealMonthly);
+        const projectedNestEgg = fvLump + fvAnnuity;
+
+        // 2. Net annual income needed from portfolio:
+        // desIncome - pension
+        const netAnnualNeeded = Math.max(0, desIncome - pension);
+
+        // 3. Target nest egg required via Safe Withdrawal Rate:
+        // Target = netAnnualNeeded / (swrPct / 100)
+        const targetNestEgg = netAnnualNeeded / (swrPct / 100);
+
+        // FIRE Number based on full desired income (25x expenses):
+        const fireNumber = desIncome * 25;
+
+        // Surplus or deficit
+        const surplus = projectedNestEgg - targetNestEgg;
+        let statusStr = '';
+        if (surplus >= 0) {
+            statusStr = 'SURPLUS (+' + '$' + Math.round(surplus).toLocaleString() + ') - ON TRACK!';
+        } else {
+            statusStr = 'SHORTFALL (-' + '$' + Math.round(Math.abs(surplus)).toLocaleString() + ')';
+        }
+
+        // Sustainable portfolio income at SWR from projected nest egg:
+        const portIncome = projectedNestEgg * (swrPct / 100);
+        const totalIncome = portIncome + pension;
+
+        // Required monthly savings to hit target nest egg:
+        // PMT_req = (Target - fvLump) / [((1 + rRealMonthly)^months - 1) / rRealMonthly]
+        let reqMonthly = monthlyContrib;
+        if (targetNestEgg > fvLump) {
+            const factor = ((Math.pow(1 + rRealMonthly, months) - 1) / rRealMonthly);
+            reqMonthly = (targetNestEgg - fvLump) / factor;
+        } else {
+            reqMonthly = 0;
+        }
+
+        const fmt = (v) => '$' + Math.round(v).toLocaleString();
+
+        document.getElementById('res_ret_years').textContent = yearsToRetire + ' years (Retire at age ' + retAge + ')';
+        document.getElementById('res_ret_projected_egg').textContent = fmt(projectedNestEgg);
+        document.getElementById('res_ret_target_egg').textContent = fmt(targetNestEgg);
+        document.getElementById('res_ret_status').textContent = statusStr;
+        document.getElementById('res_ret_port_income').textContent = fmt(portIncome) + ' / year (' + (swrPct) + '% SWR)';
+        document.getElementById('res_ret_total_income').textContent = fmt(totalIncome) + ' / year (incl. Social Security)';
+        document.getElementById('res_ret_fire_num').textContent = fmt(fireNumber) + ' (Full FI target)';
+        document.getElementById('res_ret_req_savings').textContent = fmt(reqMonthly) + ' / month (Current: ' + fmt(monthlyContrib) + ')';
+    }
+
+    document.getElementById('btn_calc_ret').addEventListener('click', calculateRetirement);
+    document.getElementById('ret_cur_age').addEventListener('input', calculateRetirement);
+    document.getElementById('ret_ret_age').addEventListener('input', calculateRetirement);
+    document.getElementById('ret_cur_savings').addEventListener('input', calculateRetirement);
+    document.getElementById('ret_monthly_contrib').addEventListener('input', calculateRetirement);
+    document.getElementById('ret_des_income').addEventListener('input', calculateRetirement);
+    document.getElementById('ret_pension').addEventListener('input', calculateRetirement);
+    document.getElementById('ret_rate_pre').addEventListener('input', calculateRetirement);
+    document.getElementById('ret_inflation').addEventListener('input', calculateRetirement);
+    document.getElementById('ret_swr').addEventListener('change', calculateRetirement);
+    calculateRetirement();
+});
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>1. Actuarial Framework of Wealth Decumulation and Retirement</h2>
+<p>In modern personal finance and wealth management, retirement planning represents an optimization problem spanning multiple decades. The accumulation phase—where employment wages are converted into capital assets—eventually transitions into the decumulation phase, where the investor must live off portfolio distributions without exhausting principal before biological death. Planning this transition requires balancing compound investment growth, inflation purchasing power decay, asset allocation, and longevity risk.</p>
+
+<p>Every comprehensive retirement model hinges on four interrelated financial pillars:</p>
+<ul>
+    <li><strong>The Accumulation Horizon:</strong> The number of working years remaining until retirement (\(N = 	ext{Retirement Age} - 	ext{Current Age}\)).</li>
+    <li><strong>The Real Rate of Return (\(r_{real}\)):</strong> The nominal market return discounted by annual inflation using the Fisher equation (\(1 + r_{real} = (1 + r_{nom}) / (1 + i)\)).</li>
+    <li><strong>Guaranteed Non-Portfolio Income:</strong> Defined-benefit corporate pensions, military retirement annuities, and governmental Social Security retirement benefits that reduce portfolio burden.</li>
+    <li><strong>The Safe Withdrawal Rate (SWR):</strong> The maximum percentage of initial portfolio capital a retiree can withdraw annually while maintaining near-zero probability of portfolio exhaustion.</li>
+</ul>
+
+<h2>2. William Bengen &amp; The Trinity Study 4% Rule Formulation</h2>
+<p>The universal foundation of modern retirement decumulation theory is the <strong>4% Rule</strong>, originally formulated in 1994 by MIT aeronautical engineer and certified financial planner William Bengen in the <em>Journal of Financial Planning</em>, and subsequently expanded in the landmark 1998 <strong>Trinity Study</strong> by Trinity University professors Philip Cooley, Carl Hubbard, and Daniel Walz.</p>
+
+<p>Analyzing historical rolling 30-year market periods in the United States from 1926 through the Great Depression, World War II, and the stagflation of the 1970s, Bengen discovered that an initial withdrawal rate of exactly <strong>4.0%</strong> from a portfolio containing 50% to 75% large-cap common stocks and 25% to 50% intermediate government bonds survived every historical 30-year period without premature failure:</p>
+
+$$	ext{First Year Withdrawal } (W_1) = 	ext{Portfolio Value at Retirement} 	imes 0.04$$
+
+$$W_{t+1} = W_t 	imes (1 + i_{inflation})$$
+
+<p>The mathematical reciprocal of 4% (\(1 / 0.04 = 25\)) forms the core equation of the <strong>FIRE (Financial Independence, Retire Early)</strong> movement: to determine the total target nest egg required to sustain a desired annual spending budget (\(E_{annual}\)):</p>
+
+$$	ext{FIRE Number} = 25 	imes E_{annual}$$
+
+<p>For early retirees planning a 40- to 50-year horizon (retiring at age 35 to 45), modern financial planners advise adopting a more conservative <strong>3.25% to 3.50% Safe Withdrawal Rate</strong> (multiplying annual expenses by \(28.5	imes	ext{ to }30.7	imes\)) to hedge against extended longevity and multi-decade sequence risk.</p>
+
+<h2>3. Mathematical Nest Egg Compounding &amp; Savings Formulations</h2>
+<p>Projecting retirement readiness requires compounding existing capital and regular periodic monthly contributions forward to the target retirement date:</p>
+
+<h3>Future Value of Existing Nest Egg</h3>
+$$FV_{lump} = PV \cdot (1 + r_{real})^N$$
+
+<h3>Future Value of Ongoing Monthly Contributions</h3>
+$$FV_{annuity} = PMT \cdot \left[rac{(1 + r_{monthly})^{12 \cdot N} - 1}{r_{monthly}}
+ight]$$
+
+$$	ext{Total Projected Nest Egg} = FV_{lump} + FV_{annuity}$$
+
+<h3>Required Nest Egg Calculation</h3>
+<p>If a retiree requires an annual retirement income \(I_{desired}\) and anticipates a guaranteed annual Social Security / pension benefit \(P_{guaranteed}\), the net annual shortfall that must be generated by portfolio capital is:</p>
+
+$$	ext{Net Annual Portfolio Withdrawal} = \max\left(0, \; I_{desired} - P_{guaranteed}
+ight)$$
+
+$$	ext{Required Nest Egg} = rac{	ext{Net Annual Portfolio Withdrawal}}{SWR}$$
+
+<p>If \(	ext{Projected Nest Egg} \ge 	ext{Required Nest Egg}\), the plan exhibits a financial surplus; otherwise, the retiree faces a funding gap requiring increased monthly savings, delayed retirement, or reduced spending.</p>
+
+<h2>4. Historical Safe Withdrawal Rate (SWR) Success Rates Table</h2>
+<p>The following financial planning data table summarizes historical portfolio survival probabilities across varying initial withdrawal rates, asset allocations, and payout durations based on updated Trinity Study data:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Initial Withdrawal Rate</th>
+            <th>Stock / Bond Allocation</th>
+            <th>25-Year Success Rate</th>
+            <th>30-Year Success Rate</th>
+            <th>40-Year Success Rate (Early FIRE)</th>
+            <th>Median Terminal Wealth Multiple</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>3.0% (Ultra-Safe)</strong></td>
+            <td>75% Stock / 25% Bond</td>
+            <td>100%</td>
+            <td>100%</td>
+            <td>100%</td>
+            <td>4.8x Initial Capital</td>
+        </tr>
+        <tr>
+            <td><strong>3.5% (Conservative FIRE)</strong></td>
+            <td>75% Stock / 25% Bond</td>
+            <td>100%</td>
+            <td>99%</td>
+            <td>96%</td>
+            <td>3.5x Initial Capital</td>
+        </tr>
+        <tr>
+            <td><strong>4.0% (Classic Bengen)</strong></td>
+            <td>75% Stock / 25% Bond</td>
+            <td>100%</td>
+            <td><strong>96% (Historical Standard)</strong></td>
+            <td>87%</td>
+            <td>2.8x Initial Capital</td>
+        </tr>
+        <tr>
+            <td><strong>4.0% (Classic Bengen)</strong></td>
+            <td>50% Stock / 50% Bond</td>
+            <td>98%</td>
+            <td>93%</td>
+            <td>81%</td>
+            <td>1.9x Initial Capital</td>
+        </tr>
+        <tr>
+            <td><strong>4.5% (Moderate Aggressive)</strong></td>
+            <td>75% Stock / 25% Bond</td>
+            <td>92%</td>
+            <td>84%</td>
+            <td>72%</td>
+            <td>1.8x Initial Capital</td>
+        </tr>
+        <tr>
+            <td><strong>5.0% (High Risk)</strong></td>
+            <td>75% Stock / 25% Bond</td>
+            <td>82%</td>
+            <td>68%</td>
+            <td>51%</td>
+            <td>0.9x Initial Capital</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>5. Sequence of Returns Risk (SRR) and The "Bucket Strategy"</h2>
+<p>The primary hazard confronting new retirees during the first 5 years of decumulation is <strong>Sequence of Returns Risk (SRR)</strong>. If a retiree encounters a severe 30% to 50% equity bear market in the immediate aftermath of retirement while simultaneously withdrawing 4% plus inflation for living expenses, the portfolio experiences permanent capital destruction.</p>
+
+<p>To insulate against SRR, financial planners utilize the <strong>Three-Bucket Asset Allocation Strategy</strong>:</p>
+<ul>
+    <li><strong>Bucket 1 (Cash &amp; Equivalents):</strong> Holds 1 to 2 years of living expenses in high-yield cash, money market funds, or short-term Treasury bills, providing guaranteed living liquidity without touching stocks during a market collapse.</li>
+    <li><strong>Bucket 2 (Fixed Income &amp; Defensive Assets):</strong> Holds 3 to 7 years of living expenses in short-to-intermediate bonds and dividend aristocrats, replenishing Bucket 1.</li>
+    <li><strong>Bucket 3 (Long-Term Growth Equities):</strong> Holds the remainder of the portfolio in diversified equities (S&amp;P 500, Total Stock Market, International), allowing 7 to 10 years of uninterrupted recovery during catastrophic economic recessions.</li>
+</ul>
+
+<h2>6. Worked Financial Planning Case Study: Sizing a 30-Year Retirement Plan</h2>
+<div class="worked-example-card">
+    <h3>Client Profile: 35-Year-Old Software Engineer Targeting Age 60 Retirement</h3>
+    <p>A 35-year-old engineer has accumulated <strong>$120,000</strong> in retirement savings. She contributes <strong>$1,200 per month</strong> ($14,400 annually). She plans to retire at <strong>Age 60</strong> (25-year accumulation window). Her target living standard requires <strong>$72,000 annually</strong> in today's purchasing power. At age 67, she expects an annual Social Security benefit of <strong>$24,000</strong> (leaving a net portfolio burden of $48,000/yr). Her investment portfolio targets a <strong>7.5% nominal return</strong> with <strong>2.5% expected inflation</strong>, utilizing a <strong>4.0% Safe Withdrawal Rate</strong>.</p>
+
+    <div class="step-solution">
+        <h4>Step 1: Calculate Real Rate of Return</h4>
+        $$r_{real} = rac{1 + 0.075}{1 + 0.025} - 1 = rac{1.075}{1.025} - 1 pprox 0.04878 	ext{ (4.88% real return)}$$
+        $$r_{monthly,real} = rac{0.04878}{12} pprox 0.004065$$
+
+        <h4>Step 2: Project Nest Egg at Age 60 in Today's Dollars</h4>
+        $$	ext{Months} = 25 	imes 12 = 300	ext{ months}$$
+        $$FV_{lump} = \$120{,}000 	imes (1 + 0.04878)^{25} = \$120{,}000 	imes 3.2847 pprox \$394{,}164$$
+        $$FV_{annuity} = \$1{,}200 	imes \left[rac{(1 + 0.004065)^{300} - 1}{0.004065}
+ight] = \$1{,}200 	imes \left[rac{3.3768 - 1}{0.004065}
+ight] = \$1{,}200 	imes 584.70 pprox \$701{,}640$$
+        $$	ext{Total Projected Nest Egg} = \$394{,}164 + \$701{,}640 = \$1{,}095{,}804$$
+
+        <h4>Step 3: Calculate Required Nest Egg at 4% SWR</h4>
+        $$	ext{Net Annual Portfolio Demand} = \$72{,}000 - \$24{,}000 = \$48{,}000	ext{ per year}$$
+        $$	ext{Target Nest Egg Required} = rac{\$48{,}000}{0.04} = \$1{,}200{,}000$$
+
+        <h4>Step 4: Readiness Gap Analysis &amp; Action Plan</h4>
+        $$	ext{Shortfall} = \$1{,}200{,}000 - \$1{,}095{,}804 = -\$104{,}196$$
+        <p>The client has funded <strong>91.3% of her goal</strong>. To bridge the \(\$104{,}200\) shortfall, she needs to increase her monthly contribution by only:</p>
+        $$\Delta PMT = rac{\$104{,}196}{584.70} pprox \$178.20	ext{ per month}$$
+        <p>By increasing her monthly savings from $1,200 to <strong>$1,380 per month</strong>, her retirement plan achieves 100% funding solvency.</p>
+    </div>
+</div>
+
+<h2>7. Frequently Asked Questions</h2>
+<div class="faq-accordion">
+    <div class="faq-item">
+        <h3>What is the 4% Safe Withdrawal Rate (Trinity Study rule)?</h3>
+        <p>The 4% rule originated from a 1994 research paper by financial planner William Bengen and was expanded by the 1998 Trinity Study (Cooley, Hubbard, and Walz). It demonstrates that an investor can withdraw 4.0% of their initial portfolio value in the first year of retirement, adjust that dollar amount annually for inflation, and have a 95%+ historical probability of not exhausting capital over a 30-year retirement horizon using a 50/50 to 75/25 stock/bond asset allocation.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is a FIRE Number and how is it calculated?</h3>
+        <p>In the Financial Independence, Retire Early (FIRE) movement, your FIRE Number is the total invested capital required to generate sufficient annual passive income to cover 100% of your living expenses without touching principal. It is calculated by multiplying your desired annual retirement expenditures by 25 (the mathematical reciprocal of the 4% withdrawal rate: 1 / 0.04 = 25).</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is Sequence of Returns Risk (SRR) in retirement planning?</h3>
+        <p>Sequence of Returns Risk refers to the danger that a retiree experiences severe market downturns in the first 3 to 5 years after beginning portfolio decumulation. Liquidating depreciated shares during a bear market permanently damages the compounding base of the portfolio, drastically increasing the probability of premature capital exhaustion compared to experiencing a bear market later in retirement.</p>
+    </div>
+    <div class="faq-item">
+        <h3>How does inflation impact retirement nest egg requirements?</h3>
+        <p>Inflation continuously erodes the purchasing power of cash. At an average inflation rate of 2.5% to 3.0%, living costs double approximately every 24 to 28 years. Consequently, retirement calculators must either calculate real inflation-adjusted rates of return (\(r_{real} pprox r_{nominal} - 	ext{inflation}\)) or compound future living expenses upward to preserve constant purchasing power.</p>
+    </div>
+</div>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏦</span>
+            <h3 class="widget-title">Related Finance & Investment</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="rule-of-72-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rule of 72 Doubling Time</a></li>
+            <li><a href="car-loan-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Car Loan Financing</a></li>
+            <li><a href="roi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ROI & Annualized CAGR</a></li>
+            <li><a href="loan-emi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan EMI Calculator</a></li>
+            <li><a href="mortgage-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Mortgage & PITI</a></li>
+            <li><a href="compound-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Compound Interest</a></li>
+            <li><a href="simple-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Simple Interest</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck</a></li>
+            <li><a href="discount-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Discount & Sale</a></li>
+            <li><a href="tip-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Tip & Bill Splitter</a></li>
+            <li><a href="amortization-schedule-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan Amortization Schedule</a></li>
+            <li><a href="apr-apy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> APR to APY Compounding Converter</a></li>
+            <li><a href="break-even-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Break-Even Point (Units & Sales)</a></li>
+            <li><a href="capital-gains-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capital Gains Tax (Short & Long)</a></li>
+            <li><a href="cd-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Certificate of Deposit (CD) Yield</a></li>
+            <li><a href="credit-card-payoff-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Credit Card Payoff (Debt Freedom)</a></li>
+            <li><a href="debt-to-income-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Debt-to-Income (DTI) Ratios</a></li>
+            <li><a href="down-payment-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Down Payment & LTV Sizer</a></li>
+            <li><a href="emergency-fund-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Emergency Fund (3-6 Months)</a></li>
+            <li><a href="inflation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Inflation & Purchasing Power</a></li>
+            <li><a href="net-salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Net Salary & Take-Home Pay</a></li>
+            <li><a href="net-worth-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Personal Net Worth & Solvency</a></li>
+            <li><a href="sales-tax-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sales Tax & Reverse Pre-Tax</a></li>
+            <li><a href="savings-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Compound Savings Growth</a></li>
+            <li><a href="savings-goal-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Savings Goal Target Sizer</a></li>
+            <li><a href="markup-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Markup & Margin Calculator</a></li>
+            <li><a href="smoking-cost-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Smoking Cost & Opportunity</a></li>
+            <li><a href="retirement-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Retirement & FIRE Planner</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="finance.html" class="sidebar-category-link">View All Finance & Investment Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub provides free, high-precision financial calculators, retirement planners, and actuarial analysis tools designed for individuals, financial advisors, and wealth managers worldwide.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Financial &amp; Health Categories</h4>
+                    <ul>
+                        <li><a href="finance.html">Finance &amp; Investment</a></li>
+                        <li><a href="health.html">Health &amp; Actuarial Sciences</a></li>
+                        <li><a href="math.html">Compound Interest &amp; Stats</a></li>
+                        <li><a href="engineering.html">Engineering Tools</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Popular Financial Calculators</h4>
+                    <ul>
+                        <li><a href="retirement-calculator.html">Retirement &amp; FIRE</a></li>
+                        <li><a href="smoking-cost-calculator.html">Smoking Cost &amp; Opportunity</a></li>
+                        <li><a href="compound-interest-calculator.html">Compound Interest</a></li>
+                        <li><a href="amortization-schedule-calculator.html">Loan Amortization</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                        <li><a href="math.html">Math Tools</a></li>
+                        <li><a href="finance.html">Finance Tools</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed analytical calculation models.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

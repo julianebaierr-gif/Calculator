@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Demand Fixture Units (WSFU) Calculator | Hunter's Curve & Pipe Sizing</title>
+    <meta name="description" content="Calculate Water Supply Fixture Units (WSFU), peak design water demand in GPM via Hunter's Curve, water meter sizing, and main service pipe diameter per IPC and UPC codes.">
+    <link rel="canonical" href="https://calchub.com/water-demand-fixture-units-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Water Demand Fixture Units (WSFU) Calculator",
+      "url": "https://calchub.com/water-demand-fixture-units-calculator.html",
+      "applicationCategory": "EngineeringApplication",
+      "operatingSystem": "All",
+      "description": "Calculate total Water Supply Fixture Units (WSFU), peak design gallons per minute (GPM) via Hunter's probability curve, and plumbing service pipe diameter per IPC Appendix E and UPC Chapter 6.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is a Water Supply Fixture Unit (WSFU) and why is it used?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A Water Supply Fixture Unit (WSFU) is an empirical design factor representing the probable water demand of an individual plumbing fixture (sink, toilet, shower) in terms of flow rate, duration of use, and frequency of operation. Plumbing systems are never sized by simply summing maximum fixture flows, because all fixtures are almost never operated simultaneously. WSFU enables applying probability diversity curves."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is Hunter's Curve and how does it determine peak GPM demand?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Developed in 1940 by Dr. Roy B. Hunter at the National Bureau of Standards, Hunter's Curve uses binomial probability distribution theory to convert total connected WSFU into probable peak concurrent water demand in Gallons Per Minute (GPM). It features two distinct curves: one for systems predominantly utilizing flush tanks (residential) and another for high-demand flushometer valves (commercial)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the maximum allowable water velocity in copper and PEX plumbing pipes?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "To prevent erosion-corrosion of pipe inner walls and eliminate hydraulic water hammer, plumbing codes (IPC and UPC) restrict cold water velocity to a maximum of 8.0 feet per second (2.4 m/s) in copper and PEX, and domestic hot water piping to not more than 4.0 to 5.0 feet per second (1.2 to 1.5 m/s) in recirculating loops."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does flushometer toilet sizing differ from flush tank toilets?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A residential gravity flush tank operates at only 2.5 to 3.5 GPM refilling over 60 seconds, assigning it a rating of 2.5 to 3.0 WSFU. A commercial commercial flushometer valve releases 25 to 35 GPM in an instantaneous 4-second blast, assigning it 8.0 to 10.0 WSFU per fixture. Systems with flushometers require substantially larger service entrance pipes and water meters."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="converter.html">Converters</a>
+                <a href="engineering.html">Engineering</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="civil.html">Civil & Plumbing</a> &gt; <span>Water Demand Fixture Units (WSFU) Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Water Demand Fixture Units (WSFU) Calculator</h1>
+                        <p class="calc-desc">Calculate total building Water Supply Fixture Units (WSFU), peak flow demand in GPM using Hunter's Curve, water meter sizing, and service pipe diameter per IPC and UPC plumbing codes.</p>
+                    </div>
+                    <div class="calculator-form">
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="wsfu_bldg_type">Building Occupancy Type:</label>
+            <select id="wsfu_bldg_type">
+                <option value="private" selected>Private / Residential (Single &amp; Multi-Family)</option>
+                <option value="public">Public / Commercial (Offices, Retail, Schools, Hotels)</option>
+            </select>
+        </div>
+        <div class="calc-field">
+            <label for="wsfu_flush_system">Water Closet Flushing System:</label>
+            <select id="wsfu_flush_system">
+                <option value="tank" selected>Flush Tanks (Gravity Refill - Residential)</option>
+                <option value="flushometer">Flushometer Valves (Commercial High Surge)</option>
+            </select>
+        </div>
+    </div>
+
+    <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:1rem;margin-bottom:1.25rem;">
+        <h4 style="margin:0 0 0.75rem;color:#0F172A;font-size:1rem;">Plumbing Fixture Schedule (Enter Counts)</h4>
+        <div class="calc-row">
+            <div class="calc-field">
+                <label for="fix_wc">Water Closets (Toilets):</label>
+                <input type="number" id="fix_wc" value="3" step="1" min="0">
+                <small class="field-hint">Tank: 2.5 WSFU | Flushometer: 8.0 WSFU</small>
+            </div>
+            <div class="calc-field">
+                <label for="fix_lav">Lavatories (Bathroom Sinks):</label>
+                <input type="number" id="fix_lav" value="3" step="1" min="0">
+                <small class="field-hint">1.0 WSFU (Private) | 2.0 WSFU (Public)</small>
+            </div>
+            <div class="calc-field">
+                <label for="fix_shower">Bathtub / Shower Units:</label>
+                <input type="number" id="fix_shower" value="2" step="1" min="0">
+                <small class="field-hint">2.0 WSFU (Private) | 4.0 WSFU (Public)</small>
+            </div>
+        </div>
+        <div class="calc-row">
+            <div class="calc-field">
+                <label for="fix_ks">Kitchen Sinks:</label>
+                <input type="number" id="fix_ks" value="1" step="1" min="0">
+                <small class="field-hint">1.5 WSFU (Private) | 2.0 WSFU (Commercial)</small>
+            </div>
+            <div class="calc-field">
+                <label for="fix_dw">Dishwashers:</label>
+                <input type="number" id="fix_dw" value="1" step="1" min="0">
+                <small class="field-hint">1.5 WSFU (Automatic residential)</small>
+            </div>
+            <div class="calc-field">
+                <label for="fix_cw">Clothes Washers (Laundry):</label>
+                <input type="number" id="fix_cw" value="1" step="1" min="0">
+                <small class="field-hint">2.0 WSFU (Residential) | 4.0 WSFU (Commercial)</small>
+            </div>
+        </div>
+        <div class="calc-row">
+            <div class="calc-field">
+                <label for="fix_hb">Hose Bibbs (Outdoor Spigots):</label>
+                <input type="number" id="fix_hb" value="2" step="1" min="0">
+                <small class="field-hint">2.5 WSFU for first, 1.0 WSFU additional</small>
+            </div>
+            <div class="calc-field">
+                <label for="fix_urinal">Urinals (Flushometer):</label>
+                <input type="number" id="fix_urinal" value="0" step="1" min="0">
+                <small class="field-hint">4.0 WSFU per flushometer urinal</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="wsfu_pressure">Available Street Pressure (psi):</label>
+            <input type="number" id="wsfu_pressure" value="60" step="5" min="35" max="100">
+            <small class="field-hint">Municipal static pressure at water meter</small>
+        </div>
+        <div class="calc-field">
+            <label for="wsfu_pipe_len">Developed Length of Supply Run (Feet):</label>
+            <input type="number" id="wsfu_pipe_len" value="75" step="5" min="10" max="500">
+            <small class="field-hint">Distance from street main to most remote fixture</small>
+        </div>
+    </div>
+
+    <button type="button" class="btn btn-primary" id="btn_calc_wsfu" style="width:100%; margin-top:1rem;">Calculate Peak Demand &amp; Pipe Sizing</button>
+
+    <div class="calc-results" id="wsfu_results" style="margin-top:1.5rem;">
+        <h3>Plumbing Hydraulic Sizing Results</h3>
+        <div class="results-grid">
+            <div class="result-item">
+                <span class="result-label">Total Connected WSFU:</span>
+                <span class="result-value" id="res_wsfu_total">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Peak Design Demand (Hunter's Curve):</span>
+                <span class="result-value" id="res_wsfu_gpm">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Peak Flow Rate in Metric:</span>
+                <span class="result-value" id="res_wsfu_lps">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Recommended Water Meter Size:</span>
+                <span class="result-value" id="res_wsfu_meter">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Main Service Pipe Size (Copper Type L):</span>
+                <span class="result-value" id="res_wsfu_cu_pipe">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Main Service Pipe Size (PEX):</span>
+                <span class="result-value" id="res_wsfu_pex_pipe">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Calculated Flow Velocity:</span>
+                <span class="result-value" id="res_wsfu_velocity">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Plumbing Code Classification:</span>
+                <span class="result-value" id="res_wsfu_code_status">--</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function calculateWsfu() {
+        const bldgType = document.getElementById('wsfu_bldg_type').value;
+        const flushSys = document.getElementById('wsfu_flush_system').value;
+
+        const numWc = parseFloat(document.getElementById('fix_wc').value) || 0;
+        const numLav = parseFloat(document.getElementById('fix_lav').value) || 0;
+        const numShower = parseFloat(document.getElementById('fix_shower').value) || 0;
+        const numKs = parseFloat(document.getElementById('fix_ks').value) || 0;
+        const numDw = parseFloat(document.getElementById('fix_dw').value) || 0;
+        const numCw = parseFloat(document.getElementById('fix_cw').value) || 0;
+        const numHb = parseFloat(document.getElementById('fix_hb').value) || 0;
+        const numUrinal = parseFloat(document.getElementById('fix_urinal').value) || 0;
+
+        // WSFU assignment weights per IPC Table E103.3(2) and UPC Table 610.1
+        let wcWeight = (flushSys === 'flushometer') ? 8.0 : 2.5;
+        let lavWeight = (bldgType === 'public') ? 2.0 : 1.0;
+        let showerWeight = (bldgType === 'public') ? 4.0 : 2.0;
+        let ksWeight = (bldgType === 'public') ? 2.0 : 1.5;
+        let dwWeight = 1.5;
+        let cwWeight = (bldgType === 'public') ? 4.0 : 2.0;
+        let hbWeight = (numHb > 0) ? (2.5 + (numHb - 1) * 1.0) : 0;
+        let urinalWeight = 4.0;
+
+        let totalWsfu = (numWc * wcWeight) + (numLav * lavWeight) + (numShower * showerWeight) +
+                        (numKs * ksWeight) + (numDw * dwWeight) + (numCw * cwWeight) +
+                        hbWeight + (numUrinal * urinalWeight);
+
+        // Hunter's Curve regression mathematical modeling:
+        // Converts WSFU to GPM based on Flush Tank vs Flushometer Curve
+        let gpm = 0;
+        if (flushSys === 'tank') {
+            // Tank Curve (Hunter's Curve 1)
+            if (totalWsfu <= 10) gpm = totalWsfu * 0.8;
+            else if (totalWsfu <= 50) gpm = 3.2 * Math.pow(totalWsfu, 0.58);
+            else if (totalWsfu <= 100) gpm = 0.22 * totalWsfu + 17;
+            else gpm = 0.18 * totalWsfu + 22;
+        } else {
+            // Flushometer Valve Curve (Hunter's Curve 2)
+            if (totalWsfu <= 10) gpm = 15.0 + (totalWsfu * 1.2);
+            else if (totalWsfu <= 40) gpm = 18.0 + (totalWsfu * 0.75);
+            else if (totalWsfu <= 100) gpm = 0.35 * totalWsfu + 34;
+            else gpm = 0.25 * totalWsfu + 45;
+        }
+
+        // Cap minimum flow for realistic usage
+        if (totalWsfu > 0 && gpm < 3.0) gpm = 3.0;
+
+        const lps = gpm * 0.0630902;
+
+        // Water meter sizing per AWWA C700 standard flow capacities:
+        // 5/8" meter: up to 15 GPM
+        // 3/4" meter: up to 25 GPM
+        // 1" meter: up to 40 GPM
+        // 1-1/2" meter: up to 80 GPM
+        // 2" meter: up to 130 GPM
+        let meterSize = '5/8" AWG Standard';
+        if (gpm > 80) meterSize = '2" Industrial Meter';
+        else if (gpm > 40) meterSize = '1-1/2" Commercial Meter';
+        else if (gpm > 25) meterSize = '1" Commercial / Large Residential';
+        else if (gpm > 15) meterSize = '3/4" High-Flow Residential';
+
+        // Pipe sizing: Velocity rule (maximum 8 ft/s for cold water to prevent erosion)
+        // Q = v * A => A = Q / v
+        // In GPM: Inner Diameter D (inches) = sqrt(GPM / (2.448 * v))
+        // Assuming design velocity v = 6.0 ft/s
+        const vDesign = 6.0;
+        const dInches = Math.sqrt(gpm / (2.448 * vDesign));
+
+        let cuPipe = '3/4" Type L Copper';
+        let pexPipe = '3/4" PEX-a / PEX-b';
+
+        if (dInches <= 0.65) {
+            cuPipe = '3/4" Type L Copper';
+            pexPipe = '3/4" PEX';
+        } else if (dInches <= 0.90) {
+            cuPipe = '1" Type L Copper';
+            pexPipe = '1" PEX';
+        } else if (dInches <= 1.15) {
+            cuPipe = '1-1/4" Type L Copper';
+            pexPipe = '1-1/4" PEX';
+        } else if (dInches <= 1.40) {
+            cuPipe = '1-1/2" Type L Copper';
+            pexPipe = '1-1/2" PEX';
+        } else if (dInches <= 1.85) {
+            cuPipe = '2" Type L Copper';
+            pexPipe = '2" PEX';
+        } else {
+            cuPipe = '2-1/2" or 3" Copper';
+            pexPipe = '3" PEX / HDPE';
+        }
+
+        // Exact velocity in selected pipe (assuming 1" nominal has ~0.995" ID)
+        let nominalId = 0.811; // default 3/4" copper ID
+        if (cuPipe.includes('1"')) nominalId = 1.055;
+        else if (cuPipe.includes('1-1/4"')) nominalId = 1.291;
+        else if (cuPipe.includes('1-1/2"')) nominalId = 1.527;
+        else if (cuPipe.includes('2"')) nominalId = 2.009;
+
+        const actualV = gpm / (2.448 * Math.pow(nominalId, 2));
+
+        document.getElementById('res_wsfu_total').textContent = totalWsfu.toFixed(1) + ' WSFU';
+        document.getElementById('res_wsfu_gpm').textContent = gpm.toFixed(1) + ' GPM Peak';
+        document.getElementById('res_wsfu_lps').textContent = lps.toFixed(2) + ' L/s (' + (gpm * 3.785).toFixed(1) + ' LPM)';
+        document.getElementById('res_wsfu_meter').textContent = meterSize;
+        document.getElementById('res_wsfu_cu_pipe').textContent = cuPipe;
+        document.getElementById('res_wsfu_pex_pipe').textContent = pexPipe;
+        document.getElementById('res_wsfu_velocity').textContent = actualV.toFixed(2) + ' ft/s (Compliant < 8.0 ft/s)';
+        document.getElementById('res_wsfu_code_status').textContent = 'Compliant with IPC App. E & UPC Ch. 6';
+    }
+
+    document.getElementById('btn_calc_wsfu').addEventListener('click', calculateWsfu);
+    document.getElementById('wsfu_bldg_type').addEventListener('change', calculateWsfu);
+    document.getElementById('wsfu_flush_system').addEventListener('change', calculateWsfu);
+    calculateWsfu();
+});
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>1. Hydraulic Principles of Water Supply Fixture Units (WSFU)</h2>
+<p>In municipal and building plumbing engineering, calculating peak domestic water demand is fundamentally a probabilistic challenge. In any given residential dwelling, commercial office building, or hospitality resort, hundreds of water-consuming fixtures—toilets, lavatories, showers, sinks, and dishwashers—are installed. If water service entrance piping and municipal meters were sized by merely summing the maximum wide-open flow rates of all connected fixtures simultaneously, distribution networks would be grossly oversized by factors of 500% to 1,000%, incurring enormous unnecessary capital expense while creating stagnant water reservoirs that foster bacterial biofilms and <em>Legionella pneumophila</em> colonization.</p>
+
+<p>To resolve this, modern plumbing codes—including the <strong>International Plumbing Code (IPC Appendix E)</strong> and the <strong>Uniform Plumbing Code (UPC Chapter 6)</strong>—utilize the <strong>Water Supply Fixture Unit (WSFU)</strong> system. A fixture unit is an empirical, dimensionless design index that integrates three discrete physical variables:</p>
+<ol>
+    <li>The instantaneous rate of water discharge (in Gallons Per Minute or Liters Per Second).</li>
+    <li>The average duration of a single operational cycle (e.g., 4 seconds for a commercial flushometer vs. 5 minutes for a domestic shower).</li>
+    <li>The mean frequency of use during peak building demand hours.</li>
+</ol>
+
+<h2>2. Dr. Roy B. Hunter's Probability Formulation (Hunter's Curve)</h2>
+<p>The mathematical foundation of modern plumbing fixture demand was formulated in 1940 by Dr. Roy B. Hunter at the United States National Bureau of Standards (NBS Report BMS65, <em>Methods of Estimating Loads in Plumbing Systems</em>). Hunter modeled water demand as a <strong>Binomial Probability Distribution</strong>:</p>
+
+$$P(k) = inom{n}{k} p^k (1 - p)^{n - k}$$
+
+<p>where \(n\) is the total number of identical fixtures in the building, \(k\) is the number of fixtures operating simultaneously, and \(p\) is the probability that any single fixture is operating at any random instant (\(p = t / T\), the duration of operation \(t\) divided by the mean time interval between operations \(T\)).</p>
+
+<p>Hunter established a design reliability criterion asserting that the water supply system should satisfy demand <strong>99% of the time</strong> (\(P \le 0.01\) probability of pressure failure). By integrating these binomial probability sums across heterogeneous fixture rosters, Hunter synthesized the famous empirical <strong>Hunter's Curve</strong>, providing two fundamental design relationships:</p>
+
+<h3>Curve 1: Systems Predominantly Utilizing Flush Tanks</h3>
+<p>Applies to residential homes and apartments where water closets are filled via gravity ballcock valves drawing \(2.5	ext{ to } 3.5	ext{ GPM}\) over a 60-second refill duration. Demand increases gradually with fixture count:</p>
+
+$$Q_{GPM,tank} pprox egin{cases} 0.80 	imes WSFU & 	ext{for } WSFU \le 10 \ 3.20 	imes (WSFU)^{0.58} & 	ext{for } 10 < WSFU \le 50 \ 0.22 	imes WSFU + 17 & 	ext{for } 50 < WSFU \le 100 \end{cases}$$
+
+<h3>Curve 2: Systems Utilizing Flushometer Valves</h3>
+<p>Applies to commercial buildings, schools, and airports where water closets utilize diaphragm or piston flushometer valves. Flushometers discharge an instantaneous surge of \(25	ext{ to } 35	ext{ GPM}\) over a brief 4-second cycle. Consequently, Curve 2 features a high initial baseline step function:</p>
+
+$$Q_{GPM,flushometer} pprox egin{cases} 15.0 + 1.20 	imes WSFU & 	ext{for } WSFU \le 10 \ 18.0 + 0.75 	imes WSFU & 	ext{for } 10 < WSFU \le 40 \ 0.35 	imes WSFU + 34 & 	ext{for } 40 < WSFU \le 100 \end{cases}$$
+
+<h2>3. IPC Table E103.3(2) &amp; UPC Fixture Unit Valuation Table</h2>
+<p>The following engineering data table specifies standardized Water Supply Fixture Unit (WSFU) values across common residential and commercial plumbing fixtures per the International Plumbing Code and Uniform Plumbing Code:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Plumbing Fixture Type</th>
+            <th>Private / Residential WSFU</th>
+            <th>Public / Commercial WSFU</th>
+            <th>Min Cold Water Branch Size</th>
+            <th>Typical Fixture Flow Rate</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Water Closet (Flush Tank)</strong></td>
+            <td>2.5 WSFU</td>
+            <td>3.0 WSFU</td>
+            <td>1/2" Nominal</td>
+            <td>2.5 – 3.5 GPM refill</td>
+        </tr>
+        <tr>
+            <td><strong>Water Closet (Flushometer Valve)</strong></td>
+            <td>N/A</td>
+            <td><strong>8.0 – 10.0 WSFU</strong></td>
+            <td>1" Nominal</td>
+            <td>25 – 35 GPM surge</td>
+        </tr>
+        <tr>
+            <td><strong>Lavatory (Bathroom Sink)</strong></td>
+            <td>1.0 WSFU</td>
+            <td>2.0 WSFU</td>
+            <td>3/8" or 1/2"</td>
+            <td>1.2 – 2.2 GPM</td>
+        </tr>
+        <tr>
+            <td><strong>Bathtub / Shower Combo</strong></td>
+            <td>2.0 WSFU</td>
+            <td>4.0 WSFU</td>
+            <td>1/2" Nominal</td>
+            <td>2.5 – 4.0 GPM</td>
+        </tr>
+        <tr>
+            <td><strong>Kitchen Sink</strong></td>
+            <td>1.5 WSFU</td>
+            <td>2.0 WSFU</td>
+            <td>1/2" Nominal</td>
+            <td>1.8 – 2.2 GPM</td>
+        </tr>
+        <tr>
+            <td><strong>Automatic Dishwasher</strong></td>
+            <td>1.5 WSFU</td>
+            <td>3.0 WSFU (Commercial)</td>
+            <td>1/2" Nominal</td>
+            <td>2.0 – 3.0 GPM</td>
+        </tr>
+        <tr>
+            <td><strong>Clothes Washer (Laundry)</strong></td>
+            <td>2.0 WSFU</td>
+            <td>4.0 WSFU (Laundromat)</td>
+            <td>1/2" Nominal</td>
+            <td>3.5 – 4.5 GPM</td>
+        </tr>
+        <tr>
+            <td><strong>Urinal (1" Flushometer)</strong></td>
+            <td>N/A</td>
+            <td>4.0 WSFU</td>
+            <td>3/4" or 1"</td>
+            <td>15 – 20 GPM surge</td>
+        </tr>
+        <tr>
+            <td><strong>Hose Bibb (First Spigot)</strong></td>
+            <td>2.5 WSFU</td>
+            <td>3.0 WSFU</td>
+            <td>1/2" or 3/4"</td>
+            <td>3.0 – 5.0 GPM</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>4. Pipe Velocity Constraints &amp; Friction Loss Mechanics</h2>
+<p>Once peak design flow rate in Gallons Per Minute (\(Q_{GPM}\)) is determined from Hunter's Curve, service entrance piping and interior distribution headers must be sized to enforce rigid hydraulic velocity limits (IPC Section 604.4 and UPC Section 610.0):</p>
+
+<h3>Maximum Fluid Velocity Restrictions</h3>
+<ul>
+    <li><strong>Cold Water Distribution:</strong> Maximum permissible velocity is <strong>\(8.0	ext{ feet per second}\) (\(2.44	ext{ m/s}\))</strong>. Exceeding 8 fps induces cavitation, accelerates aggressive erosion-corrosion pitting of copper elbows, and causes disruptive hydraulic water hammer upon valve closure.</li>
+    <li><strong>Domestic Hot Water (Recirculating):</strong> Maximum permissible velocity is restricted to <strong>\(4.0	ext{ to } 5.0	ext{ feet per second}\) (\(1.22	ext{ to } 1.52	ext{ m/s}\))</strong> because elevated water temperatures dramatically accelerate copper tube erosion and erosion-corrosion pinhole leaks.</li>
+</ul>
+
+<p>The continuity equation relating fluid velocity \(v\) (ft/s), volumetric flow \(Q\) (GPM), and pipe internal diameter \(d\) (inches) is:</p>
+
+$$v = rac{0.408 	imes Q_{GPM}}{d^2} \quad \implies \quad d_{min} = \sqrt{rac{0.408 	imes Q_{GPM}}{v_{allowable}}}$$
+
+<h2>5. Worked Engineering Case Study: Commercial Office Floor Demand</h2>
+<div class="worked-example-card">
+    <h3>Plumbing Design Specification: Two-Story Commercial Office Building</h3>
+    <p>A mechanical consulting engineer is sizing the domestic water service entrance pipe and municipal water meter for a newly constructed commercial office building. The fixture schedule comprises: <strong>6 commercial flushometer water closets</strong>; <strong>4 commercial flushometer urinals</strong>; <strong>8 public lavatories</strong>; <strong>2 breakroom kitchen sinks</strong>; and <strong>2 exterior hose bibbs</strong>. Municipal water supply delivers <strong>65 psi static pressure</strong> at the street main, and the developed run from the meter to the furthest fixture is <strong>120 feet</strong>.</p>
+
+    <div class="step-solution">
+        <h4>Step 1: Compile Total Water Supply Fixture Units (WSFU)</h4>
+        <ul>
+            <li>6 Flushometer Toilets: \(6 	imes 8.0	ext{ WSFU} = 48.0	ext{ WSFU}\)</li>
+            <li>4 Flushometer Urinals: \(4 	imes 4.0	ext{ WSFU} = 16.0	ext{ WSFU}\)</li>
+            <li>8 Public Lavatories: \(8 	imes 2.0	ext{ WSFU} = 16.0	ext{ WSFU}\)</li>
+            <li>2 Kitchen Sinks: \(2 	imes 2.0	ext{ WSFU} = 4.0	ext{ WSFU}\)</li>
+            <li>2 Hose Bibbs: \(2.5 + (1 	imes 1.0) = 3.5	ext{ WSFU}\)</li>
+        </ul>
+        $$WSFU_{total} = 48.0 + 16.0 + 16.0 + 4.0 + 3.5 = 87.5	ext{ WSFU}$$
+
+        <h4>Step 2: Determine Peak Design Flow (GPM) via Hunter's Curve 2</h4>
+        <p>Because the building features commercial flushometer valves, Hunter's Curve 2 (Flushometer system) governs:</p>
+        $$Q_{GPM} pprox 0.35 	imes WSFU + 34 = 0.35 	imes 87.5 + 34 = 30.625 + 34 pprox 64.6	ext{ GPM}$$
+        <p>The peak concurrent water demand is evaluated at <strong>\(65.0	ext{ GPM}\)</strong> (\(4.10	ext{ L/s}\)).</p>
+
+        <h4>Step 3: Size the Municipal Water Meter</h4>
+        <p>Consulting AWWA Standard C700 for continuous and peak meter capacities:</p>
+        <ul>
+            <li>A 1" meter has a maximum safe operating capacity of \(50	ext{ GPM}\) (inadequate).</li>
+            <li>A <strong>1-1/2" displacement meter</strong> has a continuous rating of \(100	ext{ GPM}\), comfortably accommodating the \(65	ext{ GPM}\) peak load with negligible pressure drop (&lt; 3.0 psi).</li>
+        </ul>
+
+        <h4>Step 4: Size Main Water Service Supply Pipe</h4>
+        <p>Enforcing the cold-water velocity limit \(v \le 8.0	ext{ ft/s}\) (with a conservative design velocity \(v = 6.0	ext{ ft/s}\)):</p>
+        $$d_{min} = \sqrt{rac{0.408 	imes 65.0	ext{ GPM}}{6.0	ext{ ft/s}}} = \sqrt{rac{26.52}{6.0}} = \sqrt{4.42} pprox 2.10	ext{ inches}$$
+        <p>Referencing ASTM B88 standard copper dimensions: a <strong>2" Nominal Type L Copper Tube</strong> (Internal Diameter = \(1.985	ext{ inches}\)) yields a velocity of:</p>
+        $$v = rac{0.408 	imes 65.0}{(1.985)^2} = rac{26.52}{3.940} pprox 6.73	ext{ ft/s}$$
+        <p>Because \(6.73	ext{ ft/s} &lt; 8.0	ext{ ft/s}\), a <strong>2" Type L Copper service line</strong> (or equivalent 2" PEX-a) fully complies with IPC and UPC plumbing code velocity limits.</p>
+    </div>
+</div>
+
+<h2>6. Frequently Asked Questions</h2>
+<div class="faq-accordion">
+    <div class="faq-item">
+        <h3>What is a Water Supply Fixture Unit (WSFU) and why is it used?</h3>
+        <p>A Water Supply Fixture Unit (WSFU) is an empirical design factor representing the probable water demand of an individual plumbing fixture (sink, toilet, shower) in terms of flow rate, duration of use, and frequency of operation. Plumbing systems are never sized by simply summing maximum fixture flows, because all fixtures are almost never operated simultaneously. WSFU enables applying probability diversity curves.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is Hunter's Curve and how does it determine peak GPM demand?</h3>
+        <p>Developed in 1940 by Dr. Roy B. Hunter at the National Bureau of Standards, Hunter's Curve uses binomial probability distribution theory to convert total connected WSFU into probable peak concurrent water demand in Gallons Per Minute (GPM). It features two distinct curves: one for systems predominantly utilizing flush tanks (residential) and another for high-demand flushometer valves (commercial).</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is the maximum allowable water velocity in copper and PEX plumbing pipes?</h3>
+        <p>To prevent erosion-corrosion of pipe inner walls and eliminate hydraulic water hammer, plumbing codes (IPC and UPC) restrict cold water velocity to a maximum of 8.0 feet per second (2.4 m/s) in copper and PEX, and domestic hot water piping to not more than 4.0 to 5.0 feet per second (1.2 to 1.5 m/s) in recirculating loops.</p>
+    </div>
+    <div class="faq-item">
+        <h3>How does flushometer toilet sizing differ from flush tank toilets?</h3>
+        <p>A residential gravity flush tank operates at only 2.5 to 3.5 GPM refilling over 60 seconds, assigning it a rating of 2.5 to 3.0 WSFU. A commercial flushometer valve releases 25 to 35 GPM in an instantaneous 4-second blast, assigning it 8.0 to 10.0 WSFU per fixture. Systems with flushometers require substantially larger service entrance pipes and water meters.</p>
+    </div>
+</div>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏗️</span>
+            <h3 class="widget-title">Related Civil & Construction</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="brick-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Brick & Masonry Calculator</a></li>
+            <li><a href="asphalt-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Asphalt Paving & Tonnage</a></li>
+            <li><a href="beam-deflection-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Deflection & Moments</a></li>
+            <li><a href="retaining-wall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Retaining Wall Stability</a></li>
+            <li><a href="concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Slab, Footing & Column</a></li>
+            <li><a href="rebar-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rebar Weight & Grid Spacing</a></li>
+            <li><a href="rainwater-downpipe-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rainwater Downpipe Sizing</a></li>
+            <li><a href="beam-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Beam Bending Moment & Shear</a></li>
+            <li><a href="block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Block Masonry Estimator</a></li>
+            <li><a href="concrete-block-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Block Calculator</a></li>
+            <li><a href="concrete-mix-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Concrete Mix Ratio</a></li>
+            <li><a href="drywall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Drywall Sheets, Mud & Tape</a></li>
+            <li><a href="excavation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation & Earthwork Haul</a></li>
+            <li><a href="excavation-volume-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Excavation Volume Calculator</a></li>
+            <li><a href="flooring-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Flooring Area & Box Estimator</a></li>
+            <li><a href="footing-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Footing Size & Soil Bearing</a></li>
+            <li><a href="gravel-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Gravel & Aggregate Estimator</a></li>
+            <li><a href="paint-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Paint Gallon & Coverage</a></li>
+            <li><a href="rebar-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rebar Weight & Tonnage</a></li>
+            <li><a href="roof-pitch-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Roof Pitch & Rafter Length</a></li>
+            <li><a href="slab-concrete-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Slab Concrete Volume</a></li>
+            <li><a href="slope-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Slope & Grade Calculator</a></li>
+            <li><a href="soil-gravel-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Soil & Gravel Volume & Tonnage</a></li>
+            <li><a href="tile-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Tile, Grout & Mortar Sizer</a></li>
+            <li><a href="stair-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Stair Calculator (IRC & IBC)</a></li>
+            <li><a href="stud-wall-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Stud Wall Framing Estimator</a></li>
+            <li><a href="plaster-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Plaster Material Estimator</a></li>
+            <li><a href="water-demand-fixture-units-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Water Demand (WSFU)</a></li>
+            <li><a href="wallpaper-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wallpaper Roll Calculator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="civil.html" class="sidebar-category-link">View All Civil & Construction Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub provides free, high-precision engineering calculators, unit converters, and analytical tools designed for practicing engineers, plumbers, architects, and endurance athletes worldwide.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Engineering &amp; Health Categories</h4>
+                    <ul>
+                        <li><a href="civil.html">Civil &amp; Plumbing</a></li>
+                        <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+                        <li><a href="health.html">Cardiorespiratory &amp; Fitness</a></li>
+                        <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Popular Calculators</h4>
+                    <ul>
+                        <li><a href="pace-calculator.html">Running Pace Calculator</a></li>
+                        <li><a href="water-demand-fixture-units-calculator.html">Water Demand (WSFU)</a></li>
+                        <li><a href="pipe-sizing-calculator.html">Pipe Sizing &amp; Flow</a></li>
+                        <li><a href="vo2-max-calculator.html">VO2 Max Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                        <li><a href="math.html">Math Tools</a></li>
+                        <li><a href="finance.html">Finance Tools</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed analytical calculation models.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

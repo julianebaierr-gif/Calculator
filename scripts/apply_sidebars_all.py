@@ -41,6 +41,9 @@ CATEGORIES = {
             ("waist-to-height-calculator.html", "Waist-to-Height Ratio (WHtR)", "📏", "Central adiposity screening, Ashwell boundary & cardiometabolic risk"),
             ("waist-to-height-ratio-calculator.html", "Waist-to-Height Ratio Sizer", "📐", "Bariatric WHtR visceral risk evaluation & boundary classification"),
             ("waist-to-hip-ratio-calculator.html", "Waist-to-Hip Ratio (WHR Risk)", "⚖️", "WHO visceral adiposity ratio, android vs gynoid fat distribution"),
+            ("one-rep-max-calculator.html", "One Rep Max (1RM)", "🏋️", "Brzycki, Epley & Lombardi 1RM strength formulas"),
+            ("vo2-max-calculator.html", "VO2 Max Calculator", "🫀", "Cooper 12-min, Rockport walk & HR ratio aerobic capacity"),
+            ("pace-calculator.html", "Running Pace & Race Splits", "⏱️", "min/mi, min/km, 400m track laps & Riegel race predictor"),
         ]
     },
     "finance": {
@@ -74,6 +77,8 @@ CATEGORIES = {
             ("savings-calculator.html", "Compound Savings Growth", "📈", "Initial deposit + monthly contributions compounder"),
             ("savings-goal-calculator.html", "Savings Goal Target Sizer", "🎯", "Required monthly contribution to hit wealth target"),
             ("markup-calculator.html", "Markup & Margin Calculator", "🏷️", "Retail selling price, profit multiplier, markup & margin %"),
+            ("smoking-cost-calculator.html", "Smoking Cost & Opportunity", "🚬", "Cash outlays, S&P 500 compound loss & 11-min life loss"),
+            ("retirement-calculator.html", "Retirement & FIRE Planner", "🏖️", "Trinity study 4% rule, nest egg sizing & inflation"),
         ]
     },
     "math": {
@@ -288,6 +293,8 @@ CATEGORIES = {
             ("stair-calculator.html", "Stair Calculator (IRC & IBC)", "🪜", "Riser height, tread run, stringer length & Blondel rule"),
             ("stud-wall-calculator.html", "Stud Wall Framing Estimator", "🪵", "Wood & steel wall studs 16\"/24\" OC, plates, corners & drywall"),
             ("plaster-calculator.html", "Plaster Material Estimator", "🧱", "Cement bags (50kg), sand volume, 1.33 dry bulking & waste"),
+            ("water-demand-fixture-units-calculator.html", "Water Demand (WSFU)", "🚰", "Hunter's curve peak GPM, meter & pipe sizing per IPC/UPC"),
+            ("wallpaper-calculator.html", "Wallpaper Roll Calculator", "🎨", "Roll counts, pattern repeat, straight & drop match waste"),
         ]
     },
     "chemical": {
@@ -364,6 +371,7 @@ CATEGORIES = {
             ("stress-strain-calculator.html", "Stress & Strain (Hooke's Law)", "🏗️", "Normal stress, strain, modulus E & safety factor"),
             ("terminal-velocity-calculator.html", "Terminal Velocity", "🪂", "Aerodynamic drag & steady-state falling speed"),
             ("specific-gravity-calculator.html", "Specific Gravity & Hydrometer", "⚖️", "Relative density, API gravity, Baumé & Brix"),
+            ("wavelength-calculator.html", "Wavelength (λ = v/f)", "📻", "EM radio, acoustic sound, λ/4 antennas & velocity factor"),
         ]
     },
     "fire": {
@@ -443,9 +451,9 @@ CATEGORIES = {
 
 def determine_tool_cat(filename):
     f = filename.lower()
-    if any(k in f for k in ["bmi", "calorie", "body-fat", "ideal-weight", "water-intake", "bmr", "macro", "a1c", "bac", "body-surface-area", "bsa", "calorie-deficit", "calories-burned", "carbohydrate", "cholesterol", "due-date", "fat-intake", "heart-rate-zone", "lean-body-mass", "max-heart-rate", "met-calculator", "ovulation", "pregnancy-weight-gain", "protein-intake", "sleep-calculator", "sodium-intake", "target-heart-rate", "tdee", "waist-to-height", "waist-to-hip"]):
+    if any(k in f for k in ["bmi", "calorie", "body-fat", "ideal-weight", "water-intake", "bmr", "macro", "a1c", "bac", "body-surface-area", "bsa", "calorie-deficit", "calories-burned", "carbohydrate", "cholesterol", "due-date", "fat-intake", "heart-rate-zone", "lean-body-mass", "max-heart-rate", "met-calculator", "ovulation", "pregnancy-weight-gain", "protein-intake", "sleep-calculator", "sodium-intake", "target-heart-rate", "tdee", "waist-to-height", "waist-to-hip", "one-rep-max", "vo2-max", "pace"]):
         return "health"
-    if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72", "amortization", "apr-apy", "break-even", "capital-gains", "cd-calculator", "credit-card", "debt-to-income", "down-payment", "emergency-fund", "inflation", "net-salary", "net-worth", "sales-tax", "savings", "markup"]):
+    if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72", "amortization", "apr-apy", "break-even", "capital-gains", "cd-calculator", "credit-card", "debt-to-income", "down-payment", "emergency-fund", "inflation", "net-salary", "net-worth", "sales-tax", "savings", "markup", "smoking-cost", "retirement"]):
         return "finance"
     if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity", "power-factor", "parallel-resistor", "battery-life", "555-timer", "led-resistor", "capacitive-reactance", "inductive-reactance", "op-amp-gain", "three-phase-power", "adc-dac", "antenna-length", "battery-short-circuit", "bjt-transistor", "breaker-size", "decibel", "earth-pit", "electrical-power", "microstrip", "busbar", "fault-current", "filter", "generator", "heatsink", "copper-cable", "earthing", "kw-to-cable", "single-phase", "three-phase", "wire-gauge", "voltage-divider", "parallel-resistance", "capacitor-energy", "resonant-frequency", "rc-time-constant", "rl-time-constant", "zener-diode", "lm317", "pcb-trace-width", "lightning-protection", "lumen-lux", "lumen-method", "motor-parameters", "buck-boost", "3-phase-power", "motor-starter", "nec-load", "neutral-conductor"]):
         return "engineering"
@@ -453,11 +461,11 @@ def determine_tool_cat(filename):
         return "solar"
     if any(k in f for k in ["cooling", "pipe", "torque", "pump-head", "gear-ratio", "bolt-torque", "bearing-life", "belt-length", "conveyor-belt", "cutting-speed", "feed-rate", "flywheel", "gear-module", "heat-exchanger", "hvac", "hydraulic-cylinder", "hydraulic-pump", "power-to-torque", "psychrometric", "pulley", "pump-flow", "reynolds-number", "shaft-diameter", "spring-rate", "thermal-expansion", "torque-converter", "torque-to-hp", "projectile", "factor-of-safety", "lead-screw", "press-fit"]):
         return "mechanical"
-    if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt", "rainwater-downpipe", "block", "drywall", "excavation", "flooring", "footing", "gravel", "paint", "roof-pitch", "slab", "slope", "soil", "tile", "stair", "stud-wall", "plaster"]):
+    if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt", "rainwater-downpipe", "block", "drywall", "excavation", "flooring", "footing", "gravel", "paint", "roof-pitch", "slab", "slope", "soil", "tile", "stair", "stud-wall", "plaster", "water-demand", "wallpaper"]):
         return "civil"
     if any(k in f for k in ["chemical", "chlorine", "alum", "boyle", "calcium-hypochlorite", "caustic", "charles", "chlorine-dioxide", "coagulant", "combined-gas", "dilution", "gay-lussac", "half-life", "henderson", "hydrazine", "ideal-gas", "lime-dosing", "molar-mass", "molarity", "ph-calculator", "ph-poh", "phosphate", "polymer", "ro-antiscalant", "sulphuric", "titration", "mass-percent", "molality", "moles-calculator", "normality", "percent-composition", "percent-yield", "theoretical-yield", "ppm-calculator"]):
         return "chemical"
-    if any(k in f for k in ["acceleration", "angular-velocity", "centripetal-force", "doppler-effect", "escape-velocity", "free-fall", "friction", "gravitational-force", "hookes-law", "kinetic-energy", "photon-energy", "simple-pendulum", "snells-law", "specific-heat", "density-calculator", "pressure-calculator", "speed-calculator", "force-calculator", "momentum-calculator", "impulse-calculator", "potential-energy", "work-power", "stress-strain", "terminal-velocity", "specific-gravity"]):
+    if any(k in f for k in ["acceleration", "angular-velocity", "centripetal-force", "doppler-effect", "escape-velocity", "free-fall", "friction", "gravitational-force", "hookes-law", "kinetic-energy", "photon-energy", "simple-pendulum", "snells-law", "specific-heat", "density-calculator", "pressure-calculator", "speed-calculator", "force-calculator", "momentum-calculator", "impulse-calculator", "potential-energy", "work-power", "stress-strain", "terminal-velocity", "specific-gravity", "wavelength"]):
         return "physics"
     if any(k in f for k in ["sprinkler", "smoke", "fire-alarm", "hydrant", "fire-pump", "nac", "strobe"]):
         return "fire"

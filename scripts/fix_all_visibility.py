@@ -44,6 +44,9 @@ CAT_MAP = {
             ("waist-to-height-calculator.html", "Waist-to-Height Ratio (WHtR)", "📏", "Central adiposity screening, Ashwell boundary & cardiometabolic risk", "WHtR = Waist Circumference ÷ Stature Height | Optimal < 0.50"),
             ("waist-to-height-ratio-calculator.html", "Waist-to-Height Ratio Sizer", "📐", "Bariatric WHtR visceral risk evaluation & boundary classification", "WHtR = Waist / Height | Boundary: <0.4 Take Care, 0.5 Ok, >0.6 High"),
             ("waist-to-hip-ratio-calculator.html", "Waist-to-Hip Ratio (WHR Risk)", "⚖️", "WHO visceral adiposity ratio, android vs gynoid fat distribution", "WHR = Waist (cm) ÷ Hip (cm) | WHO High Risk: M > 0.90, F > 0.85"),
+            ("one-rep-max-calculator.html", "One Rep Max (1RM)", "🏋️", "Brzycki, Epley & Lombardi 1RM strength formulas", "1RM = w·(1 + r/30) | Brzycki w·36/(37-r)"),
+            ("vo2-max-calculator.html", "VO2 Max Calculator", "🫀", "Cooper 12-min, Rockport walk & HR ratio aerobic capacity", "VO2 = (d - 504.9)/44.73 | 15.3·(HRmax/HRrest)"),
+            ("pace-calculator.html", "Running Pace & Race Splits", "⏱️", "min/mi, min/km, 400m track laps & Riegel race predictor", "P = T/D | T2 = T1·(D2/D1)^1.06 | 400m splits"),
         ]
     },
     "finance.html": {
@@ -75,6 +78,8 @@ CAT_MAP = {
             ("savings-calculator.html", "Compound Savings Growth", "📈", "Initial deposit + monthly contributions compounder", "FV = P(1+r/n)ⁿᵗ + PMT·[((1+r/n)ⁿᵗ - 1)/(r/n)]"),
             ("savings-goal-calculator.html", "Savings Goal Target Sizer", "🎯", "Required monthly contribution to hit wealth target", "PMT = [FV - P(1+r/n)ⁿᵗ] / [((1+r/n)ⁿᵗ - 1)/(r/n)]"),
             ("markup-calculator.html", "Markup & Margin Calculator", "🏷️", "Retail selling price, profit multiplier, markup & margin %", "P = C/(1-G) | M = G/(1-G) | Keystone 2.0x"),
+            ("smoking-cost-calculator.html", "Smoking Cost & Opportunity", "🚬", "Cash outlays, S&P 500 compound loss & 11-min life loss", "FV = PMT·[((1+r)ⁿ - 1)/r] | 11 mins lost/cigarette"),
+            ("retirement-calculator.html", "Retirement & FIRE Planner", "🏖️", "Trinity study 4% rule, nest egg sizing & inflation", "Nest Egg = (Spend - Pension)/SWR | FIRE = 25×Expenses"),
         ]
     },
     "math.html": {
@@ -280,6 +285,8 @@ CAT_MAP = {
             ("stair-calculator.html", "Stair Calculator (IRC & IBC)", "🪜", "Riser height, tread run, stringer length & Blondel rule", "2R + T = 24-25\" | R ≤ 7.75\" (IRC) / 7.0\" (IBC) | Headroom ≥ 80\""),
             ("stud-wall-calculator.html", "Stud Wall Framing Estimator", "🪵", "Wood & steel wall studs 16\"/24\" OC, plates, corners & drywall", "N = ⌈L·12/OC⌉ + 1 + backing + openings | 15% waste"),
             ("plaster-calculator.html", "Plaster Material Estimator", "🧱", "Cement bags (50kg), sand volume, 1.33 dry bulking & waste", "V_dry = V_wet × 1.33 × 1.20 | 1:3, 1:4, 1:6 mix ratios"),
+            ("water-demand-fixture-units-calculator.html", "Water Demand (WSFU)", "🚰", "Hunter's curve peak GPM, meter & pipe sizing per IPC/UPC", "Hunter's Binomial Curve | Max velocity < 8.0 ft/s"),
+            ("wallpaper-calculator.html", "Wallpaper Roll Calculator", "🎨", "Roll counts, pattern repeat, straight & drop match waste", "Strips = ⌈Perimeter/Width⌉ | Usable drops per roll"),
         ]
     },
     "chemical.html": {
@@ -350,6 +357,7 @@ CAT_MAP = {
             ("stress-strain-calculator.html", "Stress and Strain (Hooke's Elasticity)", "🏗️", "Tensile stress σ = F/A, strain ε = ΔL/L & Young's modulus E", "σ = F/A | ε = ΔL/L₀ | E = σ/ε | SF = σ_yield / σ_allow"),
             ("terminal-velocity-calculator.html", "Terminal Velocity (Aerodynamic Drag)", "🪂", "Free-fall terminal velocity, drag force & high-altitude dynamics", "v_t = √((2mg)/(ρ·A·C_d)) | F_d = ½ρ·v²·C_d·A"),
             ("specific-gravity-calculator.html", "Specific Gravity & Relative Density", "⚖️", "Specific gravity SG = ρ/ρ_ref, °API, Baumé, Brix & buoyancy", "SG = ρ/ρ_ref | °API = 141.5/SG - 131.5 | f_sub = SG_obj/SG_fl"),
+            ("wavelength-calculator.html", "Wavelength (λ = v/f)", "📻", "EM radio, acoustic sound, λ/4 antennas & velocity factor", "λ = v/f = c·VF/f | β = 2π/λ | E = hf"),
         ]
     },
     "fire-safety.html": {

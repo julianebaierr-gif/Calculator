@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pace Calculator | Running Pace, Split Times & Race Finish Predictor</title>
+    <meta name="description" content="Calculate running pace in minutes per mile and minutes per kilometer, track lap splits (400m), speed (mph/kph), and race finish times for 5K, 10K, half marathon, and marathon.">
+    <link rel="canonical" href="https://calchub.com/pace-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Pace Calculator",
+      "url": "https://calchub.com/pace-calculator.html",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "All",
+      "description": "Calculate running pace, kilometer and mile splits, track lap intervals, and marathon finish times with Peter Riegel race equivalency models.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the difference between running speed and running pace?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Speed measures distance traversed per unit of time (such as miles per hour or kilometers per hour). Running pace is the mathematical reciprocal of speed, representing the time required to cover a fixed unit of distance (such as minutes per mile or minutes per kilometer). Distance runners use pace because it enables direct mental addition for split planning."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Pete Riegel's race time predictor formula work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Engineered by Pete Riegel in 1977 and published in Runner's World, the endurance fatigue equation T2 = T1 * (D2 / D1)^1.06 projects finish times across different race distances. The fatigue exponent of 1.06 accounts for the natural exponential decline in sustainable aerobic pace as race distance increases."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is a negative split strategy superior in marathon racing?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A negative split means running the second half of a race faster than the first. Biomechanically and biochemically, starting conservatively preserves limited intramuscular glycogen stores, suppresses early lactate and hydrogen ion accumulation, prevents core temperature overheating, and leverages peak neuromuscular recruitment during the final miles."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is a 400-meter track lap split calculated from mile pace?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Because a standard running track oval is 400 meters (0.248548 miles), 1 mile is approximately 4.023 laps. To find lap split time from mile pace: Lap Time (seconds) = (Mile Pace in seconds) * (400 / 1609.344) = Mile Pace in seconds * 0.24855."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="converter.html">Converters</a>
+                <a href="engineering.html">Engineering</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="health.html">Health & Fitness</a> &gt; <span>Pace Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Pace Calculator</h1>
+                        <p class="calc-desc">Calculate running pace (min/mi and min/km), track split times, speed in mph/kph, and race finish times across 5K, 10K, Half Marathon, and Full Marathon distances.</p>
+                    </div>
+                    <div class="calculator-form">
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="pace_preset">Standard Race Distance:</label>
+            <select id="pace_preset">
+                <option value="custom">Custom Distance...</option>
+                <option value="1500">1,500 Meters</option>
+                <option value="1609.34">1 Mile (1,609 m)</option>
+                <option value="5000" selected>5K (5.0 km / 3.107 mi)</option>
+                <option value="10000">10K (10.0 km / 6.214 mi)</option>
+                <option value="16093.4">10 Miles (16.09 km)</option>
+                <option value="21097.5">Half Marathon (13.109 mi / 21.097 km)</option>
+                <option value="42195">Marathon (26.219 mi / 42.195 km)</option>
+                <option value="50000">50K Ultra (31.068 mi)</option>
+            </select>
+        </div>
+        <div class="calc-field">
+            <label for="pace_dist_val">Distance Value:</label>
+            <input type="number" id="pace_dist_val" value="5" step="0.01" min="0.01">
+        </div>
+        <div class="calc-field">
+            <label for="pace_dist_unit">Distance Unit:</label>
+            <select id="pace_dist_unit">
+                <option value="km" selected>Kilometers (km)</option>
+                <option value="mi">Miles (mi)</option>
+                <option value="m">Meters (m)</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="pace_hours">Time - Hours:</label>
+            <input type="number" id="pace_hours" value="0" step="1" min="0" max="99">
+        </div>
+        <div class="calc-field">
+            <label for="pace_mins">Minutes:</label>
+            <input type="number" id="pace_mins" value="24" step="1" min="0" max="59">
+        </div>
+        <div class="calc-field">
+            <label for="pace_secs">Seconds:</label>
+            <input type="number" id="pace_secs" value="30" step="1" min="0" max="59">
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary" id="btn_calc_pace" style="width:100%; margin-top:1rem;">Calculate Pace &amp; Race Splits</button>
+
+    <div class="calc-results" id="pace_results" style="margin-top:1.5rem;">
+        <h3>Pace &amp; Velocity Performance Breakdown</h3>
+        <div class="results-grid">
+            <div class="result-item">
+                <span class="result-label">Mile Pace (min/mi):</span>
+                <span class="result-value" id="res_pace_mi">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Kilometer Pace (min/km):</span>
+                <span class="result-value" id="res_pace_km">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">400m Track Lap Split:</span>
+                <span class="result-value" id="res_pace_lap">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Running Speed (mph):</span>
+                <span class="result-value" id="res_pace_mph">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Running Speed (km/h):</span>
+                <span class="result-value" id="res_pace_kph">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Total Elapsed Time:</span>
+                <span class="result-value" id="res_pace_time">--</span>
+            </div>
+        </div>
+
+        <div style="margin-top:1.5rem; overflow-x:auto;">
+            <h4 style="margin-bottom:0.75rem; color:#0F172A;">Riegel Race Equivalency Predictions (Based on Current Pace)</h4>
+            <table class="data-table" style="margin:0;">
+                <thead>
+                    <tr>
+                        <th>Event Distance</th>
+                        <th>Distance (km / mi)</th>
+                        <th>Predicted Time</th>
+                        <th>Projected Pace</th>
+                    </tr>
+                </thead>
+                <tbody id="pace_riegel_table">
+                    <!-- Populated via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const presetSelect = document.getElementById('pace_preset');
+    const distInput = document.getElementById('pace_dist_val');
+    const unitSelect = document.getElementById('pace_dist_unit');
+
+    presetSelect.addEventListener('change', function() {
+        const v = presetSelect.value;
+        if (v === '5000') { distInput.value = 5.0; unitSelect.value = 'km'; }
+        else if (v === '10000') { distInput.value = 10.0; unitSelect.value = 'km'; }
+        else if (v === '1500') { distInput.value = 1500; unitSelect.value = 'm'; }
+        else if (v === '1609.34') { distInput.value = 1.0; unitSelect.value = 'mi'; }
+        else if (v === '16093.4') { distInput.value = 10.0; unitSelect.value = 'mi'; }
+        else if (v === '21097.5') { distInput.value = 21.0975; unitSelect.value = 'km'; }
+        else if (v === '42195') { distInput.value = 42.195; unitSelect.value = 'km'; }
+        else if (v === '50000') { distInput.value = 50.0; unitSelect.value = 'km'; }
+        calculatePace();
+    });
+
+    function fmtTime(totalSec) {
+        const h = Math.floor(totalSec / 3600);
+        const m = Math.floor((totalSec % 3600) / 60);
+        const s = Math.round(totalSec % 60);
+        if (h > 0) {
+            return h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+        }
+        return m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    function calculatePace() {
+        const dVal = parseFloat(distInput.value) || 5;
+        const u = unitSelect.value;
+        const h = parseFloat(document.getElementById('pace_hours').value) || 0;
+        const m = parseFloat(document.getElementById('pace_mins').value) || 0;
+        const s = parseFloat(document.getElementById('pace_secs').value) || 0;
+
+        const totalSec = (h * 3600) + (m * 60) + s;
+        if (totalSec <= 0) return;
+
+        // Convert distance to meters
+        let dMeters = dVal;
+        if (u === 'km') dMeters = dVal * 1000;
+        else if (u === 'mi') dMeters = dVal * 1609.344;
+
+        const dMiles = dMeters / 1609.344;
+        const dKm = dMeters / 1000;
+
+        // Pace per mile (seconds per mile)
+        const secPerMile = totalSec / dMiles;
+        // Pace per km (seconds per km)
+        const secPerKm = totalSec / dKm;
+        // 400m track lap split
+        const secPer400m = totalSec / (dMeters / 400);
+
+        // Speed in mph and km/h
+        const mph = (dMiles / (totalSec / 3600));
+        const kph = (dKm / (totalSec / 3600));
+
+        document.getElementById('res_pace_mi').textContent = fmtTime(secPerMile) + ' /mi';
+        document.getElementById('res_pace_km').textContent = fmtTime(secPerKm) + ' /km';
+        document.getElementById('res_pace_lap').textContent = fmtTime(secPer400m) + ' (400m)';
+        document.getElementById('res_pace_mph').textContent = mph.toFixed(2) + ' mph';
+        document.getElementById('res_pace_kph').textContent = kph.toFixed(2) + ' km/h';
+        document.getElementById('res_pace_time').textContent = fmtTime(totalSec);
+
+        // Pete Riegel equivalency table: T2 = T1 * (D2 / D1)^1.06
+        const riegelDistances = [
+            {name: "1 Mile", m: 1609.344, label: "1.0 mi (1.61 km)"},
+            {name: "5K", m: 5000, label: "5.0 km (3.11 mi)"},
+            {name: "10K", m: 10000, label: "10.0 km (6.21 mi)"},
+            {name: "Half Marathon", m: 21097.5, label: "21.1 km (13.11 mi)"},
+            {name: "Marathon", m: 42195, label: "42.2 km (26.22 mi)"}
+        ];
+
+        const tbody = document.getElementById('pace_riegel_table');
+        tbody.innerHTML = '';
+        riegelDistances.forEach(item => {
+            const predSec = totalSec * Math.pow(item.m / dMeters, 1.06);
+            const predMi = item.m / 1609.344;
+            const predPaceMi = predSec / predMi;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><strong>${item.name}</strong></td><td>${item.label}</td><td>${fmtTime(predSec)}</td><td>${fmtTime(predPaceMi)} /mi</td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    document.getElementById('btn_calc_pace').addEventListener('click', calculatePace);
+    distInput.addEventListener('input', calculatePace);
+    unitSelect.addEventListener('change', calculatePace);
+    document.getElementById('pace_hours').addEventListener('input', calculatePace);
+    document.getElementById('pace_mins').addEventListener('input', calculatePace);
+    document.getElementById('pace_secs').addEventListener('input', calculatePace);
+    calculatePace();
+});
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>1. Kinematic Principles of Running Velocity and Pacing</h2>
+<p>In endurance sports physiology, running velocity can be quantified either through scalar speed (distance covered per unit time, such as miles per hour or kilometers per hour) or through <strong>running pace</strong> (the elapsed time required to traverse a standard unit of distance, expressed as minutes and seconds per mile or kilometer). Distance athletes universally plan training and race pacing using minutes per mile or kilometer because pace enables linear additive calculation of split times and target finish milestones.</p>
+
+<p>Mathematically, running pace \(P\) is the inverse of velocity \(v\):</p>
+
+$$P_{mile} = rac{T}{D_{miles}} \quad \left[rac{	ext{minutes}}{	ext{mile}}
+ight]$$
+
+$$P_{km} = rac{T}{D_{km}} \quad \left[rac{	ext{minutes}}{	ext{km}}
+ight]$$
+
+<p>The conversion between mile pace and kilometer pace is governed by the international statutory definition of the mile (\(1	ext{ statute mile} = 1{,}609.344	ext{ meters} = 1.609344	ext{ km}\)):</p>
+
+$$P_{km} = rac{P_{mile}}{1.609344} pprox P_{mile} 	imes 0.621371$$
+
+$$P_{mile} = P_{km} 	imes 1.609344$$
+
+<h2>2. Pete Riegel's Fatigue Exponent &amp; Race Time Prediction</h2>
+<p>Projecting race performance across varying distances cannot be accomplished by simple linear extrapolation, because human athletes experience exponential neuromuscular and metabolic fatigue as duration increases. In 1977, American research engineer Pete Riegel published a seminal empirical model in <em>Runner's World</em> and <em>Science</em> relating race time \(T_1\) at distance \(D_1\) to predicted race time \(T_2\) at a novel distance \(D_2\):</p>
+
+$$T_2 = T_1 	imes \left(rac{D_2}{D_1}
+ight)^{1.06}$$
+
+<p>The empirical exponent \(1.06\) captures the physiological decay in sustainable aerobic power: for every doubling of race distance, an endurance runner's average speed declines by approximately <strong>\(5.7\%\)</strong> due to muscle glycogen depletion, cardiac drift, tendon compliance degradation, and central motor drive inhibition.</p>
+
+<h2>3. Running Pace Benchmark &amp; Lap Split Conversion Table</h2>
+<p>The following sports science data table details running paces from elite international tiers down to recreational recreational fitness benchmarks, including exact 400-meter track lap split times and marathon finish times:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Performance Tier</th>
+            <th>Mile Pace (min/mi)</th>
+            <th>Km Pace (min/km)</th>
+            <th>Speed (mph)</th>
+            <th>400m Track Lap</th>
+            <th>5K Finish Time</th>
+            <th>Marathon Finish Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>World Class Elite Men</strong></td>
+            <td>4:35 /mi</td>
+            <td>2:51 /km</td>
+            <td>13.09 mph</td>
+            <td>68.3 sec</td>
+            <td>14:15</td>
+            <td>2:00:10</td>
+        </tr>
+        <tr>
+            <td><strong>Elite National Women</strong></td>
+            <td>5:10 /mi</td>
+            <td>3:13 /km</td>
+            <td>11.61 mph</td>
+            <td>77.0 sec</td>
+            <td>16:04</td>
+            <td>2:15:30</td>
+        </tr>
+        <tr>
+            <td><strong>Boston Qualifying (Sub-3)</strong></td>
+            <td>6:50 /mi</td>
+            <td>4:15 /km</td>
+            <td>8.78 mph</td>
+            <td>101.9 sec</td>
+            <td>21:14</td>
+            <td>2:59:15</td>
+        </tr>
+        <tr>
+            <td><strong>Advanced Competitive</strong></td>
+            <td>7:30 /mi</td>
+            <td>4:40 /km</td>
+            <td>8.00 mph</td>
+            <td>111.8 sec</td>
+            <td>23:18</td>
+            <td>3:16:45</td>
+        </tr>
+        <tr>
+            <td><strong>Intermediate Sub-4</strong></td>
+            <td>9:00 /mi</td>
+            <td>5:36 /km</td>
+            <td>6.67 mph</td>
+            <td>134.2 sec</td>
+            <td>27:58</td>
+            <td>3:56:05</td>
+        </tr>
+        <tr>
+            <td><strong>Recreational Fitness</strong></td>
+            <td>10:30 /mi</td>
+            <td>6:31 /km</td>
+            <td>5.71 mph</td>
+            <td>156.6 sec</td>
+            <td>32:38</td>
+            <td>4:35:20</td>
+        </tr>
+        <tr>
+            <td><strong>Walk-Run / Beginner</strong></td>
+            <td>12:30 /mi</td>
+            <td>7:46 /km</td>
+            <td>4.80 mph</td>
+            <td>186.4 sec</td>
+            <td>38:50</td>
+            <td>5:27:50</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>4. Split Pacing Strategies: Even, Negative, and Positive Splits</h2>
+<p>Execution strategy during road racing dramatically impacts physiological efficiency:</p>
+<ul>
+    <li><strong>Negative Splits (Optimal Strategy):</strong> Running the second half of the race slightly faster (\(1\%	ext{ to } 3\%\)) than the first half. Almost all world records from 1500m to the marathon have been set using negative splits. Starting at an aerobically comfortable pace allows body temperature to rise smoothly, preserves high-octane liver and muscle glycogen, minimizes toxic lactic acid accumulation, and prevents early cardiac drift.</li>
+    <li><strong>Even Splits (High Efficiency):</strong> Maintaining an identical pace per mile from the start gun to the finish line. Minimizes energy fluctuations, optimizes running economy (\(	ext{VO}_2	ext{ cost of running}\)), and eliminates pacing surges that prematurely exhaust Type IIa motor units.</li>
+    <li><strong>Positive Splits (The "Fly and Die" Mistake):</strong> Running the first half excessively fast and suffering dramatic deceleration during the final miles. Biomechanically, aggressive early pacing depletes glycogen, triggers premature reliance on slow lipid beta-oxidation, causes severe dehydration, and produces "hitting the marathon wall" around mile 20 (32 km).</li>
+</ul>
+
+<h2>5. Worked Athletic Case Study: Sizing a Sub-3:30 Marathon Pacing Strategy</h2>
+<div class="worked-example-card">
+    <h3>Pacing Strategy Specification: Breaking 3 Hours 30 Minutes</h3>
+    <p>A runner aims to complete a marathon (\(26.21875	ext{ miles}\) or \(42{,}195	ext{ meters}\)) in under <strong>3 hours 30 minutes (210 minutes total)</strong>. The coach designs a conservative negative split race execution: the first half (\(13.109	ext{ miles}\)) is run at \(105	ext{ minutes } 30	ext{ seconds}\), and the second half is run in \(104	ext{ minutes } 30	ext{ seconds}\).</p>
+
+    <div class="step-solution">
+        <h4>Step 1: Compute Overall Average Pace Target</h4>
+        $$T_{total} = 210	ext{ minutes} = 12{,}600	ext{ seconds}$$
+        $$P_{avg,mile} = rac{12{,}600	ext{ sec}}{26.21875	ext{ miles}} pprox 480.57	ext{ sec/mile} = 8	ext{ minutes } 0.57	ext{ seconds/mile (8:01 /mi)}$$
+        $$P_{avg,km} = rac{12{,}600	ext{ sec}}{42.195	ext{ km}} pprox 298.61	ext{ sec/km} = 4	ext{ minutes } 58.6	ext{ seconds/km (4:59 /km)}$$
+
+        <h4>Step 2: Calculate First Half Split (First 13.11 Miles)</h4>
+        $$T_{half1} = 105.5	ext{ min} = 6{,}330	ext{ seconds}$$
+        $$P_{half1,mile} = rac{6{,}330	ext{ sec}}{13.109375	ext{ mi}} pprox 482.86	ext{ sec/mi} = 8	ext{ min } 03	ext{ sec/mile}$$
+        <p>The runner maintains a relaxed, controlled <strong>8:03 /mi pace</strong> through the half marathon mark (\(1	ext{h } 45	ext{m } 30	ext{s}\)), saving neuromuscular capacity.</p>
+
+        <h4>Step 3: Calculate Second Half Split (Final 13.11 Miles)</h4>
+        $$T_{half2} = 104.5	ext{ min} = 6{,}270	ext{ seconds}$$
+        $$P_{half2,mile} = rac{6{,}270	ext{ sec}}{13.109375	ext{ mi}} pprox 478.28	ext{ sec/mi} = 7	ext{ min } 58	ext{ sec/mile}$$
+        <p>Over the final 10 miles, the runner accelerates slightly to <strong>7:58 /mi</strong>, passing fatiguing runners who positive-split, crossing the finish line in exactly <strong>3:29:59</strong>.</p>
+    </div>
+</div>
+
+<h2>6. Frequently Asked Questions</h2>
+<div class="faq-accordion">
+    <div class="faq-item">
+        <h3>What is the difference between running speed and running pace?</h3>
+        <p>Speed measures distance traversed per unit of time (such as miles per hour or kilometers per hour). Running pace is the mathematical reciprocal of speed, representing the time required to cover a fixed unit of distance (such as minutes per mile or minutes per kilometer). Distance runners use pace because it enables direct mental addition for split planning.</p>
+    </div>
+    <div class="faq-item">
+        <h3>How does Pete Riegel's race time predictor formula work?</h3>
+        <p>Engineered by Pete Riegel in 1977 and published in Runner's World, the endurance fatigue equation \(T_2 = T_1 	imes (D_2 / D_1)^{1.06}\) projects finish times across different race distances. The fatigue exponent of 1.06 accounts for the natural exponential decline in sustainable aerobic pace as race distance increases.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Why is a negative split strategy superior in marathon racing?</h3>
+        <p>A negative split means running the second half of a race faster than the first. Biomechanically and biochemically, starting conservatively preserves limited intramuscular glycogen stores, suppresses early lactate and hydrogen ion accumulation, prevents core temperature overheating, and leverages peak neuromuscular recruitment during the final miles.</p>
+    </div>
+    <div class="faq-item">
+        <h3>How is a 400-meter track lap split calculated from mile pace?</h3>
+        <p>Because a standard running track oval is 400 meters (0.248548 miles), 1 mile is approximately 4.023 laps. To find lap split time from mile pace: \(	ext{Lap Time (sec)} = 	ext{Mile Pace in sec} 	imes (400 / 1609.344) = 	ext{Mile Pace in sec} 	imes 0.24855\).</p>
+    </div>
+</div>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚖️</span>
+            <h3 class="widget-title">Related Health & Fitness</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bmr-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMR Calculator</a></li>
+            <li><a href="macro-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Macro Split Calculator</a></li>
+            <li><a href="calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Calculator (TDEE)</a></li>
+            <li><a href="bmi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Daily Water Intake</a></li>
+            <li><a href="a1c-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> HbA1c to eAG Glucose Sizer</a></li>
+            <li><a href="bac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Blood Alcohol (BAC) Clearance</a></li>
+            <li><a href="body-surface-area-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Surface Area (Mosteller)</a></li>
+            <li><a href="bsa-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Oncology BSA & Calvert Dosing</a></li>
+            <li><a href="calorie-deficit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Deficit & Fat Loss Planner</a></li>
+            <li><a href="calories-burned-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exercise Calories Burned (METs)</a></li>
+            <li><a href="carbohydrate-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Carbohydrate Intake & Glycogen</a></li>
+            <li><a href="cholesterol-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cholesterol Ratio & Castelli Risk</a></li>
+            <li><a href="due-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Due Date & Gestation</a></li>
+            <li><a href="fat-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Dietary Fat Intake (Grams/Day)</a></li>
+            <li><a href="heart-rate-zone-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heart Rate Zone (Karvonen HRR)</a></li>
+            <li><a href="lean-body-mass-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lean Body Mass (Boer & James)</a></li>
+            <li><a href="max-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Max Heart Rate (Tanaka & Gulati)</a></li>
+            <li><a href="met-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> METs & Activity Caloric Burn</a></li>
+            <li><a href="ovulation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ovulation & Fertile Window</a></li>
+            <li><a href="pregnancy-weight-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Weight Gain (IOM/ACOG)</a></li>
+            <li><a href="protein-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Protein Intake (ISSN/DRI Optimum)</a></li>
+            <li><a href="sleep-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sleep Cycle (90-Min REM Ultradian)</a></li>
+            <li><a href="sodium-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sodium to Salt & AHA Dietary Cap</a></li>
+            <li><a href="target-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Target Heart Rate (Karvonen HRR)</a></li>
+            <li><a href="tdee-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> TDEE & Calorie Burn (Total Daily)</a></li>
+            <li><a href="waist-to-height-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio (WHtR)</a></li>
+            <li><a href="waist-to-height-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio Sizer</a></li>
+            <li><a href="waist-to-hip-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Hip Ratio (WHR Risk)</a></li>
+            <li><a href="one-rep-max-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> One Rep Max (1RM)</a></li>
+            <li><a href="vo2-max-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> VO2 Max Calculator</a></li>
+            <li><a href="pace-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Running Pace & Race Splits</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="health.html" class="sidebar-category-link">View All Health & Fitness Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub provides free, high-precision engineering calculators, unit converters, and analytical tools designed for practicing engineers, plumbers, architects, and endurance athletes worldwide.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Engineering &amp; Health Categories</h4>
+                    <ul>
+                        <li><a href="civil.html">Civil &amp; Plumbing</a></li>
+                        <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+                        <li><a href="health.html">Cardiorespiratory &amp; Fitness</a></li>
+                        <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Popular Calculators</h4>
+                    <ul>
+                        <li><a href="pace-calculator.html">Running Pace Calculator</a></li>
+                        <li><a href="water-demand-fixture-units-calculator.html">Water Demand (WSFU)</a></li>
+                        <li><a href="pipe-sizing-calculator.html">Pipe Sizing &amp; Flow</a></li>
+                        <li><a href="vo2-max-calculator.html">VO2 Max Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                        <li><a href="math.html">Math Tools</a></li>
+                        <li><a href="finance.html">Finance Tools</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed analytical calculation models.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
