@@ -564,9 +564,6 @@ def build_sidebar_html(current_file, cat_key):
               <span class="widget-icon">{cat_data["icon"]}</span>
               <h3 class="widget-title">Related {cat_data["name"]}</h3>
             </div>
-            <button type="button" class="sidebar-shuffle-btn" onclick="rotateSidebarTools(this)" title="Shuffle recommendations" aria-label="Show 5 different tools">
-              <span class="shuffle-icon">🔀</span> <span class="shuffle-text">Shuffle</span>
-            </button>
           </div>
           <p class="sidebar-widget-subtitle">Top 5 precision tools in this discipline:</p>
           <ul class="sidebar-tools-list" id="sidebarToolsList">
@@ -582,8 +579,8 @@ def build_sidebar_html(current_file, cat_key):
       </aside>
       <script>
         if (!window.rotateSidebarTools) {{
-          window.rotateSidebarTools = function(btn) {{
-            const widget = btn ? btn.closest('.sidebar-widget') : document.querySelector('.sidebar-widget');
+          window.rotateSidebarTools = function() {{
+            const widget = document.querySelector('.sidebar-widget');
             if (!widget) return;
             const poolScript = widget.querySelector('.sidebar-pool-data');
             const list = widget.querySelector('.sidebar-tools-list');
@@ -610,10 +607,6 @@ def build_sidebar_html(current_file, cat_key):
                   </a>
                 </li>
               `).join('');
-              if (btn) {{
-                btn.classList.add('shuffling');
-                setTimeout(() => btn.classList.remove('shuffling'), 400);
-              }}
             }} catch (err) {{
               console.error('Sidebar rotation error:', err);
             }}
