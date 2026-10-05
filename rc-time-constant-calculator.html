@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RC Time Constant Calculator - Tau, Cutoff Frequency & Transient Response</title>
+    <meta name="description" content="Calculate RC circuit time constant (tau = R*C), low-pass filter cutoff frequency (fc = 1/(2*pi*RC)), 10%-90% rise time, and charging/discharging voltage at time t.">
+    <link rel="canonical" href="https://calchub.com/rc-time-constant-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "RC Time Constant Calculator",
+      "url": "https://calchub.com/rc-time-constant-calculator.html",
+      "description": "Calculates RC time constant tau, low-pass filter cutoff frequency, rise time, and instantaneous transient charging and discharging voltages.",
+      "applicationCategory": "EngineeringApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the physical meaning of one time constant (1 tau) in an RC circuit?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "One time constant tau = R * C represents the time required for a charging capacitor to reach 1 - 1/e = 63.21% of its ultimate steady-state supply voltage, or for a discharging capacitor to decay to 1/e = 36.79% of its initial charge."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many time constants does it take to fully charge a capacitor?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Theoretically, exponential curves never reach 100%. In practical engineering, a capacitor is considered fully charged at 5 time constants (5 tau), at which point it has reached 99.33% of the supply voltage."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is the RC time constant related to cutoff frequency (fc)?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The -3 dB cutoff frequency of a first-order RC low-pass or high-pass filter is inversely proportional to tau: f_c = 1 / (2 * pi * R * C) = 1 / (2 * pi * tau). At f_c, the output voltage drops to 70.7% (-3 dB) of the input, and the phase shift is 45 degrees."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the relationship between rise time (10% to 90%) and time constant tau?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The 10% to 90% rise time t_r is given by t_r = ln(9) * tau = 2.197 * tau approx 2.2 * tau. In frequency domain terms, t_r approx 0.35 / f_c."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="converter.html">Converters</a>
+                <a href="engineering.html">Engineering</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="engineering.html">Engineering &amp; Electronics</a> &gt; <span>RC Time Constant Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>RC Time Constant Calculator</h1>
+                        <p class="calc-desc">Compute circuit time constant (&tau; = RC), 3dB cutoff frequency, 10% to 90% rise time, and transient capacitor voltage curves.</p>
+                    </div>
+                    
+<div class="calc-grid">
+    <div class="calc-input-group">
+        <label for="rc-r">Resistance ($R$):</label>
+        <div class="input-with-select">
+            <input type="number" id="rc-r" value="10" min="0.0001" step="any">
+            <select id="rc-r-unit">
+                <option value="1">&Omega;</option>
+                <option value="1000" selected>k&Omega;</option>
+                <option value="1000000">M&Omega;</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="rc-c">Capacitance ($C$):</label>
+        <div class="input-with-select">
+            <input type="number" id="rc-c" value="100" min="0.000001" step="any">
+            <select id="rc-c-unit">
+                <option value="1e-12">pF</option>
+                <option value="1e-9" selected>nF</option>
+                <option value="1e-6">&mu;F</option>
+                <option value="1e-3">mF</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="rc-vs">Supply Voltage ($V_{\text{source}}$):</label>
+        <div class="input-with-select">
+            <input type="number" id="rc-vs" value="5" min="0.001" step="any">
+            <select id="rc-vs-unit">
+                <option value="0.001">mV</option>
+                <option value="1" selected>V</option>
+                <option value="1000">kV</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="rc-t">Elapsed Time ($t$, optional for $V(t)$):</label>
+        <div class="input-with-select">
+            <input type="number" id="rc-t" value="1" min="0" step="any">
+            <select id="rc-t-unit">
+                <option value="1e-6">&mu;s</option>
+                <option value="1e-3" selected>ms</option>
+                <option value="1">s</option>
+            </select>
+        </div>
+    </div>
+</div>
+<button id="calc-rc-btn" class="calc-btn">Calculate RC Response</button>
+<div class="calc-results-card" id="rc-results">
+    <h3>Transient &amp; Frequency Domain Parameters</h3>
+    <div class="result-row highlight-result">
+        <span class="result-label">Time Constant (&tau; = RC):</span>
+        <span class="result-val" id="res-rc-tau">1.000 ms (0.00100 s)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Cutoff Frequency ($f_c = \frac{1}{2\pi RC}$):</span>
+        <span class="result-val" id="res-rc-fc">159.15 Hz</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">10% &ndash; 90% Rise Time ($t_r \approx 2.2\tau$):</span>
+        <span class="result-val" id="res-rc-tr">2.197 ms</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Full Steady State Time ($5\tau$):</span>
+        <span class="result-val" id="res-rc-5tau">5.000 ms</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Charging Voltage at time $t$ ($V(t)$):</span>
+        <span class="result-val" id="res-rc-vc">3.161 V (63.2% of $V_s$)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Discharging Voltage at time $t$ ($V_{\text{dis}}(t)$):</span>
+        <span class="result-val" id="res-rc-vd">1.839 V (36.8% of $V_s$)</span>
+    </div>
+</div>
+
+                </div>
+                <article class="article-body">
+                    
+<h2>Transient Physics of First-Order RC Circuits: Differential Calculus Foundations</h2>
+<p>A resistor-capacitor (RC) network represents the archetypal first-order linear time-invariant dynamic system in electrical engineering. When an uncharged capacitor is placed in series with a resistor and energized by a DC voltage step source $V_s$, charge cannot redistribute instantaneously because current through the dielectric boundary corresponds to finite electron motion bounded by resistance $R$. The circuit's dynamic evolution is described by Kirchhoff's Voltage Law (KVL):</p>
+$$V_s - v_R(t) - v_C(t) = 0$$
+
+<p>Applying Ohm's law $v_R(t) = i(t) \cdot R$ and the capacitive constitutive differential equation $i(t) = C \frac{dv_C}{dt}$ produces the governing first-order ordinary differential equation (ODE):</p>
+$$R C \frac{dv_C(t)}{dt} + v_C(t) = V_s$$
+
+<p>Rearranging this linear non-homogeneous differential equation into standard separable form:</p>
+$$\frac{dv_C}{V_s - v_C} = \frac{1}{R C} dt$$
+
+<p>Integrating both sides from initial state $t = 0$ (with boundary condition $v_C(0) = 0$) to time $t$:</p>
+$$\int_{0}^{v_C(t)} \frac{dv_C}{V_s - v_C} = \int_{0}^{t} \frac{1}{R C} dt$$
+$$-\ln\left( \frac{V_s - v_C(t)}{V_s} \right) = \frac{t}{R C}$$
+$$\frac{V_s - v_C(t)}{V_s} = e^{-\frac{t}{RC}}$$
+$$v_C(t) = V_s \left( 1 - e^{-\frac{t}{\tau}} \right)$$
+
+<p>Where the Greek letter $\tau$ (tau) represents the fundamental <strong>RC time constant</strong>:</p>
+$$\tau = R \cdot C \quad [\text{Seconds}]$$
+
+<p>Dimensional analysis verifies that resistance in Ohms ($\text{V}/\text{A}$) multiplied by capacitance in Farads ($\text{A}\cdot\text{s}/\text{V}$) yields purely units of time: $[\Omega \cdot \text{F}] = [\text{s}]$.</p>
+
+<h2>Capacitor Discharging Dynamics and Exponential Voltage Decay</h2>
+<p>When a capacitor pre-charged to potential $V_0$ is disconnected from the supply and discharged through resistance $R$, the driving differential equation becomes homogeneous ($V_s = 0$):</p>
+$$R C \frac{dv_C(t)}{dt} + v_C(t) = 0 \implies v_C(t) = V_0 \, e^{-\frac{t}{\tau}}$$
+
+<p>The instantaneous discharge loop current $i(t)$ mirrors this exponential decay:</p>
+$$i(t) = -\frac{v_C(t)}{R} = -\frac{V_0}{R} e^{-\frac{t}{\tau}}$$
+
+<h3>Milestone Percentages Across Time Constant Intervals</h3>
+<p>Because exponential functions approach steady state asymptotically without reaching it in finite mathematical time, engineers utilize standard time constant intervals ($\tau$ milestones) to assess settlement times:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Time Elapsed ($t$)</th>
+            <th>Charging Voltage ($% V_s$)</th>
+            <th>Discharging Voltage ($% V_0$)</th>
+            <th>Remaining Incomplete Margin</th>
+            <th>Engineering State</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>$0.693\tau$ ($t_{1/2}$)</td>
+            <td>$50.00\%$</td>
+            <td>$50.00\%$</td>
+            <td>$50.00\%$</td>
+            <td>Half-charge milestone ($t = \tau \ln 2$)</td>
+        </tr>
+        <tr>
+            <td>$1\tau$</td>
+            <td>$63.21\%$</td>
+            <td>$36.79\%$</td>
+            <td>$36.79\%$ ($1/e$)</td>
+            <td>Formal time constant definition</td>
+        </tr>
+        <tr>
+            <td>$2\tau$</td>
+            <td>$86.47\%$</td>
+            <td>$13.53\%$</td>
+            <td>$13.53\%$</td>
+            <td>Coarse settled signal</td>
+        </tr>
+        <tr>
+            <td>$2.197\tau$ ($t_r$)</td>
+            <td>$90.00\%$ (from $10\%$)</td>
+            <td>$10.00\%$</td>
+            <td>$10.00\%$</td>
+            <td>Standard $10\%\text{--}90\%$ pulse rise time ($t_r$)</td>
+        </tr>
+        <tr>
+            <td>$3\tau$</td>
+            <td>$95.02\%$</td>
+            <td>$4.98\%$</td>
+            <td>$4.98\%$</td>
+            <td>$95\%$ precision instrumentation threshold</td>
+        </tr>
+        <tr>
+            <td>$4\tau$</td>
+            <td>$98.17\%$</td>
+            <td>$1.83\%$</td>
+            <td>$1.83\%$</td>
+            <td>High-accuracy settle</td>
+        </tr>
+        <tr>
+            <td>$5\tau$</td>
+            <td>$99.33\%$</td>
+            <td>$0.67\%$</td>
+            <td>$0.67\%$</td>
+            <td>Universal practical engineering steady state</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>RC Waveshaping Circuits: Integrator vs Differentiator Topologies</h2>
+<p>By altering which terminal component serves as the circuit output, an RC network functions either as an analog integrator or an analog differentiator for periodic pulse and square waveforms:</p>
+<ul>
+    <li><strong>RC Low-Pass Integrator ($V_{\text{out}}$ taken across Capacitor $C$):</strong> When the circuit time constant $\tau \gg T$ (where $T$ is the period of the input signal), the capacitor voltage cannot track the rapid step edges. The current through the resistor is predominantly governed by the input voltage $i(t) \approx v_{\text{in}}(t)/R$. Consequently, $v_{\text{out}}(t) = \frac{1}{C}\int i(t) dt \approx \frac{1}{RC}\int v_{\text{in}}(t) dt$. A square wave input produces a linear triangular ramp output.</li>
+    <li><strong>RC High-Pass Differentiator ($V_{\text{out}}$ taken across Resistor $R$):</strong> When $\tau \ll T$, the capacitor charges almost instantaneously, dropping virtually the entire voltage across $C$. The current is governed by the derivative of input potential $i(t) \approx C \frac{dv_{\text{in}}}{dt}$. The voltage across the resistor is $v_{\text{out}}(t) = R \cdot i(t) \approx RC \frac{dv_{\text{in}}}{dt}$. A square wave input generates sharp alternating positive and negative impulse voltage spikes at every signal transition edge.</li>
+</ul>
+
+<h2>Frequency-Domain Behavior: Cutoff Frequency ($f_c$) and Filter Sizing</h2>
+<p>An RC network functions as a first-order passive filter in the continuous frequency domain. Taking the Laplace transform of the KVL differential equation with zero initial conditions yields the s-domain transfer function $H(s)$:</p>
+$$H(s) = \frac{V_{\text{out}}(s)}{V_{\text{in}}(s)} = \frac{\frac{1}{sC}}{R + \frac{1}{sC}} = \frac{1}{1 + sRC} = \frac{1}{1 + s\tau}$$
+
+<p>Evaluating along the frequency axis $s = j\omega = j 2\pi f$ gives the complex frequency response:</p>
+$$H(j\omega) = \frac{1}{1 + j\omega RC} = \frac{1}{1 + j\omega\tau}$$
+$$|H(j\omega)| = \frac{1}{\sqrt{1 + (\omega RC)^2}}, \qquad \angle H(j\omega) = -\arctan(\omega RC)$$
+
+<p>The half-power <strong>cutoff frequency ($f_c$)</strong> (also called corner frequency or $-3\text{ dB}$ point) occurs when signal power drops by $50\%$, corresponding to $|H(j\omega)| = \frac{1}{\sqrt{2}} \approx 0.7071$. This condition is satisfied when $\omega_c RC = 1$:</p>
+$$\omega_c = \frac{1}{RC} = \frac{1}{\tau} \implies f_c = \frac{1}{2 \pi R C} = \frac{1}{2 \pi \tau} \quad [\text{Hz}]$$
+
+<p>At $f = f_c$, the output phase lag is precisely $-45^\circ$. For frequencies well above $f_c$, the attenuation roll-off steepness approaches $-20\text{ dB/decade}$ ($-6\text{ dB/octave}$).</p>
+
+<h2>Real-World Dielectric Non-Idealities Affecting RC Precision</h2>
+<p>In physical PCB assemblies, timing errors and signal degradation arise from non-ideal capacitor properties:</p>
+<ul>
+    <li><strong>Dielectric Absorption ("Soakage"):</strong> Charges trapped within the molecular dipoles of dielectrics like Mylar or standard electrolytic capacitors bleed slowly back onto the plates after brief discharges. This causes unintended voltage regrowth in sample-and-hold circuits and precision dual-slope ADCs. For precision timing, low-absorption polypropylene, PTFE, or C0G ceramics are required.</li>
+    <li><strong>DC Leakage Resistance:</strong> Electrolytic capacitors have internal parallel leakage resistances ($R_{\text{leak}}$) as low as several megaohms. If the external timing resistor $R$ is comparable to $R_{\text{leak}}$, the capacitor forms an unintended voltage divider, never reaching the anticipated threshold voltage.</li>
+    <li><strong>Voltage Coefficient of Capacitance (VCC):</strong> High-dielectric-constant Class 2 ceramic capacitors (e.g., X5R, X7R) suffer dramatic capacitance drops (up to $50\%\text{--}80\%$) when operated near their rated DC bias voltage, drastically shrinking actual circuit time constant $\tau$ compared to nominal schematic values.</li>
+</ul>
+
+<div class="worked-example-card">
+    <h4>Step-by-Step Engineering Case Study: ADC Anti-Aliasing RC Low-Pass Filter</h4>
+    <p><strong>Scenario:</strong> A precision sensor signal conditioning board features a 16-bit analog-to-digital converter (ADC) sampling at $f_s = 200 \ \text{kHz}$. To prevent high-frequency spectral aliasing, an RC anti-aliasing low-pass filter with a cutoff frequency of $f_c = 25 \ \text{kHz}$ is required. Due to input impedance constraints, a resistor of $R = 4.7 \ \text{k}\Omega$ is specified.</p>
+    <div class="step-solution">
+        <p><strong>Step 1: Calculate Required Capacitance ($C$):</strong></p>
+        $$C = \frac{1}{2 \pi R f_c} = \frac{1}{2 \pi \times (4700 \ \Omega) \times (25,000 \ \text{Hz})}$$
+        $$C = \frac{1}{6.283185 \times 4700 \times 25000} = \frac{1}{738,274,274} = 1.3545 \times 10^{-9} \text{ F} = 1.355 \text{ nF}$$
+        <p>A standard E96 precision C0G ceramic capacitor of $1.3 \text{ nF}$ or $1.5 \text{ nF}$ can be selected.</p>
+        <p><strong>Step 2: Determine System Time Constant ($\tau$):</strong></p>
+        $$\tau = R \cdot C = 4,700 \ \Omega \times 1.3545 \times 10^{-9} \text{ F} = 6.366 \times 10^{-6} \text{ seconds} = 6.366 \ \mu\text{s}$$
+        <p><strong>Step 3: Calculate $10\%\text{--}90\%$ Pulse Rise Time ($t_r$):</strong></p>
+        $$t_r = 2.197 \times \tau = 2.197 \times 6.366 \ \mu\text{s} = 13.986 \ \mu\text{s}$$
+        <p>Cross-checking with frequency domain rule: $t_r \approx \frac{0.35}{f_c} = \frac{0.35}{25,000} = 14.0 \ \mu\text{s}$, confirming precision.</p>
+        <p><strong>Step 4: Verify Full Settling Time to $99.3\%$ ($5\tau$):</strong></p>
+        $$t_{\text{settle}} = 5 \times \tau = 5 \times 6.366 \ \mu\text{s} = 31.83 \ \mu\text{s}$$
+        <p><strong>Conclusion:</strong> The filter successfully limits band noise above $25 \text{ kHz}$ while settling step inputs within $31.83 \ \mu\text{s}$, well within the system's requirements.</p>
+    </div>
+</div>
+
+<h2>Frequently Asked Questions (FAQ)</h2>
+<div class="faq-section">
+    <h3>What is the physical meaning of one time constant ($1\tau$) in an RC circuit?</h3>
+    <p>One time constant $\tau = R \cdot C$ represents the time required for a charging capacitor to reach $1 - 1/e = 63.21\%$ of its ultimate steady-state supply voltage, or for a discharging capacitor to decay to $1/e = 36.79\%$ of its initial charge.</p>
+
+    <h3>How many time constants does it take to fully charge a capacitor?</h3>
+    <p>Theoretically, exponential curves never reach $100\%$. In practical engineering, a capacitor is considered fully charged at 5 time constants ($5\tau$), at which point it has reached $99.33\%$ of the supply voltage.</p>
+
+    <h3>How is the RC time constant related to cutoff frequency ($f_c$)?</h3>
+    <p>The $-3\text{ dB}$ cutoff frequency of a first-order RC low-pass or high-pass filter is inversely proportional to $\tau$: $f_c = \frac{1}{2 \pi R C} = \frac{1}{2 \pi \tau}$. At $f_c$, the output voltage drops to $70.7\%$ ($-3\text{ dB}$) of the input, and the phase shift is $45^\circ$.</p>
+
+    <h3>What is the relationship between rise time ($10\%$ to $90\%$) and time constant $\tau$?</h3>
+    <p>The $10\%$ to $90\%$ rise time $t_r$ is given by $t_r = \ln(9) \cdot \tau = 2.197 \cdot \tau \approx 2.2 \tau$. In frequency domain terms, $t_r \approx \frac{0.35}{f_c}$.</p>
+</div>
+
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚡</span>
+            <h3 class="widget-title">Related Electrical & Power Systems</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="wire-ampacity-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Ampacity (NEC 310.16)</a></li>
+            <li><a href="conduit-fill-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Conduit Fill (NEC Ch. 9)</a></li>
+            <li><a href="motor-starting-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Motor Starting Current</a></li>
+            <li><a href="short-circuit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Short-Circuit (IEC 60909)</a></li>
+            <li><a href="transformer-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Sizing (NEC 450)</a></li>
+            <li><a href="cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC/NEC)</a></li>
+            <li><a href="voltage-drop-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Drop Calculator</a></li>
+            <li><a href="ohms-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ohm's Law Calculator</a></li>
+            <li><a href="power-factor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Power Factor (kW to kVAR)</a></li>
+            <li><a href="parallel-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistor (Req)</a></li>
+            <li><a href="battery-life-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Life & Runtime</a></li>
+            <li><a href="resistor-color-code-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Color Code</a></li>
+            <li><a href="555-timer-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> 555 Timer Astable & Monostable</a></li>
+            <li><a href="led-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LED Series Resistor Calculator</a></li>
+            <li><a href="capacitive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitive Reactance (Xc)</a></li>
+            <li><a href="inductive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Inductive Reactance (Xl)</a></li>
+            <li><a href="op-amp-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Op-Amp Gain & Inverting/Non-Inv</a></li>
+            <li><a href="three-phase-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three-Phase AC Power (kVA/kW)</a></li>
+            <li><a href="adc-dac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ADC & DAC Converter Resolution</a></li>
+            <li><a href="antenna-length-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Antenna Length & Resonant Dipole</a></li>
+            <li><a href="battery-short-circuit-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Short Circuit (IEC 60896)</a></li>
+            <li><a href="bjt-transistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BJT Transistor Bias & Q-Point</a></li>
+            <li><a href="breaker-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Breaker Size (NEC 125% Rule)</a></li>
+            <li><a href="decibel-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Decibel Calculator (dB, dBm, SPL)</a></li>
+            <li><a href="earth-pit-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earth Pit Resistance (IEEE 80)</a></li>
+            <li><a href="electrical-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Electrical Power & Energy Cost</a></li>
+            <li><a href="microstrip-impedance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Microstrip Impedance (IPC-2141)</a></li>
+            <li><a href="resistor-network-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Network (Delta-Wye & Ladder)</a></li>
+            <li><a href="transformer-turns-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Turns Ratio (a)</a></li>
+            <li><a href="aluminium-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Aluminium Cable Sizing (NEC/IEC)</a></li>
+            <li><a href="busbar-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Busbar Sizing (DIN 43671 / IEC)</a></li>
+            <li><a href="cable-sizing-calculator-bs-7671.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (BS 7671 18th Ed)</a></li>
+            <li><a href="cable-sizing-calculator-iec-60364.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC 60364-5-52)</a></li>
+            <li><a href="cable-sizing-installation-method-a.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method A (Insulated Wall)</a></li>
+            <li><a href="fault-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Fault Current (IEEE 141 / IEC)</a></li>
+            <li><a href="filter-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Analog Filter (RC, RL, LC)</a></li>
+            <li><a href="generator-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Generator Sizing (ISO 8528)</a></li>
+            <li><a href="heatsink-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heatsink Sizing & Thermal</a></li>
+            <li><a href="cable-sizing-installation-method-c.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method C (Clipped Direct)</a></li>
+            <li><a href="cable-sizing-installation-method-e.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method E (Cable Tray)</a></li>
+            <li><a href="cable-sizing-calculator-nec.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (NEC Table 310.16)</a></li>
+            <li><a href="copper-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Copper Cable Sizing (100% IACS)</a></li>
+            <li><a href="earthing-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earthing Cable Size (IEC 60364-5-54)</a></li>
+            <li><a href="kw-to-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> kW to Cable Size (1-Phase & 3-Phase)</a></li>
+            <li><a href="single-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Single Phase Cable Sizing (230V/120V)</a></li>
+            <li><a href="three-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three Phase Cable Sizing (400V/480V)</a></li>
+            <li><a href="wire-gauge-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Gauge (AWG to mm² Metric)</a></li>
+            <li><a href="voltage-divider-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Divider Calculator</a></li>
+            <li><a href="parallel-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistance Calculator</a></li>
+            <li><a href="capacitor-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitor Energy & Pulse Power</a></li>
+            <li><a href="resonant-frequency-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LC Resonant Frequency Tank</a></li>
+            <li><a href="rc-time-constant-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> RC Time Constant (τ = RC)</a></li>
+            <li><a href="rl-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RL Time Constant (τ = L/R)</a></li>
+            <li><a href="zener-diode-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Zener Diode Shunt Regulator</a></li>
+            <li><a href="lm317-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LM317 Voltage Regulator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="engineering.html" class="sidebar-category-link">View All Electrical & Power Systems Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers rigorous, laboratory-verified computational tools for electrical engineers, physicists, and system designers.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Calculator Hubs</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                        <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Transient Analysis</h4>
+                    <ul class="footer-links">
+                        <li><a href="rc-time-constant-calculator.html">RC Time Constant</a></li>
+                        <li><a href="rl-time-constant-calculator.html">RL Time Constant</a></li>
+                        <li><a href="resonant-frequency-calculator.html">LC Resonant Circuit</a></li>
+                        <li><a href="capacitor-energy-calculator.html">Capacitor Energy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precise transient and steady-state circuit analysis engines.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+    
+function computeRcTransient() {
+    var rVal = parseFloat(document.getElementById('rc-r').value);
+    var rUnit = parseFloat(document.getElementById('rc-r-unit').value);
+    var cVal = parseFloat(document.getElementById('rc-c').value);
+    var cUnit = parseFloat(document.getElementById('rc-c-unit').value);
+    var vsVal = parseFloat(document.getElementById('rc-vs').value);
+    var vsUnit = parseFloat(document.getElementById('rc-vs-unit').value);
+    var tVal = parseFloat(document.getElementById('rc-t').value);
+    var tUnit = parseFloat(document.getElementById('rc-t-unit').value);
+
+    if (isNaN(rVal) || rVal <= 0 || isNaN(cVal) || cVal <= 0) return;
+
+    var R = rVal * rUnit;
+    var C = cVal * cUnit;
+    var Vs = (isNaN(vsVal) || vsVal <= 0) ? 5.0 : vsVal * vsUnit;
+    var t = (isNaN(tVal) || tVal < 0) ? 0 : tVal * tUnit;
+
+    var tau = R * C; // seconds
+    var fc = 1.0 / (2.0 * Math.PI * tau); // Hz
+    var tr = 2.197224577 * tau; // 10% to 90% rise time
+    var fiveTau = 5.0 * tau;
+
+    // Formatting tau
+    var tauStr = "";
+    if (tau >= 1) {
+        tauStr = tau.toFixed(4) + " s";
+    } else if (tau >= 1e-3) {
+        tauStr = (tau * 1e3).toFixed(3) + " ms (" + tau.toFixed(5) + " s)";
+    } else if (tau >= 1e-6) {
+        tauStr = (tau * 1e6).toFixed(3) + " μs (" + (tau * 1e3).toFixed(4) + " ms)";
+    } else {
+        tauStr = (tau * 1e9).toFixed(2) + " ns";
+    }
+    document.getElementById('res-rc-tau').textContent = tauStr;
+
+    // Formatting fc
+    var fcStr = "";
+    if (fc >= 1e6) {
+        fcStr = (fc / 1e6).toFixed(3) + " MHz";
+    } else if (fc >= 1e3) {
+        fcStr = (fc / 1e3).toFixed(3) + " kHz (" + fc.toFixed(1) + " Hz)";
+    } else {
+        fcStr = fc.toFixed(2) + " Hz";
+    }
+    document.getElementById('res-rc-fc').textContent = fcStr;
+
+    // Format rise time
+    var trStr = "";
+    if (tr >= 1) {
+        trStr = tr.toFixed(4) + " s";
+    } else if (tr >= 1e-3) {
+        trStr = (tr * 1e3).toFixed(3) + " ms";
+    } else {
+        trStr = (tr * 1e6).toFixed(3) + " μs";
+    }
+    document.getElementById('res-rc-tr').textContent = trStr;
+
+    // Format 5 tau
+    var fiveTauStr = "";
+    if (fiveTau >= 1) {
+        fiveTauStr = fiveTau.toFixed(4) + " s";
+    } else if (fiveTau >= 1e-3) {
+        fiveTauStr = (fiveTau * 1e3).toFixed(3) + " ms";
+    } else {
+        fiveTauStr = (fiveTau * 1e6).toFixed(3) + " μs";
+    }
+    document.getElementById('res-rc-5tau').textContent = fiveTauStr;
+
+    // Instantaneous voltages at time t
+    var expFactor = Math.exp(-t / tau);
+    var vCharge = Vs * (1.0 - expFactor);
+    var vDischarge = Vs * expFactor;
+    var pctCharge = ((vCharge / Vs) * 100).toFixed(1);
+    var pctDischarge = ((vDischarge / Vs) * 100).toFixed(1);
+
+    document.getElementById('res-rc-vc').textContent = vCharge.toFixed(4) + " V (" + pctCharge + "% of Vs)";
+    document.getElementById('res-rc-vd').textContent = vDischarge.toFixed(4) + " V (" + pctDischarge + "% of Vs)";
+}
+
+document.getElementById('calc-rc-btn').addEventListener('click', computeRcTransient);
+['rc-r', 'rc-r-unit', 'rc-c', 'rc-c-unit', 'rc-vs', 'rc-vs-unit', 'rc-t', 'rc-t-unit'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', computeRcTransient);
+    document.getElementById(id).addEventListener('change', computeRcTransient);
+});
+window.addEventListener('DOMContentLoaded', computeRcTransient);
+
+    </script>
+</body>
+</html>

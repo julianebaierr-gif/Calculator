@@ -182,6 +182,14 @@ CATEGORIES = {
             ("single-phase-cable-sizing-calculator.html", "Single Phase Cable Sizing (230V/120V)", "🔌", "2-wire loop drop & radial/ring circuit"),
             ("three-phase-cable-sizing-calculator.html", "Three Phase Cable Sizing (400V/480V)", "⚡", "Line-to-line balanced vector drop & method E"),
             ("wire-gauge-calculator.html", "Wire Gauge (AWG to mm² Metric)", "📏", "ASTM B258 logarithmic AWG scale & circular mils"),
+            ("voltage-divider-calculator.html", "Voltage Divider Calculator", "⚡", "Loaded & unloaded divider, attenuation & Thevenin source"),
+            ("parallel-resistance-calculator.html", "Parallel Resistance Calculator", "⚡", "Equivalent resistance, conductance Siemens & current divider"),
+            ("capacitor-energy-calculator.html", "Capacitor Energy & Pulse Power", "🔋", "Stored Joules E = ½CV², charge Q = CV & peak discharge power"),
+            ("resonant-frequency-calculator.html", "LC Resonant Frequency Tank", "📻", "Series/parallel LC resonance, Q factor & 3dB bandwidth"),
+            ("rc-time-constant-calculator.html", "RC Time Constant (τ = RC)", "⏱️", "Time constant, filter cutoff fc & exponential transient curves"),
+            ("rl-time-constant-calculator.html", "RL Time Constant (τ = L/R)", "⚡", "Inductor current growth, flyback kickback & magnetic energy"),
+            ("zener-diode-calculator.html", "Zener Diode Shunt Regulator", "⚡", "Series resistor Rs, max diode power Pz & load regulation"),
+            ("lm317-calculator.html", "LM317 Voltage Regulator", "⚡", "Adjustable linear regulator Vout, R1/R2 feedback & heatsink"),
         ]
     },
     "solar": {
@@ -423,7 +431,7 @@ def determine_tool_cat(filename):
         return "health"
     if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72", "amortization", "apr-apy", "break-even", "capital-gains", "cd-calculator", "credit-card", "debt-to-income", "down-payment", "emergency-fund", "inflation", "net-salary", "net-worth", "sales-tax", "savings", "markup"]):
         return "finance"
-    if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity", "power-factor", "parallel-resistor", "battery-life", "555-timer", "led-resistor", "capacitive-reactance", "inductive-reactance", "op-amp-gain", "three-phase-power", "adc-dac", "antenna-length", "battery-short-circuit", "bjt-transistor", "breaker-size", "decibel", "earth-pit", "electrical-power", "microstrip", "busbar", "fault-current", "filter", "generator", "heatsink", "copper-cable", "earthing", "kw-to-cable", "single-phase", "three-phase", "wire-gauge"]):
+    if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity", "power-factor", "parallel-resistor", "battery-life", "555-timer", "led-resistor", "capacitive-reactance", "inductive-reactance", "op-amp-gain", "three-phase-power", "adc-dac", "antenna-length", "battery-short-circuit", "bjt-transistor", "breaker-size", "decibel", "earth-pit", "electrical-power", "microstrip", "busbar", "fault-current", "filter", "generator", "heatsink", "copper-cable", "earthing", "kw-to-cable", "single-phase", "three-phase", "wire-gauge", "voltage-divider", "parallel-resistance", "capacitor-energy", "resonant-frequency", "rc-time-constant", "rl-time-constant", "zener-diode", "lm317"]):
         return "engineering"
     if any(k in f for k in ["solar", "charging", "pv-string", "ev-charging"]):
         return "solar"

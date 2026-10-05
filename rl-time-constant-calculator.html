@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RL Time Constant Calculator - Tau, Inductor Current Growth & Flyback Energy</title>
+    <meta name="description" content="Calculate RL circuit time constant (tau = L / R), maximum inductor current (I = V/R), inductive stored energy (E = 1/2 LI²), and transient exponential growth/decay.">
+    <link rel="canonical" href="https://calchub.com/rl-time-constant-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "RL Time Constant Calculator",
+      "url": "https://calchub.com/rl-time-constant-calculator.html",
+      "description": "Calculates RL time constant tau, maximum current, magnetic field energy, and transient inductive current rise and decay.",
+      "applicationCategory": "EngineeringApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why is the RL time constant tau equal to L / R instead of L * R?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "An inductor resists changes in current by generating back-EMF proportional to di/dt. A larger resistance R limits the circuit current more rapidly, causing the rate of magnetic field establishment to settle faster. Therefore, higher resistance shortens the transient duration, yielding tau = L / R."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What causes inductive kickback (flyback voltage) when an RL circuit is switched off?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "When a switch suddenly disconnects current flowing through an inductor, di/dt becomes massively negative over a near-zero time interval. By Faraday's Law and Lenz's Law, the inductor creates an instantaneous reverse back-EMF voltage V_L = -L(di/dt) that can reach hundreds or thousands of volts, arcing switches or destroying semiconductor driver transistors if a flyback clamp diode is not present."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How much energy is stored in an inductor at steady state?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "At steady state (t >= 5 tau), the inductor acts as a short circuit with current I_max = V / R. The energy stored in its magnetic field is E_L = (1/2) * L * I_max^2 (measured in Joules)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the cutoff frequency of an RL filter?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The -3 dB corner frequency of a first-order RL low-pass or high-pass filter is f_c = R / (2 * pi * L) = 1 / (2 * pi * tau)."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="converter.html">Converters</a>
+                <a href="engineering.html">Engineering</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="engineering.html">Engineering &amp; Electronics</a> &gt; <span>RL Time Constant Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>RL Time Constant Calculator</h1>
+                        <p class="calc-desc">Compute inductor-resistor time constant (&tau; = L/R), steady-state saturation current, stored magnetic energy, and transient decay curves.</p>
+                    </div>
+                    
+<div class="calc-grid">
+    <div class="calc-input-group">
+        <label for="rl-l">Inductance ($L$):</label>
+        <div class="input-with-select">
+            <input type="number" id="rl-l" value="10" min="0.0001" step="any">
+            <select id="rl-l-unit">
+                <option value="1e-6">&mu;H</option>
+                <option value="1e-3" selected>mH</option>
+                <option value="1">H</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="rl-r">Resistance ($R$):</label>
+        <div class="input-with-select">
+            <input type="number" id="rl-r" value="50" min="0.0001" step="any">
+            <select id="rl-r-unit">
+                <option value="1" selected>&Omega;</option>
+                <option value="1000">k&Omega;</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="rl-vs">Supply Voltage ($V_{\text{source}}$):</label>
+        <div class="input-with-select">
+            <input type="number" id="rl-vs" value="12" min="0.001" step="any">
+            <select id="rl-vs-unit">
+                <option value="1" selected>V</option>
+                <option value="1000">kV</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="rl-t">Elapsed Time ($t$, optional for $i(t)$):</label>
+        <div class="input-with-select">
+            <input type="number" id="rl-t" value="200" min="0" step="any">
+            <select id="rl-t-unit">
+                <option value="1e-6" selected>&mu;s</option>
+                <option value="1e-3">ms</option>
+                <option value="1">s</option>
+            </select>
+        </div>
+    </div>
+</div>
+<button id="calc-rl-btn" class="calc-btn">Calculate RL Transient</button>
+<div class="calc-results-card" id="rl-results">
+    <h3>Inductive Transient &amp; Energy Metrics</h3>
+    <div class="result-row highlight-result">
+        <span class="result-label">Time Constant (&tau; = L / R):</span>
+        <span class="result-val" id="res-rl-tau">0.200 ms (200.0 &mu;s)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Steady-State Current ($I_{	ext{max}} = V / R$):</span>
+        <span class="result-val" id="res-rl-imax">0.240 A (240.0 mA)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Stored Magnetic Energy ($E_L = rac{1}{2} L I_{	ext{max}}^2$):</span>
+        <span class="result-val" id="res-rl-el">0.288 mJ (0.000288 J)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Cutoff Frequency ($f_c = rac{R}{2\pi L}$):</span>
+        <span class="result-val" id="res-rl-fc">795.77 Hz</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Instantaneous Current at time $t$ ($i(t)$):</span>
+        <span class="result-val" id="res-rl-it">0.1517 A (63.2% of $I_{	ext{max}}$)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Inductor Voltage at time $t$ ($v_L(t)$):</span>
+        <span class="result-val" id="res-rl-vlt">4.415 V (36.8% of $V_s$)</span>
+    </div>
+</div>
+
+                </div>
+                <article class="article-body">
+                    
+<h2>Electromagnetic Transient Theory of Inductor-Resistor (RL) Circuits</h2>
+<p>An inductor stores energy in the dynamic magnetic flux ($\Phi$) established by electric current flowing through conductive helical windings. According to Faraday's Law of Electromagnetic Induction and Lenz's Law, any time-rate of change in magnetic flux induces an electromotive force (EMF) that opposes the very current change creating it:</p>
+$$v_L(t) = L \frac{di(t)}{dt}$$
+
+<p>Where $L$ is the self-inductance in Henrys ($1\text{ H} = 1\text{ V}\cdot\text{s}/\text{A}$). When a series RL circuit is energized from rest by a DC source voltage $V_s$, the inductor initially opposes the sudden step change in current by generating a back-EMF equal and opposite to $V_s$. Consequently, at time $t = 0^+$, the inductor behaves as an instantaneous open circuit ($i(0^+) = 0$).</p>
+
+<h2>Derivation of the Current Growth Differential Equation</h2>
+<p>Applying Kirchhoff's Voltage Law around the single series closed loop gives:</p>
+$$V_s - v_R(t) - v_L(t) = 0 \implies V_s - R \, i(t) - L \frac{di(t)}{dt} = 0$$
+
+<p>Rearranging into canonical first-order ordinary differential equation form:</p>
+$$L \frac{di(t)}{dt} + R \, i(t) = V_s \implies \frac{di(t)}{dt} + \frac{R}{L} i(t) = \frac{V_s}{L}$$
+
+<p>Separating variables with initial boundary condition $i(0) = 0$:</p>
+$$\frac{di}{\frac{V_s}{R} - i} = \frac{R}{L} dt$$
+$$\int_{0}^{i(t)} \frac{di}{\frac{V_s}{R} - i} = \int_{0}^{t} \frac{R}{L} dt$$
+$$-\ln\left( \frac{\frac{V_s}{R} - i(t)}{\frac{V_s}{R}} \right) = \frac{R}{L} t$$
+$$\frac{\frac{V_s}{R} - i(t)}{\frac{V_s}{R}} = e^{-\frac{R}{L} t}$$
+$$i(t) = \frac{V_s}{R} \left( 1 - e^{-\frac{t}{\tau}} \right) = I_{\text{max}} \left( 1 - e^{-\frac{t}{\tau}} \right)$$
+
+<p>Where $\tau$ represents the fundamental <strong>RL time constant</strong>:</p>
+$$\tau = \frac{L}{R} \quad [\text{Seconds}]$$
+
+<p>Dimensional proof confirms that Henrys ($[\text{V}\cdot\text{s}/\text{A}]$) divided by Ohms ($[\text{V}/\text{A}]$) simplifies purely to time: $[\text{H}/\Omega] = [\text{s}]$.</p>
+
+<h2>Inductive Kickback, Flyback Voltage, and Snubber Protection</h2>
+<p>While current growth in an RL circuit is bounded by supply voltage, circuit interruption (decay) presents extreme transient danger. If current $I_0$ flowing through an inductor is suddenly interrupted by opening a mechanical switch or turning off a MOSFET transistor, the rate of change $\frac{di}{dt}$ theoretically approaches negative infinity because the physical break forces current to zero in nanoseconds.</p>
+
+<p>By Faraday's law, the inductor produces a massive positive inductive kickback voltage spike:</p>
+$$v_{\text{kickback}} = -L \left( \frac{di}{dt} \right) \gg V_s$$
+
+<p>This inductive flyback voltage frequently surges to thousands of volts, creating electric arcing across switch contacts, melting relay contacts, and puncturing semiconductor drain-source silicon dielectric layers. To suppress this destruction, engineers deploy a <strong>flyback (freewheeling) diode</strong> in anti-parallel across the inductive coil, providing a closed recirculating loop through which current safely decays according to:</p>
+$$i_{\text{decay}}(t) = I_0 \, e^{-\frac{t}{\tau_{\text{loop}}}}$$
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Suppression Technique</th>
+            <th>Peak Voltage Clamp</th>
+            <th>Decay Speed (Dropout Time)</th>
+            <th>Primary Application Field</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Standard Silicon Diode (1N4007)</strong></td>
+            <td>Clamped to $V_s + 0.7\text{ V}$</td>
+            <td>Slowest (long inductive circulating time)</td>
+            <td>DC relay coils, low-frequency solenoids</td>
+        </tr>
+        <tr>
+            <td><strong>Diode + Zener Diode Series Pair</strong></td>
+            <td>Clamped to $V_s + V_Z$</td>
+            <td>Fast (energy burned rapidly in Zener breakdown)</td>
+            <td>High-speed automotive fuel injectors, fast solenoids</td>
+        </tr>
+        <tr>
+            <td><strong>RC Snubber Network</strong></td>
+            <td>Damps ringing peak below breakdown</td>
+            <td>Medium (resonant dissipation)</td>
+            <td>AC inductive contactors, triac phase controllers</td>
+        </tr>
+        <tr>
+            <td><strong>Metal Oxide Varistor (MOV)</strong></td>
+            <td>Nonlinear clamping at varistor voltage</td>
+            <td>Very Fast</td>
+            <td>Surge transient protection, industrial mains coils</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>AC Impedance, Phase Shift, and Power Factor in RL Circuits</h2>
+<p>In steady-state sinusoidal AC systems operating at cyclic frequency $f$ and angular frequency $\omega = 2\pi f$, the total complex impedance of a series RL circuit is given by:</p>
+$$Z = R + j X_L = R + j \omega L$$
+$$|Z| = \sqrt{R^2 + (\omega L)^2}$$
+
+<p>The voltage leads current by phase angle $\theta$:</p>
+$$\theta = \arctan\left( \frac{\omega L}{R} \right) = \arctan(\omega \tau)$$
+
+<p>The circuit power factor is $\text{PF} = \cos(\theta) = \frac{R}{|Z|}$. Because the inductive reactive component consumes zero net average real power, magnetic energy continuously oscillates back and forth between generator and load. Industrial installations with heavy RL motor loads install power factor correction capacitor banks to counterbalance inductive reactive voltamperes ($\text{VAR}$).</p>
+
+<h2>Physical Core Non-Idealities: Saturation and Eddy Current Losses</h2>
+<p>Unlike pure mathematical inductors, physical magnetic inductors utilize ferromagnetic cores (iron powder, ferrite, electrical steel) to concentrate magnetic flux. Key non-idealities include:</p>
+<ul>
+    <li><strong>Magnetic Core Saturation:</strong> As current $i(t)$ increases, core magnetic domains fully align, causing differential permeability $\mu_r$ to collapse. When core saturation occurs, effective inductance $L$ drops abruptly to that of an air-core coil, causing current to surge destructively above design calculations.</li>
+    <li><strong>Hysteresis Losses:</strong> Alternating magnetizing and demagnetizing cycles dissipate heat proportional to the area enclosed by the core's $B\text{-}H$ loop.</li>
+    <li><strong>Eddy Current Losses:</strong> Alternating magnetic flux induces circulating currents within conductive core materials, generating $I^2 R$ thermal dissipation. Laminated core sheets and high-resistivity ferrite ceramics are employed to minimize this loss mechanism.</li>
+</ul>
+
+<div class="worked-example-card">
+    <h4>Step-by-Step Engineering Case Study: Automotive 12V Solenoid Coil Analysis</h4>
+    <p><strong>Scenario:</strong> An automotive starter relay solenoid has an internal coil inductance of $L = 85 \ \text{mH}$ and a DC winding resistance of $R = 12 \ \Omega$. It is energized by an automotive battery bus of $V_s = 13.8 \ \text{V}$.</p>
+    <div class="step-solution">
+        <p><strong>Step 1: Calculate Circuit Time Constant ($\tau$):</strong></p>
+        $$\tau = \frac{L}{R} = \frac{85 \times 10^{-3} \text{ H}}{12 \ \Omega} = 7.0833 \times 10^{-3} \text{ seconds} = 7.083 \ \text{ms}$$
+        <p><strong>Step 2: Calculate Steady-State Saturation Current ($I_{\text{max}}$):</strong></p>
+        $$I_{\text{max}} = \frac{V_s}{R} = \frac{13.8 \ \text{V}}{12 \ \Omega} = 1.150 \ \text{Amperes}$$
+        <p><strong>Step 3: Determine Stored Magnetic Energy in Coil ($E_L$):</strong></p>
+        $$E_L = \frac{1}{2} L I_{\text{max}}^2 = \frac{1}{2} \times (0.085 \text{ H}) \times (1.150 \text{ A})^2$$
+        $$E_L = 0.0425 \times 1.3225 = 0.05621 \text{ Joules} = 56.21 \text{ mJ}$$
+        <p><strong>Step 4: Calculate Current at $t = 5.0 \ \text{ms}$ After Activation:</strong></p>
+        $$i(5 \text{ ms}) = 1.150 \times \left( 1 - e^{-\frac{0.0050}{0.0070833}} \right) = 1.150 \times (1 - e^{-0.70588})$$
+        $$i(5 \text{ ms}) = 1.150 \times (1 - 0.49367) = 1.150 \times 0.50633 = 0.5823 \ \text{A (582.3 mA)}$$
+        <p><strong>Step 5: Full Actuation Settle Time ($5\tau$):</strong></p>
+        $$t_{\text{settle}} = 5 \times 7.0833 \ \text{ms} = 35.42 \ \text{ms}$$
+        <p><strong>Conclusion:</strong> The solenoid reaches $50.6\%$ of holding current within $5 \text{ ms}$ and achieves full magnetic pull force within $35.4 \text{ ms}$. A freewheeling clamp must be selected to safely dissipate the $56.2 \text{ mJ}$ magnetic collapse.</p>
+    </div>
+</div>
+
+<h2>Frequently Asked Questions (FAQ)</h2>
+<div class="faq-section">
+    <h3>Why is the RL time constant $\tau$ equal to $L / R$ instead of $L \times R$?</h3>
+    <p>An inductor resists changes in current by generating back-EMF proportional to $\frac{di}{dt}$. A larger resistance $R$ limits the circuit current more rapidly, causing the rate of magnetic field establishment to settle faster. Therefore, higher resistance shortens the transient duration, yielding $\tau = L / R$.</p>
+
+    <h3>What causes inductive kickback (flyback voltage) when an RL circuit is switched off?</h3>
+    <p>When a switch suddenly disconnects current flowing through an inductor, $\frac{di}{dt}$ becomes massively negative over a near-zero time interval. By Faraday's Law and Lenz's Law, the inductor creates an instantaneous reverse back-EMF voltage $v_L = -L \frac{di}{dt}$ that can reach hundreds or thousands of volts, arcing switches or destroying semiconductor driver transistors if a flyback clamp diode is not present.</p>
+
+    <h3>How much energy is stored in an inductor at steady state?</h3>
+    <p>At steady state ($t \ge 5\tau$), the inductor acts as a short circuit with current $I_{\text{max}} = V_s / R$. The energy stored in its magnetic field is $E_L = \frac{1}{2} L I_{\text{max}}^2$ (measured in Joules).</p>
+
+    <h3>What is the cutoff frequency of an RL filter?</h3>
+    <p>The $-3\text{ dB}$ corner frequency of a first-order RL low-pass or high-pass filter is $f_c = \frac{R}{2 \pi L} = \frac{1}{2 \pi \tau}$.</p>
+</div>
+
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚡</span>
+            <h3 class="widget-title">Related Electrical & Power Systems</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="wire-ampacity-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Ampacity (NEC 310.16)</a></li>
+            <li><a href="conduit-fill-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Conduit Fill (NEC Ch. 9)</a></li>
+            <li><a href="motor-starting-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Motor Starting Current</a></li>
+            <li><a href="short-circuit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Short-Circuit (IEC 60909)</a></li>
+            <li><a href="transformer-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Sizing (NEC 450)</a></li>
+            <li><a href="cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC/NEC)</a></li>
+            <li><a href="voltage-drop-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Drop Calculator</a></li>
+            <li><a href="ohms-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ohm's Law Calculator</a></li>
+            <li><a href="power-factor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Power Factor (kW to kVAR)</a></li>
+            <li><a href="parallel-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistor (Req)</a></li>
+            <li><a href="battery-life-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Life & Runtime</a></li>
+            <li><a href="resistor-color-code-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Color Code</a></li>
+            <li><a href="555-timer-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> 555 Timer Astable & Monostable</a></li>
+            <li><a href="led-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LED Series Resistor Calculator</a></li>
+            <li><a href="capacitive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitive Reactance (Xc)</a></li>
+            <li><a href="inductive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Inductive Reactance (Xl)</a></li>
+            <li><a href="op-amp-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Op-Amp Gain & Inverting/Non-Inv</a></li>
+            <li><a href="three-phase-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three-Phase AC Power (kVA/kW)</a></li>
+            <li><a href="adc-dac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ADC & DAC Converter Resolution</a></li>
+            <li><a href="antenna-length-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Antenna Length & Resonant Dipole</a></li>
+            <li><a href="battery-short-circuit-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Short Circuit (IEC 60896)</a></li>
+            <li><a href="bjt-transistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BJT Transistor Bias & Q-Point</a></li>
+            <li><a href="breaker-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Breaker Size (NEC 125% Rule)</a></li>
+            <li><a href="decibel-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Decibel Calculator (dB, dBm, SPL)</a></li>
+            <li><a href="earth-pit-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earth Pit Resistance (IEEE 80)</a></li>
+            <li><a href="electrical-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Electrical Power & Energy Cost</a></li>
+            <li><a href="microstrip-impedance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Microstrip Impedance (IPC-2141)</a></li>
+            <li><a href="resistor-network-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Network (Delta-Wye & Ladder)</a></li>
+            <li><a href="transformer-turns-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Turns Ratio (a)</a></li>
+            <li><a href="aluminium-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Aluminium Cable Sizing (NEC/IEC)</a></li>
+            <li><a href="busbar-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Busbar Sizing (DIN 43671 / IEC)</a></li>
+            <li><a href="cable-sizing-calculator-bs-7671.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (BS 7671 18th Ed)</a></li>
+            <li><a href="cable-sizing-calculator-iec-60364.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC 60364-5-52)</a></li>
+            <li><a href="cable-sizing-installation-method-a.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method A (Insulated Wall)</a></li>
+            <li><a href="fault-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Fault Current (IEEE 141 / IEC)</a></li>
+            <li><a href="filter-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Analog Filter (RC, RL, LC)</a></li>
+            <li><a href="generator-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Generator Sizing (ISO 8528)</a></li>
+            <li><a href="heatsink-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heatsink Sizing & Thermal</a></li>
+            <li><a href="cable-sizing-installation-method-c.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method C (Clipped Direct)</a></li>
+            <li><a href="cable-sizing-installation-method-e.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method E (Cable Tray)</a></li>
+            <li><a href="cable-sizing-calculator-nec.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (NEC Table 310.16)</a></li>
+            <li><a href="copper-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Copper Cable Sizing (100% IACS)</a></li>
+            <li><a href="earthing-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earthing Cable Size (IEC 60364-5-54)</a></li>
+            <li><a href="kw-to-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> kW to Cable Size (1-Phase & 3-Phase)</a></li>
+            <li><a href="single-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Single Phase Cable Sizing (230V/120V)</a></li>
+            <li><a href="three-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three Phase Cable Sizing (400V/480V)</a></li>
+            <li><a href="wire-gauge-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Gauge (AWG to mm² Metric)</a></li>
+            <li><a href="voltage-divider-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Divider Calculator</a></li>
+            <li><a href="parallel-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistance Calculator</a></li>
+            <li><a href="capacitor-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitor Energy & Pulse Power</a></li>
+            <li><a href="resonant-frequency-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LC Resonant Frequency Tank</a></li>
+            <li><a href="rc-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RC Time Constant (τ = RC)</a></li>
+            <li><a href="rl-time-constant-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> RL Time Constant (τ = L/R)</a></li>
+            <li><a href="zener-diode-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Zener Diode Shunt Regulator</a></li>
+            <li><a href="lm317-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LM317 Voltage Regulator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="engineering.html" class="sidebar-category-link">View All Electrical & Power Systems Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers rigorous, laboratory-verified computational tools for electrical engineers, physicists, and system designers.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Calculator Hubs</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                        <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Transient Analysis</h4>
+                    <ul class="footer-links">
+                        <li><a href="rc-time-constant-calculator.html">RC Time Constant</a></li>
+                        <li><a href="rl-time-constant-calculator.html">RL Time Constant</a></li>
+                        <li><a href="resonant-frequency-calculator.html">LC Resonant Circuit</a></li>
+                        <li><a href="capacitor-energy-calculator.html">Capacitor Energy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precise transient and steady-state circuit analysis engines.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+    
+function computeRlTransient() {
+    var lVal = parseFloat(document.getElementById('rl-l').value);
+    var lUnit = parseFloat(document.getElementById('rl-l-unit').value);
+    var rVal = parseFloat(document.getElementById('rl-r').value);
+    var rUnit = parseFloat(document.getElementById('rl-r-unit').value);
+    var vsVal = parseFloat(document.getElementById('rl-vs').value);
+    var vsUnit = parseFloat(document.getElementById('rl-vs-unit').value);
+    var tVal = parseFloat(document.getElementById('rl-t').value);
+    var tUnit = parseFloat(document.getElementById('rl-t-unit').value);
+
+    if (isNaN(lVal) || lVal <= 0 || isNaN(rVal) || rVal <= 0) return;
+
+    var L = lVal * lUnit;
+    var R = rVal * rUnit;
+    var Vs = (isNaN(vsVal) || vsVal <= 0) ? 12.0 : vsVal * vsUnit;
+    var t = (isNaN(tVal) || tVal < 0) ? 0 : tVal * tUnit;
+
+    var tau = L / R; // seconds
+    var Imax = Vs / R; // Amperes
+    var EL = 0.5 * L * Math.pow(Imax, 2); // Joules
+    var fc = R / (2.0 * Math.PI * L); // Hz
+
+    // Format tau
+    var tauStr = "";
+    if (tau >= 1) {
+        tauStr = tau.toFixed(4) + " s";
+    } else if (tau >= 1e-3) {
+        tauStr = (tau * 1e3).toFixed(3) + " ms (" + (tau * 1e6).toFixed(1) + " μs)";
+    } else {
+        tauStr = (tau * 1e6).toFixed(3) + " μs (" + (tau * 1e9).toFixed(1) + " ns)";
+    }
+    document.getElementById('res-rl-tau').textContent = tauStr;
+
+    // Format Imax
+    var imaxStr = "";
+    if (Imax >= 1) {
+        imaxStr = Imax.toFixed(3) + " A (" + (Imax * 1e3).toFixed(1) + " mA)";
+    } else {
+        imaxStr = (Imax * 1e3).toFixed(2) + " mA (" + Imax.toFixed(4) + " A)";
+    }
+    document.getElementById('res-rl-imax').textContent = imaxStr;
+
+    // Format EL
+    var elStr = "";
+    if (EL >= 1) {
+        elStr = EL.toFixed(4) + " J";
+    } else if (EL >= 1e-3) {
+        elStr = (EL * 1e3).toFixed(3) + " mJ (" + EL.toExponential(3) + " J)";
+    } else {
+        elStr = (EL * 1e6).toFixed(3) + " μJ";
+    }
+    document.getElementById('res-rl-el').textContent = elStr;
+
+    // Format fc
+    var fcStr = "";
+    if (fc >= 1e6) {
+        fcStr = (fc / 1e6).toFixed(3) + " MHz";
+    } else if (fc >= 1e3) {
+        fcStr = (fc / 1e3).toFixed(3) + " kHz";
+    } else {
+        fcStr = fc.toFixed(2) + " Hz";
+    }
+    document.getElementById('res-rl-fc').textContent = fcStr;
+
+    // Instantaneous current and voltage
+    var expFactor = Math.exp(-t / tau);
+    var it = Imax * (1.0 - expFactor);
+    var vlt = Vs * expFactor;
+    var pctI = ((it / Imax) * 100).toFixed(1);
+    var pctV = ((vlt / Vs) * 100).toFixed(1);
+
+    document.getElementById('res-rl-it').textContent = (it >= 1 ? it.toFixed(4) + " A" : (it * 1000).toFixed(2) + " mA") + " (" + pctI + "% of I_max)";
+    document.getElementById('res-rl-vlt').textContent = vlt.toFixed(4) + " V (" + pctV + "% of Vs)";
+}
+
+document.getElementById('calc-rl-btn').addEventListener('click', computeRlTransient);
+['rl-l', 'rl-l-unit', 'rl-r', 'rl-r-unit', 'rl-vs', 'rl-vs-unit', 'rl-t', 'rl-t-unit'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', computeRlTransient);
+    document.getElementById(id).addEventListener('change', computeRlTransient);
+});
+window.addEventListener('DOMContentLoaded', computeRlTransient);
+
+    </script>
+</body>
+</html>

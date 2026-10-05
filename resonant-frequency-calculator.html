@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resonant Frequency Calculator - LC Circuit Tank, Q Factor & Bandwidth</title>
+    <meta name="description" content="Calculate LC circuit resonant frequency (f0 = 1 / (2*pi*sqrt(LC))), angular resonance, characteristic tank impedance, quality factor (Q), and 3dB bandwidth.">
+    <link rel="canonical" href="https://calchub.com/resonant-frequency-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Resonant Frequency Calculator",
+      "url": "https://calchub.com/resonant-frequency-calculator.html",
+      "description": "Calculates LC circuit resonant frequency, angular velocity, characteristic impedance, Q factor, and 3dB bandwidth.",
+      "applicationCategory": "EngineeringApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What happens physically at LC electrical resonance?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "At electrical resonance, the inductive reactance X_L = 2*pi*f*L and capacitive reactance X_C = 1/(2*pi*f*C) become equal in magnitude and 180 degrees out of phase, canceling each other completely. In a series LC circuit, net impedance drops to purely resistive R (minimum impedance), allowing maximum current. In a parallel LC tank, net impedance surges to a maximum, presenting an open-circuit barrier to the resonant frequency."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do you calculate the resonant frequency of an LC circuit?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The formula is derived by equating inductive and capacitive reactance: omega*L = 1/(omega*C), leading to angular frequency omega_0 = 1/sqrt(LC) and cyclic frequency f_0 = 1 / (2 * pi * sqrt(L * C)), where L is inductance in Henrys and C is capacitance in Farads."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the Quality Factor (Q) of a resonant circuit?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Quality factor Q measures damping and selectivity. It is defined as 2*pi times the ratio of peak energy stored to energy dissipated per cycle. For a series RLC circuit, Q = (1/R) * sqrt(L/C). For a parallel RLC circuit, Q = R * sqrt(C/L). Higher Q results in a narrower 3dB bandwidth."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is 3 dB bandwidth related to resonant frequency and Q?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The half-power (-3 dB) bandwidth Delta f is inversely proportional to Q: Delta f = f_0 / Q. High-Q circuits exhibit sharp selectivity with narrow bandwidth, while low-Q circuits have broader passbands."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="converter.html">Converters</a>
+                <a href="engineering.html">Engineering</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="engineering.html">Engineering &amp; Electronics</a> &gt; <span>Resonant Frequency Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Resonant Frequency Calculator</h1>
+                        <p class="calc-desc">Compute LC tank resonant frequency, characteristic impedance (Z0), circuit Q-factor, and -3dB passband bandwidth for series and parallel networks.</p>
+                    </div>
+                    
+<div class="calc-grid">
+    <div class="calc-input-group">
+        <label for="rf-calc-mode">Calculation Target:</label>
+        <select id="rf-calc-mode">
+            <option value="freq" selected>Calculate Resonant Frequency ($f_0$)</option>
+            <option value="ind">Calculate Required Inductance ($L$)</option>
+            <option value="cap">Calculate Required Capacitance ($C$)</option>
+        </select>
+    </div>
+    <div class="calc-input-group" id="grp-rf-ind">
+        <label for="rf-l">Inductance ($L$):</label>
+        <div class="input-with-select">
+            <input type="number" id="rf-l" value="10" min="0.000001" step="any">
+            <select id="rf-l-unit">
+                <option value="1e-9">nH</option>
+                <option value="1e-6" selected>&mu;H</option>
+                <option value="1e-3">mH</option>
+                <option value="1">H</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group" id="grp-rf-cap">
+        <label for="rf-c">Capacitance ($C$):</label>
+        <div class="input-with-select">
+            <input type="number" id="rf-c" value="100" min="0.000001" step="any">
+            <select id="rf-c-unit">
+                <option value="1e-12" selected>pF</option>
+                <option value="1e-9">nF</option>
+                <option value="1e-6">&mu;F</option>
+                <option value="1e-3">mF</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group" id="grp-rf-freq" style="display:none;">
+        <label for="rf-f">Target Frequency ($f_0$):</label>
+        <div class="input-with-select">
+            <input type="number" id="rf-f" value="5.033" min="0.000001" step="any">
+            <select id="rf-f-unit">
+                <option value="1">Hz</option>
+                <option value="1e3">kHz</option>
+                <option value="1e6" selected>MHz</option>
+                <option value="1e9">GHz</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="rf-r">Series Damping Resistance ($R$, optional for Q):</label>
+        <div class="input-with-select">
+            <input type="number" id="rf-r" value="5" min="0" step="any">
+            <select id="rf-r-unit">
+                <option value="0.001">m&Omega;</option>
+                <option value="1" selected>&Omega;</option>
+                <option value="1000">k&Omega;</option>
+            </select>
+        </div>
+    </div>
+</div>
+<button id="calc-rf-btn" class="calc-btn">Calculate LC Resonance</button>
+<div class="calc-results-card" id="rf-results">
+    <h3>Resonance &amp; Network Parameters</h3>
+    <div class="result-row highlight-result">
+        <span class="result-label">Resonant Frequency ($f_0$):</span>
+        <span class="result-val" id="res-rf-f0">5.033 MHz (5,032,921 Hz)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Angular Frequency ($\omega_0$):</span>
+        <span class="result-val" id="res-rf-w0">3.162 &times; 10^7 rad/s</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Characteristic Impedance ($Z_0 = \sqrt{L/C}$):</span>
+        <span class="result-val" id="res-rf-z0">316.23 &Omega;</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Series Quality Factor ($Q_{	ext{series}}$):</span>
+        <span class="result-val" id="res-rf-q">63.25</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Half-Power Bandwidth ($\Delta f$):</span>
+        <span class="result-val" id="res-rf-bw">79.58 kHz</span>
+    </div>
+</div>
+
+                </div>
+                <article class="article-body">
+                    
+<h2>Principles of Electrical Resonance in Inductive-Capacitive (LC) Networks</h2>
+<p>Electrical resonance occurs in alternating-current (AC) circuits containing both inductive ($L$) and capacitive ($C$) energy storage elements when the respective reactive impedances cancel each other out. An inductor stores energy dynamically in its magnetic field proportionally to the square of instantaneous current ($E_L = \frac{1}{2} L I^2$), resisting changes in electric current. A capacitor stores energy electrostatically in its electric field proportionally to the square of voltage ($E_C = \frac{1}{2} C V^2$), resisting changes in potential difference.</p>
+
+<p>When coupled together in an LC resonator (frequently called an <strong>LC tank circuit</strong>), continuous cyclical energy exchange takes place between the magnetic field of the inductor and the electrostatic field of the capacitor. At the circuit's natural <strong>undamped resonant frequency ($f_0$)</strong>, the total reactive impedance reaches a critical singularity, enabling maximum energy transfer, frequency discrimination, RF filtering, oscillator generation, and wireless communication tuning.</p>
+
+<h2>Mathematical Derivation of the LC Resonant Frequency Equation</h2>
+<p>The complex impedance of an ideal inductor with inductance $L$ (in Henrys) operating at cyclic frequency $f$ and angular frequency $\omega = 2\pi f$ is purely reactive and positive (inductive reactance):</p>
+$$Z_L = j X_L = j \omega L = j 2 \pi f L$$
+
+<p>The complex impedance of an ideal capacitor with capacitance $C$ (in Farads) is purely reactive and negative (capacitive reactance):</p>
+$$Z_C = -j X_C = \frac{1}{j \omega C} = -j \frac{1}{\omega C} = -j \frac{1}{2 \pi f C}$$
+
+<p>For a series LC network, the total input impedance $Z_{\text{in}}$ across the terminal pair is the arithmetic sum of the branch impedances:</p>
+$$Z_{\text{in}}(\omega) = Z_L + Z_C = j \left( \omega L - \frac{1}{\omega C} \right)$$
+
+<p>Resonance is formally defined as the steady-state operating condition where the total reactive component of impedance vanishes to zero ($X_{\text{net}} = 0$):</p>
+$$\omega_0 L - \frac{1}{\omega_0 C} = 0 \implies \omega_0 L = \frac{1}{\omega_0 C}$$
+
+<p>Multiplying both sides by $\omega_0 / L$ yields:</p>
+$$\omega_0^2 = \frac{1}{L C} \implies \omega_0 = \frac{1}{\sqrt{L C}} \quad \left[ \frac{\text{rad}}{\text{s}} \right]$$
+
+<p>Converting angular frequency $\omega_0$ to cyclic frequency $f_0$ via $\omega_0 = 2 \pi f_0$ produces Thomson's classical resonance formula:</p>
+$$f_0 = \frac{1}{2 \pi \sqrt{L C}} \quad [\text{Hz}]$$
+
+<p>By algebraic rearrangement, if a target resonant frequency $f_0$ is mandated by RF spectrum regulations or IF passband requirements, the necessary reactive components are computed directly:</p>
+$$L = \frac{1}{4 \pi^2 f_0^2 C}, \qquad C = \frac{1}{4 \pi^2 f_0^2 L}$$
+
+<h2>Series vs Parallel Resonant Networks: Dual Topologies and Impedance Curves</h2>
+<p>While the mathematical resonance condition $\omega_0 = 1/\sqrt{LC}$ is identical for both configurations, series and parallel LC topologies present completely inverted impedance characteristics to external signal sources:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Parameter / Feature</th>
+            <th>Series Resonant Circuit (RLC)</th>
+            <th>Parallel Resonant Tank (RLC)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Resonance Impedance ($Z_0$)</strong></td>
+            <td>Minimum ($Z = R_{\text{series}}$)</td>
+            <td>Maximum ($Z = R_{\text{dynamic}} = L / (C R_s)$)</td>
+        </tr>
+        <tr>
+            <td><strong>Terminal Current at $f_0$</strong></td>
+            <td>Maximum ($I_0 = V / R$)</td>
+            <td>Minimum ($I_{\text{line}} \to 0$, circulating tank current high)</td>
+        </tr>
+        <tr>
+            <td><strong>Phase Angle at $f_0$</strong></td>
+            <td>$0^\circ$ (Purely resistive)</td>
+            <td>$0^\circ$ (Purely resistive)</td>
+        </tr>
+        <tr>
+            <td><strong>Behavior Below Resonance ($f &lt; f_0$)</strong></td>
+            <td>Capacitive ($X_C &gt; X_L$, current leads voltage)</td>
+            <td>Inductive ($I_L &gt; I_C$, line current lags voltage)</td>
+        </tr>
+        <tr>
+            <td><strong>Behavior Above Resonance ($f &gt; f_0$)</strong></td>
+            <td>Inductive ($X_L &gt; X_C$, current lags voltage)</td>
+            <td>Capacitive ($I_C &gt; I_L$, line current leads voltage)</td>
+        </tr>
+        <tr>
+            <td><strong>Primary Application</strong></td>
+            <td>Bandpass filtering, antenna matching, notch absorption</td>
+            <td>RF amplifier tank load, Colpitts/Hartley oscillators, IF rejection</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Quality Factor ($Q$), Damping Ratio, and Half-Power Bandwidth ($\Delta f$)</h2>
+<p>Real-world inductors and capacitors are never completely lossless. Real inductors contain copper wire DC resistance and high-frequency skin effect losses ($R_s$), while dielectric dissipation manifests as parallel leakage. The <strong>Quality Factor ($Q$)</strong> characterizes how underdamped the resonant oscillation is, defined as $2\pi$ times the ratio of maximum energy stored to energy dissipated per cycle:</p>
+$$Q = 2 \pi \left( \frac{\text{Maximum Energy Stored}}{\text{Energy Dissipated Per Cycle}} \right)$$
+
+<p>For a series RLC network with series loss resistance $R$:</p>
+$$Q_{\text{series}} = \frac{\omega_0 L}{R} = \frac{1}{\omega_0 C R} = \frac{1}{R} \sqrt{\frac{L}{C}} = \frac{Z_0}{R}$$
+
+<p>Where $Z_0 = \sqrt{L/C}$ is the <strong>characteristic tank impedance</strong>. The half-power ($-3\text{ dB}$) bandwidth $\Delta f = f_2 - f_1$ between upper and lower frequencies where terminal power drops by $50\%$ ($1/\sqrt{2}$ in voltage) is tightly coupled to $Q$:</p>
+$$\Delta f = \frac{f_0}{Q}$$
+
+<div class="worked-example-card">
+    <h4>Step-by-Step Engineering Case Study: FM Radio Intermediate Frequency (IF) Filter</h4>
+    <p><strong>Scenario:</strong> An RF broadcast receiver requires an intermediate frequency (IF) bandpass filter centered at standard $f_0 = 10.7 \ \text{MHz}$ with a $-3 \ \text{dB}$ channel selectivity bandwidth of $\Delta f = 200 \ \text{kHz}$. A high-frequency precision inductor of $L = 2.2 \ \mu\text{H}$ is selected.</p>
+    <div class="step-solution">
+        <p><strong>Step 1: Calculate Required Tuning Capacitance ($C$):</strong></p>
+        $$C = \frac{1}{4 \pi^2 f_0^2 L} = \frac{1}{4 \pi^2 \times (10.7 \times 10^6 \text{ Hz})^2 \times (2.2 \times 10^{-6} \text{ H})}$$
+        $$C = \frac{1}{39.4784 \times 1.1449 \times 10^{14} \times 2.2 \times 10^{-6}} = \frac{1}{9.944 \times 10^{9}} = 1.0056 \times 10^{-10} \text{ F} = 100.56 \text{ pF}$$
+        <p><strong>Step 2: Determine Required Quality Factor ($Q$):</strong></p>
+        $$Q = \frac{f_0}{\Delta f} = \frac{10.7 \times 10^6 \text{ Hz}}{200 \times 10^3 \text{ Hz}} = 53.5$$
+        <p><strong>Step 3: Calculate Characteristic Impedance ($Z_0$):</strong></p>
+        $$Z_0 = \sqrt{\frac{L}{C}} = \sqrt{\frac{2.2 \times 10^{-6}}{100.56 \times 10^{-12}}} = \sqrt{21,877.5} = 147.91 \ \Omega$$
+        <p><strong>Step 4: Compute Maximum Allowable Total Series Damping Resistance ($R_{\text{max}}$):</strong></p>
+        $$R = \frac{Z_0}{Q} = \frac{147.91 \ \Omega}{53.5} = 2.76 \ \Omega$$
+        <p><strong>Conclusion:</strong> To achieve the exact $10.7 \text{ MHz}$ center frequency and $200 \text{ kHz}$ broadcast bandwidth, the circuit must utilize a $100.6 \text{ pF}$ low-loss C0G dielectric capacitor and ensure total inductor copper plus PCB trace resistance does not exceed $2.76 \ \Omega$.</p>
+    </div>
+</div>
+
+<h2>Frequently Asked Questions (FAQ)</h2>
+<div class="faq-section">
+    <h3>What happens physically at LC electrical resonance?</h3>
+    <p>At electrical resonance, the inductive reactance $X_L = 2\pi f L$ and capacitive reactance $X_C = 1/(2\pi f C)$ become equal in magnitude and $180^\circ$ out of phase, canceling each other completely. In a series LC circuit, net impedance drops to purely resistive $R$ (minimum impedance), allowing maximum current. In a parallel LC tank, net impedance surges to a maximum, presenting an open-circuit barrier to the resonant frequency.</p>
+
+    <h3>How do you calculate the resonant frequency of an LC circuit?</h3>
+    <p>The formula is derived by equating inductive and capacitive reactance: $\omega L = 1/(\omega C)$, leading to angular frequency $\omega_0 = 1/\sqrt{LC}$ and cyclic frequency $f_0 = \frac{1}{2 \pi \sqrt{LC}}$, where $L$ is inductance in Henrys and $C$ is capacitance in Farads.</p>
+
+    <h3>What is the Quality Factor (Q) of a resonant circuit?</h3>
+    <p>Quality factor $Q$ measures damping and selectivity. It is defined as $2\pi$ times the ratio of peak energy stored to energy dissipated per cycle. For a series RLC circuit, $Q = \frac{1}{R} \sqrt{L/C}$. For a parallel RLC circuit, $Q = R \sqrt{C/L}$. Higher $Q$ results in a narrower $3\text{ dB}$ bandwidth.</p>
+
+    <h3>How is 3 dB bandwidth related to resonant frequency and Q?</h3>
+    <p>The half-power ($-3\text{ dB}$) bandwidth $\Delta f$ is inversely proportional to $Q$: $\Delta f = f_0 / Q$. High-$Q$ circuits exhibit sharp selectivity with narrow bandwidth, while low-$Q$ circuits have broader passbands.</p>
+</div>
+
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚡</span>
+            <h3 class="widget-title">Related Electrical & Power Systems</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="wire-ampacity-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Ampacity (NEC 310.16)</a></li>
+            <li><a href="conduit-fill-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Conduit Fill (NEC Ch. 9)</a></li>
+            <li><a href="motor-starting-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Motor Starting Current</a></li>
+            <li><a href="short-circuit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Short-Circuit (IEC 60909)</a></li>
+            <li><a href="transformer-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Sizing (NEC 450)</a></li>
+            <li><a href="cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC/NEC)</a></li>
+            <li><a href="voltage-drop-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Drop Calculator</a></li>
+            <li><a href="ohms-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ohm's Law Calculator</a></li>
+            <li><a href="power-factor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Power Factor (kW to kVAR)</a></li>
+            <li><a href="parallel-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistor (Req)</a></li>
+            <li><a href="battery-life-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Life & Runtime</a></li>
+            <li><a href="resistor-color-code-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Color Code</a></li>
+            <li><a href="555-timer-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> 555 Timer Astable & Monostable</a></li>
+            <li><a href="led-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LED Series Resistor Calculator</a></li>
+            <li><a href="capacitive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitive Reactance (Xc)</a></li>
+            <li><a href="inductive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Inductive Reactance (Xl)</a></li>
+            <li><a href="op-amp-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Op-Amp Gain & Inverting/Non-Inv</a></li>
+            <li><a href="three-phase-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three-Phase AC Power (kVA/kW)</a></li>
+            <li><a href="adc-dac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ADC & DAC Converter Resolution</a></li>
+            <li><a href="antenna-length-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Antenna Length & Resonant Dipole</a></li>
+            <li><a href="battery-short-circuit-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Short Circuit (IEC 60896)</a></li>
+            <li><a href="bjt-transistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BJT Transistor Bias & Q-Point</a></li>
+            <li><a href="breaker-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Breaker Size (NEC 125% Rule)</a></li>
+            <li><a href="decibel-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Decibel Calculator (dB, dBm, SPL)</a></li>
+            <li><a href="earth-pit-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earth Pit Resistance (IEEE 80)</a></li>
+            <li><a href="electrical-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Electrical Power & Energy Cost</a></li>
+            <li><a href="microstrip-impedance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Microstrip Impedance (IPC-2141)</a></li>
+            <li><a href="resistor-network-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Network (Delta-Wye & Ladder)</a></li>
+            <li><a href="transformer-turns-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Turns Ratio (a)</a></li>
+            <li><a href="aluminium-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Aluminium Cable Sizing (NEC/IEC)</a></li>
+            <li><a href="busbar-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Busbar Sizing (DIN 43671 / IEC)</a></li>
+            <li><a href="cable-sizing-calculator-bs-7671.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (BS 7671 18th Ed)</a></li>
+            <li><a href="cable-sizing-calculator-iec-60364.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC 60364-5-52)</a></li>
+            <li><a href="cable-sizing-installation-method-a.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method A (Insulated Wall)</a></li>
+            <li><a href="fault-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Fault Current (IEEE 141 / IEC)</a></li>
+            <li><a href="filter-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Analog Filter (RC, RL, LC)</a></li>
+            <li><a href="generator-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Generator Sizing (ISO 8528)</a></li>
+            <li><a href="heatsink-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heatsink Sizing & Thermal</a></li>
+            <li><a href="cable-sizing-installation-method-c.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method C (Clipped Direct)</a></li>
+            <li><a href="cable-sizing-installation-method-e.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method E (Cable Tray)</a></li>
+            <li><a href="cable-sizing-calculator-nec.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (NEC Table 310.16)</a></li>
+            <li><a href="copper-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Copper Cable Sizing (100% IACS)</a></li>
+            <li><a href="earthing-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earthing Cable Size (IEC 60364-5-54)</a></li>
+            <li><a href="kw-to-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> kW to Cable Size (1-Phase & 3-Phase)</a></li>
+            <li><a href="single-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Single Phase Cable Sizing (230V/120V)</a></li>
+            <li><a href="three-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three Phase Cable Sizing (400V/480V)</a></li>
+            <li><a href="wire-gauge-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Gauge (AWG to mm² Metric)</a></li>
+            <li><a href="voltage-divider-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Divider Calculator</a></li>
+            <li><a href="parallel-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistance Calculator</a></li>
+            <li><a href="capacitor-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitor Energy & Pulse Power</a></li>
+            <li><a href="resonant-frequency-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> LC Resonant Frequency Tank</a></li>
+            <li><a href="rc-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RC Time Constant (τ = RC)</a></li>
+            <li><a href="rl-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RL Time Constant (τ = L/R)</a></li>
+            <li><a href="zener-diode-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Zener Diode Shunt Regulator</a></li>
+            <li><a href="lm317-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LM317 Voltage Regulator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="engineering.html" class="sidebar-category-link">View All Electrical & Power Systems Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub provides free, rigorous, engineering-grade calculators, physics simulation utilities, and financial models verified against standard laboratory benchmarks.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Calculator Hubs</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                        <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Engineering Tools</h4>
+                    <ul class="footer-links">
+                        <li><a href="voltage-divider-calculator.html">Voltage Divider</a></li>
+                        <li><a href="parallel-resistance-calculator.html">Parallel Resistance</a></li>
+                        <li><a href="resonant-frequency-calculator.html">LC Resonant Tank</a></li>
+                        <li><a href="ohms-law-calculator.html">Ohm's Law Engine</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precise computational tools for engineers, scientists, and researchers.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+    
+function updateRfMode() {
+    var mode = document.getElementById('rf-calc-mode').value;
+    document.getElementById('grp-rf-ind').style.display = (mode === 'ind') ? 'none' : 'block';
+    document.getElementById('grp-rf-cap').style.display = (mode === 'cap') ? 'none' : 'block';
+    document.getElementById('grp-rf-freq').style.display = (mode === 'freq') ? 'none' : 'block';
+}
+
+function computeResonance() {
+    var mode = document.getElementById('rf-calc-mode').value;
+    var lVal = parseFloat(document.getElementById('rf-l').value);
+    var lUnit = parseFloat(document.getElementById('rf-l-unit').value);
+    var cVal = parseFloat(document.getElementById('rf-c').value);
+    var cUnit = parseFloat(document.getElementById('rf-c-unit').value);
+    var fVal = parseFloat(document.getElementById('rf-f').value);
+    var fUnit = parseFloat(document.getElementById('rf-f-unit').value);
+    var rVal = parseFloat(document.getElementById('rf-r').value);
+    var rUnit = parseFloat(document.getElementById('rf-r-unit').value);
+
+    var L = lVal * lUnit;
+    var C = cVal * cUnit;
+    var f0 = fVal * fUnit;
+    var R = (isNaN(rVal) || rVal < 0) ? 0 : rVal * rUnit;
+
+    if (mode === 'freq') {
+        if (isNaN(L) || L <= 0 || isNaN(C) || C <= 0) return;
+        f0 = 1.0 / (2.0 * Math.PI * Math.sqrt(L * C));
+    } else if (mode === 'ind') {
+        if (isNaN(f0) || f0 <= 0 || isNaN(C) || C <= 0) return;
+        L = 1.0 / (4.0 * Math.PI * Math.PI * f0 * f0 * C);
+        // Display computed L
+        var lDisp = L / lUnit;
+        document.getElementById('rf-l').value = lDisp.toFixed(4);
+    } else if (mode === 'cap') {
+        if (isNaN(f0) || f0 <= 0 || isNaN(L) || L <= 0) return;
+        C = 1.0 / (4.0 * Math.PI * Math.PI * f0 * f0 * L);
+        // Display computed C
+        var cDisp = C / cUnit;
+        document.getElementById('rf-c').value = cDisp.toFixed(4);
+    }
+
+    var w0 = 2.0 * Math.PI * f0;
+    var Z0 = Math.sqrt(L / C);
+
+    // Format f0
+    var fStr = "";
+    if (f0 >= 1e9) {
+        fStr = (f0 / 1e9).toFixed(4) + " GHz (" + (f0 / 1e6).toFixed(2) + " MHz)";
+    } else if (f0 >= 1e6) {
+        fStr = (f0 / 1e6).toFixed(4) + " MHz (" + (f0 / 1e3).toFixed(2) + " kHz)";
+    } else if (f0 >= 1e3) {
+        fStr = (f0 / 1e3).toFixed(3) + " kHz (" + f0.toFixed(1) + " Hz)";
+    } else {
+        fStr = f0.toFixed(2) + " Hz";
+    }
+    document.getElementById('res-rf-f0').textContent = fStr;
+
+    // Angular velocity
+    document.getElementById('res-rf-w0').textContent = (w0 >= 1e6 ? w0.toExponential(3) : w0.toFixed(2)) + " rad/s";
+
+    // Characteristic Impedance
+    document.getElementById('res-rf-z0').textContent = Z0.toFixed(2) + " Ω";
+
+    // Q Factor and Bandwidth
+    if (R > 0) {
+        var Q = Z0 / R; // for series RLC
+        var bw = f0 / Q;
+        document.getElementById('res-rf-q').textContent = Q.toFixed(2);
+        var bwStr = "";
+        if (bw >= 1e6) {
+            bwStr = (bw / 1e6).toFixed(3) + " MHz";
+        } else if (bw >= 1e3) {
+            bwStr = (bw / 1e3).toFixed(2) + " kHz";
+        } else {
+            bwStr = bw.toFixed(2) + " Hz";
+        }
+        document.getElementById('res-rf-bw').textContent = bwStr;
+    } else {
+        document.getElementById('res-rf-q').textContent = "∞ (Ideal lossless network)";
+        document.getElementById('res-rf-bw').textContent = "0 Hz (Impulse response)";
+    }
+}
+
+document.getElementById('rf-calc-mode').addEventListener('change', function() {
+    updateRfMode();
+    computeResonance();
+});
+document.getElementById('calc-rf-btn').addEventListener('click', computeResonance);
+['rf-l', 'rf-l-unit', 'rf-c', 'rf-c-unit', 'rf-f', 'rf-f-unit', 'rf-r', 'rf-r-unit'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', computeResonance);
+    document.getElementById(id).addEventListener('change', computeResonance);
+});
+window.addEventListener('DOMContentLoaded', function() {
+    updateRfMode();
+    computeResonance();
+});
+
+    </script>
+</body>
+</html>

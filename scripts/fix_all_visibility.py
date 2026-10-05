@@ -180,6 +180,14 @@ CAT_MAP = {
             ("single-phase-cable-sizing-calculator.html", "Single Phase Cable Sizing (230V/120V)", "🔌", "2-wire loop drop & radial/ring circuit", "ΔV = 2·I·L·R | 3% lighting & 5% power limit"),
             ("three-phase-cable-sizing-calculator.html", "Three Phase Cable Sizing (400V/480V)", "⚡", "Line-to-line balanced vector drop & method E", "ΔV = √3·I·L·(R·cosφ + X·sinφ) | IEC 60364-5-52"),
             ("wire-gauge-calculator.html", "Wire Gauge (AWG to mm² Metric)", "📏", "ASTM B258 logarithmic AWG scale & circular mils", "d_n = 0.005 × 92^((36-n)/39) in | kcmil conversion"),
+            ("voltage-divider-calculator.html", "Voltage Divider Calculator", "⚡", "Loaded & unloaded divider, attenuation & Thevenin source", "V_out = V_in · R2 / (R1 + R2) | R_th = R1 || R2"),
+            ("parallel-resistance-calculator.html", "Parallel Resistance Calculator", "⚡", "Equivalent resistance, conductance Siemens & current division", "1/R_p = ∑(1/R_i) | I_k = I_total · (R_p / R_k)"),
+            ("capacitor-energy-calculator.html", "Capacitor Energy & Pulse Power", "🔋", "Stored Joules E = ½CV², charge Q = CV & peak discharge power", "E = ½·C·V² = ½·Q·V | P_avg = E / Δt | I_peak = V / ESR"),
+            ("resonant-frequency-calculator.html", "LC Resonant Frequency Tank", "📻", "Series/parallel LC resonance, Q factor & 3dB bandwidth", "f0 = 1 / (2π√(LC)) | Q = Z0 / R | Δf = f0 / Q"),
+            ("rc-time-constant-calculator.html", "RC Time Constant (τ = RC)", "⏱️", "Time constant, filter cutoff fc & exponential transient curves", "τ = R·C | fc = 1 / (2πRC) | V(t) = Vs(1 - e^(-t/τ))"),
+            ("rl-time-constant-calculator.html", "RL Time Constant (τ = L/R)", "⚡", "Inductor current growth, flyback kickback & magnetic energy", "τ = L/R | I_max = V/R | E_L = ½·L·I² | v_L = -L(di/dt)"),
+            ("zener-diode-calculator.html", "Zener Diode Shunt Regulator", "⚡", "Series resistor Rs, max diode power Pz & load regulation", "Rs = (Vin,min - Vz) / (IL,max + Iz,min) | Pz = Vz·Iz,max"),
+            ("lm317-calculator.html", "LM317 Voltage Regulator", "⚡", "Adjustable linear regulator Vout, R1/R2 feedback & heatsink", "Vout = 1.25·(1 + R2/R1) + Iadj·R2 | θSA heatsink sizing"),
         ]
     },
     "solar-energy.html": {

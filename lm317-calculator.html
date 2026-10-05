@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LM317 Voltage Regulator Calculator - Resistors R1 & R2, Power & Heatsink</title>
+    <meta name="description" content="Calculate LM317 output voltage (Vout = 1.25*(1 + R2/R1) + Iadj*R2), feedback resistors, thermal dissipation (Pd), and required heatsink thermal resistance.">
+    <link rel="canonical" href="https://calchub.com/lm317-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "LM317 Voltage Regulator Calculator",
+      "url": "https://calchub.com/lm317-calculator.html",
+      "description": "Calculates LM317 adjustable positive linear regulator output voltage, resistor divider network, thermal dissipation, and heatsink thermal resistance.",
+      "applicationCategory": "EngineeringApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does the LM317 regulate its output voltage?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The LM317 maintains an internal temperature-compensated 1.25 V bandgap reference voltage (Vref) between its OUT and ADJ terminals. By forcing this fixed 1.25 V across programming resistor R1, a constant reference current flows into resistor R2, developing an output voltage: Vout = Vref * (1 + R2 / R1) + Iadj * R2."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is R1 commonly chosen as 240 ohms or 120 ohms?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The LM317 requires a minimum operating load current (typically 3.5 mA to 10 mA) to maintain stable regulation under all temperature conditions. With Vref = 1.25 V, setting R1 = 120 ohms guarantees a baseline current of 10.4 mA, while R1 = 240 ohms guarantees 5.2 mA, satisfying the minimum load specification without requiring an external load."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the dropout voltage of the LM317?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The LM317 requires an input-to-output voltage differential (Vin - Vout) of at least 1.5 V to 2.5 V depending on load current and junction temperature to keep its internal Darlington pass transistor in active regulation."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why are protection diodes recommended in LM317 circuits?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "If input power is abruptly grounded while large capacitors exist at the output or ADJ pin, reverse current flows into the regulator's internal transistors. Diode D1 across OUT-to-IN and diode D2 across ADJ-to-OUT safely divert discharge currents away from internal junctions."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="converter.html">Converters</a>
+                <a href="engineering.html">Engineering</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="engineering.html">Engineering &amp; Electronics</a> &gt; <span>LM317 Voltage Regulator Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>LM317 Voltage Regulator Calculator</h1>
+                        <p class="calc-desc">Calculate output voltage, feedback divider resistors (R1, R2), internal power dissipation, and thermal heatsink requirements for the LM317 IC.</p>
+                    </div>
+                    
+<div class="calc-grid">
+    <div class="calc-input-group">
+        <label for="lm-mode">Calculation Mode:</label>
+        <select id="lm-mode">
+            <option value="vout" selected>Solve Output Voltage ($V_{\text{out}}$) from Resistors</option>
+            <option value="r2">Solve Required Resistor $R_2$ from Desired $V_{\text{out}}$</option>
+        </select>
+    </div>
+    <div class="calc-input-group">
+        <label for="lm-vin">Input Voltage ($V_{\text{in}}$):</label>
+        <div class="input-with-select">
+            <input type="number" id="lm-vin" value="12" min="1.5" step="any">
+            <select id="lm-vin-unit">
+                <option value="1" selected>V</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group" id="grp-lm-r1">
+        <label for="lm-r1">Resistor $R_1$ (Standard 240 or 120 &Omega;):</label>
+        <div class="input-with-select">
+            <input type="number" id="lm-r1" value="240" min="1" step="any">
+            <select id="lm-r1-unit">
+                <option value="1" selected>&Omega;</option>
+                <option value="1000">k&Omega;</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group" id="grp-lm-r2">
+        <label for="lm-r2">Resistor $R_2$:</label>
+        <div class="input-with-select">
+            <input type="number" id="lm-r2" value="720" min="0" step="any">
+            <select id="lm-r2-unit">
+                <option value="1" selected>&Omega;</option>
+                <option value="1000">k&Omega;</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group" id="grp-lm-target-vout" style="display:none;">
+        <label for="lm-target-vout">Desired Output Voltage ($V_{\text{out}}$):</label>
+        <div class="input-with-select">
+            <input type="number" id="lm-target-vout" value="5.0" min="1.25" step="any">
+            <select id="lm-target-vout-unit">
+                <option value="1" selected>V</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="lm-il">Load Current ($I_L$):</label>
+        <div class="input-with-select">
+            <input type="number" id="lm-il" value="500" min="0" step="any">
+            <select id="lm-il-unit">
+                <option value="0.001" selected>mA</option>
+                <option value="1">A</option>
+            </select>
+        </div>
+    </div>
+</div>
+<button id="calc-lm-btn" class="calc-btn">Calculate LM317 Parameters</button>
+<div class="calc-results-card" id="lm-results">
+    <h3>LM317 Regulation &amp; Thermal Analysis</h3>
+    <div class="result-row highlight-result">
+        <span class="result-label">Output Voltage ($V_{\text{out}}$):</span>
+        <span class="result-val" id="res-lm-vout">5.04 V</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Resistor $R_2$ Value:</span>
+        <span class="result-val" id="res-lm-r2-val">720.0 &Omega;</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Input-to-Output Voltage Headroom ($V_{\text{in}} - V_{\text{out}}$):</span>
+        <span class="result-val" id="res-lm-vdiff">6.96 V (&ge; 2.0 V Dropout OK)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Regulator Internal Power Dissipation ($P_D$):</span>
+        <span class="result-val" id="res-lm-pd">3.48 W</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Thermal Management Requirement:</span>
+        <span class="result-val" id="res-lm-thermal">Heatsink Required (&theta;SA &le; 24.6 &deg;C/W)</span>
+    </div>
+</div>
+
+                </div>
+                <article class="article-body">
+                    
+<h2>Architecture of the LM317 Adjustable Linear Voltage Regulator</h2>
+<p>The LM317 is a monolithic three-terminal adjustable positive linear voltage regulator designed by Robert C. Dobkin at National Semiconductor in 1976. Widely considered one of the most versatile analog integrated circuits in electronics history, it delivers over $1.5\text{ A}$ of load current across an adjustable output range spanning $1.25\text{ V}$ to $37\text{ V}$.</p>
+
+<p>Unlike classic fixed-voltage linear regulators (e.g., the 7805 or 7812) that reference their control circuitry to an external chassis ground pin, the LM317 possesses no physical ground terminal. Instead, its internal error amplifier and temperature-compensated bandgap voltage reference float between the <strong>OUTPUT ($V_{\text{out}}$)</strong> terminal and the <strong>ADJUST ($\text{ADJ}$)</strong> terminal, maintaining a precision potential of:</p>
+$$V_{\text{ref}} = 1.25\text{ V} \quad (\text{Nominal: } 1.20\text{--}1.30\text{ V})$$
+
+<p>Because the regulator floats on the output voltage, the differential voltage experienced across the silicon pass transistor is simply $(V_{\text{in}} - V_{\text{out}})$. As long as this differential limit ($40\text{ V}$ standard, $60\text{ V}$ for the LM317HV) is not breached, the LM317 can regulate high-voltage supplies safely.</p>
+
+<h2>Derivation of the Output Voltage Equation</h2>
+<p>The programming network consists of two external resistors: $R_1$ placed between OUT and ADJ, and $R_2$ connected between ADJ and ground.</p>
+
+<p>Because the IC strictly maintains $V_{\text{ref}} = 1.25\text{ V}$ across $R_1$, a constant reference current $I_1$ flows down through $R_1$:</p>
+$$I_1 = \frac{V_{\text{ref}}}{R_1}$$
+
+<p>At the ADJ terminal node, Kirchhoff's Current Law (KCL) dictates that the total current flowing through resistor $R_2$ to ground is the sum of reference current $I_1$ and internal bias adjustment current $I_{\text{adj}}$:</p>
+$$I_2 = I_1 + I_{\text{adj}} = \frac{V_{\text{ref}}}{R_1} + I_{\text{adj}}$$
+
+<p>The total output voltage $V_{\text{out}}$ is the sum of the potential across $R_1$ and the potential across $R_2$:</p>
+$$V_{\text{out}} = V_{\text{ref}} + I_2 \cdot R_2 = V_{\text{ref}} + \left( \frac{V_{\text{ref}}}{R_1} + I_{\text{adj}} \right) R_2$$
+$$V_{\text{out}} = V_{\text{ref}} \left( 1 + \frac{R_2}{R_1} \right) + I_{\text{adj}} \cdot R_2$$
+
+<p>In typical components, $I_{\text{adj}}$ is held to a tightly controlled nominal value of $50\ \mu\text{A}$ ($100\ \mu\text{A}$ maximum). When $R_1$ is sized so that $I_1 \ge 5\text{ mA}$, the term $I_{\text{adj}} \cdot R_2$ represents an error smaller than $1\%$, allowing the simplified approximation:</p>
+$$V_{\text{out}} \approx 1.25 \left( 1 + \frac{R_2}{R_1} \right)$$
+
+<h3>Why is $R_1$ Standardized at $240\ \Omega$ or $120\ \Omega$?</h3>
+<p>All linear regulators require a <strong>minimum load current ($I_{L,\text{min}}$)</strong> to sustain internal biasing and prevent the output voltage from floating up to the unregulated input rail under no-load conditions. The LM317 datasheet specifies a maximum required minimum load current of $3.5\text{ mA}$ (commercial grade) to $10\text{ mA}$ (military/extreme temperature grade).</p>
+<ul>
+    <li>With $R_1 = 240\ \Omega$: $I_1 = \frac{1.25\text{ V}}{240\ \Omega} = 5.21\text{ mA}$. This satisfies the $3.5\text{ mA}$ requirement for all standard operating temperatures.</li>
+    <li>With $R_1 = 120\ \Omega$: $I_1 = \frac{1.25\text{ V}}{120\ \Omega} = 10.42\text{ mA}$. This satisfies the strictest $10\text{ mA}$ worst-case military specification.</li>
+</ul>
+
+<h2>Thermal Power Dissipation ($P_D$) and Heatsink Thermal Resistance Calculation</h2>
+<p>Linear regulators operate by dropping excess voltage across an internal series Darlington pass transistor, converting the product of voltage differential and load current directly into waste heat. Total internal power dissipation $P_D$ is:</p>
+$$P_D = (V_{\text{in}} - V_{\text{out}}) \cdot I_L + V_{\text{in}} \cdot I_{\text{adj}} \approx (V_{\text{in}} - V_{\text{out}}) \cdot I_L$$
+
+<p>To prevent the silicon die from exceeding its maximum safe junction temperature ($T_{J,\text{max}} = 125^\circ\text{C}$ to $150^\circ\text{C}$), the thermal impedance chain from junction to ambient air must satisfy:</p>
+$$T_J = T_A + P_D \cdot \theta_{JA}$$
+$$\theta_{JA} = \theta_{JC} + \theta_{CS} + \theta_{SA}$$
+
+<p>Where:</p>
+<ul>
+    <li><strong>$T_A$</strong>: Maximum expected ambient temperature ($^\circ\text{C}$).</li>
+    <li><strong>$\theta_{JC}$</strong>: Junction-to-case thermal resistance (typically $4.0^\circ\text{C/W}$ for a standard TO-220 package).</li>
+    <li><strong>$\theta_{CS}$</strong>: Case-to-heatsink mounting interface thermal resistance (typically $0.5\text{--}1.0^\circ\text{C/W}$ with silicone thermal grease and mica insulator).</li>
+    <li><strong>$\theta_{SA}$</strong>: Required heatsink-to-ambient thermal resistance ($^\circ\text{C/W}$).</li>
+</ul>
+
+<p>Solving for the maximum permissible heatsink thermal resistance:</p>
+$$\theta_{SA} \le \frac{T_{J,\text{max}} - T_A}{P_D} - (\theta_{JC} + \theta_{CS})$$
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Package Type</th>
+            <th>Max Current ($I_{\text{max}}$)</th>
+            <th>$\theta_{JC}$ (Junction-to-Case)</th>
+            <th>$\theta_{JA}$ (Free Air, No Heatsink)</th>
+            <th>Max Uncooled Dissipation ($25^\circ\text{C}$)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>TO-220 (LM317T)</strong></td>
+            <td>$1.5\text{ A}$</td>
+            <td>$4.0^\circ\text{C/W}$</td>
+            <td>$50^\circ\text{C/W}$</td>
+            <td>$1.5\text{--}2.0\text{ W}$</td>
+        </tr>
+        <tr>
+            <td><strong>TO-3 (LM317K Metal Can)</strong></td>
+            <td>$1.5\text{ A}$</td>
+            <td>$2.3^\circ\text{C/W}$</td>
+            <td>$35^\circ\text{C/W}$</td>
+            <td>$2.5\text{--}3.0\text{ W}$</td>
+        </tr>
+        <tr>
+            <td><strong>D2PAK / TO-263 (Surface Mount)</strong></td>
+            <td>$1.5\text{ A}$</td>
+            <td>$4.0^\circ\text{C/W}$</td>
+            <td>$45^\circ\text{C/W}$ (On 1-inch copper pad)</td>
+            <td>$1.8\text{ W}$</td>
+        </tr>
+        <tr>
+            <td><strong>SOT-223 (LM317M, 500mA)</strong></td>
+            <td>$0.5\text{ A}$</td>
+            <td>$15^\circ\text{C/W}$</td>
+            <td>$100^\circ\text{C/W}$</td>
+            <td>$0.7\text{--}1.0\text{ W}$</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Protection Diodes and Ripple Rejection Capacitor Optimization</h2>
+<p>To achieve high power supply rejection ratio (PSRR) and ensure fail-safe operation, two external design practices are essential:</p>
+<ul>
+    <li><strong>ADJ Bypass Capacitor ($C_{\text{adj}}$):</strong> Placing a $10\ \mu\text{F}$ capacitor across resistor $R_2$ bypasses the feedback divider ripple at AC, boosting ripple rejection from $65\text{ dB}$ to an exceptional $80\text{ dB}$ (a $10\times$ improvement in 100/120 Hz mains hum attenuation).</li>
+    <li><strong>Reverse Protection Diode $D_1$ (OUT to IN):</strong> When the input power supply is turned off, input capacitors discharge faster than large output filter capacitors ($C_{\text{out}}$). Without protection, current flows backwards from OUT into the internal collector, destroying the series pass transistor. Diode $D_1$ (1N4002 or 1N4007) clamps reverse voltage to $0.7\text{ V}$.</li>
+    <li><strong>Discharge Protection Diode $D_2$ (ADJ to OUT):</strong> When bypass capacitor $C_{\text{adj}}$ is utilized, an abrupt output short-circuit will dump $C_{\text{adj}}$ energy back into the ADJ pin. Diode $D_2$ discharges $C_{\text{adj}}$ safely through the load.</li>
+</ul>
+
+<div class="worked-example-card">
+    <h4>Step-by-Step Engineering Case Study: 9.0V Precision Benchtop Supply</h4>
+    <p><strong>Scenario:</strong> Design a regulated $V_{\text{out}} = 9.0\text{ V}$ benchtop supply delivering up to $I_L = 800\text{ mA}$ from an unregulated DC rectified rail of $V_{\text{in}} = 15.0\text{ V}$. An LM317T in a TO-220 package ($\theta_{JC} = 4.0^\circ\text{C/W}$) is used. Ambient operating temperature is $T_A = 40^\circ\text{C}$ and junction limit is set conservatively to $T_{J,\text{max}} = 110^\circ\text{C}$.</p>
+    <div class="step-solution">
+        <p><strong>Step 1: Choose $R_1$ and Solve for $R_2$:</strong></p>
+        <p>Select standard precision metal film resistor $R_1 = 240\ \Omega$.</p>
+        $$R_2 = \frac{V_{\text{out}} - V_{\text{ref}}}{\frac{V_{\text{ref}}}{R_1} + I_{\text{adj}}} = \frac{9.0\text{ V} - 1.25\text{ V}}{\frac{1.25\text{ V}}{240\ \Omega} + 50 \times 10^{-6}\text{ A}} = \frac{7.75\text{ V}}{0.0052083 + 0.000050} = \frac{7.75}{0.0052583} = 1,473.8\ \Omega$$
+        <p>Select standard E96 precision value $R_2 = 1.47\ \text{k}\Omega$ ($1470\ \Omega$) or trim with a multi-turn cermet potentiometer.</p>
+        <p><strong>Step 2: Check Input-to-Output Voltage Headroom:</strong></p>
+        $$V_{\text{diff}} = V_{\text{in}} - V_{\text{out}} = 15.0\text{ V} - 9.0\text{ V} = 6.0\text{ V}$$
+        <p>This comfortably exceeds the $2.0\text{ V}$ worst-case dropout voltage requirement.</p>
+        <p><strong>Step 3: Calculate Regulator Power Dissipation ($P_D$):</strong></p>
+        $$P_D = (V_{\text{in}} - V_{\text{out}}) \cdot I_L = 6.0\text{ V} \times 0.800\text{ A} = 4.80\text{ Watts}$$
+        <p><strong>Step 4: Compute Required Heatsink Thermal Resistance ($\theta_{SA}$):</strong></p>
+        <p>Assuming silicone grease mounting thermal resistance $\theta_{CS} = 1.0^\circ\text{C/W}$:</p>
+        $$\theta_{SA} \le \frac{T_{J,\text{max}} - T_A}{P_D} - (\theta_{JC} + \theta_{CS}) = \frac{110^\circ\text{C} - 40^\circ\text{C}}{4.80\text{ W}} - (4.0 + 1.0)$$
+        $$\theta_{SA} \le \frac{70}{4.80} - 5.0 = 14.58 - 5.0 = 9.58^\circ\text{C/W}$$
+        <p><strong>Conclusion:</strong> To prevent thermal shutdown, a stamped aluminum or extruded heatsink with thermal resistance rating $\theta_{SA} \le 9.5^\circ\text{C/W}$ must be mounted to the LM317T TO-220 tab.</p>
+    </div>
+</div>
+
+<h2>Frequently Asked Questions (FAQ)</h2>
+<div class="faq-section">
+    <h3>How does the LM317 regulate its output voltage?</h3>
+    <p>The LM317 maintains an internal temperature-compensated $1.25\text{ V}$ bandgap reference voltage ($V_{\text{ref}}$) between its OUT and ADJ terminals. By forcing this fixed $1.25\text{ V}$ across programming resistor $R_1$, a constant reference current flows into resistor $R_2$, developing an output voltage: $V_{\text{out}} = V_{\text{ref}} \left(1 + \frac{R_2}{R_1}\right) + I_{\text{adj}} R_2$.</p>
+
+    <h3>Why is $R_1$ commonly chosen as $240\ \Omega$ or $120\ \Omega$?</h3>
+    <p>The LM317 requires a minimum operating load current (typically $3.5\text{ mA}$ to $10\text{ mA}$) to maintain stable regulation under all temperature conditions. With $V_{\text{ref}} = 1.25\text{ V}$, setting $R_1 = 120\ \Omega$ guarantees a baseline current of $10.4\text{ mA}$, while $R_1 = 240\ \Omega$ guarantees $5.2\text{ mA}$, satisfying the minimum load specification without requiring an external load.</p>
+
+    <h3>What is the dropout voltage of the LM317?</h3>
+    <p>The LM317 requires an input-to-output voltage differential ($V_{\text{in}} - V_{\text{out}}$) of at least $1.5\text{ V}$ to $2.5\text{ V}$ depending on load current and junction temperature to keep its internal Darlington pass transistor in active regulation.</p>
+
+    <h3>Why are protection diodes recommended in LM317 circuits?</h3>
+    <p>If input power is abruptly grounded while large capacitors exist at the output or ADJ pin, reverse current flows into the regulator's internal transistors. Diode $D_1$ across OUT-to-IN and diode $D_2$ across ADJ-to-OUT safely divert discharge currents away from internal junctions.</p>
+</div>
+
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚡</span>
+            <h3 class="widget-title">Related Electrical & Power Systems</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="wire-ampacity-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Ampacity (NEC 310.16)</a></li>
+            <li><a href="conduit-fill-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Conduit Fill (NEC Ch. 9)</a></li>
+            <li><a href="motor-starting-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Motor Starting Current</a></li>
+            <li><a href="short-circuit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Short-Circuit (IEC 60909)</a></li>
+            <li><a href="transformer-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Sizing (NEC 450)</a></li>
+            <li><a href="cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC/NEC)</a></li>
+            <li><a href="voltage-drop-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Drop Calculator</a></li>
+            <li><a href="ohms-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ohm's Law Calculator</a></li>
+            <li><a href="power-factor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Power Factor (kW to kVAR)</a></li>
+            <li><a href="parallel-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistor (Req)</a></li>
+            <li><a href="battery-life-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Life & Runtime</a></li>
+            <li><a href="resistor-color-code-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Color Code</a></li>
+            <li><a href="555-timer-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> 555 Timer Astable & Monostable</a></li>
+            <li><a href="led-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LED Series Resistor Calculator</a></li>
+            <li><a href="capacitive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitive Reactance (Xc)</a></li>
+            <li><a href="inductive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Inductive Reactance (Xl)</a></li>
+            <li><a href="op-amp-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Op-Amp Gain & Inverting/Non-Inv</a></li>
+            <li><a href="three-phase-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three-Phase AC Power (kVA/kW)</a></li>
+            <li><a href="adc-dac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ADC & DAC Converter Resolution</a></li>
+            <li><a href="antenna-length-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Antenna Length & Resonant Dipole</a></li>
+            <li><a href="battery-short-circuit-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Short Circuit (IEC 60896)</a></li>
+            <li><a href="bjt-transistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BJT Transistor Bias & Q-Point</a></li>
+            <li><a href="breaker-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Breaker Size (NEC 125% Rule)</a></li>
+            <li><a href="decibel-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Decibel Calculator (dB, dBm, SPL)</a></li>
+            <li><a href="earth-pit-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earth Pit Resistance (IEEE 80)</a></li>
+            <li><a href="electrical-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Electrical Power & Energy Cost</a></li>
+            <li><a href="microstrip-impedance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Microstrip Impedance (IPC-2141)</a></li>
+            <li><a href="resistor-network-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Network (Delta-Wye & Ladder)</a></li>
+            <li><a href="transformer-turns-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Turns Ratio (a)</a></li>
+            <li><a href="aluminium-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Aluminium Cable Sizing (NEC/IEC)</a></li>
+            <li><a href="busbar-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Busbar Sizing (DIN 43671 / IEC)</a></li>
+            <li><a href="cable-sizing-calculator-bs-7671.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (BS 7671 18th Ed)</a></li>
+            <li><a href="cable-sizing-calculator-iec-60364.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC 60364-5-52)</a></li>
+            <li><a href="cable-sizing-installation-method-a.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method A (Insulated Wall)</a></li>
+            <li><a href="fault-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Fault Current (IEEE 141 / IEC)</a></li>
+            <li><a href="filter-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Analog Filter (RC, RL, LC)</a></li>
+            <li><a href="generator-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Generator Sizing (ISO 8528)</a></li>
+            <li><a href="heatsink-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heatsink Sizing & Thermal</a></li>
+            <li><a href="cable-sizing-installation-method-c.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method C (Clipped Direct)</a></li>
+            <li><a href="cable-sizing-installation-method-e.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method E (Cable Tray)</a></li>
+            <li><a href="cable-sizing-calculator-nec.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (NEC Table 310.16)</a></li>
+            <li><a href="copper-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Copper Cable Sizing (100% IACS)</a></li>
+            <li><a href="earthing-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earthing Cable Size (IEC 60364-5-54)</a></li>
+            <li><a href="kw-to-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> kW to Cable Size (1-Phase & 3-Phase)</a></li>
+            <li><a href="single-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Single Phase Cable Sizing (230V/120V)</a></li>
+            <li><a href="three-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three Phase Cable Sizing (400V/480V)</a></li>
+            <li><a href="wire-gauge-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Gauge (AWG to mm² Metric)</a></li>
+            <li><a href="voltage-divider-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Divider Calculator</a></li>
+            <li><a href="parallel-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistance Calculator</a></li>
+            <li><a href="capacitor-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitor Energy & Pulse Power</a></li>
+            <li><a href="resonant-frequency-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LC Resonant Frequency Tank</a></li>
+            <li><a href="rc-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RC Time Constant (τ = RC)</a></li>
+            <li><a href="rl-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RL Time Constant (τ = L/R)</a></li>
+            <li><a href="zener-diode-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Zener Diode Shunt Regulator</a></li>
+            <li><a href="lm317-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> LM317 Voltage Regulator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="engineering.html" class="sidebar-category-link">View All Electrical & Power Systems Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers rigorous, laboratory-verified computational tools for electrical engineers, physicists, and circuit designers.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Calculator Hubs</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                        <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Voltage Regulators</h4>
+                    <ul class="footer-links">
+                        <li><a href="zener-diode-calculator.html">Zener Shunt Regulator</a></li>
+                        <li><a href="lm317-calculator.html">LM317 Adjustable Linear IC</a></li>
+                        <li><a href="voltage-divider-calculator.html">Resistive Divider</a></li>
+                        <li><a href="parallel-resistance-calculator.html">Parallel Resistance Network</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precise voltage regulation and thermal dissipation modeling engines.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+    
+function updateLmMode() {
+    var mode = document.getElementById('lm-mode').value;
+    document.getElementById('grp-lm-r2').style.display = (mode === 'r2') ? 'none' : 'block';
+    document.getElementById('grp-lm-target-vout').style.display = (mode === 'vout') ? 'none' : 'block';
+}
+
+function computeLm317() {
+    var mode = document.getElementById('lm-mode').value;
+    var vin = parseFloat(document.getElementById('lm-vin').value);
+    var r1Val = parseFloat(document.getElementById('lm-r1').value);
+    var r1Unit = parseFloat(document.getElementById('lm-r1-unit').value);
+    var r2Val = parseFloat(document.getElementById('lm-r2').value);
+    var r2Unit = parseFloat(document.getElementById('lm-r2-unit').value);
+    var targetVout = parseFloat(document.getElementById('lm-target-vout').value);
+    var ilVal = parseFloat(document.getElementById('lm-il').value);
+    var ilUnit = parseFloat(document.getElementById('lm-il-unit').value);
+
+    var Vref = 1.25; // Volts
+    var Iadj = 50e-6; // 50 microamperes
+
+    if (isNaN(vin) || isNaN(r1Val) || r1Val <= 0) return;
+    var R1 = r1Val * r1Unit;
+    var IL = (isNaN(ilVal) || ilVal < 0) ? 0.1 : ilVal * ilUnit;
+
+    var Vout = 0;
+    var R2 = 0;
+
+    if (mode === 'vout') {
+        if (isNaN(r2Val) || r2Val < 0) return;
+        R2 = r2Val * r2Unit;
+        Vout = Vref * (1.0 + R2 / R1) + (Iadj * R2);
+    } else {
+        if (isNaN(targetVout) || targetVout < Vref) return;
+        Vout = targetVout;
+        // Target Vout = Vref * (1 + R2/R1) + Iadj * R2 = Vref + R2 * (Vref/R1 + Iadj)
+        // R2 = (Vout - Vref) / (Vref / R1 + Iadj)
+        R2 = (Vout - Vref) / ((Vref / R1) + Iadj);
+        document.getElementById('lm-r2').value = R2.toFixed(1);
+    }
+
+    var vdiff = vin - Vout;
+
+    // Display Vout
+    document.getElementById('res-lm-vout').textContent = Vout.toFixed(2) + " V";
+    document.getElementById('res-lm-r2-val').textContent = R2.toFixed(1) + " Ω";
+
+    // Headroom check
+    if (vdiff < 1.5) {
+        document.getElementById('res-lm-vdiff').textContent = vdiff.toFixed(2) + " V (WARNING: Insufficient Headroom, Dropout < 1.5 V)";
+    } else if (vdiff < 2.0) {
+        document.getElementById('res-lm-vdiff').textContent = vdiff.toFixed(2) + " V (Marginal Headroom, near dropout limit)";
+    } else {
+        document.getElementById('res-lm-vdiff').textContent = vdiff.toFixed(2) + " V (Adequate Headroom, ≥ 2.0 V OK)";
+    }
+
+    // Power dissipation Pd = (Vin - Vout) * IL + Vin * Iadj
+    var Pd = (vdiff * IL) + (vin * Iadj);
+    document.getElementById('res-lm-pd').textContent = Pd.toFixed(3) + " W";
+
+    // Heatsink estimation for TO-220 package (Rth_JC = 4 C/W, Rth_JA = 50 C/W, T_ambient = 25 C, T_jmax = 125 C)
+    var Tj_noHeatsink = 25.0 + (Pd * 50.0);
+    if (Pd <= 0.5) {
+        document.getElementById('res-lm-thermal').textContent = "No Heatsink Needed (Free air Tj ≈ " + Tj_noHeatsink.toFixed(0) + " °C)";
+    } else if (Pd <= 1.0) {
+        document.getElementById('res-lm-thermal').textContent = "Small PCB Copper Area or Clip-on Heatsink Recommended";
+    } else {
+        // Required theta_SA = (Tjmax - Tamb) / Pd - (Rth_JC + Rth_CS)
+        // Let Tjmax = 100 C (conservative), Tamb = 35 C, Rth_JC = 4 C/W, Rth_CS = 1 C/W
+        var theta_sa = ((100.0 - 35.0) / Pd) - 5.0;
+        if (theta_sa > 0) {
+            document.getElementById('res-lm-thermal').textContent = "Heatsink Required (θSA ≤ " + theta_sa.toFixed(1) + " °C/W)";
+        } else {
+            document.getElementById('res-lm-thermal').textContent = "CRITICAL: Power Dissipation Excessive for Single TO-220 (" + Pd.toFixed(1) + " W)";
+        }
+    }
+}
+
+document.getElementById('lm-mode').addEventListener('change', function() {
+    updateLmMode();
+    computeLm317();
+});
+document.getElementById('calc-lm-btn').addEventListener('click', computeLm317);
+['lm-vin', 'lm-r1', 'lm-r1-unit', 'lm-r2', 'lm-r2-unit', 'lm-target-vout', 'lm-il', 'lm-il-unit'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', computeLm317);
+    document.getElementById(id).addEventListener('change', computeLm317);
+});
+window.addEventListener('DOMContentLoaded', function() {
+    updateLmMode();
+    computeLm317();
+});
+
+    </script>
+</body>
+</html>

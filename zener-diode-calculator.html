@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zener Diode Calculator - Series Resistor Sizing, Power & Regulation</title>
+    <meta name="description" content="Calculate Zener diode series current-limiting resistor (Rs), maximum Zener power dissipation (Pz), resistor wattage, and line/load regulation limits.">
+    <link rel="canonical" href="https://calchub.com/zener-diode-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Zener Diode Calculator",
+      "url": "https://calchub.com/zener-diode-calculator.html",
+      "description": "Calculates Zener series current-limiting resistor Rs, maximum diode power dissipation Pz, resistor power rating, and regulation margins.",
+      "applicationCategory": "EngineeringApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the difference between Zener breakdown and Avalanche breakdown?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "True Zener breakdown occurs in heavily doped p-n junctions at breakdown voltages below 5.6 V, where quantum mechanical tunneling across an ultra-narrow depletion region allows electrons to cross the forbidden band gap. Avalanche breakdown predominates at voltages above 5.6 V in moderately doped junctions, where high electric fields accelerate carriers to cause impact ionization. Around 5.6 V, both effects possess opposite temperature coefficients, producing near-zero temperature drift."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do you size the series resistor (Rs) for a Zener diode regulator?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The series resistor must supply sufficient current under minimum input voltage (Vin,min) to feed maximum load current (IL,max) while maintaining the Zener diode above its knee current (Izk): Rs = (Vin,min - Vz) / (IL,max + Izk)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "When does a Zener diode dissipate maximum power?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Zener diode experiences maximum power dissipation when input voltage reaches its peak (Vin,max) and load current drops to zero (IL = 0, no-load condition). In this case, all series current shunts entirely through the Zener: Pz,max = Vz * ((Vin,max - Vz) / Rs)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What safety margin is recommended for resistor and Zener power ratings?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A standard engineering de-rating factor of 50% to 100% is strongly advised. For example, if calculated dissipation is 0.35 W, specify at least a 0.5 W or 1.0 W rated component to maintain acceptable operating temperatures."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="converter.html">Converters</a>
+                <a href="engineering.html">Engineering</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="engineering.html">Engineering &amp; Electronics</a> &gt; <span>Zener Diode Voltage Regulator Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Zener Diode Voltage Regulator Calculator</h1>
+                        <p class="calc-desc">Size series current-limiting resistors, verify maximum diode power dissipation, and design robust shunt voltage regulation stages.</p>
+                    </div>
+                    
+<div class="calc-grid">
+    <div class="calc-input-group">
+        <label for="zd-vin-min">Minimum Input Voltage ($V_{\text{in,min}}$):</label>
+        <div class="input-with-select">
+            <input type="number" id="zd-vin-min" value="10" min="0.1" step="any">
+            <select id="zd-vin-min-unit">
+                <option value="1" selected>V</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="zd-vin-max">Maximum Input Voltage ($V_{\text{in,max}}$):</label>
+        <div class="input-with-select">
+            <input type="number" id="zd-vin-max" value="14" min="0.1" step="any">
+            <select id="zd-vin-max-unit">
+                <option value="1" selected>V</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="zd-vz">Zener Voltage ($V_Z$):</label>
+        <div class="input-with-select">
+            <input type="number" id="zd-vz" value="5.1" min="0.1" step="any">
+            <select id="zd-vz-unit">
+                <option value="1" selected>V</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="zd-il-max">Maximum Load Current ($I_{L,\text{max}}$):</label>
+        <div class="input-with-select">
+            <input type="number" id="zd-il-max" value="20" min="0" step="any">
+            <select id="zd-il-max-unit">
+                <option value="0.001" selected>mA</option>
+                <option value="1">A</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="zd-iz-min">Minimum Zener Knee Current ($I_{Z,\text{min}}$):</label>
+        <div class="input-with-select">
+            <input type="number" id="zd-iz-min" value="5" min="0.1" step="any">
+            <select id="zd-iz-min-unit">
+                <option value="0.001" selected>mA</option>
+                <option value="1">A</option>
+            </select>
+        </div>
+    </div>
+</div>
+<button id="calc-zd-btn" class="calc-btn">Calculate Zener Circuit Parameters</button>
+<div class="calc-results-card" id="zd-results">
+    <h3>Zener Shunt Regulation Metrics</h3>
+    <div class="result-row highlight-result">
+        <span class="result-label">Recommended Series Resistor ($R_s$):</span>
+        <span class="result-val" id="res-zd-rs">196.00 &Omega; (Standard E24: 180 &ndash; 200 &Omega;)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Resistor Power Dissipation ($P_{Rs,\text{max}}$):</span>
+        <span class="result-val" id="res-zd-prs">0.404 W (Specify &ge; 0.5 W or 1.0 W)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Worst-Case Zener Power ($P_{Z,\text{max}}$ at no load):</span>
+        <span class="result-val" id="res-zd-pz">0.232 W (Specify &ge; 0.5 W Zener diode)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Maximum Total Input Current ($I_{S,\text{max}}$):</span>
+        <span class="result-val" id="res-zd-ismax">45.41 mA</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Minimum Total Input Current ($I_{S,\text{min}}$):</span>
+        <span class="result-val" id="res-zd-ismin">25.00 mA</span>
+    </div>
+</div>
+
+                </div>
+                <article class="article-body">
+                    
+<h2>Zener Diode Fundamentals: Quantum Tunneling vs Avalanche Breakdown</h2>
+<p>A Zener diode is a specialized silicon p-n junction diode engineered to operate stably in the reverse-bias breakdown breakdown regime. Under forward bias, it exhibits standard diode conduction with a forward threshold drop ($V_F \approx 0.7\text{ V}$). Under reverse bias below its critical threshold, only a tiny reverse leakage current flows ($I_R \sim \text{nA}$). However, once reverse potential surpasses the breakdown threshold ($V_Z$), the diode enters a highly conductive state characterized by an extremely steep current-voltage ($I\text{-}V$) curve, maintaining an almost invariant clamp voltage across wide ranges of reverse current.</p>
+
+<p>Two distinct quantum and solid-state phenomena govern this breakdown behavior depending on junction doping concentration and physical barrier thickness:</p>
+
+<ul>
+    <li><strong>Quantum Mechanical Zener Tunneling ($V_Z < 5.6\text{ V}$):</strong> In heavily doped silicon junctions, the depletion region barrier width is extraordinarily narrow (often less than $10\text{ nm}$). The resulting electric field gradient exceeds $10^6\text{ V/m}$, allowing valence band electrons to quantum mechanically tunnel directly across the forbidden energy bandgap into empty conduction band states without kinetic collision. This true Zener mechanism possesses a <em>negative temperature coefficient</em> (as crystal lattice temperature rises, bandgap energy decreases, causing breakdown voltage to slightly decrease).</li>
+    <li><strong>Avalanche Impact Ionization ($V_Z > 5.6\text{ V}$):</strong> In moderately doped silicon junctions with wider depletion regions, free thermally generated carriers accelerate to massive kinetic velocities under high reverse electric fields. When these energetic carriers collide with stationary crystal lattice atoms, they liberate secondary electron-hole pairs through impact ionization. These newly created carriers accelerate in turn, triggering an exponential multiplicative avalanche cascade. Avalanche breakdown exhibits a <em>positive temperature coefficient</em> (increased thermal lattice vibrations scatter electrons, shortening mean free path and requiring higher potential to trigger avalanche).</li>
+    <li><strong>Zero-Temperature-Coefficient Crossover ($V_Z \approx 5.6\text{ V}$):</strong> Near nominal $5.6\text{ V}$, the negative temperature coefficient of quantum tunneling precisely cancels the positive temperature coefficient of avalanche multiplication. Precision voltage reference diodes (such as the 1N821 family) intentionally operate at $5.6\text{--}6.2\text{ V}$ to achieve sub-$5\text{ ppm/}^\circ\text{C}$ temperature stability.</li>
+</ul>
+
+<h2>Mathematical Design Equations for Shunt Zener Regulation</h2>
+<p>A basic shunt regulator consists of an unregulated input voltage rail ($V_{\text{in}}$), a series current-limiting resistor ($R_s$), a Zener diode ($V_Z$), and a parallel load resistance ($R_L$) drawing load current ($I_L$). The circuit must maintain voltage regulation under extreme supply and load fluctuations.</p>
+
+<h3>1. Sizing Series Resistor $R_s$ Under Worst-Case Minimum Rail</h3>
+<p>To guarantee that the Zener diode does not fall out of regulation into high-impedance cutoff, the current through the diode must never drop below its minimum knee test current ($I_{Z,\text{min}}$ or $I_{ZK}$, typically $1\text{--}5\text{ mA}$). The worst-case condition for maintaining regulation occurs when the input voltage is at its lowest ($V_{\text{in,min}}$) and the external load current is at its maximum ($I_{L,\text{max}}$):</p>
+$$I_{S,\text{min}} = I_{L,\text{max}} + I_{Z,\text{min}}$$
+$$R_{s,\text{max}} = \frac{V_{\text{in,min}} - V_Z}{I_{L,\text{max}} + I_{Z,\text{min}}}$$
+
+<p>If $R_s$ exceeds this value, supply voltage droop or heavy load transients will pull the output voltage below $V_Z$, extinguishing Zener conduction.</p>
+
+<h3>2. Worst-Case Power Dissipation in the Zener Diode ($P_{Z,\text{max}}$)</h3>
+<p>Conversely, maximum electrical stress occurs under maximum input voltage ($V_{\text{in,max}}$) when the load is suddenly disconnected ($I_L = 0$, open-circuit no-load condition). Under this scenario, the entire current flowing through $R_s$ is shunted through the Zener diode:</p>
+$$I_{Z,\text{max}} = I_{S,\text{max}} = \frac{V_{\text{in,max}} - V_Z}{R_s}$$
+$$P_{Z,\text{max}} = V_Z \cdot I_{Z,\text{max}} = V_Z \left( \frac{V_{\text{in,max}} - V_Z}{R_s} \right)$$
+
+<p>The chosen Zener diode component must have a continuous power rating $P_{Z,\text{rated}} \ge 1.5 \times P_{Z,\text{max}}$ to ensure junction temperatures remain within safe semiconductor operating margins.</p>
+
+<h3>3. Series Resistor Power Dissipation ($P_{Rs,\text{max}}$)</h3>
+<p>The series resistor continuously dissipates ohmic heat:
+$$P_{Rs,\text{max}} = I_{S,\text{max}}^2 \cdot R_s = \frac{(V_{\text{in,max}} - V_Z)^2}{R_s}$$
+Engineers must select a power resistor (e.g., $1\text{ W}$, $2\text{ W}$, or $5\text{ W}$ wirewound/metal oxide) to prevent thermal degradation and solder joint fatigue.</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Standard Zener Family</th>
+            <th>Power Rating ($P_D$)</th>
+            <th>Typical Package</th>
+            <th>Knee Current ($I_{ZK}$)</th>
+            <th>Dynamic Impedance ($Z_Z$)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>BZX84C Series</strong></td>
+            <td>$350\text{ mW}$</td>
+            <td>SOT-23 Surface Mount</td>
+            <td>$1.0\text{--}5.0\text{ mA}$</td>
+            <td>$10\text{--}80\ \Omega$</td>
+        </tr>
+        <tr>
+            <td><strong>BZX55C Series</strong></td>
+            <td>$500\text{ mW}$</td>
+            <td>DO-35 Glass Axial</td>
+            <td>$1.0\text{--}5.0\text{ mA}$</td>
+            <td>$7\text{--}50\ \Omega$</td>
+        </tr>
+        <tr>
+            <td><strong>1N4728A &ndash; 1N4764A</strong></td>
+            <td>$1.0\text{ W}$</td>
+            <td>DO-41 Plastic Axial</td>
+            <td>$0.25\text{--}1.0\text{ mA}$</td>
+            <td>$2\text{--}30\ \Omega$</td>
+        </tr>
+        <tr>
+            <td><strong>1N5333B &ndash; 1N5388B</strong></td>
+            <td>$5.0\text{ W}$</td>
+            <td>Axial Leaded Power Case</td>
+            <td>$1.0\text{ mA}$</td>
+            <td>$1\text{--}15\ \Omega$</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Line Regulation, Load Regulation, and Dynamic Impedance ($Z_Z$)</h2>
+<p>A real Zener diode is not an ideal zero-impedance battery; it possesses an incremental dynamic resistance $Z_Z = \frac{\Delta V_Z}{\Delta I_Z}$ (ranging from $2\ \Omega$ to $100\ \Omega$). Consequently, variations in input voltage and load current cause minor shifts in output voltage:</p>
+<ul>
+    <li><strong>Line Regulation (Input Ripple Rejection):</strong> The fraction of input voltage ripple $\Delta V_{\text{in}}$ that reaches the load is governed by the voltage divider formed by $R_s$ and $Z_Z$:
+    $$\frac{\Delta V_{\text{out}}}{\Delta V_{\text{in}}} = \frac{Z_Z}{R_s + Z_Z}$$
+    Because $R_s \gg Z_Z$, input ripple is typically attenuated by $20\text{--}40\text{ dB}$.</li>
+    <li><strong>Load Regulation:</strong> When load current jumps by $\Delta I_L$, diode current drops by approximately the same amount, causing a change in output voltage $\Delta V_{\text{out}} \approx -\Delta I_L \cdot Z_Z$.</li>
+</ul>
+
+<div class="worked-example-card">
+    <h4>Step-by-Step Engineering Case Study: 5.1V Microcontroller Auxiliary Rail</h4>
+    <p><strong>Scenario:</strong> An industrial PLC auxiliary line delivers an unregulated DC supply varying between $V_{\text{in,min}} = 11.5\text{ V}$ and $V_{\text{in,max}} = 15.0\text{ V}$. An auxiliary microcontroller board requires a stabilized $V_Z = 5.1\text{ V}$ with a load current drawing between $I_{L,\text{min}} = 5\text{ mA}$ and $I_{L,\text{max}} = 25\text{ mA}$. A 1N4733A Zener diode ($5.1\text{ V}$, $1.0\text{ W}$) with a minimum knee current of $I_{Z,\text{min}} = 5.0\text{ mA}$ is selected.</p>
+    <div class="step-solution">
+        <p><strong>Step 1: Calculate Maximum Series Resistor ($R_s$):</strong></p>
+        $$I_{S,\text{min}} = I_{L,\text{max}} + I_{Z,\text{min}} = 25\text{ mA} + 5.0\text{ mA} = 30.0\text{ mA} = 0.030\text{ A}$$
+        $$R_s = \frac{V_{\text{in,min}} - V_Z}{I_{S,\text{min}}} = \frac{11.5\text{ V} - 5.1\text{ V}}{0.030\text{ A}} = \frac{6.4\text{ V}}{0.030\text{ A}} = 213.33\ \Omega$$
+        <p>Selecting the nearest lower standard E24 resistor ensures adequate current: $R_s = 200\ \Omega$.</p>
+        <p><strong>Step 2: Calculate Maximum Loop Current at $V_{\text{in,max}}$:</strong></p>
+        $$I_{S,\text{max}} = \frac{V_{\text{in,max}} - V_Z}{R_s} = \frac{15.0\text{ V} - 5.1\text{ V}}{200\ \Omega} = \frac{9.9\text{ V}}{200\ \Omega} = 0.0495\text{ A} = 49.5\text{ mA}$$
+        <p><strong>Step 3: Determine Worst-Case Zener Power Dissipation (No Load, $I_L = 0$):</strong></p>
+        $$P_{Z,\text{max}} = V_Z \cdot I_{S,\text{max}} = 5.1\text{ V} \times 0.0495\text{ A} = 0.2525\text{ W} = 252.5\text{ mW}$$
+        <p>The $1.0\text{ W}$ rated 1N4733A operates with a generous $75\%$ safety margin ($P_D / P_{\text{rated}} = 0.25$).</p>
+        <p><strong>Step 4: Sizing Resistor Wattage:</strong></p>
+        $$P_{Rs,\text{max}} = I_{S,\text{max}}^2 \cdot R_s = (0.0495\text{ A})^2 \times 200\ \Omega = 0.00245 \times 200 = 0.490\text{ W}$$
+        <p><strong>Conclusion:</strong> A standard $0.25\text{ W}$ resistor would overheat and burn out. A $1.0\text{ W}$ metal oxide $200\ \Omega$ resistor must be installed.</p>
+    </div>
+</div>
+
+<h2>Frequently Asked Questions (FAQ)</h2>
+<div class="faq-section">
+    <h3>What is the difference between Zener breakdown and Avalanche breakdown?</h3>
+    <p>True Zener breakdown occurs in heavily doped p-n junctions at breakdown voltages below $5.6\text{ V}$, where quantum mechanical tunneling across an ultra-narrow depletion region allows electrons to cross the forbidden band gap. Avalanche breakdown predominates at voltages above $5.6\text{ V}$ in moderately doped junctions, where high electric fields accelerate carriers to cause impact ionization. Around $5.6\text{ V}$, both effects possess opposite temperature coefficients, producing near-zero temperature drift.</p>
+
+    <h3>How do you size the series resistor ($R_s$) for a Zener diode regulator?</h3>
+    <p>The series resistor must supply sufficient current under minimum input voltage ($V_{\text{in,min}}$) to feed maximum load current ($I_{L,\text{max}}$) while maintaining the Zener diode above its knee current ($I_{ZK}$): $R_s = \frac{V_{\text{in,min}} - V_Z}{I_{L,\text{max}} + I_{Z,\text{min}}}$.</p>
+
+    <h3>When does a Zener diode dissipate maximum power?</h3>
+    <p>The Zener diode experiences maximum power dissipation when input voltage reaches its peak ($V_{\text{in,max}}$) and load current drops to zero ($I_L = 0$, no-load condition). In this case, all series current shunts entirely through the Zener: $P_{Z,\text{max}} = V_Z \cdot \left(\frac{V_{\text{in,max}} - V_Z}{R_s}\right)$.</p>
+
+    <h3>What safety margin is recommended for resistor and Zener power ratings?</h3>
+    <p>A standard engineering de-rating factor of $50\%$ to $100\%$ is strongly advised. For example, if calculated dissipation is $0.35\text{ W}$, specify at least a $0.5\text{ W}$ or $1.0\text{ W}$ rated component to maintain acceptable operating temperatures.</p>
+</div>
+
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚡</span>
+            <h3 class="widget-title">Related Electrical & Power Systems</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="wire-ampacity-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Ampacity (NEC 310.16)</a></li>
+            <li><a href="conduit-fill-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Conduit Fill (NEC Ch. 9)</a></li>
+            <li><a href="motor-starting-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Motor Starting Current</a></li>
+            <li><a href="short-circuit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Short-Circuit (IEC 60909)</a></li>
+            <li><a href="transformer-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Sizing (NEC 450)</a></li>
+            <li><a href="cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC/NEC)</a></li>
+            <li><a href="voltage-drop-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Drop Calculator</a></li>
+            <li><a href="ohms-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ohm's Law Calculator</a></li>
+            <li><a href="power-factor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Power Factor (kW to kVAR)</a></li>
+            <li><a href="parallel-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistor (Req)</a></li>
+            <li><a href="battery-life-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Life & Runtime</a></li>
+            <li><a href="resistor-color-code-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Color Code</a></li>
+            <li><a href="555-timer-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> 555 Timer Astable & Monostable</a></li>
+            <li><a href="led-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LED Series Resistor Calculator</a></li>
+            <li><a href="capacitive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitive Reactance (Xc)</a></li>
+            <li><a href="inductive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Inductive Reactance (Xl)</a></li>
+            <li><a href="op-amp-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Op-Amp Gain & Inverting/Non-Inv</a></li>
+            <li><a href="three-phase-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three-Phase AC Power (kVA/kW)</a></li>
+            <li><a href="adc-dac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ADC & DAC Converter Resolution</a></li>
+            <li><a href="antenna-length-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Antenna Length & Resonant Dipole</a></li>
+            <li><a href="battery-short-circuit-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Short Circuit (IEC 60896)</a></li>
+            <li><a href="bjt-transistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BJT Transistor Bias & Q-Point</a></li>
+            <li><a href="breaker-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Breaker Size (NEC 125% Rule)</a></li>
+            <li><a href="decibel-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Decibel Calculator (dB, dBm, SPL)</a></li>
+            <li><a href="earth-pit-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earth Pit Resistance (IEEE 80)</a></li>
+            <li><a href="electrical-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Electrical Power & Energy Cost</a></li>
+            <li><a href="microstrip-impedance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Microstrip Impedance (IPC-2141)</a></li>
+            <li><a href="resistor-network-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Network (Delta-Wye & Ladder)</a></li>
+            <li><a href="transformer-turns-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Turns Ratio (a)</a></li>
+            <li><a href="aluminium-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Aluminium Cable Sizing (NEC/IEC)</a></li>
+            <li><a href="busbar-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Busbar Sizing (DIN 43671 / IEC)</a></li>
+            <li><a href="cable-sizing-calculator-bs-7671.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (BS 7671 18th Ed)</a></li>
+            <li><a href="cable-sizing-calculator-iec-60364.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC 60364-5-52)</a></li>
+            <li><a href="cable-sizing-installation-method-a.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method A (Insulated Wall)</a></li>
+            <li><a href="fault-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Fault Current (IEEE 141 / IEC)</a></li>
+            <li><a href="filter-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Analog Filter (RC, RL, LC)</a></li>
+            <li><a href="generator-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Generator Sizing (ISO 8528)</a></li>
+            <li><a href="heatsink-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heatsink Sizing & Thermal</a></li>
+            <li><a href="cable-sizing-installation-method-c.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method C (Clipped Direct)</a></li>
+            <li><a href="cable-sizing-installation-method-e.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method E (Cable Tray)</a></li>
+            <li><a href="cable-sizing-calculator-nec.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (NEC Table 310.16)</a></li>
+            <li><a href="copper-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Copper Cable Sizing (100% IACS)</a></li>
+            <li><a href="earthing-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earthing Cable Size (IEC 60364-5-54)</a></li>
+            <li><a href="kw-to-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> kW to Cable Size (1-Phase & 3-Phase)</a></li>
+            <li><a href="single-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Single Phase Cable Sizing (230V/120V)</a></li>
+            <li><a href="three-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three Phase Cable Sizing (400V/480V)</a></li>
+            <li><a href="wire-gauge-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Gauge (AWG to mm² Metric)</a></li>
+            <li><a href="voltage-divider-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Divider Calculator</a></li>
+            <li><a href="parallel-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistance Calculator</a></li>
+            <li><a href="capacitor-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitor Energy & Pulse Power</a></li>
+            <li><a href="resonant-frequency-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LC Resonant Frequency Tank</a></li>
+            <li><a href="rc-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RC Time Constant (τ = RC)</a></li>
+            <li><a href="rl-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RL Time Constant (τ = L/R)</a></li>
+            <li><a href="zener-diode-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Zener Diode Shunt Regulator</a></li>
+            <li><a href="lm317-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LM317 Voltage Regulator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="engineering.html" class="sidebar-category-link">View All Electrical & Power Systems Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers rigorous, laboratory-verified computational tools for electrical engineers, physicists, and circuit designers.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Calculator Hubs</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                        <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Voltage Regulators</h4>
+                    <ul class="footer-links">
+                        <li><a href="zener-diode-calculator.html">Zener Shunt Regulator</a></li>
+                        <li><a href="lm317-calculator.html">LM317 Adjustable Linear IC</a></li>
+                        <li><a href="voltage-divider-calculator.html">Resistive Divider</a></li>
+                        <li><a href="parallel-resistance-calculator.html">Parallel Resistance Network</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precise voltage regulation and thermal dissipation modeling engines.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+    
+function computeZener() {
+    var vinMin = parseFloat(document.getElementById('zd-vin-min').value);
+    var vinMax = parseFloat(document.getElementById('zd-vin-max').value);
+    var vz = parseFloat(document.getElementById('zd-vz').value);
+    var ilMaxVal = parseFloat(document.getElementById('zd-il-max').value);
+    var ilMaxUnit = parseFloat(document.getElementById('zd-il-max-unit').value);
+    var izMinVal = parseFloat(document.getElementById('zd-iz-min').value);
+    var izMinUnit = parseFloat(document.getElementById('zd-iz-min-unit').value);
+
+    if (isNaN(vinMin) || isNaN(vinMax) || isNaN(vz) || vinMin <= vz || vinMax < vinMin) {
+        document.getElementById('res-zd-rs').textContent = "Invalid: Vin,min must exceed Vz";
+        return;
+    }
+
+    var ilMax = (isNaN(ilMaxVal) || ilMaxVal < 0) ? 0 : ilMaxVal * ilMaxUnit; // Amperes
+    var izMin = (isNaN(izMinVal) || izMinVal <= 0) ? 0.005 : izMinVal * izMinUnit; // Amperes
+
+    // Sizing Rs: Rs = (Vin,min - Vz) / (IL,max + Iz,min)
+    var isMinReq = ilMax + izMin;
+    var Rs = (vinMin - vz) / isMinReq; // Ohms
+
+    // Maximum current under Vin,max
+    var isMax = (vinMax - vz) / Rs; // Amperes
+
+    // Resistor power dissipation at Vin,max
+    var prsMax = Math.pow(vinMax - vz, 2) / Rs; // Watts
+
+    // Worst-case Zener dissipation (occurs when Vin = Vin,max and IL = 0, no-load)
+    var pzMax = vz * isMax; // Watts
+
+    // Output formatted results
+    document.getElementById('res-zd-rs').textContent = Rs.toFixed(2) + " Ω";
+    document.getElementById('res-zd-prs').textContent = prsMax.toFixed(3) + " W (Use ≥ " + (prsMax * 1.5).toFixed(2) + " W rated)";
+    document.getElementById('res-zd-pz').textContent = pzMax.toFixed(3) + " W (Use ≥ " + (pzMax * 1.5).toFixed(2) + " W rated)";
+    document.getElementById('res-zd-ismax').textContent = (isMax * 1000).toFixed(2) + " mA";
+    document.getElementById('res-zd-ismin').textContent = (isMinReq * 1000).toFixed(2) + " mA";
+}
+
+document.getElementById('calc-zd-btn').addEventListener('click', computeZener);
+['zd-vin-min', 'zd-vin-max', 'zd-vz', 'zd-il-max', 'zd-il-max-unit', 'zd-iz-min', 'zd-iz-min-unit'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', computeZener);
+    document.getElementById(id).addEventListener('change', computeZener);
+});
+window.addEventListener('DOMContentLoaded', computeZener);
+
+    </script>
+</body>
+</html>

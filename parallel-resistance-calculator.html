@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parallel Resistance Calculator - Equivalent Resistance &amp; Current Divider</title>
+  <meta name="description" content="Calculate equivalent parallel resistance (1/R_eq = 1/R1 + 1/R2 + ...), conductance in Siemens, current divider branch currents, and power dissipation.">
+  <link rel="canonical" href="https://calchub.org/parallel-resistance-calculator.html">
+  <meta property="og:title" content="Parallel Resistance Calculator - Equivalent R_eq Solver">
+  <meta property="og:description" content="Free electronics parallel resistance calculator. Solve multi-resistor networks, product-over-sum formula, current division, and branch power with step-by-step proofs.">
+  <meta property="og:url" content="https://calchub.org/parallel-resistance-calculator.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Parallel Resistance Calculator - Circuit Theory Tool">
+  <meta name="twitter:description" content="Compute equivalent resistance across parallel resistors, conductances, and branch currents with worked circuit case studies.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Parallel Resistance Calculator",
+    "url": "https://calchub.org/parallel-resistance-calculator.html",
+    "description": "Calculates equivalent resistance for any number of parallel resistors, total conductance in Siemens, and branch current division.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the formula for calculating parallel resistance?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "For N resistors in parallel, the reciprocal of the equivalent resistance equals the sum of the reciprocals of each individual resistance: 1/R_eq = 1/R1 + 1/R2 + ... + 1/Rn. For two resistors, this simplifies to the product-over-sum formula: R_eq = (R1 * R2) / (R1 + R2)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why is equivalent parallel resistance always smaller than the smallest resistor?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Each additional resistor added in parallel provides an alternate parallel path for electric current to flow, increasing the circuit's total conductance (G_total = G1 + G2 + ...). Because resistance is the reciprocal of conductance (R = 1/G), adding more conducting pathways reduces total resistance. Therefore, R_eq is always strictly less than the smallest single resistor in the network."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What happens if N identical resistors are connected in parallel?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "When N identical resistors of value R are connected in parallel, the equivalent resistance is simply the resistance of one resistor divided by the count N: R_eq = R / N. For example, four 100-ohm resistors in parallel yield exactly 100 / 4 = 25 ohms."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the current divider rule in parallel circuits?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The current divider rule states that the current flowing through any individual branch in a parallel network is inversely proportional to its resistance. For two parallel resistors connected to a total current I_total: I_1 = I_total * [R2 / (R1 + R2)] and I_2 = I_total * [R1 / (R1 + R2)]."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">CalcHub</a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="math.html">Math &amp; Statistics</a>
+        <a href="converter.html">Converters</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="engineering.html">Electrical &amp; Engineering</a> &rsaquo;
+      <span>Parallel Resistance Calculator</span>
+    </nav>
+
+    <div class="page-header">
+      <h1 class="page-title">Parallel Resistance Calculator</h1>
+      <p class="page-desc">Determine equivalent resistance ($R_{\text{eq}}$) for any combination of parallel resistors, total electrical conductance in Siemens, and branch current division.</p>
+    </div>
+
+    <div class="calc-grid">
+      <!-- Calculator Column -->
+      <div class="calc-card">
+        <div class="calc-header">
+          <h2>Parallel Resistor Network Solver</h2>
+        </div>
+
+        <!-- Preset Selection -->
+        <div class="form-group">
+          <label for="pr-preset">Standard Resistor Network Preset:</label>
+          <select id="pr-preset" class="form-control">
+            <option value="custom">-- Custom Parallel Network --</option>
+            <option value="two-equal" selected>Two Equal Resistors (10 kΩ ∥ 10 kΩ &rarr; 5.0 kΩ)</option>
+            <option value="three-equal">Three Equal Resistors (100 Ω ∥ 100 Ω ∥ 100 Ω &rarr; 33.33 Ω)</option>
+            <option value="standard-trim">Precision Resistance Trimming (10 kΩ ∥ 1 MΩ &rarr; 9.901 kΩ)</option>
+            <option value="current-shunt">Current Shunt Parallel Bank (0.1 Ω ∥ 0.1 Ω &rarr; 0.05 Ω)</option>
+            <option value="asymmetric">Asymmetric Load (1 kΩ ∥ 2.2 kΩ ∥ 4.7 kΩ &rarr; 598 Ω)</option>
+          </select>
+        </div>
+
+        <!-- Supply Voltage (optional for current/power) -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pr-vsupply">Supply Voltage ($V$, optional for currents):</label>
+            <input type="number" id="pr-vsupply" class="form-control" value="12.0" step="any">
+          </div>
+        </div>
+
+        <!-- Dynamic Resistor Rows Container -->
+        <div id="pr-resistors-container">
+          <div style="font-size: 0.875rem; font-weight: 600; color: var(--text-muted, #64748b); margin-bottom: 0.5rem; text-transform: uppercase;">Parallel Resistor Branches:</div>
+          <!-- Rows will be injected by JavaScript -->
+        </div>
+
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
+          <button type="button" id="pr-add-row-btn" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">+ Add Resistor</button>
+        </div>
+
+        <div class="form-actions" style="margin-top: 1.25rem;">
+          <button type="button" id="pr-calc-btn" class="btn btn-primary">Calculate Equivalent Resistance</button>
+          <button type="button" id="pr-reset-btn" class="btn btn-secondary">Reset</button>
+        </div>
+
+        <!-- Output Cards -->
+        <div id="pr-results" class="results-container" style="margin-top: 1.5rem;">
+          <div class="result-hero-card">
+            <div class="result-label" style="font-size: 0.875rem; color: var(--text-muted, #64748b); text-transform: uppercase; font-weight: 600;">Equivalent Resistance ($R_{\text{eq}}$)</div>
+            <div id="pr-primary-out" style="font-size: 2.25rem; font-weight: 800; color: var(--primary, #2563eb); margin: 0.25rem 0;">5.000 k&Omega;</div>
+            <div id="pr-status-out" style="font-size: 1rem; color: var(--text-secondary, #475569); font-weight: 600;">Total Conductance: 0.200 mS (Siemens)</div>
+          </div>
+
+          <div class="summary-metrics-grid">
+            <div class="metric-card">
+              <div style="font-size: 0.75rem; color: var(--text-muted, #64748b);">Total Current ($I_{\text{tot}}$)</div>
+              <div id="pr-current-out" style="font-size: 1.15rem; font-weight: 700;">2.400 mA</div>
+            </div>
+            <div class="metric-card">
+              <div style="font-size: 0.75rem; color: var(--text-muted, #64748b);">Total Circuit Power</div>
+              <div id="pr-power-out" style="font-size: 1.15rem; font-weight: 700;">28.80 mW</div>
+            </div>
+            <div class="metric-card">
+              <div style="font-size: 0.75rem; color: var(--text-muted, #64748b);">Total Conductance ($G$)</div>
+              <div id="pr-cond-out" style="font-size: 1.15rem; font-weight: 700;">0.200 mS</div>
+            </div>
+            <div class="metric-card">
+              <div style="font-size: 0.75rem; color: var(--text-muted, #64748b);">Active Branches</div>
+              <div id="pr-branches-out" style="font-size: 1.15rem; font-weight: 700;">2 Resistors</div>
+            </div>
+          </div>
+
+          <!-- Branch Current Breakdown Table -->
+          <div class="table-responsive" style="margin-top: 1rem;">
+            <table class="data-table" id="pr-breakdown-table" style="font-size: 0.9rem;">
+              <thead>
+                <tr>
+                  <th>Branch</th>
+                  <th>Resistance</th>
+                  <th>Conductance ($G_i$)</th>
+                  <th>Branch Current ($I_i$)</th>
+                  <th>Power Dissipated ($P_i$)</th>
+                </tr>
+              </thead>
+              <tbody id="pr-breakdown-body">
+                <!-- Dynamically generated rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Reference Sidebar -->
+      <aside class="sidebar-card">
+        <h3>Parallel Network Formulas</h3>
+        <ul style="font-size: 0.875rem; line-height: 1.6; margin-left: 1.25rem;">
+          <li><strong>General Law:</strong><br>\(\frac{1}{R_{\text{eq}}} = \sum_{i=1}^N \frac{1}{R_i}\)</li>
+          <li><strong>Two Resistors:</strong><br>\(R_{\text{eq}} = \frac{R_1 R_2}{R_1 + R_2}\)</li>
+          <li><strong>N Identical Resistors:</strong><br>\(R_{\text{eq}} = \frac{R}{N}\)</li>
+          <li><strong>Conductance (\(G = 1/R\)):</strong><br>\(G_{\text{total}} = G_1 + G_2 + \dots + G_N\)</li>
+          <li><strong>Current Divider:</strong><br>\(I_k = I_{\text{total}} \times \frac{G_k}{G_{\text{total}}}\)</li>
+        </ul>
+
+        <h3 style="margin-top: 1.25rem;">Key Circuit Truth</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary, #475569);">The voltage drop across all parallel branches is identical: \(V_1 = V_2 = \dots = V_{\text{supply}}\). Current splits in direct proportion to branch conductance.</p>
+      </aside>
+    </div>
+
+    <!-- Long-Form Informational Engineering Article (1,400+ Words) -->
+    <article class="article-body">
+      <h2>1. The Fundamental Physics and Mathematics of Parallel Resistors</h2>
+      <p>In electrical and electronic circuit theory, components are connected in **parallel** when both of their respective terminals are connected directly across the same two common electrical nodes. Consequently, every individual component in a parallel circuit experiences exactly the same electric potential difference (voltage drop, \(V\)) across its terminals:</p>
+      $$V_1 = V_2 = V_3 = \dots = V_N = V_{\text{source}}$$
+      <p>According to **Kirchhoff's Current Law (KCL)**, the total electric current entering a circuit junction must equal the sum of the currents leaving that junction. Therefore, the total current \(I_{\text{total}}\) delivered by the power supply splits into independent branch currents:</p>
+      $$I_{\text{total}} = I_1 + I_2 + I_3 + \dots + I_N$$
+      <p>Applying Ohm's Law (\(I_k = V / R_k\)) to each individual branch yields:</p>
+      $$\frac{V}{R_{\text{eq}}} = \frac{V}{R_1} + \frac{V}{R_2} + \frac{V}{R_3} + \dots + \frac{V}{R_N}$$
+      <p>Dividing throughout by the common voltage \(V\) produces the universal reciprocal equation for equivalent parallel resistance:</p>
+      $$\frac{1}{R_{\text{eq}}} = \frac{1}{R_1} + \frac{1}{R_2} + \frac{1}{R_3} + \dots + \frac{1}{R_N} = \sum_{k=1}^N \frac{1}{R_k}$$
+      <p>Inverting both sides gives the exact equivalent resistance:</p>
+      $$R_{\text{eq}} = \frac{1}{\sum_{k=1}^N \frac{1}{R_k}} = \left(\frac{1}{R_1} + \frac{1}{R_2} + \dots + \frac{1}{R_N}\right)^{-1}$$
+
+      <h2>2. Conductance: Simplifying Parallel Calculations</h2>
+      <p>While series circuits are most naturally analyzed using resistance (\(R\)), parallel networks are mathematically much simpler when formulated using **electrical conductance** (\(G\)), defined as the reciprocal of resistance:</p>
+      $$G = \frac{1}{R}$$
+      <p>The SI unit of conductance is the **Siemens** (symbol: **S**), historically referred to as the "mho" (\(\mho\)). Because \(1/R_{\text{eq}} = \sum (1/R_k)\), the equivalent conductance of parallel branches is simply the direct linear sum of individual branch conductances:</p>
+      $$G_{\text{total}} = G_1 + G_2 + G_3 + \dots + G_N$$
+      <p>This linear formulation explains why adding more resistors in parallel always decreases total resistance: each parallel branch adds a new physical conductive path for electrons, increasing total circuit conductance (\(G_{\text{total}} &gt; G_{\text{branch}}\)) and therefore decreasing equivalent resistance (\(R_{\text{eq}} = 1 / G_{\text{total}} &lt; R_{\text{smallest}}\)).</p>
+
+      <h2>3. Special Case Formulas: Two Resistors &amp; Identical Resistors</h2>
+
+      <h3>A. Two Resistors in Parallel: The Product-Over-Sum Rule</h3>
+      <p>For the ubiquitous case of exactly two parallel resistors, the reciprocal equation simplifies through common denominators to the famous **product-over-sum formula**:</p>
+      $$\frac{1}{R_{\text{eq}}} = \frac{1}{R_1} + \frac{1}{R_2} = \frac{R_2 + R_1}{R_1 R_2} \implies R_{\text{eq}} = \frac{R_1 \times R_2}{R_1 + R_2}$$
+      <p>This algebraic shortcut allows electrical engineers to compute parallel combinations mentally without inverting reciprocal decimals.</p>
+
+      <h3>B. N Identical Resistors in Parallel</h3>
+      <p>When \(N\) resistors of identical resistance value \(R\) are connected in parallel, each branch conducts an identical current. The equivalent resistance simplifies to:</p>
+      $$R_{\text{eq}} = \frac{R}{N}$$
+      <p>For example, ten \(100\ \Omega\) resistors connected in parallel yield \(100 / 10 = 10\ \Omega\). Furthermore, connecting \(N\) identical resistors in parallel increases the collective power rating by a factor of \(N\): ten \(0.25\text{-watt}\) resistors in parallel create a robust \(2.5\text{-watt}\) power handling bank.</p>
+
+      <h2>4. The Current Divider Rule and Power Dissipation</h2>
+      <p>Because voltage is uniform across all parallel branches, branch current is inversely proportional to branch resistance. From Ohm's Law and KCL, the fraction of total current traversing branch \(k\) is:</p>
+      $$I_k = I_{\text{total}} \times \left(\frac{R_{\text{eq}}}{R_k}\right) = I_{\text{total}} \times \left(\frac{G_k}{G_{\text{total}}}\right)$$
+      <p>For a two-resistor network:</p>
+      $$I_1 = I_{\text{total}} \times \left(\frac{R_2}{R_1 + R_2}\right), \quad I_2 = I_{\text{total}} \times \left(\frac{R_1}{R_1 + R_2}\right)$$
+      <p>Notice the counter-intuitive inversion: current through branch 1 is proportional to the resistance of the *opposite* branch (\(R_2\)). The lower-resistance branch draws the lion's share of the current.</p>
+      <p>Similarly, electrical power dissipated as heat in branch \(k\) is:</p>
+      $$P_k = V^2 / R_k = I_k^2 R_k = V \times I_k$$
+      <p>The branch with the lowest resistance dissipates the highest power, making it the most vulnerable to thermal failure or overheating.</p>
+
+      <h2>5. Parallel Resistor Engineering Benchmark Table</h2>
+      <p>The following circuit analysis table illustrates equivalent resistances, total conductances, and current division across representative parallel combinations at a standard \(12.0\text{ V}\) supply:</p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Network Description</th>
+              <th>Branch Resistors</th>
+              <th>Equivalent \(R_{\text{eq}}\)</th>
+              <th>Total Conductance</th>
+              <th>Total Current @ 12V</th>
+              <th>Total Power Dissipated</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Two Equal 1 kΩ</td>
+              <td>1.0 kΩ ∥ 1.0 kΩ</td>
+              <td>500.0 Ω</td>
+              <td>2.000 mS</td>
+              <td>24.00 mA</td>
+              <td>288.0 mW</td>
+            </tr>
+            <tr>
+              <td>Two Equal 10 kΩ</td>
+              <td>10.0 kΩ ∥ 10.0 kΩ</td>
+              <td>5.000 kΩ</td>
+              <td>0.200 mS</td>
+              <td>2.40 mA</td>
+              <td>28.8 mW</td>
+            </tr>
+            <tr>
+              <td>Three Equal 100 Ω</td>
+              <td>100 Ω ∥ 100 Ω ∥ 100 Ω</td>
+              <td>33.33 Ω</td>
+              <td>30.00 mS</td>
+              <td>360.0 mA</td>
+              <td>4.32 W</td>
+            </tr>
+            <tr>
+              <td>Precision Trim Pair</td>
+              <td>10.0 kΩ ∥ 1.0 MΩ</td>
+              <td>9.901 kΩ</td>
+              <td>0.101 mS</td>
+              <td>1.212 mA</td>
+              <td>14.54 mW</td>
+            </tr>
+            <tr>
+              <td>Current Shunt Bank</td>
+              <td>0.10 Ω ∥ 0.10 Ω</td>
+              <td>0.050 Ω</td>
+              <td>20.00 S</td>
+              <td>240.0 A</td>
+              <td>2.88 kW</td>
+            </tr>
+            <tr>
+              <td>Asymmetric Triad</td>
+              <td>1.0 kΩ ∥ 2.2 kΩ ∥ 4.7 kΩ</td>
+              <td>598.0 Ω</td>
+              <td>1.672 mS</td>
+              <td>20.07 mA</td>
+              <td>240.8 mW</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>6. Step-by-Step Worked Engineering Case Studies</h2>
+
+      <div class="worked-example-card">
+        <h3>Case Study 1: Synthesizing a Non-Standard Precision Resistor via Trimming</h3>
+        <p><strong>Scenario:</strong> An analog circuit designer needs an exact resistance of \(R_{\text{target}} = 4.75\text{ k}\Omega\) (\(4750\ \Omega\)) to set the gain of an instrumentation amplifier. The nearest standard available resistor is \(R_1 = 5.1\text{ k}\Omega\) (\(5100\ \Omega\)). Calculate the required trimming resistor \(R_{\text{trim}}\) to place in parallel with \(R_1\) to achieve the exact target.</p>
+        
+        <div class="step-solution">
+          <p><strong>Step 1: Express the target resistance in terms of parallel combination:</strong></p>
+          $$\frac{1}{R_{\text{target}}} = \frac{1}{R_1} + \frac{1}{R_{\text{trim}}}$$
+
+          <p><strong>Step 2: Solve algebraically for \(R_{\text{trim}}\):</strong></p>
+          $$\frac{1}{R_{\text{trim}}} = \frac{1}{R_{\text{target}}} - \frac{1}{R_1} = \frac{R_1 - R_{\text{target}}}{R_1 \times R_{\text{target}}}$$
+          $$R_{\text{trim}} = \frac{R_1 \times R_{\text{target}}}{R_1 - R_{\text{target}}}$$
+
+          <p><strong>Step 3: Substitute the numerical values:</strong></p>
+          $$R_{\text{trim}} = \frac{5100 \times 4750}{5100 - 4750} = \frac{24,225,000}{350} = 69,214.28\ \Omega \approx 69.21\text{ k}\Omega$$
+
+          <p><strong>Step 4: Select nearest standard resistor:</strong></p>
+          <p>A standard E96 1% resistor of \(69.8\text{ k}\Omega\) in parallel with \(5.1\text{ k}\Omega\) yields:</p>
+          $$R_{\text{actual}} = \frac{5100 \times 69800}{5100 + 69800} = \frac{355,980,000}{74900} = 4752.7\ \Omega \quad (0.05\%\text{ error})$$
+          <p><strong>Engineering Result:</strong> Paralleling a \(69.8\text{ k}\Omega\) trim resistor across the \(5.1\text{ k}\Omega\) base resistor achieves the target \(4.75\text{ k}\Omega\) with virtually zero error.</p>
+        </div>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 2: Calculating Branch Currents and Thermal Ratings in a Shunt Bank</h3>
+        <p><strong>Scenario:</strong> A motor drive speed controller connects three parallel resistors across a \(24.0\text{ V}\) bus: \(R_1 = 120\ \Omega\), \(R_2 = 240\ \Omega\), and \(R_3 = 480\ \Omega\). Determine the equivalent resistance \(R_{\text{eq}}\), the individual branch currents, and the minimum wattage rating needed for each resistor with a 2x safety margin.</p>
+        
+        <div class="step-solution">
+          <p><strong>Step 1: Calculate total conductance (\(G_{\text{total}}\)):</strong></p>
+          $$G_1 = \frac{1}{120} = 0.008333\text{ S}, \quad G_2 = \frac{1}{240} = 0.004167\text{ S}, \quad G_3 = \frac{1}{480} = 0.002083\text{ S}$$
+          $$G_{\text{total}} = 0.008333 + 0.004167 + 0.002083 = 0.014583\text{ S}$$
+
+          <p><strong>Step 2: Compute equivalent resistance (\(R_{\text{eq}}\)):</strong></p>
+          $$R_{\text{eq}} = \frac{1}{G_{\text{total}}} = \frac{1}{0.014583} = 68.57\ \Omega$$
+
+          <p><strong>Step 3: Calculate individual branch currents:</strong></p>
+          $$I_1 = \frac{24.0\text{ V}}{120\ \Omega} = 0.200\text{ A (200 mA)}$$
+          $$I_2 = \frac{24.0\text{ V}}{240\ \Omega} = 0.100\text{ A (100 mA)}$$
+          $$I_3 = \frac{24.0\text{ V}}{480\ \Omega} = 0.050\text{ A (50 mA)}$$
+          $$I_{\text{total}} = 0.200 + 0.100 + 0.050 = 0.350\text{ A (350 mA)}$$
+
+          <p><strong>Step 4: Compute actual power dissipation and specify wattage ratings:</strong></p>
+          $$P_1 = (24.0)^2 / 120 = 4.80\text{ W} \implies \text{Specify } 10.0\text{ W resistor (2x margin)}$$
+          $$P_2 = (24.0)^2 / 240 = 2.40\text{ W} \implies \text{Specify } 5.0\text{ W resistor}$$
+          $$P_3 = (24.0)^2 / 480 = 1.20\text{ W} \implies \text{Specify } 2.5\text{ W or } 3.0\text{ W resistor}$$
+          <p><strong>Conclusion:</strong> The network exhibits an equivalent resistance of \(68.57\ \Omega\) drawing \(350\text{ mA}\). Branch 1 dissipates the most heat (\(4.8\text{ W}\)) and requires a \(10\text{-watt}\) chassis-mount power resistor.</p>
+        </div>
+      </div>
+
+      <h2>7. Frequently Asked Questions (Circuit Design &amp; Troubleshooting)</h2>
+      <div class="faq-accordion">
+        <details class="faq-item">
+          <summary>What happens if one resistor in a parallel network fails open-circuit?</summary>
+          <div class="faq-answer">
+            <p>If a resistor burns out or disconnects (open-circuit, \(R \to \infty\)), that specific branch ceases to conduct current (\(I_k = 0\)). However, all other parallel branches continue operating normally because the full supply voltage remains applied across them. The circuit's total conductance decreases, and total equivalent resistance increases. This is the primary reason domestic house wiring is wired strictly in parallel: turning off a lamp does not turn off your refrigerator.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>What happens if one resistor fails short-circuit?</summary>
+          <div class="faq-answer">
+            <p>If a resistor in a parallel network shorts out (short-circuit, \(R \to 0\)), the equivalent resistance of the entire parallel network drops instantly to zero (\(R_{\text{eq}} = 0\)). Massive current flows directly through the shorted branch, bypassing all other branches and tripping the circuit breaker, blowing the fuse, or causing catastrophic thermal smoke.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>Can parallel resistors increase power handling capacity?</summary>
+          <div class="faq-answer">
+            <p>Yes. If a circuit requires a 50-ohm, 10-watt resistor but only 0.5-watt resistors are available, connecting twenty 1000-ohm, 0.5-watt resistors in parallel yields an equivalent resistance of \(1000 / 20 = 50\ \Omega\) with a cumulative power handling capability of \(20 \times 0.5\text{ W} = 10\text{ Watts}\). Power is distributed equally among all twenty identical resistors.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>How does tolerance stack up in parallel resistors?</summary>
+          <div class="faq-answer">
+            <p>Statistical error propagation demonstrates that connecting multiple resistors in parallel generally tightens the effective tolerance of the resulting combination. Random manufacturing variations in standard metal film resistors tend to average out: if two 1% resistors are paralleled, the standard deviation of the resulting equivalent resistance is approximately \(1\% / \sqrt{2} \approx 0.71\%\).</p>
+          </div>
+        </details>
+      </div>
+
+      <h2>8. Related Electrical &amp; Circuit Engineering Calculators</h2>
+      <p>Explore our integrated electronics computation suite to solve circuit impedances, time constants, and power dissipation:</p>
+      <div class="related-calculators" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        <a href="ohms-law-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Ohm's Law Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Calculate voltage, current, resistance, and electrical power ($P = VI = I^2R$).</p>
+        </a>
+        <a href="voltage-divider-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Voltage Divider Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Compute potential divider outputs ($V_{\text{out}} = V_{\text{in}} R_2/(R_1+R_2)$) and loading.</p>
+        </a>
+        <a href="rc-time-constant-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">RC Time Constant Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Solve transient capacitor charging curves ($\tau = RC$) and filter cutoff frequencies.</p>
+        </a>
+        <a href="wire-gauge-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Wire Gauge Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Calculate conductor resistance, circular mils, and voltage drop across AWG wires.</p>
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h3>CalcHub</h3>
+        <p>Your comprehensive engineering, mathematical, physical, and financial computational authority.</p>
+      </div>
+      <div class="footer-col">
+        <h3>Calculators</h3>
+        <ul>
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="math.html">Mathematics</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Electronics &amp; Circuits</h3>
+        <ul>
+          <li><a href="parallel-resistance-calculator.html">Parallel Resistance</a></li>
+          <li><a href="voltage-divider-calculator.html">Voltage Divider</a></li>
+          <li><a href="ohms-law-calculator.html">Ohm's Law</a></li>
+          <li><a href="rc-time-constant-calculator.html">RC Time Constant</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. High-precision engineering formulas and calculators. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      // DOM Elements
+      const presetSelect = document.getElementById('pr-preset');
+      const vsupplyInput = document.getElementById('pr-vsupply');
+      const container = document.getElementById('pr-resistors-container');
+      const addRowBtn = document.getElementById('pr-add-row-btn');
+      const calcBtn = document.getElementById('pr-calc-btn');
+      const resetBtn = document.getElementById('pr-reset-btn');
+
+      // Outputs
+      const primaryOut = document.getElementById('pr-primary-out');
+      const statusOut = document.getElementById('pr-status-out');
+      const currentOut = document.getElementById('pr-current-out');
+      const powerOut = document.getElementById('pr-power-out');
+      const condOut = document.getElementById('pr-cond-out');
+      const branchesOut = document.getElementById('pr-branches-out');
+      const breakdownBody = document.getElementById('pr-breakdown-body');
+
+      const PRESETS = {
+        'two-equal': [ { val: 10, unit: 1000 }, { val: 10, unit: 1000 } ],
+        'three-equal': [ { val: 100, unit: 1 }, { val: 100, unit: 1 }, { val: 100, unit: 1 } ],
+        'standard-trim': [ { val: 10, unit: 1000 }, { val: 1, unit: 1000000 } ],
+        'current-shunt': [ { val: 0.1, unit: 1 }, { val: 0.1, unit: 1 } ],
+        'asymmetric': [ { val: 1, unit: 1000 }, { val: 2.2, unit: 1000 }, { val: 4.7, unit: 1000 } ]
+      };
+
+      function createRow(val = 10, unit = 1000, index = 1) {
+        const row = document.createElement('div');
+        row.className = 'form-row pr-branch-row';
+        row.style.marginBottom = '0.5rem';
+        row.style.alignItems = 'flex-end';
+
+        row.innerHTML = `
+          <div class="form-group" style="flex: 1;">
+            <label style="font-size: 0.75rem;">Branch R${index}</label>
+            <input type="number" class="form-control pr-val-input" value="${val}" step="any" min="0.0001">
+          </div>
+          <div class="form-group" style="flex: 0.7; max-width: 100px;">
+            <label style="font-size: 0.75rem;">Unit</label>
+            <select class="form-control pr-unit-select">
+              <option value="1" ${unit === 1 ? 'selected' : ''}>&Omega;</option>
+              <option value="1000" ${unit === 1000 ? 'selected' : ''}>k&Omega;</option>
+              <option value="1000000" ${unit === 1000000 ? 'selected' : ''}>M&Omega;</option>
+            </select>
+          </div>
+          <button type="button" class="btn btn-secondary pr-remove-btn" style="padding: 0.5rem 0.75rem; margin-bottom: 1rem; color: #dc2626;">&times;</button>
+        `;
+
+        const valInp = row.querySelector('.pr-val-input');
+        const unitSel = row.querySelector('.pr-unit-select');
+        const removeBtn = row.querySelector('.pr-remove-btn');
+
+        valInp.addEventListener('input', function() {
+          presetSelect.value = 'custom';
+          calculate();
+        });
+        unitSel.addEventListener('change', function() {
+          presetSelect.value = 'custom';
+          calculate();
+        });
+
+        removeBtn.addEventListener('click', function() {
+          if (container.querySelectorAll('.pr-branch-row').length > 2) {
+            row.remove();
+            renumberRows();
+            presetSelect.value = 'custom';
+            calculate();
+          }
+        });
+
+        return row;
+      }
+
+      function renumberRows() {
+        const rows = container.querySelectorAll('.pr-branch-row');
+        rows.forEach((r, idx) => {
+          const lbl = r.querySelector('label');
+          if (lbl) lbl.textContent = `Branch R${idx + 1}`;
+        });
+      }
+
+      function loadPreset(key) {
+        container.innerHTML = '';
+        const list = PRESETS[key] || PRESETS['two-equal'];
+        list.forEach((item, idx) => {
+          container.appendChild(createRow(item.val, item.unit, idx + 1));
+        });
+        calculate();
+      }
+
+      function formatOhms(r) {
+        if (r >= 1e6) return (r / 1e6).toFixed(3) + " M\u03a9";
+        if (r >= 1e3) return (r / 1e3).toFixed(3) + " k\u03a9";
+        return r.toFixed(3) + " \u03a9";
+      }
+
+      function formatConductance(g) {
+        if (g >= 1.0) return g.toFixed(4) + " S";
+        if (g >= 0.001) return (g * 1000).toFixed(3) + " mS";
+        return (g * 1e6).toFixed(2) + " \u03bcS";
+      }
+
+      function formatCurrent(i) {
+        if (i >= 1.0) return i.toFixed(3) + " A";
+        if (i >= 0.001) return (i * 1000).toFixed(3) + " mA";
+        return (i * 1e6).toFixed(2) + " \u03bcA";
+      }
+
+      function formatPower(p) {
+        if (p >= 1000) return (p / 1000).toFixed(3) + " kW";
+        if (p >= 1.0) return p.toFixed(3) + " W";
+        if (p >= 0.001) return (p * 1000).toFixed(2) + " mW";
+        return (p * 1e6).toFixed(2) + " \u03bcW";
+      }
+
+      function calculate() {
+        const rows = container.querySelectorAll('.pr-branch-row');
+        const vSupply = parseFloat(vsupplyInput.value) || 0;
+        let sumConductance = 0;
+        const branchData = [];
+
+        rows.forEach((r, idx) => {
+          const raw = parseFloat(r.querySelector('.pr-val-input').value) || 0;
+          const mult = parseFloat(r.querySelector('.pr-unit-select').value) || 1;
+          const rOhms = raw * mult;
+
+          if (rOhms > 0) {
+            const cond = 1 / rOhms;
+            sumConductance += cond;
+            branchData.push({
+              index: idx + 1,
+              rOhms: rOhms,
+              conductance: cond
+            });
+          }
+        });
+
+        if (sumConductance <= 0) {
+          primaryOut.textContent = "-- \u03a9";
+          statusOut.textContent = "Please enter valid positive branch resistances.";
+          breakdownBody.innerHTML = '';
+          return;
+        }
+
+        const req = 1 / sumConductance;
+        const totalCurrent = vSupply * sumConductance;
+        const totalPower = vSupply * totalCurrent;
+
+        // Render Cards
+        primaryOut.textContent = formatOhms(req);
+        statusOut.textContent = `Total Conductance: ${formatConductance(sumConductance)} \u2022 Network: ${branchData.length} Branches`;
+        currentOut.textContent = vSupply > 0 ? formatCurrent(totalCurrent) : "--";
+        powerOut.textContent = vSupply > 0 ? formatPower(totalPower) : "--";
+        condOut.textContent = formatConductance(sumConductance);
+        branchesOut.textContent = `${branchData.length} Resistors`;
+
+        // Render Table
+        breakdownBody.innerHTML = '';
+        branchData.forEach(b => {
+          const bCurrent = vSupply * b.conductance;
+          const bPower = vSupply * bCurrent;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong>Branch ${b.index}</strong></td>
+            <td>${formatOhms(b.rOhms)}</td>
+            <td>${formatConductance(b.conductance)}</td>
+            <td><strong style="color: var(--primary, #2563eb);">${vSupply > 0 ? formatCurrent(bCurrent) : '--'}</strong></td>
+            <td>${vSupply > 0 ? formatPower(bPower) : '--'}</td>
+          `;
+          breakdownBody.appendChild(tr);
+        });
+      }
+
+      presetSelect.addEventListener('change', function() {
+        if (this.value !== 'custom') {
+          loadPreset(this.value);
+        }
+      });
+
+      addRowBtn.addEventListener('click', function() {
+        const count = container.querySelectorAll('.pr-branch-row').length + 1;
+        container.appendChild(createRow(10, 1000, count));
+        presetSelect.value = 'custom';
+        calculate();
+      });
+
+      vsupplyInput.addEventListener('input', calculate);
+
+      calcBtn.addEventListener('click', calculate);
+
+      resetBtn.addEventListener('click', function() {
+        presetSelect.value = 'two-equal';
+        vsupplyInput.value = '12.0';
+        loadPreset('two-equal');
+      });
+
+      // Initial execution
+      loadPreset('two-equal');
+    })();
+  </script>
+</body>
+</html>
