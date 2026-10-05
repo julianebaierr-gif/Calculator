@@ -82,6 +82,9 @@ document.addEventListener("DOMContentLoaded", () => {
   initTOC();
   initQuickCalc();
   initCategoryFilter();
+  if (typeof window.rotateSidebarTools === "function") {
+    window.rotateSidebarTools();
+  }
 });
 
 // Search Autocomplete
@@ -280,3 +283,45 @@ function initCategoryFilter() {
     });
   });
 }
+
+// Global Dynamic Rotating Top 5 Sidebar System
+window.rotateSidebarTools = function(btn) {
+  const widget = btn ? btn.closest('.sidebar-widget') : document.querySelector('.sidebar-widget');
+  if (!widget) return;
+  const poolScript = widget.querySelector('.sidebar-pool-data');
+  const list = widget.querySelector('.sidebar-tools-list');
+  if (!poolScript || !list) return;
+
+  try {
+    const pool = JSON.parse(poolScript.textContent);
+    const currentPath = window.location.pathname.split('/').pop() || '';
+    const available = pool.filter(item => item.slug !== currentPath);
+    if (!available.length) return;
+
+    for (let i = available.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [available[i], available[j]] = [available[j], available[i]];
+    }
+
+    const selected = available.slice(0, 5);
+    list.innerHTML = selected.map(item => `
+      <li>
+        <a href="${item.slug}" class="sidebar-tool-item">
+          <span class="st-icon">${item.icon}</span>
+          <div class="st-info">
+            <span class="st-title">${item.title}</span>
+            <span class="st-desc">${item.desc}</span>
+          </div>
+          <span class="st-arrow">›</span>
+        </a>
+      </li>
+    `).join('');
+
+    if (btn) {
+      btn.classList.add('shuffling');
+      setTimeout(() => btn.classList.remove('shuffling'), 400);
+    }
+  } catch (err) {
+    console.error('Sidebar rotation error:', err);
+  }
+};

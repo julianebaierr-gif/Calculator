@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
 import glob
 import re
 import os
+import json
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Full Categorized Mapping with Icons and Descriptions
 CATEGORIES = {
     "health": {
         "name": "Health & Fitness",
@@ -98,12 +101,12 @@ CATEGORIES = {
             ("net-worth-calculator.html", "Personal Net Worth & Solvency", "🏛️", "Personal balance sheet, liquid net worth & debt ratio"),
             ("sales-tax-calculator.html", "Sales Tax & Reverse Pre-Tax", "🏷️", "Combined state & local rate + gross receipt extraction"),
             ("savings-calculator.html", "Compound Savings Growth", "📈", "Initial deposit + monthly contributions compounder"),
-            ("savings-goal-calculator.html", "Savings Goal Target Sizer", "🎯", "Required monthly contribution to hit wealth target"),
-            ("markup-calculator.html", "Markup & Margin Calculator", "🏷️", "Retail selling price, profit multiplier, markup & margin %"),
-            ("smoking-cost-calculator.html", "Smoking Cost & Opportunity", "🚬", "Cash outlays, S&P 500 compound loss & 11-min life loss"),
-            ("retirement-calculator.html", "Retirement & FIRE Planner", "🏖️", "Trinity study 4% rule, nest egg sizing & inflation"),
-            ("overtime-calculator.html", "Overtime Pay Calculator", "💼", "FLSA time-and-a-half, regular rate & CA double time"),
-            ("time-card-calculator.html", "Time Card Calculator", "💼", "7-day timesheet, daily/weekly overtime & gross pay"),
+            ("savings-goal-calculator.html", "Savings Goal & Target Timeline", "🎯", "Target capital balance, monthly deposit & inflation offset"),
+            ("markup-calculator.html", "Markup & Margin Calculator", "🏷️", "Cost-plus pricing markup percentage & gross profit margin"),
+            ("smoking-cost-calculator.html", "Smoking Cost & Savings Compounder", "🚭", "Lifetime financial expenditure of tobacco & compound growth"),
+            ("retirement-calculator.html", "Retirement Nest Egg & 4% Rule", "🏖️", "FIRE movement corpus, safe withdrawal rate & horizon"),
+            ("overtime-calculator.html", "Overtime Pay (1.5x & Double Time)", "⏱️", "FLSA time-and-a-half, weighted average rate & holiday pay"),
+            ("time-card-calculator.html", "Time Card & Bi-Weekly Hours", "🕒", "Punch-clock shift hours, lunch deductions & gross wages"),
         ]
     },
     "math": {
@@ -111,129 +114,129 @@ CATEGORIES = {
         "icon": "🔢",
         "hub": "math.html",
         "tools": [
-            ("standard-deviation-calculator.html", "Standard Deviation & Variance", "📊", "Sample (n-1) & population (N) stats"),
-            ("percentage-calculator.html", "Percentage Calculator", "％", "Portions, discounts & % change"),
-            ("fraction-calculator.html", "Fraction Calculator", "➗", "Add, multiply & simplify fractions"),
-            ("ratio-calculator.html", "Ratio Simplifier", "⚖️", "Euclid's GCD ratio reduction"),
-            ("gpa-calculator.html", "College GPA Calculator", "🎓", "4.0 scale cumulative GPA"),
-            ("gcd-lcm-calculator.html", "GCD and LCM Calculator", "🔢", "Euclidean algorithm reduction & prime factorization"),
-            ("quadratic-equation-calculator.html", "Quadratic Equation Calculator", "📐", "Roots x₁ & x₂, discriminant Δ & parabola vertex (h, k)"),
-            ("pythagorean-theorem-calculator.html", "Pythagorean Theorem Calculator", "🔺", "Hypotenuse, perpendicular legs & 3D space diagonal"),
-            ("scientific-notation-calculator.html", "Scientific & Engineering Notation", "🔬", "Standard form m × 10ⁿ, engineering notation & SI prefixes"),
-            ("significant-figures-calculator.html", "Significant Figures Calculator", "📏", "Sig fig counter, round-to-even & uncertainty propagation"),
-            ("prime-number-calculator.html", "Prime Number & Factorization Engine", "⚛️", "Primality test, divisor counts d(n) & prime factor tree"),
-            ("absolute-value-calculator.html", "Absolute Value Calculator", "📏", "Real modulus |x|, complex magnitude & distance"),
-            ("area-calculator.html", "Geometric Area Calculator", "📐", "2D surface area across polygons, circles & Heron"),
-            ("arithmetic-sequence-calculator.html", "Arithmetic Sequence Calculator", "🔢", "Nth term an = a1 + (n-1)d & Gauss partial sum Sn"),
-            ("circle-calculator.html", "Circle Calculator", "⭕", "Radius, circumference, area, sector & chord"),
-            ("cube-root-calculator.html", "Cube Root Calculator", "🧊", "Principal real root, complex roots & Newton-Raphson"),
-            ("decimal-to-fraction-calculator.html", "Decimal to Fraction Calculator", "➗", "Terminating & repeating decimals to rational p/q"),
-            ("exponent-calculator.html", "Exponent & Powers Calculator", "⚡", "Powers bⁿ, negative reciprocals & fractional roots"),
-            ("factorial-calculator.html", "Factorial & Permutation Calculator", "❗", "n!, permutations P(n, r), combinations C(n, r) & Stirling"),
-            ("fraction-to-percent-calculator.html", "Fraction to Percent Calculator", "➗", "Proper, improper & mixed numbers to exact percentage"),
-            ("geometric-sequence-calculator.html", "Geometric Sequence & Series Calculator", "📈", "Nth term an = a1·rⁿ⁻¹, finite Sn & infinite S∞"),
-            ("logarithm-calculator.html", "Logarithm Calculator (Log, Ln, Log2)", "🪵", "Arbitrary base log_b(x), ln, log10 & change of base"),
-            ("long-division-calculator.html", "Long Division with Steps & Remainders", "➗", "Quotient Q, remainder R & repeating decimal expansion"),
-            ("mean-median-mode-calculator.html", "Mean, Median, Mode & Range Calculator", "📊", "Central tendency, multimodal frequencies & skewness"),
-            ("midpoint-calculator.html", "Midpoint & Distance (2D & 3D)", "📍", "2D/3D midpoint, Euclidean distance & vector slope"),
-            ("modulo-calculator.html", "Modulo & Modular Arithmetic Calculator", "🔄", "A mod M, congruence classes, Euclidean quotient & inverse"),
-            ("nth-root-calculator.html", "Nth Root & Radical Solver", "√", "Arbitrary radical index ⁿ√A & Newton-Raphson approximation"),
-            ("square-root-calculator.html", "Square Root Calculator", "√", "Principal square root, Newton-Raphson & radical simplifier"),
-            ("percent-to-fraction-calculator.html", "Percent to Fraction Calculator", "％", "Exact rational fraction, mixed number & GCD reduction"),
-            ("percent-error-calculator.html", "Percent Error & Accuracy", "🎯", "Experimental vs theoretical error, precision & uncertainty"),
-            ("rounding-calculator.html", "Rounding Calculator", "🔢", "Round to nearest integer, decimals, half-even & sig figs"),
-            ("factors-calculator.html", "Factors & Factor Pairs Calculator", "🔢", "Divisor pairs, prime factorization & aliquot sums"),
-            ("sum-of-integers-calculator.html", "Sum of Integers & Series Calculator", "∑", "Gauss consecutive sum, squared sums & range summation"),
-            ("triangle-area-calculator.html", "Triangle Area Calculator", "🔺", "Heron's formula, SAS, base-height & Shoelace coordinates"),
-            ("variance-calculator.html", "Variance Calculator (Sample & Population)", "📊", "Sample s² (n-1), population σ² (N) & deviation table"),
-            ("distance-calculator.html", "Distance Calculator (2D & 3D)", "📍", "Euclidean, Manhattan & Chebyshev coordinate distance"),
-            ("midrange-calculator.html", "Midrange & Center of Range", "⚖️", "Midrange (L+S)/2, range L-S & midhinge analysis"),
-            ("permutation-combination-calculator.html", "Permutation & Combination (nPr, nCr)", "⚙️", "nPr, nCr, permutations & combinations with repetition"),
-            ("probability-calculator.html", "Probability Calculator (Union, Bayes)", "🎲", "Single events, compound A or B, conditional & Bayes"),
-            ("proportion-calculator.html", "Proportion Calculator (Solve for X)", "∷", "Direct & inverse variation, cross-multiplication"),
-            ("quotient-and-remainder-calculator.html", "Quotient and Remainder (Divmod)", "➗", "Euclidean integer division, mixed fractions & decimals"),
-            ("z-score-calculator.html", "Z-Score & Normal Distribution", "⎶", "Standard score, percentiles, normal CDF & p-values"),
-            ("average-calculator.html", "Average Calculator (All Means & Weighted)", "📊", "Arithmetic, geometric, harmonic & RMS quadratic means"),
-            ("perimeter-calculator.html", "Perimeter Calculator (2D Polygons)", "📐", "Perimeter of rectangles, triangles, circles & polygons"),
-            ("surface-area-calculator.html", "Surface Area (3D Polyhedra & Solids)", "📦", "Total surface area of prisms, cylinders, spheres & cones"),
-            ("volume-calculator.html", "Volume Calculator (3D Solids)", "🧊", "Volumetric capacity of cylinders, prisms, spheres & cones"),
-            ("percentage-change-calculator.html", "Percentage Change (Growth & Decay)", "📈", "Relative difference, % increase/decrease & multipliers"),
-            ("ratio-simplifier-calculator.html", "Ratio Simplifier & Scale Factor", "⚖️", "Euclid's GCD ratio reduction & scale factor"),
+            ("percentage-calculator.html", "Percentage Calculator", "🔢", "Percent of, increase & decrease"),
+            ("age-calculator.html", "Exact Age Calculator", "🎂", "Years, months, days & total hours"),
+            ("gpa-calculator.html", "College & High School GPA", "🎓", "Cumulative 4.0 weighted GPA"),
+            ("fraction-calculator.html", "Fraction Calculator", "½", "Add, subtract, multiply & divide"),
+            ("ratio-calculator.html", "Ratio & Proportion Sizer", "➗", "Simplify, scale & solve missing parts"),
+            ("standard-deviation-calculator.html", "Standard Deviation & Variance", "📊", "Sample (s) & population (σ) deviation"),
+            ("gcd-lcm-calculator.html", "GCD & LCM Calculator", "🔢", "Greatest common divisor & least multiple"),
+            ("quadratic-equation-calculator.html", "Quadratic Equation Solver", "📐", "Roots via quadratic formula & vertex"),
+            ("pythagorean-theorem-calculator.html", "Pythagorean Theorem", "📐", "Right triangle hypotenuse & legs"),
+            ("scientific-notation-calculator.html", "Scientific Notation Sizer", "🔬", "Standard scientific form & powers of 10"),
+            ("significant-figures-calculator.html", "Significant Figures Sizer", "📐", "Sig fig precision rules & rounding"),
+            ("prime-number-calculator.html", "Prime Number Validator", "🔢", "Primality testing, factor trees & cryptanalysis"),
+            ("absolute-value-calculator.html", "Absolute Value Calculator", "📏", "Real & complex modulus |x|, distance from origin"),
+            ("area-calculator.html", "Area Calculator (2D Geometric)", "📐", "Circles, triangles, trapezoids, polygons & ellipses"),
+            ("arithmetic-sequence-calculator.html", "Arithmetic Sequence Sizer", "🔢", "Nth term, common difference (d) & partial sum"),
+            ("circle-calculator.html", "Circle Calculator (Radius & Area)", "⭕", "Radius, diameter, circumference & sector area"),
+            ("cube-root-calculator.html", "Cube Root Calculator (∛x)", "🧊", "Perfect cubes, real roots & fractional exponents"),
+            ("decimal-to-fraction-calculator.html", "Decimal to Fraction Sizer", "½", "Terminating & repeating decimals to lowest terms"),
+            ("exponent-calculator.html", "Exponent & Power Calculator", "⚡", "Base raised to power, negative & fractional indices"),
+            ("factorial-calculator.html", "Factorial Calculator (n!)", "❗", "Permutations, Stirling approximation & gamma function"),
+            ("fraction-to-percent-calculator.html", "Fraction to Percent Converter", "📈", "Rational fractions to exact percentages & steps"),
+            ("geometric-sequence-calculator.html", "Geometric Sequence Sizer", "📐", "Common ratio (r), nth term & infinite series sum"),
+            ("logarithm-calculator.html", "Logarithm (Log & Ln) Solver", "🪵", "Common log10, natural ln & change-of-base rule"),
+            ("long-division-calculator.html", "Long Division with Remainders", "➗", "Step-by-step polynomial & integer long division"),
+            ("mean-median-mode-calculator.html", "Mean, Median & Mode Sizer", "📊", "Measures of central tendency, range & outliers"),
+            ("midpoint-calculator.html", "Midpoint Formula (2D & 3D)", "📍", "Cartesian midpoint coordinates & line length"),
+            ("modulo-calculator.html", "Modulo & Remainder Calculator", "➗", "Modular arithmetic, clock math & congruences"),
+            ("nth-root-calculator.html", "Nth Root Calculator (ⁿ√x)", "🌿", "General radical solver, fractional powers & principal roots"),
+            ("percent-error-calculator.html", "Percent Error & Variance", "🎯", "Experimental vs theoretical accepted accuracy %"),
+            ("percent-to-fraction-calculator.html", "Percent to Fraction Converter", "½", "Percentages to reduced proper/improper fractions"),
+            ("percentage-change-calculator.html", "Percentage Change Sizer", "📈", "Relative percentage delta, gain & loss rate"),
+            ("factors-calculator.html", "Factors & Divisors Calculator", "🔢", "All positive integer factors, prime factorization tree"),
+            ("sum-of-integers-calculator.html", "Sum of Integers (Arithmetic)", "➕", "Gauss summation formula, series sum & consecutive ints"),
+            ("triangle-area-calculator.html", "Triangle Area (Heron & Base)", "📐", "Base-height, Heron's formula & SAS trigonometry"),
+            ("variance-calculator.html", "Variance Calculator (s² & σ²)", "📊", "Sample and population variance with sum of squares"),
+            ("distance-calculator.html", "2D & 3D Distance Calculator", "📏", "Euclidean distance formula between Cartesian coordinates"),
+            ("midrange-calculator.html", "Midrange Calculator", "⚖️", "Extreme score midpoint & statistical dispersion summary"),
+            ("permutation-combination-calculator.html", "Permutations & Combinations", "🎲", "nPr order-dependent & nCr selection arrangements"),
+            ("probability-calculator.html", "Probability Calculator", "🎲", "Single events, independent intersections & Bayes rule"),
+            ("proportion-calculator.html", "Direct & Inverse Proportion", "⚖️", "Solve ratios, cross multiplication & unitary scaling"),
+            ("quotient-and-remainder-calculator.html", "Quotient & Remainder Division", "➗", "Euclidean division theorem with integer remainders"),
+            ("rounding-calculator.html", "Number Rounding Sizer", "🎯", "Round to nearest integer, tenth, hundredth & sig figs"),
+            ("square-root-calculator.html", "Square Root Calculator (√x)", "📐", "Principal square roots, surd simplification & steps"),
+            ("z-score-calculator.html", "Z-Score & Normal Probability", "📊", "Standard normal distribution, percentile & p-value"),
+            ("average-calculator.html", "Average & Mean Sizer", "📊", "Arithmetic mean, weighted average & running total"),
+            ("perimeter-calculator.html", "Perimeter Calculator (All Shapes)", "📏", "Boundary perimeter for rectangles, triangles & polygons"),
+            ("surface-area-calculator.html", "Surface Area (3D Geometric)", "🧊", "Spheres, cylinders, cones, prisms & cuboids"),
+            ("volume-calculator.html", "Volume Calculator (3D Solids)", "📦", "Cubic volume for boxes, cylinders, spheres & pyramids")
         ]
     },
     "engineering": {
-        "name": "Electrical & Power Systems",
+        "name": "Electrical & Engineering",
         "icon": "⚡",
         "hub": "engineering.html",
         "tools": [
-            ("wire-ampacity-calculator.html", "Wire Ampacity (NEC 310.16)", "🔌", "Allowable conductor current & derating"),
-            ("conduit-fill-calculator.html", "Conduit Fill (NEC Ch. 9)", "🪢", "40% fill rule & wire jam ratio"),
-            ("motor-starting-current-calculator.html", "Motor Starting Current", "⚙️", "NEMA locked rotor inrush amps"),
-            ("short-circuit-calculator.html", "Short-Circuit (IEC 60909)", "💥", "Symmetrical fault kA & breaking"),
-            ("transformer-sizing-calculator.html", "Transformer Sizing (NEC 450)", "⚡", "kVA rating & full-load amps"),
-            ("cable-sizing-calculator.html", "Cable Sizing (IEC/NEC)", "🔌", "IEC/NEC ampacity & derating"),
-            ("voltage-drop-calculator.html", "Voltage Drop Calculator", "📉", "NEC 3% & 5% copper/aluminum run"),
-            ("ohms-law-calculator.html", "Ohm's Law Calculator", "⚡", "Voltage, current, power & ohms"),
-            ("power-factor-calculator.html", "Power Factor (kW to kVAR)", "⚡", "Capacitor bank rating & line current savings"),
-            ("parallel-resistor-calculator.html", "Parallel Resistor (Req)", "⚡", "Equivalent resistance & branch current divider"),
-            ("battery-life-calculator.html", "Battery Life & Runtime", "🔋", "Peukert's law discharge & C-rate runtime"),
-            ("resistor-color-code-calculator.html", "Resistor Color Code", "🎨", "4 & 5-band axial resistance"),
-            ("555-timer-calculator.html", "555 Timer Astable & Monostable", "⏱️", "Frequency, duty cycle & pulse width"),
-            ("led-resistor-calculator.html", "LED Series Resistor Calculator", "💡", "Current limiting & wattage rating"),
-            ("capacitive-reactance-calculator.html", "Capacitive Reactance (Xc)", "⚡", "AC capacitor impedance & phase shift"),
-            ("inductive-reactance-calculator.html", "Inductive Reactance (Xl)", "⚡", "AC inductor reactance & back-EMF"),
-            ("op-amp-gain-calculator.html", "Op-Amp Gain & Inverting/Non-Inv", "📈", "Closed loop gain, bandwidth & dB"),
-            ("three-phase-power-calculator.html", "Three-Phase AC Power (kVA/kW)", "⚡", "Real, reactive & apparent 3-phase power"),
-            ("adc-dac-calculator.html", "ADC & DAC Converter Resolution", "🎛️", "Quantization LSB, SQNR & ENOB"),
-            ("antenna-length-calculator.html", "Antenna Length & Resonant Dipole", "📡", "Half-wave & quarter-wave velocity factor"),
-            ("battery-short-circuit-current-calculator.html", "Battery Short Circuit (IEC 60896)", "🔋", "DC prospective fault current & arc flash"),
-            ("bjt-transistor-calculator.html", "BJT Transistor Bias & Q-Point", "⚡", "Voltage divider bias & saturation limit"),
-            ("breaker-size-calculator.html", "Breaker Size (NEC 125% Rule)", "🛡️", "Continuous load sizing & trip curves"),
-            ("decibel-calculator.html", "Decibel Calculator (dB, dBm, SPL)", "🔊", "Power, voltage, dBm to Watts & dB SPL"),
-            ("earth-pit-resistance-calculator.html", "Earth Pit Resistance (IEEE 80)", "🌍", "Grounding rod dissipation & soil resistivity"),
-            ("electrical-power-calculator.html", "Electrical Power & Energy Cost", "⚡", "Real, reactive, apparent & kWh cost"),
-            ("microstrip-impedance-calculator.html", "Microstrip Impedance (IPC-2141)", "📡", "Single-ended & differential Z0"),
-            ("resistor-network-calculator.html", "Resistor Network (Delta-Wye & Ladder)", "⚡", "Δ-Y Kennelly transform & R-2R ladder"),
-            ("transformer-turns-ratio-calculator.html", "Transformer Turns Ratio (a)", "⚡", "Voltage, current & impedance matching"),
-            ("aluminium-cable-sizing-calculator.html", "Aluminium Cable Sizing (NEC/IEC)", "🔌", "AA-8000 ampacity, lugs & AL/CU area"),
-            ("busbar-sizing-calculator.html", "Busbar Sizing (DIN 43671 / IEC)", "⚡", "Continuous ampacity & short-circuit force"),
-            ("cable-sizing-calculator-bs-7671.html", "Cable Sizing (BS 7671 18th Ed)", "🔌", "UK wiring regulations & mV/A/m drop"),
-            ("cable-sizing-calculator-iec-60364.html", "Cable Sizing (IEC 60364-5-52)", "🔌", "International LV dimensioning & adiabatic"),
-            ("cable-sizing-installation-method-a.html", "Cable Sizing Method A (Insulated Wall)", "🔌", "A1 & A2 conduit in cavity derating"),
-            ("fault-current-calculator.html", "Fault Current (IEEE 141 / IEC)", "💥", "Transformer secondary & point-to-point kA"),
-            ("filter-calculator.html", "Analog Filter (RC, RL, LC)", "🎛️", "Cutoff frequency, dB gain & phase angle"),
-            ("generator-sizing-calculator.html", "Generator Sizing (ISO 8528)", "⚡", "Standby kVA, motor inrush & altitude derate"),
-            ("heatsink-calculator.html", "Heatsink Sizing & Thermal", "❄️", "Thermal resistance θ_sa & junction temp"),
-            ("cable-sizing-installation-method-c.html", "Cable Sizing Method C (Clipped Direct)", "🔌", "Surface clipped to masonry ampacity"),
-            ("cable-sizing-installation-method-e.html", "Cable Sizing Method E (Cable Tray)", "🔌", "Perforated tray & ladder rack in free air"),
-            ("cable-sizing-calculator-nec.html", "Cable Sizing (NEC Table 310.16)", "🔌", "125% continuous load & conduit fill derate"),
-            ("copper-cable-sizing-calculator.html", "Copper Cable Sizing (100% IACS)", "🔌", "Pure ETP Cu ampacity & I²R loss cost"),
-            ("earthing-cable-size-calculator.html", "Earthing Cable Size (IEC 60364-5-54)", "⚡", "Adiabatic S = √(I²·t)/k & k-factor"),
-            ("kw-to-cable-size-calculator.html", "kW to Cable Size (1-Phase & 3-Phase)", "🔌", "Active kW to full-load current & mV/A/m"),
-            ("single-phase-cable-sizing-calculator.html", "Single Phase Cable Sizing (230V/120V)", "🔌", "2-wire loop drop & radial/ring circuit"),
-            ("three-phase-cable-sizing-calculator.html", "Three Phase Cable Sizing (400V/480V)", "⚡", "Line-to-line balanced vector drop & method E"),
-            ("wire-gauge-calculator.html", "Wire Gauge (AWG to mm² Metric)", "📏", "ASTM B258 logarithmic AWG scale & circular mils"),
-            ("voltage-divider-calculator.html", "Voltage Divider Calculator", "⚡", "Loaded & unloaded divider, attenuation & Thevenin source"),
-            ("parallel-resistance-calculator.html", "Parallel Resistance Calculator", "⚡", "Equivalent resistance, conductance Siemens & current divider"),
-            ("capacitor-energy-calculator.html", "Capacitor Energy & Pulse Power", "🔋", "Stored Joules E = ½CV², charge Q = CV & peak discharge power"),
-            ("resonant-frequency-calculator.html", "LC Resonant Frequency Tank", "📻", "Series/parallel LC resonance, Q factor & 3dB bandwidth"),
-            ("rc-time-constant-calculator.html", "RC Time Constant (τ = RC)", "⏱️", "Time constant, filter cutoff fc & exponential transient curves"),
-            ("rl-time-constant-calculator.html", "RL Time Constant (τ = L/R)", "⚡", "Inductor current growth, flyback kickback & magnetic energy"),
-            ("zener-diode-calculator.html", "Zener Diode Shunt Regulator", "⚡", "Series resistor Rs, max diode power Pz & load regulation"),
-            ("lm317-calculator.html", "LM317 Voltage Regulator", "⚡", "Adjustable linear regulator Vout, R1/R2 feedback & heatsink"),
-            ("pcb-trace-width-calculator.html", "PCB Trace Width (IPC-2152)", "🔌", "Current ampacity, copper weight & temperature rise"),
-            ("lightning-protection-calculator.html", "Lightning Protection (NFPA 780)", "⚡", "Rolling sphere radius, collection area & strike risk"),
-            ("lumen-lux-calculator.html", "Lumen to Lux Illuminance", "💡", "Luminous flux to lux, beam spread & candela"),
-            ("lumen-method-calculator.html", "Lumen Method Fixture Layout", "💡", "IESNA zonal cavity, room cavity ratio & fixture grid"),
-            ("motor-parameters-calculator.html", "Motor Parameters & Slip", "⚙️", "Induction motor slip, synchronous speed & full load torque"),
-            ("buck-boost-converter-calculator.html", "Buck-Boost Converter", "⚡", "Inductor sizing, duty cycle, CCM critical L & ripple"),
-            ("3-phase-power-calculator.html", "3-Phase Power (kW, kVA, kVAR)", "🔌", "Active, reactive, apparent power & PF correction capacitor"),
-            ("motor-starter-sizing-calculator.html", "Motor Starter Sizing (NEC 430)", "⚙️", "NEMA sizes, IEC AC-3 contactors, overloads & breaker OCPD"),
-            ("nec-load-calculation-calculator.html", "NEC Load Calculation (Residential)", "🏡", "Dwelling service sizing, panel amps & SE cable per NEC 220"),
-            ("neutral-conductor-sizing-calculator.html", "Neutral Conductor Sizing", "⚡", "3-Phase unbalance, triplen harmonics & NEC 220.61 reduction"),
-            ("best-engineering-calculator.html", "Best Engineering Calculator Guide", "🖩", "NCEES FE/PE exam legal models, Casio vs TI vs HP"),
-            ("cable-sizing-guide.html", "Cable Sizing Guide & Selection", "🔌", "IEC 60364-5-52, BS 7671, NEC 310 ampacity & drop"),
-            ("engineering-formulas.html", "Engineering Formulas Compendium", "📐", "Master multi-discipline formulas & live equation solver"),
+            ("wire-ampacity-calculator.html", "Wire Ampacity (NEC 310.16)", "⚡", "Allowable copper & aluminium conductor capacity"),
+            ("conduit-fill-calculator.html", "Conduit Fill (NEC Ch. 9)", "🔌", "EMT, PVC & RMC allowable wire fill percentages"),
+            ("motor-starting-current-calculator.html", "Motor Starting Current", "⚙️", "Locked rotor kVA code letters & inrush current"),
+            ("short-circuit-calculator.html", "Short-Circuit (IEC 60909)", "⚡", "Symmetrical fault kA & transformer impedance"),
+            ("transformer-sizing-calculator.html", "Transformer Sizing (NEC 450)", "🔌", "kVA load rating, primary & secondary full-load amps"),
+            ("cable-sizing-calculator.html", "Cable Sizing (IEC/NEC)", "🔌", "Full load current, derating factors & thermal limit"),
+            ("voltage-drop-calculator.html", "Voltage Drop Calculator", "📉", "Single & 3-phase conductor run voltage drop"),
+            ("ohms-law-calculator.html", "Ohm's Law Calculator", "⚡", "Voltage, current, resistance & electrical power"),
+            ("power-factor-calculator.html", "Power Factor (kW to kVAR)", "⚡", "Apparent kVA, true kW, reactive kVAR & correction"),
+            ("parallel-resistor-calculator.html", "Parallel Resistor (Req)", "🎨", "Equivalent resistance for 2 to 6 branch circuits"),
+            ("battery-life-calculator.html", "Battery Life & Runtime", "🔋", "Battery discharge duration from mAh & load current"),
+            ("resistor-color-code-calculator.html", "Resistor Color Code", "🎨", "4, 5 & 6 band EIA axial resistor color decoding"),
+            ("555-timer-calculator.html", "555 Timer Astable & Monostable", "⏱️", "Oscillation frequency, duty cycle & pulse width"),
+            ("led-resistor-calculator.html", "LED Series Resistor Calculator", "💡", "Current limiting resistor ohms & dissipation watts"),
+            ("capacitive-reactance-calculator.html", "Capacitive Reactance (Xc)", "⚡", "AC capacitance impedance ohms at given frequency"),
+            ("inductive-reactance-calculator.html", "Inductive Reactance (Xl)", "⚡", "AC inductor choke impedance ohms at frequency"),
+            ("op-amp-gain-calculator.html", "Op-Amp Gain & Inverting/Non-Inv", "🎛️", "Operational amplifier voltage gain ratio & dB"),
+            ("three-phase-power-calculator.html", "Three-Phase AC Power (kVA/kW)", "⚡", "Star & delta line-to-line balanced AC active power"),
+            ("adc-dac-calculator.html", "ADC & DAC Converter Resolution", "🎛️", "Quantization voltage step, LSB & SNR bit depth"),
+            ("antenna-length-calculator.html", "Antenna Length & Resonant Dipole", "📡", "Quarter-wave whip & half-wave dipole physical length"),
+            ("battery-short-circuit-current-calculator.html", "Battery Short Circuit (IEC 60896)", "🔋", "Battery bank prospective peak prospective fault current"),
+            ("bjt-transistor-calculator.html", "BJT Transistor Bias & Q-Point", "⚡", "Base-emitter voltage, collector current & hFE beta"),
+            ("breaker-size-calculator.html", "Breaker Size (NEC 125% Rule)", "🛡️", "Continuous load standard circuit breaker ampacity"),
+            ("decibel-calculator.html", "Decibel Calculator (dB, dBm, SPL)", "🔊", "Power ratio, voltage gain dB & sound pressure"),
+            ("earth-pit-resistance-calculator.html", "Earth Pit Resistance (IEEE 80)", "🌍", "Ground rod dissipation ohms in varying soil resistivity"),
+            ("electrical-power-calculator.html", "Electrical Power & Energy Cost", "💡", "Kilowatt consumption, monthly kWh & utility tariffs"),
+            ("microstrip-impedance-calculator.html", "Microstrip Impedance (IPC-2141)", "📡", "PCB trace characteristic impedance Z0 & dielectric"),
+            ("resistor-network-calculator.html", "Resistor Network (Delta-Wye)", "⚡", "Complex bridge, ladder & star-delta transformations"),
+            ("transformer-turns-ratio-calculator.html", "Transformer Turns Ratio (a)", "🔌", "Voltage transformation ratio, turns count & primary Z"),
+            ("aluminium-cable-sizing-calculator.html", "Aluminium Cable Sizing", "🔌", "Aluminium feeder sizing with conductivity derating"),
+            ("busbar-sizing-calculator.html", "Busbar Sizing (DIN 43671 / IEC)", "⚡", "Copper & aluminium switchgear busbar thermal capacity"),
+            ("cable-sizing-calculator-bs-7671.html", "Cable Sizing (BS 7671 18th Ed)", "🔌", "UK IET Wiring Regulations thermal & voltage sizing"),
+            ("cable-sizing-calculator-iec-60364.html", "Cable Sizing (IEC 60364-5-52)", "🔌", "International electrotechnical cable installation rules"),
+            ("cable-sizing-installation-method-a.html", "Cable Sizing Method A (Thermal Wall)", "🔌", "Enclosed conduit in thermally insulated walls"),
+            ("fault-current-calculator.html", "Fault Current (IEEE 141 / IEC)", "⚡", "Point-to-point infinite bus prospective fault kA"),
+            ("filter-calculator.html", "Analog Filter (RC, RL, LC)", "🎛️", "Low-pass, high-pass cutoff frequency & roll-off slope"),
+            ("generator-sizing-calculator.html", "Generator Sizing (ISO 8528)", "⚙️", "Standby alternator kVA sizing for inductive motor loads"),
+            ("heatsink-calculator.html", "Heatsink Sizing & Thermal", "🌡️", "Semiconductor junction-to-ambient thermal resistance °C/W"),
+            ("cable-sizing-installation-method-c.html", "Cable Sizing Method C (Direct Wall)", "🔌", "Surface-mounted direct clipped cable installation"),
+            ("cable-sizing-installation-method-e.html", "Cable Sizing Method E (Cable Tray)", "🔌", "Open perforated cable tray free-air ampacity"),
+            ("cable-sizing-calculator-nec.html", "Cable Sizing (NEC Table 310.16)", "🔌", "North American National Electrical Code conductor gauge"),
+            ("copper-cable-sizing-calculator.html", "Copper Cable Sizing (100% IACS)", "🔌", "Pure annealed electrolytic copper conductor sizing"),
+            ("earthing-cable-size-calculator.html", "Earthing Cable Size (IEC 60364)", "🌍", "Adiabatic equation minimum protective earth cross-section"),
+            ("kw-to-cable-size-calculator.html", "kW to Cable Size (1 & 3-Phase)", "🔌", "Direct active power rating to required copper gauge"),
+            ("single-phase-cable-sizing-calculator.html", "Single Phase Cable Sizing (230V)", "🔌", "Residential 2-wire conductor selection & voltage drop"),
+            ("three-phase-cable-sizing-calculator.html", "Three Phase Cable Sizing (400V)", "🔌", "Commercial & industrial 400V/480V distribution feeders"),
+            ("wire-gauge-calculator.html", "Wire Gauge (AWG to mm²)", "📏", "American Wire Gauge diameter, circular mils & metric mm²"),
+            ("voltage-divider-calculator.html", "Voltage Divider Calculator", "⚡", "Dual resistor potential divider output voltage Vout"),
+            ("parallel-resistance-calculator.html", "Parallel Resistance Calculator", "⚡", "Reciprocal formula branch conductor equivalent ohms"),
+            ("capacitor-energy-calculator.html", "Capacitor Energy & Pulse Power", "⚡", "Stored joules E = ½CV² & instant discharge wattage"),
+            ("resonant-frequency-calculator.html", "LC Resonant Frequency Tank", "📻", "Series & parallel tank circuit resonance f0 in MHz"),
+            ("rc-time-constant-calculator.html", "RC Time Constant (τ = R·C)", "⏱️", "Capacitor charging time constant & 63.2% rise voltage"),
+            ("rl-time-constant-calculator.html", "RL Time Constant (τ = L/R)", "⏱️", "Inductor charging transient time & decay rate"),
+            ("zener-diode-calculator.html", "Zener Diode Shunt Regulator", "⚡", "Zener series ballast resistor & power dissipation watts"),
+            ("lm317-calculator.html", "LM317 Adjustable Regulator", "🎛️", "Output voltage Vout from R1/R2 feedback network"),
+            ("pcb-trace-width-calculator.html", "PCB Trace Width (IPC-2152)", "📐", "Internal & external copper trace width for ampacity limit"),
+            ("lightning-protection-calculator.html", "Lightning Protection (IEC 62305)", "🌩️", "Rolling sphere radius, protection angle & down conductors"),
+            ("lumen-lux-calculator.html", "Lumen to Lux Illuminance", "💡", "Luminous flux spread over floor area square meters"),
+            ("lumen-method-calculator.html", "Lumen Method Lighting Layout", "💡", "Room cavity ratio, utilization factor & luminaire count"),
+            ("motor-parameters-calculator.html", "Motor Parameters & Torque", "⚙️", "Synchronous RPM, slip percentage & mechanical shaft watts"),
+            ("buck-boost-converter-calculator.html", "Buck-Boost DC Converter", "⚡", "Switching duty cycle, inductor ripple & output voltage"),
+            ("3-phase-power-calculator.html", "3-Phase Power Calculator", "⚡", "Active, reactive & apparent 3-phase electrical loads"),
+            ("motor-starter-sizing-calculator.html", "Motor Starter Sizing (AC-3)", "⚙️", "Contactor current rating, thermal overload relay setting"),
+            ("nec-load-calculation-calculator.html", "NEC Service Load Calculation", "🏠", "Residential general lighting, small appliances & HVAC"),
+            ("neutral-conductor-sizing-calculator.html", "Neutral Conductor Sizing", "🔌", "Unbalanced 3-phase neutral current & triplen harmonics"),
+            ("best-engineering-calculator.html", "Best Engineering Solvers Guide", "📚", "Benchmark engineering software formulas & standards"),
+            ("cable-sizing-guide.html", "Cable Sizing Standards Handbook", "📖", "IEC, NEC & BS cable selection design methodologies"),
+            ("engineering-formulas.html", "Master Engineering Formulas", "📐", "Electrical, mechanical & civil structural formula sheet")
         ]
     },
     "solar": {
@@ -241,12 +244,17 @@ CATEGORIES = {
         "icon": "☀️",
         "hub": "solar-energy.html",
         "tools": [
-            ("solar-panel-sizing-calculator.html", "Solar Panel & Array Sizing", "☀️", "Array watts & peak sun hours"),
-            ("solar-battery-bank-calculator.html", "Solar Battery Bank Sizing", "🔋", "Storage Ah & kWh for autonomy"),
-            ("solar-inverter-sizing-calculator.html", "Solar Inverter Sizing", "⚡", "Continuous kVA & surge capacity"),
-            ("pv-string-sizing-calculator.html", "PV String Sizing (NEC 690)", "☀️", "MPPT voltage limits & module temperature"),
-            ("ev-charging-time-calculator.html", "EV Charging Time & Power", "🔌", "Levels 1, 2 & DC Fast charge time"),
-            ("ev-charging-circuit-calculator.html", "EV Charging Circuit (NEC 625)", "🔌", "Continuous load 125%, breaker & AWG wire"),
+            ("solar-panel-sizing-calculator.html", "Solar Panel Sizing & PV Array", "☀️", "Photovoltaic panel count from daily kilowatt-hours"),
+            ("solar-battery-bank-calculator.html", "Solar Battery Bank Sizing", "🔋", "Storage capacity kWh & DoD autonomy days"),
+            ("solar-inverter-sizing-calculator.html", "Solar Inverter Sizing (kW/kVA)", "⚡", "Continuous running wattage & surge multiplier"),
+            ("ev-charging-time-calculator.html", "EV Charging Time & Power", "🔌", "Electric vehicle battery recharge hours & kW level"),
+            ("pv-string-sizing-calculator.html", "PV String Sizing (Voc & Vmp)", "☀️", "Temperature-corrected open circuit voltage limits"),
+            ("battery-life-calculator.html", "Battery Autonomy Runtime", "🔋", "Deep cycle battery backup duration under load"),
+            ("battery-short-circuit-current-calculator.html", "Battery Short Circuit Current", "🔋", "IEC 60896 battery fault current & DC breaker capacity"),
+            ("cable-sizing-calculator.html", "DC/AC Cable Sizing", "🔌", "Solar string conductor gauge & thermal ampacity"),
+            ("voltage-drop-calculator.html", "Solar Circuit Voltage Drop", "📉", "Minimize DC array line losses & voltage sag"),
+            ("electrical-power-calculator.html", "Solar Array Yield & kW Power", "⚡", "Instantaneous power & peak daily kilowatt-hours"),
+            ("generator-sizing-calculator.html", "Hybrid Generator Backup", "⚙️", "Off-grid generator sizing & solar blending")
         ]
     },
     "mechanical": {
@@ -254,40 +262,40 @@ CATEGORIES = {
         "icon": "⚙️",
         "hub": "mechanical.html",
         "tools": [
-            ("bolt-torque-calculator.html", "Bolt Torque & Preload", "🔩", "Tightening torque & clamp load preload"),
-            ("bearing-life-calculator.html", "Bearing Life (ISO 281)", "⚙️", "L10 & L10h rating life in revs & hours"),
-            ("pump-head-calculator.html", "Pump Head (TDH & Flow)", "🌊", "Total dynamic head & motor BHP"),
-            ("gear-ratio-calculator.html", "Gear Ratio & Speed", "⚙️", "Velocity reduction & torque ratio"),
-            ("cooling-load-calculator.html", "Cooling Load (HVAC) Sizing", "❄️", "Sensible & latent heat in BTU/hr"),
-            ("pipe-sizing-calculator.html", "Pipe Sizing & Water Flow", "🚰", "Internal diameter & friction loss"),
-            ("torque-calculator.html", "Torque & Shaft Power", "⚙️", "Rotational torque N·m & kW/HP"),
-            ("belt-length-calculator.html", "Belt Length (Open & Crossed Pulley)", "⚙️", "Pitch length, center distance & wrap angle"),
-            ("conveyor-belt-speed-calculator.html", "Conveyor Belt Speed & Tonnage", "🏭", "Linear velocity, drum RPM & CEMA capacity"),
-            ("cutting-speed-calculator.html", "Cutting Speed & Spindle RPM", "⚙️", "Linear surface speed Vc & Taylor tool life"),
-            ("feed-rate-calculator.html", "CNC Feed Rate & Chip Load", "⚙️", "Table feed vf, radial chip thinning & MRR"),
-            ("flywheel-energy-calculator.html", "Flywheel Kinetic Energy & Stress", "🔄", "Stored energy, moment of inertia & hoop stress"),
-            ("gear-module-calculator.html", "Gear Module & Pitch Geometry", "⚙️", "Metric module m, diametral pitch DP & tip dia"),
-            ("heat-exchanger-calculator.html", "Heat Exchanger (LMTD & NTU Area)", "🌡️", "Thermal duty, counter-flow LMTD & TEMA area"),
-            ("hvac-calculator.html", "HVAC Sizing & Cooling Tonnage", "❄️", "Sensible, latent dehumidification & supply CFM"),
-            ("hydraulic-cylinder-calculator.html", "Hydraulic Cylinder Sizing (ISO 6020)", "🚜", "Push/pull force, fluid velocity & Euler buckling"),
-            ("hydraulic-cylinder-force-calculator.html", "Hydraulic Cylinder Net Force (ISO 3320)", "🚜", "Net thrust, backpressure & seal friction drag"),
-            ("hydraulic-cylinder-speed-calculator.html", "Hydraulic Cylinder Speed & Flow", "🚜", "Piston velocity, cycle time & regenerative boost"),
-            ("hydraulic-pump-power-calculator.html", "Hydraulic Pump Power (ISO 4409)", "⚙️", "Motor drive power, displacement & shaft torque"),
-            ("power-to-torque-calculator.html", "Power to Torque & Shaft Sizing", "⚙️", "Rotary torque, gear ratio & shaft shear stress"),
-            ("psychrometric-calculator.html", "Psychrometric & Moist Air (ASHRAE)", "🌡️", "Dew point, humidity ratio W, wet bulb & enthalpy"),
-            ("pulley-mechanical-advantage-calculator.html", "Pulley Mechanical Advantage (CMAA 70)", "🏗️", "Block & tackle IMA, AMA & reeving friction"),
-            ("pulley-rpm-calculator.html", "Pulley RPM & Belt Speed (ISO 5296)", "⚙️", "Rotational speed, ratio, belt velocity & slip"),
-            ("pump-flow-calculator.html", "Pump Flow Rate & Velocity", "🌊", "Pipe bore velocity, m³/h, GPM & VFD scaling"),
-            ("reynolds-number-calculator.html", "Reynolds Number (Moody & Swamee-Jain)", "🧪", "Laminar, transition & turbulent flow regime"),
-            ("shaft-diameter-calculator.html", "Shaft Diameter (ASME B106.1M)", "⚙️", "Combined torsion, bending moment & keyway de-rate"),
-            ("spring-rate-calculator.html", "Helical Spring Rate (SMI / ASTM A228)", "🌀", "Spring constant k, Wahl stress factor & solid height"),
-            ("thermal-expansion-calculator.html", "Thermal Expansion & Pipe Stress", "🌡️", "Linear growth ΔL, volumetric ΔV & ASME loop leg"),
-            ("torque-converter.html", "Torque Converter Sizing (SAE J643)", "🚗", "Stall torque ratio, speed ratio & K-factor"),
-            ("torque-to-hp-calculator.html", "Torque to HP & BMEP Converter", "🏎️", "Brake horsepower, kilowatts & 4-stroke BMEP"),
-            ("projectile-motion-calculator.html", "Projectile Motion Trajectory", "🚀", "Apex height, time of flight, range & impact velocity"),
-            ("factor-of-safety-calculator.html", "Factor of Safety (ASME / AISC)", "🛡️", "Yield/ultimate safety margins, MoS & Goodman fatigue"),
-            ("lead-screw-calculator.html", "Lead Screw & Power Screw Torque", "⚙️", "Acme/Trapezoidal lifting torque, self-locking & power"),
-            ("press-fit-calculator.html", "Press Fit & Interference Fits", "🚜", "Lamé thick cylinder pressure, push force & shrink fit"),
+            ("cooling-load-calculator.html", "Cooling Load (HVAC) Sizing", "❄️", "Sensible, latent heat gain & tons of refrigeration"),
+            ("pipe-sizing-calculator.html", "Pipe Sizing & Water Flow", "🚰", "Volumetric flow rate, velocity limit & diameter"),
+            ("torque-calculator.html", "Torque & Shaft Power", "⚙️", "Rotational mechanical torque from horsepower & RPM"),
+            ("pump-head-calculator.html", "Pump Total Dynamic Head (TDH)", "💧", "Static elevation, friction loss & discharge head"),
+            ("gear-ratio-calculator.html", "Gear Ratio & Output Speed", "⚙️", "Velocity reduction ratio, pitch diameter & output RPM"),
+            ("bolt-torque-calculator.html", "Bolt Torque & Clamp Force", "🔩", "Tightening torque T = K·F·d & proof load safety"),
+            ("bearing-life-calculator.html", "Bearing Life L10 Rating (ISO)", "🔄", "Rolling element bearing fatigue hours at speed"),
+            ("belt-length-calculator.html", "V-Belt & Flat Belt Length", "⚙️", "Center distance, pulley pitch diameters & contact angle"),
+            ("conveyor-belt-speed-calculator.html", "Conveyor Belt Capacity (TPH)", "📦", "Material bulk density, cross-sectional bed & speed"),
+            ("cutting-speed-calculator.html", "Machining Cutting Speed & Feed", "⚙️", "Surface meters per min, spindle RPM & tool feed"),
+            ("feed-rate-calculator.html", "Milling Feed Rate (mm/min)", "⚙️", "Tooth chip load, cutter flute count & table feed"),
+            ("flywheel-energy-calculator.html", "Flywheel Energy & Inertia", "🔄", "Stored kinetic energy, radius of gyration & mass"),
+            ("gear-module-calculator.html", "Spur Gear Module & Pitch (ISO)", "⚙️", "Metric gear tooth dimensions, addendum & dedendum"),
+            ("heat-exchanger-calculator.html", "Heat Exchanger LMTD & Duty", "🔥", "Log mean temperature difference & heat transfer rate"),
+            ("hvac-calculator.html", "HVAC Airflow CFM & Duct Sizer", "❄️", "Room sensible heat ratio & friction rate per 100ft"),
+            ("hydraulic-cylinder-calculator.html", "Hydraulic Cylinder Force & Speed", "🚜", "Push/pull piston tonnage & fluid flow requirements"),
+            ("hydraulic-cylinder-force-calculator.html", "Hydraulic Cylinder Force Sizer", "🚜", "Direct fluid pressure to extension/retraction force"),
+            ("hydraulic-cylinder-speed-calculator.html", "Hydraulic Cylinder Speed", "🚜", "Cycle time seconds from pump GPM & stroke length"),
+            ("hydraulic-pump-power-calculator.html", "Hydraulic Pump Drive Power", "⚙️", "Required electric motor drive kW from PSI & flow"),
+            ("power-to-torque-calculator.html", "Power to Torque Converter", "⚙️", "Mechanical kW/HP to Newton-meters & foot-pounds"),
+            ("psychrometric-calculator.html", "Psychrometric Air Properties", "🌡️", "Dry bulb, wet bulb, relative humidity & dew point"),
+            ("pulley-mechanical-advantage-calculator.html", "Pulley Mechanical Advantage", "🏗️", "Rope fall count, tension reduction & lifting effort"),
+            ("pulley-rpm-calculator.html", "Pulley Ratio & Driven RPM", "⚙️", "Belt drive pulley speed relationship D1·N1 = D2·N2"),
+            ("pump-flow-calculator.html", "Pump Flow Rate & Cavitation", "💧", "Discharge volume capacity & pipe velocity checks"),
+            ("reynolds-number-calculator.html", "Reynolds Number (Laminar/Turb)", "🌊", "Fluid flow regime, kinematic viscosity & pipe size"),
+            ("shaft-diameter-calculator.html", "Shaft Diameter (ASME Code)", "⚙️", "Torsional shear stress & bending moment combined"),
+            ("spring-rate-calculator.html", "Helical Spring Rate & Stiffness", "🌀", "Hooke's constant k from wire diameter & coil count"),
+            ("thermal-expansion-calculator.html", "Linear Thermal Expansion (ΔL)", "🌡️", "Expansion coefficient, temperature delta & growth"),
+            ("torque-converter.html", "Torque Unit Converter", "🔄", "Nm, ft-lb, in-lb, kgf-m & dyn-cm interconversions"),
+            ("torque-to-hp-calculator.html", "Torque to Horsepower Sizer", "🐎", "Engine brake horsepower from dyno torque & RPM"),
+            ("projectile-motion-calculator.html", "Projectile Trajectory Motion", "🚀", "Launch angle, max apogee height & flight range"),
+            ("factor-of-safety-calculator.html", "Factor of Safety (FoS Stress)", "🛡️", "Yield/ultimate strength vs working service stress"),
+            ("lead-screw-calculator.html", "Lead Screw Torque & Thrust", "🔩", "Linear actuator drive torque, pitch lead & friction"),
+            ("press-fit-calculator.html", "Interference Press Fit (Hole/Shaft)", "⚙️", "Contact pressure, assembly force & radial interference")
         ]
     },
     "civil": {
@@ -295,35 +303,30 @@ CATEGORIES = {
         "icon": "🏗️",
         "hub": "civil.html",
         "tools": [
-            ("brick-calculator.html", "Brick & Masonry Calculator", "🧱", "ASTM modular brick & mortar bags"),
-            ("asphalt-calculator.html", "Asphalt Paving & Tonnage", "🛣️", "HMA road tonnage & base course"),
-            ("beam-deflection-calculator.html", "Beam Deflection & Moments", "📐", "AISC 360 deflection & moment"),
-            ("retaining-wall-calculator.html", "Retaining Wall Stability", "🧱", "Rankine earth pressure & overturning"),
-            ("concrete-calculator.html", "Concrete Slab, Footing & Column", "🏗️", "Wet concrete m³ & cement bags"),
-            ("rebar-calculator.html", "Rebar Weight & Grid Spacing", "🔩", "Cut bar counts & linear mass kg/lbs"),
-            ("rainwater-downpipe-calculator.html", "Rainwater Downpipe Sizing", "🌧️", "BS EN 12056 roof catchment & leader sizing"),
-            ("beam-calculator.html", "Beam Bending Moment & Shear", "📐", "AISC 360 simply supported & cantilever SFD/BMD"),
-            ("block-calculator.html", "Block Masonry Estimator", "🧱", "CMU block counts, Type S mortar & core grout"),
-            ("concrete-block-calculator.html", "Concrete Block Calculator", "🧱", "ASTM C90 CMU counts, mortar & ASTM C476 grout"),
-            ("concrete-mix-ratio-calculator.html", "Concrete Mix Ratio", "🏗️", "ACI 211.1 1.54 factor, cement bags & aggregate"),
-            ("drywall-calculator.html", "Drywall Sheets, Mud & Tape", "🏠", "ASTM C840 gypsum sheets 4x8 to 4x12 & compound"),
-            ("excavation-calculator.html", "Excavation & Earthwork Haul", "🚜", "OSHA 1926 bank vs loose cubic yards & haul fleet"),
-            ("excavation-volume-calculator.html", "Excavation Volume Calculator", "📐", "Prismoidal formula & trapezoidal trench slopes"),
-            ("flooring-calculator.html", "Flooring Area & Box Estimator", "🪵", "NWFA hardwood, LVP & tile carton boxes & underlay"),
-            ("footing-size-calculator.html", "Footing Size & Soil Bearing", "🏛️", "Pad width B, contact pressure & two-way punching shear"),
-            ("gravel-calculator.html", "Gravel & Aggregate Estimator", "🪨", "Tonnage, cubic meters/yards & compaction allowance"),
-            ("paint-calculator.html", "Paint Gallon & Coverage", "🎨", "Wall & ceiling gallons, liters, primer & fenestrations"),
-            ("rebar-weight-calculator.html", "Rebar Weight & Tonnage", "🔩", "Metric kg/m d²/162, US lb/ft #²/24 & BBS bundles"),
-            ("roof-pitch-calculator.html", "Roof Pitch & Rafter Length", "🏠", "Pitch X:12, slope angle, area multiplier & rafter length"),
-            ("slab-concrete-calculator.html", "Slab Concrete Volume", "🏗️", "Slab-on-grade, thickened edge footings & saw-cut joints"),
-            ("slope-calculator.html", "Slope & Grade Calculator", "📐", "Rise/run gradient, % grade, angle & ADA ramp 1:12 compliance"),
-            ("soil-gravel-calculator.html", "Soil & Gravel Volume & Tonnage", "🪨", "Proctor density compaction, loose LCY haulage & quarry tons"),
-            ("tile-calculator.html", "Tile, Grout & Mortar Sizer", "🔲", "Floor/wall cartons, TCNA joint grout weight & thinset notch"),
-            ("stair-calculator.html", "Stair Calculator (IRC & IBC)", "🪜", "Riser height, tread run, stringer length & Blondel rule"),
-            ("stud-wall-calculator.html", "Stud Wall Framing Estimator", "🪵", "Wood & steel wall studs 16\"/24\" OC, plates, corners & drywall"),
-            ("plaster-calculator.html", "Plaster Material Estimator", "🧱", "Cement bags (50kg), sand volume, 1.33 dry bulking & waste"),
-            ("water-demand-fixture-units-calculator.html", "Water Demand (WSFU)", "🚰", "Hunter's curve peak GPM, meter & pipe sizing per IPC/UPC"),
-            ("wallpaper-calculator.html", "Wallpaper Roll Calculator", "🎨", "Roll counts, pattern repeat, straight & drop match waste"),
+            ("concrete-calculator.html", "Concrete Volume (Slab & Footing)", "🏗️", "Cubic yards, bags & premix volume"),
+            ("rebar-calculator.html", "Rebar Weight & Grid Spacing", "🔩", "Total steel tonnage, lap splices & bar count"),
+            ("beam-deflection-calculator.html", "Beam Deflection & Bending Moment", "🏗️", "Simply supported & cantilever deflection limits"),
+            ("retaining-wall-calculator.html", "Retaining Wall (Rankine Ka)", "🧱", "Lateral earth pressure thrust & overturning moment"),
+            ("brick-calculator.html", "Brick & Mortar Estimator", "🧱", "Standard modular bricks, mortar volume & wastage"),
+            ("asphalt-calculator.html", "Asphalt Tonnage & Paving Area", "🛣️", "Compacted hot mix asphalt metric tonnes & depth"),
+            ("rainwater-downpipe-calculator.html", "Rainwater Downpipe Sizing", "🌧️", "Roof catchment area, storm rainfall intensity & gutter"),
+            ("block-calculator.html", "Concrete Block (CMU) Estimator", "🧱", "Standard 8x8x16 concrete masonry units & grout"),
+            ("drywall-calculator.html", "Drywall Sheet & Mud Estimator", "📐", "Wall & ceiling board count with joint compound"),
+            ("excavation-calculator.html", "Excavation & Earthwork Volume", "🚜", "Cut and fill cubic meters with soil swell factor"),
+            ("flooring-calculator.html", "Flooring & Tile Coverage", "🪵", "Hardwood, laminate & vinyl plank box calculation"),
+            ("footing-size-calculator.html", "Foundation Footing Concrete", "🏗️", "Continuous strip & spread isolated footing yards"),
+            ("gravel-calculator.html", "Gravel & Crushed Stone Tonnage", "🪨", "Aggregates weight in tons from trench dimensions"),
+            ("paint-calculator.html", "Paint Coverage & Gallons Sizer", "🎨", "Surface square footage, coats & door/window deduct"),
+            ("roof-pitch-calculator.html", "Roof Pitch & Slope Rafter", "🏠", "Rise/run pitch multiplier, rafter length & roof area"),
+            ("slab-concrete-calculator.html", "Concrete Slab Yardage Sizer", "🏗️", "Driveway, patio & basement in-situ concrete volume"),
+            ("slope-calculator.html", "Slope Gradient & Percent Grade", "📐", "Elevation delta, pitch ratio, degrees & percentage"),
+            ("soil-gravel-calculator.html", "Topsoil, Sand & Gravel Sizer", "🌱", "Landscaping material bulk cubic yards & tons"),
+            ("tile-calculator.html", "Ceramic Tile & Grout Estimator", "🧱", "Floor & wall tile count with grout gap allowance"),
+            ("stair-calculator.html", "Stair Riser & Tread Sizer (IBC)", "🪜", "Building code rise/run layout & stringer length"),
+            ("stud-wall-calculator.html", "Wood Stud Wall Framing", "🪵", "16-in & 24-in on-center studs, top/sole plates"),
+            ("plaster-calculator.html", "Plaster & Rendering Mortar", "🧱", "Cement plaster bags, fine sand volume & thickness"),
+            ("water-demand-fixture-units-calculator.html", "Water Demand (Hunter Fixture Units)", "🚰", "WSFU simultaneous peak water flow GPM in buildings"),
+            ("wallpaper-calculator.html", "Wallpaper Roll Estimator", "🎨", "Room wall rolls, pattern repeat waste & borders")
         ]
     },
     "chemical": {
@@ -331,76 +334,73 @@ CATEGORIES = {
         "icon": "🧪",
         "hub": "chemical.html",
         "tools": [
-            ("chlorine-dosing-calculator.html", "Chlorine Dosing Calculator", "💧", "AWWA C651 water disinfection & bleach"),
-            ("chemical-dosing-calculator.html", "Chemical Dosing Rate Calculator", "🧪", "Pump flow LPH & mg/L ppm feed"),
-            ("pipe-sizing-calculator.html", "Pipe Sizing & Water Flow", "🚰", "Internal diameter & friction loss"),
-            ("cooling-load-calculator.html", "Cooling Load (HVAC) Sizing", "❄️", "Sensible & latent heat in BTU/hr"),
-            ("alum-dosing-calculator.html", "Alum Dosing & Coagulation Feed", "🧪", "AWWA B403 liquid/dry alum feed, pump mL/min & alkalinity"),
-            ("boyles-law-calculator.html", "Boyle's Gas Law (P₁V₁=P₂V₂)", "🎈", "Isothermal gas expansion, compression work & compressibility Z"),
-            ("calcium-hypochlorite-dosing-calculator.html", "Calcium Hypochlorite (HTH 68%)", "💧", "AWWA C651 water main shock, 65-70% tablets & CT credit"),
-            ("caustic-soda-dosing-calculator.html", "Caustic Soda (NaOH) Dosing", "🧪", "50% & 25% NaOH feed, alkalinity boost & LCR corrosion"),
-            ("charles-law-calculator.html", "Charles's Law (V₁/T₁=V₂/T₂)", "🌡️", "Isobaric thermal gas expansion, Kelvin scale & boundary work"),
-            ("chlorine-dioxide-dosing-calculator.html", "Chlorine Dioxide (ClO₂) Oxidation", "🔬", "Precursor NaClO₂ feed, Fe/Mn removal & EPA chlorite cap"),
-            ("coagulant-dosing-calculator.html", "Coagulant Dosing (Jar Test Sizer)", "🧪", "Alum, FeCl₃ & ACH feed rates, dry kg/day & pump sizing"),
-            ("combined-gas-law-calculator.html", "Combined Gas Law (P₁V₁/T₁=P₂V₂/T₂)", "🎈", "Simultaneous pressure, volume & temperature transitions"),
-            ("dilution-calculator.html", "Solution Dilution (C₁V₁ = C₂V₂)", "🧪", "Serial dilution, stock aliquots, solvent volume & buffer mix"),
-            ("gay-lussac-law-calculator.html", "Gay-Lussac's Gas Law (P₁/T₁=P₂/T₂)", "🌡️", "Isochoric rigid vessel pressure & thermal burst safety"),
-            ("half-life-calculator.html", "Radioactive Half-Life & Decay", "☢️", "Exponential nuclear kinetics, remaining mass & activity"),
-            ("henderson-hasselbalch-calculator.html", "Henderson-Hasselbalch (pH Buffer)", "🧪", "Acid-base conjugate ratio, pKa & Van Slyke buffer beta"),
-            ("hydrazine-dosing-calculator.html", "Hydrazine Dosing (Boiler Deoxygenation)", "💧", "ASME / EPRI AVT(R) dissolved O₂ scavenger & pump sizing"),
-            ("ideal-gas-law-calculator.html", "Ideal Gas Law (PV = nRT)", "🎈", "Universal gas state equation, density & compressibility Z"),
-            ("lime-dosing-calculator.html", "Lime Softening (Ca(OH)₂ & CaO)", "🧱", "AWWA B202 softening, CO₂ removal & sludge yield"),
-            ("molar-mass-calculator.html", "Molar Mass (IUPAC Formula Sizer)", "🔬", "Molecular weight, formula mass & mass % composition"),
-            ("molarity-calculator.html", "Molarity & Solution Preparation", "🧪", "Molar concentration, mass grams, volume & normality N"),
-            ("ph-calculator.html", "pH & [H⁺]/[OH⁻] Equilibrium", "🌡️", "Strong/weak acids & bases, exact quadratic Ka & pOH"),
-            ("ph-poh-calculator.html", "pH to pOH & Ion Converter", "🌡️", "Mutual conversion, hydronium [H⁺], hydroxide & Kw"),
-            ("phosphate-dosing-calculator.html", "Phosphate Dosing (Boiler & Lead CCT)", "💧", "ASME / EPRI TSP/DSP congruent treatment & EPA LCR"),
-            ("polymer-dosing-calculator.html", "Polymer Dosing (Sludge Dewatering)", "🧪", "Centrifuge & belt press kg/DT, aging tank & pump LPH"),
-            ("ro-antiscalant-dosing-calculator.html", "RO Antiscalant (Membrane Scaling)", "🌊", "Concentration factor CF=1/(1-Y), LSI & neat pump LPH"),
-            ("sulphuric-acid-dosing-calculator.html", "Sulfuric Acid (H₂SO₄) Dosing", "🧪", "93% & 98% H₂SO₄ feed, alkalinity reduction & cooling tower"),
-            ("titration-calculator.html", "Acid-Base Titration (C₁V₁ = C₂V₂)", "🔬", "Equivalence point, analyte molarity & polyprotic curves"),
-            ("mass-percent-calculator.html", "Mass Percent (% w/w)", "⚗️", "Weight percent concentration & solutions"),
-            ("molality-calculator.html", "Molality & Cryoscopy", "❄️", "Molal concentration & freezing depression"),
-            ("moles-calculator.html", "Moles & Avogadro Converter", "⚛️", "Grams to moles & 6.022e23 particle count"),
-            ("normality-calculator.html", "Normality & Equivalents", "🧪", "Equivalents per liter & titration N1V1=N2V2"),
-            ("percent-composition-calculator.html", "Percent Composition", "🔬", "Elemental mass % & empirical formula"),
-            ("percent-yield-calculator.html", "Percent Yield & Efficiency", "⚖️", "Actual vs theoretical reaction yield"),
-            ("theoretical-yield-calculator.html", "Theoretical Yield & Limiting Reagent", "🎯", "Stoichiometric maximum & excess leftover"),
-            ("ppm-calculator.html", "PPM & PPB Concentration", "💧", "Parts per million & mg/L in water"),
+            ("chemical-dosing-calculator.html", "Chemical Dosing Rate (PPM)", "🧪", "Flow rate m³/hr to pure reagent kg/day"),
+            ("chlorine-dosing-calculator.html", "Chlorine Dosing & Sodium Hypo", "💧", "Free chlorine residual & bleach dosing stroke"),
+            ("alum-dosing-calculator.html", "Alum Coagulant Dosing", "🧪", "Alum mg/L jar test dose to bulk tanker volume"),
+            ("boyles-law-calculator.html", "Boyle's Gas Law (P1·V1 = P2·V2)", "🎈", "Isothermal pressure and volume inverse variation"),
+            ("calcium-hypochlorite-dosing-calculator.html", "Calcium Hypochlorite 65% Sizer", "🧪", "Granular chlorine powder batch grams & PPM target"),
+            ("caustic-soda-dosing-calculator.html", "Caustic Soda (NaOH) Neutralization", "🧪", "pH adjustment alkalinity demand & 50% liquor liters"),
+            ("charles-law-calculator.html", "Charles's Law (V1/T1 = V2/T2)", "🔥", "Isobaric gas volume thermal expansion with Kelvin T"),
+            ("chlorine-dioxide-dosing-calculator.html", "Chlorine Dioxide (ClO2) Generator", "🧪", "Sodium chlorite precursor feed rate & active oxidant"),
+            ("coagulant-dosing-calculator.html", "Water Treatment Coagulant Sizer", "💧", "Jar test optimal dosing for raw water turbidity"),
+            ("combined-gas-law-calculator.html", "Combined Gas Law (PV/T)", "💨", "Simultaneous pressure, volume & temperature shifts"),
+            ("dilution-calculator.html", "Solution Dilution (C1·V1 = C2·V2)", "🧪", "Stock concentrate dilution to target molarity/PPM"),
+            ("gay-lussac-law-calculator.html", "Gay-Lussac's Law (P1/T1 = P2/T2)", "🌡️", "Isochoric gas pressure vs temperature relationship"),
+            ("half-life-calculator.html", "Radioactive Half-Life & Decay", "☢️", "Decay constant λ, remaining activity & elapsed half-lives"),
+            ("henderson-hasselbalch-calculator.html", "Henderson-Hasselbalch Buffer pH", "🧪", "Acid dissociation pKa, conjugate base/acid ratio"),
+            ("hydrazine-dosing-calculator.html", "Hydrazine Boiler Oxygen Scavenger", "🔥", "Dissolved O2 chemical scavenging in steam boilers"),
+            ("ideal-gas-law-calculator.html", "Ideal Gas Law (PV = nRT)", "🎈", "Molar volume, universal gas constant R & gas moles"),
+            ("lime-dosing-calculator.html", "Hydrated Lime Dosing (Ca(OH)2)", "🧪", "Water softening, carbonate hardness precipitation"),
+            ("molar-mass-calculator.html", "Molecular Weight & Molar Mass", "⚖️", "Periodic element atomic weight chemical sum g/mol"),
+            ("molarity-calculator.html", "Molarity Calculator (M = mol/L)", "🧪", "Molar concentration from solute grams & volume"),
+            ("ph-calculator.html", "pH & Hydronium Ion Sizer", "🧪", "pH = -log[H+] acid-base logarithmic scale"),
+            ("ph-poh-calculator.html", "pH to pOH & Hydroxide Ions", "🧪", "Water ion product Kw = 14.0 relationship at 25°C"),
+            ("phosphate-dosing-calculator.html", "Phosphate Boiler Corrosion Inhibitor", "🧪", "Congruent phosphate water treatment in drums"),
+            ("polymer-dosing-calculator.html", "Flocculant Polymer Dosing", "💧", "Dry powder make-up batch % & flocculation stroke"),
+            ("ro-antiscalant-dosing-calculator.html", "RO Membrane Antiscalant Dosing", "💧", "Reverse osmosis scale prevention injection rate"),
+            ("sulphuric-acid-dosing-calculator.html", "Sulphuric Acid (H2SO4) Dosing", "🧪", "Alkalinity destruction & cooling tower acid feed"),
+            ("titration-calculator.html", "Acid-Base Titration (Ma·Va = Mb·Vb)", "🧪", "Equivalence endpoint neutralization analysis"),
+            ("mass-percent-calculator.html", "Mass Percent Concentration (w/w%)", "⚖️", "Solute mass over total solution mass percentage"),
+            ("molality-calculator.html", "Molality Calculator (m = mol/kg)", "🧪", "Moles of solute per kilogram of pure solvent"),
+            ("moles-calculator.html", "Chemical Moles & Avogadro Number", "⚛️", "Grams to moles via molecular weight & 6.022×10²³"),
+            ("normality-calculator.html", "Normality Calculator (N = Eq/L)", "🧪", "Equivalent concentration for redox & acid-base"),
+            ("percent-composition-calculator.html", "Percent Composition by Element", "🔬", "Elemental mass percentage in empirical formulas"),
+            ("percent-yield-calculator.html", "Percent Chemical Reaction Yield", "🧪", "Actual recovered mass vs theoretical stoich limit"),
+            ("theoretical-yield-calculator.html", "Theoretical Stoichiometric Yield", "⚗️", "Limiting reactant stoichiometry & theoretical grams"),
+            ("ppm-calculator.html", "PPM to mg/L & Percent Sizer", "💧", "Parts per million, mg/kg & percentage equivalents")
         ]
     },
     "physics": {
         "name": "Physics & Applied Mechanics",
-        "icon": "🔬",
+        "icon": "🔭",
         "hub": "physics.html",
         "tools": [
-            ("acceleration-calculator.html", "Acceleration (SUVAT)", "🚀", "Uniform acceleration & g-force"),
-            ("angular-velocity-calculator.html", "Angular Velocity", "⚙️", "RPM to rad/s & tangential speed"),
-            ("centripetal-force-calculator.html", "Centripetal Force", "🔄", "Inward force & roadway banking"),
-            ("doppler-effect-calculator.html", "Doppler Effect", "🔊", "Sound & radar frequency shift"),
-            ("escape-velocity-calculator.html", "Escape Velocity", "🪐", "Planetary gravity & orbital speed"),
-            ("free-fall-calculator.html", "Free Fall Calculator", "🪂", "Impact speed & air drag terminal velocity"),
-            ("friction-calculator.html", "Friction (Static & Kinetic)", "🧱", "Friction force, normal force & angle of repose"),
-            ("gravitational-force-calculator.html", "Gravitational Force", "🌌", "Mutual planetary attraction & orbital dynamics"),
-            ("hookes-law-calculator.html", "Hooke's Law (Springs)", "🪢", "Restoring force, elastic energy & spring constant"),
-            ("kinetic-energy-calculator.html", "Kinetic Energy", "⚡", "Translational ½mv² & rotational flywheel energy"),
-            ("photon-energy-calculator.html", "Photon Energy", "💡", "Planck relation E = hf = hc/λ & electron-volts"),
-            ("simple-pendulum-calculator.html", "Simple Pendulum", "🕰️", "Oscillation period, frequency & seconds pendulum"),
-            ("snells-law-calculator.html", "Snell's Law (Refraction)", "🔍", "Refraction angle, critical angle & optical fiber TIR"),
-            ("specific-heat-calculator.html", "Specific Heat Capacity", "🔥", "Sensible heat Q = mcΔT & thermal equilibrium"),
-            ("acceleration-converter.html", "Acceleration Converter", "🚀", "m/s², g₀, ft/s², Gal & automotive 0-60 mph metrics"),
-            ("density-calculator.html", "Density & Specific Gravity (ρ = m/V)", "⚖️", "Volumetric mass density, buoyant force & API gravity"),
-            ("pressure-calculator.html", "Pressure Calculator (Fluid & Mechanical)", "⚙️", "Mechanical contact stress P=F/A & hydrostatic head P=ρgh"),
-            ("speed-calculator.html", "Speed & Velocity Kinematics (v = d/t)", "⏱️", "Scalar velocity, running pace min/km & kinematic acceleration"),
-            ("force-calculator.html", "Force Calculator (F = ma)", "⚡", "Force, gravitational weight & Newton II"),
-            ("momentum-calculator.html", "Momentum & Collisions (p = mv)", "🎱", "Linear momentum, elastic/inelastic collisions"),
-            ("impulse-calculator.html", "Impulse & Impact Force", "💥", "Impulse J = FΔt, crash attenuation & Isp"),
-            ("potential-energy-calculator.html", "Potential Energy (mgh & ½kx²)", "🏔️", "Gravitational & spring potential energy"),
-            ("work-power-calculator.html", "Work & Power (W = Fd, P = W/t)", "⚙️", "Mechanical work, linear/shaft power & HP"),
-            ("stress-strain-calculator.html", "Stress & Strain (Hooke's Law)", "🏗️", "Normal stress, strain, modulus E & safety factor"),
-            ("terminal-velocity-calculator.html", "Terminal Velocity", "🪂", "Aerodynamic drag & steady-state falling speed"),
-            ("specific-gravity-calculator.html", "Specific Gravity & Hydrometer", "⚖️", "Relative density, API gravity, Baumé & Brix"),
-            ("wavelength-calculator.html", "Wavelength (λ = v/f)", "📻", "EM radio, acoustic sound, λ/4 antennas & velocity factor"),
+            ("acceleration-calculator.html", "Acceleration & Velocity Sizer", "🏎️", "Newtonian linear acceleration from speed and time"),
+            ("angular-velocity-calculator.html", "Angular Velocity & RPM (ω)", "🔄", "Radians per second, rotational speed & linear v"),
+            ("centripetal-force-calculator.html", "Centripetal Force (Fc = mv²/r)", "🎡", "Circular curve radial acceleration & force"),
+            ("doppler-effect-calculator.html", "Doppler Effect Sound & Light", "🚨", "Observed frequency shift from source & observer speed"),
+            ("escape-velocity-calculator.html", "Escape Velocity Calculator", "🚀", "Gravitational escape speed from planetary bodies"),
+            ("free-fall-calculator.html", "Free Fall Velocity & Distance", "🍎", "Gravitational drop speed v = gt neglecting drag"),
+            ("friction-calculator.html", "Friction Force & Normal Load", "🛷", "Static and kinetic friction force from mu (μ)"),
+            ("gravitational-force-calculator.html", "Newton's Gravitational Law (F)", "🌌", "Universal gravitation attraction between masses"),
+            ("hookes-law-calculator.html", "Hooke's Law Spring Force (F=kx)", "🌀", "Restoring elastic force from spring displacement"),
+            ("kinetic-energy-calculator.html", "Kinetic Energy (KE = ½mv²)", "⚡", "Joules of kinetic mechanical work in moving body"),
+            ("photon-energy-calculator.html", "Photon Energy (E = hf)", "💡", "Planck's constant, electromagnetic wave eV & wavelength"),
+            ("simple-pendulum-calculator.html", "Simple Pendulum Period (T)", "🕰️", "Small angle oscillation period from arm length & g"),
+            ("snells-law-calculator.html", "Snell's Optical Refraction Law", "🔍", "Refractive index n1/n2 & critical total internal angle"),
+            ("specific-heat-calculator.html", "Specific Heat & Enthalpy (Q=mcΔT)", "🔥", "Thermal energy joules required to raise mass temp"),
+            ("density-calculator.html", "Density, Mass & Volume (ρ = m/V)", "⚖️", "Specific material density kg/m³ and buoyant state"),
+            ("pressure-calculator.html", "Hydrostatic Fluid Pressure (P=ρgh)", "🌊", "Column head pressure in Pascals, bar and PSI"),
+            ("speed-calculator.html", "Speed, Distance & Time Sizer", "⏱️", "Kinematic velocity v = d/t in mph, km/h & m/s"),
+            ("force-calculator.html", "Newton's Second Law Force (F=ma)", "🥊", "Net dynamic force in Newtons from mass & accel"),
+            ("momentum-calculator.html", "Linear Momentum (p = mv)", "🎱", "Conserved momentum & kinetic energy in collisions"),
+            ("impulse-calculator.html", "Impulse & Force Duration (J=FΔt)", "💥", "Change in momentum produced by impact force"),
+            ("potential-energy-calculator.html", "Gravitational Potential Energy (PE)", "⛰️", "Stored positional work PE = mgh in Joules"),
+            ("work-power-calculator.html", "Mechanical Work & Power (W=Fd)", "⚙️", "Force over distance work joules & power watts"),
+            ("stress-strain-calculator.html", "Stress, Strain & Young's Modulus", "📏", "Engineering tensile stress σ, strain ε & elasticity"),
+            ("terminal-velocity-calculator.html", "Terminal Velocity with Drag", "🪂", "Drag coefficient, frontal area & fluid density limit"),
+            ("specific-gravity-calculator.html", "Specific Gravity & Relative Density", "💧", "Substance density relative to pure water reference"),
+            ("wavelength-calculator.html", "Wavelength & Frequency (λ = c/f)", "📻", "Electromagnetic & acoustic wave speed equations")
         ]
     },
     "fire": {
@@ -408,16 +408,16 @@ CATEGORIES = {
         "icon": "🚨",
         "hub": "fire-safety.html",
         "tools": [
-            ("fire-alarm-battery-calculator.html", "Fire Alarm Battery (NFPA 72)", "🚨", "24h standby + evacuation alarm Ah sizing"),
-            ("hydrant-fire-flow-calculator.html", "Hydrant Fire Flow (NFPA 291)", "🚒", "Pitot discharge flow & rated 20 psi capacity"),
-            ("fire-sprinkler-calculator.html", "Fire Sprinkler Hydraulics", "💦", "NFPA 13 head flow Q=K√P & demand"),
-            ("smoke-detector-spacing-calculator.html", "Smoke Detector Spacing & Layout", "🚨", "NFPA 72 ceiling height derating"),
-            ("cable-sizing-calculator.html", "Cable Sizing (IEC/NEC)", "🔌", "Fire alarm circuit conductor gauge"),
-            ("voltage-drop-calculator.html", "Voltage Drop Calculator", "📉", "Alarm notification appliance circuit"),
-            ("fire-pump-sizing-calculator.html", "Fire Pump Sizing (NFPA 20)", "🚒", "Rated flow, net head, churn & motor BHP"),
-            ("nac-voltage-drop-calculator.html", "NAC Voltage Drop (NFPA 72 & UL 864)", "🚨", "Point-to-point & lump-sum 16V EOL limit"),
-            ("fire-sprinkler-hydraulic-calculator.html", "Fire Sprinkler Hydraulic (NFPA 13)", "💦", "Hazen-Williams friction & head Q=K√P"),
-            ("strobe-candela-calculator.html", "Strobe Candela (NFPA 72 Chapter 18)", "🚨", "Wall & ceiling candela sizing & UL 1971"),
+            ("smoke-detector-spacing-calculator.html", "Smoke Detector Spacing (NFPA 72)", "🚨", "Room dimensions to 30ft grid layout"),
+            ("fire-sprinkler-calculator.html", "Fire Sprinkler Discharge (Q=K√P)", "💦", "Single head water flow in GPM"),
+            ("fire-alarm-battery-calculator.html", "Fire Alarm Standby Battery", "🔋", "24-hr quiescent standby + 5-min alarm load"),
+            ("hydrant-fire-flow-calculator.html", "Fire Hydrant Flow (NFPA 291)", "🚰", "Pitot tube reading to rated discharge at 20 psi"),
+            ("fire-pump-sizing-calculator.html", "Fire Pump Sizing (NFPA 20)", "🚒", "Rated capacity GPM & net pressure boost"),
+            ("nac-voltage-drop-calculator.html", "NAC Circuit Voltage Drop (NFPA 72)", "📉", "Notification appliance strobe/horn circuit length"),
+            ("strobe-candela-calculator.html", "Strobe Candela Sizing (NFPA 72)", "💡", "Room square footage to wall/ceiling candela cd"),
+            ("water-demand-fixture-units-calculator.html", "Building Water Demand", "🚰", "Hunter fixture units peak building water flow"),
+            ("lightning-protection-calculator.html", "Lightning Protection Risk", "🌩️", "IEC 62305 risk assessment & rolling sphere"),
+            ("pipe-sizing-calculator.html", "Fire Water Pipe Hydraulics", "🚰", "Hazen-Williams friction loss and pipe diameter")
         ]
     },
     "programmer": {
@@ -425,10 +425,15 @@ CATEGORIES = {
         "icon": "👨‍💻",
         "hub": "programmer.html",
         "tools": [
-            ("subnet-calculator.html", "IPv4 Subnet & CIDR IP Calculator", "🌐", "Network ID, mask & usable hosts"),
-            ("unit-converter.html", "Universal Multi-Unit Converter", "🔄", "Data, bytes & physical unit converter"),
-            ("date-difference-calculator.html", "Date Difference & Workdays", "📅", "Epoch timestamp & elapsed time"),
-            ("percentage-calculator.html", "Percentage Calculator", "％", "Ratio, portion & growth rate"),
+            ("subnet-calculator.html", "IPv4 Subnet & CIDR Mask Sizer", "🌐", "Network address, usable hosts & broadcast IP"),
+            ("number-base-converter.html", "Number Base Converter (Hex/Dec/Bin)", "💻", "Binary, octal, decimal & hexadecimal conversion"),
+            ("data-storage-converter.html", "Data Storage Units (KB, MB, GB, TB)", "💾", "Binary GiB (1024) vs decimal GB (1000) drive capacity"),
+            ("data-transfer-rate-converter.html", "Network Bandwidth & Transfer Speed", "🚀", "Mbps, Gbps, MB/s & download ETA calculator"),
+            ("unix-timestamp-converter.html", "Unix Timestamp & Epoch Converter", "💻", "Seconds/milliseconds to ISO 8601 UTC & local datetime"),
+            ("modulo-calculator.html", "Modulo & Remainder Sizer", "➗", "Modular arithmetic, clock math & congruences"),
+            ("scientific-notation-calculator.html", "Scientific Notation Sizer", "🔬", "Standard scientific form & powers of 10"),
+            ("prime-number-calculator.html", "Prime Number Validator", "🔢", "Primality testing, factor trees & cryptanalysis"),
+            ("significant-figures-calculator.html", "Significant Figures Sizer", "📐", "Sig fig precision rules & rounding")
         ]
     },
     "datetime": {
@@ -436,26 +441,26 @@ CATEGORIES = {
         "icon": "📅",
         "hub": "datetime.html",
         "tools": [
-            ("date-difference-calculator.html", "Date Difference & Business Days", "📅", "Exact calendar days & work weeks"),
-            ("hours-calculator.html", "Work Hours Calculator", "⏱️", "Start/end time, lunch breaks & gross pay"),
-            ("week-number-calculator.html", "ISO Week Number", "📅", "ISO calendar week, ordinal date & boundaries"),
-            ("add-days-to-date-calculator.html", "Add Days to Date", "🗓️", "Add/subtract calendar and business days"),
-            ("add-time-calculator.html", "Add Time Calculator", "⏰", "Clock math, duration sum & day rollovers"),
-            ("business-days-calculator.html", "Business Days Calculator", "💼", "Working days between dates & bank holidays"),
-            ("countdown-calculator.html", "Countdown Calculator", "⏳", "Live countdown timer to events and dates"),
-            ("date-calculator.html", "Calendar Date Calculator", "📅", "Date intervals, duration & month clamping"),
-            ("day-of-week-calculator.html", "Day of the Week Calculator", "📅", "Zeller's congruence, Doomsday rule & birth weekday"),
-            ("day-of-year-calculator.html", "Day of the Year Calculator", "🗓️", "Ordinal date YYYY-DDD, solar declination & year percent"),
-            ("decimal-time-calculator.html", "Decimal Time Calculator", "⏱️", "Payroll hours, French metric time & Swatch .beats"),
-            ("leap-year-calculator.html", "Leap Year Calculator", "🌍", "Gregorian 400-year cycle, astronomical tropical year"),
-            ("months-between-dates-calculator.html", "Months Between Dates", "📅", "Calendar month diff, fractional months & 30/360 basis"),
-            ("quarter-of-year-calculator.html", "Quarter of Year Calculator", "📊", "Q1-Q4 calendar, fiscal government & retail 4-4-5"),
-            ("time-calculator.html", "Time Calculator (Sexagesimal)", "⏰", "Add, subtract, multiply, divide durations & takt time"),
-            ("time-duration-calculator.html", "Time Duration Calculator", "⏱️", "Exact elapsed duration, decimal hours & ISO 8601"),
-            ("weeks-between-dates-calculator.html", "Weeks Between Dates", "📅", "Full weeks, days, decimal weeks & gestation age"),
-            ("age-calculator.html", "Exact Age Calculator", "🎂", "Chronological age & day of week"),
-            ("salary-calculator.html", "Salary & Paycheck Calculator", "💼", "Hourly to annual pay rates"),
-            ("unit-converter.html", "Universal Multi-Unit Converter", "🔄", "Time, speed, temperature & length"),
+            ("date-difference-calculator.html", "Date Difference & Day Counter", "📅", "Elapsed days, weeks & calendar months between dates"),
+            ("age-calculator.html", "Exact Age & Chronology Sizer", "🎂", "Years, months, days, minutes & next birthday countdown"),
+            ("hours-calculator.html", "Work Hours & Shift Sizer", "🕒", "Punch time card duration, breaks & overtime"),
+            ("week-number-calculator.html", "ISO Week Number Sizer", "📅", "ISO-8601 workweek index & calendar start/end dates"),
+            ("add-days-to-date-calculator.html", "Add/Subtract Days to Date", "🗓️", "Future or past target milestone date generator"),
+            ("add-time-calculator.html", "Time Duration Adder & Subtractor", "⏱️", "Sum clock hours, minutes & seconds with carry-over"),
+            ("business-days-calculator.html", "Business Days & Working Week Sizer", "💼", "Exclude weekends and public holidays between dates"),
+            ("countdown-calculator.html", "Milestone Countdown Timer", "⏳", "Live countdown in days, hours, minutes & seconds"),
+            ("date-calculator.html", "Universal Calendar Date Sizer", "📅", "Comprehensive calendar math & timeline intervals"),
+            ("day-of-week-calculator.html", "Day of the Week (Doomsday Rule)", "🗓️", "Determine day of the week for any historical date"),
+            ("day-of-year-calculator.html", "Day of Year & Julian Ordinal", "📆", "Day index (1 to 365/366) and remaining year %"),
+            ("decimal-time-calculator.html", "Decimal Time & Fraction of Day", "⏰", "Convert HH:MM:SS to decimal fractional hours"),
+            ("leap-year-calculator.html", "Leap Year Checker & Gregorian Rule", "🐸", "Divisibility by 4, 100, and 400 calendar validation"),
+            ("months-between-dates-calculator.html", "Months Between Dates Sizer", "📅", "Decimal and integer whole months elapsed between dates"),
+            ("quarter-of-year-calculator.html", "Fiscal & Calendar Quarter Sizer", "📊", "Q1, Q2, Q3, Q4 financial boundaries & schedules"),
+            ("time-calculator.html", "Time Difference & Interval Sizer", "🕒", "Difference between two clock timestamps in hours/mins"),
+            ("time-duration-calculator.html", "Total Duration & Elapsed Time", "⏱️", "Chronological duration across multiple event timestamps"),
+            ("weeks-between-dates-calculator.html", "Weeks Between Dates Sizer", "🗓️", "Integer weeks and residual days between dates"),
+            ("time-converter.html", "Time Unit & Chronometric Converter", "⏱️", "Seconds, ms, μs, ns, hours, days & years"),
+            ("time-zone-converter.html", "Time Zone & World Clock Converter", "🌍", "UTC offsets, daylight saving transitions & meeting planner")
         ]
     },
     "converter": {
@@ -463,33 +468,33 @@ CATEGORIES = {
         "icon": "🔄",
         "hub": "converter.html",
         "tools": [
-            ("unit-converter.html", "Universal Multi-Unit Converter", "🔄", "Length, mass, temp, pressure & vol"),
-            ("length-converter.html", "Length & Distance Converter", "📏", "Meters, feet, inches, kilometers, miles & nautical miles"),
-            ("weight-converter.html", "Weight & Mass Converter", "⚖️", "Kilograms, pounds, ounces, stone, carats & metric tonnes"),
-            ("temperature-converter.html", "Temperature Scale Converter", "🌡️", "Celsius, Fahrenheit, Kelvin, Rankine & Réaumur"),
-            ("area-converter.html", "Land & Geometric Area Converter", "📐", "Square meters, feet, acres, hectares & square miles"),
-            ("volume-converter.html", "Volume & Capacity Converter", "🧪", "Liters, US gallons, imperial gallons, cubic meters & feet"),
-            ("pressure-converter.html", "Pressure & Vacuum Converter", "💨", "Pascals, bar, PSI, atmospheres, Torr & inHg"),
-            ("speed-converter.html", "Speed & Velocity Converter", "🚀", "m/s, km/h, mph, knots, feet/s & Mach"),
-            ("energy-converter.html", "Energy & Work Converter", "⚡", "Joules, kWh, calories, kcal, BTU & electron-volts"),
-            ("power-converter.html", "Power Converter (Watts, kW, HP)", "⚡", "Mechanical HP, metric PS, Watts & kilowatts"),
-            ("force-converter.html", "Force Converter (Newtons, lbf, kN)", "💪", "Newtons, pound-force, dynes & kips"),
-            ("data-storage-converter.html", "Data Storage Converter (GB, TB, GiB)", "💾", "Decimal SI bytes & binary IEC units"),
-            ("data-transfer-rate-converter.html", "Data Transfer Rate Converter (Mbps, Gbps)", "🌐", "Bandwidth, bits vs bytes & download speed"),
-            ("frequency-converter.html", "Frequency Converter (Hz, RPM, rad/s)", "📻", "Hertz, kHz, MHz, GHz & RPM"),
-            ("flow-rate-converter.html", "Flow Rate Converter (GPM, L/min, m³/h)", "🌊", "Volumetric flow, US GPM, L/min & m³/h"),
-            ("fuel-economy-converter.html", "Fuel Economy Converter (MPG, L/100km)", "⛽", "Harmonic fuel consumption, US MPG & L/100km"),
-            ("angle-converter.html", "Angle Converter (Degrees, Radians, MOA)", "📐", "Degrees, radians, gradians, MOA & mrad"),
-            ("density-converter.html", "Density & Specific Gravity Converter", "⚖️", "kg/m³, g/cm³, lb/ft³, lb/gal & API gravity"),
-            ("illuminance-converter.html", "Illuminance & Light Level Converter", "💡", "Lux (lx), Foot-Candles (fc), Phot & Nox"),
-            ("thermal-conductivity-converter.html", "Thermal Conductivity (k-value)", "🌡️", "W/(m·K), BTU/(hr·ft·°F) & R-values"),
-            ("viscosity-converter.html", "Viscosity (Dynamic & Kinematic)", "🌊", "Centipoise (cP), Pa·s, Centistokes & SUS"),
-            ("cooking-converter.html", "Cooking & Baking Recipe Converter", "🍳", "Cups, tbsp, tsp, grams & ingredient density"),
-            ("number-base-converter.html", "Number Base (Bin, Oct, Dec, Hex)", "💻", "Binary, Octal, Decimal, Hex & Two's Comp"),
-            ("roman-numeral-converter.html", "Roman Numeral Converter (1 to 3.9M)", "🏛️", "Classical subtractive & Vinculum bars"),
-            ("time-converter.html", "Time Unit & Chronometric Converter", "⏱️", "Seconds, ms, μs, ns, hours, days & years"),
-            ("time-zone-converter.html", "Time Zone & World Clock Converter", "🌍", "UTC offsets, daylight saving transitions & meeting planner"),
-            ("unix-timestamp-converter.html", "Unix Timestamp & Epoch Converter", "💻", "Seconds/milliseconds to ISO 8601 UTC & local datetime"),
+            ("unit-converter.html", "Universal Multi-Unit Converter", "🔄", "Omni-discipline conversion across 20+ dimensions"),
+            ("length-converter.html", "Length & Distance Converter", "📏", "Meters, feet, inches, miles, km, nautical & yards"),
+            ("weight-converter.html", "Weight & Mass Converter", "⚖️", "Kilograms, pounds, ounces, grams, stones & tons"),
+            ("temperature-converter.html", "Temperature Unit Converter", "🌡️", "Celsius, Fahrenheit, Kelvin & Rankine equations"),
+            ("area-converter.html", "Area & Land Square Converter", "📐", "Square meters, acres, hectares, sq ft & sq miles"),
+            ("volume-converter.html", "Volume & Capacity Converter", "🧪", "Liters, gallons, fluid oz, cubic meters & cups"),
+            ("pressure-converter.html", "Pressure Unit Converter", "💨", "PSI, bar, Pascals, atmospheres & mmHg"),
+            ("speed-converter.html", "Speed & Velocity Converter", "🏎️", "km/h, mph, m/s, knots & Mach number"),
+            ("energy-converter.html", "Energy & Work Converter", "⚡", "Joules, calories, kilowatt-hours, BTU & ft-lbs"),
+            ("power-converter.html", "Power Unit Converter", "💡", "Watts, horsepower, kW, BTU/hr & metric PS"),
+            ("force-converter.html", "Force Unit Converter", "🥊", "Newtons, pound-force, dynes & kilogram-force"),
+            ("data-storage-converter.html", "Data Storage Converter", "💾", "Bytes, KB, MB, GB, TB, PB & mebibytes"),
+            ("data-transfer-rate-converter.html", "Data Transfer Rate Converter", "🚀", "bps, Kbps, Mbps, Gbps & byte transfer speed"),
+            ("frequency-converter.html", "Frequency & Angular Converter", "📻", "Hertz, kHz, MHz, GHz, RPM & rad/sec"),
+            ("flow-rate-converter.html", "Volumetric Flow Rate Converter", "🚰", "m³/hr, L/min, GPM, CFS & cubic ft/min"),
+            ("fuel-economy-converter.html", "Fuel Economy & Mileage Converter", "⛽", "MPG (US & UK), L/100km & km/L equations"),
+            ("angle-converter.html", "Angle & Direction Converter", "📐", "Degrees, radians, gradians, minutes & seconds"),
+            ("density-converter.html", "Density Unit Converter", "⚖️", "kg/m³, g/cm³, lb/cu ft, lb/gal & specific gravity"),
+            ("illuminance-converter.html", "Illuminance Lighting Converter", "💡", "Lux, foot-candles, phot & lumens per area"),
+            ("thermal-conductivity-converter.html", "Thermal Conductivity Converter", "🔥", "W/m·K, BTU/hr·ft·°F & cal/s·cm·°C"),
+            ("viscosity-converter.html", "Viscosity Dynamic & Kinematic", "💧", "Centipoise, Pa·s, centistokes & m²/s"),
+            ("cooking-converter.html", "Culinary & Kitchen Converter", "🍳", "Teaspoons, tablespoons, cups, grams & ounces"),
+            ("number-base-converter.html", "Number Base Converter", "💻", "Binary, octal, decimal & hexadecimal conversion"),
+            ("roman-numeral-converter.html", "Roman Numeral Converter", "🏛️", "Standard Roman numerals (I to MMMCMXCIX) to Arabic"),
+            ("time-converter.html", "Time Unit Converter", "⏱️", "Seconds, ms, hours, days, weeks & years"),
+            ("time-zone-converter.html", "Time Zone Converter", "🌍", "World clock UTC offsets & regional timezone deltas"),
+            ("unix-timestamp-converter.html", "Unix Timestamp Converter", "💻", "Epoch seconds/ms to human ISO 8601 UTC date")
         ]
     }
 }
@@ -526,75 +531,129 @@ def determine_tool_cat(filename):
 
 def build_sidebar_html(current_file, cat_key):
     cat_data = CATEGORIES[cat_key]
+    available = [t for t in cat_data["tools"] if t[0] != current_file]
+    if not available:
+        available = cat_data["tools"]
+
+    initial_5 = available[:5]
     items_html = []
-    for slug, title, icon, desc in cat_data["tools"]:
-        is_active = (slug == current_file)
-        active_class = " active" if is_active else ""
-        items_html.append(f'''            <li><a href="{slug}" class="sidebar-link-item{active_class}"><span class="link-bullet">›</span> {title}</a></li>''')
+    for slug, title, icon, desc in initial_5:
+        items_html.append(f'''            <li>
+              <a href="{slug}" class="sidebar-tool-item">
+                <span class="st-icon">{icon}</span>
+                <div class="st-info">
+                  <span class="st-title">{title}</span>
+                  <span class="st-desc">{desc}</span>
+                </div>
+                <span class="st-arrow">›</span>
+              </a>
+            </li>''')
 
     tools_list = "\n".join(items_html)
+    pool_data = [
+        {"slug": slug, "title": title, "icon": icon, "desc": desc}
+        for slug, title, icon, desc in available
+    ]
+    json_pool = json.dumps(pool_data, ensure_ascii=False)
 
     return f'''      <!-- Related Category Sidebar -->
-      <aside class="post-sidebar">
+      <aside class="post-sidebar" aria-label="Related Calculators Sidebar">
         <div class="sidebar-widget">
           <div class="sidebar-widget-header">
-            <span class="widget-icon">{cat_data["icon"]}</span>
-            <h3 class="widget-title">Related {cat_data["name"]}</h3>
+            <div class="widget-header-title-wrap">
+              <span class="widget-icon">{cat_data["icon"]}</span>
+              <h3 class="widget-title">Related {cat_data["name"]}</h3>
+            </div>
+            <button type="button" class="sidebar-shuffle-btn" onclick="rotateSidebarTools(this)" title="Shuffle recommendations" aria-label="Show 5 different tools">
+              <span class="shuffle-icon">🔀</span> <span class="shuffle-text">Shuffle</span>
+            </button>
           </div>
-          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
-          <ul class="sidebar-links-list">
+          <p class="sidebar-widget-subtitle">Top 5 precision tools in this discipline:</p>
+          <ul class="sidebar-tools-list" id="sidebarToolsList">
 {tools_list}
           </ul>
-          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
-            <a href="{cat_data["hub"]}" class="sidebar-category-link">View All {cat_data["name"]} Calculators &rarr;</a>
+          <div class="sidebar-widget-footer">
+            <a href="{cat_data["hub"]}" class="sidebar-category-link">View All {cat_data["name"]} ({len(cat_data["tools"])}+) &rarr;</a>
           </div>
+          <script type="application/json" class="sidebar-pool-data">
+{json_pool}
+          </script>
         </div>
-      </aside>'''
+      </aside>
+      <script>
+        if (!window.rotateSidebarTools) {{
+          window.rotateSidebarTools = function(btn) {{
+            const widget = btn ? btn.closest('.sidebar-widget') : document.querySelector('.sidebar-widget');
+            if (!widget) return;
+            const poolScript = widget.querySelector('.sidebar-pool-data');
+            const list = widget.querySelector('.sidebar-tools-list');
+            if (!poolScript || !list) return;
+            try {{
+              const pool = JSON.parse(poolScript.textContent);
+              const currentPath = window.location.pathname.split('/').pop() || '';
+              const available = pool.filter(item => item.slug !== currentPath);
+              if (!available.length) return;
+              for (let i = available.length - 1; i > 0; i--) {{
+                const j = Math.floor(Math.random() * (i + 1));
+                [available[i], available[j]] = [available[j], available[i]];
+              }}
+              const selected = available.slice(0, 5);
+              list.innerHTML = selected.map(item => `
+                <li>
+                  <a href="${{item.slug}}" class="sidebar-tool-item">
+                    <span class="st-icon">${{item.icon}}</span>
+                    <div class="st-info">
+                      <span class="st-title">${{item.title}}</span>
+                      <span class="st-desc">${{item.desc}}</span>
+                    </div>
+                    <span class="st-arrow">›</span>
+                  </a>
+                </li>
+              `).join('');
+              if (btn) {{
+                btn.classList.add('shuffling');
+                setTimeout(() => btn.classList.remove('shuffling'), 400);
+              }}
+            }} catch (err) {{
+              console.error('Sidebar rotation error:', err);
+            }}
+          }};
+          document.addEventListener('DOMContentLoaded', () => {{
+            window.rotateSidebarTools();
+          }});
+        }}
+      </script>'''
 
 def update_all_sidebars():
     category_pages = set([
         "index.html", "404.html", "health.html", "finance.html", "math.html",
         "engineering.html", "solar-energy.html", "mechanical.html", "civil.html",
-        "chemical.html", "physics.html", "fire-safety.html", "programmer.html", "datetime.html", "converter.html"
+        "chemical.html", "physics.html", "fire-safety.html", "programmer.html",
+        "datetime.html", "converter.html"
     ])
 
     all_html_files = glob.glob(os.path.join(BASE_DIR, "*.html"))
     tool_files = [f for f in all_html_files if os.path.basename(f) not in category_pages]
 
-    print(f"Applying updated sidebars across {len(tool_files)} tool pages...")
+    print(f"Applying updated Top 5 Dynamic Sidebars across {len(tool_files)} tool pages...")
     updated_count = 0
 
-    # Pattern for existing sidebar
-    sidebar_regex = re.compile(r'<!--\s*(?:Related Category Sidebar|Post Sidebar)\s*-->\s*<aside class="post-sidebar"[^>]*>.*?</aside>', re.DOTALL | re.IGNORECASE)
+    # Pattern for existing sidebar + optional following script
+    sidebar_regex = re.compile(
+        r'(?:<!--\s*(?:Related Category Sidebar|Post Sidebar)\s*-->\s*)?<aside class="(?:post-sidebar|sidebar-column|converter-sidebar|sidebar)"[^>]*>[\s\S]*?</aside>(?:\s*<script>[\s\S]*?rotateSidebarTools[\s\S]*?</script>)?',
+        re.IGNORECASE
+    )
 
     for file_path in tool_files:
         filename = os.path.basename(file_path)
         cat_key = determine_tool_cat(filename)
         new_sidebar = build_sidebar_html(filename, cat_key)
 
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
             content = f.read()
 
         if sidebar_regex.search(content):
             content = sidebar_regex.sub(lambda m: new_sidebar, content)
-            with open(file_path, "w", encoding="utf-8") as f:
-                f.write(content)
-            updated_count += 1
-        elif '<aside class="post-sidebar"' in content:
-            alt_regex = re.compile(r'<aside class="post-sidebar"[^>]*>.*?</aside>', re.DOTALL | re.IGNORECASE)
-            content = alt_regex.sub(lambda m: new_sidebar, content)
-            with open(file_path, "w", encoding="utf-8") as f:
-                f.write(content)
-            updated_count += 1
-        elif '<aside class="calc-sidebar"' in content:
-            calc_regex = re.compile(r'<aside class="calc-sidebar"[^>]*>.*?</aside>', re.DOTALL | re.IGNORECASE)
-            content = calc_regex.sub(lambda m: new_sidebar, content)
-            with open(file_path, "w", encoding="utf-8") as f:
-                f.write(content)
-            updated_count += 1
-        elif '<aside class="sidebar"' in content:
-            s_regex = re.compile(r'<aside class="sidebar"[^>]*>.*?</aside>', re.DOTALL | re.IGNORECASE)
-            content = s_regex.sub(lambda m: new_sidebar, content)
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write(content)
             updated_count += 1
