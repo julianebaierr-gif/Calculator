@@ -243,24 +243,24 @@ window.addEventListener('DOMContentLoaded', calculateHours);
                     <h2>Mathematical Formulation of Work Time and Decimal Conversion</h2>
 <p>Tracking occupational attendance, professional billable hours, and industrial shift work requires continuous transformation between sexagesimal chronometric units (hours, minutes, and seconds based on base-60) and decimal arithmetic (base-10). Automated payroll software, enterprise resource planning (ERP) systems, and job-costing databases cannot directly execute algebraic multiplication on strings representing hours and minutes ($HH:MM$). Instead, worked intervals must be mapped to continuous real numbers known as decimal hours.</p>
 
-<p>The total raw elapsed duration $T_{	ext{raw}}$ between an arbitrary clock-in timestamp $t_{	ext{start}}$ and clock-out timestamp $t_{	ext{end}}$ on a 24-hour diurnal cycle is expressed in total minutes as follows:</p>
+<p>The total raw elapsed duration $T_{\text{raw}}$ between an arbitrary clock-in timestamp $t_{\text{start}}$ and clock-out timestamp $t_{\text{end}}$ on a 24-hour diurnal cycle is expressed in total minutes as follows:</p>
 
-$$T_{	ext{raw}} = (t_{	ext{end}} - t_{	ext{start}}) \pmod{1440}$$
+$$T_{\text{raw}} = (t_{\text{end}} - t_{\text{start}}) \pmod{1440}$$
 
-<p>Where $1440$ represents the total number of minutes in a standard civil solar day ($24 	imes 60$). When an employee works an overnight nocturnal shift—for example, clocking in at 21:45 in the evening and clocking out at 06:15 the following morning—the condition $t_{	ext{end}} < t_{	ext{start}}$ triggers the modulo operator, automatically shifting the terminal timestamp forward by adding 1,440 minutes.</p>
+<p>Where $1440$ represents the total number of minutes in a standard civil solar day ($24 \times 60$). When an employee works an overnight nocturnal shift—for example, clocking in at 21:45 in the evening and clocking out at 06:15 the following morning—the condition $t_{\text{end}} < t_{\text{start}}$ triggers the modulo operator, automatically shifting the terminal timestamp forward by adding 1,440 minutes.</p>
 
-<p>Net payable work time $T_{	ext{net}}$ accounts for bona fide unpaid meal or personal rest intervals $T_{	ext{break}}$ where the worker is fully relieved of all duties:</p>
+<p>Net payable work time $T_{\text{net}}$ accounts for bona fide unpaid meal or personal rest intervals $T_{\text{break}}$ where the worker is fully relieved of all duties:</p>
 
-$$T_{	ext{net}} = \max(0, T_{	ext{raw}} - T_{	ext{break}})$$
+$$T_{\text{net}} = \max(0, T_{\text{raw}} - T_{\text{break}})$$
 
-<p>Conversion from net discrete minutes $T_{	ext{net}}$ to fractional decimal hours $H_{	ext{decimal}}$ is governed by exact rational division:</p>
+<p>Conversion from net discrete minutes $T_{\text{net}}$ to fractional decimal hours $H_{\text{decimal}}$ is governed by exact rational division:</p>
 
-$$H_{	ext{decimal}} = rac{T_{	ext{net}}}{60} = H_{	ext{integer}} + rac{M_{	ext{remainder}}}{60}$$
+$$H_{\text{decimal}} = \frac{T_{\text{net}}}{60} = H_{\text{integer}} + \frac{M_{\text{remainder}}}{60}$$
 
-<p>Where $H_{	ext{integer}} = \lfloor T_{	ext{net}} / 60 
-floor$ and $M_{	ext{remainder}} = T_{	ext{net}} mod 60$. For instance, a shift duration of 7 hours and 42 minutes yields:</p>
+<p>Where $H_{\text{integer}} = \lfloor T_{\text{net}} / 60 
+floor$ and $M_{\text{remainder}} = T_{\text{net}} mod 60$. For instance, a shift duration of 7 hours and 42 minutes yields:</p>
 
-$$H_{	ext{decimal}} = 7 + rac{42}{60} = 7 + 0.70 = 7.700 	ext{ hours}$$
+$$H_{\text{decimal}} = 7 + \frac{42}{60} = 7 + 0.70 = 7.700 \text{ hours}$$
 
 <h2>The FLSA 7-Minute Rounding Framework (29 CFR § 785.48)</h2>
 <p>In accordance with United States federal statutory regulations established by the Fair Labor Standards Act (FLSA) under Title 29 of the Code of Federal Regulations, Section 785.48(b), employers are legally permitted to record employee starting and stopping times to the nearest five minutes, six minutes (one-tenth of an hour), or quarter of an hour (15 minutes). For the common 15-minute rounding paradigm, the statute establishes an asymmetric 7/8 minute rule:</p>
@@ -301,15 +301,15 @@ $$H_{	ext{decimal}} = 7 + rac{42}{60} = 7 + 0.70 = 7.700 	ext{ hours}$$
 </table>
 
 <h2>Overtime Allocation and Gross Wage Formulation</h2>
-<p>Gross compensation $W_{	ext{gross}}$ is governed by statutory overtime thresholds, commonly defined under federal standards as 40 hours per workweek, or under daily overtime jurisdictions (such as California Labor Code § 510) as all hours exceeding 8.0 in a single diurnal work period. For a daily overtime model with threshold $H_{	ext{ot\_thresh}}$:</p>
+<p>Gross compensation $W_{\text{gross}}$ is governed by statutory overtime thresholds, commonly defined under federal standards as 40 hours per workweek, or under daily overtime jurisdictions (such as California Labor Code § 510) as all hours exceeding 8.0 in a single diurnal work period. For a daily overtime model with threshold $H_{\text{ot\_thresh}}$:</p>
 
-$$H_{	ext{reg}} = \min(H_{	ext{decimal}}, H_{	ext{ot\_thresh}})$$
+$$H_{\text{reg}} = \min(H_{\text{decimal}}, H_{\text{ot\_thresh}})$$
 
-$$H_{	ext{ot}} = \max(0, H_{	ext{decimal}} - H_{	ext{ot\_thresh}})$$
+$$H_{\text{ot}} = \max(0, H_{\text{decimal}} - H_{\text{ot\_thresh}})$$
 
-<p>Gross compensation combines standard remuneration at the base contract rate $R_{	ext{base}}$ with premium compensation calculated at the statutory time-and-a-half rate ($1.5 	imes R_{	ext{base}}$):</p>
+<p>Gross compensation combines standard remuneration at the base contract rate $R_{\text{base}}$ with premium compensation calculated at the statutory time-and-a-half rate ($1.5 \times R_{\text{base}}$):</p>
 
-$$W_{	ext{gross}} = (H_{	ext{reg}} 	imes R_{	ext{base}}) + (H_{	ext{ot}} 	imes 1.5 	imes R_{	ext{base}})$$
+$$W_{\text{gross}} = (H_{\text{reg}} \times R_{\text{base}}) + (H_{\text{ot}} \times 1.5 \times R_{\text{base}})$$
 
 <div class="worked-example-card">
     <h3>Worked Engineering Case Study: Overnight Manufacturing Shift</h3>
@@ -317,28 +317,28 @@ $$W_{	ext{gross}} = (H_{	ext{reg}} 	imes R_{	ext{base}}) + (H_{	ext{ot}} 	imes 1
     
     <div class="step-solution">
         <h4>Step 1: Convert Start and End Timestamps to Diurnal Minutes</h4>
-        <p>Start: $20:47 = (20 	imes 60) + 47 = 1200 + 47 = 1247 	ext{ minutes}$.</p>
-        <p>End: $06:22 = (6 	imes 60) + 22 = 360 + 22 = 382 	ext{ minutes}$.</p>
+        <p>Start: $20:47 = (20 \times 60) + 47 = 1200 + 47 = 1247 \text{ minutes}$.</p>
+        <p>End: $06:22 = (6 \times 60) + 22 = 360 + 22 = 382 \text{ minutes}$.</p>
 
         <h4>Step 2: Calculate Raw Elapsed Span Across Midnight</h4>
-        <p>Since $t_{	ext{end}} (382) < t_{	ext{start}} (1247)$, add 1,440 minutes:</p>
-        $$T_{	ext{raw}} = (382 + 1440) - 1247 = 1822 - 1247 = 575 	ext{ minutes}$$
+        <p>Since $t_{\text{end}} (382) < t_{\text{start}} (1247)$, add 1,440 minutes:</p>
+        $$T_{\text{raw}} = (382 + 1440) - 1247 = 1822 - 1247 = 575 \text{ minutes}$$
         <p>In sexagesimal hours: $\lfloor 575 / 60 
-floor = 9 	ext{ hours and } 35 	ext{ minutes}$.</p>
+floor = 9 \text{ hours and } 35 \text{ minutes}$.</p>
 
         <h4>Step 3: Deduct Unpaid Meal Interval</h4>
-        $$T_{	ext{net}} = 575 - 45 = 530 	ext{ minutes}$$
-        $$	ext{Net Duration} = 8 	ext{ hours and } 50 	ext{ minutes}$$
+        $$T_{\text{net}} = 575 - 45 = 530 \text{ minutes}$$
+        $$\text{Net Duration} = 8 \text{ hours and } 50 \text{ minutes}$$
 
         <h4>Step 4: Convert to Decimal Hours</h4>
-        $$H_{	ext{decimal}} = rac{530}{60} pprox 8.8333 	ext{ hours}$$
+        $$H_{\text{decimal}} = \frac{530}{60} pprox 8.8333 \text{ hours}$$
 
         <h4>Step 5: Partition Regular vs. Overtime Hours and Compute Wages</h4>
-        <p>Regular Hours $H_{	ext{reg}} = 8.000 	ext{ hours}$.</p>
-        <p>Overtime Hours $H_{	ext{ot}} = 8.8333 - 8.000 = 0.8333 	ext{ hours}$.</p>
-        <p>Regular Pay: $8.000 	imes \$34.00 = \$272.00$.</p>
-        <p>Overtime Rate: $\$34.00 	imes 1.5 = \$51.00 / 	ext{hour}$.</p>
-        <p>Overtime Pay: $0.8333 	imes \$51.00 = \$42.50$.</p>
+        <p>Regular Hours $H_{\text{reg}} = 8.000 \text{ hours}$.</p>
+        <p>Overtime Hours $H_{\text{ot}} = 8.8333 - 8.000 = 0.8333 \text{ hours}$.</p>
+        <p>Regular Pay: $8.000 \times \$34.00 = \$272.00$.</p>
+        <p>Overtime Rate: $\$34.00 \times 1.5 = \$51.00 / \text{hour}$.</p>
+        <p>Overtime Pay: $0.8333 \times \$51.00 = \$42.50$.</p>
         <p><strong>Total Gross Shift Earnings:</strong> $\$272.00 + \$42.50 = \$314.50$.</p>
     </div>
 </div>
@@ -349,7 +349,36 @@ floor = 9 	ext{ hours and } 35 	ext{ minutes}$.</p>
     <li><strong>Asymmetric Rounding Practices:</strong> Implementing a punch clock configured to round employee arrivals forward to the next quarter hour while rounding clock-outs backward constitutes an unlawful FLSA wage violation subject to federal Department of Labor back-pay penalties.</li>
     <li><strong>Unrecorded Short Breaks:</strong> Under 29 CFR § 785.18, short rest pauses lasting 5 to 20 minutes are legally defined as compensable working hours that cannot be deducted from employee timesheet totals.</li>
 </ol>
-                </article>
+                
+      <!-- Contextual Internal Linking: Connected Workflow Solvers -->
+      <section class="related-tools-section" style="margin-top: 2.75rem; padding-top: 1.75rem; border-top: 1px solid var(--border-light, #e2e8f0);">
+        <h2 style="margin-bottom: 0.75rem;">Connected Computational Solvers &amp; Cross-Disciplinary Workflows</h2>
+        <p style="color: var(--text-secondary, #475569); margin-bottom: 1.25rem;">Explore precision analytical companion models and dedicated verification solvers from our <a href="datetime.html">Date & Time Utilities</a> directory for hours analysis:</p>
+        <div class="related-tools-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+        <a href="add-days-to-date-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Add Days to Date Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Perform verified calculations and analysis using our precision Add Days to Date Calculator tool.</span>
+        </a>
+        <a href="add-time-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Add Time Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Perform verified calculations and analysis using our precision Add Time Calculator tool.</span>
+        </a>
+        <a href="business-days-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Business Days Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Calculate the exact number of business working days between two calendar dates.</span>
+        </a>
+        <a href="countdown-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Countdown Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Perform verified calculations and analysis using our precision Countdown Calculator tool.</span>
+        </a>
+        <a href="date-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Date Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Perform verified calculations and analysis using our precision Date Calculator tool.</span>
+        </a>
+        </div>
+      </section>
+
+    </article>
             </main>
                                     <!-- Related Category Sidebar -->
       <aside class="post-sidebar">

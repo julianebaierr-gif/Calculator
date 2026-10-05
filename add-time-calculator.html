@@ -260,70 +260,70 @@ window.addEventListener('DOMContentLoaded', updateTimeCalc);
                 </div>
                 <article class="article-body">
                     <h2>Mathematical Foundations of Sexagesimal Time Arithmetic</h2>
-<p>Unlike standard decimal arithmetic which operates in base-10, civil chronometry and astronomical angle measurement are founded on the sexagesimal (base-60) numerical positional system developed in ancient Mesopotamia. In sexagesimal timekeeping, an hour is subdivided into 60 minutes, and each minute is further subdivided into 60 seconds ($1 	ext{ hour} = 60 	ext{ minutes} = 3,600 	ext{ seconds}$). Furthermore, the diurnal rotation of the Earth establishes a secondary modulus of 24 hours per civil solar day ($1 	ext{ day} = 24 	ext{ hours} = 1,440 	ext{ minutes} = 86,400 	ext{ seconds}$).</p>
+<p>Unlike standard decimal arithmetic which operates in base-10, civil chronometry and astronomical angle measurement are founded on the sexagesimal (base-60) numerical positional system developed in ancient Mesopotamia. In sexagesimal timekeeping, an hour is subdivided into 60 minutes, and each minute is further subdivided into 60 seconds ($1 \text{ hour} = 60 \text{ minutes} = 3,600 \text{ seconds}$). Furthermore, the diurnal rotation of the Earth establishes a secondary modulus of 24 hours per civil solar day ($1 \text{ day} = 24 \text{ hours} = 1,440 \text{ minutes} = 86,400 \text{ seconds}$).</p>
 
 <p>Performing addition or subtraction on chronometric vectors $(H_1, M_1, S_1)$ and $(H_2, M_2, S_2)$ requires rigorous carry-over and borrowing algorithms. The mathematical carry-over sequence for addition is formalized as follows:</p>
 
-$$S_{	ext{raw}} = S_1 + S_2, \quad S_{	ext{net}} = S_{	ext{raw}} mod 60, \quad C_M = \left\lfloor rac{S_{	ext{raw}}}{60} 
+$$S_{\text{raw}} = S_1 + S_2, \quad S_{\text{net}} = S_{\text{raw}} mod 60, \quad C_M = \left\lfloor \frac{S_{\text{raw}}}{60} 
 ight
 floor$$
 
-$$M_{	ext{raw}} = M_1 + M_2 + C_M, \quad M_{	ext{net}} = M_{	ext{raw}} mod 60, \quad C_H = \left\lfloor rac{M_{	ext{raw}}}{60} 
+$$M_{\text{raw}} = M_1 + M_2 + C_M, \quad M_{\text{net}} = M_{\text{raw}} mod 60, \quad C_H = \left\lfloor \frac{M_{\text{raw}}}{60} 
 ight
 floor$$
 
-$$H_{	ext{raw}} = H_1 + H_2 + C_H, \quad H_{	ext{net}} = H_{	ext{raw}} mod 24, \quad D_{	ext{overflow}} = \left\lfloor rac{H_{	ext{raw}}}{24} 
+$$H_{\text{raw}} = H_1 + H_2 + C_H, \quad H_{\text{net}} = H_{\text{raw}} mod 24, \quad D_{\text{overflow}} = \left\lfloor \frac{H_{\text{raw}}}{24} 
 ight
 floor$$
 
-<p>Where $C_M$ and $C_H$ represent the integer carry-over quotients, and $D_{	ext{overflow}}$ represents the count of 24-hour diurnal boundaries crossed. In subtraction, whenever $S_1 < S_2$, a borrow of 60 seconds is decremented from $M_1$. If $M_1 < M_2$, a borrow of 60 minutes is decremented from $H_1$.</p>
+<p>Where $C_M$ and $C_H$ represent the integer carry-over quotients, and $D_{\text{overflow}}$ represents the count of 24-hour diurnal boundaries crossed. In subtraction, whenever $S_1 < S_2$, a borrow of 60 seconds is decremented from $M_1$. If $M_1 < M_2$, a borrow of 60 minutes is decremented from $H_1$.</p>
 
 <h2>Clock-Time Projection vs. Continuous Duration Summation</h2>
 <p>Modern chronometry differentiates strictly between two distinct computational paradigms:</p>
 
 <ol>
     <li><strong>Clock-Time Addition (Time of Day):</strong> Adding a duration $\Delta t$ to a fixed moment on the civil clock $T_0$. Because clocks are cyclic dials bounded by 24:00 (or two 12-hour AM/PM cycles), this operation is cyclic and produces a resulting timestamp plus a day offset:
-    $$T_{	ext{target}} = (T_0 + \Delta t) \pmod{86400 	ext{ seconds}}$$
+    $$T_{\text{target}} = (T_0 + \Delta t) \pmod{86400 \text{ seconds}}$$
     </li>
     <li><strong>Duration Aggregation (Elapsed Interval):</strong> Accumulating multiple work periods, flight legs, machinery runtimes, or audio/video tracks. In duration summation, time is an unbounded linear scalar:
-    $$T_{	ext{total}} = \sum_{i=1}^n ig(H_i \cdot 3600 + M_i \cdot 60 + S_iig)$$
+    $$T_{\text{total}} = \sum_{i=1}^n ig(H_i \cdot 3600 + M_i \cdot 60 + S_iig)$$
     </li>
 </ol>
 
 <h3>Continuous Decimal and Metric Equivalencies</h3>
 <p>For scientific computation, statistical analysis, and billing databases, composite sexagesimal intervals $(H, M, S)$ must be converted into continuous decimal representations:</p>
 
-$$H_{	ext{decimal}} = H + rac{M}{60} + rac{S}{3600}$$
+$$H_{\text{decimal}} = H + \frac{M}{60} + \frac{S}{3600}$$
 
-$$M_{	ext{decimal}} = (H 	imes 60) + M + rac{S}{60}$$
+$$M_{\text{decimal}} = (H \times 60) + M + \frac{S}{60}$$
 
-$$S_{	ext{total}} = (H 	imes 3600) + (M 	imes 60) + S$$
+$$S_{\text{total}} = (H \times 3600) + (M \times 60) + S$$
 
 <h2>SMPTE Timecode Synchronization and Video Frame Mathematics</h2>
-<p>In digital broadcasting, professional audio recording, and cinematography, time addition is extended from pure seconds down to discrete photographic frames via the <strong>SMPTE (Society of Motion Picture and Television Engineers) Timecode</strong> standard ($HH:MM:SS:FF$). Because American NTSC color television broadcasts operate at a non-integer rate of exactly $29.97$ frames per second ($30 / 1.001 	ext{ fps}$), standard integer arithmetic generates a cumulative chronometric time drift of exactly $107.89 	ext{ milliseconds}$ for every hour of playback.</p>
+<p>In digital broadcasting, professional audio recording, and cinematography, time addition is extended from pure seconds down to discrete photographic frames via the <strong>SMPTE (Society of Motion Picture and Television Engineers) Timecode</strong> standard ($HH:MM:SS:FF$). Because American NTSC color television broadcasts operate at a non-integer rate of exactly $29.97$ frames per second ($30 / 1.001 \text{ fps}$), standard integer arithmetic generates a cumulative chronometric time drift of exactly $107.89 \text{ milliseconds}$ for every hour of playback.</p>
 
 <p>To eliminate this playback discrepancy, broadcast engineers utilize <strong>Drop-Frame Timecode (DF)</strong>:</p>
 
 <ul>
     <li>Frame numbers <code>00</code> and <code>01</code> are skipped at the start of every minute, EXCEPT every tenth minute (minutes <code>00, 10, 20, 30, 40, 50</code>).</li>
-    <li>Total dropped frame count per hour equals $54 	ext{ minutes} 	imes 2 	ext{ frames} = 108 	ext{ frames}$, perfectly resynchronizing television wall-clock time with real atomic time.</li>
+    <li>Total dropped frame count per hour equals $54 \text{ minutes} \times 2 \text{ frames} = 108 \text{ frames}$, perfectly resynchronizing television wall-clock time with real atomic time.</li>
 </ul>
 
 <h2>Relativistic Time Adjustments in Aerospace and GPS Navigation</h2>
-<p>In orbital satellite mechanics and Global Positioning System (GPS) engineering, simple Galilean time addition ($T = t_1 + t_2$) fails due to Albert Einstein's special and general theories of relativity. GPS satellites orbit at an altitude of approximately $20,200 	ext{ km}$ at velocities of $3.9 	ext{ km/s}$:</p>
+<p>In orbital satellite mechanics and Global Positioning System (GPS) engineering, simple Galilean time addition ($T = t_1 + t_2$) fails due to Albert Einstein's special and general theories of relativity. GPS satellites orbit at an altitude of approximately $20,200 \text{ km}$ at velocities of $3.9 \text{ km/s}$:</p>
 
 <ul>
-    <li><strong>Special Relativity (Kinematic Dilation):</strong> The satellite's high velocity causes atomic clocks to run slower by approximately $-7 \ \mu	ext{s/day}$ relative to Earth ground observers:
-    $$\Delta t_v = t_0 \left( \sqrt{1 - rac{v^2}{c^2}} - 1 
-ight) pprox -rac{1}{2}rac{v^2}{c^2} t_0$$
+    <li><strong>Special Relativity (Kinematic Dilation):</strong> The satellite's high velocity causes atomic clocks to run slower by approximately $-7 \ \mu\text{s/day}$ relative to Earth ground observers:
+    $$\Delta t_v = t_0 \left( \sqrt{1 - \frac{v^2}{c^2}} - 1 
+ight) pprox -\frac{1}{2}\frac{v^2}{c^2} t_0$$
     </li>
-    <li><strong>General Relativity (Gravitational Dilation):</strong> The weaker gravitational potential at $20,200 	ext{ km}$ causes satellite atomic clocks to run faster by $+45 \ \mu	ext{s/day}$:
-    $$\Delta t_g = t_0 \left( rac{\Delta \Phi}{c^2} 
+    <li><strong>General Relativity (Gravitational Dilation):</strong> The weaker gravitational potential at $20,200 \text{ km}$ causes satellite atomic clocks to run faster by $+45 \ \mu\text{s/day}$:
+    $$\Delta t_g = t_0 \left( \frac{\Delta \Phi}{c^2} 
 ight)$$
     </li>
 </ul>
 
-<p>The net relativistic drift is $+38 \ \mu	ext{s/day}$. Left uncorrected in time addition algorithms, this $38 \ \mu	ext{s}$ discrepancy would cause GPS ground position errors to compound by approximately $11.4 	ext{ kilometers per day}$ ($38 \ \mu	ext{s} 	imes 3 	imes 10^8 	ext{ m/s}$)!</p>
+<p>The net relativistic drift is $+38 \ \mu\text{s/day}$. Left uncorrected in time addition algorithms, this $38 \ \mu\text{s}$ discrepancy would cause GPS ground position errors to compound by approximately $11.4 \text{ kilometers per day}$ ($38 \ \mu\text{s} \times 3 \times 10^8 \text{ m/s}$)!</p>
 
 <h3>Chronometric Carry-Over and Conversion Benchmark Table</h3>
 <p>The following table outlines standard time addition scenarios, carry-over mechanics, and equivalent decimal outputs:</p>
@@ -355,36 +355,65 @@ ight)$$
     
     <div class="step-solution">
         <h4>Step 1: Sum the Raw Seconds</h4>
-        $$S_{	ext{raw}} = 25 + 50 + 15 = 90 	ext{ seconds}$$
-        $$S_{	ext{net}} = 90 mod 60 = 30 	ext{ seconds}$$
+        $$S_{\text{raw}} = 25 + 50 + 15 = 90 \text{ seconds}$$
+        $$S_{\text{net}} = 90 mod 60 = 30 \text{ seconds}$$
         $$C_M = \lfloor 90 / 60 
-floor = 1 	ext{ carried minute}$$
+floor = 1 \text{ carried minute}$$
 
         <h4>Step 2: Sum the Raw Minutes with Carry</h4>
-        $$M_{	ext{raw}} = 48 + 34 + 52 + 1 = 135 	ext{ minutes}$$
-        $$M_{	ext{net}} = 135 mod 60 = 15 	ext{ minutes}$$
+        $$M_{\text{raw}} = 48 + 34 + 52 + 1 = 135 \text{ minutes}$$
+        $$M_{\text{net}} = 135 mod 60 = 15 \text{ minutes}$$
         $$C_H = \lfloor 135 / 60 
-floor = 2 	ext{ carried hours}$$
+floor = 2 \text{ carried hours}$$
 
         <h4>Step 3: Sum the Raw Hours with Carry</h4>
-        $$H_{	ext{total}} = 3 + 5 + 4 + 2 = 14 	ext{ hours}$$
+        $$H_{\text{total}} = 3 + 5 + 4 + 2 = 14 \text{ hours}$$
         <p><strong>Total Cumulative Duration:</strong> 14 hours, 15 minutes, 30 seconds.</p>
 
         <h4>Step 4: Convert to Continuous Decimal Hours</h4>
-        $$H_{	ext{decimal}} = 14 + rac{15}{60} + rac{30}{3600} = 14 + 0.25 + 0.00833 = 14.2583 	ext{ decimal hours}$$
+        $$H_{\text{decimal}} = 14 + \frac{15}{60} + \frac{30}{3600} = 14 + 0.25 + 0.00833 = 14.2583 \text{ decimal hours}$$
 
         <h4>Step 5: Regulatory Compliance Evaluation</h4>
-        <p>The cumulative block flight time of $14.2583 	ext{ hours}$ exceeds the $14.0000 	ext{ hour}$ statutory ceiling by exactly 15 minutes and 30 seconds ($0.2583 	ext{ hours}$). Under FAA Part 117 rules, the operator must reassign Sector 3 to relief crew to prevent a mandatory crew duty rest violation.</p>
+        <p>The cumulative block flight time of $14.2583 \text{ hours}$ exceeds the $14.0000 \text{ hour}$ statutory ceiling by exactly 15 minutes and 30 seconds ($0.2583 \text{ hours}$). Under FAA Part 117 rules, the operator must reassign Sector 3 to relief crew to prevent a mandatory crew duty rest violation.</p>
     </div>
 </div>
 
 <h2>Common Calculation Errors in Time Addition</h2>
 <ol>
-    <li><strong>Decimal Point Confusion:</strong> Treating minutes as decimal fractions (e.g., entering 2 hours and 45 minutes as $2.45$ instead of $2.75$). Performing arithmetic directly on sexagesimal minutes as decimals produces mathematically catastrophic errors (such as concluding that $2.45 + 1.30 = 3.75$, when $2	ext{h }45	ext{m} + 1	ext{h }30	ext{m} = 4	ext{h }15	ext{m} = 4.25	ext{ hrs}$).</li>
+    <li><strong>Decimal Point Confusion:</strong> Treating minutes as decimal fractions (e.g., entering 2 hours and 45 minutes as $2.45$ instead of $2.75$). Performing arithmetic directly on sexagesimal minutes as decimals produces mathematically catastrophic errors (such as concluding that $2.45 + 1.30 = 3.75$, when $2\text{h }45\text{m} + 1\text{h }30\text{m} = 4\text{h }15\text{m} = 4.25\text{ hrs}$).</li>
     <li><strong>Omission of Modulo Rollover in 12-Hour Formats:</strong> Failing to adjust for the 12-hour AM/PM flip (e.g., 11:30 AM plus 2 hours equals 01:30 PM, not 13:30 AM).</li>
     <li><strong>Leap Second Misunderstandings:</strong> While the International Earth Rotation and Reference Systems Service (IERS) periodically inserts atomic leap seconds (UTC), civil time software ignores leap seconds for standard interval addition to prevent variable-rate clock distortion.</li>
 </ol>
-                </article>
+                
+      <!-- Contextual Internal Linking: Connected Workflow Solvers -->
+      <section class="related-tools-section" style="margin-top: 2.75rem; padding-top: 1.75rem; border-top: 1px solid var(--border-light, #e2e8f0);">
+        <h2 style="margin-bottom: 0.75rem;">Connected Computational Solvers &amp; Cross-Disciplinary Workflows</h2>
+        <p style="color: var(--text-secondary, #475569); margin-bottom: 1.25rem;">Explore precision analytical companion models and dedicated verification solvers from our <a href="datetime.html">Date & Time Utilities</a> directory for add time analysis:</p>
+        <div class="related-tools-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+        <a href="add-days-to-date-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Add Days to Date Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Perform verified calculations and analysis using our precision Add Days to Date Calculator tool.</span>
+        </a>
+        <a href="decimal-time-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Decimal Time Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Perform verified calculations and analysis using our precision Decimal Time Calculator tool.</span>
+        </a>
+        <a href="time-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Time Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Add, subtract, multiply, and divide time durations in hours, minutes, and seconds (HH:MM:SS).</span>
+        </a>
+        <a href="time-duration-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Time Duration Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Calculate the exact duration and time span between two dates and times.</span>
+        </a>
+        <a href="business-days-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Business Days Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Calculate the exact number of business working days between two calendar dates.</span>
+        </a>
+        </div>
+      </section>
+
+    </article>
             </main>
                                     <!-- Related Category Sidebar -->
       <aside class="post-sidebar">

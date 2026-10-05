@@ -289,19 +289,19 @@ window.addEventListener('DOMContentLoaded', calculateCableSize);
     </li>
     <li><strong>Voltage Drop Limitation:</strong> The percentage voltage drop $\Delta V_{\%}$ across the conductor span must remain below statutory thresholds (typically $3\%$ to $5\%$) to guarantee proper motor starting torque and sensitive electronic functionality.</li>
     <li><strong>Short-Circuit Thermal Withstand:</strong> The conductor cross-sectional area $S$ must satisfy the adiabatic energy withstand equation during upstream fault clearing time $t$:
-    $$k^2 S^2 \ge I_{	ext{sc}}^2 t \implies S \ge rac{I_{	ext{sc}} \sqrt{t}}{k}$$
+    $$k^2 S^2 \ge I_{\text{sc}}^2 t \implies S \ge \frac{I_{\text{sc}} \sqrt{t}}{k}$$
     </li>
-    <li><strong>Harmonic Current Derating:</strong> In modern commercial facilities with heavy non-linear LED, VFD, and server loads, triplen harmonic currents ($3	ext{rd}, 9	ext{th}, 15	ext{th}$) circulate through the neutral conductor, requiring neutral up-sizing per IEC 60364-5-52 Annex E.</li>
+    <li><strong>Harmonic Current Derating:</strong> In modern commercial facilities with heavy non-linear LED, VFD, and server loads, triplen harmonic currents ($3\text{rd}, 9\text{th}, 15\text{th}$) circulate through the neutral conductor, requiring neutral up-sizing per IEC 60364-5-52 Annex E.</li>
 </ol>
 
 <h2>Installation Derating Factors and Thermal Modeling</h2>
-<p>Nominal cable current capacities published in regulatory standards (such as IEC 60364-5-52 Table B.52 or NEC Article 310 Table 310.16) are referenced to idealized baseline operating conditions: an ambient air temperature of $30^\circ	ext{C}$ and an isolated single circuit. In real industrial installations, conductors are derated using environmental correction factors:</p>
+<p>Nominal cable current capacities published in regulatory standards (such as IEC 60364-5-52 Table B.52 or NEC Article 310 Table 310.16) are referenced to idealized baseline operating conditions: an ambient air temperature of $30^\circ\text{C}$ and an isolated single circuit. In real industrial installations, conductors are derated using environmental correction factors:</p>
 
-$$I_z = I_{	ext{tabulated}} 	imes C_a 	imes C_g 	imes C_i 	imes C_s$$
+$$I_z = I_{\text{tabulated}} \times C_a \times C_g \times C_i \times C_s$$
 
 <p>Where the mathematical derating coefficients represent:</p>
 <ul>
-    <li>$C_a$ (Ambient Temperature Factor): Accounts for operating in ambient temperatures exceeding $30^\circ	ext{C}$ (e.g., $C_a = 0.82$ for $45^\circ	ext{C}$ ambient in XLPE insulation).</li>
+    <li>$C_a$ (Ambient Temperature Factor): Accounts for operating in ambient temperatures exceeding $30^\circ\text{C}$ (e.g., $C_a = 0.82$ for $45^\circ\text{C}$ ambient in XLPE insulation).</li>
     <li>$C_g$ (Grouping / Bundling Factor): Accounts for mutual thermal heating when multiple single-core or multi-core cables run touching in conduits or trays (e.g., $C_g = 0.70$ for 4 grouped circuits).</li>
     <li>$C_i$ (Thermal Insulation Factor): Derates cables embedded in building thermal fiberglass or cellulose batting ($C_i pprox 0.50$ to $0.75$).</li>
     <li>$C_s$ (Soil Thermal Resistivity Factor): Applies to direct-buried underground cables based on soil moisture and thermal resistivity ($K \cdot m / W$).</li>
@@ -323,54 +323,84 @@ $$I_z = I_{	ext{tabulated}} 	imes C_a 	imes C_g 	imes C_i 	imes C_s$$
         <tr><td>Method B1 / B2</td><td>Cables in conduit or trunking on a wooden/masonry wall</td><td>Moderate</td><td>135 A</td><td>128 A</td></tr>
         <tr><td>Method C</td><td>Single or multi-core cable clipped direct to non-combustible surface</td><td>High (Convection Free)</td><td>164 A</td><td>155 A</td></tr>
         <tr><td>Method E / F</td><td>Cables in free air on open perforated cable tray or ladder rack</td><td>Highest (Optimal Ventilation)</td><td>182 A</td><td>172 A</td></tr>
-        <tr><td>Method D1 / D2</td><td>Direct buried or in underground ducts in soil ($20^\circ	ext{C}$)</td><td>High (Soil Conduction)</td><td>170 A</td><td>160 A</td></tr>
+        <tr><td>Method D1 / D2</td><td>Direct buried or in underground ducts in soil ($20^\circ\text{C}$)</td><td>High (Soil Conduction)</td><td>170 A</td><td>160 A</td></tr>
     </tbody>
 </table>
 
 <h2>Voltage Drop Mathematical Formulations</h2>
 <p>Voltage drop across an alternating current (AC) feeder is evaluated from conductor resistance $R$ and inductive reactance $X$:</p>
 
-$$\Delta V_{	ext{3-phase}} = \sqrt{3} \cdot I_b \cdot L \cdot \left( R \cos \phi + X \sin \phi 
+$$\Delta V_{\text{3-phase}} = \sqrt{3} \cdot I_b \cdot L \cdot \left( R \cos \phi + X \sin \phi 
 ight)$$
-$$\Delta V_{	ext{1-phase}} = 2 \cdot I_b \cdot L \cdot \left( R \cos \phi + X \sin \phi 
+$$\Delta V_{\text{1-phase}} = 2 \cdot I_b \cdot L \cdot \left( R \cos \phi + X \sin \phi 
 ight)$$
 
-<p>Where $L$ is one-way feeder length in kilometers, and $R$ and $X$ are expressed in $\Omega / 	ext{km}$. The percentage drop evaluates as:</p>
+<p>Where $L$ is one-way feeder length in kilometers, and $R$ and $X$ are expressed in $\Omega / \text{km}$. The percentage drop evaluates as:</p>
 
-$$\Delta V_{\%} = rac{\Delta V}{V_{	ext{nominal}}} 	imes 100\%$$
+$$\Delta V_{\%} = \frac{\Delta V}{V_{\text{nominal}}} \times 100\%$$
 
 <div class="worked-example-card">
     <h3>Worked Industrial Engineering Case Study: 45 kW Wastewater Pump Feeder</h3>
-    <p><strong>Scenario:</strong> A 400V, 3-phase, 50 Hz municipal wastewater treatment plant installs a 45 kW submersible lift pump operating at a power factor of $\cos \phi = 0.85$ lagging. The cable route runs <strong>75 meters</strong> in an open ventilated tray. Ambient summer temperature reaches $40^\circ	ext{C}$ ($C_a = 0.91$), and the cable runs bundled alongside two other operational feeders ($C_g = 0.80$). Maximum allowable voltage drop is 3.0%. Size the required Copper XLPE cable.</p>
+    <p><strong>Scenario:</strong> A 400V, 3-phase, 50 Hz municipal wastewater treatment plant installs a 45 kW submersible lift pump operating at a power factor of $\cos \phi = 0.85$ lagging. The cable route runs <strong>75 meters</strong> in an open ventilated tray. Ambient summer temperature reaches $40^\circ\text{C}$ ($C_a = 0.91$), and the cable runs bundled alongside two other operational feeders ($C_g = 0.80$). Maximum allowable voltage drop is 3.0%. Size the required Copper XLPE cable.</p>
     
     <div class="step-solution">
         <h4>Step 1: Calculate Design Full-Load Current ($I_b$)</h4>
-        $$I_b = rac{P}{\sqrt{3} \cdot V \cdot \cos \phi} = rac{45,000}{\sqrt{3} \cdot 400 \cdot 0.85} = rac{45,000}{588.897} pprox 76.41 	ext{ A}$$
+        $$I_b = \frac{P}{\sqrt{3} \cdot V \cdot \cos \phi} = \frac{45,000}{\sqrt{3} \cdot 400 \cdot 0.85} = \frac{45,000}{588.897} pprox 76.41 \text{ A}$$
 
         <h4>Step 2: Evaluate Total Environmental Derating Factor</h4>
-        $$C_{	ext{total}} = C_a 	imes C_g = 0.91 	imes 0.80 = 0.728$$
+        $$C_{\text{total}} = C_a \times C_g = 0.91 \times 0.80 = 0.728$$
 
         <h4>Step 3: Determine Required Minimum Tabulated Ampacity ($I_z$)</h4>
-        $$I_z = rac{I_b}{C_{	ext{total}}} = rac{76.41}{0.728} pprox 104.96 	ext{ A}$$
-        <p>From IEC Method C / E tables: A $25 	ext{ mm}^2$ Cu XLPE cable provides $133 	ext{ A}$ (satisfies ampacity $133 	imes 0.728 = 96.8 	ext{ A} < 104.96 	ext{ A}$, so next size up $35 	ext{ mm}^2$ provides $164 	imes 0.728 = 119.4 	ext{ A}$, which PASSES).</p>
+        $$I_z = \frac{I_b}{C_{\text{total}}} = \frac{76.41}{0.728} pprox 104.96 \text{ A}$$
+        <p>From IEC Method C / E tables: A $25 \text{ mm}^2$ Cu XLPE cable provides $133 \text{ A}$ (satisfies ampacity $133 \times 0.728 = 96.8 \text{ A} < 104.96 \text{ A}$, so next size up $35 \text{ mm}^2$ provides $164 \times 0.728 = 119.4 \text{ A}$, which PASSES).</p>
 
-        <h4>Step 4: Verify Voltage Drop on $35 	ext{ mm}^2$ Conductor</h4>
-        <p>For $35 	ext{ mm}^2$ copper at $90^\circ	ext{C}$: $R pprox 0.627 \, \Omega/	ext{km} = 0.000627 \, \Omega/	ext{m}$.</p>
-        $$\Delta V = \sqrt{3} \cdot (76.41) \cdot (75) \cdot (0.000627 \cdot 0.85) = 132.34 \cdot 75 \cdot 0.000533 pprox 5.29 	ext{ V}$$
-        $$\Delta V_{\%} = rac{5.29}{400} 	imes 100\% pprox 1.32\%$$
-        <p><strong>Conclusion:</strong> $1.32\% < 3.0\%$ maximum limit! A <strong>$35 	ext{ mm}^2$ Copper XLPE 4-core cable</strong> satisfies both thermal ampacity and voltage drop criteria.</p>
+        <h4>Step 4: Verify Voltage Drop on $35 \text{ mm}^2$ Conductor</h4>
+        <p>For $35 \text{ mm}^2$ copper at $90^\circ\text{C}$: $R pprox 0.627 \, \Omega/\text{km} = 0.000627 \, \Omega/\text{m}$.</p>
+        $$\Delta V = \sqrt{3} \cdot (76.41) \cdot (75) \cdot (0.000627 \cdot 0.85) = 132.34 \cdot 75 \cdot 0.000533 pprox 5.29 \text{ V}$$
+        $$\Delta V_{\%} = \frac{5.29}{400} \times 100\% pprox 1.32\%$$
+        <p><strong>Conclusion:</strong> $1.32\% < 3.0\%$ maximum limit! A <strong>$35 \text{ mm}^2$ Copper XLPE 4-core cable</strong> satisfies both thermal ampacity and voltage drop criteria.</p>
     </div>
 </div>
 
 <h2>Common Implementation Pitfalls in Cable Sizing</h2>
 <ol>
-    <li><strong>Neglecting Inductive Reactance in Large Feeders:</strong> For conductors larger than $70 	ext{ mm}^2$ (or 2/0 AWG), inductive reactance $X$ becomes comparable to AC resistance $R$. Ignoring reactive drop underestimates total voltage drop by 20% to 40%.</li>
+    <li><strong>Neglecting Inductive Reactance in Large Feeders:</strong> For conductors larger than $70 \text{ mm}^2$ (or 2/0 AWG), inductive reactance $X$ becomes comparable to AC resistance $R$. Ignoring reactive drop underestimates total voltage drop by 20% to 40%.</li>
     <li><strong>Sizing Exclusively for Ampacity While Ignoring Voltage Drop:</strong> On long runs exceeding 50 meters, a cable that easily passes thermal ampacity will frequently fail voltage drop criteria, leading to motor contactor chatter and premature equipment burn-out.</li>
-    <li><strong>Overlooking Short-Circuit Thermal Ratings:</strong> High prospective fault currents near substation transformers can vaporize undersized grounding or neutral conductors before the circuit breaker trips unless verified against the adiabatic equation $S \ge I_{	ext{sc}} \sqrt{t} / k$.</li>
+    <li><strong>Overlooking Short-Circuit Thermal Ratings:</strong> High prospective fault currents near substation transformers can vaporize undersized grounding or neutral conductors before the circuit breaker trips unless verified against the adiabatic equation $S \ge I_{\text{sc}} \sqrt{t} / k$.</li>
 </ol>
 
 <section class="faq-section">
-    <h2>Frequently Asked Questions About Cable Sizing</h2>
+    
+      <!-- Contextual Internal Linking: Connected Workflow Solvers -->
+      <section class="related-tools-section" style="margin-top: 2.75rem; padding-top: 1.75rem; border-top: 1px solid var(--border-light, #e2e8f0);">
+        <h2 style="margin-bottom: 0.75rem;">Connected Computational Solvers &amp; Cross-Disciplinary Workflows</h2>
+        <p style="color: var(--text-secondary, #475569); margin-bottom: 1.25rem;">Explore precision analytical companion models and dedicated verification solvers from our <a href="engineering.html">Electrical & Power Systems</a> directory for cable sizing guide analysis:</p>
+        <div class="related-tools-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+        <a href="aluminium-cable-sizing-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Aluminium Cable Sizing Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Calculate aluminum cable size, allowable ampacity, voltage drop, and copper-to-aluminum equivalent gauge per NEC Table 310.</span>
+        </a>
+        <a href="cable-sizing-calculator-bs-7671.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Cable Sizing BS 7671 Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Perform verified calculations and analysis using our precision Cable Sizing BS 7671 Calculator tool.</span>
+        </a>
+        <a href="cable-sizing-calculator-iec-60364.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Cable Sizing Calculator IEC 60364</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Calculate low-voltage electrical cable sizes strictly compliant with IEC 60364-5-52.</span>
+        </a>
+        <a href="cable-sizing-calculator-nec.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Cable Sizing Calculator NEC</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Calculate electrical wire and cable sizes strictly compliant with NFPA 70 NEC Table 310.</span>
+        </a>
+        <a href="cable-sizing-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Cable Sizing Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Free online cable sizing calculator per IEC 60364-5-52 and BS 7671.</span>
+        </a>
+        </div>
+      </section>
+
+
+      <h2>Frequently Asked Questions About Cable Sizing</h2>
     <div class="faq-item">
         <h3>What are the four primary criteria for sizing an electrical cable?</h3>
         <p>Cable sizing requires satisfying four independent engineering criteria: (1) Continuous current ampacity under derated thermal conditions, (2) Maximum allowable voltage drop percentage, (3) Short-circuit adiabatic thermal withstand capability, and (4) Mechanical strength and physical installation constraints.</p>

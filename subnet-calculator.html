@@ -343,6 +343,128 @@
     
 
       
+      
+      <h2>Binary Boolean Masking & VLSM Subnetting Architecture</h2>
+      <p>In Internet Protocol version 4 (IPv4) networking, defined under <strong>RFC 791</strong> and <strong>RFC 4632</strong>, a 32-bit address is partitioned into a network prefix and a host identifier. Subnetting enables network administrators to divide physical and virtual networks into segmented broadcast domains, optimizing IP address utilization and enforcing routing firewall boundaries.</p>
+
+      <h3>Bitwise Boolean Masking & Host Population Equations</h3>
+      <p>Every IPv4 address and subnet mask consists of 32 binary bits divided into four 8-bit octets. When a routing device evaluates a destination packet, it performs a bitwise logical AND operation ($\&$) between the 32-bit destination IP address and the configured Subnet Mask:</p>
+      <div class="math-block">
+        $$\text{Network Address} = \text{Destination IP Address} \ \& \ \text{Subnet Mask}$$
+        $$\text{Broadcast Address} = \text{Network Address} \ | \ (\sim \text{Subnet Mask})$$
+      </div>
+      <p>For any Classless Inter-Domain Routing (CIDR) prefix length $/n$ (where $n$ represents the count of leading 1-bits in the mask), the host bit count is $h = 32 - n$. The total address block size and usable host population evaluate as:</p>
+      <div class="math-block">
+        $$\text{Total Addresses} = 2^{32 - n} = 2^h$$
+        $$\text{Usable Host Addresses} = 2^h - 2\quad (\text{for } n \le 30)$$
+      </div>
+      <p>Two addresses in every subnet are reserved by protocol: the all-zeros host address (identifying the Network Wire) and the all-ones host address (identifying the Subnet Directed Broadcast).</p>
+
+      <h3>Point-to-Point Links: /30 vs RFC 3021 /31 Subnets</h3>
+      <p>In legacy routing, point-to-point router serial links utilized $/30$ subnets, allocating $4$ addresses ($2^2$) to provide $2$ usable host interfaces, resulting in a $50\%$ address wastage rate. <strong>RFC 3021: Using 31-Bit Prefixes on IPv4 Point-to-Point Links</strong> eliminated this inefficiency by permitting $/31$ subnets on point-to-point Ethernet links, treating the host bits $0$ and $1$ as valid endpoints without network or broadcast reservations.</p>
+
+      <table class="reference-table" style="margin: 1.5rem 0;">
+        <thead>
+          <tr>
+            <th>CIDR Prefix</th>
+            <th>Dotted Decimal Subnet Mask</th>
+            <th>Wildcard Mask</th>
+            <th>Total Addresses</th>
+            <th>Usable Host Interfaces</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>/24</strong></td>
+            <td>255.255.255.0</td>
+            <td>0.0.0.255</td>
+            <td>256</td>
+            <td>254 hosts (Standard LAN)</td>
+          </tr>
+          <tr>
+            <td><strong>/25</strong></td>
+            <td>255.255.255.128</td>
+            <td>0.0.0.127</td>
+            <td>128</td>
+            <td>126 hosts</td>
+          </tr>
+          <tr>
+            <td><strong>/26</strong></td>
+            <td>255.255.255.192</td>
+            <td>0.0.0.63</td>
+            <td>64</td>
+            <td>62 hosts</td>
+          </tr>
+          <tr>
+            <td><strong>/27</strong></td>
+            <td>255.255.255.224</td>
+            <td>0.0.0.31</td>
+            <td>32</td>
+            <td>30 hosts</td>
+          </tr>
+          <tr>
+            <td><strong>/28</strong></td>
+            <td>255.255.255.240</td>
+            <td>0.0.0.15</td>
+            <td>16</td>
+            <td>14 hosts</td>
+          </tr>
+          <tr>
+            <td><strong>/29</strong></td>
+            <td>255.255.255.248</td>
+            <td>0.0.0.7</td>
+            <td>8</td>
+            <td>6 hosts (Small DMZ)</td>
+          </tr>
+          <tr>
+            <td><strong>/30</strong></td>
+            <td>255.255.255.252</td>
+            <td>0.0.0.3</td>
+            <td>4</td>
+            <td>2 hosts (Point-to-point)</td>
+          </tr>
+          <tr>
+            <td><strong>/31</strong></td>
+            <td>255.255.255.254</td>
+            <td>0.0.0.1</td>
+            <td>2</td>
+            <td>2 hosts (RFC 3021 P2P)</td>
+          </tr>
+          <tr>
+            <td><strong>/32</strong></td>
+            <td>255.255.255.255</td>
+            <td>0.0.0.0</td>
+            <td>1</td>
+            <td>1 host (Loopback interface)</td>
+          </tr>
+        </tbody>
+      </table>
+
+
+      <!-- Contextual Internal Linking: Connected Workflow Solvers -->
+      <section class="related-tools-section" style="margin-top: 2.75rem; padding-top: 1.75rem; border-top: 1px solid var(--border-light, #e2e8f0);">
+        <h2 style="margin-bottom: 0.75rem;">Connected Computational Solvers &amp; Cross-Disciplinary Workflows</h2>
+        <p style="color: var(--text-secondary, #475569); margin-bottom: 1.25rem;">Explore precision analytical companion models and dedicated verification solvers from our <a href="programmer.html">Computer Science & Networking</a> directory for subnetting analysis:</p>
+        <div class="related-tools-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+          <a href="data-storage-converter.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+            <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Data Storage Converter</span>
+            <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Convert between bits, bytes, kilobytes, megabytes, gigabytes, and binary gibibytes.</span>
+          </a>
+          <a href="data-transfer-rate-converter.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+            <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Data Transfer Rate Converter</span>
+            <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Calculate network bandwidth throughput, line capacity, and transfer latency across telecommunications circuits.</span>
+          </a>
+          <a href="number-base-converter.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+            <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Number Base Converter</span>
+            <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Convert numeric representations across binary, octal, decimal, and hexadecimal bases for low-level systems programming.</span>
+          </a>
+          <a href="unix-timestamp-converter.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+            <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Unix Timestamp Converter</span>
+            <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Convert epoch timestamps into human-readable ISO-8601 calendar dates and audit system network logs.</span>
+          </a>
+        </div>
+      </section>
+
       <div class="faq-container" style="margin-top:2.5rem;">
         <h3 style="margin-bottom:1.5rem;">Frequently Asked Questions</h3>
         

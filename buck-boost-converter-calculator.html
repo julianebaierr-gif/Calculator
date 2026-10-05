@@ -261,29 +261,29 @@ $$\int_0^{T_{sw}} v_L(t) \, dt = (V_{in}) \cdot D \cdot T_{sw} + (-V_{out} - V_D
 
 <p>Solving for the nominal duty ratio \(D\) while factoring in power stage efficiency \(\eta\) and diode forward drop \(V_D\) gives:</p>
 
-$$D = rac{V_{out} + V_D}{V_{in} \cdot \eta + V_{out} + V_D}$$
+$$D = \frac{V_{out} + V_D}{V_{in} \cdot \eta + V_{out} + V_D}$$
 
 <p>The average inductor current \(I_{L,avg}\) exceeds the DC load current \(I_{out}\) because the inductor transfers energy to the output network only during the turn-off interval \((1 - D)\):</p>
 
-$$I_{L,avg} = rac{I_{out}}{1 - D}$$
+$$I_{L,avg} = \frac{I_{out}}{1 - D}$$
 
 <p>The peak-to-peak inductor current ripple \(\Delta I_L\) is specified as a fraction \(r\) (the inductor ripple ratio, typically selected between \(0.20\) and \(0.40\)) of the average inductor current:</p>
 
-$$\Delta I_L = r \cdot I_{L,avg} = r \cdot rac{I_{out}}{1 - D}$$
+$$\Delta I_L = r \cdot I_{L,avg} = r \cdot \frac{I_{out}}{1 - D}$$
 
 <p>Applying Faraday's Law during the switch ON-time yields the required power stage inductance \(L\):</p>
 
-$$L = rac{V_{in} \cdot D}{\Delta I_L \cdot f_{sw}} = rac{V_{in} \cdot D \cdot (1 - D)}{r \cdot I_{out} \cdot f_{sw}}$$
+$$L = \frac{V_{in} \cdot D}{\Delta I_L \cdot f_{sw}} = \frac{V_{in} \cdot D \cdot (1 - D)}{r \cdot I_{out} \cdot f_{sw}}$$
 
 <p>The peak inductor current \(I_{L,pk}\) and root-mean-square (RMS) current \(I_{L,rms}\), critical for core saturation checking and copper wire loss calculations, are expressed as:</p>
 
-$$I_{L,pk} = I_{L,avg} + rac{\Delta I_L}{2}$$
+$$I_{L,pk} = I_{L,avg} + \frac{\Delta I_L}{2}$$
 
-$$I_{L,rms} = \sqrt{I_{L,avg}^2 + rac{\Delta I_L^2}{12}}$$
+$$I_{L,rms} = \sqrt{I_{L,avg}^2 + \frac{\Delta I_L^2}{12}}$$
 
 <p>Because the output filter capacitor must supply the full load current during the switch conduction time \(D \cdot T_{sw}\), output capacitance requirements are notably more stringent than those of a standard buck converter. The minimum capacitance \(C_{out}\) to guarantee an output voltage ripple no greater than \(\Delta V_o\) is:</p>
 
-$$C_{out,min} = rac{I_{out} \cdot D}{\Delta V_o \cdot f_{sw}}$$
+$$C_{out,min} = \frac{I_{out} \cdot D}{\Delta V_o \cdot f_{sw}}$$
 
 <h2>3. Empirical Design Benchmark Table for SMPS Inductors</h2>
 <p>The following engineering data table provides standard magnetic core material selections, permeability values, saturation flux densities, and recommended operational frequency bands for switch-mode converter design:</p>
@@ -346,42 +346,72 @@ $$C_{out,min} = rac{I_{out} \cdot D}{\Delta V_o \cdot f_{sw}}$$
 <h2>4. Right-Half-Plane Zero (RHPZ) and Feedback Compensation</h2>
 <p>A crucial dynamic characteristic of Continuous Conduction Mode (CCM) buck-boost and boost topologies is the presence of an inherent <strong>Right-Half-Plane (RHP) Zero</strong> in the power stage control-to-output transfer function \(G_{vd}(s)\). The frequency of this zero is calculated as:</p>
 
-$$\omega_{RHPZ} = rac{R_{load} \cdot (1 - D)^2}{D \cdot L} \quad \implies \quad f_{RHPZ} = rac{R_{load} \cdot (1 - D)^2}{2\pi \cdot D \cdot L}$$
+$$\omega_{RHPZ} = \frac{R_{load} \cdot (1 - D)^2}{D \cdot L} \quad \implies \quad f_{RHPZ} = \frac{R_{load} \cdot (1 - D)^2}{2\pi \cdot D \cdot L}$$
 
-<p>In classical control theory, an ordinary left-half-plane zero contributes \(+20	ext{ dB/decade}\) of gain slope and \(+90^\circ\) of phase lead, improving stability. Conversely, an RHP zero boosts loop gain by \(+20	ext{ dB/decade}\) while introducing a severe <strong>\(-90^\circ\) phase lag</strong>. If the closed-loop crossover frequency \(f_c\) approaches \(f_{RHPZ}\), the system experiences uncontrollable regenerative oscillation. Consequently, power supply design guidelines enforce the rule that loop crossover frequency must be kept below:</p>
+<p>In classical control theory, an ordinary left-half-plane zero contributes \(+20\text{ dB/decade}\) of gain slope and \(+90^\circ\) of phase lead, improving stability. Conversely, an RHP zero boosts loop gain by \(+20\text{ dB/decade}\) while introducing a severe <strong>\(-90^\circ\) phase lag</strong>. If the closed-loop crossover frequency \(f_c\) approaches \(f_{RHPZ}\), the system experiences uncontrollable regenerative oscillation. Consequently, power supply design guidelines enforce the rule that loop crossover frequency must be kept below:</p>
 
-$$f_{cross} \le rac{1}{3} 	ext{ to } rac{1}{5} f_{RHPZ}$$
+$$f_{cross} \le \frac{1}{3} \text{ to } \frac{1}{5} f_{RHPZ}$$
 
 <h2>5. Worked Engineering Case Study: Automotive Step-Up/Down Supply</h2>
 <div class="worked-example-card">
     <h3>Design Specification: 12V Nominal to 24V Auxiliary Rail</h3>
-    <p>An automotive telemetry computer requires a regulated \(V_{out} = 24	ext{ V}\) rail delivering \(I_{out} = 2.5	ext{ A}\) (\(60	ext{ W}\)). The automotive battery fluctuates between \(V_{in,min} = 9	ext{ V}\) during cold cranking and \(V_{in,nom} = 13.8	ext{ V}\). The controller operates at \(f_{sw} = 150	ext{ kHz}\) with an estimated efficiency \(\eta = 88\%\), Schottky diode drop \(V_D = 0.5	ext{ V}\), ripple current ratio \(r = 0.30\), and peak-to-peak output ripple limit \(\Delta V_o \le 50	ext{ mV}\).</p>
+    <p>An automotive telemetry computer requires a regulated \(V_{out} = 24\text{ V}\) rail delivering \(I_{out} = 2.5\text{ A}\) (\(60\text{ W}\)). The automotive battery fluctuates between \(V_{in,min} = 9\text{ V}\) during cold cranking and \(V_{in,nom} = 13.8\text{ V}\). The controller operates at \(f_{sw} = 150\text{ kHz}\) with an estimated efficiency \(\eta = 88\%\), Schottky diode drop \(V_D = 0.5\text{ V}\), ripple current ratio \(r = 0.30\), and peak-to-peak output ripple limit \(\Delta V_o \le 50\text{ mV}\).</p>
 
     <div class="step-solution">
         <h4>Step 1: Compute Maximum Operating Duty Cycle (Worst-Case Low Input)</h4>
-        <p>At \(V_{in} = 9	ext{ V}\):</p>
-        $$D = rac{24 + 0.5}{(9 	imes 0.88) + 24 + 0.5} = rac{24.5}{7.92 + 24.5} = rac{24.5}{32.42} pprox 0.7557 	ext{ (75.6\%)}$$
+        <p>At \(V_{in} = 9\text{ V}\):</p>
+        $$D = \frac{24 + 0.5}{(9 \times 0.88) + 24 + 0.5} = \frac{24.5}{7.92 + 24.5} = \frac{24.5}{32.42} pprox 0.7557 \text{ (75.6\%)}$$
 
         <h4>Step 2: Average Inductor Current and Target Current Ripple</h4>
-        $$I_{L,avg} = rac{I_{out}}{1 - D} = rac{2.5}{1 - 0.7557} = rac{2.5}{0.2443} = 10.233	ext{ A}$$
-        $$\Delta I_L = r 	imes I_{L,avg} = 0.30 	imes 10.233	ext{ A} = 3.07	ext{ A}$$
+        $$I_{L,avg} = \frac{I_{out}}{1 - D} = \frac{2.5}{1 - 0.7557} = \frac{2.5}{0.2443} = 10.233\text{ A}$$
+        $$\Delta I_L = r \times I_{L,avg} = 0.30 \times 10.233\text{ A} = 3.07\text{ A}$$
 
         <h4>Step 3: Inductance Calculation</h4>
-        $$L = rac{V_{in} \cdot D}{\Delta I_L \cdot f_{sw}} = rac{9 	imes 0.7557}{3.07 	imes 150{,}000} = rac{6.8013}{460{,}500} pprox 14.77 	imes 10^{-6}	ext{ H} pprox 15	ext{ }\mu	ext{H}$$
+        $$L = \frac{V_{in} \cdot D}{\Delta I_L \cdot f_{sw}} = \frac{9 \times 0.7557}{3.07 \times 150{,}000} = \frac{6.8013}{460{,}500} pprox 14.77 \times 10^{-6}\text{ H} pprox 15\text{ }\mu\text{H}$$
 
         <h4>Step 4: Inductor Peak Current and Component Voltage Stress</h4>
-        $$I_{L,pk} = 10.233 + rac{3.07}{2} = 11.77	ext{ A}$$
-        $$V_{sw,max} = V_{in,max} + V_{out} + V_D = 16	ext{ V} + 24	ext{ V} + 0.5	ext{ V} = 40.5	ext{ V}$$
-        <p>A power MOSFET rated for at least \(60	ext{ V}\) breakdown with low \(R_{DS(on)}\) and an inductor with a saturation current rating \(I_{sat} \ge 14	ext{ A}\) are selected to provide adequate operating margin.</p>
+        $$I_{L,pk} = 10.233 + \frac{3.07}{2} = 11.77\text{ A}$$
+        $$V_{sw,max} = V_{in,max} + V_{out} + V_D = 16\text{ V} + 24\text{ V} + 0.5\text{ V} = 40.5\text{ V}$$
+        <p>A power MOSFET rated for at least \(60\text{ V}\) breakdown with low \(R_{DS(on)}\) and an inductor with a saturation current rating \(I_{sat} \ge 14\text{ A}\) are selected to provide adequate operating margin.</p>
 
         <h4>Step 5: Minimum Output Filter Capacitance</h4>
-        $$C_{out,min} = rac{I_{out} \cdot D}{f_{sw} \cdot \Delta V_o} = rac{2.5 	imes 0.7557}{150{,}000 	imes 0.050} = rac{1.8893}{7500} pprox 251.9	ext{ }\mu	ext{F}$$
-        <p>A parallel combination of three \(100	ext{ }\mu	ext{F}\), \(35	ext{ V}\) low-ESR polymer aluminum electrolytic capacitors shunted by two \(10	ext{ }\mu	ext{F}\) X7R ceramic capacitors satisfies both the capacitive bulk requirement and high-frequency ESR ripple suppression.</p>
+        $$C_{out,min} = \frac{I_{out} \cdot D}{f_{sw} \cdot \Delta V_o} = \frac{2.5 \times 0.7557}{150{,}000 \times 0.050} = \frac{1.8893}{7500} pprox 251.9\text{ }\mu\text{F}$$
+        <p>A parallel combination of three \(100\text{ }\mu\text{F}\), \(35\text{ V}\) low-ESR polymer aluminum electrolytic capacitors shunted by two \(10\text{ }\mu\text{F}\) X7R ceramic capacitors satisfies both the capacitive bulk requirement and high-frequency ESR ripple suppression.</p>
     </div>
 </div>
 
 <h2>6. Frequently Asked Questions</h2>
-<div class="faq-accordion">
+
+      <!-- Contextual Internal Linking: Connected Workflow Solvers -->
+      <section class="related-tools-section" style="margin-top: 2.75rem; padding-top: 1.75rem; border-top: 1px solid var(--border-light, #e2e8f0);">
+        <h2 style="margin-bottom: 0.75rem;">Connected Computational Solvers &amp; Cross-Disciplinary Workflows</h2>
+        <p style="color: var(--text-secondary, #475569); margin-bottom: 1.25rem;">Explore precision analytical companion models and dedicated verification solvers from our <a href="engineering.html">Electrical & Power Systems</a> directory for buck boost converter analysis:</p>
+        <div class="related-tools-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+        <a href="torque-converter.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Torque Converter Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Perform verified calculations and analysis using our precision Torque Converter Calculator tool.</span>
+        </a>
+        <a href="3-phase-power-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">3-Phase Power Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Perform verified calculations and analysis using our precision 3-Phase Power Calculator tool.</span>
+        </a>
+        <a href="555-timer-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">555 Timer Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Perform verified calculations and analysis using our precision 555 Timer Calculator tool.</span>
+        </a>
+        <a href="a1c-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">A1C Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Convert your Hemoglobin HbA1c percentage to Estimated Average Glucose (eAG) in mg/dL and mmol/L, plus IFCC units (mmol/mol).</span>
+        </a>
+        <a href="acceleration-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Acceleration Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Perform verified calculations and analysis using our precision Acceleration Calculator tool.</span>
+        </a>
+        </div>
+      </section>
+
+
+      <div class="faq-accordion">
     <div class="faq-item">
         <h3>What is the primary difference between inverting and four-switch non-inverting buck-boost converters?</h3>
         <p>An inverting buck-boost converter reverses the polarity of the DC output with respect to ground and employs only two power switches (one active transistor and one diode). A four-switch synchronous non-inverting buck-boost converter utilizes four power MOSFETs (two half-bridges) and an inductor. It preserves positive voltage polarity and delivers superior efficiency (&gt;96%) by operating dynamically as a pure buck converter when \(V_{in} \gg V_{out}\), a pure boost converter when \(V_{in} \ll V_{out}\), and in 4-switch buck-boost mode only when input and output voltages are nearly identical.</p>
@@ -392,12 +422,12 @@ $$f_{cross} \le rac{1}{3} 	ext{ to } rac{1}{5} f_{RHPZ}$$
     </div>
     <div class="faq-item">
         <h3>How does Right-Half-Plane (RHP) zero affect the compensation loop of a buck-boost converter in CCM?</h3>
-        <p>In Continuous Conduction Mode, when the control loop demands higher output voltage by suddenly increasing duty cycle \(D\), the immediate short-term effect is a reduction in the switch turn-off time \((1 - D)\), temporarily decreasing the energy delivered to the load until inductor current ramps up. This phenomenon creates a Right-Half-Plane zero that increases open-loop gain by \(+20	ext{ dB/decade}\) while degrading loop phase by \(-90^\circ\). To prevent severe phase margin erosion and instability, loop bandwidth must be restricted to less than one-third to one-fifth of the RHP zero frequency.</p>
+        <p>In Continuous Conduction Mode, when the control loop demands higher output voltage by suddenly increasing duty cycle \(D\), the immediate short-term effect is a reduction in the switch turn-off time \((1 - D)\), temporarily decreasing the energy delivered to the load until inductor current ramps up. This phenomenon creates a Right-Half-Plane zero that increases open-loop gain by \(+20\text{ dB/decade}\) while degrading loop phase by \(-90^\circ\). To prevent severe phase margin erosion and instability, loop bandwidth must be restricted to less than one-third to one-fifth of the RHP zero frequency.</p>
     </div>
     <div class="faq-item">
         <h3>How is the minimum critical inductance (L_crit) calculated to maintain Continuous Conduction Mode (CCM)?</h3>
         <p>Continuous Conduction Mode requires that the instantaneous inductor current does not drop to zero at any point during the cycle. At the CCM/DCM boundary, peak-to-peak ripple current \(\Delta I_L\) equals twice the average inductor current. For a minimum operating load current \(I_{out,min}\), critical inductance is calculated as:</p>
-        $$L_{crit} = rac{V_{in} \cdot D}{2 \cdot I_{L,avg,min} \cdot f_{sw}} = rac{V_{in} \cdot D \cdot (1 - D)}{2 \cdot I_{out,min} \cdot f_{sw}}$$
+        $$L_{crit} = \frac{V_{in} \cdot D}{2 \cdot I_{L,avg,min} \cdot f_{sw}} = \frac{V_{in} \cdot D \cdot (1 - D)}{2 \cdot I_{out,min} \cdot f_{sw}}$$
     </div>
 </div>
                 </article>

@@ -329,9 +329,9 @@ $$\Delta D = d_2 - d_1, \quad \Delta M = M_2 - M_1, \quad \Delta Y = Y_2 - Y_1$$
 <h3>1. Positional Borrowing Across Months</h3>
 <p>If $\Delta D < 0$, days must be borrowed from the preceding month $M_2 - 1$. Crucially, the number of borrowed days is NOT a fixed constant (such as 30), but equals the exact physical calendar length of the immediately preceding month:</p>
 
-$$\Delta D = \Delta D + 	ext{DaysInMonth}(Y_2, M_2 - 1), \quad \Delta M = \Delta M - 1$$
+$$\Delta D = \Delta D + \text{DaysInMonth}(Y_2, M_2 - 1), \quad \Delta M = \Delta M - 1$$
 
-<p>Where $	ext{DaysInMonth}$ evaluates to 31 for January, 28 or 29 for February, 31 for March, 30 for April, and so forth.</p>
+<p>Where $\text{DaysInMonth}$ evaluates to 31 for January, 28 or 29 for February, 31 for March, 30 for April, and so forth.</p>
 
 <h3>2. Positional Borrowing Across Years</h3>
 <p>If $\Delta M < 0$, a borrow is decremented from the year term, transferring 12 months to the monthly accumulator:</p>
@@ -341,13 +341,13 @@ $$\Delta M = \Delta M + 12, \quad \Delta Y = \Delta Y - 1$$
 <h2>The End-of-Month Clamping Phenomenon in Temporal Projection</h2>
 <p>When adding or subtracting calendar intervals from an anchor date—for example, adding exactly one month to January 31st—algebraic computation encounters an impossibility: the date <em>February 31st</em> does not exist in any solar calendar. In software systems and legal contracts, this is resolved via the <strong>End-of-Month Clamping Convention</strong> (standardized by ANSI SQL, Java <code>java.time</code>, and Python <code>dateutil.relativedelta</code>):</p>
 
-$$M_{	ext{new}} = (M_0 + \Delta M) mod 12$$
+$$M_{\text{new}} = (M_0 + \Delta M) mod 12$$
 
-$$Y_{	ext{new}} = Y_0 + \left\lfloor rac{M_0 + \Delta M}{12} 
+$$Y_{\text{new}} = Y_0 + \left\lfloor \frac{M_0 + \Delta M}{12} 
 ight
 floor$$
 
-$$d_{	ext{clamped}} = \minig(d_0, 	ext{DaysInMonth}(Y_{	ext{new}}, M_{	ext{new}})ig)$$
+$$d_{\text{clamped}} = \minig(d_0, \text{DaysInMonth}(Y_{\text{new}}, M_{\text{new}})ig)$$
 
 <p>Under this formal convention, adding one month to January 31, 2026 clamps cleanly to <strong>February 28, 2026</strong>. In a leap year (such as 2028), adding one month to January 31st clamps cleanly to <strong>February 29, 2028</strong>.</p>
 
@@ -384,9 +384,9 @@ $$d_{	ext{clamped}} = \minig(d_0, 	ext{DaysInMonth}(Y_{	ext{new}}, M_{	ext{new}
 
 <p>For modern aerospace tracking and satellite flight dynamics, NASA and the International Astronomical Union (IAU) commonly employ the <strong>Modified Julian Date (MJD)</strong>:</p>
 
-$$	ext{MJD} = 	ext{JDN} - 2400000.5$$
+$$\text{MJD} = \text{JDN} - 2400000.5$$
 
-<p>The offset of $0.5$ shifts the start of the astronomical day from noon to midnight UTC, ensuring seamless synchronization with civil solar dates. The duration between any two historical or future events $(t_1, t_2)$ is obtained through exact scalar subtraction: $\Delta t = 	ext{MJD}_2 - 	ext{MJD}_1$, completely circumventing calendar irregularities.</p>
+<p>The offset of $0.5$ shifts the start of the astronomical day from noon to midnight UTC, ensuring seamless synchronization with civil solar dates. The duration between any two historical or future events $(t_1, t_2)$ is obtained through exact scalar subtraction: $\Delta t = \text{MJD}_2 - \text{MJD}_1$, completely circumventing calendar irregularities.</p>
 
 <h2>The Year 2038 Problem (Y2K38) in Computer Systems</h2>
 <p>In software engineering and Unix-like operating systems (including Linux, Android, iOS, and macOS), calendar dates are traditionally stored as the number of elapsed seconds since the Unix Epoch (January 1, 1970 00:00:00 UTC). Systems utilizing legacy <strong>32-bit signed integers</strong> (<code>time_t</code>) possess a maximum positive representable value of $2^{31} - 1 = 2,147,483,647$ seconds.</p>
@@ -407,15 +407,15 @@ $$	ext{MJD} = 	ext{JDN} - 2400000.5$$
     <div class="step-solution">
         <h4>Step 1: Apply 6-Month Addition with Clamping</h4>
         <p>Baseline: August 31, 2026 ($Y=2026, M=8, D=31$).</p>
-        <p>Target Month: $8 + 6 = 14 \implies 14 - 12 = 	ext{Month 2 (February of 2027)}$.</p>
+        <p>Target Month: $8 + 6 = 14 \implies 14 - 12 = \text{Month 2 (February of 2027)}$.</p>
         <p>Year: $2026 + 1 = 2027$.</p>
         <p>Evaluate February 2027: 2027 is not divisible by 4, so February contains 28 days.</p>
         <p>Apply clamping: $\min(31, 28) = 28$.</p>
         <p><strong>Target Protocol Date:</strong> Sunday, February 28, 2027.</p>
 
         <h4>Step 2: Calculate Allowable $\pm 7$ Day Window</h4>
-        <p>Earliest Visit Date: $	ext{Feb 28} - 7 	ext{ days} = 	ext{Sunday, February 21, 2027}$.</p>
-        <p>Latest Visit Date: $	ext{Feb 28} + 7 	ext{ days} = 	ext{Sunday, March 7, 2027}$.</p>
+        <p>Earliest Visit Date: $\text{Feb 28} - 7 \text{ days} = \text{Sunday, February 21, 2027}$.</p>
+        <p>Latest Visit Date: $\text{Feb 28} + 7 \text{ days} = \text{Sunday, March 7, 2027}$.</p>
         <p>Total Allowable Span: 15 inclusive calendar days (Feb 21 through Mar 7, 2027).</p>
     </div>
 </div>
@@ -423,10 +423,39 @@ $$	ext{MJD} = 	ext{JDN} - 2400000.5$$
 <h2>Common Methodological Errors in Date Calculations</h2>
 <ol>
     <li><strong>Naive Thirty-Day Month Multipliers:</strong> Multiplying months by 30 (e.g., assuming 6 months = 180 days) introduces systematic discrepancies. The interval from March 1 to September 1 contains 184 days, whereas the interval from September 1 to March 1 contains only 181 days (or 182 in a leap year). True date math must traverse actual calendar months.</li>
-    <li><strong>Asymmetry in Temporal Reversal:</strong> Adding a month and then subtracting a month does not necessarily return to the original date due to clamping. For example, $	ext{Jan 31} + 1 	ext{ month} = 	ext{Feb 28}$; subsequent subtraction $	ext{Feb 28} - 1 	ext{ month} = 	ext{Jan 28}$, resulting in an irreversible 3-day loss.</li>
+    <li><strong>Asymmetry in Temporal Reversal:</strong> Adding a month and then subtracting a month does not necessarily return to the original date due to clamping. For example, $\text{Jan 31} + 1 \text{ month} = \text{Feb 28}$; subsequent subtraction $\text{Feb 28} - 1 \text{ month} = \text{Jan 28}$, resulting in an irreversible 3-day loss.</li>
     <li><strong>Proleptic Gregorian Calendar Distortion:</strong> Projecting dates prior to October 15, 1582 requires specifying whether calculations utilize the proleptic Gregorian calendar or the historical Julian calendar (which drifted by 10 days at the time of the Gregorian reform).</li>
 </ol>
-                </article>
+                
+      <!-- Contextual Internal Linking: Connected Workflow Solvers -->
+      <section class="related-tools-section" style="margin-top: 2.75rem; padding-top: 1.75rem; border-top: 1px solid var(--border-light, #e2e8f0);">
+        <h2 style="margin-bottom: 0.75rem;">Connected Computational Solvers &amp; Cross-Disciplinary Workflows</h2>
+        <p style="color: var(--text-secondary, #475569); margin-bottom: 1.25rem;">Explore precision analytical companion models and dedicated verification solvers from our <a href="datetime.html">Date & Time Utilities</a> directory for date analysis:</p>
+        <div class="related-tools-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+        <a href="add-days-to-date-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Add Days to Date Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Perform verified calculations and analysis using our precision Add Days to Date Calculator tool.</span>
+        </a>
+        <a href="date-difference-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Date Difference & Business Days Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Perform verified calculations and analysis using our precision Date Difference & Business Days Calculator tool.</span>
+        </a>
+        <a href="add-time-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Add Time Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Perform verified calculations and analysis using our precision Add Time Calculator tool.</span>
+        </a>
+        <a href="business-days-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Business Days Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Calculate the exact number of business working days between two calendar dates.</span>
+        </a>
+        <a href="countdown-calculator.html" class="related-tool-card" style="display: flex; flex-direction: column; padding: 1.1rem; background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <span style="font-weight: 700; color: var(--primary, #2563eb); margin-bottom: 0.35rem;">Countdown Calculator</span>
+          <span style="font-size: 0.85rem; color: var(--text-body, #475569); line-height: 1.45;">Perform verified calculations and analysis using our precision Countdown Calculator tool.</span>
+        </a>
+        </div>
+      </section>
+
+    </article>
             </main>
                                     <!-- Related Category Sidebar -->
       <aside class="post-sidebar">
