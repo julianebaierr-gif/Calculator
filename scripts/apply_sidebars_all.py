@@ -190,6 +190,11 @@ CATEGORIES = {
             ("rl-time-constant-calculator.html", "RL Time Constant (τ = L/R)", "⚡", "Inductor current growth, flyback kickback & magnetic energy"),
             ("zener-diode-calculator.html", "Zener Diode Shunt Regulator", "⚡", "Series resistor Rs, max diode power Pz & load regulation"),
             ("lm317-calculator.html", "LM317 Voltage Regulator", "⚡", "Adjustable linear regulator Vout, R1/R2 feedback & heatsink"),
+            ("pcb-trace-width-calculator.html", "PCB Trace Width (IPC-2152)", "🔌", "Current ampacity, copper weight & temperature rise"),
+            ("lightning-protection-calculator.html", "Lightning Protection (NFPA 780)", "⚡", "Rolling sphere radius, collection area & strike risk"),
+            ("lumen-lux-calculator.html", "Lumen to Lux Illuminance", "💡", "Luminous flux to lux, beam spread & candela"),
+            ("lumen-method-calculator.html", "Lumen Method Fixture Layout", "💡", "IESNA zonal cavity, room cavity ratio & fixture grid"),
+            ("motor-parameters-calculator.html", "Motor Parameters & Slip", "⚙️", "Induction motor slip, synchronous speed & full load torque"),
         ]
     },
     "solar": {
@@ -241,6 +246,9 @@ CATEGORIES = {
             ("torque-converter.html", "Torque Converter Sizing (SAE J643)", "🚗", "Stall torque ratio, speed ratio & K-factor"),
             ("torque-to-hp-calculator.html", "Torque to HP & BMEP Converter", "🏎️", "Brake horsepower, kilowatts & 4-stroke BMEP"),
             ("projectile-motion-calculator.html", "Projectile Motion Trajectory", "🚀", "Apex height, time of flight, range & impact velocity"),
+            ("factor-of-safety-calculator.html", "Factor of Safety (ASME / AISC)", "🛡️", "Yield/ultimate safety margins, MoS & Goodman fatigue"),
+            ("lead-screw-calculator.html", "Lead Screw & Power Screw Torque", "⚙️", "Acme/Trapezoidal lifting torque, self-locking & power"),
+            ("press-fit-calculator.html", "Press Fit & Interference Fits", "🚜", "Lamé thick cylinder pressure, push force & shrink fit"),
         ]
     },
     "civil": {
@@ -431,11 +439,11 @@ def determine_tool_cat(filename):
         return "health"
     if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72", "amortization", "apr-apy", "break-even", "capital-gains", "cd-calculator", "credit-card", "debt-to-income", "down-payment", "emergency-fund", "inflation", "net-salary", "net-worth", "sales-tax", "savings", "markup"]):
         return "finance"
-    if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity", "power-factor", "parallel-resistor", "battery-life", "555-timer", "led-resistor", "capacitive-reactance", "inductive-reactance", "op-amp-gain", "three-phase-power", "adc-dac", "antenna-length", "battery-short-circuit", "bjt-transistor", "breaker-size", "decibel", "earth-pit", "electrical-power", "microstrip", "busbar", "fault-current", "filter", "generator", "heatsink", "copper-cable", "earthing", "kw-to-cable", "single-phase", "three-phase", "wire-gauge", "voltage-divider", "parallel-resistance", "capacitor-energy", "resonant-frequency", "rc-time-constant", "rl-time-constant", "zener-diode", "lm317"]):
+    if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity", "power-factor", "parallel-resistor", "battery-life", "555-timer", "led-resistor", "capacitive-reactance", "inductive-reactance", "op-amp-gain", "three-phase-power", "adc-dac", "antenna-length", "battery-short-circuit", "bjt-transistor", "breaker-size", "decibel", "earth-pit", "electrical-power", "microstrip", "busbar", "fault-current", "filter", "generator", "heatsink", "copper-cable", "earthing", "kw-to-cable", "single-phase", "three-phase", "wire-gauge", "voltage-divider", "parallel-resistance", "capacitor-energy", "resonant-frequency", "rc-time-constant", "rl-time-constant", "zener-diode", "lm317", "pcb-trace-width", "lightning-protection", "lumen-lux", "lumen-method", "motor-parameters"]):
         return "engineering"
     if any(k in f for k in ["solar", "charging", "pv-string", "ev-charging"]):
         return "solar"
-    if any(k in f for k in ["cooling", "pipe", "torque", "pump-head", "gear-ratio", "bolt-torque", "bearing-life", "belt-length", "conveyor-belt", "cutting-speed", "feed-rate", "flywheel", "gear-module", "heat-exchanger", "hvac", "hydraulic-cylinder", "hydraulic-pump", "power-to-torque", "psychrometric", "pulley", "pump-flow", "reynolds-number", "shaft-diameter", "spring-rate", "thermal-expansion", "torque-converter", "torque-to-hp", "projectile"]):
+    if any(k in f for k in ["cooling", "pipe", "torque", "pump-head", "gear-ratio", "bolt-torque", "bearing-life", "belt-length", "conveyor-belt", "cutting-speed", "feed-rate", "flywheel", "gear-module", "heat-exchanger", "hvac", "hydraulic-cylinder", "hydraulic-pump", "power-to-torque", "psychrometric", "pulley", "pump-flow", "reynolds-number", "shaft-diameter", "spring-rate", "thermal-expansion", "torque-converter", "torque-to-hp", "projectile", "factor-of-safety", "lead-screw", "press-fit"]):
         return "mechanical"
     if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt", "rainwater-downpipe", "block", "drywall", "excavation", "flooring", "footing", "gravel", "paint", "roof-pitch", "slab", "slope", "soil", "tile"]):
         return "civil"

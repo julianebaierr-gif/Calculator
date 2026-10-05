@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factor of Safety Calculator - Structural, Yield & Fatigue Design (ASME)</title>
+    <meta name="description" content="Calculate mechanical Factor of Safety (FoS = Yield/Working Stress), Margin of Safety (MoS), Goodman fatigue limit, and structural compliance with ASME/AISC standards.">
+    <link rel="canonical" href="https://calchub.com/factor-of-safety-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Factor of Safety Calculator",
+      "url": "https://calchub.com/factor-of-safety-calculator.html",
+      "description": "Calculates Factor of Safety (FoS), Margin of Safety (MoS), and cyclic fatigue limits using static yield and modified Goodman criteria.",
+      "applicationCategory": "EngineeringApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the difference between Factor of Safety (FoS) and Margin of Safety (MoS)?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Factor of Safety is the ratio of structural capacity (yield or ultimate strength) to applied operational stress: FoS = S_material / sigma_working. Margin of Safety is defined as MoS = FoS - 1 = (S_material / sigma_working) - 1. An MoS > 0 indicates structural adequacy, MoS = 0 represents boundary capacity, and MoS < 0 denotes failure."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Should Factor of Safety be based on Yield Strength or Ultimate Tensile Strength?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For ductile materials (structural steel, aluminum alloys) in machines and buildings, FoS is universally based on Yield Strength (S_y) to prevent permanent plastic deformation. For brittle materials (cast iron, ceramics, concrete) or catastrophic containment vessels, FoS is calculated against Ultimate Tensile Strength (S_ut) using higher safety margins."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the modified Goodman relation for fatigue loading?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Under fluctuating cyclic loading with alternating stress sigma_a and mean tensile stress sigma_m, the modified Goodman criterion determines safety against fatigue failure: (sigma_a / S_e) + (sigma_m / S_ut) = 1 / FoS, where S_e is the endurance limit and S_ut is the ultimate tensile strength."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are typical engineering Factor of Safety values across industries?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Aerospace: 1.25 to 1.50 (mass critical); Automotive: 1.5 to 2.5; Civil structural steel (AISC): 1.67 to 2.0; Boilers and pressure vessels (ASME Section VIII): 3.5 to 4.0; Elevators and wire ropes: 8.0 to 12.0."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="converter.html">Converters</a>
+                <a href="engineering.html">Engineering</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="engineering.html">Engineering</a> &gt; <span>Factor of Safety Calculator (FoS &amp; MoS)</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Factor of Safety Calculator (FoS &amp; MoS)</h1>
+                        <p class="calc-desc">Compute mechanical Factor of Safety (FoS), Margin of Safety (MoS), von Mises yield ratios, and cyclic fatigue endurance limits.</p>
+                    </div>
+                    
+<div class="calc-grid">
+    <div class="calc-input-group">
+        <label for="fos-mode">Failure Criterion Mode:</label>
+        <select id="fos-mode">
+            <option value="yield" selected>Static Yield Strength ($S_y$ - Ductile Materials)</option>
+            <option value="ultimate">Ultimate Tensile Strength ($S_{ut}$ - Brittle / Burst)</option>
+            <option value="fatigue">Cyclic Fatigue (Modified Goodman Criterion)</option>
+        </select>
+    </div>
+    <div class="calc-input-group" id="grp-fos-str">
+        <label for="fos-strength">Material Strength ($S_y$ or $S_{ut}$):</label>
+        <div class="input-with-select">
+            <input type="number" id="fos-strength" value="250" min="0.1" step="any">
+            <select id="fos-str-unit">
+                <option value="1" selected>MPa (N/mm&sup2;)</option>
+                <option value="0.001">GPa</option>
+                <option value="6.894757">ksi</option>
+                <option value="0.006894757">psi</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group" id="grp-fos-work">
+        <label for="fos-working">Applied Working Stress ($\sigma_{	ext{work}}$):</label>
+        <div class="input-with-select">
+            <input type="number" id="fos-working" value="125" min="0.1" step="any">
+            <select id="fos-work-unit">
+                <option value="1" selected>MPa (N/mm&sup2;)</option>
+                <option value="0.001">GPa</option>
+                <option value="6.894757">ksi</option>
+                <option value="0.006894757">psi</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group" id="grp-fos-alt" style="display:none;">
+        <label for="fos-sigma-a">Alternating Stress Amplitude ($\sigma_a$):</label>
+        <div class="input-with-select">
+            <input type="number" id="fos-sigma-a" value="50" min="0" step="any">
+            <select id="fos-sigma-a-unit">
+                <option value="1" selected>MPa</option>
+                <option value="6.894757">ksi</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group" id="grp-fos-end" style="display:none;">
+        <label for="fos-se">Endurance Limit ($S_e$):</label>
+        <div class="input-with-select">
+            <input type="number" id="fos-se" value="150" min="0.1" step="any">
+            <select id="fos-se-unit">
+                <option value="1" selected>MPa</option>
+                <option value="6.894757">ksi</option>
+            </select>
+        </div>
+    </div>
+</div>
+<button id="calc-fos-btn" class="calc-btn">Calculate Safety Margin</button>
+<div class="calc-results-card" id="fos-results">
+    <h3>Structural Adequacy &amp; Safety Factors</h3>
+    <div class="result-row highlight-result">
+        <span class="result-label">Factor of Safety ($	ext{FoS}$):</span>
+        <span class="result-val" id="res-fos-val">2.000</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Margin of Safety ($	ext{MoS} = 	ext{FoS} - 1$):</span>
+        <span class="result-val" id="res-fos-mos">+1.000 (+100.0%)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Structural Integrity Assessment:</span>
+        <span class="result-val" id="res-fos-status" style="color:#16a34a; font-weight:700;">SAFE &amp; ADEQUATE</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Allowable Working Capacity Utilization:</span>
+        <span class="result-val" id="res-fos-util">50.0%</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Industry Benchmark Comparison:</span>
+        <span class="result-val" id="res-fos-benchmark">Meets Standard Machinery (1.5 &ndash; 2.5)</span>
+    </div>
+</div>
+
+                </div>
+                <article class="article-body">
+                    
+<h2>Foundations of Structural Reliability and Safety Margins in Mechanical Design</h2>
+<p>In mechanical, structural, and aerospace engineering, physical structures are subjected to variable operational loads, environmental degradation, geometric manufacturing tolerances, and intrinsic material microscopic variances. The <strong>Factor of Safety ($\text{FoS}$)</strong>, frequently denoted as $N$ or $\text{SF}$, is the dimensionless ratio of a structural component's ultimate capacity or material resistance limit to the maximum anticipated working load or operational stress.</p>
+
+<p>A properly evaluated Factor of Safety ensures that unexpected load surges, stress concentrations, dynamic vibration shocks, or minor metallurgical inclusions do not induce catastrophic rupture or permanent plastic deformation during the intended design service life. The fundamental mathematical expression is formulated as:</p>
+$$\text{FoS} = \frac{\text{Failure Criterion Material Capacity}}{\text{Operational Working Stress}} = \frac{S_{\text{material}}}{\sigma_{\text{working}}}$$
+
+<h2>Factor of Safety ($\text{FoS}$) vs Margin of Safety ($\text{MoS}$)</h2>
+<p>While consumer engineering frequently references Factor of Safety, aerospace organizations (NASA, ESA, FAA, DoD) mandate the use of the <strong>Margin of Safety ($\text{MoS}$ or $\text{MS}$)</strong> to quantify excess load-bearing capacity above regulatory certification requirements:</p>
+$$\text{MoS} = \frac{\text{Allowable Load / Stress}}{(\text{Design Load / Stress}) \times \text{FoS}_{\text{required}}} - 1 = \frac{\text{FoS}_{\text{actual}}}{\text{FoS}_{\text{required}}} - 1$$
+
+<p>When the required factor of safety is standardized to unity ($\text{FoS}_{\text{req}} = 1.0$), the definition simplifies directly to:</p>
+$$\text{MoS} = \text{FoS}_{\text{actual}} - 1$$
+
+<p>The interpretation of Margin of Safety values across formal structural validation audits follows rigid criteria:</p>
+<ul>
+    <li><strong>$\text{MoS} > 0$ (Positive Margin):</strong> The structure possesses adequate excess strength. For example, an $\text{MoS} = +0.25$ indicates the component can carry $25\%$ more load than its regulatory maximum design limit.</li>
+    <li><strong>$\text{MoS} = 0.0$ (Zero Margin):</strong> The component is operating exactly at its ultimate structural boundary. While theoretically compliant, zero margin offers zero tolerance for manufacturing anomalies.</li>
+    <li><strong>$\text{MoS} < 0$ (Negative Margin):</strong> The structure is non-compliant, unsafe, and will experience yield deformation or catastrophic rupture under design conditions.</li>
+</ul>
+
+<h2>Failure Theories: Ductile vs Brittle Material Criteria</h2>
+<p>Selecting the appropriate material strength parameter ($S_{\text{material}}$) depends on material ductility, crystalline microstructure, and operational failure mode:</p>
+
+<h3>1. Ductile Materials (Elongation $\ge 5\%$): Static Yield Criterion ($S_y$)</h3>
+<p>For ductile metals (mild structural steel, austenitic stainless steel, 6061-T6 aluminum, titanium alloys), failure is defined as the onset of irreversible plastic yielding. Designers evaluate safety against the material's <strong>Yield Strength ($S_y$)</strong> using multi-axial stress invariants:</p>
+$$\text{FoS}_{\text{yield}} = \frac{S_y}{\sigma_{\text{von Mises}}}$$
+
+<p>Where $\sigma_{\text{von Mises}}$ is the equivalent distortional energy stress combining triaxial principle stresses ($\sigma_1, \sigma_2, \sigma_3$):</p>
+$$\sigma_{\text{von Mises}} = \sqrt{\frac{1}{2} [(\sigma_1 - \sigma_2)^2 + (\sigma_2 - \sigma_3)^2 + (\sigma_3 - \sigma_1)^2]}$$
+
+<h3>2. Brittle Materials (Elongation $< 5\%$): Ultimate Strength ($S_{ut}$)</h3>
+<p>Brittle materials (gray cast iron, structural ceramics, unreinforced concrete, tooling steels) do not yield plastically; instead, microcracks propagate catastrophically into cleavage fracture. For brittle elements, safety is calculated against <strong>Ultimate Tensile Strength ($S_{ut}$)</strong> or Ultimate Compressive Strength ($S_{uc}$) using the Maximum Normal Stress Theory (Rankine) or Modified Mohr criteria:</p>
+$$\text{FoS}_{\text{ultimate}} = \frac{S_{ut}}{\sigma_1} \quad (\text{where } \sigma_1 \text{ is maximum principal tensile stress})$$
+
+<h2>Cyclic Fatigue Failure: Modified Goodman and Soderberg Criteria</h2>
+<p>Over $80\%$ of all real-world mechanical machine failures occur due to progressive cyclic fatigue at stress levels far below static yield strength. Fluctuating loads exhibit an alternating stress amplitude ($\sigma_a$) superimposed onto a non-zero mean static stress ($\sigma_m$):</p>
+$$\sigma_a = \frac{\sigma_{\text{max}} - \sigma_{\text{min}}}{2}, \qquad \sigma_m = \frac{\sigma_{\text{max}} + \sigma_{\text{min}}}{2}$$
+
+<p>The <strong>Modified Goodman Criterion</strong> provides the most reliable conservative estimate for infinite fatigue life across ductile engineering alloys:</p>
+$$\frac{\sigma_a}{S_e} + \frac{\sigma_m}{S_{ut}} = \frac{1}{\text{FoS}}$$
+
+<p>Where $S_e$ is the endurance limit (fatigue limit) of the material modified by Marin surface finish, size, and reliability factors. The stricter <strong>Soderberg Criterion</strong> substitutes yield strength $S_y$ for ultimate strength $S_{ut}$ to eliminate any local yielding under peak cycles:</p>
+$$\frac{\sigma_a}{S_e} + \frac{\sigma_m}{S_y} = \frac{1}{\text{FoS}_{\text{Soderberg}}}$$
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Engineering Industry / Sector</th>
+            <th>Governing Standard</th>
+            <th>Typical Factor of Safety ($\text{FoS}$)</th>
+            <th>Primary Engineering Rationale</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Aerospace Airframes &amp; Spacecraft</strong></td>
+            <td>FAA FAR 25 / NASA-STD-5001</td>
+            <td>$1.25\text{--}1.50$ (Yield: 1.1; Ult: 1.5)</td>
+            <td>Extreme mass sensitivity; rigorous non-destructive inspection</td>
+        </tr>
+        <tr>
+            <td><strong>Civil Structural Building Steel</strong></td>
+            <td>AISC 360 / Eurocode 3</td>
+            <td>$1.67\text{--}2.00$</td>
+            <td>Wind gusts, live occupancy variances, seismic dampening</td>
+        </tr>
+        <tr>
+            <td><strong>Automotive Powertrain &amp; Chassis</strong></td>
+            <td>SAE J429 / ISO 26262</td>
+            <td>$1.50\text{--}2.50$</td>
+            <td>Road surface shock impacts, fatigue life over 150k miles</td>
+        </tr>
+        <tr>
+            <td><strong>Pressure Vessels &amp; Boilers</strong></td>
+            <td>ASME Section VIII Div 1</td>
+            <td>$3.50\text{--}4.00$</td>
+            <td>Lethal pneumatic/steam expansion hazards, corrosion thinning</td>
+        </tr>
+        <tr>
+            <td><strong>Passenger Elevators &amp; Hoists</strong></td>
+            <td>ASME A17.1 / EN 81</td>
+            <td>$8.00\text{--}12.00$</td>
+            <td>Direct life-safety critical cable bending fatigue and sudden stops</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="worked-example-card">
+    <h4>Step-by-Step Engineering Case Study: Hydraulic Excavator Pin Sizing</h4>
+    <p><strong>Scenario:</strong> A main boom joint on a hydraulic excavator utilizes a solid cylindrical pivot pin fabricated from quenched and tempered 4140 alloy steel ($S_y = 655\ \text{MPa}$, $S_{ut} = 850\ \text{MPa}$). Peak operating loads generate a maximum calculated von Mises bending plus shear stress of $\sigma_{\text{work}} = 260\ \text{MPa}$. The mining equipment design specification mandates a minimum Factor of Safety of $\text{FoS}_{\text{req}} = 2.0$.</p>
+    <div class="step-solution">
+        <p><strong>Step 1: Calculate Actual Factor of Safety against Yield ($\text{FoS}_{\text{actual}}$):</strong></p>
+        $$\text{FoS}_{\text{actual}} = \frac{S_y}{\sigma_{\text{work}}} = \frac{655\ \text{MPa}}{260\ \text{MPa}} = 2.519$$
+        <p><strong>Step 2: Calculate Margin of Safety ($\text{MoS}$) relative to Requirement:</strong></p>
+        $$\text{MoS} = \frac{\text{FoS}_{\text{actual}}}{\text{FoS}_{\text{req}}} - 1 = \frac{2.519}{2.00} - 1 = 1.2595 - 1 = +0.2595\ (+26.0\%)$$
+        <p><strong>Step 3: Evaluate Cyclic Fatigue under Fluctuating Load:</strong></p>
+        <p>If cyclic digging loads induce alternating stress $\sigma_a = 90\ \text{MPa}$ with mean stress $\sigma_m = 170\ \text{MPa}$, and pin polished endurance limit is $S_e = 310\ \text{MPa}$:</p>
+        $$\frac{1}{\text{FoS}_{\text{fatigue}}} = \frac{\sigma_a}{S_e} + \frac{\sigma_m}{S_{ut}} = \frac{90\ \text{MPa}}{310\ \text{MPa}} + \frac{170\ \text{MPa}}{850\ \text{MPa}} = 0.2903 + 0.2000 = 0.4903$$
+        $$\text{FoS}_{\text{fatigue}} = \frac{1}{0.4903} = 2.039$$
+        <p><strong>Conclusion:</strong> The design achieves a static $\text{FoS} = 2.52$ ($\text{MoS} = +26\%$) and a cyclic fatigue $\text{FoS} = 2.04$, comfortably satisfying the client requirement of $2.0$ across all operational states.</p>
+    </div>
+</div>
+
+<h2>Frequently Asked Questions (FAQ)</h2>
+<div class="faq-section">
+    <h3>What is the difference between Factor of Safety ($\text{FoS}$) and Margin of Safety ($\text{MoS}$)?</h3>
+    <p>Factor of Safety is the ratio of structural capacity (yield or ultimate strength) to applied operational stress: $\text{FoS} = S_{\text{material}} / \sigma_{\text{working}}$. Margin of Safety is defined as $\text{MoS} = \text{FoS} - 1 = (S_{\text{material}} / \sigma_{\text{working}}) - 1$. An $\text{MoS} > 0$ indicates structural adequacy, $\text{MoS} = 0$ represents boundary capacity, and $\text{MoS} < 0$ denotes failure.</p>
+
+    <h3>Should Factor of Safety be based on Yield Strength or Ultimate Tensile Strength?</h3>
+    <p>For ductile materials (structural steel, aluminum alloys) in machines and buildings, $\text{FoS}$ is universally based on Yield Strength ($S_y$) to prevent permanent plastic deformation. For brittle materials (cast iron, ceramics, concrete) or catastrophic containment vessels, $\text{FoS}$ is calculated against Ultimate Tensile Strength ($S_{ut}$) using higher safety margins.</p>
+
+    <h3>What is the modified Goodman relation for fatigue loading?</h3>
+    <p>Under fluctuating cyclic loading with alternating stress $\sigma_a$ and mean tensile stress $\sigma_m$, the modified Goodman criterion determines safety against fatigue failure: $\frac{\sigma_a}{S_e} + \frac{\sigma_m}{S_{ut}} = \frac{1}{\text{FoS}}$, where $S_e$ is the endurance limit and $S_{ut}$ is the ultimate tensile strength.</p>
+
+    <h3>What are typical engineering Factor of Safety values across industries?</h3>
+    <p>Aerospace: $1.25$ to $1.50$ (mass critical); Automotive: $1.5$ to $2.5$; Civil structural steel (AISC): $1.67$ to $2.0$; Boilers and pressure vessels (ASME Section VIII): $3.5$ to $4.0$; Elevators and wire ropes: $8.0$ to $12.0$.</p>
+</div>
+
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚙️</span>
+            <h3 class="widget-title">Related Mechanical & HVAC</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bolt-torque-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Bolt Torque & Preload</a></li>
+            <li><a href="bearing-life-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Bearing Life (ISO 281)</a></li>
+            <li><a href="pump-head-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pump Head (TDH & Flow)</a></li>
+            <li><a href="gear-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Gear Ratio & Speed</a></li>
+            <li><a href="cooling-load-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cooling Load (HVAC) Sizing</a></li>
+            <li><a href="pipe-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pipe Sizing & Water Flow</a></li>
+            <li><a href="torque-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Torque & Shaft Power</a></li>
+            <li><a href="belt-length-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Belt Length (Open & Crossed Pulley)</a></li>
+            <li><a href="conveyor-belt-speed-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Conveyor Belt Speed & Tonnage</a></li>
+            <li><a href="cutting-speed-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cutting Speed & Spindle RPM</a></li>
+            <li><a href="feed-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> CNC Feed Rate & Chip Load</a></li>
+            <li><a href="flywheel-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Flywheel Kinetic Energy & Stress</a></li>
+            <li><a href="gear-module-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Gear Module & Pitch Geometry</a></li>
+            <li><a href="heat-exchanger-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heat Exchanger (LMTD & NTU Area)</a></li>
+            <li><a href="hvac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> HVAC Sizing & Cooling Tonnage</a></li>
+            <li><a href="hydraulic-cylinder-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Hydraulic Cylinder Sizing (ISO 6020)</a></li>
+            <li><a href="hydraulic-cylinder-force-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Hydraulic Cylinder Net Force (ISO 3320)</a></li>
+            <li><a href="hydraulic-cylinder-speed-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Hydraulic Cylinder Speed & Flow</a></li>
+            <li><a href="hydraulic-pump-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Hydraulic Pump Power (ISO 4409)</a></li>
+            <li><a href="power-to-torque-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Power to Torque & Shaft Sizing</a></li>
+            <li><a href="psychrometric-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Psychrometric & Moist Air (ASHRAE)</a></li>
+            <li><a href="pulley-mechanical-advantage-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pulley Mechanical Advantage (CMAA 70)</a></li>
+            <li><a href="pulley-rpm-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pulley RPM & Belt Speed (ISO 5296)</a></li>
+            <li><a href="pump-flow-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pump Flow Rate & Velocity</a></li>
+            <li><a href="reynolds-number-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Reynolds Number (Moody & Swamee-Jain)</a></li>
+            <li><a href="shaft-diameter-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Shaft Diameter (ASME B106.1M)</a></li>
+            <li><a href="spring-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Helical Spring Rate (SMI / ASTM A228)</a></li>
+            <li><a href="thermal-expansion-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Thermal Expansion & Pipe Stress</a></li>
+            <li><a href="torque-converter.html" class="sidebar-link-item"><span class="link-bullet">›</span> Torque Converter Sizing (SAE J643)</a></li>
+            <li><a href="torque-to-hp-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Torque to HP & BMEP Converter</a></li>
+            <li><a href="projectile-motion-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Projectile Motion Trajectory</a></li>
+            <li><a href="factor-of-safety-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Factor of Safety (ASME / AISC)</a></li>
+            <li><a href="lead-screw-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lead Screw & Power Screw Torque</a></li>
+            <li><a href="press-fit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Press Fit & Interference Fits</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="mechanical.html" class="sidebar-category-link">View All Mechanical & HVAC Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub provides free, rigorous, engineering-grade calculators, physics simulation utilities, and structural models verified against international standards (IPC, ASME, IEEE, ISO).</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Calculator Hubs</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                        <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Engineering Tools</h4>
+                    <ul class="footer-links">
+                        <li><a href="pcb-trace-width-calculator.html">PCB Trace Sizing (IPC-2152)</a></li>
+                        <li><a href="factor-of-safety-calculator.html">Factor of Safety (ASME)</a></li>
+                        <li><a href="microstrip-impedance-calculator.html">Microstrip Impedance</a></li>
+                        <li><a href="stress-strain-calculator.html">Stress &amp; Strain Analysis</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precision computational tools for design engineers and physical scientists.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+    
+function updateFosMode() {
+    var mode = document.getElementById('fos-mode').value;
+    var isFatigue = (mode === 'fatigue');
+    document.getElementById('grp-fos-alt').style.display = isFatigue ? 'block' : 'none';
+    document.getElementById('grp-fos-end').style.display = isFatigue ? 'block' : 'none';
+    if (isFatigue) {
+        document.querySelector('#grp-fos-str label').textContent = "Ultimate Tensile Strength (S_ut):";
+        document.querySelector('#grp-fos-work label').textContent = "Mean Static Stress (σ_m):";
+    } else if (mode === 'ultimate') {
+        document.querySelector('#grp-fos-str label').textContent = "Ultimate Tensile Strength (S_ut):";
+        document.querySelector('#grp-fos-work label').textContent = "Working Peak Stress (σ_work):";
+    } else {
+        document.querySelector('#grp-fos-str label').textContent = "Material Yield Strength (S_y):";
+        document.querySelector('#grp-fos-work label').textContent = "Applied Working Stress (σ_work):";
+    }
+}
+
+function computeFos() {
+    var mode = document.getElementById('fos-mode').value;
+    var sVal = parseFloat(document.getElementById('fos-strength').value);
+    var sUnit = parseFloat(document.getElementById('fos-str-unit').value);
+    var wVal = parseFloat(document.getElementById('fos-working').value);
+    var wUnit = parseFloat(document.getElementById('fos-work-unit').value);
+
+    if (isNaN(sVal) || sVal <= 0 || isNaN(wVal) || wVal <= 0) return;
+
+    var S = sVal * sUnit; // MPa
+    var sigma_w = wVal * wUnit; // MPa
+    var fos = 0;
+
+    if (mode === 'fatigue') {
+        var saVal = parseFloat(document.getElementById('fos-sigma-a').value);
+        var saUnit = parseFloat(document.getElementById('fos-sigma-a-unit').value);
+        var seVal = parseFloat(document.getElementById('fos-se').value);
+        var seUnit = parseFloat(document.getElementById('fos-se-unit').value);
+
+        var sigma_a = (isNaN(saVal) || saVal < 0) ? 0 : saVal * saUnit;
+        var Se = (isNaN(seVal) || seVal <= 0) ? 100 : seVal * seUnit;
+
+        // Modified Goodman: (sigma_a / Se) + (sigma_m / Sut) = 1 / FoS
+        var goodmanSum = (sigma_a / Se) + (sigma_w / S);
+        if (goodmanSum <= 0) return;
+        fos = 1.0 / goodmanSum;
+    } else {
+        // Static Yield or Ultimate
+        fos = S / sigma_w;
+    }
+
+    var mos = fos - 1.0;
+    var util = (1.0 / fos) * 100.0;
+
+    document.getElementById('res-fos-val').textContent = fos.toFixed(3);
+
+    var mosStr = (mos >= 0 ? "+" : "") + mos.toFixed(3) + " (" + (mos >= 0 ? "+" : "") + (mos * 100).toFixed(1) + "%)";
+    document.getElementById('res-fos-mos').textContent = mosStr;
+
+    var statusEl = document.getElementById('res-fos-status');
+    if (fos >= 1.5) {
+        statusEl.textContent = "SAFE & ADEQUATE (FoS ≥ 1.5)";
+        statusEl.style.color = "#16a34a";
+    } else if (fos >= 1.0) {
+        statusEl.textContent = "MARGINAL (1.0 ≤ FoS < 1.5) - Verify Standards";
+        statusEl.style.color = "#d97706";
+    } else {
+        statusEl.textContent = "CRITICAL: STRUCTURAL FAILURE PREDICTED (FoS < 1.0)";
+        statusEl.style.color = "#dc2626";
+    }
+
+    document.getElementById('res-fos-util').textContent = util.toFixed(1) + "%";
+
+    // Industry benchmark
+    var benchEl = document.getElementById('res-fos-benchmark');
+    if (fos >= 8.0) {
+        benchEl.textContent = "Elevators & Overhead Rigging (8.0 – 12.0)";
+    } else if (fos >= 3.5) {
+        benchEl.textContent = "ASME Boiler & Pressure Vessels (3.5 – 4.0)";
+    } else if (fos >= 2.0) {
+        benchEl.textContent = "General Machinery & Heavy Equipment (2.0 – 2.5)";
+    } else if (fos >= 1.5) {
+        benchEl.textContent = "AISC Structural & Civil Building Frame (1.67 – 2.0)";
+    } else if (fos >= 1.25) {
+        benchEl.textContent = "Aerospace & Mass-Critical Structures (1.25 – 1.5)";
+    } else {
+        benchEl.textContent = "Below Standard Engineering Minimums (< 1.25)";
+    }
+}
+
+document.getElementById('fos-mode').addEventListener('change', function() {
+    updateFosMode();
+    computeFos();
+});
+document.getElementById('calc-fos-btn').addEventListener('click', computeFos);
+['fos-strength', 'fos-str-unit', 'fos-working', 'fos-work-unit', 'fos-sigma-a', 'fos-sigma-a-unit', 'fos-se', 'fos-se-unit'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', computeFos);
+    document.getElementById(id).addEventListener('change', computeFos);
+});
+window.addEventListener('DOMContentLoaded', function() {
+    updateFosMode();
+    computeFos();
+});
+
+    </script>
+</body>
+</html>

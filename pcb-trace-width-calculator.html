@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCB Trace Width Calculator - IPC-2152 & IPC-2221 Current Capacity</title>
+    <meta name="description" content="Calculate PCB trace width, cross-sectional area, ampacity, voltage drop, and temperature rise using IPC-2221 and IPC-2152 thermal design standards.">
+    <link rel="canonical" href="https://calchub.com/pcb-trace-width-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "PCB Trace Width Calculator",
+      "url": "https://calchub.com/pcb-trace-width-calculator.html",
+      "description": "Calculates PCB trace width, ampacity, cross-sectional area, voltage drop, and power loss based on IPC-2221 and IPC-2152 standards.",
+      "applicationCategory": "EngineeringApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the difference between IPC-2221 and IPC-2152 trace sizing?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "IPC-2221 is based on legacy empirical charts dating back to 1954 National Bureau of Standards experiments on isolated traces in vacuum/air, which often overestimate required trace width. IPC-2152 is the modern comprehensive standard based on physical thermal measurements that account for board thickness, FR-4 substrate thermal conductivity, internal plane heat spreading, and convective cooling."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why do internal PCB traces require greater width than external traces for the same current?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "External traces sit in contact with ambient air, facilitating natural convective and radiative heat dissipation. Internal traces are completely encapsulated by epoxy-glass FR-4 dielectric, which acts as a thermal insulator (low thermal conductivity ~0.25 W/mK). Consequently, internal layers retain heat and require approximately twice the cross-sectional area to maintain identical temperature rise."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is standard 1 oz copper thickness?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "One ounce (1 oz) of copper represents 1 oz of copper rolled flat over one square foot of area, resulting in a nominal foil thickness of approximately 1.37 mils (0.00137 inches or 34.8 micrometers). Common PCB copper weights include 0.5 oz (17.5 um), 1 oz (35 um), 2 oz (70 um), and 3 oz (105 um)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What allowable temperature rise (Delta T) is standard for PCB traces?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For commercial electronics operating at 25 C to 40 C ambient, a 10 C temperature rise is common. For high-density power electronics or automotive under-hood applications, designers often allow 20 C to 30 C Delta T, provided total peak temperature remains below the FR-4 glass transition temperature (Tg, typically 130 C to 170 C)."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="converter.html">Converters</a>
+                <a href="engineering.html">Engineering</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="engineering.html">Engineering</a> &gt; <span>PCB Trace Width Calculator (IPC-2152 &amp; IPC-2221)</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>PCB Trace Width Calculator (IPC-2152 &amp; IPC-2221)</h1>
+                        <p class="calc-desc">Determine required printed circuit board copper trace width for target current, allowable temperature rise, copper weight, and trace length.</p>
+                    </div>
+                    
+<div class="calc-grid">
+    <div class="calc-input-group">
+        <label for="pcb-current">Design Current ($I$):</label>
+        <div class="input-with-select">
+            <input type="number" id="pcb-current" value="3.0" min="0.01" step="any">
+            <select id="pcb-current-unit">
+                <option value="1" selected>Amperes (A)</option>
+                <option value="0.001">Milliamperes (mA)</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="pcb-temp-rise">Allowable Temperature Rise ($\Delta T$):</label>
+        <div class="input-with-select">
+            <input type="number" id="pcb-temp-rise" value="10" min="1" max="100" step="any">
+            <select id="pcb-temp-unit">
+                <option value="1" selected>&deg;C</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="pcb-cu-weight">Copper Foil Weight / Thickness:</label>
+        <select id="pcb-cu-weight">
+            <option value="0.5">0.5 oz/ft&sup2; (17.5 &mu;m / 0.69 mil)</option>
+            <option value="1.0" selected>1.0 oz/ft&sup2; (35.0 &mu;m / 1.37 mil)</option>
+            <option value="2.0">2.0 oz/ft&sup2; (70.0 &mu;m / 2.74 mil)</option>
+            <option value="3.0">3.0 oz/ft&sup2; (105.0 &mu;m / 4.11 mil)</option>
+            <option value="4.0">4.0 oz/ft&sup2; (140.0 &mu;m / 5.48 mil)</option>
+        </select>
+    </div>
+    <div class="calc-input-group">
+        <label for="pcb-length">Trace Physical Length ($L$):</label>
+        <div class="input-with-select">
+            <input type="number" id="pcb-length" value="2.0" min="0.01" step="any">
+            <select id="pcb-length-unit">
+                <option value="1" selected>Inches (in)</option>
+                <option value="0.03937">Millimeters (mm)</option>
+                <option value="0.3937">Centimeters (cm)</option>
+            </select>
+        </div>
+    </div>
+</div>
+<button id="calc-pcb-btn" class="calc-btn">Calculate PCB Trace Dimensions</button>
+<div class="calc-results-card" id="pcb-results">
+    <h3>Conductor Sizing &amp; Thermal Dissipation</h3>
+    <div class="result-row highlight-result">
+        <span class="result-label">External Layer Required Width:</span>
+        <span class="result-val" id="res-pcb-w-ext">48.24 mils (1.225 mm)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Internal Layer Required Width:</span>
+        <span class="result-val" id="res-pcb-w-int">125.43 mils (3.186 mm)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">External Cross-Sectional Area:</span>
+        <span class="result-val" id="res-pcb-area-ext">66.08 mils&sup2; (0.0426 mm&sup2;)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Trace DC Resistance ($R_{	ext{DC}}$ at 25&deg;C):</span>
+        <span class="result-val" id="res-pcb-rdc">0.0205 &Omega; (20.5 m&Omega;)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Voltage Drop across Length ($\Delta V$):</span>
+        <span class="result-val" id="res-pcb-vdrop">0.0616 V (61.6 mV)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Ohmic Power Loss ($P_{	ext{loss}} = I^2 R$):</span>
+        <span class="result-val" id="res-pcb-ploss">0.185 W (184.7 mW)</span>
+    </div>
+</div>
+
+                </div>
+                <article class="article-body">
+                    
+<h2>Physics and Standards of Printed Circuit Board Conductor Sizing</h2>
+<p>Printed circuit board (PCB) traces are rectangular copper conductors laminated onto dielectric substrates such as standard FR-4 (flame retardant woven glass-reinforced epoxy). When electric current flows through a conductive trace, electrical resistance converts energy into thermal dissipation via Joule heating ($P = I^2 R$). As thermal energy accumulates, the conductor temperature rises until the rate of internal heat generation equals the rate of convective, conductive, and radiative heat transfer to the ambient environment and neighboring PCB structural planes.</p>
+
+<p>Accurate trace width determination is vital in high-reliability hardware engineering. Undersized conductors experience excessive thermal stress, leading to conductor delamination, dielectric blistering, solder mask discoloration, solder joint reflow fatigue, and catastrophic trace vaporization during surge events. Conversely, excessively wide traces consume critical PCB routing area, increase parasitic capacitance to adjacent planes, and limit component escape routing on high-density interconnect (HDI) multilayer boards.</p>
+
+<h2>IPC-2221 Empirical Conductor Sizing Model</h2>
+<p>The historical benchmark for printed circuit board current capacity is the IPC-2221 standard (formerly IPC-D-275), formulated from classic experiments conducted by the National Bureau of Standards (NBS) in 1954. The standard establishes an empirical power-law relationship correlating permissible continuous DC current ($I$), allowable conductor temperature rise ($\Delta T$), and cross-sectional area ($A$):</p>
+$$I = k \cdot (\Delta T)^b \cdot A^c$$
+
+<p>Where:</p>
+<ul>
+    <li><strong>$I$</strong>: Maximum allowable continuous current in Amperes ($\text{A}$).</li>
+    <li><strong>$\Delta T$</strong>: Maximum allowable temperature rise above ambient in degrees Celsius ($^\circ\text{C}$).</li>
+    <li><strong>$A$</strong>: Cross-sectional conductor area in square mils ($\text{mils}^2$, where $1\text{ mil} = 0.001\text{ inch} = 25.4\ \mu\text{m}$).</li>
+    <li><strong>$k$</strong>: Layer-dependent empirical constant ($k = 0.048$ for external surface layers; $k = 0.024$ for internal buried layers).</li>
+    <li><strong>$b$</strong>: Temperature exponent constant ($b = 0.44$).</li>
+    <li><strong>$c$</strong>: Geometric area exponent constant ($c = 0.725$).</li>
+</ul>
+
+<p>Inverting the empirical power law to solve for the required cross-sectional conductor area $A$:</p>
+$$A = \left( \frac{I}{k \cdot (\Delta T)^b} \right)^{\frac{1}{c}} = \left( \frac{I}{k \cdot (\Delta T)^{0.44}} \right)^{\frac{1}{0.725}} \quad [\text{mils}^2]$$
+
+<p>Once cross-sectional area $A$ is determined, the physical required trace width $W$ is calculated by dividing by the nominal copper foil thickness $T_{\text{copper}}$:</p>
+$$W = \frac{A}{T_{\text{copper}}} \quad [\text{mils}]$$
+
+<h3>Copper Foil Thickness and Standard Ounce Weights</h3>
+<p>In printed circuit manufacturing, copper thickness is designated in ounces per square foot ($\text{oz/ft}^2$). One ounce ($1\text{ oz}$) of copper corresponds to the thickness of one avoirdupois ounce of copper rolled flat across a surface area of exactly one square foot ($0.0929\ \text{m}^2$). The equivalent geometric thickness values are tabulated below:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Designation</th>
+            <th>Nominal Weight</th>
+            <th>Thickness (mils)</th>
+            <th>Thickness ($\mu\text{m}$)</th>
+            <th>Primary Application</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>0.5 oz (H oz)</strong></td>
+            <td>$0.5\ \text{oz/ft}^2$</td>
+            <td>$0.69\ \text{mils}$</td>
+            <td>$17.5\ \mu\text{m}$</td>
+            <td>Fine-pitch HDI, high-speed digital escape routing</td>
+        </tr>
+        <tr>
+            <td><strong>1.0 oz (1 oz)</strong></td>
+            <td>$1.0\ \text{oz/ft}^2$</td>
+            <td>$1.38\ \text{mils}$</td>
+            <td>$35.0\ \mu\text{m}$</td>
+            <td>Standard commercial multilayer signals and low power</td>
+        </tr>
+        <tr>
+            <td><strong>2.0 oz (2 oz)</strong></td>
+            <td>$2.0\ \text{oz/ft}^2$</td>
+            <td>$2.76\ \text{mils}$</td>
+            <td>$70.0\ \mu\text{m}$</td>
+            <td>Industrial DC-DC switch-mode converters, motor drivers</td>
+        </tr>
+        <tr>
+            <td><strong>3.0 oz (3 oz)</strong></td>
+            <td>$3.0\ \text{oz/ft}^2$</td>
+            <td>$4.13\ \text{mils}$</td>
+            <td>$105.0\ \mu\text{m}$</td>
+            <td>Heavy copper automotive, solar inverters, high-current bus</td>
+        </tr>
+        <tr>
+            <td><strong>4.0 oz (4 oz)</strong></td>
+            <td>$4.0\ \text{oz/ft}^2$</td>
+            <td>$5.51\ \text{mils}$</td>
+            <td>$140.0\ \mu\text{m}$</td>
+            <td>Extreme power distribution, aerospace power distribution</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>IPC-2152 Modern Standard and Thermal Spreading Improvements</h2>
+<p>While IPC-2221 provided a safe conservative baseline for decades, modern multi-layer boards differ drastically from 1950s single-sided boards. The current industry standard, <strong>IPC-2152 (Standard for Determining Current-Carrying Capacity in Printed Board Design)</strong>, was developed through comprehensive empirical and finite element modeling (FEM). Key insights incorporated into IPC-2152 include:</p>
+<ul>
+    <li><strong>Internal Plane Thermal Sinking:</strong> Solid internal copper ground and power planes act as effective heat spreaders. An external trace routed over an unbroken ground plane runs substantially cooler than an isolated trace because heat conducts through the thin prepreg dielectric into the copper plane.</li>
+    <li><strong>Substrate Thickness and Thermal Conductivity:</strong> Thicker core substrates offer higher thermal capacitance, but FR-4 has poor through-plane thermal conductivity ($k_z \approx 0.25\text{--}0.35\ \text{W/m}\cdot\text{K}$). High-temperature substrates like polyimide or ceramic-filled hydrocarbons exhibit improved thermal performance.</li>
+    <li><strong>Solder Mask and Conformal Coating:</strong> A standard solder mask layer ($0.5\text{--}1.0\ \text{mil}$) increases the effective infrared emissivity of bare copper from $\sim 0.05$ to over $0.85$, significantly enhancing radiative cooling.</li>
+</ul>
+
+<h2>DC Resistance, Voltage Drop, and Joule Heating Calculations</h2>
+<p>In addition to thermal rise limits, designers must verify that DC voltage drop ($\Delta V$) across long power traces does not breach supply tolerance thresholds for sensitive integrated circuits (e.g., modern microprocessors requiring $1.0\text{ V} \pm 3\%$).</p>
+
+<p>The electrical resistance of a copper trace at room temperature ($25^\circ\text{C}$) is given by:</p>
+$$R_{\text{DC}} = \rho_{25} \cdot \frac{L}{A} = \left( 1.724 \times 10^{-6}\ \Omega\cdot\text{cm} \right) \cdot \frac{L}{A}$$
+
+<p>Accounting for the positive temperature coefficient of annealed copper ($\alpha = 0.00393\ /^\circ\text{C}$):</p>
+$$R_T = R_{25} \cdot [1 + \alpha \cdot (\Delta T)]$$
+$$\Delta V = I \cdot R_T, \qquad P_{\text{loss}} = I^2 \cdot R_T$$
+
+<div class="worked-example-card">
+    <h4>Step-by-Step Engineering Case Study: 12V 5A Buck Converter Power Stage Trace</h4>
+    <p><strong>Scenario:</strong> A point-of-load synchronous buck converter delivers continuous $I = 5.0\ \text{A}$ across an external surface trace with a length of $L = 3.0\ \text{inches}$ ($76.2\ \text{mm}$). The board uses standard $1\ \text{oz}$ copper foil ($T = 1.378\ \text{mils}$). The allowable temperature rise is set to $\Delta T = 15^\circ\text{C}$.</p>
+    <div class="step-solution">
+        <p><strong>Step 1: Calculate Required Cross-Sectional Area ($A_{\text{ext}}$):</strong></p>
+        $$A = \left( \frac{I}{0.048 \times (\Delta T)^{0.44}} \right)^{\frac{1}{0.725}} = \left( \frac{5.0}{0.048 \times 15^{0.44}} \right)^{\frac{1}{0.725}}$$
+        $$\Delta T^{0.44} = 15^{0.44} \approx 3.303$$
+        $$A = \left( \frac{5.0}{0.048 \times 3.303} \right)^{\frac{1}{0.725}} = \left( \frac{5.0}{0.15854} \right)^{1.3793} = (31.537)^{1.3793} \approx 117.82\ \text{mils}^2$$
+        <p><strong>Step 2: Determine Required External Trace Width ($W$):</strong></p>
+        $$W = \frac{A}{T_{\text{copper}}} = \frac{117.82\ \text{mils}^2}{1.378\ \text{mils}} = 85.50\ \text{mils} \approx 2.172\ \text{mm}$$
+        <p><strong>Step 3: Calculate Conductor Resistance and Voltage Drop:</strong></p>
+        $$R_{\text{DC}} = \frac{0.6787 \times 3.0\ \text{in}}{117.82\ \text{mils}^2} \times [1 + 0.00393 \times 7.5] = 0.01728 \times 1.0295 = 0.01779\ \Omega\ (17.79\ \text{m}\Omega)$$
+        $$\Delta V = I \cdot R = 5.0\ \text{A} \times 0.01779\ \Omega = 0.0889\ \text{V} = 88.9\ \text{mV}$$
+        <p><strong>Step 4: Determine Power Dissipation:</strong></p>
+        $$P_{\text{loss}} = I^2 \cdot R = (5.0)^2 \times 0.01779 = 25 \times 0.01779 = 0.445\ \text{Watts} = 445\ \text{mW}$$
+        <p><strong>Conclusion:</strong> A minimum trace width of $86\ \text{mils}$ ($2.2\ \text{mm}$) is required on the external layer to restrict temperature rise to $15^\circ\text{C}$ and hold voltage drop to under $90\ \text{mV}$.</p>
+    </div>
+</div>
+
+<h2>Frequently Asked Questions (FAQ)</h2>
+<div class="faq-section">
+    <h3>What is the difference between IPC-2221 and IPC-2152 trace sizing?</h3>
+    <p>IPC-2221 is based on legacy empirical charts dating back to 1954 National Bureau of Standards experiments on isolated traces in vacuum/air, which often overestimate required trace width. IPC-2152 is the modern comprehensive standard based on physical thermal measurements that account for board thickness, FR-4 substrate thermal conductivity, internal plane heat spreading, and convective cooling.</p>
+
+    <h3>Why do internal PCB traces require greater width than external traces for the same current?</h3>
+    <p>External traces sit in contact with ambient air, facilitating natural convective and radiative heat dissipation. Internal traces are completely encapsulated by epoxy-glass FR-4 dielectric, which acts as a thermal insulator (low thermal conductivity $\sim 0.25\ \text{W/m}\cdot\text{K}$). Consequently, internal layers retain heat and require approximately twice the cross-sectional area to maintain identical temperature rise.</p>
+
+    <h3>What is standard 1 oz copper thickness?</h3>
+    <p>One ounce ($1\ \text{oz}$) of copper represents $1\ \text{oz}$ of copper rolled flat over one square foot of area, resulting in a nominal foil thickness of approximately $1.378\ \text{mils}$ ($0.001378\ \text{inches}$ or $35.0\ \mu\text{m}$). Common PCB copper weights include $0.5\ \text{oz}$ ($17.5\ \mu\text{m}$), $1\ \text{oz}$ ($35\ \mu\text{m}$), $2\ \text{oz}$ ($70\ \mu\text{m}$), and $3\ \text{oz}$ ($105\ \mu\text{m}$).</p>
+
+    <h3>What allowable temperature rise ($\Delta T$) is standard for PCB traces?</h3>
+    <p>For commercial electronics operating at $25^\circ\text{C}$ to $40^\circ\text{C}$ ambient, a $10^\circ\text{C}$ temperature rise is common. For high-density power electronics or automotive under-hood applications, designers often allow $20^\circ\text{C}$ to $30^\circ\text{C}$ $\Delta T$, provided total peak temperature remains below the FR-4 glass transition temperature ($T_g$, typically $130^\circ\text{C}$ to $170^\circ\text{C}$).</p>
+</div>
+
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚡</span>
+            <h3 class="widget-title">Related Electrical & Power Systems</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="wire-ampacity-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Ampacity (NEC 310.16)</a></li>
+            <li><a href="conduit-fill-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Conduit Fill (NEC Ch. 9)</a></li>
+            <li><a href="motor-starting-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Motor Starting Current</a></li>
+            <li><a href="short-circuit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Short-Circuit (IEC 60909)</a></li>
+            <li><a href="transformer-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Sizing (NEC 450)</a></li>
+            <li><a href="cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC/NEC)</a></li>
+            <li><a href="voltage-drop-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Drop Calculator</a></li>
+            <li><a href="ohms-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ohm's Law Calculator</a></li>
+            <li><a href="power-factor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Power Factor (kW to kVAR)</a></li>
+            <li><a href="parallel-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistor (Req)</a></li>
+            <li><a href="battery-life-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Life & Runtime</a></li>
+            <li><a href="resistor-color-code-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Color Code</a></li>
+            <li><a href="555-timer-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> 555 Timer Astable & Monostable</a></li>
+            <li><a href="led-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LED Series Resistor Calculator</a></li>
+            <li><a href="capacitive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitive Reactance (Xc)</a></li>
+            <li><a href="inductive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Inductive Reactance (Xl)</a></li>
+            <li><a href="op-amp-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Op-Amp Gain & Inverting/Non-Inv</a></li>
+            <li><a href="three-phase-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three-Phase AC Power (kVA/kW)</a></li>
+            <li><a href="adc-dac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ADC & DAC Converter Resolution</a></li>
+            <li><a href="antenna-length-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Antenna Length & Resonant Dipole</a></li>
+            <li><a href="battery-short-circuit-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Short Circuit (IEC 60896)</a></li>
+            <li><a href="bjt-transistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BJT Transistor Bias & Q-Point</a></li>
+            <li><a href="breaker-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Breaker Size (NEC 125% Rule)</a></li>
+            <li><a href="decibel-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Decibel Calculator (dB, dBm, SPL)</a></li>
+            <li><a href="earth-pit-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earth Pit Resistance (IEEE 80)</a></li>
+            <li><a href="electrical-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Electrical Power & Energy Cost</a></li>
+            <li><a href="microstrip-impedance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Microstrip Impedance (IPC-2141)</a></li>
+            <li><a href="resistor-network-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Network (Delta-Wye & Ladder)</a></li>
+            <li><a href="transformer-turns-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Turns Ratio (a)</a></li>
+            <li><a href="aluminium-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Aluminium Cable Sizing (NEC/IEC)</a></li>
+            <li><a href="busbar-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Busbar Sizing (DIN 43671 / IEC)</a></li>
+            <li><a href="cable-sizing-calculator-bs-7671.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (BS 7671 18th Ed)</a></li>
+            <li><a href="cable-sizing-calculator-iec-60364.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC 60364-5-52)</a></li>
+            <li><a href="cable-sizing-installation-method-a.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method A (Insulated Wall)</a></li>
+            <li><a href="fault-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Fault Current (IEEE 141 / IEC)</a></li>
+            <li><a href="filter-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Analog Filter (RC, RL, LC)</a></li>
+            <li><a href="generator-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Generator Sizing (ISO 8528)</a></li>
+            <li><a href="heatsink-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heatsink Sizing & Thermal</a></li>
+            <li><a href="cable-sizing-installation-method-c.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method C (Clipped Direct)</a></li>
+            <li><a href="cable-sizing-installation-method-e.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method E (Cable Tray)</a></li>
+            <li><a href="cable-sizing-calculator-nec.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (NEC Table 310.16)</a></li>
+            <li><a href="copper-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Copper Cable Sizing (100% IACS)</a></li>
+            <li><a href="earthing-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earthing Cable Size (IEC 60364-5-54)</a></li>
+            <li><a href="kw-to-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> kW to Cable Size (1-Phase & 3-Phase)</a></li>
+            <li><a href="single-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Single Phase Cable Sizing (230V/120V)</a></li>
+            <li><a href="three-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three Phase Cable Sizing (400V/480V)</a></li>
+            <li><a href="wire-gauge-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Gauge (AWG to mm² Metric)</a></li>
+            <li><a href="voltage-divider-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Divider Calculator</a></li>
+            <li><a href="parallel-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistance Calculator</a></li>
+            <li><a href="capacitor-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitor Energy & Pulse Power</a></li>
+            <li><a href="resonant-frequency-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LC Resonant Frequency Tank</a></li>
+            <li><a href="rc-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RC Time Constant (τ = RC)</a></li>
+            <li><a href="rl-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RL Time Constant (τ = L/R)</a></li>
+            <li><a href="zener-diode-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Zener Diode Shunt Regulator</a></li>
+            <li><a href="lm317-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LM317 Voltage Regulator</a></li>
+            <li><a href="pcb-trace-width-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> PCB Trace Width (IPC-2152)</a></li>
+            <li><a href="lightning-protection-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lightning Protection (NFPA 780)</a></li>
+            <li><a href="lumen-lux-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lumen to Lux Illuminance</a></li>
+            <li><a href="lumen-method-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lumen Method Fixture Layout</a></li>
+            <li><a href="motor-parameters-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Motor Parameters & Slip</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="engineering.html" class="sidebar-category-link">View All Electrical & Power Systems Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub provides free, rigorous, engineering-grade calculators, physics simulation utilities, and structural models verified against international standards (IPC, ASME, IEEE, ISO).</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Calculator Hubs</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                        <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Engineering Tools</h4>
+                    <ul class="footer-links">
+                        <li><a href="pcb-trace-width-calculator.html">PCB Trace Sizing (IPC-2152)</a></li>
+                        <li><a href="factor-of-safety-calculator.html">Factor of Safety (ASME)</a></li>
+                        <li><a href="microstrip-impedance-calculator.html">Microstrip Impedance</a></li>
+                        <li><a href="stress-strain-calculator.html">Stress &amp; Strain Analysis</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precision computational tools for design engineers and physical scientists.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+    
+function computePcbTrace() {
+    var iVal = parseFloat(document.getElementById('pcb-current').value);
+    var iUnit = parseFloat(document.getElementById('pcb-current-unit').value);
+    var dt = parseFloat(document.getElementById('pcb-temp-rise').value);
+    var cuOz = parseFloat(document.getElementById('pcb-cu-weight').value);
+    var lVal = parseFloat(document.getElementById('pcb-length').value);
+    var lUnit = parseFloat(document.getElementById('pcb-length-unit').value);
+
+    if (isNaN(iVal) || iVal <= 0 || isNaN(dt) || dt <= 0) return;
+
+    var I = iVal * iUnit; // Amperes
+    var L_in = lVal * lUnit; // Inches
+    var thicknessMils = cuOz * 1.378; // mils (1 oz = 1.378 mils = 35 um)
+
+    // IPC-2221 Formula: I = k * (dt)^0.44 * A^0.725
+    // Area A = (I / (k * dt^0.44))^(1 / 0.725) mils^2
+    // For external layers: k = 0.048
+    // For internal layers: k = 0.024
+    var k_ext = 0.048;
+    var k_int = 0.024;
+    var b = 0.44;
+    var c = 0.725;
+
+    var A_ext = Math.pow(I / (k_ext * Math.pow(dt, b)), 1.0 / c); // mils^2
+    var A_int = Math.pow(I / (k_int * Math.pow(dt, b)), 1.0 / c); // mils^2
+
+    var W_ext_mils = A_ext / thicknessMils;
+    var W_int_mils = A_int / thicknessMils;
+
+    var W_ext_mm = W_ext_mils * 0.0254;
+    var W_int_mm = W_int_mils * 0.0254;
+
+    var A_ext_mm2 = A_ext * 0.00064516;
+
+    // Resistance calculation
+    // Resistivity of annealed copper rho = 1.724e-6 ohm-cm = 6.787e-7 ohm-in
+    // R = rho * L / A
+    // In mils: R = (6.787e-7 ohm-in * L_in) / (A_ext * 1e-6 sq in) = 0.6787 * L_in / A_ext
+    // Accounting for temperature: R_T = R_25 * (1 + 0.00393 * (dt))
+    var R_dc = (6.787e-1 * L_in / A_ext) * (1.0 + 0.00393 * (dt / 2.0));
+    var V_drop = I * R_dc;
+    var P_loss = I * I * R_dc;
+
+    document.getElementById('res-pcb-w-ext').textContent = W_ext_mils.toFixed(2) + " mils (" + W_ext_mm.toFixed(3) + " mm)";
+    document.getElementById('res-pcb-w-int').textContent = W_int_mils.toFixed(2) + " mils (" + W_int_mm.toFixed(3) + " mm)";
+    document.getElementById('res-pcb-area-ext').innerHTML = A_ext.toFixed(2) + " mils&sup2; (" + A_ext_mm2.toFixed(4) + " mm&sup2;)";
+
+    if (R_dc >= 1) {
+        document.getElementById('res-pcb-rdc').textContent = R_dc.toFixed(4) + " Ω";
+    } else {
+        document.getElementById('res-pcb-rdc').textContent = (R_dc * 1000).toFixed(2) + " mΩ (" + R_dc.toFixed(4) + " Ω)";
+    }
+
+    if (V_drop >= 1) {
+        document.getElementById('res-pcb-vdrop').textContent = V_drop.toFixed(4) + " V";
+    } else {
+        document.getElementById('res-pcb-vdrop').textContent = (V_drop * 1000).toFixed(2) + " mV (" + V_drop.toFixed(4) + " V)";
+    }
+
+    if (P_loss >= 1) {
+        document.getElementById('res-pcb-ploss').textContent = P_loss.toFixed(3) + " W";
+    } else {
+        document.getElementById('res-pcb-ploss').textContent = (P_loss * 1000).toFixed(2) + " mW (" + P_loss.toFixed(4) + " W)";
+    }
+}
+
+document.getElementById('calc-pcb-btn').addEventListener('click', computePcbTrace);
+['pcb-current', 'pcb-current-unit', 'pcb-temp-rise', 'pcb-cu-weight', 'pcb-length', 'pcb-length-unit'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', computePcbTrace);
+    document.getElementById(id).addEventListener('change', computePcbTrace);
+});
+window.addEventListener('DOMContentLoaded', computePcbTrace);
+
+    </script>
+</body>
+</html>

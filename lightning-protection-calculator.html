@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lightning Protection Calculator - Rolling Sphere Method (NFPA 780 & IEC 62305)</title>
+    <meta name="description" content="Calculate lightning protection zone radius, rolling sphere penetration, equivalent collection area (Ad), and annual strike frequency (Nd) per NFPA 780 and IEC 62305.">
+    <link rel="canonical" href="https://calchub.com/lightning-protection-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Lightning Protection Calculator",
+      "url": "https://calchub.com/lightning-protection-calculator.html",
+      "description": "Calculates lightning protection zone of protection, rolling sphere method parameters, collection area, and strike risk per NFPA 780 and IEC 62305.",
+      "applicationCategory": "EngineeringApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the Rolling Sphere Method (RSM) in lightning protection?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Rolling Sphere Method is an electro-geometric modeling standard (NFPA 780, IEC 62305, IEEE 998) that visualizes an imaginary sphere rolled over a structure. All points touched by the sphere are susceptible to direct lightning strikes. Any surface beneath the sphere suspended between air terminals or above ground is inside the protected zone."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are the rolling sphere radii for different Lightning Protection Levels (LPL)?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "IEC 62305 and NFPA 780 define four levels: LPL I uses R = 20 m (99% interception efficiency, protects critical chemical/explosive plants); LPL II uses R = 30 m (97% efficiency); LPL III uses R = 45 m (91% efficiency, standard commercial structures); LPL IV uses R = 60 m (84% efficiency)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is the protection radius of a single vertical air terminal calculated?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For a vertical rod of height h where h <= R, the horizontal protection radius rx at the reference ground plane is calculated as rx = sqrt(h * (2R - h)), where R is the rolling sphere radius."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is the expected annual strike frequency (Nd) determined?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Annual strike frequency is calculated as Nd = Ng * Ad * Cd * 10^-6, where Ng is annual ground flash density (flashes/km2/yr), Ad is structure equivalent collection area (m2), and Cd is environmental location factor."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="converter.html">Converters</a>
+                <a href="engineering.html">Engineering</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="engineering.html">Engineering</a> &gt; <span>Lightning Protection Rolling Sphere Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Lightning Protection Rolling Sphere Calculator</h1>
+                        <p class="calc-desc">Determine air terminal protection radius, rolling sphere penetration depth, equivalent collection area, and annual flash risk per NFPA 780 and IEC 62305.</p>
+                    </div>
+                    
+<div class="calc-grid">
+    <div class="calc-input-group">
+        <label for="lp-level">Lightning Protection Level (LPL / Class):</label>
+        <select id="lp-level">
+            <option value="20">Level I: $R = 20\text{ m}$ (Critical Infrastructure / Explosives, 99%)</option>
+            <option value="30">Level II: $R = 30\text{ m}$ (High Risk Commercial / Hospitals, 97%)</option>
+            <option value="45" selected>Level III: $R = 45\text{ m}$ (Standard Commercial &amp; Residential, 91%)</option>
+            <option value="60">Level IV: $R = 60\text{ m}$ (Open Farm / Non-Hazardous Storage, 84%)</option>
+        </select>
+    </div>
+    <div class="calc-input-group">
+        <label for="lp-rod-h">Air Terminal Tip Height ($h$ above roof/ground):</label>
+        <div class="input-with-select">
+            <input type="number" id="lp-rod-h" value="3.0" min="0.3" step="any">
+            <select id="lp-rod-h-unit">
+                <option value="1" selected>Meters (m)</option>
+                <option value="0.3048">Feet (ft)</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="lp-bldg-l">Structure Length ($L$):</label>
+        <div class="input-with-select">
+            <input type="number" id="lp-bldg-l" value="40" min="1" step="any">
+            <select id="lp-bldg-l-unit">
+                <option value="1" selected>Meters (m)</option>
+                <option value="0.3048">Feet (ft)</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="lp-bldg-w">Structure Width ($W$):</label>
+        <div class="input-with-select">
+            <input type="number" id="lp-bldg-w" value="25" min="1" step="any">
+            <select id="lp-bldg-w-unit">
+                <option value="1" selected>Meters (m)</option>
+                <option value="0.3048">Feet (ft)</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="lp-bldg-h">Structure Roof Height ($H$):</label>
+        <div class="input-with-select">
+            <input type="number" id="lp-bldg-h" value="15" min="1" step="any">
+            <select id="lp-bldg-h-unit">
+                <option value="1" selected>Meters (m)</option>
+                <option value="0.3048">Feet (ft)</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="lp-keraunic">Thunderstorm Days per Year ($T_d$ or isokeraunic):</label>
+        <div class="input-with-select">
+            <input type="number" id="lp-keraunic" value="30" min="1" max="250" step="any">
+            <select id="lp-keraunic-unit">
+                <option value="1" selected>Days/year</option>
+            </select>
+        </div>
+    </div>
+</div>
+<button id="calc-lp-btn" class="calc-btn">Calculate Rolling Sphere Protection</button>
+<div class="calc-results-card" id="lp-results">
+    <h3>Rolling Sphere Protection &amp; Risk Metrics</h3>
+    <div class="result-row highlight-result">
+        <span class="result-label">Air Terminal Ground Protection Radius ($r_x$):</span>
+        <span class="result-val" id="res-lp-rx">16.16 m (53.0 ft)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Rolling Sphere Radius ($R$):</span>
+        <span class="result-val" id="res-lp-r">45.0 m (147.6 ft)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Structure Equivalent Collection Area ($A_d$):</span>
+        <span class="result-val" id="res-lp-ad">3,656.9 m&sup2; (0.00366 km&sup2;)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Ground Flash Density ($N_g$):</span>
+        <span class="result-val" id="res-lp-ng">2.82 flashes/km&sup2;/year</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Estimated Annual Direct Strikes ($N_d$):</span>
+        <span class="result-val" id="res-lp-nd">0.0103 strikes/yr (1 strike every 97 years)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Minimum Down-Conductor Requirement:</span>
+        <span class="result-val" id="res-lp-downcond">&ge; 2 Down-Conductors (Spacing &le; 15 m)</span>
+    </div>
+</div>
+
+                </div>
+                <article class="article-body">
+                    
+<h2>Electrophysics of Atmospheric Discharges and Leader Attachment</h2>
+<p>Cloud-to-ground lightning is a transient, high-current atmospheric electric discharge initiated when electrostatic charge separation within cumulonimbus clouds establishes breakdown electric fields exceeding $3\text{ MV/m}$ in moist air. A stepped leader descends in discrete nanosecond steps of tens of meters, creating an ionized plasma channel carrying thousands of Coulombs of charge. As the stepped leader approaches within $50\text{--}100\text{ meters}$ of the Earth's surface, the intense ground-level electric field gradient launches upward connecting leaders from sharp, elevated ground structures (building corners, parapets, radio towers, air terminals).</p>
+
+<p>The instant an upward connecting leader establishes electrical contact with the downward stepped leader, the final striking distance is bridged. A return stroke surges upward at roughly one-third the speed of light, discharging peak currents ranging from $10\text{ kA}$ to over $200\text{ kA}$ with di/dt wavefront gradients exceeding $100\text{ kA/}\mu\text{s}$, producing severe mechanical blast shockwaves, extreme ohmic Joule heating, and lethal side-flash potential differences.</p>
+
+<h2>The Rolling Sphere Method (RSM) Electro-Geometric Model</h2>
+<p>Modern lightning protection design (governed globally by <strong>NFPA 780</strong> in North America, <strong>IEC 62305</strong> internationally, and <strong>IEEE 998</strong> for electrical substations) is grounded in the <strong>Electro-Geometric Model (EGM)</strong>. The fundamental physical premise of EGM is that the striking distance ($r_s$) across which the downward leader attaches to a ground object is a function of the prospective peak return stroke current ($I$):</p>
+$$r_s = A \cdot I^b$$
+
+<p>Per IEC and Whitehead formulations, $r_s \approx 10 \cdot I^{0.65}$ (where $r_s$ is in meters and $I$ in kA). In the <strong>Rolling Sphere Method</strong>, an imaginary sphere of standardized radius $R = r_s$ is rolled across the terrain, over all buildings, towers, and parapets. Any physical point on the building or roof that touches the sphere's surface is exposed to direct lightning strikes. Conversely, all spatial volume enclosed underneath the sphere without touching its boundary resides within the <strong>Zone of Protection (LPZ 0B)</strong>.</p>
+
+<h3>Lightning Protection Levels (LPL) and Rolling Sphere Radii</h3>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Protection Level (LPL)</th>
+            <th>Sphere Radius ($R$)</th>
+            <th>Minimum Current ($I_{\text{min}}$)</th>
+            <th>Interception Efficiency</th>
+            <th>Typical Protected Structure</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>LPL I (Class I)</strong></td>
+            <td>$20\text{ meters}$ ($65\text{ ft}$)</td>
+            <td>$3\text{ kA}$</td>
+            <td>$99\%$</td>
+            <td>Chemical refineries, ammunition depots, nuclear plants</td>
+        </tr>
+        <tr>
+            <td><strong>LPL II (Class II)</strong></td>
+            <td>$30\text{ meters}$ ($100\text{ ft}$)</td>
+            <td>$5\text{ kA}$</td>
+            <td>$97\%$</td>
+            <td>Hospitals, data centers, telecom central offices</td>
+        </tr>
+        <tr>
+            <td><strong>LPL III (Class III)</strong></td>
+            <td>$45\text{ meters}$ ($150\text{ ft}$)</td>
+            <td>$10\text{ kA}$</td>
+            <td>$91\%$</td>
+            <td>Commercial offices, multi-family residences, retail</td>
+        </tr>
+        <tr>
+            <td><strong>LPL IV (Class IV)</strong></td>
+            <td>$60\text{ meters}$ ($200\text{ ft}$)</td>
+            <td>$16\text{ kA}$</td>
+            <td>$84\%$</td>
+            <td>Agricultural warehouses, non-combustible open storage</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Mathematical Formulations for Protection Radius ($r_x$) and Sag Depth ($p$)</h2>
+<p>For an isolated vertical air terminal rod of height $h$ positioned on a flat horizontal plane (where $h \le R$), the horizontal circular protection radius $r_x$ at the reference plane is derived using the Pythagorean theorem on the right triangle formed by the sphere center:</p>
+$$(R - h)^2 + r_x^2 = R^2$$
+$$r_x^2 = R^2 - (R - h)^2 = R^2 - (R^2 - 2Rh + h^2) = 2Rh - h^2$$
+$$r_x = \sqrt{h (2R - h)} \quad [\text{Meters}]$$
+
+<p>When two air terminals of equal height $h$ are separated by horizontal distance $D$, the rolling sphere rolls between them and sags downward. The maximum penetration dip depth $p$ below the terminal tip level is:</p>
+$$p = R - \sqrt{R^2 - \left( \frac{D}{2} \right)^2}$$
+
+<p>To ensure intermediate roof equipment is not struck, the height of the protected equipment must not exceed $h_{\text{equip}} \le h - p$. If $D > 2R$, the sphere touches the roof surface between the terminals, creating an unprotected strike zone.</p>
+
+<h2>Risk Assessment: Collection Area ($A_d$) and Annual Flash Expectancy ($N_d$)</h2>
+<p>To assess whether a building requires an engineered lightning protection system, IEC 62305-2 defines the <strong>Equivalent Collection Area ($A_d$)</strong> of an isolated rectangular building of length $L$, width $W$, and roof height $H$ as:</p>
+$$A_d = L \cdot W + 2 \cdot L \cdot H + 2 \cdot W \cdot H + \pi \cdot H^2 \quad [\text{m}^2]$$
+
+<p>The annual ground flash density $N_g$ (lightning flashes per square kilometer per year) is calculated from local keraunic thunderstorm days $T_d$:</p>
+$$N_g = 0.04 \cdot T_d^{1.25} \quad \left[ \frac{\text{flashes}}{\text{km}^2\cdot\text{year}} \right]$$
+
+<p>The expected annual direct strike frequency $N_d$ to the structure is:</p>
+$$N_d = N_g \cdot A_d \cdot C_d \times 10^{-6} \quad [\text{Strikes / Year}]$$
+
+<p>Where $C_d$ is the environmental location factor ($C_d = 1.0$ for isolated flat terrain; $C_d = 2.0$ on a hilltop; $C_d = 0.5$ in dense urban centers surrounded by taller structures).</p>
+
+<div class="worked-example-card">
+    <h4>Step-by-Step Engineering Case Study: Commercial Data Center Facility</h4>
+    <p><strong>Scenario:</strong> A tier-3 data center building measures $L = 60\ \text{m}$, $W = 35\ \text{m}$, and $H = 12\ \text{m}$. Due to financial mission-criticality, Level II protection ($R = 30\ \text{m}$) is specified. Parapet air terminals have a height of $h = 1.5\ \text{m}$ above the roof surface. The region experiences $T_d = 40$ thunderstorm days per year.</p>
+    <div class="step-solution">
+        <p><strong>Step 1: Calculate Air Terminal Protection Radius ($r_x$):</strong></p>
+        $$r_x = \sqrt{h (2R - h)} = \sqrt{1.5 \times ((2 \times 30) - 1.5)} = \sqrt{1.5 \times 58.5} = \sqrt{87.75} = 9.367\ \text{meters}$$
+        <p>Each terminal covers a horizontal radius of $9.37\ \text{m}$ ($30.7\ \text{ft}$) on the roof deck.</p>
+        <p><strong>Step 2: Calculate Equivalent Collection Area ($A_d$):</strong></p>
+        $$A_d = (60 \times 35) + 2(60 \times 12) + 2(35 \times 12) + \pi(12)^2$$
+        $$A_d = 2100 + 1440 + 840 + 452.39 = 4,832.39\ \text{m}^2 \approx 0.00483\ \text{km}^2$$
+        <p><strong>Step 3: Determine Ground Flash Density ($N_g$):</strong></p>
+        $$N_g = 0.04 \times (40)^{1.25} = 0.04 \times 100.995 = 4.04\ \text{flashes/km}^2/\text{year}$$
+        <p><strong>Step 4: Compute Annual Direct Strike Expectancy ($N_d$):</strong></p>
+        $$N_d = 4.04 \times 4,832.39 \times 1.0 \times 10^{-6} = 0.01952\ \text{strikes/year}$$
+        <p>The statistical return period between direct lightning strikes is $T_{\text{return}} = \frac{1}{0.01952} \approx 51.2\ \text{years}$.</p>
+        <p><strong>Step 5: Determine Minimum Down-Conductor Network:</strong></p>
+        <p>Total building perimeter $P = 2(60 + 35) = 190\ \text{m}$. For LPL II, maximum down-conductor spacing is $10\ \text{m}$:</p>
+        $$N_{\text{down}} = \left\lceil \frac{190}{10} \right\rceil = 19\ \text{down-conductors}$$
+        <p><strong>Conclusion:</strong> A complete LPZ 0B Faraday mesh with 19 perimeter down-conductors connected to an interconnected grounding ring electrode ($R_{\text{ground}} \le 10\ \Omega$) must be installed.</p>
+    </div>
+</div>
+
+<h2>Frequently Asked Questions (FAQ)</h2>
+<div class="faq-section">
+    <h3>What is the Rolling Sphere Method (RSM) in lightning protection?</h3>
+    <p>The Rolling Sphere Method is an electro-geometric modeling standard (NFPA 780, IEC 62305, IEEE 998) that visualizes an imaginary sphere rolled over a structure. All points touched by the sphere are susceptible to direct lightning strikes. Any surface beneath the sphere suspended between air terminals or above ground is inside the protected zone.</p>
+
+    <h3>What are the rolling sphere radii for different Lightning Protection Levels (LPL)?</h3>
+    <p>IEC 62305 and NFPA 780 define four levels: LPL I uses $R = 20\text{ m}$ ($99\%$ interception efficiency, protects critical chemical/explosive plants); LPL II uses $R = 30\text{ m}$ ($97\%$ efficiency); LPL III uses $R = 45\text{ m}$ ($91\%$ efficiency, standard commercial structures); LPL IV uses $R = 60\text{ m}$ ($84\%$ efficiency).</p>
+
+    <h3>How is the protection radius of a single vertical air terminal calculated?</h3>
+    <p>For a vertical rod of height $h$ where $h \le R$, the horizontal protection radius $r_x$ at the reference ground plane is calculated as $r_x = \sqrt{h (2R - h)}$, where $R$ is the rolling sphere radius.</p>
+
+    <h3>How is the expected annual strike frequency ($N_d$) determined?</h3>
+    <p>Annual strike frequency is calculated as $N_d = N_g \cdot A_d \cdot C_d \times 10^{-6}$, where $N_g$ is annual ground flash density (flashes/$\text{km}^2$/yr), $A_d$ is structure equivalent collection area ($\text{m}^2$), and $C_d$ is the environmental location factor.</p>
+</div>
+
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚡</span>
+            <h3 class="widget-title">Related Electrical & Power Systems</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="wire-ampacity-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Ampacity (NEC 310.16)</a></li>
+            <li><a href="conduit-fill-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Conduit Fill (NEC Ch. 9)</a></li>
+            <li><a href="motor-starting-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Motor Starting Current</a></li>
+            <li><a href="short-circuit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Short-Circuit (IEC 60909)</a></li>
+            <li><a href="transformer-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Sizing (NEC 450)</a></li>
+            <li><a href="cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC/NEC)</a></li>
+            <li><a href="voltage-drop-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Drop Calculator</a></li>
+            <li><a href="ohms-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ohm's Law Calculator</a></li>
+            <li><a href="power-factor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Power Factor (kW to kVAR)</a></li>
+            <li><a href="parallel-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistor (Req)</a></li>
+            <li><a href="battery-life-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Life & Runtime</a></li>
+            <li><a href="resistor-color-code-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Color Code</a></li>
+            <li><a href="555-timer-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> 555 Timer Astable & Monostable</a></li>
+            <li><a href="led-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LED Series Resistor Calculator</a></li>
+            <li><a href="capacitive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitive Reactance (Xc)</a></li>
+            <li><a href="inductive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Inductive Reactance (Xl)</a></li>
+            <li><a href="op-amp-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Op-Amp Gain & Inverting/Non-Inv</a></li>
+            <li><a href="three-phase-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three-Phase AC Power (kVA/kW)</a></li>
+            <li><a href="adc-dac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ADC & DAC Converter Resolution</a></li>
+            <li><a href="antenna-length-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Antenna Length & Resonant Dipole</a></li>
+            <li><a href="battery-short-circuit-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Short Circuit (IEC 60896)</a></li>
+            <li><a href="bjt-transistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BJT Transistor Bias & Q-Point</a></li>
+            <li><a href="breaker-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Breaker Size (NEC 125% Rule)</a></li>
+            <li><a href="decibel-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Decibel Calculator (dB, dBm, SPL)</a></li>
+            <li><a href="earth-pit-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earth Pit Resistance (IEEE 80)</a></li>
+            <li><a href="electrical-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Electrical Power & Energy Cost</a></li>
+            <li><a href="microstrip-impedance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Microstrip Impedance (IPC-2141)</a></li>
+            <li><a href="resistor-network-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Network (Delta-Wye & Ladder)</a></li>
+            <li><a href="transformer-turns-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Turns Ratio (a)</a></li>
+            <li><a href="aluminium-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Aluminium Cable Sizing (NEC/IEC)</a></li>
+            <li><a href="busbar-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Busbar Sizing (DIN 43671 / IEC)</a></li>
+            <li><a href="cable-sizing-calculator-bs-7671.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (BS 7671 18th Ed)</a></li>
+            <li><a href="cable-sizing-calculator-iec-60364.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC 60364-5-52)</a></li>
+            <li><a href="cable-sizing-installation-method-a.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method A (Insulated Wall)</a></li>
+            <li><a href="fault-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Fault Current (IEEE 141 / IEC)</a></li>
+            <li><a href="filter-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Analog Filter (RC, RL, LC)</a></li>
+            <li><a href="generator-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Generator Sizing (ISO 8528)</a></li>
+            <li><a href="heatsink-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heatsink Sizing & Thermal</a></li>
+            <li><a href="cable-sizing-installation-method-c.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method C (Clipped Direct)</a></li>
+            <li><a href="cable-sizing-installation-method-e.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method E (Cable Tray)</a></li>
+            <li><a href="cable-sizing-calculator-nec.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (NEC Table 310.16)</a></li>
+            <li><a href="copper-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Copper Cable Sizing (100% IACS)</a></li>
+            <li><a href="earthing-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earthing Cable Size (IEC 60364-5-54)</a></li>
+            <li><a href="kw-to-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> kW to Cable Size (1-Phase & 3-Phase)</a></li>
+            <li><a href="single-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Single Phase Cable Sizing (230V/120V)</a></li>
+            <li><a href="three-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three Phase Cable Sizing (400V/480V)</a></li>
+            <li><a href="wire-gauge-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Gauge (AWG to mm² Metric)</a></li>
+            <li><a href="voltage-divider-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Divider Calculator</a></li>
+            <li><a href="parallel-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistance Calculator</a></li>
+            <li><a href="capacitor-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitor Energy & Pulse Power</a></li>
+            <li><a href="resonant-frequency-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LC Resonant Frequency Tank</a></li>
+            <li><a href="rc-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RC Time Constant (τ = RC)</a></li>
+            <li><a href="rl-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RL Time Constant (τ = L/R)</a></li>
+            <li><a href="zener-diode-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Zener Diode Shunt Regulator</a></li>
+            <li><a href="lm317-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LM317 Voltage Regulator</a></li>
+            <li><a href="pcb-trace-width-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> PCB Trace Width (IPC-2152)</a></li>
+            <li><a href="lightning-protection-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Lightning Protection (NFPA 780)</a></li>
+            <li><a href="lumen-lux-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lumen to Lux Illuminance</a></li>
+            <li><a href="lumen-method-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lumen Method Fixture Layout</a></li>
+            <li><a href="motor-parameters-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Motor Parameters & Slip</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="engineering.html" class="sidebar-category-link">View All Electrical & Power Systems Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub provides free, engineering-grade calculators, physics simulation utilities, and facility safety models verified against NFPA 780, IEC 62305, and IESNA lighting codes.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Calculator Hubs</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                        <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Facility Safety &amp; Optics</h4>
+                    <ul class="footer-links">
+                        <li><a href="lightning-protection-calculator.html">Rolling Sphere Lightning</a></li>
+                        <li><a href="lumen-lux-calculator.html">Lumen Lux Photometry</a></li>
+                        <li><a href="earth-pit-resistance-calculator.html">Grounding Electrode Grid</a></li>
+                        <li><a href="illuminance-converter.html">Lux to Foot-Candles</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Computational tools for electrical engineers, facility designers, and architects.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+    
+function computeLightning() {
+    var R = parseFloat(document.getElementById('lp-level').value);
+    var hVal = parseFloat(document.getElementById('lp-rod-h').value);
+    var hUnit = parseFloat(document.getElementById('lp-rod-h-unit').value);
+    var lVal = parseFloat(document.getElementById('lp-bldg-l').value);
+    var lUnit = parseFloat(document.getElementById('lp-bldg-l-unit').value);
+    var wVal = parseFloat(document.getElementById('lp-bldg-w').value);
+    var wUnit = parseFloat(document.getElementById('lp-bldg-w-unit').value);
+    var bldgHVal = parseFloat(document.getElementById('lp-bldg-h').value);
+    var bldgHUnit = parseFloat(document.getElementById('lp-bldg-h-unit').value);
+    var Td = parseFloat(document.getElementById('lp-keraunic').value);
+
+    if (isNaN(hVal) || hVal <= 0 || isNaN(lVal) || lVal <= 0 || isNaN(wVal) || wVal <= 0 || isNaN(bldgHVal) || bldgHVal <= 0 || isNaN(Td) || Td <= 0) return;
+
+    var h = hVal * hUnit; // meters
+    var L = lVal * lUnit; // meters
+    var W = wVal * wUnit; // meters
+    var H = bldgHVal * bldgHUnit; // meters
+
+    // Protection radius rx = sqrt(h * (2R - h)) if h <= R, else R
+    var rx = 0;
+    if (h <= R) {
+        rx = Math.sqrt(h * ((2.0 * R) - h));
+    } else {
+        rx = R;
+    }
+    var rx_ft = rx * 3.28084;
+    var R_ft = R * 3.28084;
+
+    // Equivalent collection area Ad per IEC 62305-2:
+    // For an isolated rectangular structure: Ad = L*W + 2*L*H + 2*W*H + pi*H^2
+    var Ad = (L * W) + (2.0 * L * H) + (2.0 * W * H) + (Math.PI * Math.pow(H, 2)); // m^2
+    var Ad_km2 = Ad * 1e-6;
+
+    // Ground Flash Density Ng per IEC 62305: Ng = 0.04 * (Td)^1.25 flashes/km^2/year
+    var Ng = 0.04 * Math.pow(Td, 1.25);
+
+    // Expected annual lightning flash frequency Nd = Ng * Ad * Cd * 1e-6 (assume Cd = 1.0 isolated)
+    var Nd = Ng * Ad * 1e-6;
+    var returnPeriod = (Nd > 0) ? (1.0 / Nd) : 999999;
+
+    document.getElementById('res-lp-rx').textContent = rx.toFixed(2) + " m (" + rx_ft.toFixed(1) + " ft)";
+    document.getElementById('res-lp-r').textContent = R.toFixed(1) + " m (" + R_ft.toFixed(1) + " ft)";
+    document.getElementById('res-lp-ad').textContent = Ad.toFixed(1) + " m² (" + Ad_km2.toFixed(5) + " km²)";
+    document.getElementById('res-lp-ng').textContent = Ng.toFixed(2) + " flashes/km²/year";
+
+    var ndStr = Nd.toFixed(4) + " strikes/yr (1 strike every " + Math.round(returnPeriod) + " years)";
+    document.getElementById('res-lp-nd').textContent = ndStr;
+
+    // Down conductor spacing per IEC 62305:
+    // LPL I: 10m, LPL II: 10m, LPL III: 15m, LPL IV: 20m
+    var spacing = (R === 20 || R === 30) ? 10 : ((R === 45) ? 15 : 20);
+    var perimeter = 2.0 * (L + W);
+    var reqDown = Math.max(2, Math.ceil(perimeter / spacing));
+    document.getElementById('res-lp-downcond').textContent = "≥ " + reqDown + " Down-Conductors (Perimeter " + perimeter.toFixed(0) + "m, Max Spacing " + spacing + "m)";
+}
+
+document.getElementById('calc-lp-btn').addEventListener('click', computeLightning);
+['lp-level', 'lp-rod-h', 'lp-rod-h-unit', 'lp-bldg-l', 'lp-bldg-l-unit', 'lp-bldg-w', 'lp-bldg-w-unit', 'lp-bldg-h', 'lp-bldg-h-unit', 'lp-keraunic'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', computeLightning);
+    document.getElementById(id).addEventListener('change', computeLightning);
+});
+window.addEventListener('DOMContentLoaded', computeLightning);
+
+    </script>
+</body>
+</html>

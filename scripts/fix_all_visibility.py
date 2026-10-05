@@ -188,6 +188,11 @@ CAT_MAP = {
             ("rl-time-constant-calculator.html", "RL Time Constant (τ = L/R)", "⚡", "Inductor current growth, flyback kickback & magnetic energy", "τ = L/R | I_max = V/R | E_L = ½·L·I² | v_L = -L(di/dt)"),
             ("zener-diode-calculator.html", "Zener Diode Shunt Regulator", "⚡", "Series resistor Rs, max diode power Pz & load regulation", "Rs = (Vin,min - Vz) / (IL,max + Iz,min) | Pz = Vz·Iz,max"),
             ("lm317-calculator.html", "LM317 Voltage Regulator", "⚡", "Adjustable linear regulator Vout, R1/R2 feedback & heatsink", "Vout = 1.25·(1 + R2/R1) + Iadj·R2 | θSA heatsink sizing"),
+            ("pcb-trace-width-calculator.html", "PCB Trace Width (IPC-2152)", "🔌", "Current ampacity, copper weight & temperature rise", "I = k·ΔT^0.44·A^0.725 | W = A / T_cu"),
+            ("lightning-protection-calculator.html", "Lightning Protection (NFPA 780)", "⚡", "Rolling sphere radius, collection area & strike risk", "rx = √(h(2R - h)) | Nd = Ng·Ad·Cd·10⁻⁶"),
+            ("lumen-lux-calculator.html", "Lumen to Lux Illuminance", "💡", "Luminous flux to lux, beam spread & candela", "E = I / d² | Ω = 2π(1 - cos(θ/2)) | CBCP"),
+            ("lumen-method-calculator.html", "Lumen Method Fixture Layout", "💡", "IESNA zonal cavity, room cavity ratio & fixture grid", "N = (E·A) / (n·Φ·CU·LLF) | RCR = 5h(L+W)/A"),
+            ("motor-parameters-calculator.html", "Motor Parameters & Slip", "⚙️", "Induction motor slip, synchronous speed & full load torque", "Ns = 120f/P | s = (Ns - Nr)/Ns | τ = 9548.8·P/Nr"),
         ]
     },
     "solar-energy.html": {
@@ -235,6 +240,9 @@ CAT_MAP = {
             ("torque-converter.html", "Torque Converter Sizing (SAE J643)", "🚗", "Stall torque ratio, speed ratio & K-factor", "TR = T_turb/T_pump | SR = N_turb/N_pump | η = TR·SR"),
             ("torque-to-hp-calculator.html", "Torque to HP & BMEP Converter", "🏎️", "Brake horsepower, kilowatts & 4-stroke BMEP", "HP = (T·RPM) / 5252 | BMEP = (4π·T)/(Vd·100)"),
             ("projectile-motion-calculator.html", "Projectile Motion Trajectory", "🚀", "Apex height, time of flight, range & impact velocity", "H = h0 + (v0·sinθ)²/(2g) | R = v0·cosθ·T"),
+            ("factor-of-safety-calculator.html", "Factor of Safety (ASME / AISC)", "🛡️", "Yield/ultimate safety margins, MoS & Goodman fatigue", "FoS = S_mat / σ_work | MoS = FoS - 1 | σa/Se + σm/Sut"),
+            ("lead-screw-calculator.html", "Lead Screw & Power Screw Torque", "⚙️", "Acme/Trapezoidal lifting torque, self-locking & power", "T = ½F·dm·(μ'+tanλ)/(1-μ'tanλ) | η = F·L / (2πT)"),
+            ("press-fit-calculator.html", "Press Fit & Interference Fits", "🚜", "Lamé thick cylinder pressure, push force & shrink fit", "p = δ / [d·(compliance)] | F = μ·p·π·d·L | T = ½F·d"),
         ]
     },
     "civil.html": {

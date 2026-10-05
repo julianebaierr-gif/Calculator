@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motor Parameters Calculator - Slip, Synchronous Speed & Full Load Torque</title>
+    <meta name="description" content="Calculate induction motor synchronous speed (Ns = 120f/P), percentage rotor slip, full load torque (FLT), input electrical kW, and mechanical shaft power.">
+    <link rel="canonical" href="https://calchub.com/motor-parameters-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Motor Parameters Calculator",
+      "url": "https://calchub.com/motor-parameters-calculator.html",
+      "description": "Calculates induction motor synchronous speed, rotor slip, full load torque, input power, and full-load current.",
+      "applicationCategory": "EngineeringApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is synchronous speed in an AC induction motor?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Synchronous speed (Ns) is the rotational velocity of the stator magnetic field, determined by AC line frequency f and pole count P: Ns = (120 * f) / P RPM. For a 60 Hz system, synchronous speeds are 3600 RPM (2 poles), 1800 RPM (4 poles), and 1200 RPM (6 poles)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why must an induction motor have rotor slip?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "An induction motor relies on Faraday's law of induction. If the rotor spun at synchronous speed, there would be zero relative motion between the rotating stator flux and the rotor bars, inducing zero rotor voltage, zero rotor current, and producing zero mechanical torque. Therefore, an induction motor must always operate below synchronous speed: Slip s = (Ns - Nr) / Ns * 100%."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is full-load torque calculated from shaft power and speed?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Full load torque is calculated as tau = (P_kW * 9548.8) / N_r (in Newton-meters) or tau = (5252 * HP) / N_r (in pound-feet), where N_r is the rated operating rotor speed in RPM."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the typical full-load slip for NEMA Design B motors?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Standard NEMA Design B industrial squirrel-cage induction motors operate with full-load slip between 1.5% and 4.0% (e.g., a 4-pole 1800 RPM motor typically runs at 1740 to 1765 RPM under full rated load)."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="converter.html">Converters</a>
+                <a href="engineering.html">Engineering</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="engineering.html">Engineering</a> &gt; <span>Induction Motor Parameters &amp; Slip Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Induction Motor Parameters &amp; Slip Calculator</h1>
+                        <p class="calc-desc">Compute synchronous speed, percentage slip, full load shaft torque, electrical input kW, full-load amps (FLA), and NEMA operating characteristics.</p>
+                    </div>
+                    
+<div class="calc-grid">
+    <div class="calc-input-group">
+        <label for="mp-power">Rated Shaft Mechanical Power ($P_{\text{shaft}}$):</label>
+        <div class="input-with-select">
+            <input type="number" id="mp-power" value="15" min="0.1" step="any">
+            <select id="mp-pwr-unit">
+                <option value="1" selected>Kilowatts (kW)</option>
+                <option value="0.745699872">Horsepower (HP)</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="mp-freq">AC Line Frequency ($f$):</label>
+        <select id="mp-freq">
+            <option value="60" selected>60 Hz (North America, Brazil, KSA)</option>
+            <option value="50">50 Hz (Europe, Asia, Australia, Africa)</option>
+        </select>
+    </div>
+    <div class="calc-input-group">
+        <label for="mp-poles">Stator Pole Count ($P$):</label>
+        <select id="mp-poles">
+            <option value="2">2 Poles (3600 / 3000 RPM)</option>
+            <option value="4" selected>4 Poles (1800 / 1500 RPM - Standard)</option>
+            <option value="6">6 Poles (1200 / 1000 RPM)</option>
+            <option value="8">8 Poles (900 / 750 RPM)</option>
+            <option value="12">12 Poles (600 / 500 RPM)</option>
+        </select>
+    </div>
+    <div class="calc-input-group">
+        <label for="mp-rotor-rpm">Rotor Operating Speed ($N_r$):</label>
+        <div class="input-with-select">
+            <input type="number" id="mp-rotor-rpm" value="1750" min="1" step="any">
+            <select id="mp-rotor-unit">
+                <option value="1" selected>RPM (rev/min)</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="mp-voltage">Line-to-Line Voltage ($V_{\text{LL}}$):</label>
+        <div class="input-with-select">
+            <input type="number" id="mp-voltage" value="460" min="10" step="any">
+            <select id="mp-volt-unit">
+                <option value="1" selected>Volts (V AC)</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="mp-pf">Operating Power Factor ($\cos\theta$):</label>
+        <input type="number" id="mp-pf" value="0.86" min="0.1" max="1.0" step="0.01">
+    </div>
+    <div class="calc-input-group">
+        <label for="mp-eff">Nominal Efficiency ($\eta$):</label>
+        <div class="input-with-select">
+            <input type="number" id="mp-eff" value="92.4" min="50" max="99" step="0.1">
+            <select id="mp-eff-unit">
+                <option value="1" selected>% (NEMA Premium / IE3)</option>
+            </select>
+        </div>
+    </div>
+</div>
+<button id="calc-mp-btn" class="calc-btn">Calculate Motor Characteristics</button>
+<div class="calc-results-card" id="mp-results">
+    <h3>Electromechanical Operating Characteristics</h3>
+    <div class="result-row highlight-result">
+        <span class="result-label">Synchronous Speed ($N_s$):</span>
+        <span class="result-val" id="res-mp-ns">1,800 RPM (Stator Flux Speed)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Full-Load Rotor Slip ($s$):</span>
+        <span class="result-val" id="res-mp-slip">2.78% (50.0 RPM slip speed)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Full-Load Shaft Torque ($	au$):</span>
+        <span class="result-val" id="res-mp-torque">81.85 N&middot;m (60.37 lb-ft)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Electrical Input Power ($P_{	ext{in}}$):</span>
+        <span class="result-val" id="res-mp-pin">16.23 kW (21.77 kVA Apparent)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Full-Load Line Current ($I_{	ext{FLA}}$):</span>
+        <span class="result-val" id="res-mp-fla">23.71 Amperes</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Rotor Induced Slip Frequency ($f_r$):</span>
+        <span class="result-val" id="res-mp-fr">1.67 Hz</span>
+    </div>
+</div>
+
+                </div>
+                <article class="article-body">
+                    
+<h2>Electromechanical Fundamentals of AC Induction Motors</h2>
+<p>The three-phase alternating current (AC) squirrel-cage induction motor, patented by Nikola Tesla in 1888, is the undisputed workhorse of modern global industry, consuming over $60\%$ of all industrial electrical power worldwide. The induction motor operates on the principle of electromagnetic induction: three-phase sinusoidal voltages applied to distributed stator windings create a continuously rotating magnetic field (RMF) of constant magnitude rotating at <strong>Synchronous Speed ($N_s$)</strong>.</p>
+
+<p>The speed of this rotating stator magnetic field is locked strictly to AC supply line frequency ($f$) and the geometric number of magnetic poles ($P$) per phase wound into the stator laminations:</p>
+$$N_s = \frac{120 \cdot f}{P} \quad [\text{RPM}]$$
+
+<p>Where $120 = 2 \times 60$ accounts for seconds-to-minutes conversion and two electrical pole alternations per complete electrical cycle. In $60\text{ Hz}$ grids, standard synchronous speeds are $3,600\text{ RPM}$ ($2\text{ pole}$), $1,800\text{ RPM}$ ($4\text{ pole}$), and $1,200\text{ RPM}$ ($6\text{ pole}$). In $50\text{ Hz}$ grids, corresponding speeds are $3,000$, $1,500$, and $1,000\text{ RPM}$.</p>
+
+<h2>The Physics of Rotor Slip ($s$) and Torque Generation</h2>
+<p>An induction motor can never operate at synchronous speed ($N_r \ne N_s$) under steady mechanical drive conditions. If the conductive rotor turned at the identical speed as the stator flux, the magnetic lines of force would appear stationary relative to the rotor bars. By Faraday's Law of Electromagnetic Induction:</p>
+$$e_{\text{induced}} = -\frac{d\Phi}{dt} = 0$$
+
+<p>With zero relative velocity ($\Delta v = 0$), no voltage is induced, no circulating rotor current flows, and Lorentz magnetic force ($F = I L \times B$) vanishes to zero, extinguishing mechanical torque. To generate drive torque, the rotor must constantly fall behind the rotating stator field. This relative velocity lag is termed <strong>Rotor Slip ($s$)</strong>:</p>
+$$s = \frac{N_s - N_r}{N_s} \times 100\% = \frac{\Delta N}{N_s} \times 100\%$$
+
+<p>The electrical frequency of the alternating current induced within the rotor bars ($f_r$) is directly proportional to slip:</p>
+$$f_r = s \cdot f \quad [\text{Hz}]$$
+
+<p>Under normal full-load operating conditions in standard NEMA Design B or IEC IE3 motors, slip is small ($1.5\%\text{--}4.0\%$), causing rotor currents to cycle at a gentle $1\text{--}2.5\text{ Hz}$, which keeps rotor core hysteresis and eddy current losses negligibly low.</p>
+
+<h2>Full-Load Shaft Torque ($\tau$) and Mechanical Power</h2>
+<p>The mechanical power delivered at the rotating shaft output ($P_{\text{mech}}$) is related to rotational torque ($\tau$) and angular velocity ($\omega = \frac{2\pi N_r}{60}$) by:</p>
+$$P_{\text{mech}} = \tau \cdot \omega = \tau \cdot \left( \frac{2\pi N_r}{60} \right)$$
+
+<p>Rearranging in metric engineering units where power is in Kilowatts ($\text{kW}$) and torque is in Newton-meters ($\text{N}\cdot\text{m}$):</p>
+$$\tau = \frac{60 \times 1000 \cdot P_{\text{kW}}}{2\pi \cdot N_r} = \frac{9548.8 \cdot P_{\text{kW}}}{N_r} \quad [\text{N}\cdot\text{m}]$$
+
+<p>In North American imperial units (Horsepower and pound-feet):</p>
+$$\tau = \frac{5252.1 \cdot \text{HP}}{N_r} \quad [\text{lb-ft}]$$
+
+<h2>Electrical Input Power, Full Load Amps (FLA), and Efficiency</h2>
+<p>Because induction motors draw lagging magnetizing reactive power to establish stator flux, their electrical characteristics depend on line-to-line RMS voltage ($V_{\text{LL}}$), power factor ($\cos\theta$), and electrical-to-mechanical conversion efficiency ($\eta$):</p>
+
+<h3>1. Active and Apparent Power</h3>
+$$P_{\text{in}} = \frac{P_{\text{shaft}}}{\eta} \quad [\text{kW}], \qquad S_{\text{in}} = \frac{P_{\text{in}}}{\cos\theta} \quad [\text{kVA}]$$
+
+<h3>2. Full Load Current (FLA) in Three-Phase Balanced Systems</h3>
+$$P_{\text{in}} = \sqrt{3} \cdot V_{\text{LL}} \cdot I_{\text{FLA}} \cdot \cos\theta \implies I_{\text{FLA}} = \frac{P_{\text{in}} \times 1000}{\sqrt{3} \cdot V_{\text{LL}} \cdot \cos\theta}$$
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>NEMA Motor Design Class</th>
+            <th>Locked Rotor Torque</th>
+            <th>Starting Current (LRA)</th>
+            <th>Full Load Slip</th>
+            <th>Primary Industrial Applications</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>NEMA Design B (Standard)</strong></td>
+            <td>Normal ($120\%\text{--}150\%$)</td>
+            <td>Normal ($600\%\text{--}700\%$ FLA)</td>
+            <td>Low ($1.5\%\text{--}3.5\%$)</td>
+            <td>Centrifugal pumps, HVAC fans, blowers, machine tools</td>
+        </tr>
+        <tr>
+            <td><strong>NEMA Design C (High Torque)</strong></td>
+            <td>High ($200\%\text{--}250\%$)</td>
+            <td>Normal ($600\%\text{--}700\%$ FLA)</td>
+            <td>Low to Medium ($3\%\text{--}5\%$)</td>
+            <td>Loaded conveyors, positive displacement pumps, crushers</td>
+        </tr>
+        <tr>
+            <td><strong>NEMA Design D (High Slip)</strong></td>
+            <td>Very High ($\ge 275\%$)</td>
+            <td>Low ($300\%\text{--}500\%$ FLA)</td>
+            <td>High ($5\%\text{--}13\%$)</td>
+            <td>Punch presses, stamping flywheels, hoists, oil well jacks</td>
+        </tr>
+        <tr>
+            <td><strong>NEMA Design A</strong></td>
+            <td>Normal ($120\%\text{--}150\%$)</td>
+            <td>High ($> 800\%$ FLA)</td>
+            <td>Ultra-Low ($< 1.5\%$)</td>
+            <td>Extremely high efficiency, requires oversized switchgear</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="worked-example-card">
+    <h4>Step-by-Step Engineering Case Study: 30 kW Wastewater Centrifugal Pump Motor</h4>
+    <p><strong>Scenario:</strong> A municipal wastewater pump is driven by a 4-pole 3-phase squirrel-cage induction motor rated at $P_{\text{shaft}} = 30.0\ \text{kW}$ ($40.23\ \text{HP}$) operating on a $400\ \text{V}$, $50\ \text{Hz}$ industrial grid. The manufacturer nameplate lists full-load rotor speed $N_r = 1,460\ \text{RPM}$, nominal efficiency $\eta = 93.6\%$ (IE3 Premium), and full-load power factor $\cos\theta = 0.85$.</p>
+    <div class="step-solution">
+        <p><strong>Step 1: Compute Synchronous Speed ($N_s$):</strong></p>
+        $$N_s = \frac{120 \times 50\ \text{Hz}}{4\ \text{poles}} = \frac{6000}{4} = 1,500\ \text{RPM}$$
+        <p><strong>Step 2: Determine Full-Load Slip ($s$):</strong></p>
+        $$\Delta N = N_s - N_r = 1,500 - 1,460 = 40\ \text{RPM}$$
+        $$s = \frac{40\ \text{RPM}}{1,500\ \text{RPM}} \times 100\% = 2.667\%$$
+        <p><strong>Step 3: Calculate Full-Load Shaft Torque ($\tau$):</strong></p>
+        $$\tau = \frac{9548.8 \times 30.0\ \text{kW}}{1,460\ \text{RPM}} = \frac{286,464}{1,460} = 196.21\ \text{N}\cdot\text{m} \approx 144.72\ \text{lb-ft}$$
+        <p><strong>Step 4: Compute Electrical Input Power ($P_{\text{in}}$) and Apparent Power ($S$):</strong></p>
+        $$P_{\text{in}} = \frac{P_{\text{shaft}}}{\eta} = \frac{30.0\ \text{kW}}{0.936} = 32.051\ \text{kW}$$
+        $$S_{\text{in}} = \frac{32.051\ \text{kW}}{0.85} = 37.707\ \text{kVA}$$
+        <p><strong>Step 5: Determine Full Load Rated Current ($I_{\text{FLA}}$):</strong></p>
+        $$I_{\text{FLA}} = \frac{32.051 \times 1000}{\sqrt{3} \times 400\ \text{V} \times 0.85} = \frac{32,051}{1.73205 \times 340} = \frac{32,051}{588.9} = 54.43\ \text{Amperes}$$
+        <p><strong>Step 6: Rotor Induced Slip Frequency ($f_r$):</strong></p>
+        $$f_r = 0.02667 \times 50\ \text{Hz} = 1.333\ \text{Hz}$$
+        <p><strong>Conclusion:</strong> The motor develops $196.2\ \text{N}\cdot\text{m}$ of shaft torque at $2.67\%$ slip, drawing $54.43\ \text{A}$ of line current with minimal rotor electrical losses ($1.33\ \text{Hz}$ rotor frequency).</p>
+    </div>
+</div>
+
+<h2>Frequently Asked Questions (FAQ)</h2>
+<div class="faq-section">
+    <h3>What is synchronous speed in an AC induction motor?</h3>
+    <p>Synchronous speed ($N_s$) is the rotational velocity of the stator magnetic field, determined by AC line frequency $f$ and pole count $P$: $N_s = \frac{120 \cdot f}{P}\ \text{RPM}$. For a $60\text{ Hz}$ system, synchronous speeds are $3,600\text{ RPM}$ ($2\text{ poles}$), $1,800\text{ RPM}$ ($4\text{ poles}$), and $1,200\text{ RPM}$ ($6\text{ poles}$).</p>
+
+    <h3>Why must an induction motor have rotor slip?</h3>
+    <p>An induction motor relies on Faraday's law of induction. If the rotor spun at synchronous speed, there would be zero relative motion between the rotating stator flux and the rotor bars, inducing zero rotor voltage, zero rotor current, and producing zero mechanical torque. Therefore, an induction motor must always operate below synchronous speed: $\text{Slip } s = \frac{N_s - N_r}{N_s} \times 100\%$.</p>
+
+    <h3>How is full-load torque calculated from shaft power and speed?</h3>
+    <p>Full load torque is calculated as $\tau = \frac{P_{\text{kW}} \times 9548.8}{N_r}$ (in Newton-meters) or $\tau = \frac{5252 \times \text{HP}}{N_r}$ (in pound-feet), where $N_r$ is the rated operating rotor speed in RPM.</p>
+
+    <h3>What is the typical full-load slip for NEMA Design B motors?</h3>
+    <p>Standard NEMA Design B industrial squirrel-cage induction motors operate with full-load slip between $1.5\%$ and $4.0\%$ (e.g., a 4-pole $1,800\text{ RPM}$ motor typically runs at $1,740$ to $1,765\text{ RPM}$ under full rated load).</p>
+</div>
+
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚡</span>
+            <h3 class="widget-title">Related Electrical & Power Systems</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="wire-ampacity-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Ampacity (NEC 310.16)</a></li>
+            <li><a href="conduit-fill-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Conduit Fill (NEC Ch. 9)</a></li>
+            <li><a href="motor-starting-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Motor Starting Current</a></li>
+            <li><a href="short-circuit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Short-Circuit (IEC 60909)</a></li>
+            <li><a href="transformer-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Sizing (NEC 450)</a></li>
+            <li><a href="cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC/NEC)</a></li>
+            <li><a href="voltage-drop-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Drop Calculator</a></li>
+            <li><a href="ohms-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ohm's Law Calculator</a></li>
+            <li><a href="power-factor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Power Factor (kW to kVAR)</a></li>
+            <li><a href="parallel-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistor (Req)</a></li>
+            <li><a href="battery-life-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Life & Runtime</a></li>
+            <li><a href="resistor-color-code-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Color Code</a></li>
+            <li><a href="555-timer-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> 555 Timer Astable & Monostable</a></li>
+            <li><a href="led-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LED Series Resistor Calculator</a></li>
+            <li><a href="capacitive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitive Reactance (Xc)</a></li>
+            <li><a href="inductive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Inductive Reactance (Xl)</a></li>
+            <li><a href="op-amp-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Op-Amp Gain & Inverting/Non-Inv</a></li>
+            <li><a href="three-phase-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three-Phase AC Power (kVA/kW)</a></li>
+            <li><a href="adc-dac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ADC & DAC Converter Resolution</a></li>
+            <li><a href="antenna-length-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Antenna Length & Resonant Dipole</a></li>
+            <li><a href="battery-short-circuit-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Short Circuit (IEC 60896)</a></li>
+            <li><a href="bjt-transistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BJT Transistor Bias & Q-Point</a></li>
+            <li><a href="breaker-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Breaker Size (NEC 125% Rule)</a></li>
+            <li><a href="decibel-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Decibel Calculator (dB, dBm, SPL)</a></li>
+            <li><a href="earth-pit-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earth Pit Resistance (IEEE 80)</a></li>
+            <li><a href="electrical-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Electrical Power & Energy Cost</a></li>
+            <li><a href="microstrip-impedance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Microstrip Impedance (IPC-2141)</a></li>
+            <li><a href="resistor-network-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Network (Delta-Wye & Ladder)</a></li>
+            <li><a href="transformer-turns-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Turns Ratio (a)</a></li>
+            <li><a href="aluminium-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Aluminium Cable Sizing (NEC/IEC)</a></li>
+            <li><a href="busbar-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Busbar Sizing (DIN 43671 / IEC)</a></li>
+            <li><a href="cable-sizing-calculator-bs-7671.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (BS 7671 18th Ed)</a></li>
+            <li><a href="cable-sizing-calculator-iec-60364.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC 60364-5-52)</a></li>
+            <li><a href="cable-sizing-installation-method-a.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method A (Insulated Wall)</a></li>
+            <li><a href="fault-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Fault Current (IEEE 141 / IEC)</a></li>
+            <li><a href="filter-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Analog Filter (RC, RL, LC)</a></li>
+            <li><a href="generator-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Generator Sizing (ISO 8528)</a></li>
+            <li><a href="heatsink-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heatsink Sizing & Thermal</a></li>
+            <li><a href="cable-sizing-installation-method-c.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method C (Clipped Direct)</a></li>
+            <li><a href="cable-sizing-installation-method-e.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method E (Cable Tray)</a></li>
+            <li><a href="cable-sizing-calculator-nec.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (NEC Table 310.16)</a></li>
+            <li><a href="copper-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Copper Cable Sizing (100% IACS)</a></li>
+            <li><a href="earthing-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earthing Cable Size (IEC 60364-5-54)</a></li>
+            <li><a href="kw-to-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> kW to Cable Size (1-Phase & 3-Phase)</a></li>
+            <li><a href="single-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Single Phase Cable Sizing (230V/120V)</a></li>
+            <li><a href="three-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three Phase Cable Sizing (400V/480V)</a></li>
+            <li><a href="wire-gauge-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Gauge (AWG to mm² Metric)</a></li>
+            <li><a href="voltage-divider-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Divider Calculator</a></li>
+            <li><a href="parallel-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistance Calculator</a></li>
+            <li><a href="capacitor-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitor Energy & Pulse Power</a></li>
+            <li><a href="resonant-frequency-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LC Resonant Frequency Tank</a></li>
+            <li><a href="rc-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RC Time Constant (τ = RC)</a></li>
+            <li><a href="rl-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RL Time Constant (τ = L/R)</a></li>
+            <li><a href="zener-diode-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Zener Diode Shunt Regulator</a></li>
+            <li><a href="lm317-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LM317 Voltage Regulator</a></li>
+            <li><a href="pcb-trace-width-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> PCB Trace Width (IPC-2152)</a></li>
+            <li><a href="lightning-protection-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lightning Protection (NFPA 780)</a></li>
+            <li><a href="lumen-lux-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lumen to Lux Illuminance</a></li>
+            <li><a href="lumen-method-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lumen Method Fixture Layout</a></li>
+            <li><a href="motor-parameters-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Motor Parameters & Slip</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="engineering.html" class="sidebar-category-link">View All Electrical & Power Systems Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub provides free, engineering-grade calculators, physics simulation utilities, and architectural layout models verified against IESNA, NEMA, and IEC standards.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Calculator Hubs</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                        <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Engineering Tools</h4>
+                    <ul class="footer-links">
+                        <li><a href="lumen-method-calculator.html">IESNA Zonal Cavity</a></li>
+                        <li><a href="motor-parameters-calculator.html">AC Induction Motor Slip</a></li>
+                        <li><a href="three-phase-power-calculator.html">Three-Phase Power</a></li>
+                        <li><a href="motor-starting-current-calculator.html">Motor Inrush Amps</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precision computational tools for facility engineers, electricians, and MEP designers.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+    
+function computeMotorParams() {
+    var pwrVal = parseFloat(document.getElementById('mp-power').value);
+    var pwrUnit = parseFloat(document.getElementById('mp-pwr-unit').value);
+    var f = parseFloat(document.getElementById('mp-freq').value);
+    var P = parseInt(document.getElementById('mp-poles').value, 10);
+    var nr = parseFloat(document.getElementById('mp-rotor-rpm').value);
+    var V = parseFloat(document.getElementById('mp-voltage').value);
+    var pf = parseFloat(document.getElementById('mp-pf').value);
+    var effPct = parseFloat(document.getElementById('mp-eff').value);
+
+    if (isNaN(pwrVal) || pwrVal <= 0 || isNaN(nr) || nr <= 0 || isNaN(V) || V <= 0 || isNaN(pf) || pf <= 0 || isNaN(effPct) || effPct <= 0) return;
+
+    var P_shaft_kW = pwrVal * pwrUnit; // kW
+    var P_shaft_HP = P_shaft_kW / 0.745699872;
+    var eff = effPct / 100.0;
+
+    // Synchronous speed Ns = 120 * f / P
+    var Ns = (120.0 * f) / P;
+
+    // Check rotor speed
+    if (nr >= Ns) {
+        document.getElementById('res-mp-slip').textContent = "Invalid: Induction motor rotor must run slower than Ns (" + Ns + " RPM)";
+        return;
+    }
+
+    // Slip s = (Ns - Nr) / Ns * 100%
+    var slipRpm = Ns - nr;
+    var slipRatio = slipRpm / Ns;
+    var slipPct = slipRatio * 100.0;
+
+    // Induced rotor frequency fr = s * f
+    var fr = slipRatio * f;
+
+    // Full load torque tau = (P_kW * 9548.8) / nr (N*m)
+    var torque_Nm = (P_shaft_kW * 9548.8) / nr;
+    var torque_lbft = torque_Nm * 0.737562;
+
+    // Electrical input power Pin = P_shaft / eff (kW)
+    var P_in_kW = P_shaft_kW / eff;
+    var S_kVA = P_in_kW / pf;
+
+    // Full load current FLA for 3-phase: I = Pin / (sqrt(3) * V * pf)
+    var I_fla = (P_in_kW * 1000.0) / (Math.sqrt(3.0) * V * pf);
+
+    document.getElementById('res-mp-ns').textContent = Ns.toFixed(0) + " RPM (Stator Flux Speed)";
+    document.getElementById('res-mp-slip').textContent = slipPct.toFixed(2) + "% (" + slipRpm.toFixed(1) + " RPM slip speed)";
+    document.getElementById('res-mp-torque').textContent = torque_Nm.toFixed(2) + " N·m (" + torque_lbft.toFixed(2) + " lb-ft)";
+    document.getElementById('res-mp-pin').textContent = P_in_kW.toFixed(2) + " kW (" + S_kVA.toFixed(2) + " kVA Apparent)";
+    document.getElementById('res-mp-fla').textContent = I_fla.toFixed(2) + " Amperes";
+    document.getElementById('res-mp-fr').textContent = fr.toFixed(2) + " Hz";
+}
+
+document.getElementById('calc-mp-btn').addEventListener('click', computeMotorParams);
+['mp-power', 'mp-pwr-unit', 'mp-freq', 'mp-poles', 'mp-rotor-rpm', 'mp-voltage', 'mp-pf', 'mp-eff'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', computeMotorParams);
+    document.getElementById(id).addEventListener('change', computeMotorParams);
+});
+window.addEventListener('DOMContentLoaded', computeMotorParams);
+
+    </script>
+</body>
+</html>

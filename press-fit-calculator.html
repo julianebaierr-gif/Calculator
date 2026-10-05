@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Press Fit Calculator - Interference, Contact Pressure & Push-On Force</title>
+    <meta name="description" content="Calculate interference press fit contact pressure (Lame equations), assembly push-on force, torque transmission capacity, and thermal shrink fit temperature.">
+    <link rel="canonical" href="https://calchub.com/press-fit-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Press Fit Calculator",
+      "url": "https://calchub.com/press-fit-calculator.html",
+      "description": "Calculates interference fit radial contact pressure, assembly push-on force, torque capacity, and shrink fit temperatures using Lamé equations.",
+      "applicationCategory": "EngineeringApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is an interference press fit?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "An interference press fit (or shrink fit) is a permanent or semi-permanent mechanical fastening method where the outer diameter of a shaft is slightly larger than the mating bore diameter of a hub. When forced together, elastic deformation generates intense radial contact pressure, enabling torque and axial load transmission via friction without keys, splines, or welds."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Lamé's thick-walled cylinder theory apply to press fits?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Lamé equations model the radial and tangential hoop stress distributions in thick-walled concentric cylinders. By matching the radial displacement delta of the inner cylinder (shaft compression) and outer cylinder (hub dilation) at the interface boundary, the exact interfacial contact pressure p is determined."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between mechanical press fitting and thermal shrink fitting?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Mechanical press fitting forces components together at ambient temperature using a hydraulic press, requiring high insertion force and creating galling or scoring risk. Thermal shrink fitting heats the hub (expanding the bore) or cools the shaft in liquid nitrogen/dry ice (shrinking the shaft) to achieve zero-clearance drop-in assembly without mechanical abrasion."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What ISO tolerance classes correspond to interference fits?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Common ISO interference fits include H7/p6 (light press fit for rigid positioning), H7/r6 (medium drive fit for permanent hubs), and H7/s6 (heavy permanent shrink fit for maximum torque transmission)."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="converter.html">Converters</a>
+                <a href="engineering.html">Engineering</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="engineering.html">Engineering</a> &gt; <span>Press Fit &amp; Interference Fit Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Press Fit &amp; Interference Fit Calculator</h1>
+                        <p class="calc-desc">Determine radial contact pressure, assembly press force, torque transmission capacity, and shrink-fit thermal heating using Lamé thick-walled cylinder theory.</p>
+                    </div>
+                    
+<div class="calc-grid">
+    <div class="calc-input-group">
+        <label for="pf-d">Nominal Interface Diameter ($d$):</label>
+        <div class="input-with-select">
+            <input type="number" id="pf-d" value="50" min="1" step="any">
+            <select id="pf-d-unit">
+                <option value="1" selected>Millimeters (mm)</option>
+                <option value="25.4">Inches (in)</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="pf-do">Hub Outer Diameter ($d_o$):</label>
+        <div class="input-with-select">
+            <input type="number" id="pf-do" value="100" min="1.1" step="any">
+            <select id="pf-do-unit">
+                <option value="1" selected>Millimeters (mm)</option>
+                <option value="25.4">Inches (in)</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="pf-di">Shaft Inner Bore ($d_i$, 0 for solid):</label>
+        <div class="input-with-select">
+            <input type="number" id="pf-di" value="0" min="0" step="any">
+            <select id="pf-di-unit">
+                <option value="1" selected>Millimeters (mm)</option>
+                <option value="25.4">Inches (in)</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="pf-length">Engagement Hub Length ($L$):</label>
+        <div class="input-with-select">
+            <input type="number" id="pf-length" value="60" min="1" step="any">
+            <select id="pf-length-unit">
+                <option value="1" selected>Millimeters (mm)</option>
+                <option value="25.4">Inches (in)</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="pf-interf">Total Diametral Interference ($\delta$):</label>
+        <div class="input-with-select">
+            <input type="number" id="pf-interf" value="0.040" min="0.0001" step="any">
+            <select id="pf-interf-unit">
+                <option value="1" selected>Millimeters (mm)</option>
+                <option value="0.001">&mu;m (microns)</option>
+                <option value="0.0254">mils (0.001 in)</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-input-group">
+        <label for="pf-material">Material Pair (Shaft / Hub):</label>
+        <select id="pf-material">
+            <option value="steel-steel" selected>Steel on Steel (E = 207 GPa, &nu; = 0.30)</option>
+            <option value="steel-ci">Steel on Cast Iron (E_hub = 100 GPa, &nu; = 0.25)</option>
+            <option value="steel-bronze">Steel on Bronze (E_hub = 110 GPa, &nu; = 0.34)</option>
+            <option value="steel-alum">Steel on Aluminum (E_hub = 70 GPa, &nu; = 0.33)</option>
+        </select>
+    </div>
+    <div class="calc-input-group">
+        <label for="pf-fric">Interface Friction Coefficient ($\mu$):</label>
+        <div class="input-with-select">
+            <input type="number" id="pf-fric" value="0.12" min="0.01" max="0.5" step="0.01">
+            <select id="pf-fric-preset" onchange="document.getElementById('pf-fric').value = this.value; computePressFit();">
+                <option value="0.12">Lubricated Press-Fit (0.10 &ndash; 0.12)</option>
+                <option value="0.18">Dry Press-Fit Assembly (0.15 &ndash; 0.20)</option>
+                <option value="0.25">Shrink-Fit Degreased (0.20 &ndash; 0.30)</option>
+            </select>
+        </div>
+    </div>
+</div>
+<button id="calc-pf-btn" class="calc-btn">Calculate Interference Fit Metrics</button>
+<div class="calc-results-card" id="pf-results">
+    <h3>Contact Pressure &amp; Assembly Capacity</h3>
+    <div class="result-row highlight-result">
+        <span class="result-label">Radial Contact Pressure ($p$):</span>
+        <span class="result-val" id="res-pf-p">49.68 MPa (7,205 psi)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Axial Assembly Push Force ($F_{	ext{axial}}$):</span>
+        <span class="result-val" id="res-pf-faxial">56.19 kN (12,631 lbf)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Transmittable Torque Capacity ($T_{	ext{max}}$):</span>
+        <span class="result-val" id="res-pf-torque">1,404.7 N&middot;m (1,036 ft-lb)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Max Tangential Hoop Stress in Hub ($\sigma_{t,	ext{max}}$):</span>
+        <span class="result-val" id="res-pf-hoop">82.80 MPa (Tensile at bore)</span>
+    </div>
+    <div class="result-row">
+        <span class="result-label">Thermal Shrink-Fit Heating ($\Delta T$ for 0.02mm assembly clearance):</span>
+        <span class="result-val" id="res-pf-temp">+100.0 &deg;C above ambient (Target: 125 &deg;C)</span>
+    </div>
+</div>
+
+                </div>
+                <article class="article-body">
+                    
+<h2>Principles of Interference Press Fits and Shrink Fits</h2>
+<p>An interference fit (commonly called a press fit or shrink fit) is a semi-permanent or permanent mechanical assembly technique where a male cylindrical component (shaft or pin) has an outer diameter intentionally manufactured larger than the mating female bore of a hub, gear, pulley, or bearing ring. When assembled, the negative clearance (interference $\delta$) creates mutual elastic deformation: the shaft contracts radially under compression, while the surrounding hub expands outward under tension.</p>
+
+<p>This elastic strain establishes a severe continuous <strong>radial interface contact pressure ($p$)</strong> across the mating boundary. Frictional adhesion between the pressurized micro-asperities of the two mating surfaces allows direct transmission of large torsional twisting moments ($T$) and bidirectional axial thrust loads ($F_{\text{axial}}$) without requiring failure-prone keyways, splines, set screws, or fusion welding.</p>
+
+<h2>Thick-Walled Cylinder Mechanics: Lamé Elasticity Formulations</h2>
+<p>To accurately calculate the interface contact pressure, both components are modeled as concentric thick-walled elastic cylinders using Gabriel Lamé's classical 1852 elastostatic boundary value equations.</p>
+
+<p>For a thick-walled cylinder subjected to internal pressure $p_i$ and external pressure $p_o$, radial stress $\sigma_r(r)$ and tangential hoop stress $\sigma_t(r)$ at radius $r$ are:</p>
+$$\sigma_r(r) = \frac{p_i r_i^2 - p_o r_o^2}{r_o^2 - r_i^2} - \frac{(p_i - p_o) r_i^2 r_o^2}{r^2 (r_o^2 - r_i^2)}$$
+$$\sigma_t(r) = \frac{p_i r_i^2 - p_o r_o^2}{r_o^2 - r_i^2} + \frac{(p_i - p_o) r_i^2 r_o^2}{r^2 (r_o^2 - r_i^2)}$$
+
+<h3>Derivation of Contact Pressure ($p$) from Total Interference ($\delta$)</h3>
+<p>At the mating nominal diameter $d = 2r$, the total diametral interference $\delta = d_{\text{shaft}} - d_{\text{hole}}$ is the absolute sum of the radial dilation of the hub bore ($\Delta d_o$) and the radial contraction of the shaft surface ($\Delta d_i$):</p>
+$$\delta = |\Delta d_o| + |\Delta d_i|$$
+
+<p>Applying Hooke's generalized plane stress law ($\varepsilon_t = \frac{\Delta d}{d} = \frac{\sigma_t - \nu \sigma_r}{E}$) to both cylinders yields the master press-fit interference relationship:</p>
+$$p = \frac{\delta}{d \left[ \frac{1}{E_o}\left( \frac{d_o^2 + d^2}{d_o^2 - d^2} + \nu_o \right) + \frac{1}{E_i}\left( \frac{d^2 + d_i^2}{d^2 - d_i^2} - \nu_i \right) \right]} \quad [\text{Pascals}]$$
+
+<p>Where:</p>
+<ul>
+    <li><strong>$d$</strong>: Nominal mating contact diameter ($\text{m}$).</li>
+    <li><strong>$d_o$</strong>: Outer diameter of the exterior hub ($\text{m}$).</li>
+    <li><strong>$d_i$</strong>: Internal bore diameter of a hollow shaft ($d_i = 0$ for a solid solid shaft, simplifying the bracketed shaft term to $\frac{1 - \nu_i}{E_i}$).</li>
+    <li><strong>$E_o, E_i$</strong>: Young's Modulus of elasticity of the hub and shaft materials ($\text{Pa}$).</li>
+    <li><strong>$\nu_o, \nu_i$</strong>: Poisson's ratio of the hub and shaft materials.</li>
+    <li><strong>$\delta$</strong>: Total diametral interference ($\text{m}$).</li>
+</ul>
+
+<h2>Load Transmission Capacities: Axial Force and Torque</h2>
+<p>Once contact pressure $p$ is established across engagement length $L$, the assembly's frictional load-holding capacity is governed by Coulomb friction with coefficient $\mu$:</p>
+
+<h3>1. Axial Holding Capacity and Insertion Push Force ($F_{\text{axial}}$)</h3>
+<p>The total normal force acting across the cylindrical surface area $A_{\text{contact}} = \pi \cdot d \cdot L$ is $N_{\text{total}} = p \cdot \pi \cdot d \cdot L$. The maximum axial force the joint can sustain before slipping (and the required hydraulic ram push-on assembly force) is:</p>
+$$F_{\text{axial}} = \mu \cdot p \cdot \pi \cdot d \cdot L \quad [\text{Newtons}]$$
+
+<h3>2. Torsional Torque Capacity ($T_{\text{max}}$)</h3>
+<p>Because frictional shear traction acts at radius $r = \frac{d}{2}$, the maximum transmittable torque before angular slippage is:</p>
+$$T_{\text{max}} = F_{\text{axial}} \cdot \left( \frac{d}{2} \right) = \frac{1}{2} \mu \cdot p \cdot \pi \cdot d^2 \cdot L \quad [\text{N}\cdot\text{m}]$$
+
+<h2>Peak Tangential Hoop Stress and Hub Rupture Safety</h2>
+<p>The most vulnerable region in any interference assembly is the inner bore surface of the hub ($r = d/2$), where tensile tangential hoop stress reaches its maximum value:</p>
+$$\sigma_{t,\text{max}} = p \left( \frac{d_o^2 + d^2}{d_o^2 - d^2} \right) \quad [\text{Tensile}]$$
+
+<p>Combining tensile hoop stress with compressive radial stress ($\sigma_r = -p$), the equivalent von Mises stress at the hub bore is:</p>
+$$\sigma_{\text{von Mises}} = \sqrt{\sigma_t^2 - \sigma_t \sigma_r + \sigma_r^2} = \sqrt{\sigma_t^2 + \sigma_t p + p^2}$$
+
+<p>To avoid plastic yielding, cracking, or permanent loosening of the joint, the von Mises stress must satisfy $\sigma_{\text{von Mises}} \le \frac{S_{y,\text{hub}}}{\text{FoS}}$.</p>
+
+<h2>Thermal Shrink-Fit Assembly Temperature ($\Delta T$)</h2>
+<p>Mechanical press fitting at ambient temperature requires massive hydraulic rams and risks destructive surface galling, scoring, and metal transfer. Thermal shrink fitting bypasses mechanical abrasion by thermally expanding the hub or cryogenic shrinking the shaft.</p>
+
+<p>To provide smooth drop-in assembly with a safe assembly diametral clearance (typically $c = 0.02\text{--}0.05\ \text{mm}$), the required temperature differential $\Delta T$ is:</p>
+$$\Delta T = \frac{\delta + c}{\alpha_{\text{hub}} \cdot d} \quad [^\circ\text{C}]$$
+
+<p>Where $\alpha_{\text{hub}}$ is the linear thermal expansion coefficient of the hub material (e.g., $12 \times 10^{-6}\ /^\circ\text{C}$ for carbon steel; $23 \times 10^{-6}\ /^\circ\text{C}$ for aluminum).</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>ISO Fit Class</th>
+            <th>Type of Fit</th>
+            <th>Typical Interference Range</th>
+            <th>Primary Application Field</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>H7 / p6</strong></td>
+            <td>Light Press Fit</td>
+            <td>$0.015\text{--}0.035\ \text{mm}$</td>
+            <td>Locating dowels, small gear hubs, non-slip bushings</td>
+        </tr>
+        <tr>
+            <td><strong>H7 / r6</strong></td>
+            <td>Medium Drive Fit</td>
+            <td>$0.025\text{--}0.055\ \text{mm}$</td>
+            <td>Couplings, machine tool pulleys, permanent bearing collars</td>
+        </tr>
+        <tr>
+            <td><strong>H7 / s6</strong></td>
+            <td>Heavy Permanent Shrink Fit</td>
+            <td>$0.040\text{--}0.090\ \text{mm}$</td>
+            <td>Locomotive wheel tires, heavy crane bull gears, turbines</td>
+        </tr>
+        <tr>
+            <td><strong>H7 / u6</strong></td>
+            <td>Extreme Force Fit</td>
+            <td>$0.060\text{--}0.150\ \text{mm}$</td>
+            <td>Maximum torque assemblies, stress relief heat treatment required</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="worked-example-card">
+    <h4>Step-by-Step Engineering Case Study: Heavy Drive Gear on Solid Steel Shaft</h4>
+    <p><strong>Scenario:</strong> A steel spur gear hub ($E_o = 207\ \text{GPa}$, $\nu_o = 0.30$, $S_y = 400\ \text{MPa}$) with outer diameter $d_o = 120\ \text{mm}$ and width $L = 75\ \text{mm}$ is shrink-fitted onto a solid steel shaft ($d_i = 0$, $E_i = 207\ \text{GPa}$, $\nu_i = 0.30$) of nominal diameter $d = 60\ \text{mm}$. The total diametral interference is ground to $\delta = 0.050\ \text{mm}$ ($50\ \mu\text{m}$). The interface coefficient of friction is $\mu = 0.15$.</p>
+    <div class="step-solution">
+        <p><strong>Step 1: Calculate Cylinder Geometric Compliances:</strong></p>
+        $$\frac{d_o^2 + d^2}{d_o^2 - d^2} = \frac{120^2 + 60^2}{120^2 - 60^2} = \frac{14400 + 3600}{14400 - 3600} = \frac{18000}{10800} = 1.6667$$
+        $$\text{Term}_{\text{hub}} = \frac{1}{207 \times 10^9} [1.6667 + 0.30] = \frac{1.9667}{207 \times 10^9} = 9.501 \times 10^{-12}\ \text{m}^2/\text{N}$$
+        $$\text{Term}_{\text{shaft}} = \frac{1}{207 \times 10^9} [1.0 - 0.30] = \frac{0.70}{207 \times 10^9} = 3.382 \times 10^{-12}\ \text{m}^2/\text{N}$$
+        <p><strong>Step 2: Determine Interface Contact Pressure ($p$):</strong></p>
+        $$p = \frac{\delta}{d (\text{Term}_{\text{hub}} + \text{Term}_{\text{shaft}})} = \frac{0.000050\ \text{m}}{0.060 \times (9.501 + 3.382) \times 10^{-12}}$$
+        $$p = \frac{5.0 \times 10^{-5}}{0.060 \times 12.883 \times 10^{-12}} = \frac{5.0 \times 10^{-5}}{7.7298 \times 10^{-13}} = 64.685 \times 10^6\ \text{Pa} = 64.69\ \text{MPa}$$
+        <p><strong>Step 3: Calculate Transmittable Torque Capacity ($T_{\text{max}}$):</strong></p>
+        $$T_{\text{max}} = \frac{1}{2} \mu \cdot p \cdot \pi \cdot d^2 \cdot L = 0.5 \times 0.15 \times 64.69 \times 10^6 \times \pi \times (0.060)^2 \times 0.075$$
+        $$T_{\text{max}} = 4.85175 \times 10^6 \times 3.14159 \times 0.0036 \times 0.075 = 4,115.4\ \text{N}\cdot\text{m}$$
+        <p><strong>Step 4: Check Hub Bore Tensile Hoop Stress and Yield Safety:</strong></p>
+        $$\sigma_{t,\text{max}} = p \times 1.6667 = 64.69\ \text{MPa} \times 1.6667 = 107.82\ \text{MPa}$$
+        $$\sigma_{\text{von Mises}} = \sqrt{107.82^2 + (107.82 \times 64.69) + 64.69^2} = \sqrt{11625 + 6975 + 4185} = \sqrt{22785} = 150.95\ \text{MPa}$$
+        $$\text{FoS} = \frac{S_y}{\sigma_{\text{von Mises}}} = \frac{400\ \text{MPa}}{150.95\ \text{MPa}} = 2.65\ \text{(Safe)}$$
+        <p><strong>Conclusion:</strong> The joint safely transmits over $4,115\ \text{N}\cdot\text{m}$ of continuous torque with a high safety factor of $2.65$ against hub yielding.</p>
+    </div>
+</div>
+
+<h2>Frequently Asked Questions (FAQ)</h2>
+<div class="faq-section">
+    <h3>What is an interference press fit?</h3>
+    <p>An interference press fit (or shrink fit) is a permanent or semi-permanent mechanical fastening method where the outer diameter of a shaft is slightly larger than the mating bore diameter of a hub. When forced together, elastic deformation generates intense radial contact pressure, enabling torque and axial load transmission via friction without keys, splines, or welds.</p>
+
+    <h3>How does Lamé's thick-walled cylinder theory apply to press fits?</h3>
+    <p>Lamé equations model the radial and tangential hoop stress distributions in thick-walled concentric cylinders. By matching the radial displacement $\delta$ of the inner cylinder (shaft compression) and outer cylinder (hub dilation) at the interface boundary, the exact interfacial contact pressure $p$ is determined.</p>
+
+    <h3>What is the difference between mechanical press fitting and thermal shrink fitting?</h3>
+    <p>Mechanical press fitting forces components together at ambient temperature using a hydraulic press, requiring high insertion force and creating galling or scoring risk. Thermal shrink fitting heats the hub (expanding the bore) or cools the shaft in liquid nitrogen/dry ice (shrinking the shaft) to achieve zero-clearance drop-in assembly without mechanical abrasion.</p>
+
+    <h3>What ISO tolerance classes correspond to interference fits?</h3>
+    <p>Common ISO interference fits include H7/p6 (light press fit for rigid positioning), H7/r6 (medium drive fit for permanent hubs), and H7/s6 (heavy permanent shrink fit for maximum torque transmission).</p>
+</div>
+
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚙️</span>
+            <h3 class="widget-title">Related Mechanical & HVAC</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bolt-torque-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Bolt Torque & Preload</a></li>
+            <li><a href="bearing-life-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Bearing Life (ISO 281)</a></li>
+            <li><a href="pump-head-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pump Head (TDH & Flow)</a></li>
+            <li><a href="gear-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Gear Ratio & Speed</a></li>
+            <li><a href="cooling-load-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cooling Load (HVAC) Sizing</a></li>
+            <li><a href="pipe-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pipe Sizing & Water Flow</a></li>
+            <li><a href="torque-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Torque & Shaft Power</a></li>
+            <li><a href="belt-length-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Belt Length (Open & Crossed Pulley)</a></li>
+            <li><a href="conveyor-belt-speed-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Conveyor Belt Speed & Tonnage</a></li>
+            <li><a href="cutting-speed-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cutting Speed & Spindle RPM</a></li>
+            <li><a href="feed-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> CNC Feed Rate & Chip Load</a></li>
+            <li><a href="flywheel-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Flywheel Kinetic Energy & Stress</a></li>
+            <li><a href="gear-module-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Gear Module & Pitch Geometry</a></li>
+            <li><a href="heat-exchanger-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heat Exchanger (LMTD & NTU Area)</a></li>
+            <li><a href="hvac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> HVAC Sizing & Cooling Tonnage</a></li>
+            <li><a href="hydraulic-cylinder-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Hydraulic Cylinder Sizing (ISO 6020)</a></li>
+            <li><a href="hydraulic-cylinder-force-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Hydraulic Cylinder Net Force (ISO 3320)</a></li>
+            <li><a href="hydraulic-cylinder-speed-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Hydraulic Cylinder Speed & Flow</a></li>
+            <li><a href="hydraulic-pump-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Hydraulic Pump Power (ISO 4409)</a></li>
+            <li><a href="power-to-torque-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Power to Torque & Shaft Sizing</a></li>
+            <li><a href="psychrometric-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Psychrometric & Moist Air (ASHRAE)</a></li>
+            <li><a href="pulley-mechanical-advantage-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pulley Mechanical Advantage (CMAA 70)</a></li>
+            <li><a href="pulley-rpm-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pulley RPM & Belt Speed (ISO 5296)</a></li>
+            <li><a href="pump-flow-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pump Flow Rate & Velocity</a></li>
+            <li><a href="reynolds-number-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Reynolds Number (Moody & Swamee-Jain)</a></li>
+            <li><a href="shaft-diameter-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Shaft Diameter (ASME B106.1M)</a></li>
+            <li><a href="spring-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Helical Spring Rate (SMI / ASTM A228)</a></li>
+            <li><a href="thermal-expansion-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Thermal Expansion & Pipe Stress</a></li>
+            <li><a href="torque-converter.html" class="sidebar-link-item"><span class="link-bullet">›</span> Torque Converter Sizing (SAE J643)</a></li>
+            <li><a href="torque-to-hp-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Torque to HP & BMEP Converter</a></li>
+            <li><a href="projectile-motion-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Projectile Motion Trajectory</a></li>
+            <li><a href="factor-of-safety-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Factor of Safety (ASME / AISC)</a></li>
+            <li><a href="lead-screw-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lead Screw & Power Screw Torque</a></li>
+            <li><a href="press-fit-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Press Fit & Interference Fits</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="mechanical.html" class="sidebar-category-link">View All Mechanical & HVAC Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub provides free, laboratory-verified computational tools for mechanical, structural, and electrical engineers designed around ASME, ISO, and DIN industrial standards.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Calculator Hubs</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                        <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Mechanical Engines</h4>
+                    <ul class="footer-links">
+                        <li><a href="lead-screw-calculator.html">Lead Screw Torque</a></li>
+                        <li><a href="press-fit-calculator.html">Press Fit Interference</a></li>
+                        <li><a href="bolt-torque-calculator.html">Bolt Preload &amp; Torque</a></li>
+                        <li><a href="factor-of-safety-calculator.html">Factor of Safety</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precision mechanical engineering and power transmission models.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+    
+function computePressFit() {
+    var dVal = parseFloat(document.getElementById('pf-d').value);
+    var dUnit = parseFloat(document.getElementById('pf-d-unit').value);
+    var doVal = parseFloat(document.getElementById('pf-do').value);
+    var doUnit = parseFloat(document.getElementById('pf-do-unit').value);
+    var diVal = parseFloat(document.getElementById('pf-di').value);
+    var diUnit = parseFloat(document.getElementById('pf-di-unit').value);
+    var lVal = parseFloat(document.getElementById('pf-length').value);
+    var lUnit = parseFloat(document.getElementById('pf-length-unit').value);
+    var deltaVal = parseFloat(document.getElementById('pf-interf').value);
+    var deltaUnit = parseFloat(document.getElementById('pf-interf-unit').value);
+    var matKey = document.getElementById('pf-material').value;
+    var mu = parseFloat(document.getElementById('pf-fric').value);
+
+    if (isNaN(dVal) || dVal <= 0 || isNaN(doVal) || doVal <= dVal || isNaN(deltaVal) || deltaVal <= 0 || isNaN(mu) || mu <= 0) return;
+
+    var d = (dVal * dUnit) / 1000.0; // meters
+    var d_o = (doVal * doUnit) / 1000.0; // meters
+    var d_i = isNaN(diVal) ? 0 : (diVal * diUnit) / 1000.0; // meters
+    var L = (lVal * lUnit) / 1000.0; // meters
+    var delta = (deltaVal * deltaUnit) / 1000.0; // meters
+
+    // Elastic Modulus and Poisson's ratio
+    var Ei = 207e9; // Steel shaft (Pa)
+    var nui = 0.30;
+    var Eo = 207e9; // Hub
+    var nuo = 0.30;
+    var alpha_hub = 12e-6; // 1/C for steel
+
+    if (matKey === 'steel-ci') {
+        Eo = 100e9;
+        nuo = 0.25;
+        alpha_hub = 10.5e-6;
+    } else if (matKey === 'steel-bronze') {
+        Eo = 110e9;
+        nuo = 0.34;
+        alpha_hub = 18e-6;
+    } else if (matKey === 'steel-alum') {
+        Eo = 70e9;
+        nuo = 0.33;
+        alpha_hub = 23e-6;
+    }
+
+    // Lamé Thick-Walled Cylinder Equation:
+    // delta = d * p * [ (1/Eo)*((do^2 + d^2)/(do^2 - d^2) + nuo) + (1/Ei)*((d^2 + di^2)/(d^2 - di^2) - nui) ]
+    var term_hub = (1.0 / Eo) * (((Math.pow(d_o, 2) + Math.pow(d, 2)) / (Math.pow(d_o, 2) - Math.pow(d, 2))) + nuo);
+    var term_shaft = 0;
+    if (d_i > 0 && d_i < d) {
+        term_shaft = (1.0 / Ei) * (((Math.pow(d, 2) + Math.pow(d_i, 2)) / (Math.pow(d, 2) - Math.pow(d_i, 2))) - nui);
+    } else {
+        // Solid shaft: (d^2 + 0)/(d^2 - 0) = 1
+        term_shaft = (1.0 / Ei) * (1.0 - nui);
+    }
+
+    var denom = d * (term_hub + term_shaft);
+    if (denom <= 0) return;
+    var p = delta / denom; // Pascals
+
+    var p_MPa = p / 1e6;
+    var p_psi = p_MPa * 145.0377;
+
+    // Axial Assembly Force F_axial = pi * d * L * p * mu
+    var F_axial = Math.PI * d * L * p * mu; // Newtons
+    var F_kN = F_axial / 1000.0;
+    var F_lbf = F_axial * 0.224809;
+
+    // Torque Capacity T = 0.5 * pi * d^2 * L * p * mu = F_axial * (d / 2)
+    var T_Nm = F_axial * (d / 2.0); // N*m
+    var T_ftlb = T_Nm * 0.737562;
+
+    // Max Tangential Hoop Stress in Hub at inner bore: sigma_t = p * (do^2 + d^2) / (do^2 - d^2)
+    var sigma_t = p * ((Math.pow(d_o, 2) + Math.pow(d, 2)) / (Math.pow(d_o, 2) - Math.pow(d, 2)));
+    var sigma_t_MPa = sigma_t / 1e6;
+
+    // Shrink Fit Temperature: delta_T = (delta + clearance) / (alpha * d)
+    // Add 0.02 mm assembly clearance
+    var clear_m = 0.00002;
+    var delta_T = (delta + clear_m) / (alpha_hub * d);
+    var target_T = 25.0 + delta_T;
+
+    document.getElementById('res-pf-p').textContent = p_MPa.toFixed(2) + " MPa (" + p_psi.toFixed(0) + " psi)";
+    document.getElementById('res-pf-faxial').textContent = F_kN.toFixed(2) + " kN (" + F_lbf.toFixed(0) + " lbf)";
+    document.getElementById('res-pf-torque').textContent = T_Nm.toFixed(1) + " N·m (" + T_ftlb.toFixed(0) + " ft-lb)";
+    document.getElementById('res-pf-hoop').textContent = sigma_t_MPa.toFixed(2) + " MPa (Tensile at bore)";
+    document.getElementById('res-pf-temp').textContent = "+" + delta_T.toFixed(1) + " °C above ambient (Bore target: " + target_T.toFixed(0) + " °C)";
+}
+
+document.getElementById('calc-pf-btn').addEventListener('click', computePressFit);
+['pf-d', 'pf-d-unit', 'pf-do', 'pf-do-unit', 'pf-di', 'pf-di-unit', 'pf-length', 'pf-length-unit', 'pf-interf', 'pf-interf-unit', 'pf-material', 'pf-fric'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', computePressFit);
+    document.getElementById(id).addEventListener('change', computePressFit);
+});
+window.addEventListener('DOMContentLoaded', computePressFit);
+
+    </script>
+</body>
+</html>
