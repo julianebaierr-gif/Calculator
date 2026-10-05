@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3-Phase Power Calculator | Real, Reactive & Apparent Power (kW, kVAR, kVA)</title>
+    <meta name="description" content="Calculate active, reactive, and apparent power, line and phase currents, power factor correction capacitance, and load impedance for balanced 3-phase Wye (Star) and Delta electrical systems.">
+    <link rel="canonical" href="https://calchub.com/3-phase-power-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "3-Phase Power Calculator",
+      "url": "https://calchub.com/3-phase-power-calculator.html",
+      "applicationCategory": "EngineeringApplication",
+      "operatingSystem": "All",
+      "description": "Calculate 3-phase electrical power parameters including real power (kW), reactive power (kVAR), apparent power (kVA), phase currents, and power factor correction capacitance.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why is the square root of 3 (sqrt(3) ≈ 1.732) used in 3-phase power calculations?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The factor sqrt(3) arises geometrically from the 120-degree phase displacement between the three sinusoidal voltages. In a balanced Wye (Star) connection, vector addition of two 120-degree displaced phase voltages yields a line-to-line voltage magnitude equal to sqrt(3) times the phase-to-neutral voltage: V_LL = sqrt(3) * V_LN."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between active (kW), reactive (kVAR), and apparent (kVA) power?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Active power (P in kW) represents the actual usable energy consumed by resistive loads to perform mechanical work or heat generation. Reactive power (Q in kVAR) is the non-working oscillating power required to sustain magnetic fields in inductive equipment such as motors and transformers. Apparent power (S in kVA) is the total vector sum of active and reactive power: S = sqrt(P^2 + Q^2)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does current and voltage differ between Wye (Star) and Delta configurations?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In a Wye (Star) system, line current equals phase current (I_line = I_phase), while line-to-line voltage is sqrt(3) times phase voltage (V_LL = sqrt(3) * V_phase). In a Delta system, line-to-line voltage equals phase voltage (V_LL = V_phase), while line current is sqrt(3) times phase current (I_line = sqrt(3) * I_phase)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is power factor correction capacitor rating (kVAR) calculated?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The required corrective reactive power Q_c is calculated using: Q_c = P * [tan(acos(PF_initial)) - tan(acos(PF_target))]. Installing shunt capacitors with rating Q_c cancels lagging inductive reactive current, reducing apparent kVA demand and eliminating utility power factor penalties."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="converter.html">Converters</a>
+                <a href="engineering.html">Engineering</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="engineering.html">Engineering</a> &gt; <span>3-Phase Power Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>3-Phase Power Calculator</h1>
+                        <p class="calc-desc">Compute 3-phase real power (kW), reactive power (kVAR), apparent power (kVA), line-to-line vs line-to-neutral voltages, and power factor correction capacitors.</p>
+                    </div>
+                    <div class="calculator-form">
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="p3_calc_mode">Calculation Target:</label>
+            <select id="p3_calc_mode">
+                <option value="from_vi">Calculate Power from Voltage &amp; Current</option>
+                <option value="from_p">Calculate Current from Known Power (kW)</option>
+            </select>
+        </div>
+        <div class="calc-field">
+            <label for="p3_connection">Configuration:</label>
+            <select id="p3_connection">
+                <option value="wye">Wye / Star (Y) Connection</option>
+                <option value="delta">Delta (Δ) Connection</option>
+            </select>
+        </div>
+    </div>
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="p3_vll">Line-to-Line Voltage \(V_{L-L}\) (V):</label>
+            <input type="number" id="p3_vll" value="480" step="1" min="1">
+            <small class="field-hint">e.g., 480V, 400V, 208V, 600V</small>
+        </div>
+        <div class="calc-field" id="box_p3_iline">
+            <label for="p3_iline">Line Current \(I_L\) (A):</label>
+            <input type="number" id="p3_iline" value="65" step="0.1" min="0.1">
+            <small class="field-hint">Measured RMS line conductor current</small>
+        </div>
+        <div class="calc-field" id="box_p3_power_input" style="display:none;">
+            <label for="p3_p_kw">Real Power \(P\) (kW):</label>
+            <input type="number" id="p3_p_kw" value="45" step="0.1" min="0.1">
+            <small class="field-hint">Nameplate or measured electrical active load</small>
+        </div>
+    </div>
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="p3_pf">Operating Power Factor (\(\cos\phi\)):</label>
+            <input type="number" id="p3_pf" value="0.82" step="0.01" min="0.1" max="1.0">
+            <small class="field-hint">Lagging (inductive) load power factor</small>
+        </div>
+        <div class="calc-field">
+            <label for="p3_target_pf">Target Power Factor:</label>
+            <input type="number" id="p3_target_pf" value="0.95" step="0.01" min="0.80" max="1.0">
+            <small class="field-hint">Desired utility compliant power factor</small>
+        </div>
+    </div>
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="p3_freq">AC Line Frequency:</label>
+            <select id="p3_freq">
+                <option value="60">60 Hz (North America, ANSI)</option>
+                <option value="50">50 Hz (Europe, Asia, IEC)</option>
+            </select>
+        </div>
+        <div class="calc-field">
+            <label for="p3_eff">Motor / Load Efficiency \(\eta\) (%):</label>
+            <input type="number" id="p3_eff" value="100" step="1" min="50" max="100">
+            <small class="field-hint">Set 100% for electrical input, &lt;100% for shaft output</small>
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary" id="btn_calc_p3" style="width:100%; margin-top:1rem;">Calculate 3-Phase Power Parameters</button>
+
+    <div class="calc-results" id="p3_results" style="margin-top:1.5rem;">
+        <h3>3-Phase Electrical Load Analysis</h3>
+        <div class="results-grid">
+            <div class="result-item">
+                <span class="result-label">Real Power \(P\):</span>
+                <span class="result-value" id="res_p3_p">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Apparent Power \(S\):</span>
+                <span class="result-value" id="res_p3_s">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Reactive Power \(Q\):</span>
+                <span class="result-value" id="res_p3_q">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Line Current \(I_L\):</span>
+                <span class="result-value" id="res_p3_il">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Phase Voltage \(V_{ph}\):</span>
+                <span class="result-value" id="res_p3_vph">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Phase Current \(I_{ph}\):</span>
+                <span class="result-value" id="res_p3_iph">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Correction Capacitor \(Q_c\):</span>
+                <span class="result-value" id="res_p3_qc">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Capacitance / Phase \(C_{ph}\):</span>
+                <span class="result-value" id="res_p3_cph">--</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modeSelect = document.getElementById('p3_calc_mode');
+    const boxIline = document.getElementById('box_p3_iline');
+    const boxPower = document.getElementById('box_p3_power_input');
+
+    modeSelect.addEventListener('change', function() {
+        if (modeSelect.value === 'from_vi') {
+            boxIline.style.display = 'block';
+            boxPower.style.display = 'none';
+        } else {
+            boxIline.style.display = 'none';
+            boxPower.style.display = 'block';
+        }
+    });
+
+    function calculate3Phase() {
+        const mode = modeSelect.value;
+        const conn = document.getElementById('p3_connection').value;
+        const vll = parseFloat(document.getElementById('p3_vll').value) || 480;
+        const pf = parseFloat(document.getElementById('p3_pf').value) || 0.82;
+        const targetPf = parseFloat(document.getElementById('p3_target_pf').value) || 0.95;
+        const freq = parseFloat(document.getElementById('p3_freq').value) || 60;
+        const eff = (parseFloat(document.getElementById('p3_eff').value) || 100) / 100;
+
+        let pKw, iline, sKva, qKvar;
+
+        if (mode === 'from_vi') {
+            iline = parseFloat(document.getElementById('p3_iline').value) || 65;
+            sKva = (Math.sqrt(3) * vll * iline) / 1000;
+            pKw = sKva * pf * eff;
+            const sinPhi = Math.sin(Math.acos(pf));
+            qKvar = sKva * sinPhi;
+        } else {
+            pKw = parseFloat(document.getElementById('p3_p_kw').value) || 45;
+            const pInputKw = pKw / eff;
+            sKva = pInputKw / pf;
+            iline = (sKva * 1000) / (Math.sqrt(3) * vll);
+            const sinPhi = Math.sin(Math.acos(pf));
+            qKvar = sKva * sinPhi;
+        }
+
+        // Phase voltages and currents
+        let vph, iph;
+        if (conn === 'wye') {
+            vph = vll / Math.sqrt(3);
+            iph = iline;
+        } else {
+            vph = vll;
+            iph = iline / Math.sqrt(3);
+        }
+
+        // Power factor correction
+        // Qc = P * (tan(phi1) - tan(phi2))
+        const phi1 = Math.acos(pf);
+        const phi2 = Math.acos(Math.min(1.0, targetPf));
+        let qc = pKw * (Math.tan(phi1) - Math.tan(phi2));
+        if (qc < 0) qc = 0;
+
+        // Capacitance calculation per phase (Delta-connected capacitor bank is standard)
+        // Qc_total = 3 * (Vll^2 * 2 * pi * f * C_delta)
+        // C_delta = (Qc * 1000) / (3 * 2 * pi * freq * Vll^2)
+        const omega = 2 * Math.PI * freq;
+        const cDeltaFarads = (qc * 1000) / (3 * omega * Math.pow(vll, 2));
+        const cMicroFarad = (cDeltaFarads * 1e6).toFixed(1) + ' µF (Δ)';
+
+        document.getElementById('res_p3_p').textContent = pKw.toFixed(2) + ' kW';
+        document.getElementById('res_p3_s').textContent = sKva.toFixed(2) + ' kVA';
+        document.getElementById('res_p3_q').textContent = qKvar.toFixed(2) + ' kVAR';
+        document.getElementById('res_p3_il').textContent = iline.toFixed(2) + ' A';
+        document.getElementById('res_p3_vph').textContent = vph.toFixed(1) + ' V';
+        document.getElementById('res_p3_iph').textContent = iph.toFixed(2) + ' A';
+        document.getElementById('res_p3_qc').textContent = qc.toFixed(2) + ' kVAR';
+        document.getElementById('res_p3_cph').textContent = cMicroFarad;
+    }
+
+    document.getElementById('btn_calc_p3').addEventListener('click', calculate3Phase);
+    calculate3Phase();
+});
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>1. Fundamental Principles of Polyphase Alternating Current</h2>
+<p>Three-phase alternating current (AC) electrical transmission and distribution constitutes the backbone of modern industrial power grids and commercial electrical infrastructure. Engineered originally by Nikola Tesla and Charles Proteus Steinmetz, three-phase systems deliver a continuous, constant instantaneous power transfer to rotating machines, unlike single-phase AC circuits which pulsate between zero and peak power twice per cycle at line frequency.</p>
+
+<p>In a balanced three-phase generator or load, three separate sinusoidal voltages of identical amplitude and frequency are displaced from each other by an electrical phase angle of exactly \(120^\circ\) (\(2\pi/3	ext{ radians}\)):</p>
+
+$$v_A(t) = V_{pk} \cos(\omega t)$$
+
+$$v_B(t) = V_{pk} \cos\left(\omega t - rac{2\pi}{3}
+ight)$$
+
+$$v_C(t) = V_{pk} \cos\left(\omega t - rac{4\pi}{3}
+ight)$$
+
+<p>Because the sum of three identical vectors displaced by \(120^\circ\) equals zero (\(v_A + v_B + v_C = 0\)), balanced three-phase systems eliminate the requirement for a return neutral conductor of equal cross-section, reducing copper usage by approximately 25% compared to three independent single-phase circuits transporting equivalent energy.</p>
+
+<h2>2. Wye (Star) vs. Delta Network Topologies</h2>
+<p>Three-phase circuits are wired in either a <strong>Wye (Star, Y)</strong> or <strong>Delta (\(\Delta\))</strong> configuration, governing the spatial and mathematical relationship between line quantities (measured at the external supply terminals) and phase quantities (experienced across individual internal load windings):</p>
+
+<h3>Wye (Star, Y) Connection</h3>
+<p>In a Wye configuration, three load impedances meet at a common central neutral point \(N\). The current traversing any incoming line conductor flows directly into that respective phase winding without splitting:</p>
+
+$$I_{line} = I_{phase}$$
+
+<p>The line-to-line voltage \(V_{L-L}\) is the vector difference between two phase-to-neutral voltages displaced by \(120^\circ\). Applying vector trigonometry yields the fundamental \(\sqrt{3} pprox 1.73205\) relationship:</p>
+
+$$V_{L-L} = \sqrt{3} \cdot V_{phase} = \sqrt{3} \cdot V_{L-N}$$
+
+<h3>Delta (\(\Delta\)) Connection</h3>
+<p>In a Delta configuration, the three load impedances are connected end-to-end in a closed loop, forming an equilateral triangle. Each phase winding is connected directly across two line conductors, meaning line-to-line voltage equals phase voltage:</p>
+
+$$V_{line} = V_{phase}$$
+
+<p>Conversely, the line current divides between two adjacent phase branches. For balanced conditions, Kirchhoff's Current Law gives:</p>
+
+$$I_{line} = \sqrt{3} \cdot I_{phase}$$
+
+<h2>3. Power Equations: Active (kW), Reactive (kVAR), and Apparent (kVA)</h2>
+<p>Regardless of whether the load is wired in Wye or Delta, total power in a balanced three-phase electrical circuit is derived directly from terminal line-to-line voltage \(V_{L-L}\) and line current \(I_{line}\):</p>
+
+<h3>Active / Real Power (\(P\))</h3>
+<p>Real power is the actual thermodynamic work converted into mechanical rotation, heat, or illumination, measured in kilowatts (kW):</p>
+
+$$P = \sqrt{3} \cdot V_{L-L} \cdot I_{line} \cdot \cos\phi \quad [	ext{W}]$$
+
+<p>where \(\cos\phi\) is the operating power factor (\(PF\)), representing the cosine of the phase displacement angle between phase voltage and phase current.</p>
+
+<h3>Apparent Power (\(S\))</h3>
+<p>Apparent power represents the total complex volt-ampere product that utility transformers, switchgear, and conductors must be sized to transport, measured in kilovolt-amperes (kVA):</p>
+
+$$S = \sqrt{3} \cdot V_{L-L} \cdot I_{line} \quad [	ext{VA}]$$
+
+<h3>Reactive Power (\(Q\))</h3>
+<p>Reactive power oscillates cyclically between inductive magnetic fields (in motors, solenoids, transformers) and the AC supply without performing net mechanical work, measured in reactive kilovolt-amperes (kVAR):</p>
+
+$$Q = \sqrt{3} \cdot V_{L-L} \cdot I_{line} \cdot \sin\phi \quad [	ext{VAR}]$$
+
+<p>These three quantities form the classical <strong>Power Triangle</strong>:</p>
+
+$$S = \sqrt{P^2 + Q^2} \quad \implies \quad PF = \cos\phi = rac{P}{S}$$
+
+<h2>4. Industrial Voltage Standards Reference Table</h2>
+<p>The following engineering data table lists standard commercial and industrial three-phase utilization voltages across North American (ANSI/IEEE) and International (IEC) standards, along with typical applications:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Nominal System Voltage</th>
+            <th>Configuration</th>
+            <th>Phase-to-Neutral</th>
+            <th>Standard Region</th>
+            <th>Primary Utilization</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>480Y / 277 V</strong></td>
+            <td>4-Wire Wye</td>
+            <td>277 V</td>
+            <td>North America (ANSI)</td>
+            <td>Industrial motors, commercial HVAC, fluorescent/LED high-bay lighting</td>
+        </tr>
+        <tr>
+            <td><strong>208Y / 120 V</strong></td>
+            <td>4-Wire Wye</td>
+            <td>120 V</td>
+            <td>North America (ANSI)</td>
+            <td>Commercial office buildings, retail, servers, receptacle convenience loads</td>
+        </tr>
+        <tr>
+            <td><strong>400Y / 230 V</strong></td>
+            <td>4-Wire Wye</td>
+            <td>230 V</td>
+            <td>Europe, IEC International</td>
+            <td>Standard commercial &amp; industrial distribution, residential single-phase derived</td>
+        </tr>
+        <tr>
+            <td><strong>600Y / 347 V</strong></td>
+            <td>4-Wire Wye</td>
+            <td>347 V</td>
+            <td>Canada (CSA)</td>
+            <td>Heavy manufacturing, mining, industrial pumping, institutional facilities</td>
+        </tr>
+        <tr>
+            <td><strong>240 V Delta</strong></td>
+            <td>3-Wire Delta / High-Leg</td>
+            <td>120 V / 208 V (high leg)</td>
+            <td>North America (Legacy)</td>
+            <td>Small machine shops, legacy 3-phase machinery with 120V single-phase tap</td>
+        </tr>
+        <tr>
+            <td><strong>4160 V (Medium Voltage)</strong></td>
+            <td>3-Wire Wye / Delta</td>
+            <td>2400 V</td>
+            <td>Global (IEEE / IEC)</td>
+            <td>Large industrial chillers, utility water pumps, municipal compressors (&gt;500 HP)</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>5. Power Factor Correction Engineering Methodology</h2>
+<p>Inductive industrial loads (induction motors operating below full rated shaft torque) cause the line current to lag voltage, leading to poor power factor (\(PF &lt; 0.85\)). Low power factor increases \(I^2R\) transmission losses in upstream conductors and triggers punitive reactive power surcharge billing from electrical utility providers.</p>
+
+<p>To correct the power factor from an initial lagging value \(PF_1 = \cos\phi_1\) to a target value \(PF_2 = \cos\phi_2\), a balanced shunt capacitor bank is installed across the supply bus. The required corrective capacitive kVAR rating \(Q_c\) is:</p>
+
+$$Q_c = P \cdot \left(	an\phi_1 - 	an\phi_2
+ight) = P \cdot \left(	an(rccos(PF_1)) - 	an(rccos(PF_2))
+ight)$$
+
+<p>When connecting the capacitor bank in Delta (\(\Delta\)) configuration across line-to-line terminals, the required capacitance per phase \(C_\Delta\) at frequency \(f\) is calculated as:</p>
+
+$$C_\Delta = rac{Q_c 	imes 1000}{3 \cdot 2\pi f \cdot V_{L-L}^2} \quad [	ext{Farads}]$$
+
+<h2>6. Worked Industrial Calculation Example: Manufacturing Facility Feeder</h2>
+<div class="worked-example-card">
+    <h3>Engineering Case Study: Sizing Feeder for 480V Industrial Machine Cell</h3>
+    <p>A manufacturing facility operates an automated machining cell consisting of multiple three-phase induction motor drives. The electrical feeder operates at \(V_{L-L} = 480	ext{ V}\), \(60	ext{ Hz}\). A digital power quality meter records a steady-state line current \(I_{line} = 65.0	ext{ A}\) with a lagging power factor \(PF = 0.82\). The plant engineer must compute the active power (kW), apparent power (kVA), reactive power (kVAR), and determine the required Delta capacitor bank to elevate the power factor to \(0.95\).</p>
+
+    <div class="step-solution">
+        <h4>Step 1: Compute Total Apparent Power (\(S\))</h4>
+        $$S = \sqrt{3} \cdot V_{L-L} \cdot I_{line} = 1.73205 	imes 480	ext{ V} 	imes 65.0	ext{ A} = 54{,}040	ext{ VA} = 54.04	ext{ kVA}$$
+
+        <h4>Step 2: Compute Total Active Real Power (\(P\))</h4>
+        $$P = S 	imes PF = 54.04	ext{ kVA} 	imes 0.82 = 44.31	ext{ kW}$$
+
+        <h4>Step 3: Compute Initial Reactive Power (\(Q_1\))</h4>
+        $$\phi_1 = rccos(0.82) pprox 34.915^\circ$$
+        $$\sin\phi_1 = \sin(34.915^\circ) = 0.5724$$
+        $$Q_1 = S 	imes \sin\phi_1 = 54.04	ext{ kVA} 	imes 0.5724 = 30.93	ext{ kVAR}$$
+
+        <h4>Step 4: Compute Power Factor Correction Capacitor Rating (\(Q_c\))</h4>
+        $$\phi_2 = rccos(0.95) pprox 18.195^\circ$$
+        $$	an\phi_1 = 	an(34.915^\circ) = 0.6980$$
+        $$	an\phi_2 = 	an(18.195^\circ) = 0.3287$$
+        $$Q_c = P \cdot (	an\phi_1 - 	an\phi_2) = 44.31	ext{ kW} 	imes (0.6980 - 0.3287) = 44.31 	imes 0.3693 = 16.36	ext{ kVAR}$$
+
+        <h4>Step 5: Compute Required Capacitance per Phase for Delta Bank</h4>
+        $$C_\Delta = rac{Q_c 	imes 1000}{3 \cdot 2\pi f \cdot V_{L-L}^2} = rac{16{,}360}{3 	imes 2\pi 	imes 60 	imes (480)^2} = rac{16{,}360}{3 	imes 376.99 	imes 230{,}400} = rac{16{,}360}{260{,}551{,}884} pprox 62.8 	imes 10^{-6}	ext{ F} pprox 62.8	ext{ }\mu	ext{F}$$
+        <p>A standard 3-phase, \(480	ext{ V}\), \(17.5	ext{ kVAR}\) enclosed capacitor bank with internal discharge resistors will successfully bring the power factor to \(0.95+\), lowering line current from \(65.0	ext{ A}\) down to \(56.1	ext{ A}\) and releasing \(8.9	ext{ A}\) of feeder ampacity capacity.</p>
+    </div>
+</div>
+
+<h2>7. Frequently Asked Questions</h2>
+<div class="faq-accordion">
+    <div class="faq-item">
+        <h3>Why is the square root of 3 (sqrt(3) ≈ 1.732) used in 3-phase power calculations?</h3>
+        <p>The factor \(\sqrt{3}\) originates from the trigonometric vector relationship between the three sinusoidal phases displaced by \(120^\circ\). In a Wye system, the line-to-line voltage is obtained by subtracting two phase vectors: \(ec{V}_{AB} = ec{V}_{AN} - ec{V}_{BN}\). Solving the vector triangle with interior angles of \(30^\circ\), \(30^\circ\), and \(120^\circ\) proves that \(V_{AB} = 2 \cdot V_{AN} \cdot \cos(30^\circ) = 2 \cdot V_{AN} \cdot (\sqrt{3}/2) = \sqrt{3} \cdot V_{AN}\).</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is the difference between active (kW), reactive (kVAR), and apparent (kVA) power?</h3>
+        <p>Active power (\(P\), kW) is the productive electrical energy converted directly into mechanical rotation, thermal heat, or optical radiation. Reactive power (\(Q\), kVAR) represents non-dissipative circulating energy required to magnetize transformer cores and motor stator windings. Apparent power (\(S\), kVA) is the total geometric vector sum (\(S = \sqrt{P^2 + Q^2}\)), defining the thermal loading capacity required from utility generators, transformers, and distribution cables.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What happens if a three-phase system experiences severe phase voltage imbalance?</h3>
+        <p>Even small voltage imbalances induce severe, disproportionate current imbalances in induction motors due to low negative-sequence impedance. A 3% voltage unbalance can trigger a 20% to 30% phase current unbalance, leading to localized stator winding overheating, vibration, and significant motor insulation life reduction. In such scenarios, NEMA MG-1 standards require derating the motor's horsepower capacity.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Why are power factor correction capacitors usually connected in Delta rather than Wye?</h3>
+        <p>In a Delta connection, each capacitor experiences full line-to-line voltage \(V_{L-L}\), whereas in Wye each capacitor experiences only \(V_{L-L} / \sqrt{3}\). Since capacitive reactive power output scales with the square of applied voltage (\(Q_c \propto V^2\)), a Delta-connected capacitor bank delivers three times more reactive kVAR than an identically rated capacitance connected in Wye, drastically reducing physical capacitor cell volume and cost.</p>
+    </div>
+</div>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚡</span>
+            <h3 class="widget-title">Related Electrical & Power Systems</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="wire-ampacity-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Ampacity (NEC 310.16)</a></li>
+            <li><a href="conduit-fill-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Conduit Fill (NEC Ch. 9)</a></li>
+            <li><a href="motor-starting-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Motor Starting Current</a></li>
+            <li><a href="short-circuit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Short-Circuit (IEC 60909)</a></li>
+            <li><a href="transformer-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Sizing (NEC 450)</a></li>
+            <li><a href="cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC/NEC)</a></li>
+            <li><a href="voltage-drop-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Drop Calculator</a></li>
+            <li><a href="ohms-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ohm's Law Calculator</a></li>
+            <li><a href="power-factor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Power Factor (kW to kVAR)</a></li>
+            <li><a href="parallel-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistor (Req)</a></li>
+            <li><a href="battery-life-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Life & Runtime</a></li>
+            <li><a href="resistor-color-code-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Color Code</a></li>
+            <li><a href="555-timer-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> 555 Timer Astable & Monostable</a></li>
+            <li><a href="led-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LED Series Resistor Calculator</a></li>
+            <li><a href="capacitive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitive Reactance (Xc)</a></li>
+            <li><a href="inductive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Inductive Reactance (Xl)</a></li>
+            <li><a href="op-amp-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Op-Amp Gain & Inverting/Non-Inv</a></li>
+            <li><a href="three-phase-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three-Phase AC Power (kVA/kW)</a></li>
+            <li><a href="adc-dac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ADC & DAC Converter Resolution</a></li>
+            <li><a href="antenna-length-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Antenna Length & Resonant Dipole</a></li>
+            <li><a href="battery-short-circuit-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Short Circuit (IEC 60896)</a></li>
+            <li><a href="bjt-transistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BJT Transistor Bias & Q-Point</a></li>
+            <li><a href="breaker-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Breaker Size (NEC 125% Rule)</a></li>
+            <li><a href="decibel-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Decibel Calculator (dB, dBm, SPL)</a></li>
+            <li><a href="earth-pit-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earth Pit Resistance (IEEE 80)</a></li>
+            <li><a href="electrical-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Electrical Power & Energy Cost</a></li>
+            <li><a href="microstrip-impedance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Microstrip Impedance (IPC-2141)</a></li>
+            <li><a href="resistor-network-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Network (Delta-Wye & Ladder)</a></li>
+            <li><a href="transformer-turns-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Turns Ratio (a)</a></li>
+            <li><a href="aluminium-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Aluminium Cable Sizing (NEC/IEC)</a></li>
+            <li><a href="busbar-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Busbar Sizing (DIN 43671 / IEC)</a></li>
+            <li><a href="cable-sizing-calculator-bs-7671.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (BS 7671 18th Ed)</a></li>
+            <li><a href="cable-sizing-calculator-iec-60364.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC 60364-5-52)</a></li>
+            <li><a href="cable-sizing-installation-method-a.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method A (Insulated Wall)</a></li>
+            <li><a href="fault-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Fault Current (IEEE 141 / IEC)</a></li>
+            <li><a href="filter-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Analog Filter (RC, RL, LC)</a></li>
+            <li><a href="generator-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Generator Sizing (ISO 8528)</a></li>
+            <li><a href="heatsink-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heatsink Sizing & Thermal</a></li>
+            <li><a href="cable-sizing-installation-method-c.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method C (Clipped Direct)</a></li>
+            <li><a href="cable-sizing-installation-method-e.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method E (Cable Tray)</a></li>
+            <li><a href="cable-sizing-calculator-nec.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (NEC Table 310.16)</a></li>
+            <li><a href="copper-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Copper Cable Sizing (100% IACS)</a></li>
+            <li><a href="earthing-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earthing Cable Size (IEC 60364-5-54)</a></li>
+            <li><a href="kw-to-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> kW to Cable Size (1-Phase & 3-Phase)</a></li>
+            <li><a href="single-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Single Phase Cable Sizing (230V/120V)</a></li>
+            <li><a href="three-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three Phase Cable Sizing (400V/480V)</a></li>
+            <li><a href="wire-gauge-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Gauge (AWG to mm² Metric)</a></li>
+            <li><a href="voltage-divider-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Divider Calculator</a></li>
+            <li><a href="parallel-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistance Calculator</a></li>
+            <li><a href="capacitor-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitor Energy & Pulse Power</a></li>
+            <li><a href="resonant-frequency-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LC Resonant Frequency Tank</a></li>
+            <li><a href="rc-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RC Time Constant (τ = RC)</a></li>
+            <li><a href="rl-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RL Time Constant (τ = L/R)</a></li>
+            <li><a href="zener-diode-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Zener Diode Shunt Regulator</a></li>
+            <li><a href="lm317-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LM317 Voltage Regulator</a></li>
+            <li><a href="pcb-trace-width-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> PCB Trace Width (IPC-2152)</a></li>
+            <li><a href="lightning-protection-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lightning Protection (NFPA 780)</a></li>
+            <li><a href="lumen-lux-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lumen to Lux Illuminance</a></li>
+            <li><a href="lumen-method-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lumen Method Fixture Layout</a></li>
+            <li><a href="motor-parameters-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Motor Parameters & Slip</a></li>
+            <li><a href="buck-boost-converter-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Buck-Boost Converter</a></li>
+            <li><a href="3-phase-power-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> 3-Phase Power (kW, kVA, kVAR)</a></li>
+            <li><a href="motor-starter-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Motor Starter Sizing (NEC 430)</a></li>
+            <li><a href="nec-load-calculation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> NEC Load Calculation (Residential)</a></li>
+            <li><a href="neutral-conductor-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Neutral Conductor Sizing</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="engineering.html" class="sidebar-category-link">View All Electrical & Power Systems Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub provides free, high-precision engineering calculators, unit converters, and analytical tools designed for practicing engineers, technicians, and students worldwide.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Engineering Categories</h4>
+                    <ul>
+                        <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+                        <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+                        <li><a href="civil.html">Civil &amp; Structural</a></li>
+                        <li><a href="chemical.html">Chemical &amp; Process</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Popular Calculators</h4>
+                    <ul>
+                        <li><a href="pcb-trace-width-calculator.html">PCB Trace Width</a></li>
+                        <li><a href="wire-ampacity-calculator.html">Wire Ampacity</a></li>
+                        <li><a href="voltage-divider-calculator.html">Voltage Divider</a></li>
+                        <li><a href="motor-parameters-calculator.html">Motor Parameters</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                        <li><a href="math.html">Math Tools</a></li>
+                        <li><a href="finance.html">Finance Tools</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed analytical calculation models.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

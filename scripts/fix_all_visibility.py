@@ -193,6 +193,11 @@ CAT_MAP = {
             ("lumen-lux-calculator.html", "Lumen to Lux Illuminance", "💡", "Luminous flux to lux, beam spread & candela", "E = I / d² | Ω = 2π(1 - cos(θ/2)) | CBCP"),
             ("lumen-method-calculator.html", "Lumen Method Fixture Layout", "💡", "IESNA zonal cavity, room cavity ratio & fixture grid", "N = (E·A) / (n·Φ·CU·LLF) | RCR = 5h(L+W)/A"),
             ("motor-parameters-calculator.html", "Motor Parameters & Slip", "⚙️", "Induction motor slip, synchronous speed & full load torque", "Ns = 120f/P | s = (Ns - Nr)/Ns | τ = 9548.8·P/Nr"),
+            ("buck-boost-converter-calculator.html", "Buck-Boost Converter", "⚡", "Inductor sizing, duty cycle, CCM critical L & ripple", "D = Vo / (Vin + Vo) | L = Vin·D / (ΔIL·fsw) | RHPZ"),
+            ("3-phase-power-calculator.html", "3-Phase Power (kW, kVA, kVAR)", "🔌", "Active, reactive, apparent power & PF correction capacitor", "P = √3·V_LL·IL·cosφ | S = √3·V_LL·IL | Qc delta bank"),
+            ("motor-starter-sizing-calculator.html", "Motor Starter Sizing (NEC 430)", "⚙️", "NEMA sizes, IEC AC-3 contactors, overloads & breaker OCPD", "FLA table 430.250 | 125% ampacity | Inverse breaker 250%"),
+            ("nec-load-calculation-calculator.html", "NEC Load Calculation (Residential)", "🏡", "Dwelling service sizing, panel amps & SE cable per NEC 220", "Optional 220.82: 10kVA @ 100%, 40% rem + HVAC @ 100%"),
+            ("neutral-conductor-sizing-calculator.html", "Neutral Conductor Sizing", "⚡", "3-Phase unbalance, triplen harmonics & NEC 220.61 reduction", "In_fund = √(Ia²+...+Ic² - IaIb...) | Triplen In_3rd = 3·Ih3"),
         ]
     },
     "solar-energy.html": {
@@ -272,6 +277,9 @@ CAT_MAP = {
             ("slope-calculator.html", "Slope & Grade Calculator (ADAAG 405)", "📐", "Rise/run gradient, % grade, angle & ADA ramp 1:12 compliance", "m = Rise/Run | Grade % = m·100 | ADA max 8.33%"),
             ("soil-gravel-calculator.html", "Soil & Gravel Volume & Tonnage", "🪨", "Proctor density compaction, loose LCY haulage & quarry tons", "V_loose = V_compacted·(1 + C_f) | Mass = V·ρ"),
             ("tile-calculator.html", "Tile, Grout & Mortar Sizer (TCNA)", "🔲", "Floor/wall cartons, TCNA joint grout weight & thinset notch", "Grout = [(L+W)·Jw·Jd·ρ] / (L·W) · Area · 1.10"),
+            ("stair-calculator.html", "Stair Calculator (IRC & IBC)", "🪜", "Riser height, tread run, stringer length & Blondel rule", "2R + T = 24-25\" | R ≤ 7.75\" (IRC) / 7.0\" (IBC) | Headroom ≥ 80\""),
+            ("stud-wall-calculator.html", "Stud Wall Framing Estimator", "🪵", "Wood & steel wall studs 16\"/24\" OC, plates, corners & drywall", "N = ⌈L·12/OC⌉ + 1 + backing + openings | 15% waste"),
+            ("plaster-calculator.html", "Plaster Material Estimator", "🧱", "Cement bags (50kg), sand volume, 1.33 dry bulking & waste", "V_dry = V_wet × 1.33 × 1.20 | 1:3, 1:4, 1:6 mix ratios"),
         ]
     },
     "chemical.html": {

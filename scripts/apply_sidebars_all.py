@@ -195,6 +195,11 @@ CATEGORIES = {
             ("lumen-lux-calculator.html", "Lumen to Lux Illuminance", "💡", "Luminous flux to lux, beam spread & candela"),
             ("lumen-method-calculator.html", "Lumen Method Fixture Layout", "💡", "IESNA zonal cavity, room cavity ratio & fixture grid"),
             ("motor-parameters-calculator.html", "Motor Parameters & Slip", "⚙️", "Induction motor slip, synchronous speed & full load torque"),
+            ("buck-boost-converter-calculator.html", "Buck-Boost Converter", "⚡", "Inductor sizing, duty cycle, CCM critical L & ripple"),
+            ("3-phase-power-calculator.html", "3-Phase Power (kW, kVA, kVAR)", "🔌", "Active, reactive, apparent power & PF correction capacitor"),
+            ("motor-starter-sizing-calculator.html", "Motor Starter Sizing (NEC 430)", "⚙️", "NEMA sizes, IEC AC-3 contactors, overloads & breaker OCPD"),
+            ("nec-load-calculation-calculator.html", "NEC Load Calculation (Residential)", "🏡", "Dwelling service sizing, panel amps & SE cable per NEC 220"),
+            ("neutral-conductor-sizing-calculator.html", "Neutral Conductor Sizing", "⚡", "3-Phase unbalance, triplen harmonics & NEC 220.61 reduction"),
         ]
     },
     "solar": {
@@ -280,6 +285,9 @@ CATEGORIES = {
             ("slope-calculator.html", "Slope & Grade Calculator", "📐", "Rise/run gradient, % grade, angle & ADA ramp 1:12 compliance"),
             ("soil-gravel-calculator.html", "Soil & Gravel Volume & Tonnage", "🪨", "Proctor density compaction, loose LCY haulage & quarry tons"),
             ("tile-calculator.html", "Tile, Grout & Mortar Sizer", "🔲", "Floor/wall cartons, TCNA joint grout weight & thinset notch"),
+            ("stair-calculator.html", "Stair Calculator (IRC & IBC)", "🪜", "Riser height, tread run, stringer length & Blondel rule"),
+            ("stud-wall-calculator.html", "Stud Wall Framing Estimator", "🪵", "Wood & steel wall studs 16\"/24\" OC, plates, corners & drywall"),
+            ("plaster-calculator.html", "Plaster Material Estimator", "🧱", "Cement bags (50kg), sand volume, 1.33 dry bulking & waste"),
         ]
     },
     "chemical": {
@@ -439,13 +447,13 @@ def determine_tool_cat(filename):
         return "health"
     if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72", "amortization", "apr-apy", "break-even", "capital-gains", "cd-calculator", "credit-card", "debt-to-income", "down-payment", "emergency-fund", "inflation", "net-salary", "net-worth", "sales-tax", "savings", "markup"]):
         return "finance"
-    if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity", "power-factor", "parallel-resistor", "battery-life", "555-timer", "led-resistor", "capacitive-reactance", "inductive-reactance", "op-amp-gain", "three-phase-power", "adc-dac", "antenna-length", "battery-short-circuit", "bjt-transistor", "breaker-size", "decibel", "earth-pit", "electrical-power", "microstrip", "busbar", "fault-current", "filter", "generator", "heatsink", "copper-cable", "earthing", "kw-to-cable", "single-phase", "three-phase", "wire-gauge", "voltage-divider", "parallel-resistance", "capacitor-energy", "resonant-frequency", "rc-time-constant", "rl-time-constant", "zener-diode", "lm317", "pcb-trace-width", "lightning-protection", "lumen-lux", "lumen-method", "motor-parameters"]):
+    if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity", "power-factor", "parallel-resistor", "battery-life", "555-timer", "led-resistor", "capacitive-reactance", "inductive-reactance", "op-amp-gain", "three-phase-power", "adc-dac", "antenna-length", "battery-short-circuit", "bjt-transistor", "breaker-size", "decibel", "earth-pit", "electrical-power", "microstrip", "busbar", "fault-current", "filter", "generator", "heatsink", "copper-cable", "earthing", "kw-to-cable", "single-phase", "three-phase", "wire-gauge", "voltage-divider", "parallel-resistance", "capacitor-energy", "resonant-frequency", "rc-time-constant", "rl-time-constant", "zener-diode", "lm317", "pcb-trace-width", "lightning-protection", "lumen-lux", "lumen-method", "motor-parameters", "buck-boost", "3-phase-power", "motor-starter", "nec-load", "neutral-conductor"]):
         return "engineering"
     if any(k in f for k in ["solar", "charging", "pv-string", "ev-charging"]):
         return "solar"
     if any(k in f for k in ["cooling", "pipe", "torque", "pump-head", "gear-ratio", "bolt-torque", "bearing-life", "belt-length", "conveyor-belt", "cutting-speed", "feed-rate", "flywheel", "gear-module", "heat-exchanger", "hvac", "hydraulic-cylinder", "hydraulic-pump", "power-to-torque", "psychrometric", "pulley", "pump-flow", "reynolds-number", "shaft-diameter", "spring-rate", "thermal-expansion", "torque-converter", "torque-to-hp", "projectile", "factor-of-safety", "lead-screw", "press-fit"]):
         return "mechanical"
-    if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt", "rainwater-downpipe", "block", "drywall", "excavation", "flooring", "footing", "gravel", "paint", "roof-pitch", "slab", "slope", "soil", "tile"]):
+    if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt", "rainwater-downpipe", "block", "drywall", "excavation", "flooring", "footing", "gravel", "paint", "roof-pitch", "slab", "slope", "soil", "tile", "stair", "stud-wall", "plaster"]):
         return "civil"
     if any(k in f for k in ["chemical", "chlorine", "alum", "boyle", "calcium-hypochlorite", "caustic", "charles", "chlorine-dioxide", "coagulant", "combined-gas", "dilution", "gay-lussac", "half-life", "henderson", "hydrazine", "ideal-gas", "lime-dosing", "molar-mass", "molarity", "ph-calculator", "ph-poh", "phosphate", "polymer", "ro-antiscalant", "sulphuric", "titration", "mass-percent", "molality", "moles-calculator", "normality", "percent-composition", "percent-yield", "theoretical-yield", "ppm-calculator"]):
         return "chemical"

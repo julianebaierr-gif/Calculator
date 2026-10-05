@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buck-Boost Converter Calculator | Inductance, Ripple, Duty Cycle & Capacitance</title>
+    <meta name="description" content="Calculate duty cycle, critical inductance, peak inductor current, switch voltage stress, and output filter capacitance for inverting and non-inverting buck-boost DC-DC power supplies.">
+    <link rel="canonical" href="https://calchub.com/buck-boost-converter-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Buck-Boost Converter Calculator",
+      "url": "https://calchub.com/buck-boost-converter-calculator.html",
+      "applicationCategory": "EngineeringApplication",
+      "operatingSystem": "All",
+      "description": "Calculate duty cycle, continuous conduction mode (CCM) critical inductance, ripple current, and output capacitance for buck-boost power stages.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the primary difference between inverting and four-switch non-inverting buck-boost converters?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "An inverting buck-boost topology reverses output voltage polarity relative to the input using a single active switch, diode, and inductor. In contrast, a 4-switch synchronous buck-boost converter maintains identical polarity and features higher efficiency by dynamically transitioning between pure buck, buck-boost, and pure boost modes depending on whether Vin is higher, comparable to, or lower than Vout."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is the inductor ripple current ratio (r) typically chosen between 0.2 and 0.4?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A ripple ratio r between 0.2 and 0.4 (20% to 40% of average inductor current) balances magnetic core volume and dynamic loop response against conduction and AC winding losses. Setting r below 0.2 yields an excessively large inductor with sluggish transient response, while r above 0.4 induces high peak currents, increased core hysteresis loss, and severe output voltage ripple."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Right-Half-Plane (RHP) zero affect the compensation loop of a buck-boost converter in CCM?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In Continuous Conduction Mode (CCM), a buck-boost converter exhibits a Right-Half-Plane (RHP) zero in its control-to-output transfer function. The RHP zero adds 20 dB/decade gain while simultaneously introducing a 90-degree phase lag. To ensure closed-loop feedback stability, the loop crossover frequency must typically be limited to below one-third or one-fifth of the RHP zero frequency."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is the minimum critical inductance (L_crit) calculated to maintain Continuous Conduction Mode (CCM)?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Critical inductance is determined at minimum load current: L_crit = (Vin * D) / (2 * I_load_min * f_sw), or equivalently L_crit = ((1 - D)^2 * R_load_max) / (2 * f_sw). When actual inductance falls below L_crit, the inductor current collapses to zero before the end of the switching cycle, forcing the converter into Discontinuous Conduction Mode (DCM)."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="converter.html">Converters</a>
+                <a href="engineering.html">Engineering</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="engineering.html">Engineering</a> &gt; <span>Buck-Boost Converter Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Buck-Boost Converter Calculator</h1>
+                        <p class="calc-desc">Compute duty cycle, minimum continuous conduction inductance, peak switch current, and filter capacitor values for switch-mode DC-DC buck-boost power converters.</p>
+                    </div>
+                    <div class="calculator-form">
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="bb_vin">Input Voltage \(V_{in}\) (V):</label>
+            <input type="number" id="bb_vin" value="12" step="0.1" min="0.1">
+            <small class="field-hint">Nominal DC power rail voltage</small>
+        </div>
+        <div class="calc-field">
+            <label for="bb_vout">Desired Output Voltage \(V_{out}\) (V):</label>
+            <input type="number" id="bb_vout" value="24" step="0.1" min="0.1">
+            <small class="field-hint">Target regulated DC output voltage</small>
+        </div>
+    </div>
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="bb_iout">Output Load Current \(I_{out}\) (A):</label>
+            <input type="number" id="bb_iout" value="2.5" step="0.1" min="0.01">
+            <small class="field-hint">Maximum continuous load current</small>
+        </div>
+        <div class="calc-field">
+            <label for="bb_fsw">Switching Frequency \(f_{sw}\) (kHz):</label>
+            <input type="number" id="bb_fsw" value="150" step="1" min="10">
+            <small class="field-hint">PWM controller operating frequency</small>
+        </div>
+    </div>
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="bb_ripple_ratio">Inductor Ripple Ratio \(r\) (\(\Delta I_L / I_L\)):</label>
+            <input type="number" id="bb_ripple_ratio" value="0.30" step="0.05" min="0.1" max="1.0">
+            <small class="field-hint">Recommended design target: 0.20 to 0.40</small>
+        </div>
+        <div class="calc-field">
+            <label for="bb_vripple">Max Output Voltage Ripple \(\Delta V_o\) (mV):</label>
+            <input type="number" id="bb_vripple" value="50" step="1" min="1">
+            <small class="field-hint">Peak-to-peak output capacitor ripple specification</small>
+        </div>
+    </div>
+    <div class="calc-row">
+        <div class="calc-field">
+            <label for="bb_vd">Diode / Sync Rectifier Drop \(V_D\) (V):</label>
+            <input type="number" id="bb_vd" value="0.5" step="0.05" min="0.0">
+            <small class="field-hint">Schottky forward drop (~0.4-0.6V) or sync FET drop (~0.05V)</small>
+        </div>
+        <div class="calc-field">
+            <label for="bb_eff">Estimated Efficiency \(\eta\) (%):</label>
+            <input type="number" id="bb_eff" value="88" step="1" min="50" max="99">
+            <small class="field-hint">Expected conversion efficiency (typical: 85% - 94%)</small>
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary" id="btn_calc_bb" style="width:100%; margin-top:1rem;">Calculate Power Stage Parameters</button>
+
+    <div class="calc-results" id="bb_results" style="margin-top:1.5rem;">
+        <h3>Power Stage Design Summary</h3>
+        <div class="results-grid">
+            <div class="result-item">
+                <span class="result-label">Operating Duty Cycle \(D\):</span>
+                <span class="result-value" id="res_bb_duty">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Recommended Inductance \(L\):</span>
+                <span class="result-value" id="res_bb_l">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Critical Inductance \(L_{crit}\) (at 10% load):</span>
+                <span class="result-value" id="res_bb_lcrit">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Inductor Peak Current \(I_{L,pk}\):</span>
+                <span class="result-value" id="res_bb_ilpk">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Inductor RMS Current \(I_{L,rms}\):</span>
+                <span class="result-value" id="res_bb_ilrms">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Minimum Output Filter \(C_{out}\):</span>
+                <span class="result-value" id="res_bb_cout">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Switch Voltage Stress \(V_{sw,max}\):</span>
+                <span class="result-value" id="res_bb_vsw">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Right-Half-Plane Zero \(f_{RHPZ}\):</span>
+                <span class="result-value" id="res_bb_rhpz">--</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function calculateBuckBoost() {
+        const vin = parseFloat(document.getElementById('bb_vin').value) || 12;
+        const vout = parseFloat(document.getElementById('bb_vout').value) || 24;
+        const iout = parseFloat(document.getElementById('bb_iout').value) || 2.5;
+        const fswKhz = parseFloat(document.getElementById('bb_fsw').value) || 150;
+        const fsw = fswKhz * 1000;
+        const r = parseFloat(document.getElementById('bb_ripple_ratio').value) || 0.3;
+        const vrippleMv = parseFloat(document.getElementById('bb_vripple').value) || 50;
+        const vripple = vrippleMv / 1000;
+        const vd = parseFloat(document.getElementById('bb_vd').value) || 0.5;
+        const eff = (parseFloat(document.getElementById('bb_eff').value) || 88) / 100;
+
+        // Duty cycle accounting for diode drop and efficiency
+        // Vout = (D * Vin * eff) / ((1 - D)) - Vd  => D = (Vout + Vd) / (Vin * eff + Vout + Vd)
+        const d = (vout + vd) / (vin * eff + vout + vd);
+        const dPercent = (d * 100).toFixed(1) + '%';
+
+        // Average inductor current IL,avg = Iout / (1 - D)
+        const ilAvg = iout / (1 - d);
+        
+        // Inductor ripple current Delta IL = r * IL,avg
+        const deltaIl = r * ilAvg;
+
+        // Inductance L = (Vin * D) / (deltaIl * fsw)
+        const lH = (vin * d) / (deltaIl * fsw);
+        const lMicroH = (lH * 1e6).toFixed(1) + ' µH';
+
+        // Critical inductance at 10% load
+        const ioutMin = 0.10 * iout;
+        const ilAvgMin = ioutMin / (1 - d);
+        const lCritH = (vin * d) / (2 * ilAvgMin * fsw);
+        const lCritMicroH = (lCritH * 1e6).toFixed(1) + ' µH';
+
+        // Peak and RMS inductor current
+        const ilPk = ilAvg + (deltaIl / 2);
+        const ilRms = Math.sqrt(Math.pow(ilAvg, 2) + Math.pow(deltaIl, 2) / 12);
+
+        // Output filter capacitance Cout = (Iout * D) / (fsw * DeltaVo)
+        const coutF = (iout * d) / (fsw * vripple);
+        const coutMicroF = (coutF * 1e6).toFixed(1) + ' µF';
+
+        // Switch maximum voltage stress
+        const vswMax = vin + vout + vd;
+
+        // Right Half Plane Zero: f_RHPZ = (R_load * (1 - D)^2) / (2 * pi * D * L)
+        const rLoad = vout / iout;
+        const rhpzHz = (rLoad * Math.pow(1 - d, 2)) / (2 * Math.PI * d * lH);
+        const rhpzKhz = (rhpzHz / 1000).toFixed(1) + ' kHz';
+
+        document.getElementById('res_bb_duty').textContent = dPercent;
+        document.getElementById('res_bb_l').textContent = lMicroH;
+        document.getElementById('res_bb_lcrit').textContent = lCritMicroH;
+        document.getElementById('res_bb_ilpk').textContent = ilPk.toFixed(2) + ' A';
+        document.getElementById('res_bb_ilrms').textContent = ilRms.toFixed(2) + ' A';
+        document.getElementById('res_bb_cout').textContent = coutMicroF;
+        document.getElementById('res_bb_vsw').textContent = vswMax.toFixed(1) + ' V';
+        document.getElementById('res_bb_rhpz').textContent = rhpzKhz;
+    }
+
+    document.getElementById('btn_calc_bb').addEventListener('click', calculateBuckBoost);
+    calculateBuckBoost();
+});
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>1. Fundamental Theory of Buck-Boost DC-DC Conversion</h2>
+<p>In power electronics design, the buck-boost converter represents a canonical switch-mode power supply (SMPS) topology capable of delivering an output voltage that can be higher, lower, or equal in absolute magnitude to the input supply voltage. Unlike classic step-down (buck) or step-up (boost) architectures, the buck-boost topology accommodates battery discharge curves where the chemical cell voltage begins above the required system rail and subsequently declines below it as capacity is depleted.</p>
+
+<p>The standard classical topology is the <strong>inverting buck-boost converter</strong>, which produces a negative output voltage relative to circuit ground using a single controlled active switch (MOSFET), a passive freewheeling diode (or synchronous secondary MOSFET), an energy storage inductor, and an output filter capacitor. During the switch conduction phase (\(t_{on} = D \cdot T_{sw}\)), the inductor is connected directly across the DC input source. Energy accumulates in the inductor's magnetic core as the flux density ramps up linearly, while the diode is reverse-biased, isolating the output capacitor and load. During the switch turn-off interval (\(t_{off} = (1 - D) \cdot T_{sw}\)), the collapsing magnetic field reverses the inductor's terminal voltage, forward-biasing the freewheeling diode and discharging stored electromagnetic energy into the output filter capacitor and external load.</p>
+
+<h2>2. Core Mathematical Derivations &amp; Governing Equations</h2>
+<p>To design an efficient, thermally resilient switch-mode power converter, power stage magnetics and semiconductor components must be synthesized through rigorous volt-second balance and charge-balance relationships. Under steady-state Continuous Conduction Mode (CCM), the net volt-seconds applied across the inductor over one complete switching period \(T_{sw} = 1 / f_{sw}\) must equate to zero:</p>
+
+$$\int_0^{T_{sw}} v_L(t) \, dt = (V_{in}) \cdot D \cdot T_{sw} + (-V_{out} - V_D) \cdot (1 - D) \cdot T_{sw} = 0$$
+
+<p>Solving for the nominal duty ratio \(D\) while factoring in power stage efficiency \(\eta\) and diode forward drop \(V_D\) gives:</p>
+
+$$D = rac{V_{out} + V_D}{V_{in} \cdot \eta + V_{out} + V_D}$$
+
+<p>The average inductor current \(I_{L,avg}\) exceeds the DC load current \(I_{out}\) because the inductor transfers energy to the output network only during the turn-off interval \((1 - D)\):</p>
+
+$$I_{L,avg} = rac{I_{out}}{1 - D}$$
+
+<p>The peak-to-peak inductor current ripple \(\Delta I_L\) is specified as a fraction \(r\) (the inductor ripple ratio, typically selected between \(0.20\) and \(0.40\)) of the average inductor current:</p>
+
+$$\Delta I_L = r \cdot I_{L,avg} = r \cdot rac{I_{out}}{1 - D}$$
+
+<p>Applying Faraday's Law during the switch ON-time yields the required power stage inductance \(L\):</p>
+
+$$L = rac{V_{in} \cdot D}{\Delta I_L \cdot f_{sw}} = rac{V_{in} \cdot D \cdot (1 - D)}{r \cdot I_{out} \cdot f_{sw}}$$
+
+<p>The peak inductor current \(I_{L,pk}\) and root-mean-square (RMS) current \(I_{L,rms}\), critical for core saturation checking and copper wire loss calculations, are expressed as:</p>
+
+$$I_{L,pk} = I_{L,avg} + rac{\Delta I_L}{2}$$
+
+$$I_{L,rms} = \sqrt{I_{L,avg}^2 + rac{\Delta I_L^2}{12}}$$
+
+<p>Because the output filter capacitor must supply the full load current during the switch conduction time \(D \cdot T_{sw}\), output capacitance requirements are notably more stringent than those of a standard buck converter. The minimum capacitance \(C_{out}\) to guarantee an output voltage ripple no greater than \(\Delta V_o\) is:</p>
+
+$$C_{out,min} = rac{I_{out} \cdot D}{\Delta V_o \cdot f_{sw}}$$
+
+<h2>3. Empirical Design Benchmark Table for SMPS Inductors</h2>
+<p>The following engineering data table provides standard magnetic core material selections, permeability values, saturation flux densities, and recommended operational frequency bands for switch-mode converter design:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Core Material</th>
+            <th>Composition</th>
+            <th>Initial Permeability (\(\mu_i\))</th>
+            <th>Saturation Flux \(B_{sat}\) (T)</th>
+            <th>Core Loss at 100 kHz</th>
+            <th>Optimal Frequency Range</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Sendust (Kool M\(\mu\))</strong></td>
+            <td>Fe-Si-Al alloy powder</td>
+            <td>60 – 125</td>
+            <td>1.05 T</td>
+            <td>Low</td>
+            <td>50 kHz – 500 kHz</td>
+        </tr>
+        <tr>
+            <td><strong>High Flux</strong></td>
+            <td>50% Ni, 50% Fe alloy</td>
+            <td>14 – 160</td>
+            <td>1.50 T</td>
+            <td>Moderate</td>
+            <td>20 kHz – 300 kHz</td>
+        </tr>
+        <tr>
+            <td><strong>MPP (Molypermalloy)</strong></td>
+            <td>79% Ni, 17% Fe, 4% Mo</td>
+            <td>14 – 300</td>
+            <td>0.75 T</td>
+            <td>Lowest</td>
+            <td>100 kHz – 1.5 MHz</td>
+        </tr>
+        <tr>
+            <td><strong>Iron Powder (-26 mix)</strong></td>
+            <td>Pure distributed air gap Fe</td>
+            <td>75</td>
+            <td>1.40 T</td>
+            <td>High</td>
+            <td>10 kHz – 100 kHz</td>
+        </tr>
+        <tr>
+            <td><strong>Power Ferrite (MnZn)</strong></td>
+            <td>N87 / 3C90 sintered ceramic</td>
+            <td>2000 – 3000 (gapped)</td>
+            <td>0.38 – 0.49 T</td>
+            <td>Very Low</td>
+            <td>100 kHz – 2.0 MHz</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>4. Right-Half-Plane Zero (RHPZ) and Feedback Compensation</h2>
+<p>A crucial dynamic characteristic of Continuous Conduction Mode (CCM) buck-boost and boost topologies is the presence of an inherent <strong>Right-Half-Plane (RHP) Zero</strong> in the power stage control-to-output transfer function \(G_{vd}(s)\). The frequency of this zero is calculated as:</p>
+
+$$\omega_{RHPZ} = rac{R_{load} \cdot (1 - D)^2}{D \cdot L} \quad \implies \quad f_{RHPZ} = rac{R_{load} \cdot (1 - D)^2}{2\pi \cdot D \cdot L}$$
+
+<p>In classical control theory, an ordinary left-half-plane zero contributes \(+20	ext{ dB/decade}\) of gain slope and \(+90^\circ\) of phase lead, improving stability. Conversely, an RHP zero boosts loop gain by \(+20	ext{ dB/decade}\) while introducing a severe <strong>\(-90^\circ\) phase lag</strong>. If the closed-loop crossover frequency \(f_c\) approaches \(f_{RHPZ}\), the system experiences uncontrollable regenerative oscillation. Consequently, power supply design guidelines enforce the rule that loop crossover frequency must be kept below:</p>
+
+$$f_{cross} \le rac{1}{3} 	ext{ to } rac{1}{5} f_{RHPZ}$$
+
+<h2>5. Worked Engineering Case Study: Automotive Step-Up/Down Supply</h2>
+<div class="worked-example-card">
+    <h3>Design Specification: 12V Nominal to 24V Auxiliary Rail</h3>
+    <p>An automotive telemetry computer requires a regulated \(V_{out} = 24	ext{ V}\) rail delivering \(I_{out} = 2.5	ext{ A}\) (\(60	ext{ W}\)). The automotive battery fluctuates between \(V_{in,min} = 9	ext{ V}\) during cold cranking and \(V_{in,nom} = 13.8	ext{ V}\). The controller operates at \(f_{sw} = 150	ext{ kHz}\) with an estimated efficiency \(\eta = 88\%\), Schottky diode drop \(V_D = 0.5	ext{ V}\), ripple current ratio \(r = 0.30\), and peak-to-peak output ripple limit \(\Delta V_o \le 50	ext{ mV}\).</p>
+
+    <div class="step-solution">
+        <h4>Step 1: Compute Maximum Operating Duty Cycle (Worst-Case Low Input)</h4>
+        <p>At \(V_{in} = 9	ext{ V}\):</p>
+        $$D = rac{24 + 0.5}{(9 	imes 0.88) + 24 + 0.5} = rac{24.5}{7.92 + 24.5} = rac{24.5}{32.42} pprox 0.7557 	ext{ (75.6\%)}$$
+
+        <h4>Step 2: Average Inductor Current and Target Current Ripple</h4>
+        $$I_{L,avg} = rac{I_{out}}{1 - D} = rac{2.5}{1 - 0.7557} = rac{2.5}{0.2443} = 10.233	ext{ A}$$
+        $$\Delta I_L = r 	imes I_{L,avg} = 0.30 	imes 10.233	ext{ A} = 3.07	ext{ A}$$
+
+        <h4>Step 3: Inductance Calculation</h4>
+        $$L = rac{V_{in} \cdot D}{\Delta I_L \cdot f_{sw}} = rac{9 	imes 0.7557}{3.07 	imes 150{,}000} = rac{6.8013}{460{,}500} pprox 14.77 	imes 10^{-6}	ext{ H} pprox 15	ext{ }\mu	ext{H}$$
+
+        <h4>Step 4: Inductor Peak Current and Component Voltage Stress</h4>
+        $$I_{L,pk} = 10.233 + rac{3.07}{2} = 11.77	ext{ A}$$
+        $$V_{sw,max} = V_{in,max} + V_{out} + V_D = 16	ext{ V} + 24	ext{ V} + 0.5	ext{ V} = 40.5	ext{ V}$$
+        <p>A power MOSFET rated for at least \(60	ext{ V}\) breakdown with low \(R_{DS(on)}\) and an inductor with a saturation current rating \(I_{sat} \ge 14	ext{ A}\) are selected to provide adequate operating margin.</p>
+
+        <h4>Step 5: Minimum Output Filter Capacitance</h4>
+        $$C_{out,min} = rac{I_{out} \cdot D}{f_{sw} \cdot \Delta V_o} = rac{2.5 	imes 0.7557}{150{,}000 	imes 0.050} = rac{1.8893}{7500} pprox 251.9	ext{ }\mu	ext{F}$$
+        <p>A parallel combination of three \(100	ext{ }\mu	ext{F}\), \(35	ext{ V}\) low-ESR polymer aluminum electrolytic capacitors shunted by two \(10	ext{ }\mu	ext{F}\) X7R ceramic capacitors satisfies both the capacitive bulk requirement and high-frequency ESR ripple suppression.</p>
+    </div>
+</div>
+
+<h2>6. Frequently Asked Questions</h2>
+<div class="faq-accordion">
+    <div class="faq-item">
+        <h3>What is the primary difference between inverting and four-switch non-inverting buck-boost converters?</h3>
+        <p>An inverting buck-boost converter reverses the polarity of the DC output with respect to ground and employs only two power switches (one active transistor and one diode). A four-switch synchronous non-inverting buck-boost converter utilizes four power MOSFETs (two half-bridges) and an inductor. It preserves positive voltage polarity and delivers superior efficiency (&gt;96%) by operating dynamically as a pure buck converter when \(V_{in} \gg V_{out}\), a pure boost converter when \(V_{in} \ll V_{out}\), and in 4-switch buck-boost mode only when input and output voltages are nearly identical.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Why is the inductor ripple current ratio (r) typically chosen between 0.2 and 0.4?</h3>
+        <p>Selecting \(r\) between 0.20 and 0.40 provides an optimal trade-off between magnetic component volume and power losses. A lower ripple ratio (\(r &lt; 0.2\)) requires a large, bulky inductor with higher DCR (winding resistance), increasing copper losses and slowing closed-loop transient response. A higher ripple ratio (\(r &gt; 0.4\)) produces severe AC peak currents, excessive core hysteresis and eddy-current losses, and demands much larger output capacitors to attenuate voltage ripple.</p>
+    </div>
+    <div class="faq-item">
+        <h3>How does Right-Half-Plane (RHP) zero affect the compensation loop of a buck-boost converter in CCM?</h3>
+        <p>In Continuous Conduction Mode, when the control loop demands higher output voltage by suddenly increasing duty cycle \(D\), the immediate short-term effect is a reduction in the switch turn-off time \((1 - D)\), temporarily decreasing the energy delivered to the load until inductor current ramps up. This phenomenon creates a Right-Half-Plane zero that increases open-loop gain by \(+20	ext{ dB/decade}\) while degrading loop phase by \(-90^\circ\). To prevent severe phase margin erosion and instability, loop bandwidth must be restricted to less than one-third to one-fifth of the RHP zero frequency.</p>
+    </div>
+    <div class="faq-item">
+        <h3>How is the minimum critical inductance (L_crit) calculated to maintain Continuous Conduction Mode (CCM)?</h3>
+        <p>Continuous Conduction Mode requires that the instantaneous inductor current does not drop to zero at any point during the cycle. At the CCM/DCM boundary, peak-to-peak ripple current \(\Delta I_L\) equals twice the average inductor current. For a minimum operating load current \(I_{out,min}\), critical inductance is calculated as:</p>
+        $$L_{crit} = rac{V_{in} \cdot D}{2 \cdot I_{L,avg,min} \cdot f_{sw}} = rac{V_{in} \cdot D \cdot (1 - D)}{2 \cdot I_{out,min} \cdot f_{sw}}$$
+    </div>
+</div>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚡</span>
+            <h3 class="widget-title">Related Electrical & Power Systems</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="wire-ampacity-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Ampacity (NEC 310.16)</a></li>
+            <li><a href="conduit-fill-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Conduit Fill (NEC Ch. 9)</a></li>
+            <li><a href="motor-starting-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Motor Starting Current</a></li>
+            <li><a href="short-circuit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Short-Circuit (IEC 60909)</a></li>
+            <li><a href="transformer-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Sizing (NEC 450)</a></li>
+            <li><a href="cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC/NEC)</a></li>
+            <li><a href="voltage-drop-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Drop Calculator</a></li>
+            <li><a href="ohms-law-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ohm's Law Calculator</a></li>
+            <li><a href="power-factor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Power Factor (kW to kVAR)</a></li>
+            <li><a href="parallel-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistor (Req)</a></li>
+            <li><a href="battery-life-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Life & Runtime</a></li>
+            <li><a href="resistor-color-code-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Color Code</a></li>
+            <li><a href="555-timer-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> 555 Timer Astable & Monostable</a></li>
+            <li><a href="led-resistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LED Series Resistor Calculator</a></li>
+            <li><a href="capacitive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitive Reactance (Xc)</a></li>
+            <li><a href="inductive-reactance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Inductive Reactance (Xl)</a></li>
+            <li><a href="op-amp-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Op-Amp Gain & Inverting/Non-Inv</a></li>
+            <li><a href="three-phase-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three-Phase AC Power (kVA/kW)</a></li>
+            <li><a href="adc-dac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ADC & DAC Converter Resolution</a></li>
+            <li><a href="antenna-length-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Antenna Length & Resonant Dipole</a></li>
+            <li><a href="battery-short-circuit-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Battery Short Circuit (IEC 60896)</a></li>
+            <li><a href="bjt-transistor-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BJT Transistor Bias & Q-Point</a></li>
+            <li><a href="breaker-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Breaker Size (NEC 125% Rule)</a></li>
+            <li><a href="decibel-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Decibel Calculator (dB, dBm, SPL)</a></li>
+            <li><a href="earth-pit-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earth Pit Resistance (IEEE 80)</a></li>
+            <li><a href="electrical-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Electrical Power & Energy Cost</a></li>
+            <li><a href="microstrip-impedance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Microstrip Impedance (IPC-2141)</a></li>
+            <li><a href="resistor-network-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Resistor Network (Delta-Wye & Ladder)</a></li>
+            <li><a href="transformer-turns-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Transformer Turns Ratio (a)</a></li>
+            <li><a href="aluminium-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Aluminium Cable Sizing (NEC/IEC)</a></li>
+            <li><a href="busbar-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Busbar Sizing (DIN 43671 / IEC)</a></li>
+            <li><a href="cable-sizing-calculator-bs-7671.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (BS 7671 18th Ed)</a></li>
+            <li><a href="cable-sizing-calculator-iec-60364.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (IEC 60364-5-52)</a></li>
+            <li><a href="cable-sizing-installation-method-a.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method A (Insulated Wall)</a></li>
+            <li><a href="fault-current-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Fault Current (IEEE 141 / IEC)</a></li>
+            <li><a href="filter-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Analog Filter (RC, RL, LC)</a></li>
+            <li><a href="generator-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Generator Sizing (ISO 8528)</a></li>
+            <li><a href="heatsink-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heatsink Sizing & Thermal</a></li>
+            <li><a href="cable-sizing-installation-method-c.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method C (Clipped Direct)</a></li>
+            <li><a href="cable-sizing-installation-method-e.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing Method E (Cable Tray)</a></li>
+            <li><a href="cable-sizing-calculator-nec.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cable Sizing (NEC Table 310.16)</a></li>
+            <li><a href="copper-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Copper Cable Sizing (100% IACS)</a></li>
+            <li><a href="earthing-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Earthing Cable Size (IEC 60364-5-54)</a></li>
+            <li><a href="kw-to-cable-size-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> kW to Cable Size (1-Phase & 3-Phase)</a></li>
+            <li><a href="single-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Single Phase Cable Sizing (230V/120V)</a></li>
+            <li><a href="three-phase-cable-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Three Phase Cable Sizing (400V/480V)</a></li>
+            <li><a href="wire-gauge-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Wire Gauge (AWG to mm² Metric)</a></li>
+            <li><a href="voltage-divider-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Voltage Divider Calculator</a></li>
+            <li><a href="parallel-resistance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Parallel Resistance Calculator</a></li>
+            <li><a href="capacitor-energy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capacitor Energy & Pulse Power</a></li>
+            <li><a href="resonant-frequency-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LC Resonant Frequency Tank</a></li>
+            <li><a href="rc-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RC Time Constant (τ = RC)</a></li>
+            <li><a href="rl-time-constant-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> RL Time Constant (τ = L/R)</a></li>
+            <li><a href="zener-diode-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Zener Diode Shunt Regulator</a></li>
+            <li><a href="lm317-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> LM317 Voltage Regulator</a></li>
+            <li><a href="pcb-trace-width-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> PCB Trace Width (IPC-2152)</a></li>
+            <li><a href="lightning-protection-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lightning Protection (NFPA 780)</a></li>
+            <li><a href="lumen-lux-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lumen to Lux Illuminance</a></li>
+            <li><a href="lumen-method-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lumen Method Fixture Layout</a></li>
+            <li><a href="motor-parameters-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Motor Parameters & Slip</a></li>
+            <li><a href="buck-boost-converter-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Buck-Boost Converter</a></li>
+            <li><a href="3-phase-power-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> 3-Phase Power (kW, kVA, kVAR)</a></li>
+            <li><a href="motor-starter-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Motor Starter Sizing (NEC 430)</a></li>
+            <li><a href="nec-load-calculation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> NEC Load Calculation (Residential)</a></li>
+            <li><a href="neutral-conductor-sizing-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Neutral Conductor Sizing</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="engineering.html" class="sidebar-category-link">View All Electrical & Power Systems Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub provides free, high-precision engineering calculators, unit converters, and analytical tools designed for practicing engineers, technicians, and students worldwide.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Engineering Categories</h4>
+                    <ul>
+                        <li><a href="engineering.html">Electrical &amp; Electronics</a></li>
+                        <li><a href="mechanical.html">Mechanical &amp; HVAC</a></li>
+                        <li><a href="civil.html">Civil &amp; Structural</a></li>
+                        <li><a href="chemical.html">Chemical &amp; Process</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Popular Calculators</h4>
+                    <ul>
+                        <li><a href="pcb-trace-width-calculator.html">PCB Trace Width</a></li>
+                        <li><a href="wire-ampacity-calculator.html">Wire Ampacity</a></li>
+                        <li><a href="voltage-divider-calculator.html">Voltage Divider</a></li>
+                        <li><a href="motor-parameters-calculator.html">Motor Parameters</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Unit Converters</a></li>
+                        <li><a href="math.html">Math Tools</a></li>
+                        <li><a href="finance.html">Finance Tools</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed analytical calculation models.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
