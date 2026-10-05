@@ -133,6 +133,7 @@ CAT_MAP = {
             ("surface-area-calculator.html", "Surface Area (3D Polyhedra & Solids)", "📦", "Total surface area of prisms, cylinders, spheres & cones", "SA = 2πr(r+h) | 4πr² | 2(lw+lh+wh)"),
             ("volume-calculator.html", "Volume Calculator (3D Solids)", "🧊", "Volumetric capacity of cylinders, prisms, spheres & cones", "V = πr²h | l·w·h | (4/3)πr³ | (1/3)πr²h"),
             ("percentage-change-calculator.html", "Percentage Change (Growth & Decay)", "📈", "Relative difference, % increase/decrease & multipliers", "Δ% = [(V2 - V1)/V1] × 100% | k = V2/V1"),
+            ("ratio-simplifier-calculator.html", "Ratio Simplifier & Scale Factor", "⚖️", "Euclid's GCD ratio reduction, simplest integer form & scale", "A:B = (A/GCD):(B/GCD) | Scale Factor k = B/A"),
         ]
     },
     "engineering.html": {
@@ -383,6 +384,13 @@ CAT_MAP = {
         "title": "Date & Time Utility",
         "tools": [
             ("date-difference-calculator.html", "Date Difference & Business Days", "📅", "Exact calendar days & work weeks", "Elapsed Days & Mon-Fri Working Days"),
+            ("hours-calculator.html", "Hours & Work Time Calculator", "⏱️", "Start/end time, lunch breaks, decimal hours & gross pay", "Total Hours = (End - Start) - Break | Pay = Hours × Rate"),
+            ("week-number-calculator.html", "Week Number (ISO 8601)", "📅", "ISO calendar week, ordinal date, week start/end dates", "Week 1 = week with 4 Jan | W = ⌊(10 + DoY - DoW)/7⌋"),
+            ("add-days-to-date-calculator.html", "Add Days to Date", "🗓️", "Add/subtract days, business days exclusion & target date", "Target = StartDate ± N days | Leap year aware"),
+            ("add-time-calculator.html", "Add Time (Clock & Duration)", "⏰", "Add/subtract hours, minutes, seconds & 12h/24h overflow", "T_total = T1 + T2 | s_tot mod 60, m_tot mod 60, h_tot"),
+            ("business-days-calculator.html", "Business Days Calculator", "💼", "Working days between dates, weekend & holiday exclusion", "Net Days = Total Days - Weekends(Sat/Sun) - Holidays"),
+            ("countdown-calculator.html", "Event Countdown Timer", "⏳", "Days, hours, minutes, seconds to target date & milestones", "Remaining = Target - Current | d, h, m, s breakdown"),
+            ("date-calculator.html", "Calendar Date Calculator", "📅", "Date intervals, duration between dates, years/months/days", "Δ = Date2 - Date1 | Gregorian calendar algorithm"),
         ]
     },
     "converter.html": {

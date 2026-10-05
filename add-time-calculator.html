@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Time Calculator | Add or Subtract Hours, Minutes & Seconds</title>
+    <meta name="description" content="Add or subtract time intervals, clock times, hours, minutes, and seconds with carry-over rollover math, multi-day overflow tracking, and decimal conversions.">
+    <link rel="canonical" href="https://calchub.com/add-time-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Add Time Calculator",
+      "url": "https://calchub.com/add-time-calculator.html",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "Performs sexagesimal time addition and subtraction across hours, minutes, and seconds with day rollover tracking."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does base-60 carry-over work when adding time?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Time addition operates on base-60 (sexagesimal) arithmetic. When seconds exceed 59, they are divided by 60; the remainder represents the net seconds, and the quotient is carried over as added minutes. Similarly, when minutes exceed 59, the quotient carries over as additional hours."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the calculator handle time crossing past midnight (24 hours)?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "When adding durations to clock timestamps, any accumulated hours exceeding 24 are divided by 24. The quotient is recorded as an integer day overflow count (+1 day, +2 days, etc.), while the modulo remainder yields the new 24-hour clock time."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can you subtract time intervals with this calculator?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Switching to subtraction mode allows subtracting durations from a base time. If a term has fewer seconds or minutes than the subtracted term, the algorithm borrows 60 units from the adjacent higher unit (borrowing 60 seconds from 1 minute, or 60 minutes from 1 hour)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How are summed hours and minutes converted to decimal hours?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Total decimal hours are computed via the formula: Decimal Hours = Hours + (Minutes / 60) + (Seconds / 3600). For example, 5 hours, 36 minutes, and 18 seconds equals 5 + 0.60 + 0.005 = 5.605 decimal hours."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="datetime.html">Date &amp; Time</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="finance.html">Finance</a>
+                <a href="converter.html">Converters</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="datetime.html">Date &amp; Time Utility</a> &gt; <span>Add Time Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Add Time Calculator</h1>
+                        <p class="calc-desc">Perform sexagesimal clock and duration arithmetic: sum multiple time spans, add hours to a start time, and track days overflow with second-level precision.</p>
+                    </div>
+                    <div class="calc-grid">
+    <div class="calc-inputs">
+        <div class="input-group">
+            <label for="calcMode">Calculation Mode</label>
+            <select id="calcMode" class="input-field">
+                <option value="clock" selected>Add Duration to Clock Time (e.g., 08:30 + 4h 45m)</option>
+                <option value="durations">Sum Two Durations (Time 1 + Time 2)</option>
+            </select>
+            <span class="input-hint">Select whether adding to a time-of-day or summing durations</span>
+        </div>
+        <div id="clockSection">
+            <div class="input-group">
+                <label for="baseClock">Initial Clock Time</label>
+                <input type="time" id="baseClock" value="08:30" class="input-field">
+                <span class="input-hint">Starting timestamp (24-hour / AM-PM format)</span>
+            </div>
+        </div>
+        <div id="duration1Section" style="display:none;">
+            <div class="input-group">
+                <label>First Duration (Time 1)</label>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;">
+                    <input type="number" id="h1" value="4" min="0" placeholder="Hours" class="input-field">
+                    <input type="number" id="m1" value="45" min="0" max="59" placeholder="Mins" class="input-field">
+                    <input type="number" id="s1" value="0" min="0" max="59" placeholder="Secs" class="input-field">
+                </div>
+                <span class="input-hint">Hours : Minutes : Seconds</span>
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="opSign">Operation</label>
+            <select id="opSign" class="input-field">
+                <option value="add" selected>+ Add (Advance Forward)</option>
+                <option value="sub">- Subtract (Rewind Backward)</option>
+            </select>
+            <span class="input-hint">Add or subtract the secondary duration</span>
+        </div>
+        <div class="input-group">
+            <label>Duration to Add / Subtract</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;">
+                <input type="number" id="h2" value="6" min="0" placeholder="Hours" class="input-field">
+                <input type="number" id="m2" value="45" min="0" max="59" placeholder="Mins" class="input-field">
+                <input type="number" id="s2" value="30" min="0" max="59" placeholder="Secs" class="input-field">
+            </div>
+            <span class="input-hint">Hours : Minutes : Seconds</span>
+        </div>
+    </div>
+    <div class="calc-results">
+        <div class="result-card primary-result">
+            <div class="result-label" id="resPrimaryLabel">Resulting Clock Time</div>
+            <div class="result-value" id="resPrimaryVal" style="font-size:1.85rem;">15:15:30 (03:15:30 PM)</div>
+            <div class="result-sub" id="resOverflow">Same Day (0 Days Overflow)</div>
+        </div>
+        <div class="result-grid-mini" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem;">
+            <div class="result-card">
+                <div class="result-label">Total Cumulative Duration</div>
+                <div class="result-value-sm" id="resTotalDuration">6h 45m 30s</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Decimal Hours</div>
+                <div class="result-value-sm" id="resDecHours">6.7583 hrs</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Total Minutes</div>
+                <div class="result-value-sm" id="resTotalMinutes">405.50 mins</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Total Seconds</div>
+                <div class="result-value-sm" id="resTotalSeconds">24,330 secs</div>
+            </div>
+        </div>
+        <div class="result-card" style="margin-top:1rem;background:var(--bg-accent, #eff6ff);border-left:4px solid var(--brand-primary, #2563eb);">
+            <div class="result-label">Timecode &amp; Media Breakdown</div>
+            <div class="result-value" id="resTimecode" style="color:var(--brand-primary, #2563eb);font-size:1.35rem;">06:45:30.000</div>
+            <div class="result-sub" id="resHumanFriendly">6 hours, 45 minutes, 30 seconds</div>
+        </div>
+    </div>
+</div>
+<script>
+function updateTimeCalc() {
+    const mode = document.getElementById('calcMode').value;
+    const op = document.getElementById('opSign').value;
+
+    document.getElementById('clockSection').style.display = (mode === 'clock') ? 'block' : 'none';
+    document.getElementById('duration1Section').style.display = (mode === 'durations') ? 'block' : 'none';
+
+    const h2 = parseInt(document.getElementById('h2').value, 10) || 0;
+    const m2 = parseInt(document.getElementById('m2').value, 10) || 0;
+    const s2 = parseInt(document.getElementById('s2').value, 10) || 0;
+    const deltaSecs = (h2 * 3600) + (m2 * 60) + s2;
+
+    if (mode === 'clock') {
+        const clockStr = document.getElementById('baseClock').value;
+        if (!clockStr) return;
+        const [ch, cm] = clockStr.split(':').map(Number);
+        const baseSecs = (ch * 3600) + (cm * 60);
+
+        let finalSecs = (op === 'add') ? (baseSecs + deltaSecs) : (baseSecs - deltaSecs);
+        let daysOverflow = Math.floor(finalSecs / 86400);
+        let normSecs = ((finalSecs % 86400) + 86400) % 86400;
+
+        const outH = Math.floor(normSecs / 3600);
+        const remS = normSecs % 3600;
+        const outM = Math.floor(remS / 60);
+        const outS = remS % 60;
+
+        const pad = (n) => String(n).padStart(2, '0');
+        const h24 = `${pad(outH)}:${pad(outM)}:${pad(outS)}`;
+        const ampm = outH >= 12 ? 'PM' : 'AM';
+        const h12Num = outH % 12 || 12;
+        const h12 = `${pad(h12Num)}:${pad(outM)}:${pad(outS)} ${ampm}`;
+
+        document.getElementById('resPrimaryLabel').innerText = 'Resulting Clock Time';
+        document.getElementById('resPrimaryVal').innerText = `${h24} (${h12})`;
+
+        let dayText = 'Same Day (0 Days Overflow)';
+        if (daysOverflow > 0) dayText = `+${daysOverflow} Day${daysOverflow > 1 ? 's' : ''} Forward (Following Day)`;
+        else if (daysOverflow < 0) dayText = `${daysOverflow} Day${Math.abs(daysOverflow) > 1 ? 's' : ''} Backward (Preceding Day)`;
+        document.getElementById('resOverflow').innerText = dayText;
+
+        const decHrs = deltaSecs / 3600;
+        document.getElementById('resTotalDuration').innerText = `${h2}h ${m2}m ${s2}s`;
+        document.getElementById('resDecHours').innerText = `${decHrs.toFixed(4)} hrs`;
+        document.getElementById('resTotalMinutes').innerText = `${(deltaSecs / 60).toFixed(2)} mins`;
+        document.getElementById('resTotalSeconds').innerText = `${deltaSecs.toLocaleString()} secs`;
+        document.getElementById('resTimecode').innerText = `${pad(h2)}:${pad(m2)}:${pad(s2)}.000`;
+        document.getElementById('resHumanFriendly').innerText = `${h2} hours, ${m2} minutes, ${s2} seconds`;
+    } else {
+        const h1 = parseInt(document.getElementById('h1').value, 10) || 0;
+        const m1 = parseInt(document.getElementById('m1').value, 10) || 0;
+        const s1 = parseInt(document.getElementById('s1').value, 10) || 0;
+        const secs1 = (h1 * 3600) + (m1 * 60) + s1;
+
+        let totSecs = (op === 'add') ? (secs1 + deltaSecs) : Math.max(0, secs1 - deltaSecs);
+        const days = Math.floor(totSecs / 86400);
+        const remD = totSecs % 86400;
+        const outH = Math.floor(remD / 3600);
+        const remM = remD % 3600;
+        const outM = Math.floor(remM / 60);
+        const outS = remM % 60;
+
+        const pad = (n) => String(n).padStart(2, '0');
+        document.getElementById('resPrimaryLabel').innerText = 'Combined Sum Duration';
+        if (days > 0) {
+            document.getElementById('resPrimaryVal').innerText = `${days}d ${outH}h ${outM}m ${outS}s`;
+            document.getElementById('resOverflow').innerText = `Spans ${days} full 24-hr day${days > 1 ? 's' : ''}`;
+        } else {
+            document.getElementById('resPrimaryVal').innerText = `${outH}h ${outM}m ${outS}s`;
+            document.getElementById('resOverflow').innerText = `Less than 24 hours total`;
+        }
+
+        const totalHoursExact = totSecs / 3600;
+        document.getElementById('resTotalDuration').innerText = `${Math.floor(totSecs/3600)}h ${outM}m ${outS}s`;
+        document.getElementById('resDecHours').innerText = `${totalHoursExact.toFixed(4)} hrs`;
+        document.getElementById('resTotalMinutes').innerText = `${(totSecs / 60).toFixed(2)} mins`;
+        document.getElementById('resTotalSeconds').innerText = `${totSecs.toLocaleString()} secs`;
+        document.getElementById('resTimecode').innerText = `${pad(Math.floor(totSecs/3600))}:${pad(outM)}:${pad(outS)}.000`;
+        document.getElementById('resHumanFriendly').innerText = `${days > 0 ? days + ' days, ' : ''}${outH} hours, ${outM} minutes, ${outS} seconds`;
+    }
+}
+
+['calcMode', 'baseClock', 'h1', 'm1', 's1', 'opSign', 'h2', 'm2', 's2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('input', updateTimeCalc);
+        el.addEventListener('change', updateTimeCalc);
+    }
+});
+window.addEventListener('DOMContentLoaded', updateTimeCalc);
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>Mathematical Foundations of Sexagesimal Time Arithmetic</h2>
+<p>Unlike standard decimal arithmetic which operates in base-10, civil chronometry and astronomical angle measurement are founded on the sexagesimal (base-60) numerical positional system developed in ancient Mesopotamia. In sexagesimal timekeeping, an hour is subdivided into 60 minutes, and each minute is further subdivided into 60 seconds ($1 	ext{ hour} = 60 	ext{ minutes} = 3,600 	ext{ seconds}$). Furthermore, the diurnal rotation of the Earth establishes a secondary modulus of 24 hours per civil solar day ($1 	ext{ day} = 24 	ext{ hours} = 1,440 	ext{ minutes} = 86,400 	ext{ seconds}$).</p>
+
+<p>Performing addition or subtraction on chronometric vectors $(H_1, M_1, S_1)$ and $(H_2, M_2, S_2)$ requires rigorous carry-over and borrowing algorithms. The mathematical carry-over sequence for addition is formalized as follows:</p>
+
+$$S_{	ext{raw}} = S_1 + S_2, \quad S_{	ext{net}} = S_{	ext{raw}} mod 60, \quad C_M = \left\lfloor rac{S_{	ext{raw}}}{60} 
+ight
+floor$$
+
+$$M_{	ext{raw}} = M_1 + M_2 + C_M, \quad M_{	ext{net}} = M_{	ext{raw}} mod 60, \quad C_H = \left\lfloor rac{M_{	ext{raw}}}{60} 
+ight
+floor$$
+
+$$H_{	ext{raw}} = H_1 + H_2 + C_H, \quad H_{	ext{net}} = H_{	ext{raw}} mod 24, \quad D_{	ext{overflow}} = \left\lfloor rac{H_{	ext{raw}}}{24} 
+ight
+floor$$
+
+<p>Where $C_M$ and $C_H$ represent the integer carry-over quotients, and $D_{	ext{overflow}}$ represents the count of 24-hour diurnal boundaries crossed. In subtraction, whenever $S_1 < S_2$, a borrow of 60 seconds is decremented from $M_1$. If $M_1 < M_2$, a borrow of 60 minutes is decremented from $H_1$.</p>
+
+<h2>Clock-Time Projection vs. Continuous Duration Summation</h2>
+<p>Modern chronometry differentiates strictly between two distinct computational paradigms:</p>
+
+<ol>
+    <li><strong>Clock-Time Addition (Time of Day):</strong> Adding a duration $\Delta t$ to a fixed moment on the civil clock $T_0$. Because clocks are cyclic dials bounded by 24:00 (or two 12-hour AM/PM cycles), this operation is cyclic and produces a resulting timestamp plus a day offset:
+    $$T_{	ext{target}} = (T_0 + \Delta t) \pmod{86400 	ext{ seconds}}$$
+    </li>
+    <li><strong>Duration Aggregation (Elapsed Interval):</strong> Accumulating multiple work periods, flight legs, machinery runtimes, or audio/video tracks. In duration summation, time is an unbounded linear scalar:
+    $$T_{	ext{total}} = \sum_{i=1}^n ig(H_i \cdot 3600 + M_i \cdot 60 + S_iig)$$
+    </li>
+</ol>
+
+<h3>Continuous Decimal and Metric Equivalencies</h3>
+<p>For scientific computation, statistical analysis, and billing databases, composite sexagesimal intervals $(H, M, S)$ must be converted into continuous decimal representations:</p>
+
+$$H_{	ext{decimal}} = H + rac{M}{60} + rac{S}{3600}$$
+
+$$M_{	ext{decimal}} = (H 	imes 60) + M + rac{S}{60}$$
+
+$$S_{	ext{total}} = (H 	imes 3600) + (M 	imes 60) + S$$
+
+<h2>SMPTE Timecode Synchronization and Video Frame Mathematics</h2>
+<p>In digital broadcasting, professional audio recording, and cinematography, time addition is extended from pure seconds down to discrete photographic frames via the <strong>SMPTE (Society of Motion Picture and Television Engineers) Timecode</strong> standard ($HH:MM:SS:FF$). Because American NTSC color television broadcasts operate at a non-integer rate of exactly $29.97$ frames per second ($30 / 1.001 	ext{ fps}$), standard integer arithmetic generates a cumulative chronometric time drift of exactly $107.89 	ext{ milliseconds}$ for every hour of playback.</p>
+
+<p>To eliminate this playback discrepancy, broadcast engineers utilize <strong>Drop-Frame Timecode (DF)</strong>:</p>
+
+<ul>
+    <li>Frame numbers <code>00</code> and <code>01</code> are skipped at the start of every minute, EXCEPT every tenth minute (minutes <code>00, 10, 20, 30, 40, 50</code>).</li>
+    <li>Total dropped frame count per hour equals $54 	ext{ minutes} 	imes 2 	ext{ frames} = 108 	ext{ frames}$, perfectly resynchronizing television wall-clock time with real atomic time.</li>
+</ul>
+
+<h2>Relativistic Time Adjustments in Aerospace and GPS Navigation</h2>
+<p>In orbital satellite mechanics and Global Positioning System (GPS) engineering, simple Galilean time addition ($T = t_1 + t_2$) fails due to Albert Einstein's special and general theories of relativity. GPS satellites orbit at an altitude of approximately $20,200 	ext{ km}$ at velocities of $3.9 	ext{ km/s}$:</p>
+
+<ul>
+    <li><strong>Special Relativity (Kinematic Dilation):</strong> The satellite's high velocity causes atomic clocks to run slower by approximately $-7 \ \mu	ext{s/day}$ relative to Earth ground observers:
+    $$\Delta t_v = t_0 \left( \sqrt{1 - rac{v^2}{c^2}} - 1 
+ight) pprox -rac{1}{2}rac{v^2}{c^2} t_0$$
+    </li>
+    <li><strong>General Relativity (Gravitational Dilation):</strong> The weaker gravitational potential at $20,200 	ext{ km}$ causes satellite atomic clocks to run faster by $+45 \ \mu	ext{s/day}$:
+    $$\Delta t_g = t_0 \left( rac{\Delta \Phi}{c^2} 
+ight)$$
+    </li>
+</ul>
+
+<p>The net relativistic drift is $+38 \ \mu	ext{s/day}$. Left uncorrected in time addition algorithms, this $38 \ \mu	ext{s}$ discrepancy would cause GPS ground position errors to compound by approximately $11.4 	ext{ kilometers per day}$ ($38 \ \mu	ext{s} 	imes 3 	imes 10^8 	ext{ m/s}$)!</p>
+
+<h3>Chronometric Carry-Over and Conversion Benchmark Table</h3>
+<p>The following table outlines standard time addition scenarios, carry-over mechanics, and equivalent decimal outputs:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Initial Time ($T_1$)</th>
+            <th>Added Span ($T_2$)</th>
+            <th>Carry Quotient ($C_M, C_H$)</th>
+            <th>Simplified Duration</th>
+            <th>Decimal Hours</th>
+            <th>Total Seconds</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>01h 45m 30s</td><td>02h 25m 45s</td><td>$C_M = 1, C_H = 1$</td><td>04h 11m 15s</td><td>4.1875 hrs</td><td>15,075 s</td></tr>
+        <tr><td>03h 50m 12s</td><td>05h 35m 48s</td><td>$C_M = 1, C_H = 1$</td><td>09h 26m 00s</td><td>9.4333 hrs</td><td>33,960 s</td></tr>
+        <tr><td>07h 15m 00s</td><td>08h 45m 00s</td><td>$C_M = 0, C_H = 1$</td><td>16h 00m 00s</td><td>16.0000 hrs</td><td>57,600 s</td></tr>
+        <tr><td>12h 40m 50s</td><td>11h 35m 25s</td><td>$C_M = 1, C_H = 1$</td><td>24h 16m 15s (1d 0h 16m)</td><td>24.2708 hrs</td><td>87,375 s</td></tr>
+        <tr><td>05h 18m 33s</td><td>03h 41m 27s</td><td>$C_M = 1, C_H = 1$</td><td>09h 00m 00s</td><td>9.0000 hrs</td><td>32,400 s</td></tr>
+        <tr><td>18h 30m 00s</td><td>09h 45m 00s</td><td>$C_M = 0, C_H = 1$</td><td>28h 15m 00s (1d 4h 15m)</td><td>28.2500 hrs</td><td>101,700 s</td></tr>
+    </tbody>
+</table>
+
+<div class="worked-example-card">
+    <h3>Worked Aviation Case Study: Multi-Leg Commercial Flight Crew Block Hours</h3>
+    <p><strong>Scenario:</strong> A commercial airline flight crew operates three consecutive flight sectors on a transatlantic route: Sector 1 block time is <strong>03 hours, 48 minutes, 25 seconds</strong>; Sector 2 block time is <strong>05 hours, 34 minutes, 50 seconds</strong>; Sector 3 block time is <strong>04 hours, 52 minutes, 15 seconds</strong>. Federal Aviation Administration (FAA) Part 117 flight duty regulations mandate that cumulative flight block hours must not exceed 14.00 decimal hours. Calculate: (1) total cumulative block time, (2) exact decimal hours, and (3) verify regulatory compliance.</p>
+    
+    <div class="step-solution">
+        <h4>Step 1: Sum the Raw Seconds</h4>
+        $$S_{	ext{raw}} = 25 + 50 + 15 = 90 	ext{ seconds}$$
+        $$S_{	ext{net}} = 90 mod 60 = 30 	ext{ seconds}$$
+        $$C_M = \lfloor 90 / 60 
+floor = 1 	ext{ carried minute}$$
+
+        <h4>Step 2: Sum the Raw Minutes with Carry</h4>
+        $$M_{	ext{raw}} = 48 + 34 + 52 + 1 = 135 	ext{ minutes}$$
+        $$M_{	ext{net}} = 135 mod 60 = 15 	ext{ minutes}$$
+        $$C_H = \lfloor 135 / 60 
+floor = 2 	ext{ carried hours}$$
+
+        <h4>Step 3: Sum the Raw Hours with Carry</h4>
+        $$H_{	ext{total}} = 3 + 5 + 4 + 2 = 14 	ext{ hours}$$
+        <p><strong>Total Cumulative Duration:</strong> 14 hours, 15 minutes, 30 seconds.</p>
+
+        <h4>Step 4: Convert to Continuous Decimal Hours</h4>
+        $$H_{	ext{decimal}} = 14 + rac{15}{60} + rac{30}{3600} = 14 + 0.25 + 0.00833 = 14.2583 	ext{ decimal hours}$$
+
+        <h4>Step 5: Regulatory Compliance Evaluation</h4>
+        <p>The cumulative block flight time of $14.2583 	ext{ hours}$ exceeds the $14.0000 	ext{ hour}$ statutory ceiling by exactly 15 minutes and 30 seconds ($0.2583 	ext{ hours}$). Under FAA Part 117 rules, the operator must reassign Sector 3 to relief crew to prevent a mandatory crew duty rest violation.</p>
+    </div>
+</div>
+
+<h2>Common Calculation Errors in Time Addition</h2>
+<ol>
+    <li><strong>Decimal Point Confusion:</strong> Treating minutes as decimal fractions (e.g., entering 2 hours and 45 minutes as $2.45$ instead of $2.75$). Performing arithmetic directly on sexagesimal minutes as decimals produces mathematically catastrophic errors (such as concluding that $2.45 + 1.30 = 3.75$, when $2	ext{h }45	ext{m} + 1	ext{h }30	ext{m} = 4	ext{h }15	ext{m} = 4.25	ext{ hrs}$).</li>
+    <li><strong>Omission of Modulo Rollover in 12-Hour Formats:</strong> Failing to adjust for the 12-hour AM/PM flip (e.g., 11:30 AM plus 2 hours equals 01:30 PM, not 13:30 AM).</li>
+    <li><strong>Leap Second Misunderstandings:</strong> While the International Earth Rotation and Reference Systems Service (IERS) periodically inserts atomic leap seconds (UTC), civil time software ignores leap seconds for standard interval addition to prevent variable-rate clock distortion.</li>
+</ol>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">📅</span>
+            <h3 class="widget-title">Related Date & Time Utility</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="date-difference-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Date Difference & Business Days</a></li>
+            <li><a href="hours-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Work Hours Calculator</a></li>
+            <li><a href="week-number-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ISO Week Number</a></li>
+            <li><a href="add-days-to-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Add Days to Date</a></li>
+            <li><a href="add-time-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Add Time Calculator</a></li>
+            <li><a href="business-days-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Business Days Calculator</a></li>
+            <li><a href="countdown-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Countdown Calculator</a></li>
+            <li><a href="date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calendar Date Calculator</a></li>
+            <li><a href="age-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exact Age Calculator</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck Calculator</a></li>
+            <li><a href="unit-converter.html" class="sidebar-link-item"><span class="link-bullet">›</span> Universal Multi-Unit Converter</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="datetime.html" class="sidebar-category-link">View All Date & Time Utility Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers institutional-grade chronometric computing engines, financial clearing calculators, and sexagesimal algebraic models compliant with ISO 8601, SEC, and international labor standards.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Chronometric &amp; Time Suites</h4>
+                    <ul>
+                        <li><a href="datetime.html">Date &amp; Time Utilities</a></li>
+                        <li><a href="finance.html">Financial Planning</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="converter.html">Unit &amp; Chrono Converters</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Core Time Calculators</h4>
+                    <ul>
+                        <li><a href="business-days-calculator.html">Business Days Calculator</a></li>
+                        <li><a href="add-time-calculator.html">Add Time Calculator</a></li>
+                        <li><a href="hours-calculator.html">Work Hours Calculator</a></li>
+                        <li><a href="date-difference-calculator.html">Date Difference</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Metric Converters</a></li>
+                        <li><a href="engineering.html">Engineering Tools</a></li>
+                        <li><a href="health.html">Health &amp; Fitness</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precision timekeeping and business date clearing systems.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

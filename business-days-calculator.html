@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Days Calculator | Working Days Between Dates & Holidays</title>
+    <meta name="description" content="Calculate the exact number of business working days between two calendar dates. Automatically excludes weekends and federal banking holidays with T+1 financial settlement logic.">
+    <link rel="canonical" href="https://calchub.com/business-days-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Business Days Calculator",
+      "url": "https://calchub.com/business-days-calculator.html",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "Calculates working business days between two dates, excluding Saturdays, Sundays, and official public holidays."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How are business days calculated between two dates?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The calculation takes the total calendar days between two dates, calculates the number of complete 7-day weeks (each providing 5 business days), evaluates the remaining days based on the starting day of the week, and subtracts any official public holidays that fall on a Monday through Friday."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What holidays are excluded from business days?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Official United States Federal Reserve banking holidays are typically excluded, including New Year's Day, Martin Luther King Jr. Day, Washington's Birthday, Memorial Day, Juneteenth, Independence Day, Labor Day, Columbus Day, Veterans Day, Thanksgiving, and Christmas Day."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What happens if a holiday falls on a weekend?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Under US Federal Code (5 U.S.C. § 6103), if a public holiday falls on a Sunday, it is officially observed on the following Monday. If it falls on a Saturday, it is observed on the preceding Friday. The observed weekday is treated as a non-business day."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the T+1 settlement rule in financial markets?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Under SEC Rule 15c6-1 implemented in May 2024, standard securities transactions in the United States settle on a T+1 basis (Transaction date plus one business day), replacing the previous T+2 settlement framework."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="datetime.html">Date &amp; Time</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="finance.html">Finance</a>
+                <a href="converter.html">Converters</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="datetime.html">Date &amp; Time Utility</a> &gt; <span>Business Days Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Business Days Calculator</h1>
+                        <p class="calc-desc">Compute net business working days, excluded weekends, and statutory public holidays between any two calendar dates for legal, commercial, and financial deadlines.</p>
+                    </div>
+                    <div class="calc-grid">
+    <div class="calc-inputs">
+        <div class="input-group">
+            <label for="bStartDate">Start Date</label>
+            <input type="date" id="bStartDate" class="input-field">
+            <span class="input-hint">Initial reference date</span>
+        </div>
+        <div class="input-group">
+            <label for="bEndDate">End Date</label>
+            <input type="date" id="bEndDate" class="input-field">
+            <span class="input-hint">Target concluding date</span>
+        </div>
+        <div class="input-group">
+            <label for="includeStart">Boundary Date Inclusion</label>
+            <select id="includeStart" class="input-field">
+                <option value="excludeStart" selected>Exclude Start Date (Standard Span: End - Start)</option>
+                <option value="includeBoth">Include Both Start and End Dates</option>
+            </select>
+            <span class="input-hint">Contract counting convention</span>
+        </div>
+        <div class="input-group">
+            <label for="holidaySchedule">Holiday Exclusion Schedule</label>
+            <select id="holidaySchedule" class="input-field">
+                <option value="usFed" selected>US Federal Reserve Banking Holidays</option>
+                <option value="none">Weekends Only (No Holidays Excluded)</option>
+            </select>
+            <span class="input-hint">Select official bank holiday calendar</span>
+        </div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+            <button type="button" class="btn-outline" onclick="setSpanPreset(30)">+30 Days</button>
+            <button type="button" class="btn-outline" onclick="setSpanPreset(60)">+60 Days</button>
+            <button type="button" class="btn-outline" onclick="setSpanPreset(90)">+90 Days</button>
+            <button type="button" class="btn-outline" onclick="setSpanPreset('month')">End of Month</button>
+        </div>
+    </div>
+    <div class="calc-results">
+        <div class="result-card primary-result">
+            <div class="result-label">Net Business Working Days</div>
+            <div class="result-value" id="resNetBusDays" style="font-size:2rem;">22 Business Days</div>
+            <div class="result-sub" id="resWorkHours">176.0 Standard Working Hours (@ 8h/day)</div>
+        </div>
+        <div class="result-grid-mini" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem;">
+            <div class="result-card">
+                <div class="result-label">Total Calendar Days</div>
+                <div class="result-value-sm" id="resTotalCalDays">31 Days</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Weekend Days (Sat/Sun)</div>
+                <div class="result-value-sm" id="resWeekendDays">8 Days</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Holidays Excluded</div>
+                <div class="result-value-sm" id="resHolidaysCount">1 Holiday</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Business Day Ratio</div>
+                <div class="result-value-sm" id="resBusRatio">70.97% of Span</div>
+            </div>
+        </div>
+        <div class="result-card" id="resHolidayListCard" style="margin-top:1rem;background:var(--bg-accent, #eff6ff);border-left:4px solid var(--brand-primary, #2563eb);">
+            <div class="result-label">Observed Federal Holidays in Range</div>
+            <div class="result-value" id="resHolidayNames" style="color:var(--brand-primary, #2563eb);font-size:1.15rem;">Thanksgiving Day (Nov 26, 2026)</div>
+            <div class="result-sub" id="resFinancialNote">T+1 Settlement: Trade executed on start date settles next business day</div>
+        </div>
+    </div>
+</div>
+<script>
+// Federal Reserve holidays generator for arbitrary year
+function getUSFederalHolidays(year) {
+    const holidays = [];
+
+    // Helper to find nth weekday of month
+    function getNthWeekday(y, m, dow, n) {
+        let count = 0;
+        for (let d = 1; d <= 31; d++) {
+            const dt = new Date(y, m, d);
+            if (dt.getMonth() !== m) break;
+            if (dt.getDay() === dow) {
+                count++;
+                if (count === n) return dt;
+            }
+        }
+        return null;
+    }
+
+    // Helper for last weekday of month
+    function getLastWeekday(y, m, dow) {
+        let last = null;
+        for (let d = 1; d <= 31; d++) {
+            const dt = new Date(y, m, d);
+            if (dt.getMonth() !== m) break;
+            if (dt.getDay() === dow) last = dt;
+        }
+        return last;
+    }
+
+    // Helper for observed date
+    function addObserved(name, actualDate) {
+        const dow = actualDate.getDay();
+        let obs = new Date(actualDate);
+        if (dow === 0) obs.setDate(actualDate.getDate() + 1); // Sunday -> Monday
+        else if (dow === 6) obs.setDate(actualDate.getDate() - 1); // Saturday -> Friday
+        holidays.push({ name, date: obs, actual: actualDate });
+    }
+
+    addObserved("New Year's Day", new Date(year, 0, 1));
+    holidays.push({ name: "Martin Luther King Jr. Day", date: getNthWeekday(year, 0, 1, 3) });
+    holidays.push({ name: "Washington's Birthday", date: getNthWeekday(year, 1, 1, 3) });
+    holidays.push({ name: "Memorial Day", date: getLastWeekday(year, 4, 1) });
+    addObserved("Juneteenth", new Date(year, 5, 19));
+    addObserved("Independence Day", new Date(year, 6, 4));
+    holidays.push({ name: "Labor Day", date: getNthWeekday(year, 8, 1, 1) });
+    holidays.push({ name: "Columbus Day", date: getNthWeekday(year, 9, 1, 2) });
+    addObserved("Veterans Day", new Date(year, 10, 11));
+    holidays.push({ name: "Thanksgiving Day", date: getNthWeekday(year, 10, 4, 4) });
+    addObserved("Christmas Day", new Date(year, 11, 25));
+
+    return holidays;
+}
+
+function calculateBusinessDays() {
+    const sStr = document.getElementById('bStartDate').value;
+    const eStr = document.getElementById('bEndDate').value;
+    const boundary = document.getElementById('includeStart').value;
+    const holMode = document.getElementById('holidaySchedule').value;
+
+    if (!sStr || !eStr) return;
+
+    let [sy, sm, sd] = sStr.split('-').map(Number);
+    let [ey, em, ed] = eStr.split('-').map(Number);
+
+    let start = new Date(sy, sm - 1, sd);
+    let end = new Date(ey, em - 1, ed);
+
+    if (end < start) {
+        let t = start; start = end; end = t;
+    }
+
+    // Build holiday dictionary across years
+    const holidayMap = new Map();
+    if (holMode === 'usFed') {
+        for (let y = start.getFullYear(); y <= end.getFullYear(); y++) {
+            const hList = getUSFederalHolidays(y);
+            hList.forEach(h => {
+                if (h.date) {
+                    const key = `${h.date.getFullYear()}-${String(h.date.getMonth() + 1).padStart(2, '0')}-${String(h.date.getDate()).padStart(2, '0')}`;
+                    holidayMap.set(key, h.name);
+                }
+            });
+        }
+    }
+
+    let calDays = 0;
+    let busDays = 0;
+    let weekendDays = 0;
+    let holidaysExcluded = [];
+
+    let cur = new Date(start);
+    if (boundary === 'excludeStart') {
+        cur.setDate(cur.getDate() + 1);
+    }
+
+    while (cur <= end) {
+        calDays++;
+        const dow = cur.getDay();
+        const dateKey = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`;
+
+        if (dow === 0 || dow === 6) {
+            weekendDays++;
+        } else {
+            if (holidayMap.has(dateKey)) {
+                holidaysExcluded.push(`${holidayMap.get(dateKey)} (${dateKey})`);
+            } else {
+                busDays++;
+            }
+        }
+        cur.setDate(cur.getDate() + 1);
+    }
+
+    document.getElementById('resNetBusDays').innerText = `${busDays} Business Day${busDays !== 1 ? 's' : ''}`;
+    document.getElementById('resWorkHours').innerText = `${(busDays * 8).toFixed(1)} Standard Working Hours (@ 8h/day)`;
+    document.getElementById('resTotalCalDays').innerText = `${calDays} Day${calDays !== 1 ? 's' : ''}`;
+    document.getElementById('resWeekendDays').innerText = `${weekendDays} Day${weekendDays !== 1 ? 's' : ''}`;
+    document.getElementById('resHolidaysCount').innerText = `${holidaysExcluded.length} Holiday${holidaysExcluded.length !== 1 ? 's' : ''}`;
+    document.getElementById('resBusRatio').innerText = calDays > 0 ? `${((busDays / calDays) * 100).toFixed(1)}% of Span` : '0%';
+
+    const hListCard = document.getElementById('resHolidayListCard');
+    if (holidaysExcluded.length > 0) {
+        hListCard.style.display = 'block';
+        document.getElementById('resHolidayNames').innerText = holidaysExcluded.join(' • ');
+    } else {
+        document.getElementById('resHolidayNames').innerText = 'None in selected date range';
+    }
+}
+
+function setSpanPreset(days) {
+    const sStr = document.getElementById('bStartDate').value;
+    if (!sStr) return;
+    const [sy, sm, sd] = sStr.split('-').map(Number);
+    let start = new Date(sy, sm - 1, sd);
+    let target = new Date(start);
+
+    if (days === 'month') {
+        target = new Date(start.getFullYear(), start.getMonth() + 1, 0);
+    } else {
+        target.setDate(start.getDate() + days);
+    }
+
+    const y = target.getFullYear();
+    const m = String(target.getMonth() + 1).padStart(2, '0');
+    const d = String(target.getDate()).padStart(2, '0');
+    document.getElementById('bEndDate').value = `${y}-${m}-${d}`;
+    calculateBusinessDays();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    const today = new Date();
+    const sy = today.getFullYear();
+    const sm = String(today.getMonth() + 1).padStart(2, '0');
+    const sd = String(today.getDate()).padStart(2, '0');
+    document.getElementById('bStartDate').value = `${sy}-${sm}-${sd}`;
+
+    const end = new Date(today);
+    end.setDate(today.getDate() + 30);
+    const ey = end.getFullYear();
+    const em = String(end.getMonth() + 1).padStart(2, '0');
+    const ed = String(end.getDate()).padStart(2, '0');
+    document.getElementById('bEndDate').value = `${ey}-${em}-${ed}`;
+
+    ['bStartDate', 'bEndDate', 'includeStart', 'holidaySchedule'].forEach(id => {
+        document.getElementById(id).addEventListener('change', calculateBusinessDays);
+    });
+    calculateBusinessDays();
+});
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>Mathematical Formulation of Business Day Counting</h2>
+<p>In financial engineering, international banking logistics, judicial case management, and corporate contract administration, statutory deadlines are overwhelmingly defined in terms of <strong>business days</strong> (working days) rather than natural calendar days. Standard calendar duration arithmetic treats all 365 days of the year symmetrically; business day arithmetic introduces a discrete non-continuous step function that systematically suppresses non-working weekend intervals (Saturdays and Sundays) and sovereign public banking holidays.</p>
+
+<p>For any two calendar dates $D_1$ and $D_2$ where $D_2 > D_1$, the total elapsed calendar span $N_{	ext{cal}} = D_2 - D_1$ can be decomposed into an integer number of full seven-day cycles $W_{	ext{full}}$ and a remainder interval $R$:</p>
+
+$$W_{	ext{full}} = \left\lfloor rac{N_{	ext{cal}}}{7} 
+ight
+floor, \quad R = N_{	ext{cal}} mod 7$$
+
+<p>Because every complete seven-day week contains exactly five business working days and two weekend days, the baseline working day count prior to holiday suppression is evaluated via:</p>
+
+$$N_{	ext{base\_bus}} = (W_{	ext{full}} 	imes 5) + f(	ext{DoW}_1, R)$$
+
+<p>Where $	ext{DoW}_1 \in \{1=	ext{Mon}, \dots, 7=	ext{Sun}\}$ denotes the day of the week of the starting date, and $f(	ext{DoW}_1, R)$ represents the deterministic transition function mapping how many of the $R$ remainder days fall on Monday through Friday:</p>
+
+$$f(	ext{DoW}, R) = \sum_{k=1}^R \mathbb{I}ig((	ext{DoW} + k - 1) mod 7 \in \{1, 2, 3, 4, 5\}ig)$$
+
+<p>Where $\mathbb{I}$ represents the indicator function returning 1 if the day falls on a weekday, and 0 if it falls on Saturday (6) or Sunday (0). Finally, net payable business days $N_{	ext{net\_bus}}$ subtract all official bank holidays $H_{	ext{observed}}$ that coincide with a Monday-through-Friday weekday:</p>
+
+$$N_{	ext{net\_bus}} = N_{	ext{base\_bus}} - \sum_{h \in 	ext{Holidays}} \mathbb{I}ig(D_1 < h \le D_2 \land 	ext{DoW}(h) \in \{1,\dots,5\}ig)$$
+
+<h2>United States Federal Reserve Banking Holiday Schedule</h2>
+<p>Under Title 5 of the United States Code (5 U.S.C. § 6103), the federal government mandates eleven statutory annual public holidays. When federal holidays fall on a weekend, statutory observation rules dictate financial clearinghouse and Federal Reserve wire closures:</p>
+
+<ul>
+    <li><strong>Sunday Holidays:</strong> Observed on the immediately following Monday (e.g., if Christmas Day falls on Sunday, December 25th, the official bank closure occurs on Monday, December 26th).</li>
+    <li><strong>Saturday Holidays:</strong> Observed on the immediately preceding Friday (e.g., if Independence Day falls on Saturday, July 4th, Federal Reserve operations close on Friday, July 3rd).</li>
+</ul>
+
+<h3>2026 United States Federal Reserve Holiday Reference Schedule</h3>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Official Holiday Name</th>
+            <th>Statutory Date</th>
+            <th>Observed Banking Date (2026)</th>
+            <th>Day of Week</th>
+            <th>Clearinghouse Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>New Year's Day</td><td>January 1</td><td>Thursday, January 1, 2026</td><td>Thursday</td><td>Closed</td></tr>
+        <tr><td>Martin Luther King Jr. Day</td><td>3rd Mon in Jan</td><td>Monday, January 19, 2026</td><td>Monday</td><td>Closed</td></tr>
+        <tr><td>Washington's Birthday</td><td>3rd Mon in Feb</td><td>Monday, February 16, 2026</td><td>Monday</td><td>Closed</td></tr>
+        <tr><td>Memorial Day</td><td>Last Mon in May</td><td>Monday, May 25, 2026</td><td>Monday</td><td>Closed</td></tr>
+        <tr><td>Juneteenth National Independence</td><td>June 19</td><td>Friday, June 19, 2026</td><td>Friday</td><td>Closed</td></tr>
+        <tr><td>Independence Day</td><td>July 4</td><td>Friday, July 3, 2026 (Observed)</td><td>Friday</td><td>Closed</td></tr>
+        <tr><td>Labor Day</td><td>1st Mon in Sep</td><td>Monday, September 7, 2026</td><td>Monday</td><td>Closed</td></tr>
+        <tr><td>Columbus Day</td><td>2nd Mon in Oct</td><td>Monday, October 12, 2026</td><td>Monday</td><td>Closed</td></tr>
+        <tr><td>Veterans Day</td><td>November 11</td><td>Wednesday, November 11, 2026</td><td>Wednesday</td><td>Closed</td></tr>
+        <tr><td>Thanksgiving Day</td><td>4th Thu in Nov</td><td>Thursday, November 26, 2026</td><td>Thursday</td><td>Closed</td></tr>
+        <tr><td>Christmas Day</td><td>December 25</td><td>Friday, December 25, 2026</td><td>Friday</td><td>Closed</td></tr>
+    </tbody>
+</table>
+
+<h2>Financial Settlement Cycles: The T+1 SEC Transition</h2>
+<p>In global capital markets, trade settlement defines the temporal interval between trade execution (T) and the final exchange of cash for securities. On May 28, 2024, the United States Securities and Exchange Commission (SEC) formally enacted amendments to <strong>Rule 15c6-1(a)</strong>, transitioning standard settlement for equities, corporate bonds, and municipal securities from a <strong>T+2</strong> (Trade Date + 2 Business Days) to a <strong>T+1</strong> (Trade Date + 1 Business Day) regime.</p>
+
+<p>Under T+1 settlement:</p>
+<ul>
+    <li>A stock purchased on Monday settles on Tuesday.</li>
+    <li>A trade executed on Friday settles on Monday (skipping the weekend).</li>
+    <li>A trade executed on the business day immediately preceding a Federal Reserve holiday (such as the Wednesday before Thanksgiving) settles on Friday, skipping the holiday Thursday.</li>
+</ul>
+
+<h2>Fixed Income Day Count Conventions and ISDA Standards</h2>
+<p>In fixed income bond markets, interest rate swaps, and commercial debt underwriting, calculating accrued interest requires pairing business days with formal <strong>Day Count Conventions</strong> standardized by the International Swaps and Derivatives Association (ISDA):</p>
+
+<ul>
+    <li><strong>Actual/Actual (ICMA):</strong> Computes exact accrued calendar days divided by the actual number of days in the coupon period. Primary standard for US Treasury bonds and sovereign debt.</li>
+    <li><strong>30/360 (Bond Basis):</strong> Assumes twelve uniform 30-day months per year (360-day annualized denominator). Standard across US corporate and municipal bonds.</li>
+    <li><strong>Actual/360 (Money Market):</strong> Uses actual elapsed calendar days divided by a 360-day baseline year. Universal standard for US commercial paper, repurchase agreements (repos), and SOFR / LIBOR floating loan spreads.</li>
+    <li><strong>Modified Following Business Day Convention:</strong> If a scheduled coupon payment falls on a non-business day (weekend or bank holiday), the payment rolls forward to the next business day—UNLESS that business day falls in the next calendar month, in which case the payment date rolls backward to the preceding business day.</li>
+</ul>
+
+<div class="worked-example-card">
+    <h3>Worked Financial Case Study: SEC Form 8-K Regulatory Filing Deadline</h3>
+    <p><strong>Scenario:</strong> A publicly traded biotechnology corporation on the NASDAQ experiences a material corporate event (a definitive merger agreement) on <strong>Wednesday, November 25, 2026</strong>. Under SEC General Instruction B.1 to Form 8-K, the corporation must file the disclosure within <strong>four business days</strong> after the occurrence of the triggering event. Federal banking operations are closed on Thursday, November 26 (Thanksgiving Day). Determine the mandatory SEC filing deadline.</p>
+    
+    <div class="step-solution">
+        <h4>Step 1: Identify the Triggering Date (Day 0)</h4>
+        <p>Triggering Event: Wednesday, November 25, 2026. Under SEC procedural rules, the triggering day itself is excluded ($D_0$).</p>
+
+        <h4>Step 2: Progress Chronologically Day-by-Day</h4>
+        <ul>
+            <li><strong>Thursday, Nov 26, 2026:</strong> Thanksgiving Day (Federal Holiday). Excluded. (Running count: 0 business days)</li>
+            <li><strong>Friday, Nov 27, 2026:</strong> Regular business day (SEC EDGAR is open). Business Day 1.</li>
+            <li><strong>Saturday, Nov 28, 2026:</strong> Weekend. Excluded.</li>
+            <li><strong>Sunday, Nov 29, 2026:</strong> Weekend. Excluded.</li>
+            <li><strong>Monday, Nov 30, 2026:</strong> Regular business day. Business Day 2.</li>
+            <li><strong>Tuesday, Dec 01, 2026:</strong> Regular business day. Business Day 3.</li>
+            <li><strong>Wednesday, Dec 02, 2026:</strong> Regular business day. Business Day 4.</li>
+        </ul>
+
+        <h4>Step 3: Establish the Statutory Deadline</h4>
+        <p>The fourth business day concludes precisely on <strong>Wednesday, December 2, 2026 at 17:30 Eastern Time</strong> (standard EDGAR submission close). Failing to account for the Thanksgiving holiday would have led counsel to falsely assume a Tuesday, Dec 1 deadline.</p>
+    </div>
+</div>
+
+<h2>Common Audit Pitfalls in Business Day Calculations</h2>
+<ol>
+    <li><strong>International Cross-Border Mismatches:</strong> Commercial partners operating between London and New York frequently encounter desynchronized bank closures. The UK observes Spring Bank Holiday and Summer Bank Holiday (which do not exist in the US), while the US observes Thanksgiving and Juneteenth (standard business days in the UK). Cross-border contracts must explicitly designate the governing clearinghouse jurisdiction.</li>
+    <li><strong>Middle Eastern Weekend Conventions:</strong> In Saudi Arabia, the UAE, and other Gulf Cooperation Council (GCC) states, the standard commercial weekend historically aligned with Friday and Saturday (or Thursday and Friday). Modernization reforms in the UAE aligned with Saturday/Sunday, but regional counterparty calendars must be explicitly verified.</li>
+    <li><strong>Good Friday Discrepancy:</strong> Good Friday is a market holiday for major US stock exchanges (NYSE, NASDAQ) under FINRA rules, but is NOT a statutory federal bank holiday (Federal Reserve wire facilities remain open). Financial operations must differentiate between banking days and trading exchange days.</li>
+</ol>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">📅</span>
+            <h3 class="widget-title">Related Date & Time Utility</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="date-difference-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Date Difference & Business Days</a></li>
+            <li><a href="hours-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Work Hours Calculator</a></li>
+            <li><a href="week-number-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ISO Week Number</a></li>
+            <li><a href="add-days-to-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Add Days to Date</a></li>
+            <li><a href="add-time-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Add Time Calculator</a></li>
+            <li><a href="business-days-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Business Days Calculator</a></li>
+            <li><a href="countdown-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Countdown Calculator</a></li>
+            <li><a href="date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calendar Date Calculator</a></li>
+            <li><a href="age-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exact Age Calculator</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck Calculator</a></li>
+            <li><a href="unit-converter.html" class="sidebar-link-item"><span class="link-bullet">›</span> Universal Multi-Unit Converter</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="datetime.html" class="sidebar-category-link">View All Date & Time Utility Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers institutional-grade chronometric computing engines, financial clearing calculators, and sexagesimal algebraic models compliant with ISO 8601, SEC, and international labor standards.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Chronometric &amp; Time Suites</h4>
+                    <ul>
+                        <li><a href="datetime.html">Date &amp; Time Utilities</a></li>
+                        <li><a href="finance.html">Financial Planning</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="converter.html">Unit &amp; Chrono Converters</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Core Time Calculators</h4>
+                    <ul>
+                        <li><a href="business-days-calculator.html">Business Days Calculator</a></li>
+                        <li><a href="add-time-calculator.html">Add Time Calculator</a></li>
+                        <li><a href="hours-calculator.html">Work Hours Calculator</a></li>
+                        <li><a href="date-difference-calculator.html">Date Difference</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Metric Converters</a></li>
+                        <li><a href="engineering.html">Engineering Tools</a></li>
+                        <li><a href="health.html">Health &amp; Fitness</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precision timekeeping and business date clearing systems.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

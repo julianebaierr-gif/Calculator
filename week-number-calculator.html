@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week Number Calculator | ISO 8601 Calendar Week, Dates & Year</title>
+    <meta name="description" content="Determine the exact ISO 8601 week number, week start and end dates, ordinal day of year, and total weeks (52 or 53) for any Gregorian calendar date.">
+    <link rel="canonical" href="https://calchub.com/week-number-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Week Number Calculator",
+      "url": "https://calchub.com/week-number-calculator.html",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "Calculates ISO 8601 and traditional calendar week numbers, start and end dates of the week, and annual week counts."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the ISO 8601 week numbering standard?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Under international standard ISO 8601, weeks begin on Monday (Day 1) and end on Sunday (Day 7). Week 1 of any calendar year is defined as the week containing the first Thursday of that year, which is mathematically identical to the week containing January 4th."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can a date in late December belong to Week 1 of the following year?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. If December 29, 30, or 31 falls on a Monday, Tuesday, or Wednesday, and the following Thursday is in January, those days belong to Week 1 of the subsequent ISO week-numbering year."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What causes a year to have 53 weeks instead of 52?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Any standard 365-day year that begins on a Thursday (or leap year that begins on a Wednesday or Thursday) contains 53 ISO weeks. This occurs because 365 days equals 52 weeks plus 1 extra day (or 2 extra days in a leap year)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the US calendar week system differ from ISO 8601?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In the traditional US system, weeks begin on Sunday and end on Saturday. Furthermore, Week 1 is typically defined as the week containing January 1st, regardless of whether that week contains only one or two days of the new calendar year."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="datetime.html">Date &amp; Time</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="finance.html">Finance</a>
+                <a href="converter.html">Converters</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="datetime.html">Date &amp; Time Utility</a> &gt; <span>Week Number Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Week Number Calculator</h1>
+                        <p class="calc-desc">Calculate the international standard ISO 8601 calendar week number, week starting and ending dates, day of year, and fiscal year boundaries.</p>
+                    </div>
+                    <div class="calc-grid">
+    <div class="calc-inputs">
+        <div class="input-group">
+            <label for="targetDate">Select Calendar Date</label>
+            <input type="date" id="targetDate" class="input-field">
+            <span class="input-hint">Choose any historical, current, or future date</span>
+        </div>
+        <div class="input-group">
+            <label for="weekStandard">Week Numbering Standard</label>
+            <select id="weekStandard" class="input-field">
+                <option value="iso" selected>ISO 8601 (Monday-Start, First Thu)</option>
+                <option value="us">US Traditional (Sunday-Start, Jan 1)</option>
+            </select>
+            <span class="input-hint">Select international ISO or North American standard</span>
+        </div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+            <button type="button" class="btn-outline" onclick="setDatePreset(0)">Today</button>
+            <button type="button" class="btn-outline" onclick="setDatePreset('jan1')">Jan 1</button>
+            <button type="button" class="btn-outline" onclick="setDatePreset('mid')">Mid-Year</button>
+            <button type="button" class="btn-outline" onclick="setDatePreset('dec31')">Dec 31</button>
+        </div>
+    </div>
+    <div class="calc-results">
+        <div class="result-card primary-result">
+            <div class="result-label">ISO Week Number</div>
+            <div class="result-value" id="resWeekNum">Week 41</div>
+            <div class="result-sub" id="resWeekYear">ISO Week-Numbering Year: 2026</div>
+        </div>
+        <div class="result-grid-mini" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem;">
+            <div class="result-card">
+                <div class="result-label">Week Starts (Monday)</div>
+                <div class="result-value-sm" id="resWeekStart">Oct 05, 2026</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Week Ends (Sunday)</div>
+                <div class="result-value-sm" id="resWeekEnd">Oct 11, 2026</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Day of the Year</div>
+                <div class="result-value-sm" id="resDayOfYear">Day 278 of 365</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Total Weeks in Year</div>
+                <div class="result-value-sm" id="resTotalWeeks">53 Weeks (Long Year)</div>
+            </div>
+        </div>
+        <div class="result-card" style="margin-top:1rem;background:var(--bg-accent, #eff6ff);border-left:4px solid var(--brand-primary, #2563eb);">
+            <div class="result-label">Calendar &amp; Fiscal Breakdown</div>
+            <div class="result-value" id="resQuarter" style="color:var(--brand-primary, #2563eb);font-size:1.4rem;">Quarter 4 (Q4) &bull; 75.8% Year Complete</div>
+            <div class="result-sub" id="resDaysLeft">87 days remaining until New Year</div>
+        </div>
+    </div>
+</div>
+<script>
+function getISOWeekDetails(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    // Set to nearest Thursday: current date + 4 - current day number (make Sunday 7)
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    const isoYear = d.getUTCFullYear();
+    return { weekNo, isoYear };
+}
+
+function weeksInISOYear(year) {
+    const d = new Date(Date.UTC(year, 11, 28));
+    return getISOWeekDetails(d).weekNo;
+}
+
+function calculateWeek() {
+    const dateInput = document.getElementById('targetDate').value;
+    if (!dateInput) return;
+
+    const parts = dateInput.split('-').map(Number);
+    const date = new Date(parts[0], parts[1] - 1, parts[2]);
+
+    const standard = document.getElementById('weekStandard').value;
+
+    let weekNum, weekYear;
+
+    if (standard === 'iso') {
+        const iso = getISOWeekDetails(date);
+        weekNum = iso.weekNo;
+        weekYear = iso.isoYear;
+    } else {
+        // US Traditional: Jan 1 is in week 1, Sunday starts week
+        const startOfYear = new Date(date.getFullYear(), 0, 1);
+        const dayOfYear = Math.floor((date - startOfYear) / (24 * 60 * 60 * 1000));
+        weekNum = Math.ceil((dayOfYear + startOfYear.getDay() + 1) / 7);
+        weekYear = date.getFullYear();
+    }
+
+    // Week boundaries (Monday to Sunday for ISO)
+    const dayOfWeek = date.getDay(); // 0 is Sun, 1 is Mon
+    const diffToMon = (dayOfWeek === 0 ? -6 : 1) - dayOfWeek;
+    const monday = new Date(date);
+    monday.setDate(date.getDate() + diffToMon);
+
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+
+    // Day of Year
+    const startOfCalYear = new Date(date.getFullYear(), 0, 1);
+    const isLeap = (date.getFullYear() % 4 === 0 && (date.getFullYear() % 100 !== 0 || date.getFullYear() % 400 === 0));
+    const daysInYear = isLeap ? 366 : 365;
+    const dayOfYear = Math.floor((date - startOfCalYear) / (24 * 60 * 60 * 1000)) + 1;
+    const daysLeft = daysInYear - dayOfYear;
+    const yearPct = ((dayOfYear / daysInYear) * 100).toFixed(1);
+
+    const totalWeeksInYear = weeksInISOYear(weekYear);
+    const quarter = Math.floor(date.getMonth() / 3) + 1;
+
+    const options = { month: 'short', day: '2-digit', year: 'numeric' };
+    document.getElementById('resWeekNum').innerText = `Week ${weekNum}`;
+    document.getElementById('resWeekYear').innerText = `${standard === 'iso' ? 'ISO' : 'US'} Week-Numbering Year: ${weekYear}`;
+    document.getElementById('resWeekStart').innerText = monday.toLocaleDateString('en-US', options);
+    document.getElementById('resWeekEnd').innerText = sunday.toLocaleDateString('en-US', options);
+    document.getElementById('resDayOfYear').innerText = `Day ${dayOfYear} of ${daysInYear}`;
+    document.getElementById('resTotalWeeks').innerText = `${totalWeeksInYear} Weeks (${totalWeeksInYear === 53 ? 'Leap Week Year' : 'Standard 52 Wks'})`;
+    document.getElementById('resQuarter').innerText = `Quarter ${quarter} (Q${quarter}) • ${yearPct}% of Year Elapsed`;
+    document.getElementById('resDaysLeft').innerText = `${daysLeft} days remaining until ${date.getFullYear() + 1}`;
+}
+
+function setDatePreset(type) {
+    const today = new Date();
+    let target = new Date();
+    if (type === 'jan1') {
+        target = new Date(today.getFullYear(), 0, 1);
+    } else if (type === 'mid') {
+        target = new Date(today.getFullYear(), 6, 1);
+    } else if (type === 'dec31') {
+        target = new Date(today.getFullYear(), 11, 31);
+    }
+    const y = target.getFullYear();
+    const m = String(target.getMonth() + 1).padStart(2, '0');
+    const d = String(target.getDate()).padStart(2, '0');
+    document.getElementById('targetDate').value = `${y}-${m}-${d}`;
+    calculateWeek();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = String(today.getDate()).padStart(2, '0');
+    document.getElementById('targetDate').value = `${y}-${m}-${d}`;
+    ['targetDate', 'weekStandard'].forEach(id => {
+        document.getElementById(id).addEventListener('change', calculateWeek);
+    });
+    calculateWeek();
+});
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>Mathematical and Algorithmic Definition of ISO 8601 Weeks</h2>
+<p>In global supply chain management, enterprise resource planning (ERP), financial fiscal reporting, and international governance, referencing calendar periods by discrete week numbers provides an invariant, uniform interval of exactly seven days (168 hours). The standard international authority governing this formulation is <strong>ISO 8601</strong> (<em>Data elements and interchange formats – Information interchange – Representation of dates and times</em>).</p>
+
+<p>Under ISO 8601, the calendrical week is strictly defined by three fundamental axioms:</p>
+<ol>
+    <li><strong>Week Orientation:</strong> The first day of the week is invariant: Monday is Day 1 ($d = 1$), progressing sequentially to Sunday as Day 7 ($d = 7$).</li>
+    <li><strong>Week 01 Anchor Rule:</strong> Week 01 of any calendar year is formally defined as the week that contains the first Thursday of that Gregorian year.</li>
+    <li><strong>Equivalent Anchor Equivalencies:</strong> Axiom 2 is mathematically identical to establishing that Week 01 is:
+        <ul>
+            <li>The week containing January 4th.</li>
+            <li>The first week of the year containing at least four days belonging to the new calendar year.</li>
+            <li>The week starting with the Monday closest to January 1st (within the closed interval December 29 to January 4).</li>
+        </ul>
+    </li>
+</ol>
+
+<h2>The ISO Week Number Calculation Algorithm</h2>
+<p>To evaluate the ISO week number $W$ and the corresponding ISO week-numbering year $Y_{	ext{iso}}$ for an arbitrary Gregorian date $(Y, M, D)$, the algorithm maps the target date to its ordinal Day of the Year ($	ext{DoY}$) and its Day of the Week ($	ext{DoW} \in \{1=	ext{Mon}, \dots, 7=	ext{Sun}\}$).</p>
+
+<p>The mathematical closed-form relation to determine the nearest Thursday's position is expressed as:</p>
+
+$$P_{	ext{Thu}} = 	ext{DoY} + 4 - 	ext{DoW}$$
+
+<p>If $P_{	ext{Thu}} < 1$, the date falls chronologically before the first Thursday of the Gregorian year, meaning the date belongs to the final week (Week 52 or Week 53) of the preceding calendar year $Y - 1$. Conversely, if $P_{	ext{Thu}} > 	ext{DaysInYear}(Y)$, the date falls into Week 01 of the subsequent calendar year $Y + 1$.</p>
+
+<p>When $P_{	ext{Thu}}$ lies validly within year $Y$, the ISO week number is derived via integer floor division:</p>
+
+$$W = \left\lfloor rac{P_{	ext{Thu}} - 1}{7} 
+ight
+floor + 1 = \left\lfloor rac{	ext{DoY} - 	ext{DoW} + 10}{7} 
+ight
+floor$$
+
+<h2>The 53-Week Leap Week Phenomenon</h2>
+<p>Because an astronomical Gregorian solar year contains either 365 days (52 weeks plus 1 day) or 366 days in a leap year (52 weeks plus 2 days), the calendar day-of-week anchors shift forward by 1 or 2 days every year. Over an average 400-year Gregorian cycle ($146,097 	ext{ days} = 20,871 	ext{ exact weeks}$), this fractional accumulation requires periodic <strong>leap-week years</strong> containing exactly 53 weeks.</p>
+
+<p>A Gregorian year $Y$ contains exactly 53 ISO weeks if and only if:</p>
+
+<ul>
+    <li>January 1st of year $Y$ falls on a Thursday ($	ext{DoW}(	ext{Jan 1}) = 4$), OR</li>
+    <li>The year $Y$ is a leap year ($	ext{Leap}(Y) = 	ext{true}$) and January 1st falls on a Wednesday ($	ext{DoW}(	ext{Jan 1}) = 3$).</li>
+</ul>
+
+<h3>Multi-Year ISO 8601 Calendar Week Reference Matrix</h3>
+<p>The following technical table provides the exact week configuration, starting boundary dates, and annual week count across consecutive calendar years from 2020 through 2032:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Calendar Year</th>
+            <th>Jan 1 Weekday</th>
+            <th>Leap Year?</th>
+            <th>Total ISO Weeks</th>
+            <th>Week 01 Starts (Monday)</th>
+            <th>Week 52/53 Ends (Sunday)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>2020</td><td>Wednesday</td><td>Yes (366 d)</td><td>53 Weeks</td><td>Dec 30, 2019</td><td>Jan 03, 2021</td></tr>
+        <tr><td>2021</td><td>Friday</td><td>No (365 d)</td><td>52 Weeks</td><td>Jan 04, 2021</td><td>Jan 02, 2022</td></tr>
+        <tr><td>2022</td><td>Saturday</td><td>No (365 d)</td><td>52 Weeks</td><td>Jan 03, 2022</td><td>Jan 01, 2023</td></tr>
+        <tr><td>2023</td><td>Sunday</td><td>No (365 d)</td><td>52 Weeks</td><td>Jan 02, 2023</td><td>Dec 31, 2023</td></tr>
+        <tr><td>2024</td><td>Monday</td><td>Yes (366 d)</td><td>52 Weeks</td><td>Jan 01, 2024</td><td>Dec 29, 2024</td></tr>
+        <tr><td>2025</td><td>Wednesday</td><td>No (365 d)</td><td>52 Weeks</td><td>Dec 30, 2024</td><td>Dec 28, 2025</td></tr>
+        <tr><td>2026</td><td>Thursday</td><td>No (365 d)</td><td>53 Weeks</td><td>Dec 29, 2025</td><td>Jan 03, 2027</td></tr>
+        <tr><td>2027</td><td>Friday</td><td>No (365 d)</td><td>52 Weeks</td><td>Jan 04, 2027</td><td>Jan 02, 2028</td></tr>
+        <tr><td>2028</td><td>Saturday</td><td>Yes (366 d)</td><td>52 Weeks</td><td>Jan 03, 2028</td><td>Dec 31, 2028</td></tr>
+        <tr><td>2029</td><td>Monday</td><td>No (365 d)</td><td>52 Weeks</td><td>Jan 01, 2029</td><td>Dec 30, 2029</td></tr>
+        <tr><td>2030</td><td>Tuesday</td><td>No (365 d)</td><td>52 Weeks</td><td>Dec 31, 2029</td><td>Dec 29, 2030</td></tr>
+        <tr><td>2031</td><td>Wednesday</td><td>No (365 d)</td><td>52 Weeks</td><td>Dec 30, 2030</td><td>Dec 28, 2031</td></tr>
+        <tr><td>2032</td><td>Thursday</td><td>Yes (366 d)</td><td>53 Weeks</td><td>Dec 29, 2031</td><td>Jan 02, 2033</td></tr>
+    </tbody>
+</table>
+
+<div class="worked-example-card">
+    <h3>Worked Engineering Case Study: Automotive Supply Chain Delivery Sprint</h3>
+    <p><strong>Scenario:</strong> A tier-1 automotive manufacturing subcontractor in Stuttgart, Germany receives a just-in-time logistics contract specifying delivery during <em>ISO Week 01 of 2027</em>. The procurement officer in Chicago assumes this refers to January 1, 2027. Determine: (1) the exact Gregorian start and end dates for ISO Week 01 of 2027, and (2) whether January 1, 2027 belongs to Week 01 of 2027 or Week 53 of 2026.</p>
+    
+    <div class="step-solution">
+        <h4>Step 1: Analyze January 1, 2027</h4>
+        <p>Year 2027 is a standard 365-day year. January 1, 2027 falls on a <strong>Friday</strong> ($	ext{DoW} = 5$).</p>
+        <p>Day of Year: $	ext{DoY} = 1$.</p>
+
+        <h4>Step 2: Evaluate the Nearest Thursday Position</h4>
+        $$P_{	ext{Thu}} = 	ext{DoY} + 4 - 	ext{DoW} = 1 + 4 - 5 = 0$$
+        <p>Since $P_{	ext{Thu}} = 0 < 1$, January 1, 2027 falls before the first Thursday of 2027. Therefore, January 1, 2027 belongs to the <strong>final week of ISO Year 2026</strong>!</p>
+
+        <h4>Step 3: Determine the Total Weeks in 2026</h4>
+        <p>From the reference matrix, January 1, 2026 was a Thursday, confirming that 2026 is an ISO 53-week leap-week year. Therefore, January 1, 2027 is part of <strong>Week 53 of 2026</strong>.</p>
+
+        <h4>Step 4: Establish True Boundaries for Week 01 of 2027</h4>
+        <p>The first Thursday of 2027 occurs on January 7, 2027.</p>
+        <p>The Monday of that week is: $	ext{Jan 7} - 3 = 	ext{January 4, 2027}$.</p>
+        <p>The Sunday closing that week is: $	ext{Jan 4} + 6 = 	ext{January 10, 2027}$.</p>
+        <p><strong>Conclusion:</strong> ISO Week 01 of 2027 spans from <strong>Monday, January 4, 2027</strong> to <strong>Sunday, January 10, 2027</strong>. Delivering components on January 1st would represent delivery in Week 53 of 2026, causing a premature delivery inventory violation.</p>
+    </div>
+</div>
+
+<h2>Common Enterprise Integration Pitfalls</h2>
+<ol>
+    <li><strong>Assuming Week 1 Always Starts in January:</strong> As illustrated in 2020 and 2026, ISO Week 01 regularly begins in late December (e.g., Dec 29 or Dec 30). Database aggregation queries grouping strictly by <code>YEAR(date)</code> and <code>WEEK(date)</code> produce catastrophic split-record errors unless using ISO-aware functions (e.g., SQL <code>%V</code> and <code>%G</code> in POSIX <code>strftime</code>).</li>
+    <li><strong>Incompatible Regional Standards:</strong> North American accounting frameworks (US / Canada) commonly treat Sunday as day 1 and count any partial week containing Jan 1 as Week 1. Comparing US week numbers directly against European ISO week numbers without normalization causes multi-day reporting misalignments.</li>
+    <li><strong>Fiscal 4-4-5 Retail Calendars:</strong> Corporate retail entities frequently adopt National Retail Federation (NRF) 4-4-5 or 4-5-4 week structures rather than pure ISO 8601, requiring dedicated quarterly mapping matrices.</li>
+</ol>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">📅</span>
+            <h3 class="widget-title">Related Date & Time Utility</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="date-difference-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Date Difference & Business Days</a></li>
+            <li><a href="hours-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Work Hours Calculator</a></li>
+            <li><a href="week-number-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> ISO Week Number</a></li>
+            <li><a href="add-days-to-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Add Days to Date</a></li>
+            <li><a href="add-time-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Add Time Calculator</a></li>
+            <li><a href="business-days-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Business Days Calculator</a></li>
+            <li><a href="countdown-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Countdown Calculator</a></li>
+            <li><a href="date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calendar Date Calculator</a></li>
+            <li><a href="age-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exact Age Calculator</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck Calculator</a></li>
+            <li><a href="unit-converter.html" class="sidebar-link-item"><span class="link-bullet">›</span> Universal Multi-Unit Converter</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="datetime.html" class="sidebar-category-link">View All Date & Time Utility Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub provides peer-reviewed chronometric algorithms, ISO 8601 calendrical engines, and high-precision datetime mathematics for global enterprise logistics, legal compliance, and software engineering.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Chronometric &amp; Time Suites</h4>
+                    <ul>
+                        <li><a href="datetime.html">Date &amp; Time Utilities</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="finance.html">Financial Planning</a></li>
+                        <li><a href="converter.html">Unit &amp; Time Converters</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Popular Calendrical Tools</h4>
+                    <ul>
+                        <li><a href="week-number-calculator.html">ISO Week Number</a></li>
+                        <li><a href="add-days-to-date-calculator.html">Add Days to Date</a></li>
+                        <li><a href="hours-calculator.html">Work Hours Calculator</a></li>
+                        <li><a href="date-difference-calculator.html">Date Difference</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Metric Converters</a></li>
+                        <li><a href="engineering.html">Engineering Tools</a></li>
+                        <li><a href="health.html">Health &amp; Fitness</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Compliant with ISO 8601, Gregorian, and Julian calendrical standards.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

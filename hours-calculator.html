@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hours Calculator | Work Time, Decimal Hours, Breaks & Gross Pay</title>
+    <meta name="description" content="Calculate total work hours, minutes, and decimal hours between start and end times with unpaid break deductions, FLSA 7-minute rounding rules, and gross payroll earnings.">
+    <link rel="canonical" href="https://calchub.com/hours-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Hours Calculator",
+      "url": "https://calchub.com/hours-calculator.html",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "Professional work hours, decimal conversion, lunch break subtraction, and payroll computation tool."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How are minutes converted into decimal hours for payroll?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Minutes are divided by 60 to produce a decimal fraction. For instance, 15 minutes equals 15/60 = 0.25 hours, 30 minutes equals 0.50 hours, and 45 minutes equals 0.75 hours. Decimal hours are required by automated payroll accounting software to multiply by hourly wage rates."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the FLSA 7-minute rounding rule (29 CFR § 785.48)?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Under the US Fair Labor Standards Act (FLSA), employers may round employee punch times to the nearest 15-minute interval (quarter of an hour). Punches between 1 and 7 minutes past the quarter-hour round down, whereas punches between 8 and 14 minutes past the quarter-hour round up to the next quarter-hour."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the calculator handle overnight shifts crossing midnight?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "When the recorded end time is numerically earlier than the start time (e.g., start at 22:00 and end at 06:30), the algorithm applies a modulo-24 adjustment by adding 24 hours (1,440 minutes) to the end timestamp before subtracting the start time and deducting unpaid meal breaks."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between total elapsed hours and net billable hours?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Total elapsed hours represent the total wall-clock duration between clock-in and clock-out. Net billable or payable hours subtract all bona fide unpaid meal intervals (typically 30 to 60 minutes where the employee is entirely relieved from duty per labor standards)."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="datetime.html">Date &amp; Time</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="finance.html">Finance</a>
+                <a href="converter.html">Converters</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="datetime.html">Date &amp; Time Utility</a> &gt; <span>Hours Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Hours Calculator</h1>
+                        <p class="calc-desc">Compute precise worked elapsed time, sexagesimal to decimal conversions, unpaid lunch break subtractions, and gross payroll amounts across overnight shifts.</p>
+                    </div>
+                    <div class="calc-grid">
+    <div class="calc-inputs">
+        <div class="input-group">
+            <label for="startTime">Start Time (Clock-In)</label>
+            <input type="time" id="startTime" value="09:00" class="input-field">
+            <span class="input-hint">24-hour or AM/PM shift starting timestamp</span>
+        </div>
+        <div class="input-group">
+            <label for="endTime">End Time (Clock-Out)</label>
+            <input type="time" id="endTime" value="17:30" class="input-field">
+            <span class="input-hint">Shift end timestamp (handles overnight shifts)</span>
+        </div>
+        <div class="input-group">
+            <label for="breakMins">Unpaid Break Duration (Minutes)</label>
+            <input type="number" id="breakMins" value="30" min="0" max="720" step="1" class="input-field">
+            <span class="input-hint">Deducted lunch or meal recess (e.g., 30 or 60 min)</span>
+        </div>
+        <div class="input-group">
+            <label for="hourlyRate">Hourly Pay Rate ($ / hour)</label>
+            <input type="number" id="hourlyRate" value="28.50" min="0" step="0.25" class="input-field">
+            <span class="input-hint">Base contract or standard hourly wage</span>
+        </div>
+        <div class="input-group">
+            <label for="roundingMode">FLSA Punch Rounding Mode</label>
+            <select id="roundingMode" class="input-field">
+                <option value="exact" selected>Exact Minutes (No Rounding)</option>
+                <option value="15min">15-Minute Rule (7/8 Minute FLSA Window)</option>
+                <option value="6min">6-Minute Tenth-Hour Rule (0.10 hr)</option>
+            </select>
+            <span class="input-hint">Select employer timesheet rounding standard</span>
+        </div>
+        <div class="input-group">
+            <label for="overtimeThreshold">Daily Overtime Threshold (Hours)</label>
+            <input type="number" id="overtimeThreshold" value="8.0" min="0" max="24" step="0.5" class="input-field">
+            <span class="input-hint">Standard daily hours before 1.5x overtime multiplier (default 8)</span>
+        </div>
+    </div>
+    <div class="calc-results">
+        <div class="result-card primary-result">
+            <div class="result-label">Net Payable Work Duration</div>
+            <div class="result-value" id="resDuration">7 hrs 00 mins</div>
+            <div class="result-sub" id="resDecimal">7.000 Decimal Hours</div>
+        </div>
+        <div class="result-grid-mini" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem;">
+            <div class="result-card">
+                <div class="result-label">Total Elapsed Span</div>
+                <div class="result-value-sm" id="resElapsed">8 hrs 30 mins</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Break Deducted</div>
+                <div class="result-value-sm" id="resBreakDeducted">30 mins (0.50 hrs)</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Regular Hours</div>
+                <div class="result-value-sm" id="resRegularHrs">7.00 hrs</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Overtime Hours</div>
+                <div class="result-value-sm" id="resOvertimeHrs">0.00 hrs</div>
+            </div>
+        </div>
+        <div class="result-card" style="margin-top:1rem;background:var(--bg-accent, #eff6ff);border-left:4px solid var(--brand-primary, #2563eb);">
+            <div class="result-label">Estimated Gross Shift Earnings</div>
+            <div class="result-value" id="resGrossPay" style="color:var(--brand-primary, #2563eb);font-size:1.75rem;">$199.50</div>
+            <div class="result-sub" id="resPayBreakdown">7.00 hrs @ $28.50/hr + 0.00 OT hrs @ $42.75/hr</div>
+        </div>
+    </div>
+</div>
+<script>
+function calculateHours() {
+    const startStr = document.getElementById('startTime').value;
+    const endStr = document.getElementById('endTime').value;
+    const breakMins = Math.max(0, parseFloat(document.getElementById('breakMins').value) || 0);
+    const hourlyRate = Math.max(0, parseFloat(document.getElementById('hourlyRate').value) || 0);
+    const roundingMode = document.getElementById('roundingMode').value;
+    const otThreshold = Math.max(0, parseFloat(document.getElementById('overtimeThreshold').value) || 8);
+
+    if (!startStr || !endStr) return;
+
+    const [sh, sm] = startStr.split(':').map(Number);
+    const [eh, em] = endStr.split(':').map(Number);
+
+    let startTotalMins = sh * 60 + sm;
+    let endTotalMins = eh * 60 + em;
+
+    // Apply punch rounding to start and end if requested
+    function applyPunchRounding(mins, mode) {
+        if (mode === '15min') {
+            const remainder = mins % 15;
+            if (remainder >= 8) {
+                return mins + (15 - remainder);
+            } else {
+                return mins - remainder;
+            }
+        } else if (mode === '6min') {
+            const remainder = mins % 6;
+            if (remainder >= 3) {
+                return mins + (6 - remainder);
+            } else {
+                return mins - remainder;
+            }
+        }
+        return mins;
+    }
+
+    const roundedStartMins = applyPunchRounding(startTotalMins, roundingMode);
+    let roundedEndMins = applyPunchRounding(endTotalMins, roundingMode);
+
+    // Midnight rollover logic
+    if (roundedEndMins < roundedStartMins) {
+        roundedEndMins += 24 * 60;
+    }
+
+    let rawElapsedMins = roundedEndMins - roundedStartMins;
+    let netMins = Math.max(0, rawElapsedMins - breakMins);
+
+    const netHours = Math.floor(netMins / 60);
+    const netRemainderMins = netMins % 60;
+    const decimalHours = netMins / 60;
+
+    const elapsedHours = Math.floor(rawElapsedMins / 60);
+    const elapsedRemainderMins = rawElapsedMins % 60;
+
+    let regularHours = Math.min(decimalHours, otThreshold);
+    let overtimeHours = Math.max(0, decimalHours - otThreshold);
+
+    const otRate = hourlyRate * 1.5;
+    const regularPay = regularHours * hourlyRate;
+    const overtimePay = overtimeHours * otRate;
+    const totalGross = regularPay + overtimePay;
+
+    document.getElementById('resDuration').innerText = `${netHours} hrs ${netRemainderMins.toString().padStart(2, '0')} mins`;
+    document.getElementById('resDecimal').innerText = `${decimalHours.toFixed(3)} Decimal Hours (${decimalHours.toFixed(2)} for payroll)`;
+    document.getElementById('resElapsed').innerText = `${elapsedHours} hrs ${elapsedRemainderMins.toString().padStart(2, '0')} mins`;
+    document.getElementById('resBreakDeducted').innerText = `${breakMins} mins (${(breakMins / 60).toFixed(2)} hrs)`;
+    document.getElementById('resRegularHrs').innerText = `${regularHours.toFixed(2)} hrs`;
+    document.getElementById('resOvertimeHrs').innerText = `${overtimeHours.toFixed(2)} hrs`;
+    document.getElementById('resGrossPay').innerText = `$${totalGross.toFixed(2)}`;
+    document.getElementById('resPayBreakdown').innerText = `${regularHours.toFixed(2)} reg hrs @ $${hourlyRate.toFixed(2)} + ${overtimeHours.toFixed(2)} OT hrs @ $${otRate.toFixed(2)}`;
+}
+
+['startTime', 'endTime', 'breakMins', 'hourlyRate', 'roundingMode', 'overtimeThreshold'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('input', calculateHours);
+        el.addEventListener('change', calculateHours);
+    }
+});
+window.addEventListener('DOMContentLoaded', calculateHours);
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>Mathematical Formulation of Work Time and Decimal Conversion</h2>
+<p>Tracking occupational attendance, professional billable hours, and industrial shift work requires continuous transformation between sexagesimal chronometric units (hours, minutes, and seconds based on base-60) and decimal arithmetic (base-10). Automated payroll software, enterprise resource planning (ERP) systems, and job-costing databases cannot directly execute algebraic multiplication on strings representing hours and minutes ($HH:MM$). Instead, worked intervals must be mapped to continuous real numbers known as decimal hours.</p>
+
+<p>The total raw elapsed duration $T_{	ext{raw}}$ between an arbitrary clock-in timestamp $t_{	ext{start}}$ and clock-out timestamp $t_{	ext{end}}$ on a 24-hour diurnal cycle is expressed in total minutes as follows:</p>
+
+$$T_{	ext{raw}} = (t_{	ext{end}} - t_{	ext{start}}) \pmod{1440}$$
+
+<p>Where $1440$ represents the total number of minutes in a standard civil solar day ($24 	imes 60$). When an employee works an overnight nocturnal shift—for example, clocking in at 21:45 in the evening and clocking out at 06:15 the following morning—the condition $t_{	ext{end}} < t_{	ext{start}}$ triggers the modulo operator, automatically shifting the terminal timestamp forward by adding 1,440 minutes.</p>
+
+<p>Net payable work time $T_{	ext{net}}$ accounts for bona fide unpaid meal or personal rest intervals $T_{	ext{break}}$ where the worker is fully relieved of all duties:</p>
+
+$$T_{	ext{net}} = \max(0, T_{	ext{raw}} - T_{	ext{break}})$$
+
+<p>Conversion from net discrete minutes $T_{	ext{net}}$ to fractional decimal hours $H_{	ext{decimal}}$ is governed by exact rational division:</p>
+
+$$H_{	ext{decimal}} = rac{T_{	ext{net}}}{60} = H_{	ext{integer}} + rac{M_{	ext{remainder}}}{60}$$
+
+<p>Where $H_{	ext{integer}} = \lfloor T_{	ext{net}} / 60 
+floor$ and $M_{	ext{remainder}} = T_{	ext{net}} mod 60$. For instance, a shift duration of 7 hours and 42 minutes yields:</p>
+
+$$H_{	ext{decimal}} = 7 + rac{42}{60} = 7 + 0.70 = 7.700 	ext{ hours}$$
+
+<h2>The FLSA 7-Minute Rounding Framework (29 CFR § 785.48)</h2>
+<p>In accordance with United States federal statutory regulations established by the Fair Labor Standards Act (FLSA) under Title 29 of the Code of Federal Regulations, Section 785.48(b), employers are legally permitted to record employee starting and stopping times to the nearest five minutes, six minutes (one-tenth of an hour), or quarter of an hour (15 minutes). For the common 15-minute rounding paradigm, the statute establishes an asymmetric 7/8 minute rule:</p>
+
+<ul>
+    <li><strong>Down-Rounding (1 to 7 Minutes):</strong> If an employee punches in between 1 and 7 minutes after a 15-minute boundary, the time is rounded back down to the preceding quarter-hour mark.</li>
+    <li><strong>Up-Rounding (8 to 14 Minutes):</strong> If an employee punches in between 8 and 14 minutes past a 15-minute boundary, the time is rounded forward to the next quarter-hour mark.</li>
+    <li><strong>Symmetry Principle:</strong> The employer cannot enforce rounding that exclusively operates in favor of the business. It must work symmetrically on clock-ins and clock-outs, ensuring that over an extended auditing period, employee compensation accurately reflects all hours worked.</li>
+</ul>
+
+<h3>Sexagesimal to Decimal Conversion Reference Table</h3>
+<p>The following benchmark reference matrix establishes the exact fractional and decimal equivalencies across the complete 60-minute cycle in 5-minute increments, alongside standard payroll rounding benchmarks:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Minutes ($MM$)</th>
+            <th>Fractional Hour</th>
+            <th>Decimal Equivalent</th>
+            <th>Tenth-Hour (6-Min)</th>
+            <th>Quarter-Hour (15-Min)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>05 mins</td><td>5 / 60</td><td>0.0833 hr</td><td>0.10 hr</td><td>0.00 hr (Round Down)</td></tr>
+        <tr><td>10 mins</td><td>10 / 60</td><td>0.1667 hr</td><td>0.20 hr</td><td>0.25 hr (Round Up)</td></tr>
+        <tr><td>15 mins</td><td>15 / 60</td><td>0.2500 hr</td><td>0.30 hr</td><td>0.25 hr (Exact)</td></tr>
+        <tr><td>20 mins</td><td>20 / 60</td><td>0.3333 hr</td><td>0.30 hr</td><td>0.25 hr (Round Down)</td></tr>
+        <tr><td>25 mins</td><td>25 / 60</td><td>0.4167 hr</td><td>0.40 hr</td><td>0.50 hr (Round Up)</td></tr>
+        <tr><td>30 mins</td><td>30 / 60</td><td>0.5000 hr</td><td>0.50 hr</td><td>0.50 hr (Exact)</td></tr>
+        <tr><td>35 mins</td><td>35 / 60</td><td>0.5833 hr</td><td>0.60 hr</td><td>0.50 hr (Round Down)</td></tr>
+        <tr><td>40 mins</td><td>40 / 60</td><td>0.6667 hr</td><td>0.70 hr</td><td>0.75 hr (Round Up)</td></tr>
+        <tr><td>45 mins</td><td>45 / 60</td><td>0.7500 hr</td><td>0.80 hr</td><td>0.75 hr (Exact)</td></tr>
+        <tr><td>50 mins</td><td>50 / 60</td><td>0.8333 hr</td><td>0.80 hr</td><td>0.75 hr (Round Down)</td></tr>
+        <tr><td>55 mins</td><td>55 / 60</td><td>0.9167 hr</td><td>0.90 hr</td><td>1.00 hr (Round Up)</td></tr>
+        <tr><td>60 mins</td><td>60 / 60</td><td>1.0000 hr</td><td>1.00 hr</td><td>1.00 hr (Exact)</td></tr>
+    </tbody>
+</table>
+
+<h2>Overtime Allocation and Gross Wage Formulation</h2>
+<p>Gross compensation $W_{	ext{gross}}$ is governed by statutory overtime thresholds, commonly defined under federal standards as 40 hours per workweek, or under daily overtime jurisdictions (such as California Labor Code § 510) as all hours exceeding 8.0 in a single diurnal work period. For a daily overtime model with threshold $H_{	ext{ot\_thresh}}$:</p>
+
+$$H_{	ext{reg}} = \min(H_{	ext{decimal}}, H_{	ext{ot\_thresh}})$$
+
+$$H_{	ext{ot}} = \max(0, H_{	ext{decimal}} - H_{	ext{ot\_thresh}})$$
+
+<p>Gross compensation combines standard remuneration at the base contract rate $R_{	ext{base}}$ with premium compensation calculated at the statutory time-and-a-half rate ($1.5 	imes R_{	ext{base}}$):</p>
+
+$$W_{	ext{gross}} = (H_{	ext{reg}} 	imes R_{	ext{base}}) + (H_{	ext{ot}} 	imes 1.5 	imes R_{	ext{base}})$$
+
+<div class="worked-example-card">
+    <h3>Worked Engineering Case Study: Overnight Manufacturing Shift</h3>
+    <p><strong>Scenario:</strong> A CNC precision machinist clocks into an aerospace manufacturing plant at 20:47 in the evening and clocks out at 06:22 the following morning. The employee takes an unpaid 45-minute lunch break at 01:30. The machinist's contractual base pay is $34.00 per hour, and the facility enforces daily overtime compensation for all hours worked in excess of 8.00 hours. Punch rounding is set to exact minutes.</p>
+    
+    <div class="step-solution">
+        <h4>Step 1: Convert Start and End Timestamps to Diurnal Minutes</h4>
+        <p>Start: $20:47 = (20 	imes 60) + 47 = 1200 + 47 = 1247 	ext{ minutes}$.</p>
+        <p>End: $06:22 = (6 	imes 60) + 22 = 360 + 22 = 382 	ext{ minutes}$.</p>
+
+        <h4>Step 2: Calculate Raw Elapsed Span Across Midnight</h4>
+        <p>Since $t_{	ext{end}} (382) < t_{	ext{start}} (1247)$, add 1,440 minutes:</p>
+        $$T_{	ext{raw}} = (382 + 1440) - 1247 = 1822 - 1247 = 575 	ext{ minutes}$$
+        <p>In sexagesimal hours: $\lfloor 575 / 60 
+floor = 9 	ext{ hours and } 35 	ext{ minutes}$.</p>
+
+        <h4>Step 3: Deduct Unpaid Meal Interval</h4>
+        $$T_{	ext{net}} = 575 - 45 = 530 	ext{ minutes}$$
+        $$	ext{Net Duration} = 8 	ext{ hours and } 50 	ext{ minutes}$$
+
+        <h4>Step 4: Convert to Decimal Hours</h4>
+        $$H_{	ext{decimal}} = rac{530}{60} pprox 8.8333 	ext{ hours}$$
+
+        <h4>Step 5: Partition Regular vs. Overtime Hours and Compute Wages</h4>
+        <p>Regular Hours $H_{	ext{reg}} = 8.000 	ext{ hours}$.</p>
+        <p>Overtime Hours $H_{	ext{ot}} = 8.8333 - 8.000 = 0.8333 	ext{ hours}$.</p>
+        <p>Regular Pay: $8.000 	imes \$34.00 = \$272.00$.</p>
+        <p>Overtime Rate: $\$34.00 	imes 1.5 = \$51.00 / 	ext{hour}$.</p>
+        <p>Overtime Pay: $0.8333 	imes \$51.00 = \$42.50$.</p>
+        <p><strong>Total Gross Shift Earnings:</strong> $\$272.00 + \$42.50 = \$314.50$.</p>
+    </div>
+</div>
+
+<h2>Common Audit Traps and Timesheet Discrepancies</h2>
+<ol>
+    <li><strong>Minute-to-Decimal Truncation Errors:</strong> Calculating payroll by rounding decimal hours to a single decimal place (e.g., recording 8 hours 20 minutes as 8.3 instead of 8.333) results in compounding payroll shortfalls of 2 minutes per shift, accumulating into significant annual wage underpayments.</li>
+    <li><strong>Asymmetric Rounding Practices:</strong> Implementing a punch clock configured to round employee arrivals forward to the next quarter hour while rounding clock-outs backward constitutes an unlawful FLSA wage violation subject to federal Department of Labor back-pay penalties.</li>
+    <li><strong>Unrecorded Short Breaks:</strong> Under 29 CFR § 785.18, short rest pauses lasting 5 to 20 minutes are legally defined as compensable working hours that cannot be deducted from employee timesheet totals.</li>
+</ol>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">📅</span>
+            <h3 class="widget-title">Related Date & Time Utility</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="date-difference-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Date Difference & Business Days</a></li>
+            <li><a href="hours-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Work Hours Calculator</a></li>
+            <li><a href="week-number-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ISO Week Number</a></li>
+            <li><a href="add-days-to-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Add Days to Date</a></li>
+            <li><a href="add-time-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Add Time Calculator</a></li>
+            <li><a href="business-days-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Business Days Calculator</a></li>
+            <li><a href="countdown-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Countdown Calculator</a></li>
+            <li><a href="date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calendar Date Calculator</a></li>
+            <li><a href="age-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exact Age Calculator</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck Calculator</a></li>
+            <li><a href="unit-converter.html" class="sidebar-link-item"><span class="link-bullet">›</span> Universal Multi-Unit Converter</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="datetime.html" class="sidebar-category-link">View All Date & Time Utility Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers professional-grade, peer-reviewed computational engines, timesheet mathematics, and algebraic reduction utilities adhering to international ISO, FLSA, and IEEE scientific calculation standards.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Chronometric &amp; Math Suites</h4>
+                    <ul>
+                        <li><a href="datetime.html">Date &amp; Time Utilities</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="finance.html">Payroll &amp; Financial Analysis</a></li>
+                        <li><a href="converter.html">Unit &amp; Chrono Converters</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Core Productivity Tools</h4>
+                    <ul>
+                        <li><a href="hours-calculator.html">Work Hours Calculator</a></li>
+                        <li><a href="ratio-simplifier-calculator.html">Ratio Simplifier</a></li>
+                        <li><a href="salary-calculator.html">Salary &amp; Paycheck</a></li>
+                        <li><a href="date-difference-calculator.html">Date Difference</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Metric Converters</a></li>
+                        <li><a href="engineering.html">Engineering Tools</a></li>
+                        <li><a href="health.html">Health &amp; Fitness</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precision chronological and algebraic computational systems.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -133,6 +133,7 @@ CATEGORIES = {
             ("surface-area-calculator.html", "Surface Area (3D Polyhedra & Solids)", "📦", "Total surface area of prisms, cylinders, spheres & cones"),
             ("volume-calculator.html", "Volume Calculator (3D Solids)", "🧊", "Volumetric capacity of cylinders, prisms, spheres & cones"),
             ("percentage-change-calculator.html", "Percentage Change (Growth & Decay)", "📈", "Relative difference, % increase/decrease & multipliers"),
+            ("ratio-simplifier-calculator.html", "Ratio Simplifier & Scale Factor", "⚖️", "Euclid's GCD ratio reduction & scale factor"),
         ]
     },
     "engineering": {
@@ -408,6 +409,13 @@ CATEGORIES = {
         "hub": "datetime.html",
         "tools": [
             ("date-difference-calculator.html", "Date Difference & Business Days", "📅", "Exact calendar days & work weeks"),
+            ("hours-calculator.html", "Work Hours Calculator", "⏱️", "Start/end time, lunch breaks & gross pay"),
+            ("week-number-calculator.html", "ISO Week Number", "📅", "ISO calendar week, ordinal date & boundaries"),
+            ("add-days-to-date-calculator.html", "Add Days to Date", "🗓️", "Add/subtract calendar and business days"),
+            ("add-time-calculator.html", "Add Time Calculator", "⏰", "Clock math, duration sum & day rollovers"),
+            ("business-days-calculator.html", "Business Days Calculator", "💼", "Working days between dates & bank holidays"),
+            ("countdown-calculator.html", "Countdown Calculator", "⏳", "Live countdown timer to events and dates"),
+            ("date-calculator.html", "Calendar Date Calculator", "📅", "Date intervals, duration & month clamping"),
             ("age-calculator.html", "Exact Age Calculator", "🎂", "Chronological age & day of week"),
             ("salary-calculator.html", "Salary & Paycheck Calculator", "💼", "Hourly to annual pay rates"),
             ("unit-converter.html", "Universal Multi-Unit Converter", "🔄", "Time, speed, temperature & length"),
@@ -471,7 +479,7 @@ def determine_tool_cat(filename):
         return "fire"
     if "subnet" in f:
         return "programmer"
-    if any(k in f for k in ["date-difference", "age"]):
+    if any(k in f for k in ["date-difference", "age", "hours-calculator", "week-number", "add-days-to-date", "add-time", "business-days", "countdown", "date-calculator"]):
         return "datetime"
     if any(k in f for k in ["unit-converter", "length-converter", "weight-converter", "temperature-converter", "area-converter", "volume-converter", "pressure-converter", "speed-converter", "energy-converter", "power-converter", "force-converter", "data-storage-converter", "data-transfer-rate-converter", "frequency-converter", "flow-rate-converter", "fuel-economy-converter", "angle-converter", "density-converter", "illuminance-converter", "thermal-conductivity-converter", "viscosity-converter", "cooking-converter", "number-base-converter", "roman-numeral-converter", "time-converter", "time-zone", "unix-timestamp"]):
         return "converter"

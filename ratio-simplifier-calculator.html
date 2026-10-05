@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ratio Simplifier Calculator | Reduce Ratios to Simplest Form (A:B)</title>
+    <meta name="description" content="Simplify ratios into lowest integer terms using Euclid's GCD algorithm. Supports multi-term ratios (A:B:C), fractional and decimal inputs, aspect ratios, and scaling factors.">
+    <link rel="canonical" href="https://calchub.com/ratio-simplifier-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Ratio Simplifier Calculator",
+      "url": "https://calchub.com/ratio-simplifier-calculator.html",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "Mathematical ratio reduction tool utilizing the Euclidean algorithm to simplify two-term and three-term ratios to lowest terms."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do you simplify a ratio to lowest terms?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "To simplify an integer ratio A:B, find the Greatest Common Divisor (GCD) of both terms using the Euclidean algorithm, then divide both A and B by that GCD. The resulting integers have a GCD of 1, representing the ratio in its simplest primitive form."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How are decimal and fractional ratios simplified?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For decimal ratios, multiply all terms by a power of 10 sufficient to convert every term into an integer (e.g., 2.5:1.25 multiplied by 100 becomes 250:125, which reduces to 2:1). For fractional ratios, multiply each term by the Least Common Multiple (LCM) of all denominators."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can three-part ratios (A:B:C) be simplified?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. A three-part ratio A:B:C is simplified by computing the greatest common divisor across all three terms: GCD(A, B, C) = GCD(GCD(A, B), C). Each term is then divided by this joint divisor."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between a ratio and a proportion?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A ratio expresses the relative magnitude or comparative relationship between two quantities (A:B). A proportion is a mathematical equation stating that two distinct ratios are equal (A/B = C/D)."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="datetime.html">Date &amp; Time</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="finance.html">Finance</a>
+                <a href="converter.html">Converters</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="math.html">Mathematics &amp; Utilities</a> &gt; <span>Ratio Simplifier Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Ratio Simplifier Calculator</h1>
+                        <p class="calc-desc">Reduce any two-term or multi-term ratio to its simplest primitive integer form, solve missing proportion values, and compute exact geometric scale factors.</p>
+                    </div>
+                    <div class="calc-grid">
+    <div class="calc-inputs">
+        <div class="input-group">
+            <label for="ratioA">Ratio Term A</label>
+            <input type="number" id="ratioA" value="1920" step="any" class="input-field">
+            <span class="input-hint">First quantity, integer or decimal (e.g., 1920 or 2.5)</span>
+        </div>
+        <div class="input-group">
+            <label for="ratioB">Ratio Term B</label>
+            <input type="number" id="ratioB" value="1080" step="any" class="input-field">
+            <span class="input-hint">Second quantity, integer or decimal (e.g., 1080 or 1.25)</span>
+        </div>
+        <div class="input-group">
+            <label for="ratioC">Optional Term C (Multi-part A:B:C)</label>
+            <input type="number" id="ratioC" value="" placeholder="Optional 3rd term" step="any" class="input-field">
+            <span class="input-hint">Leave blank for standard 2-term ratio (e.g., for concrete 1:2:4)</span>
+        </div>
+        <div class="input-group">
+            <label for="scaleTarget">Solve Proportion: Target Term A</label>
+            <input type="number" id="scaleTarget" value="" placeholder="e.g., Scale to new width" step="any" class="input-field">
+            <span class="input-hint">Enter target value for A to calculate scaled B (Proportion solver)</span>
+        </div>
+    </div>
+    <div class="calc-results">
+        <div class="result-card primary-result">
+            <div class="result-label">Simplest Integer Ratio</div>
+            <div class="result-value" id="resSimplified">16 : 9</div>
+            <div class="result-sub" id="resGCD">Greatest Common Divisor (GCD) = 120</div>
+        </div>
+        <div class="result-grid-mini" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem;">
+            <div class="result-card">
+                <div class="result-label">Unit Ratio (1 : n)</div>
+                <div class="result-value-sm" id="resUnitB">1 : 0.5625</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Unit Ratio (n : 1)</div>
+                <div class="result-value-sm" id="resUnitA">1.7778 : 1</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Decimal Value (A / B)</div>
+                <div class="result-value-sm" id="resDecimalVal">1.777778</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Percentage (A / (A+B))</div>
+                <div class="result-value-sm" id="resPercent">64.00% : 36.00%</div>
+            </div>
+        </div>
+        <div class="result-card" id="resProportionBox" style="margin-top:1rem;background:var(--bg-accent, #eff6ff);border-left:4px solid var(--brand-primary, #2563eb);display:none;">
+            <div class="result-label">Scaled Equivalent Proportion</div>
+            <div class="result-value" id="resScaled" style="color:var(--brand-primary, #2563eb);font-size:1.5rem;">A = 0 &rarr; B = 0</div>
+            <div class="result-sub" id="resScaleFormula">Scale multiplier k = 1.0</div>
+        </div>
+    </div>
+</div>
+<script>
+function gcd2(a, b) {
+    a = Math.abs(a);
+    b = Math.abs(b);
+    while (b) {
+        let t = b;
+        b = a % b;
+        a = t;
+    }
+    return a;
+}
+
+function calculateRatio() {
+    let a = parseFloat(document.getElementById('ratioA').value);
+    let b = parseFloat(document.getElementById('ratioB').value);
+    let cStr = document.getElementById('ratioC').value.trim();
+    let hasC = cStr !== '' && !isNaN(parseFloat(cStr));
+    let c = hasC ? parseFloat(cStr) : null;
+    let targetA = parseFloat(document.getElementById('scaleTarget').value);
+
+    if (isNaN(a) || isNaN(b) || a <= 0 || b <= 0) return;
+    if (hasC && c <= 0) return;
+
+    // Convert potential decimals to integers by finding common multiplier
+    function getDecimalPlaces(num) {
+        const s = num.toString();
+        const idx = s.indexOf('.');
+        return idx >= 0 ? s.length - idx - 1 : 0;
+    }
+
+    let dPlaces = Math.max(getDecimalPlaces(a), getDecimalPlaces(b));
+    if (hasC) dPlaces = Math.max(dPlaces, getDecimalPlaces(c));
+
+    let multiplier = Math.pow(10, Math.min(dPlaces, 6));
+    let intA = Math.round(a * multiplier);
+    let intB = Math.round(b * multiplier);
+    let intC = hasC ? Math.round(c * multiplier) : null;
+
+    let commonDiv = gcd2(intA, intB);
+    if (hasC) commonDiv = gcd2(commonDiv, intC);
+
+    let simpA = intA / commonDiv;
+    let simpB = intB / commonDiv;
+    let simpC = hasC ? intC / commonDiv : null;
+
+    if (hasC) {
+        document.getElementById('resSimplified').innerText = `${simpA} : ${simpB} : ${simpC}`;
+        document.getElementById('resGCD').innerText = `Multiplied by ${multiplier}, Common GCD = ${commonDiv}`;
+        document.getElementById('resUnitB').innerText = `1 : ${(b/a).toFixed(4)} : ${(c/a).toFixed(4)}`;
+        document.getElementById('resUnitA').innerText = `${(a/c).toFixed(4)} : ${(b/c).toFixed(4)} : 1`;
+        document.getElementById('resDecimalVal').innerText = `N/A (Multi-term)`;
+        const tot = a + b + c;
+        document.getElementById('resPercent').innerText = `${((a/tot)*100).toFixed(1)}% : ${((b/tot)*100).toFixed(1)}% : ${((c/tot)*100).toFixed(1)}%`;
+    } else {
+        document.getElementById('resSimplified').innerText = `${simpA} : ${simpB}`;
+        document.getElementById('resGCD').innerText = `Common Divisor (GCD) = ${commonDiv / (multiplier > 1 ? multiplier : 1)}`;
+        document.getElementById('resUnitB').innerText = `1 : ${(b / a).toFixed(4)}`;
+        document.getElementById('resUnitA').innerText = `${(a / b).toFixed(4)} : 1`;
+        document.getElementById('resDecimalVal').innerText = (a / b).toFixed(6);
+        const tot = a + b;
+        document.getElementById('resPercent').innerText = `${((a/tot)*100).toFixed(2)}% : ${((b/tot)*100).toFixed(2)}%`;
+    }
+
+    // Proportion scaling
+    const propBox = document.getElementById('resProportionBox');
+    if (!isNaN(targetA) && targetA > 0) {
+        propBox.style.display = 'block';
+        const scaleFactor = targetA / a;
+        const scaledB = b * scaleFactor;
+        if (hasC) {
+            const scaledC = c * scaleFactor;
+            document.getElementById('resScaled').innerText = `${targetA} : ${scaledB.toFixed(2)} : ${scaledC.toFixed(2)}`;
+        } else {
+            document.getElementById('resScaled').innerText = `${targetA} : ${scaledB.toFixed(2)}`;
+        }
+        document.getElementById('resScaleFormula').innerText = `Scale Factor k = ${scaleFactor.toFixed(4)} (based on A = ${targetA})`;
+    } else {
+        propBox.style.display = 'none';
+    }
+}
+
+['ratioA', 'ratioB', 'ratioC', 'scaleTarget'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('input', calculateRatio);
+        el.addEventListener('change', calculateRatio);
+    }
+});
+window.addEventListener('DOMContentLoaded', calculateRatio);
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>Theoretical Principles of Ratio Simplification</h2>
+<p>In classical number theory and applied mathematics, a ratio represents a quantitative quotient that expresses the proportional relationship between two or more commensurate magnitudes. For any two non-zero real numbers $A$ and $B$, the expression $A : B$ denotes that the first quantity contains $A / B$ times as many units as the second quantity.</p>
+
+<p>A ratio is said to be in its <strong>simplest form</strong> (or primitive irreducible form) when all of its components are mutually coprime positive integers—meaning that their Greatest Common Divisor (GCD) is exactly 1:</p>
+
+$$\gcd\left(rac{A}{\gcd(A, B)}, rac{B}{\gcd(A, B)}
+ight) = 1$$
+
+<p>The reduction of an integer ratio $A : B$ directly utilizes the Euclidean Algorithm, an ancient iterative procedure founded on the principle that the greatest common divisor of two integers $a$ and $b$ (where $a > b$) also divides their algebraic remainder $a mod b$:</p>
+
+$$\gcd(a, b) = \gcd(b, a mod b) \quad 	ext{iterated until } a mod b = 0$$
+
+<p>Once $\gcd(A, B)$ is determined, the simplified terms $A'$ and $B'$ are evaluated via exact division:</p>
+
+$$A' = rac{A}{\gcd(A, B)}, \quad B' = rac{B}{\gcd(A, B)}$$
+
+<h2>Handling Non-Integer and Multi-Part Terms</h2>
+<p>Practical scientific, engineering, and chemical applications frequently introduce quantities that are not integers, including rational fractions, empirical decimals, or multi-term compound mixtures.</p>
+
+<h3>1. Decimal Ratios</h3>
+<p>When terms contain fractional decimal digits (e.g., $3.75 : 1.25$), each term is magnified by an integer power of ten $10^k$, where $k$ matches the maximum number of decimal places present across all terms:</p>
+
+$$k = \max(	ext{decimals}(A), 	ext{decimals}(B))$$
+
+$$A_{	ext{int}} = A 	imes 10^k, \quad B_{	ext{int}} = B 	imes 10^k$$
+
+<p>The Euclidean reduction is subsequently performed on the resulting integers $A_{	ext{int}}$ and $B_{	ext{int}}$.</p>
+
+<h3>2. Fractional Ratios</h3>
+<p>For ratios expressed as fractions $p_1/q_1 : p_2/q_2$, the terms are unified by computing the Least Common Multiple (LCM) of the denominators:</p>
+
+$$	ext{LCM}(q_1, q_2) = rac{q_1 	imes q_2}{\gcd(q_1, q_2)}$$
+
+<p>Multiplying each fraction by the joint denominator clears the fractional expressions:</p>
+
+$$\left(rac{p_1}{q_1} 	imes 	ext{LCM}
+ight) : \left(rac{p_2}{q_2} 	imes 	ext{LCM}
+ight)$$
+
+<h3>3. Multi-Term Ratios (A : B : C)</h3>
+<p>For three-term or higher mixtures—such as standard concrete proportioning (cement : sand : aggregate) or mortar recipes—the overall GCD is derived associatively:</p>
+
+$$\gcd(A, B, C) = \gcd(\gcd(A, B), C)$$
+
+<p>Dividing every term by this global divisor yields the primitive three-term ratio.</p>
+
+<h2>Standard Display Aspect Ratios and Comparative Matrix</h2>
+<p>The most pervasive digital implementation of ratio simplification occurs in digital imaging, cinematography, and display engineering, where pixel dimensions are reduced to aspect ratios. The following table illustrates standard industry display standards and their mathematical reductions:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Format Name</th>
+            <th>Native Resolution ($W 	imes H$)</th>
+            <th>Greatest Common Divisor</th>
+            <th>Simplified Aspect Ratio</th>
+            <th>Decimal Aspect Ratio</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>VGA Standard</td><td>640 &times; 480</td><td>160</td><td>4 : 3</td><td>1.3333 : 1</td></tr>
+        <tr><td>High Definition (720p)</td><td>1280 &times; 720</td><td>80</td><td>16 : 9</td><td>1.7778 : 1</td></tr>
+        <tr><td>Full HD (1080p)</td><td>1920 &times; 1080</td><td>120</td><td>16 : 9</td><td>1.7778 : 1</td></tr>
+        <tr><td>WUXGA Display</td><td>1920 &times; 1200</td><td>240</td><td>16 : 10 (8 : 5)</td><td>1.6000 : 1</td></tr>
+        <tr><td>Ultra HD 4K</td><td>3840 &times; 2160</td><td>240</td><td>16 : 9</td><td>1.7778 : 1</td></tr>
+        <tr><td>Cinema 4K (DCI)</td><td>4096 &times; 2160</td><td>256</td><td>256 : 135</td><td>1.8963 : 1</td></tr>
+        <tr><td>Ultra-Wide Monitor</td><td>3440 &times; 1440</td><td>80</td><td>43 : 18 (&approx; 21:9)</td><td>2.3889 : 1</td></tr>
+        <tr><td>Classic 35mm Film</td><td>36mm &times; 24mm</td><td>12</td><td>3 : 2</td><td>1.5000 : 1</td></tr>
+    </tbody>
+</table>
+
+<h2>Continued Fractions and Rational Approximation of Real Ratios</h2>
+<p>When physical measurements, irrational constants, or continuous engineering parameters yield non-integer ratios (such as $\pi : 1 pprox 3.14159265 : 1$ or the Golden Ratio $\phi : 1 pprox 1.61803399 : 1$), exact integer simplification is impossible because the true terms share no common measure (incommensurability). Under such conditions, applied mathematics utilizes <strong>Simple Continued Fractions</strong> to construct the best possible rational approximations.</p>
+
+<p>Any real quotient $x = A / B$ can be expressed uniquely as a continued fraction expansion:</p>
+
+$$x = a_0 + rac{1}{a_1 + rac{1}{a_2 + rac{1}{a_3 + \dots}}}$$
+
+<p>The partial convergents $p_k / q_k$ generated by truncating this infinite or long expansion at index $k$ provide the mathematically optimal integer ratios:</p>
+
+$$p_k = a_k p_{k-1} + p_{k-2}, \quad q_k = a_k q_{k-1} + q_{k-2}$$
+
+<p>By Dirichlet's Approximation Theorem, each convergent $p_k / q_k$ satisfies the inequality:</p>
+
+$$\left| rac{A}{B} - rac{p_k}{q_k} 
+ight| < rac{1}{q_k^2}$$
+
+<p>This formulation allows mechanical engineers designing gearbox tooth counts, astronomical clock gear trains, and architectural proportions to identify the most accurate integer gear ratios (e.g., approximating $\pi pprox 355 : 113$ with an error of less than $3 	imes 10^{-7}$).</p>
+
+<h2>Proportions and Scaling Multipliers</h2>
+<p>A proportion equates two equivalent ratios: $A / B = C / D$. When one term is modified, all complementary terms must scale by the exact same linear factor $k$ to preserve dimensional symmetry:</p>
+
+$$k = rac{A_{	ext{new}}}{A_{	ext{original}}}$$
+
+$$B_{	ext{new}} = B_{	ext{original}} 	imes k$$
+
+<div class="worked-example-card">
+    <h3>Worked Engineering Case Study: Concrete Mix Volumetric Scaling</h3>
+    <p><strong>Scenario:</strong> A structural engineer is preparing a high-strength concrete mix batch for foundation footings. The design specification specifies a volumetric proportion of 350 kg cement, 700 kg sand, and 1,050 kg coarse crushed stone aggregate. The on-site mixer requires scaling down so that exactly 120 kg of cement is utilized per drum batch. Determine: (1) the simplest integer ratio of the mix, and (2) the exact quantities of sand and aggregate required for the 120 kg cement batch.</p>
+    
+    <div class="step-solution">
+        <h4>Step 1: Formulate the Three-Part Integer Ratio</h4>
+        <p>Raw mix: $350 : 700 : 1050$.</p>
+
+        <h4>Step 2: Calculate the Greatest Common Divisor (GCD)</h4>
+        <p>Using the Euclidean algorithm:</p>
+        $$\gcd(350, 700) = 350 \quad (	ext{since } 700 = 2 	imes 350 + 0)$$
+        $$\gcd(350, 1050) = 350 \quad (	ext{since } 1050 = 3 	imes 350 + 0)$$
+        <p>Therefore, the global joint divisor is $\gcd(350, 700, 1050) = 350$.</p>
+
+        <h4>Step 3: Reduce to Simplest Terms</h4>
+        $$A' = rac{350}{350} = 1, \quad B' = rac{700}{350} = 2, \quad C' = rac{1050}{350} = 3$$
+        <p><strong>Simplified Ratio:</strong> $1 : 2 : 3$ (Standard M15 structural concrete specification).</p>
+
+        <h4>Step 4: Scale the Proportion to 120 kg Cement Batch</h4>
+        <p>Linear scale factor: $k = 120 / 1 = 120$.</p>
+        <p>Required Sand: $B_{	ext{scaled}} = 2 	imes 120 = 240 	ext{ kg}$.</p>
+        <p>Required Aggregate: $C_{	ext{scaled}} = 3 	imes 120 = 360 	ext{ kg}$.</p>
+        <p><strong>Total Batch Mass:</strong> $120 + 240 + 360 = 720 	ext{ kg}$.</p>
+    </div>
+</div>
+
+<h2>Common Analytical Pitfalls with Ratios</h2>
+<ol>
+    <li><strong>Confusing Part-to-Part with Part-to-Whole Ratios:</strong> In a ratio of $1 : 4$, the first part does not represent $1/4$ ($25\%$) of the whole; it represents $1 / (1 + 4) = 1/5$ ($20\%$). The total number of constituent parts is $A + B$.</li>
+    <li><strong>Unit Mismatch:</strong> Ratios are inherently dimensionless scalars, meaning that the input terms must share identical physical units prior to reduction. Comparing 500 millimeters to 2 meters requires converting 2 meters to 2,000 millimeters first ($500 : 2000 \implies 1 : 4$).</li>
+    <li><strong>Floating Point Rounding Artifacts:</strong> Performing division before simplification in numerical code can introduce IEEE 754 precision noise (e.g., $1/3 pprox 0.3333333333333333$). The Euclidean algorithm must always operate directly on integer numerators and denominators to guarantee exact algebraic purity.</li>
+</ol>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🔢</span>
+            <h3 class="widget-title">Related Mathematics & Utilities</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="standard-deviation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Standard Deviation & Variance</a></li>
+            <li><a href="percentage-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Percentage Calculator</a></li>
+            <li><a href="fraction-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Fraction Calculator</a></li>
+            <li><a href="ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ratio Simplifier</a></li>
+            <li><a href="gpa-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> College GPA Calculator</a></li>
+            <li><a href="gcd-lcm-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> GCD and LCM Calculator</a></li>
+            <li><a href="quadratic-equation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Quadratic Equation Calculator</a></li>
+            <li><a href="pythagorean-theorem-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pythagorean Theorem Calculator</a></li>
+            <li><a href="scientific-notation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Scientific & Engineering Notation</a></li>
+            <li><a href="significant-figures-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Significant Figures Calculator</a></li>
+            <li><a href="prime-number-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Prime Number & Factorization Engine</a></li>
+            <li><a href="absolute-value-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Absolute Value Calculator</a></li>
+            <li><a href="area-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Geometric Area Calculator</a></li>
+            <li><a href="arithmetic-sequence-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Arithmetic Sequence Calculator</a></li>
+            <li><a href="circle-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Circle Calculator</a></li>
+            <li><a href="cube-root-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cube Root Calculator</a></li>
+            <li><a href="decimal-to-fraction-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Decimal to Fraction Calculator</a></li>
+            <li><a href="exponent-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exponent & Powers Calculator</a></li>
+            <li><a href="factorial-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Factorial & Permutation Calculator</a></li>
+            <li><a href="fraction-to-percent-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Fraction to Percent Calculator</a></li>
+            <li><a href="geometric-sequence-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Geometric Sequence & Series Calculator</a></li>
+            <li><a href="logarithm-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Logarithm Calculator (Log, Ln, Log2)</a></li>
+            <li><a href="long-division-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Long Division with Steps & Remainders</a></li>
+            <li><a href="mean-median-mode-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Mean, Median, Mode & Range Calculator</a></li>
+            <li><a href="midpoint-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Midpoint & Distance (2D & 3D)</a></li>
+            <li><a href="modulo-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Modulo & Modular Arithmetic Calculator</a></li>
+            <li><a href="nth-root-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Nth Root & Radical Solver</a></li>
+            <li><a href="square-root-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Square Root Calculator</a></li>
+            <li><a href="percent-to-fraction-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Percent to Fraction Calculator</a></li>
+            <li><a href="percent-error-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Percent Error & Accuracy</a></li>
+            <li><a href="rounding-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rounding Calculator</a></li>
+            <li><a href="factors-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Factors & Factor Pairs Calculator</a></li>
+            <li><a href="sum-of-integers-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sum of Integers & Series Calculator</a></li>
+            <li><a href="triangle-area-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Triangle Area Calculator</a></li>
+            <li><a href="variance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Variance Calculator (Sample & Population)</a></li>
+            <li><a href="distance-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Distance Calculator (2D & 3D)</a></li>
+            <li><a href="midrange-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Midrange & Center of Range</a></li>
+            <li><a href="permutation-combination-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Permutation & Combination (nPr, nCr)</a></li>
+            <li><a href="probability-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Probability Calculator (Union, Bayes)</a></li>
+            <li><a href="proportion-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Proportion Calculator (Solve for X)</a></li>
+            <li><a href="quotient-and-remainder-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Quotient and Remainder (Divmod)</a></li>
+            <li><a href="z-score-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Z-Score & Normal Distribution</a></li>
+            <li><a href="average-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Average Calculator (All Means & Weighted)</a></li>
+            <li><a href="perimeter-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Perimeter Calculator (2D Polygons)</a></li>
+            <li><a href="surface-area-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Surface Area (3D Polyhedra & Solids)</a></li>
+            <li><a href="volume-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Volume Calculator (3D Solids)</a></li>
+            <li><a href="percentage-change-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Percentage Change (Growth & Decay)</a></li>
+            <li><a href="ratio-simplifier-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Ratio Simplifier & Scale Factor</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="math.html" class="sidebar-category-link">View All Mathematics & Utilities Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers professional-grade, peer-reviewed computational engines, timesheet mathematics, and algebraic reduction utilities adhering to international ISO, FLSA, and IEEE scientific calculation standards.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Chronometric &amp; Math Suites</h4>
+                    <ul>
+                        <li><a href="datetime.html">Date &amp; Time Utilities</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                        <li><a href="finance.html">Payroll &amp; Financial Analysis</a></li>
+                        <li><a href="converter.html">Unit &amp; Chrono Converters</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Core Productivity Tools</h4>
+                    <ul>
+                        <li><a href="hours-calculator.html">Work Hours Calculator</a></li>
+                        <li><a href="ratio-simplifier-calculator.html">Ratio Simplifier</a></li>
+                        <li><a href="salary-calculator.html">Salary &amp; Paycheck</a></li>
+                        <li><a href="date-difference-calculator.html">Date Difference</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Metric Converters</a></li>
+                        <li><a href="engineering.html">Engineering Tools</a></li>
+                        <li><a href="health.html">Health &amp; Fitness</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precision chronological and algebraic computational systems.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
