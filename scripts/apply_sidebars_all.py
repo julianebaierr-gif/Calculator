@@ -80,6 +80,7 @@ CATEGORIES = {
             ("smoking-cost-calculator.html", "Smoking Cost & Opportunity", "🚬", "Cash outlays, S&P 500 compound loss & 11-min life loss"),
             ("retirement-calculator.html", "Retirement & FIRE Planner", "🏖️", "Trinity study 4% rule, nest egg sizing & inflation"),
             ("overtime-calculator.html", "Overtime Pay Calculator", "💼", "FLSA time-and-a-half, regular rate & CA double time"),
+            ("time-card-calculator.html", "Time Card Calculator", "💼", "7-day timesheet, daily/weekly overtime & gross pay"),
         ]
     },
     "math": {
@@ -207,6 +208,9 @@ CATEGORIES = {
             ("motor-starter-sizing-calculator.html", "Motor Starter Sizing (NEC 430)", "⚙️", "NEMA sizes, IEC AC-3 contactors, overloads & breaker OCPD"),
             ("nec-load-calculation-calculator.html", "NEC Load Calculation (Residential)", "🏡", "Dwelling service sizing, panel amps & SE cable per NEC 220"),
             ("neutral-conductor-sizing-calculator.html", "Neutral Conductor Sizing", "⚡", "3-Phase unbalance, triplen harmonics & NEC 220.61 reduction"),
+            ("best-engineering-calculator.html", "Best Engineering Calculator Guide", "🖩", "NCEES FE/PE exam legal models, Casio vs TI vs HP"),
+            ("cable-sizing-guide.html", "Cable Sizing Guide & Selection", "🔌", "IEC 60364-5-52, BS 7671, NEC 310 ampacity & drop"),
+            ("engineering-formulas.html", "Engineering Formulas Compendium", "📐", "Master multi-discipline formulas & live equation solver"),
         ]
     },
     "solar": {
@@ -424,6 +428,8 @@ CATEGORIES = {
             ("months-between-dates-calculator.html", "Months Between Dates", "📅", "Calendar month diff, fractional months & 30/360 basis"),
             ("quarter-of-year-calculator.html", "Quarter of Year Calculator", "📊", "Q1-Q4 calendar, fiscal government & retail 4-4-5"),
             ("time-calculator.html", "Time Calculator (Sexagesimal)", "⏰", "Add, subtract, multiply, divide durations & takt time"),
+            ("time-duration-calculator.html", "Time Duration Calculator", "⏱️", "Exact elapsed duration, decimal hours & ISO 8601"),
+            ("weeks-between-dates-calculator.html", "Weeks Between Dates", "📅", "Full weeks, days, decimal weeks & gestation age"),
             ("age-calculator.html", "Exact Age Calculator", "🎂", "Chronological age & day of week"),
             ("salary-calculator.html", "Salary & Paycheck Calculator", "💼", "Hourly to annual pay rates"),
             ("unit-converter.html", "Universal Multi-Unit Converter", "🔄", "Time, speed, temperature & length"),
@@ -469,9 +475,9 @@ def determine_tool_cat(filename):
     f = filename.lower()
     if any(k in f for k in ["bmi", "calorie", "body-fat", "ideal-weight", "water-intake", "bmr", "macro", "a1c", "bac", "body-surface-area", "bsa", "calorie-deficit", "calories-burned", "carbohydrate", "cholesterol", "due-date", "fat-intake", "heart-rate-zone", "lean-body-mass", "max-heart-rate", "met-calculator", "ovulation", "pregnancy-weight-gain", "protein-intake", "sleep-calculator", "sodium-intake", "target-heart-rate", "tdee", "waist-to-height", "waist-to-hip", "one-rep-max", "vo2-max", "pace"]):
         return "health"
-    if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72", "amortization", "apr-apy", "break-even", "capital-gains", "cd-calculator", "credit-card", "debt-to-income", "down-payment", "emergency-fund", "inflation", "net-salary", "net-worth", "sales-tax", "savings", "markup", "smoking-cost", "retirement", "overtime"]):
+    if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72", "amortization", "apr-apy", "break-even", "capital-gains", "cd-calculator", "credit-card", "debt-to-income", "down-payment", "emergency-fund", "inflation", "net-salary", "net-worth", "sales-tax", "savings", "markup", "smoking-cost", "retirement", "overtime", "time-card"]):
         return "finance"
-    if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity", "power-factor", "parallel-resistor", "battery-life", "555-timer", "led-resistor", "capacitive-reactance", "inductive-reactance", "op-amp-gain", "three-phase-power", "adc-dac", "antenna-length", "battery-short-circuit", "bjt-transistor", "breaker-size", "decibel", "earth-pit", "electrical-power", "microstrip", "busbar", "fault-current", "filter", "generator", "heatsink", "copper-cable", "earthing", "kw-to-cable", "single-phase", "three-phase", "wire-gauge", "voltage-divider", "parallel-resistance", "capacitor-energy", "resonant-frequency", "rc-time-constant", "rl-time-constant", "zener-diode", "lm317", "pcb-trace-width", "lightning-protection", "lumen-lux", "lumen-method", "motor-parameters", "buck-boost", "3-phase-power", "motor-starter", "nec-load", "neutral-conductor"]):
+    if any(k in f for k in ["short-circuit", "transformer", "ohms", "voltage-drop", "resistor", "cable-sizing", "conduit-fill", "motor-starting", "wire-ampacity", "power-factor", "parallel-resistor", "battery-life", "555-timer", "led-resistor", "capacitive-reactance", "inductive-reactance", "op-amp-gain", "three-phase-power", "adc-dac", "antenna-length", "battery-short-circuit", "bjt-transistor", "breaker-size", "decibel", "earth-pit", "electrical-power", "microstrip", "busbar", "fault-current", "filter", "generator", "heatsink", "copper-cable", "earthing", "kw-to-cable", "single-phase", "three-phase", "wire-gauge", "voltage-divider", "parallel-resistance", "capacitor-energy", "resonant-frequency", "rc-time-constant", "rl-time-constant", "zener-diode", "lm317", "pcb-trace-width", "lightning-protection", "lumen-lux", "lumen-method", "motor-parameters", "buck-boost", "3-phase-power", "motor-starter", "nec-load", "neutral-conductor", "best-engineering", "cable-sizing-guide", "engineering-formulas"]):
         return "engineering"
     if any(k in f for k in ["solar", "charging", "pv-string", "ev-charging"]):
         return "solar"
@@ -487,7 +493,7 @@ def determine_tool_cat(filename):
         return "fire"
     if "subnet" in f:
         return "programmer"
-    if any(k in f for k in ["date-difference", "age", "hours-calculator", "week-number", "add-days-to-date", "add-time", "business-days", "countdown", "date-calculator", "day-of-week", "day-of-year", "decimal-time", "leap-year", "months-between-dates", "quarter-of-year", "time-calculator"]):
+    if any(k in f for k in ["date-difference", "age", "hours-calculator", "week-number", "add-days-to-date", "add-time", "business-days", "countdown", "date-calculator", "day-of-week", "day-of-year", "decimal-time", "leap-year", "months-between-dates", "quarter-of-year", "time-calculator", "time-duration", "weeks-between-dates"]):
         return "datetime"
     if any(k in f for k in ["unit-converter", "length-converter", "weight-converter", "temperature-converter", "area-converter", "volume-converter", "pressure-converter", "speed-converter", "energy-converter", "power-converter", "force-converter", "data-storage-converter", "data-transfer-rate-converter", "frequency-converter", "flow-rate-converter", "fuel-economy-converter", "angle-converter", "density-converter", "illuminance-converter", "thermal-conductivity-converter", "viscosity-converter", "cooking-converter", "number-base-converter", "roman-numeral-converter", "time-converter", "time-zone", "unix-timestamp"]):
         return "converter"

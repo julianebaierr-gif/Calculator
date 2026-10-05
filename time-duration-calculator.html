@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Duration Calculator | Calculate Hours, Minutes & Seconds Between Times</title>
+    <meta name="description" content="Calculate the exact duration and time span between two dates and times. Computes elapsed hours, minutes, seconds, decimal hours, and ISO 8601 duration strings.">
+    <link rel="canonical" href="https://calchub.com/time-duration-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Time Duration Calculator",
+      "url": "https://calchub.com/time-duration-calculator.html",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "Calculates the exact elapsed duration between two date-time timestamps in hours, minutes, seconds, and ISO 8601 notation."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How is time duration calculated across days?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The start and end date-times are converted to millisecond epoch timestamps, the difference is calculated, and then decomposed into integer days, hours, minutes, and seconds."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is an ISO 8601 duration format?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "An ISO 8601 duration begins with P (for period), followed by date components (Y, M, W, D), then T (for time), followed by time components (H, M, S). For example, P2DT4H30M represents 2 days, 4 hours, and 30 minutes."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Daylight Saving Time affect duration calculations?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Standard wall-clock timestamps can gain or lose 1 hour during spring and autumn transitions. High-precision duration systems convert timestamps to UTC first to measure physical elapsed time."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between time duration and time difference?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Time duration measures elapsed physical time between two specific chronological events, whereas time difference often refers to timezone offsets between two geographic locations."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="datetime.html">Date &amp; Time</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="finance.html">Finance</a>
+                <a href="converter.html">Converters</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="datetime.html">Date &amp; Time Utility</a> &gt; <span>Time Duration Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Time Duration Calculator</h1>
+                        <p class="calc-desc">Compute the exact chronological time span between start and end date-times, with multi-unit breakdown in seconds, minutes, decimal hours, and ISO 8601 format.</p>
+                    </div>
+                    <div class="calc-body">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
+        <div>
+            <label for="startDateTime" style="font-weight: 600; font-size: 0.875rem;">Start Date &amp; Time:</label>
+            <input type="datetime-local" id="startDateTime" class="input-field" value="2026-10-01T08:00">
+        </div>
+        <div>
+            <label for="endDateTime" style="font-weight: 600; font-size: 0.875rem;">End Date &amp; Time:</label>
+            <input type="datetime-local" id="endDateTime" class="input-field" value="2026-10-05T17:30">
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
+        <button type="button" class="btn btn-primary" onclick="calculateDuration()">Calculate Duration</button>
+        <button type="button" class="btn btn-outline" onclick="setDurationPreset('24h')">+24 Hours</button>
+        <button type="button" class="btn btn-outline" onclick="setDurationPreset('1w')">+1 Week</button>
+    </div>
+
+    <div class="result-box" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 1.25rem;">
+        <h3 style="margin-top: 0; color: #1e293b; font-size: 1.1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">Chronological Elapsed Span</h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Formatted Span</div>
+                <div id="resFormattedSpan" style="font-size: 1.4rem; font-weight: 700; color: #2563eb;">4d 9h 30m</div>
+                <div id="resIsoDuration" style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">ISO: P4DT9H30M</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Total Decimal Hours</div>
+                <div id="resDecimalHours" style="font-size: 1.4rem; font-weight: 700; color: #0f172a;">105.50 hr</div>
+                <div id="resTotalMinutes" style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">6,330 minutes</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Total Seconds (SI)</div>
+                <div id="resTotalSeconds" style="font-size: 1.4rem; font-weight: 700; color: #059669;">379,800 s</div>
+                <div id="resMillis" style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">379,800,000 ms</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Days &amp; Fraction</div>
+                <div id="resFractionDays" style="font-size: 1.4rem; font-weight: 700; color: #7c3aed;">4.3958 Days</div>
+                <div id="resFractionWeeks" style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">0.628 weeks</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function setDurationPreset(type) {
+    const sEl = document.getElementById('startDateTime');
+    const eEl = document.getElementById('endDateTime');
+    const start = new Date(sEl.value || new Date());
+    let end = new Date(start);
+
+    if (type === '24h') {
+        end.setHours(end.getHours() + 24);
+    } else if (type === '1w') {
+        end.setDate(end.getDate() + 7);
+    }
+
+    const pad = (n) => String(n).padStart(2, '0');
+    const toLocalISO = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    eEl.value = toLocalISO(end);
+    calculateDuration();
+}
+
+function calculateDuration() {
+    const sStr = document.getElementById('startDateTime').value;
+    const eStr = document.getElementById('endDateTime').value;
+    if (!sStr || !eStr) return;
+
+    let d1 = new Date(sStr);
+    let d2 = new Date(eStr);
+
+    let isNeg = false;
+    if (d2 < d1) {
+        const tmp = d1;
+        d1 = d2;
+        d2 = tmp;
+        isNeg = true;
+    }
+
+    const diffMs = d2 - d1;
+    const totalSec = Math.floor(diffMs / 1000);
+    const totalMin = Math.floor(totalSec / 60);
+    const totalHours = totalSec / 3600;
+    const totalDays = totalSec / 86400;
+
+    const days = Math.floor(totalSec / 86400);
+    const remSec1 = totalSec % 86400;
+    const hours = Math.floor(remSec1 / 3600);
+    const remSec2 = remSec1 % 3600;
+    const mins = Math.floor(remSec2 / 60);
+    const secs = remSec2 % 60;
+
+    const prefix = isNeg ? "-" : "";
+    document.getElementById('resFormattedSpan').innerText = `${prefix}${days}d ${hours}h ${mins}m ${secs}s`;
+    document.getElementById('resIsoDuration').innerText = `ISO: ${prefix}P${days}DT${hours}H${mins}M${secs}S`;
+    document.getElementById('resDecimalHours').innerText = `${prefix}${totalHours.toFixed(2)} hr`;
+    document.getElementById('resTotalMinutes').innerText = `${prefix}${totalMin.toLocaleString()} minutes`;
+    document.getElementById('resTotalSeconds').innerText = `${prefix}${totalSec.toLocaleString()} s`;
+    document.getElementById('resMillis').innerText = `${prefix}${diffMs.toLocaleString()} ms`;
+    document.getElementById('resFractionDays').innerText = `${prefix}${totalDays.toFixed(4)} Days`;
+    document.getElementById('resFractionWeeks').innerText = `${prefix}${(totalDays / 7).toFixed(3)} weeks`;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('startDateTime').addEventListener('change', calculateDuration);
+    document.getElementById('endDateTime').addEventListener('change', calculateDuration);
+    calculateDuration();
+});
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>Mathematical Principles of Continuous Time Duration</h2>
+<p>In physical kinematics, chronobiology, space geodesy, and computer networking, measuring the exact <strong>duration</strong> elapsed between two chronological events requires continuous interval arithmetic. While discrete dates follow discontinuous calendar partitions (varying month lengths, leap years), duration is an invariant physical scalar measured in the SI base unit of seconds ($s$).</p>
+
+<p>Given an initial timestamp $t_{	ext{start}}$ and a terminal timestamp $t_{	ext{end}}$, the fundamental elapsed duration $\Delta t$ is evaluated from their UNIX epoch representations (milliseconds elapsed since January 1, 1970 00:00:00 UTC):</p>
+
+$$\Delta t_{	ext{sec}} = rac{	au_{	ext{end}} - 	au_{	ext{start}}}{1000}$$
+
+<p>Decomposing continuous seconds $\Delta t_{	ext{sec}}$ into hierarchical sexagesimal components—days $D$, hours $H$, minutes $M$, and seconds $S$—is governed by successive modulo and floor operators:</p>
+
+$$D = \left\lfloor rac{\Delta t_{	ext{sec}}}{86400} 
+ight
+floor$$
+$$H = \left\lfloor rac{\Delta t_{	ext{sec}} mod 86400}{3600} 
+ight
+floor$$
+$$M = \left\lfloor rac{\Delta t_{	ext{sec}} mod 3600}{60} 
+ight
+floor$$
+$$S = \Delta t_{	ext{sec}} mod 60$$
+
+<h2>The ISO 8601 Duration Standard Representation</h2>
+<p>International standard <strong>ISO 8601-1:2019</strong> specifies an unambiguous syntax for exchanging duration metadata across enterprise computer software, distributed APIs, and database schemas. An ISO 8601 duration string follows the canonical format:</p>
+
+$$	ext{P}[n]	ext{Y}[n]	ext{M}[n]	ext{D}	ext{T}[n]	ext{H}[n]	ext{M}[n]	ext{S}$$
+
+<p>Where the structural tokens denote:</p>
+<ul>
+    <li><strong><code>P</code> (Period Designator):</strong> Placed at the very start of the duration representation.</li>
+    <li><strong><code>Y</code>, <code>M</code>, <code>W</code>, <code>D</code>:</strong> Represent years, months, weeks, and days respectively.</li>
+    <li><strong><code>T</code> (Time Separator):</strong> Must precede all time elements (hours, minutes, seconds).</li>
+    <li><strong><code>H</code>, <code>M</code>, <code>S</code>:</strong> Represent hours, minutes, and seconds respectively.</li>
+</ul>
+<p>For example, a mission elapsed span of 4 days, 9 hours, 30 minutes, and 15 seconds is unambiguously formatted as <code>P4DT9H30M15S</code>.</p>
+
+<h3>Chronometric Units and Conversion Factors Matrix</h3>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Time Duration Unit</th>
+            <th>SI Base Seconds ($s$)</th>
+            <th>Minutes</th>
+            <th>Decimal Hours</th>
+            <th>Solar Days</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>1 Millisecond (ms)</td><td>$10^{-3} 	ext{ s}$</td><td>$1.667 	imes 10^{-5}$</td><td>$2.778 	imes 10^{-7}$</td><td>$1.157 	imes 10^{-8}$</td></tr>
+        <tr><td>1 Second (s)</td><td>$1.0 	ext{ s}$</td><td>$0.01667 	ext{ min}$</td><td>$0.000278 	ext{ hr}$</td><td>$1.157 	imes 10^{-5}$</td></tr>
+        <tr><td>1 Minute (min)</td><td>$60.0 	ext{ s}$</td><td>$1.0 	ext{ min}$</td><td>$0.01667 	ext{ hr}$</td><td>$0.000694 	ext{ d}$</td></tr>
+        <tr><td>1 Hour (hr)</td><td>$3,600 	ext{ s}$</td><td>$60.0 	ext{ min}$</td><td>$1.0 	ext{ hr}$</td><td>$0.04167 	ext{ d}$</td></tr>
+        <tr><td>1 Mean Solar Day (d)</td><td>$86,400 	ext{ s}$</td><td>$1,440 	ext{ min}$</td><td>$24.0 	ext{ hr}$</td><td>$1.0000 	ext{ d}$</td></tr>
+        <tr><td>1 Standard Week (wk)</td><td>$604,800 	ext{ s}$</td><td>$10,080 	ext{ min}$</td><td>$168.0 	ext{ hr}$</td><td>$7.0000 	ext{ d}$</td></tr>
+        <tr><td>1 Julian Year ($a$)</td><td>$31,557,600 	ext{ s}$</td><td>$525,960 	ext{ min}$</td><td>$8,766.0 	ext{ hr}$</td><td>$365.25 	ext{ d}$</td></tr>
+    </tbody>
+</table>
+
+<h2>Network Telemetry and Distributed Systems Clock Synchronization</h2>
+<p>In cloud computing, high-frequency financial trading, and distributed database consensus (such as Google Spanner's TrueTime API), duration measurements face relativistic and network latency challenges. Network Time Protocol (NTP) and Precision Time Protocol (IEEE 1588 PTP) synchronize atomic clocks across global data centers.</p>
+<p>When measuring durations across servers, engineers utilize <strong>monotonic clock timers</strong> (e.g., <code>clock_gettime(CLOCK_MONOTONIC)</code> in Linux) rather than wall-clock real time (<code>CLOCK_REALTIME</code>). Monotonic clocks never jump backward due to NTP slew adjustments or leap second insertions, guaranteeing mathematically positive duration evaluations.</p>
+
+<div class="worked-example-card">
+    <h3>Worked Engineering Case Study: Aerospace Satellite Tracking Pass Duration</h3>
+    <p><strong>Scenario:</strong> A Low Earth Orbit (LEO) earth observation satellite enters ground station acquisition of signal (AOS) on <strong>October 5, 2026 at 04:12:35 UTC</strong> and loses signal (LOS) on <strong>October 5, 2026 at 04:26:50 UTC</strong>. Calculate: (1) exact pass duration in sexagesimal notation, (2) total seconds, (3) decimal hours, and (4) data transmitted if telemetry downlink operates at 850 Mbps.</p>
+    
+    <div class="step-solution">
+        <h4>Step 1: Compute Sexagesimal Duration</h4>
+        <p>Start: $04:12:35 = (4 	imes 3600) + (12 	imes 60) + 35 = 14,400 + 720 + 35 = 15,155 	ext{ seconds}$.</p>
+        <p>End: $04:26:50 = (4 	imes 3600) + (26 	imes 60) + 50 = 14,400 + 1560 + 50 = 16,010 	ext{ seconds}$.</p>
+        $$\Delta t_{	ext{sec}} = 16,010 - 15,155 = 855 	ext{ seconds}$$
+        <p>Partitioning into minutes and seconds:</p>
+        $$	ext{Minutes} = \lfloor 855 / 60 
+floor = 14 	ext{ minutes}$$
+        $$	ext{Seconds} = 855 mod 60 = 15 	ext{ seconds}$$
+        <p><strong>Pass Span:</strong> <code>0h 14m 15s</code> (ISO: <code>PT14M15S</code>).</p>
+
+        <h4>Step 2: Convert to Decimal Hours</h4>
+        $$\Delta t_{	ext{decimal}} = rac{855}{3600} = 0.2375 	ext{ hours}$$
+
+        <h4>Step 3: Calculate Telemetry Downlink Volume</h4>
+        $$	ext{Total Bits} = 855 	ext{ seconds} 	imes 850 	imes 10^6 	ext{ bps} = 7.2675 	imes 10^{11} 	ext{ bits}$$
+        $$	ext{Total Gigabytes} = rac{7.2675 	imes 10^{11}}{8 	imes 10^9} pprox 90.84 	ext{ GB}$$
+    </div>
+</div>
+
+<h2>Common Implementation Pitfalls with Duration Calculations</h2>
+<ol>
+    <li><strong>Daylight Saving Time (DST) Jumps:</strong> Calculating duration between local wall-clock times across the spring transition (e.g., 01:30 to 03:30) appears to span 2 hours, but physically only 1 hour elapsed because clocks jumped forward at 02:00. Always compute durations using UTC epoch timestamps.</li>
+    <li><strong>Leap Second Distortions:</strong> While civil time occasionally inserts a 61st second (23:59:60 UTC) to match Earth's slowing rotation, POSIX standards ignore leap seconds, causing a 1-second discrepancy against International Atomic Time (TAI).</li>
+    <li><strong>Floating Point Inaccuracies in Millisecond Conversions:</strong> Dividing large epoch millisecond timestamps directly in 32-bit floating point induces truncation errors. Systems must retain 64-bit double precision integers.</li>
+</ol>
+
+
+<h2>Specialized Applications: Athletic Chronometry and High-Precision Lap Splits</h2>
+<p>In Olympic track and field, motorsport telemetry (Formula 1, NASCAR), and competitive swimming, time duration calculations require sub-second millisecond resolution governed by international governing bodies (World Athletics, FIA, World Aquatics). At velocities exceeding 300 km/h in Formula 1 racing, an interval of just 0.001 seconds (1 millisecond) represents approximately 8.33 centimeters of physical track displacement. Chronometric timing systems employ transponder loops embedded in the circuit asphalt that generate differential time splits:</p>
+
+$$\Delta t_{	ext{split}} = t_{	ext{sector, } k} - t_{	ext{sector, } k-1}$$
+
+<p>Accumulating lap sectors into total race duration requires high-precision sexagesimal floating-point addition that prevents IEEE 754 binary floating-point roundoff drift over multi-hour endurance events like the 24 Hours of Le Mans.</p>
+
+<h2>Relational Databases and SQL Temporal Duration Modeling</h2>
+<p>In enterprise software architecture and data warehousing (PostgreSQL, Oracle, Snowflake, MySQL), durations are stored using specialized temporal data types such as SQL standard <code>INTERVAL DAY TO SECOND</code>. Evaluating differences between timestamps utilizes statutory SQL functions:</p>
+<pre><code>-- PostgreSQL exact duration extraction
+SELECT AGE(end_timestamp, start_timestamp) AS calendar_span,
+       EXTRACT(EPOCH FROM (end_timestamp - start_timestamp)) AS elapsed_seconds;
+</code></pre>
+<p>Engineers must exercise care when querying durations across Daylight Saving Time adjustments: calculating duration from naive local timestamp columns without timezone offsets (<code>TIMESTAMP WITHOUT TIME ZONE</code>) introduces a 1-hour discrepancy twice annually during clock transitions.</p>
+<section class="faq-section">
+    <h2>Frequently Asked Questions About Time Duration</h2>
+    <div class="faq-item">
+        <h3>How is time duration calculated across days?</h3>
+        <p>The start and end date-times are converted to millisecond epoch timestamps, the difference is calculated, and then decomposed into integer days, hours, minutes, and seconds.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is an ISO 8601 duration format?</h3>
+        <p>An ISO 8601 duration begins with P (for period), followed by date components (Y, M, W, D), then T (for time), followed by time components (H, M, S). For example, P2DT4H30M represents 2 days, 4 hours, and 30 minutes.</p>
+    </div>
+    <div class="faq-item">
+        <h3>How does Daylight Saving Time affect duration calculations?</h3>
+        <p>Standard wall-clock timestamps can gain or lose 1 hour during spring and autumn transitions. High-precision duration systems convert timestamps to UTC first to measure physical elapsed time.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is the difference between time duration and time difference?</h3>
+        <p>Time duration measures elapsed physical time between two specific chronological events, whereas time difference often refers to timezone offsets between two geographic locations.</p>
+    </div>
+</section>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">📅</span>
+            <h3 class="widget-title">Related Date & Time Utility</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="date-difference-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Date Difference & Business Days</a></li>
+            <li><a href="hours-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Work Hours Calculator</a></li>
+            <li><a href="week-number-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ISO Week Number</a></li>
+            <li><a href="add-days-to-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Add Days to Date</a></li>
+            <li><a href="add-time-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Add Time Calculator</a></li>
+            <li><a href="business-days-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Business Days Calculator</a></li>
+            <li><a href="countdown-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Countdown Calculator</a></li>
+            <li><a href="date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calendar Date Calculator</a></li>
+            <li><a href="day-of-week-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Day of the Week Calculator</a></li>
+            <li><a href="day-of-year-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Day of the Year Calculator</a></li>
+            <li><a href="decimal-time-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Decimal Time Calculator</a></li>
+            <li><a href="leap-year-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Leap Year Calculator</a></li>
+            <li><a href="months-between-dates-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Months Between Dates</a></li>
+            <li><a href="quarter-of-year-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Quarter of Year Calculator</a></li>
+            <li><a href="time-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Time Calculator (Sexagesimal)</a></li>
+            <li><a href="time-duration-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Time Duration Calculator</a></li>
+            <li><a href="weeks-between-dates-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Weeks Between Dates</a></li>
+            <li><a href="age-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exact Age Calculator</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck Calculator</a></li>
+            <li><a href="unit-converter.html" class="sidebar-link-item"><span class="link-bullet">›</span> Universal Multi-Unit Converter</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="datetime.html" class="sidebar-category-link">View All Date & Time Utility Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers peer-reviewed chronometric computing algorithms, professional engineering suites, and enterprise financial calendar engines compliant with ISO 8601, NCEES, and FLSA reporting standards.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Professional Suites</h4>
+                    <ul>
+                        <li><a href="datetime.html">Date &amp; Time Utilities</a></li>
+                        <li><a href="engineering.html">Engineering Tools</a></li>
+                        <li><a href="finance.html">Financial Planning</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Core Calculators</h4>
+                    <ul>
+                        <li><a href="time-card-calculator.html">Time Card Calculator</a></li>
+                        <li><a href="time-duration-calculator.html">Time Duration Calculator</a></li>
+                        <li><a href="weeks-between-dates-calculator.html">Weeks Between Dates</a></li>
+                        <li><a href="best-engineering-calculator.html">Best Engineering Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Metric Converters</a></li>
+                        <li><a href="cable-sizing-guide.html">Cable Sizing Guide</a></li>
+                        <li><a href="engineering-formulas.html">Engineering Formulas</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, chronometry, and mathematical computational systems.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

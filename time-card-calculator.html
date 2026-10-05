@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Card Calculator | Free Weekly Timesheet Hours & Gross Pay</title>
+    <meta name="description" content="Free online time card calculator. Enter clock in/out times and lunch breaks for Monday to Sunday. Computes daily hours, weekly overtime, and gross pay.">
+    <link rel="canonical" href="https://calchub.com/time-card-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Time Card Calculator",
+      "url": "https://calchub.com/time-card-calculator.html",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "Calculates daily and weekly employee time card hours, lunch deductions, overtime, and gross wages."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does a weekly time card calculator calculate total hours?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For each workday, it subtracts clock-in time from clock-out time (accounting for shifts that cross midnight), deducts any unpaid meal or break duration in minutes, and converts the net result to decimal hours."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the FLSA 15-minute rounding rule for time cards?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Under 29 CFR 785.48, employers can round punches to the nearest 15 minutes using the 7/8 minute rule: punches 1 to 7 minutes past the quarter hour round down, and punches 8 to 14 minutes round up."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is weekly overtime allocated on a time card?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Under federal FLSA rules, any hours worked beyond 40 hours in a 7-day workweek are classified as overtime and compensated at 1.5 times the standard regular hourly rate."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do employers have to pay for lunch breaks?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Under federal law, genuine bona fide meal periods lasting 30 minutes or longer where the employee is completely relieved from all work duties are unpaid. Rest breaks lasting 5 to 20 minutes must be counted as paid work time."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="datetime.html">Date &amp; Time</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="finance.html">Finance</a>
+                <a href="converter.html">Converters</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="finance.html">Finance &amp; Payroll</a> &gt; <span>Time Card Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Time Card Calculator</h1>
+                        <p class="calc-desc">Compute total weekly timesheet hours, unpaid meal break deductions, regular vs. overtime wage allocations, and gross paycheck earnings across all 7 days.</p>
+                    </div>
+                    <div class="calc-body">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
+        <div>
+            <label for="tcBaseRate" style="font-weight: 600; font-size: 0.875rem;">Hourly Wage Rate ($):</label>
+            <input type="number" id="tcBaseRate" class="input-field" value="25.00" min="0" step="0.50">
+        </div>
+        <div>
+            <label for="tcOtThreshold" style="font-weight: 600; font-size: 0.875rem;">Weekly Overtime Threshold:</label>
+            <input type="number" id="tcOtThreshold" class="input-field" value="40" min="0" max="60" step="1">
+            <span class="input-hint">Standard FLSA threshold is 40 hours/week</span>
+        </div>
+        <div>
+            <label for="tcDailyOt" style="font-weight: 600; font-size: 0.875rem;">Daily Overtime (> 8 hrs):</label>
+            <select id="tcDailyOt" class="input-field">
+                <option value="no">Weekly Only (> 40 hrs @ 1.5x)</option>
+                <option value="yes">Daily (> 8h @ 1.5x, > 12h @ 2.0x)</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- 7-Day Timesheet Table -->
+    <div style="overflow-x: auto; margin-bottom: 1.25rem;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem; background: white; border: 1px solid #cbd5e1; border-radius: 6px;">
+            <thead>
+                <tr style="background: #f1f5f9; color: #334155; text-align: left;">
+                    <th style="padding: 0.6rem; border-bottom: 2px solid #cbd5e1;">Day</th>
+                    <th style="padding: 0.6rem; border-bottom: 2px solid #cbd5e1;">Time In</th>
+                    <th style="padding: 0.6rem; border-bottom: 2px solid #cbd5e1;">Time Out</th>
+                    <th style="padding: 0.6rem; border-bottom: 2px solid #cbd5e1;">Break (mins)</th>
+                    <th style="padding: 0.6rem; border-bottom: 2px solid #cbd5e1; text-align: right;">Total Hours</th>
+                </tr>
+            </thead>
+            <tbody id="timesheetBody">
+                <!-- Rows injected via script -->
+            </tbody>
+        </table>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
+        <button type="button" class="btn btn-primary" onclick="calculateTimeCard()">Calculate Paycheck</button>
+        <button type="button" class="btn btn-outline" onclick="fillStandardWorkweek()">Fill 9-to-5 Mon-Fri</button>
+        <button type="button" class="btn btn-outline" onclick="clearTimesheet()">Clear All</button>
+    </div>
+
+    <div class="result-box" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 1.25rem;">
+        <h3 style="margin-top: 0; color: #1e293b; font-size: 1.1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">Weekly Timesheet &amp; Payroll Summary</h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Total Weekly Hours</div>
+                <div id="resTotalHours" style="font-size: 1.5rem; font-weight: 700; color: #2563eb;">40.00 hrs</div>
+                <div id="resTotalMins" style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">2,400 net minutes</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Regular Wages</div>
+                <div id="resRegWages" style="font-size: 1.4rem; font-weight: 700; color: #0f172a;">$1,000.00</div>
+                <div id="resRegHours" style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">40.00 hrs @ $25.00/hr</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Overtime Wages</div>
+                <div id="resOtWages" style="font-size: 1.4rem; font-weight: 700; color: #d97706;">$0.00</div>
+                <div id="resOtHours" style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">0.00 hrs @ $37.50/hr</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Total Gross Pay</div>
+                <div id="resGrossPay" style="font-size: 1.5rem; font-weight: 700; color: #16a34a;">$1,000.00</div>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">Pre-tax gross compensation</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+function buildTimesheetRows() {
+    const tbody = document.getElementById('timesheetBody');
+    tbody.innerHTML = '';
+    DAYS.forEach((day, idx) => {
+        const isWeekday = idx < 5;
+        const inVal = isWeekday ? '08:30' : '';
+        const outVal = isWeekday ? '17:00' : '';
+        const breakVal = isWeekday ? '30' : '0';
+
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid #e2e8f0';
+        tr.innerHTML = `
+            <td style="padding: 0.5rem; font-weight: 600;">${day}</td>
+            <td style="padding: 0.5rem;"><input type="time" id="in_${idx}" class="input-field" value="${inVal}" style="padding: 0.35rem; font-size: 0.85rem;" onchange="calculateTimeCard()"></td>
+            <td style="padding: 0.5rem;"><input type="time" id="out_${idx}" class="input-field" value="${outVal}" style="padding: 0.35rem; font-size: 0.85rem;" onchange="calculateTimeCard()"></td>
+            <td style="padding: 0.5rem;"><input type="number" id="brk_${idx}" class="input-field" value="${breakVal}" min="0" max="240" step="5" style="padding: 0.35rem; font-size: 0.85rem; width: 80px;" oninput="calculateTimeCard()"></td>
+            <td id="tot_${idx}" style="padding: 0.5rem; text-align: right; font-weight: 700; color: #2563eb;">8.00 hr</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function fillStandardWorkweek() {
+    DAYS.forEach((_, idx) => {
+        const isWeekday = idx < 5;
+        document.getElementById(`in_${idx}`).value = isWeekday ? '09:00' : '';
+        document.getElementById(`out_${idx}`).value = isWeekday ? '17:00' : '';
+        document.getElementById(`brk_${idx}`).value = isWeekday ? '30' : '0';
+    });
+    calculateTimeCard();
+}
+
+function clearTimesheet() {
+    DAYS.forEach((_, idx) => {
+        document.getElementById(`in_${idx}`).value = '';
+        document.getElementById(`out_${idx}`).value = '';
+        document.getElementById(`brk_${idx}`).value = '0';
+    });
+    calculateTimeCard();
+}
+
+function calculateTimeCard() {
+    const rate = parseFloat(document.getElementById('tcBaseRate').value) || 0;
+    const otThresh = parseFloat(document.getElementById('tcOtThreshold').value) || 40;
+    const dailyOt = document.getElementById('tcDailyOt').value === 'yes';
+
+    let totalWeekMins = 0;
+    let totalRegHours = 0;
+    let totalOtHours = 0;
+    let totalDtHours = 0;
+
+    DAYS.forEach((_, idx) => {
+        const inStr = document.getElementById(`in_${idx}`).value;
+        const outStr = document.getElementById(`out_${idx}`).value;
+        const brkMins = parseFloat(document.getElementById(`brk_${idx}`).value) || 0;
+
+        let dayMins = 0;
+        if (inStr && outStr) {
+            const [inH, inM] = inStr.split(':').map(Number);
+            const [outH, outM] = outStr.split(':').map(Number);
+            let start = (inH * 60) + inM;
+            let end = (outH * 60) + outM;
+
+            if (end < start) {
+                end += 1440; // Midnight rollover
+            }
+            dayMins = Math.max(0, (end - start) - brkMins);
+        }
+
+        const dayHours = dayMins / 60;
+        document.getElementById(`tot_${idx}`).innerText = `${dayHours.toFixed(2)} hr`;
+        totalWeekMins += dayMins;
+
+        if (dailyOt) {
+            if (dayHours <= 8) {
+                totalRegHours += dayHours;
+            } else if (dayHours <= 12) {
+                totalRegHours += 8;
+                totalOtHours += (dayHours - 8);
+            } else {
+                totalRegHours += 8;
+                totalOtHours += 4;
+                totalDtHours += (dayHours - 12);
+            }
+        }
+    });
+
+    const totalWeekHours = totalWeekMins / 60;
+
+    if (!dailyOt) {
+        if (totalWeekHours <= otThresh) {
+            totalRegHours = totalWeekHours;
+            totalOtHours = 0;
+        } else {
+            totalRegHours = otThresh;
+            totalOtHours = totalWeekHours - otThresh;
+        }
+        totalDtHours = 0;
+    }
+
+    const regWages = totalRegHours * rate;
+    const otWages = (totalOtHours * rate * 1.5) + (totalDtHours * rate * 2.0);
+    const grossPay = regWages + otWages;
+
+    document.getElementById('resTotalHours').innerText = `${totalWeekHours.toFixed(2)} hrs`;
+    document.getElementById('resTotalMins').innerText = `${Math.round(totalWeekMins).toLocaleString()} net minutes`;
+    document.getElementById('resRegWages').innerText = `$${regWages.toFixed(2)}`;
+    document.getElementById('resRegHours').innerText = `${totalRegHours.toFixed(2)} hrs @ $${rate.toFixed(2)}/hr`;
+    document.getElementById('resOtWages').innerText = `$${otWages.toFixed(2)}`;
+    document.getElementById('resOtHours').innerText = `${(totalOtHours + totalDtHours).toFixed(2)} hrs @ 1.5x/2.0x`;
+    document.getElementById('resGrossPay').innerText = `$${grossPay.toFixed(2)}`;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    buildTimesheetRows();
+    document.getElementById('tcBaseRate').addEventListener('input', calculateTimeCard);
+    document.getElementById('tcOtThreshold').addEventListener('input', calculateTimeCard);
+    document.getElementById('tcDailyOt').addEventListener('change', calculateTimeCard);
+    calculateTimeCard();
+});
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>Mathematical and Statutory Structure of Timesheet Calculations</h2>
+<p>Modern payroll administration relies on structured employee time recording systems, colloquially designated as <strong>time cards</strong> or <strong>timesheets</strong>. In hourly employment arrangements, gross compensation $W_{	ext{gross}}$ is governed by accurate temporal summation across discrete shifts, rigorous deduction of statutory unpaid meal breaks, and algorithmic partitioning between straight-time regular hours and overtime premium hours.</p>
+
+<p>For each diurnal shift $i \in \{1, 2, \dots, 7\}$ spanning a standard seven-day payroll workweek, total elapsed duration in net minutes $T_{	ext{net}, i}$ is evaluated as:</p>
+
+$$T_{	ext{net}, i} = (t_{	ext{out}, i} - t_{	ext{in}, i}) - B_{	ext{unpaid}, i}$$
+
+<p>Where $t_{	ext{in}, i}$ and $t_{	ext{out}, i}$ represent timestamps expressed in minutes from midnight ($0 \le t \le 1440$). When a night shift crosses the midnight threshold ($t_{	ext{out}, i} < t_{	ext{in}, i}$), modular diurnal transformation adds $1,440 	ext{ minutes}$ ($24 	ext{ hours}$) to the terminal punch:</p>
+
+$$t_{	ext{out}, i} = t_{	ext{out}, i} + 1440$$
+
+<p>Total workweek duration in fractional decimal hours $H_{	ext{total}}$ is then evaluated via rational division by 60:</p>
+
+$$H_{	ext{total}} = rac{1}{60} \sum_{i=1}^{7} T_{	ext{net}, i}$$
+
+<h2>The FLSA 7/8-Minute Rounding Rule (29 CFR § 785.48)</h2>
+<p>Under Title 29, Section 785.48(b) of the United States Code of Federal Regulations, employers are legally authorized to record employee starting and stopping times to the nearest quarter of an hour (15 minutes). The statute establishes the celebrated <strong>7/8-minute rounding window</strong>:</p>
+
+<ul>
+    <li><strong>Down-Rounding (Minutes 1 through 7):</strong> If an employee clocks in 1 to 7 minutes past a quarter-hour mark (e.g., 08:07), the punch rounds down to the preceding quarter hour (08:00).</li>
+    <li><strong>Up-Rounding (Minutes 8 through 14):</strong> If an employee clocks in 8 to 14 minutes past a quarter-hour mark (e.g., 08:08), the punch rounds forward to the subsequent quarter hour (08:15).</li>
+    <li><strong>Regulatory Neutrality Requirement:</strong> Federal courts strictly enforce that time clock rounding must operate neutrally over time. An employer cannot program an automated system to round down on clock-ins and round down on clock-outs, as this systematically deprives employees of lawfully earned compensation.</li>
+</ul>
+
+<h3>Sexagesimal to Decimal Minutes Reference Matrix</h3>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Recorded Minutes</th>
+            <th>Fractional Ratio</th>
+            <th>Decimal Hours</th>
+            <th>FLSA 15-Minute Rounding</th>
+            <th>Tenth-Hour (6-Minute) Rounding</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>01 – 07 mins</td><td>x / 60</td><td>0.02 – 0.12 hr</td><td>0.00 hr (Round Down)</td><td>Nearest 0.10 hr</td></tr>
+        <tr><td>08 – 14 mins</td><td>x / 60</td><td>0.13 – 0.23 hr</td><td>0.25 hr (Round Up)</td><td>Nearest 0.20 hr</td></tr>
+        <tr><td>15 mins</td><td>15 / 60</td><td>0.250 hr</td><td>0.25 hr (Exact)</td><td>0.20 or 0.30 hr</td></tr>
+        <tr><td>16 – 22 mins</td><td>x / 60</td><td>0.27 – 0.37 hr</td><td>0.25 hr (Round Down)</td><td>Nearest 0.30 hr</td></tr>
+        <tr><td>23 – 29 mins</td><td>x / 60</td><td>0.38 – 0.48 hr</td><td>0.50 hr (Round Up)</td><td>Nearest 0.40 hr</td></tr>
+        <tr><td>30 mins</td><td>30 / 60</td><td>0.500 hr</td><td>0.50 hr (Exact)</td><td>0.50 hr (Exact)</td></tr>
+        <tr><td>38 – 44 mins</td><td>x / 60</td><td>0.63 – 0.73 hr</td><td>0.75 hr (Round Up)</td><td>Nearest 0.70 hr</td></tr>
+        <tr><td>45 mins</td><td>45 / 60</td><td>0.750 hr</td><td>0.75 hr (Exact)</td><td>0.70 or 0.80 hr</td></tr>
+        <tr><td>53 – 59 mins</td><td>x / 60</td><td>0.88 – 0.98 hr</td><td>1.00 hr (Round Up)</td><td>Nearest 1.00 hr</td></tr>
+    </tbody>
+</table>
+
+<h2>Overtime Allocation: Federal FLSA vs. California Daily Rules</h2>
+<p>Gross compensation is partitioned into regular and overtime tiers according to jurisdiction:</p>
+
+<h3>1. Standard Federal FLSA Weekly Model</h3>
+<p>Under federal guidelines, overtime applies strictly to weekly totals exceeding 40.0 hours ($H_{	ext{ot\_thresh}} = 40$):</p>
+
+$$H_{	ext{reg}} = \min(H_{	ext{total}}, 40)$$
+$$H_{	ext{ot}} = \max(0, H_{	ext{total}} - 40)$$
+$$W_{	ext{gross}} = (H_{	ext{reg}} 	imes R_{	ext{base}}) + (H_{	ext{ot}} 	imes 1.5 	imes R_{	ext{base}})$$
+
+<h3>2. California Daily Overtime and Double-Time Model (Labor Code § 510)</h3>
+<p>Under California statutory rules, hours are evaluated on each individual day:</p>
+<ul>
+    <li>Daily hours $\le 8.0$: Paid at straight base rate $R_{	ext{base}}$.</li>
+    <li>Daily hours $> 8.0$ up to $12.0$: Paid at $1.5 	imes R_{	ext{base}}$ (Time-and-a-half).</li>
+    <li>Daily hours $> 12.0$: Paid at $2.0 	imes R_{	ext{base}}$ (Double time).</li>
+    <li>7th Consecutive Day: First 8 hours at $1.5	imes$; all hours $> 8$ at $2.0	imes$.</li>
+</ul>
+
+<div class="worked-example-card">
+    <h3>Worked Corporate Payroll Case Study: Warehouse Operations Shift Card</h3>
+    <p><strong>Scenario:</strong> A logistics specialist works five shifts during a holiday peak week: Monday (08:00 to 17:30, 30-min break), Tuesday (08:00 to 18:30, 45-min break), Wednesday (07:30 to 16:30, 30-min break), Thursday (08:00 to 19:00, 60-min break), and Friday (08:00 to 17:00, 30-min break). Base wage is $26.00/hour. Compute: (1) daily net hours, (2) weekly total hours, (3) regular vs. overtime hours, and (4) gross earnings under federal FLSA rules.</p>
+    
+    <div class="step-solution">
+        <h4>Step 1: Compute Daily Net Hours</h4>
+        <p>Monday: $9.5	ext{h gross} - 0.5	ext{h break} = 9.00 	ext{ hours}$.</p>
+        <p>Tuesday: $10.5	ext{h gross} - 0.75	ext{h break} = 9.75 	ext{ hours}$.</p>
+        <p>Wednesday: $9.0	ext{h gross} - 0.5	ext{h break} = 8.50 	ext{ hours}$.</p>
+        <p>Thursday: $11.0	ext{h gross} - 1.0	ext{h break} = 10.00 	ext{ hours}$.</p>
+        <p>Friday: $9.0	ext{h gross} - 0.5	ext{h break} = 8.50 	ext{ hours}$.</p>
+
+        <h4>Step 2: Sum Total Weekly Hours</h4>
+        $$H_{	ext{total}} = 9.00 + 9.75 + 8.50 + 10.00 + 8.50 = 45.75 	ext{ hours}$$
+
+        <h4>Step 3: Partition Regular and Overtime Hours</h4>
+        $$H_{	ext{reg}} = 40.00 	ext{ hours}$$
+        $$H_{	ext{ot}} = 45.75 - 40.00 = 5.75 	ext{ overtime hours}$$
+
+        <h4>Step 4: Compute Gross Compensation</h4>
+        $$	ext{Regular Pay} = 40.00 	imes \$26.00 = \$1,040.00$$
+        $$	ext{Overtime Pay} = 5.75 	imes (\$26.00 	imes 1.5) = 5.75 	imes \$39.00 = \$224.25$$
+        $$	ext{Total Gross Pay} = \$1,040.00 + \$224.25 = \$1,264.25$$
+    </div>
+</div>
+
+<h2>Common Calculation Errors in Time Card Management</h2>
+<ol>
+    <li><strong>Failing to Deduct Unpaid Breaks:</strong> Gross clock spans must have unpaid meal periods subtracted before converting to decimal pay hours. Including lunch periods inflates labor costs unlawfully.</li>
+    <li><strong>Decimal Time Truncation:</strong> Truncating minutes prematurely (e.g., treating 45 minutes as 0.45 hours instead of 0.75 hours) shorts employees by 18 minutes of wages per shift.</li>
+    <li><strong>Midnight Crossing Sign Errors:</strong> When an employee works an overnight shift (e.g., 22:00 to 06:00), subtracting $6 - 22$ yields $-16$. Software engines must add 24 hours to obtain the true 8-hour shift duration.</li>
+</ol>
+
+<section class="faq-section">
+    <h2>Frequently Asked Questions About Time Cards</h2>
+    <div class="faq-item">
+        <h3>How does a weekly time card calculator calculate total hours?</h3>
+        <p>For each workday, it subtracts clock-in time from clock-out time (accounting for shifts that cross midnight), deducts any unpaid meal or break duration in minutes, and converts the net result to decimal hours.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is the FLSA 15-minute rounding rule for time cards?</h3>
+        <p>Under 29 CFR 785.48, employers can round punches to the nearest 15 minutes using the 7/8 minute rule: punches 1 to 7 minutes past the quarter hour round down, and punches 8 to 14 minutes round up.</p>
+    </div>
+    <div class="faq-item">
+        <h3>How is weekly overtime allocated on a time card?</h3>
+        <p>Under federal FLSA rules, any hours worked beyond 40 hours in a 7-day workweek are classified as overtime and compensated at 1.5 times the standard regular hourly rate.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Do employers have to pay for lunch breaks?</h3>
+        <p>Under federal law, genuine bona fide meal periods lasting 30 minutes or longer where the employee is completely relieved from all work duties are unpaid. Rest breaks lasting 5 to 20 minutes must be counted as paid work time.</p>
+    </div>
+</section>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">🏦</span>
+            <h3 class="widget-title">Related Finance & Investment</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="rule-of-72-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rule of 72 Doubling Time</a></li>
+            <li><a href="car-loan-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Car Loan Financing</a></li>
+            <li><a href="roi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ROI & Annualized CAGR</a></li>
+            <li><a href="loan-emi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan EMI Calculator</a></li>
+            <li><a href="mortgage-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Mortgage & PITI</a></li>
+            <li><a href="compound-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Compound Interest</a></li>
+            <li><a href="simple-interest-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Simple Interest</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck</a></li>
+            <li><a href="discount-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Discount & Sale</a></li>
+            <li><a href="tip-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Tip & Bill Splitter</a></li>
+            <li><a href="amortization-schedule-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Loan Amortization Schedule</a></li>
+            <li><a href="apr-apy-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> APR to APY Compounding Converter</a></li>
+            <li><a href="break-even-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Break-Even Point (Units & Sales)</a></li>
+            <li><a href="capital-gains-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Capital Gains Tax (Short & Long)</a></li>
+            <li><a href="cd-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Certificate of Deposit (CD) Yield</a></li>
+            <li><a href="credit-card-payoff-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Credit Card Payoff (Debt Freedom)</a></li>
+            <li><a href="debt-to-income-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Debt-to-Income (DTI) Ratios</a></li>
+            <li><a href="down-payment-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Down Payment & LTV Sizer</a></li>
+            <li><a href="emergency-fund-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Emergency Fund (3-6 Months)</a></li>
+            <li><a href="inflation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Inflation & Purchasing Power</a></li>
+            <li><a href="net-salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Net Salary & Take-Home Pay</a></li>
+            <li><a href="net-worth-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Personal Net Worth & Solvency</a></li>
+            <li><a href="sales-tax-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sales Tax & Reverse Pre-Tax</a></li>
+            <li><a href="savings-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Compound Savings Growth</a></li>
+            <li><a href="savings-goal-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Savings Goal Target Sizer</a></li>
+            <li><a href="markup-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Markup & Margin Calculator</a></li>
+            <li><a href="smoking-cost-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Smoking Cost & Opportunity</a></li>
+            <li><a href="retirement-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Retirement & FIRE Planner</a></li>
+            <li><a href="overtime-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Overtime Pay Calculator</a></li>
+            <li><a href="time-card-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Time Card Calculator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="finance.html" class="sidebar-category-link">View All Finance & Investment Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers peer-reviewed chronometric computing algorithms, professional engineering suites, and enterprise financial calendar engines compliant with ISO 8601, NCEES, and FLSA reporting standards.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Professional Suites</h4>
+                    <ul>
+                        <li><a href="datetime.html">Date &amp; Time Utilities</a></li>
+                        <li><a href="engineering.html">Engineering Tools</a></li>
+                        <li><a href="finance.html">Financial Planning</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Core Calculators</h4>
+                    <ul>
+                        <li><a href="time-card-calculator.html">Time Card Calculator</a></li>
+                        <li><a href="time-duration-calculator.html">Time Duration Calculator</a></li>
+                        <li><a href="weeks-between-dates-calculator.html">Weeks Between Dates</a></li>
+                        <li><a href="best-engineering-calculator.html">Best Engineering Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Metric Converters</a></li>
+                        <li><a href="cable-sizing-guide.html">Cable Sizing Guide</a></li>
+                        <li><a href="engineering-formulas.html">Engineering Formulas</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, chronometry, and mathematical computational systems.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

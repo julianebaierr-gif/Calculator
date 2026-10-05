@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weeks Between Dates Calculator | Full Weeks, Days & Gestation Progress</title>
+    <meta name="description" content="Calculate the exact number of weeks and days between two dates. Computes full weeks, decimal weeks, percentage of year, and clinical obstetric gestation age.">
+    <link rel="canonical" href="https://calchub.com/weeks-between-dates-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Weeks Between Dates Calculator",
+      "url": "https://calchub.com/weeks-between-dates-calculator.html",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript",
+      "description": "Calculates the number of whole weeks and residual days between any two calendar dates."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do you calculate weeks and days between two dates?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Find the total number of days between the two dates, divide by 7 to get whole completed weeks, and the remainder gives the residual leftover days."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many weeks are in a standard calendar year?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A common year has 365 days, which equals 52 weeks and 1 day (52.143 weeks). A leap year has 366 days, which equals 52 weeks and 2 days (52.286 weeks)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do obstetricians calculate pregnancy gestation weeks?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Obstetricians measure gestational age from the first day of the last menstrual period (LMP) in completed weeks and days (e.g. 24 weeks and 3 days), with full term defined at 40 weeks."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many two-week Agile sprints fit in a calendar quarter?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A standard quarter has 13 weeks (91 days), which comfortably accommodates 6 two-week development sprints (12 weeks) plus 1 buffer/hardening week."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="datetime.html">Date &amp; Time</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="finance.html">Finance</a>
+                <a href="converter.html">Converters</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="datetime.html">Date &amp; Time Utility</a> &gt; <span>Weeks Between Dates Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Weeks Between Dates Calculator</h1>
+                        <p class="calc-desc">Compute the exact number of calendar weeks and leftover days between two dates, including fractional decimal weeks, agile sprint intervals, and gestation tracking.</p>
+                    </div>
+                    <div class="calc-body">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
+        <div>
+            <label for="wksStartDate" style="font-weight: 600; font-size: 0.875rem;">Start Date:</label>
+            <input type="date" id="wksStartDate" class="input-field" value="2026-01-01">
+        </div>
+        <div>
+            <label for="wksEndDate" style="font-weight: 600; font-size: 0.875rem;">End Date:</label>
+            <input type="date" id="wksEndDate" class="input-field" value="2026-10-05">
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
+        <button type="button" class="btn btn-primary" onclick="calculateWeeksBetween()">Calculate Weeks</button>
+        <button type="button" class="btn btn-outline" onclick="setWeeksPreset('12w')">12-Week Goal</button>
+        <button type="button" class="btn btn-outline" onclick="setWeeksPreset('gest')">40-Week Gestation</button>
+    </div>
+
+    <div class="result-box" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 1.25rem;">
+        <h3 style="margin-top: 0; color: #1e293b; font-size: 1.1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">Elapsed Weeks Breakdown</h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Whole Weeks &amp; Days</div>
+                <div id="resWholeWeeks" style="font-size: 1.4rem; font-weight: 700; color: #2563eb;">39 Wks, 4 Days</div>
+                <div id="resDecimalWeeks" style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">39.571 decimal weeks</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Total Calendar Days</div>
+                <div id="resTotalDays" style="font-size: 1.4rem; font-weight: 700; color: #0f172a;">277 Days</div>
+                <div id="resWorkDays" style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">Approx 198 workdays</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Agile 2-Week Sprints</div>
+                <div id="resAgileSprints" style="font-size: 1.4rem; font-weight: 700; color: #059669;">19.8 Sprints</div>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">Standard 10-day sprints</div>
+            </div>
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Annual Percentage</div>
+                <div id="resYearPct" style="font-size: 1.4rem; font-weight: 700; color: #7c3aed;">75.89%</div>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">Of 52.14-week year</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function setWeeksPreset(type) {
+    const today = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const toYMD = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+
+    document.getElementById('wksStartDate').value = toYMD(today);
+    let end = new Date(today);
+
+    if (type === '12w') {
+        end.setDate(end.getDate() + (12 * 7));
+    } else if (type === 'gest') {
+        end.setDate(end.getDate() + (40 * 7));
+    }
+    document.getElementById('wksEndDate').value = toYMD(end);
+    calculateWeeksBetween();
+}
+
+function calculateWeeksBetween() {
+    const sStr = document.getElementById('wksStartDate').value;
+    const eStr = document.getElementById('wksEndDate').value;
+    if (!sStr || !eStr) return;
+
+    let d1 = new Date(sStr + 'T00:00:00');
+    let d2 = new Date(eStr + 'T00:00:00');
+
+    let isNeg = false;
+    if (d2 < d1) {
+        const tmp = d1;
+        d1 = d2;
+        d2 = tmp;
+        isNeg = true;
+    }
+
+    const diffMs = d2 - d1;
+    const totalDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+    const wholeWeeks = Math.floor(totalDays / 7);
+    const remDays = totalDays % 7;
+    const decWeeks = totalDays / 7;
+    const sprints = (decWeeks / 2).toFixed(1);
+    const yrPct = ((totalDays / 365) * 100).toFixed(2);
+    const workDays = Math.round(totalDays * (5 / 7));
+
+    const prefix = isNeg ? "-" : "";
+    document.getElementById('resWholeWeeks').innerText = `${prefix}${wholeWeeks} Wks, ${remDays} Days`;
+    document.getElementById('resDecimalWeeks').innerText = `${prefix}${decWeeks.toFixed(3)} decimal weeks`;
+    document.getElementById('resTotalDays').innerText = `${prefix}${totalDays.toLocaleString()} Days`;
+    document.getElementById('resWorkDays').innerText = `Approx ${prefix}${workDays} working days`;
+    document.getElementById('resAgileSprints').innerText = `${prefix}${sprints} Sprints`;
+    document.getElementById('resYearPct').innerText = `${yrPct}%`;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('wksStartDate').addEventListener('change', calculateWeeksBetween);
+    document.getElementById('wksEndDate').addEventListener('change', calculateWeeksBetween);
+    calculateWeeksBetween();
+});
+</script>
+                </div>
+                <article class="article-body">
+                    <h2>Mathematical Formulation of Week Intervals</h2>
+<p>In project scheduling, clinical medicine, educational semesters, and sprint planning, time is predominantly quantified in discrete units of <strong>weeks</strong> ($7 	ext{ solar days}$). Unlike months, which fluctuate between 28 and 31 days, a week is an invariant seven-day continuum containing exactly:</p>
+
+$$1 	ext{ Week} = 7 	ext{ days} = 168 	ext{ hours} = 10,080 	ext{ minutes} = 604,800 	ext{ seconds}$$
+
+<p>Given any two calendar dates $D_1$ and $D_2$, the exact number of completed whole weeks $W_{	ext{whole}}$ and remaining residual days $D_{	ext{residual}}$ is evaluated via integer floor division and modulo arithmetic:</p>
+
+$$\Delta D_{	ext{total}} = |D_2 - D_1|$$
+$$W_{	ext{whole}} = \left\lfloor rac{\Delta D_{	ext{total}}}{7} 
+ight
+floor$$
+$$D_{	ext{residual}} = \Delta D_{	ext{total}} mod 7$$
+
+<p>The continuous fractional decimal week value $W_{	ext{decimal}}$ evaluates as:</p>
+
+$$W_{	ext{decimal}} = rac{\Delta D_{	ext{total}}}{7} = W_{	ext{whole}} + rac{D_{	ext{residual}}}{7}$$
+
+<h2>Clinical Obstetric Gestational Age (ACOG Protocol)</h2>
+<p>In obstetrics and gynecology, fetal development is measured strictly in <strong>completed gestational weeks and days</strong> calculated from the first day of the patient's Last Menstrual Period (LMP). Under American College of Obstetricians and Gynecologists (ACOG) Committee Opinion No. 700:</p>
+
+<ul>
+    <li><strong>Estimated Date of Delivery (EDD):</strong> Evaluated at exactly 40 weeks and 0 days ($280 	ext{ days}$) from LMP.</li>
+    <li><strong>First Trimester:</strong> $0	ext{w } 0	ext{d}$ through $13	ext{w } 6	ext{d}$.</li>
+    <li><strong>Second Trimester:</strong> $14	ext{w } 0	ext{d}$ through $27	ext{w } 6	ext{d}$.</li>
+    <li><strong>Third Trimester:</strong> $28	ext{w } 0	ext{d}$ through birth.</li>
+    <li><strong>Full Term Window:</strong> Spans between $39	ext{w } 0	ext{d}$ and $40	ext{w } 6	ext{d}$.</li>
+</ul>
+
+<h3>Comparative Calendar Week Division Matrix</h3>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Time Horizon</th>
+            <th>Total Days</th>
+            <th>Completed Whole Weeks</th>
+            <th>Decimal Weeks</th>
+            <th>Agile 2-Week Sprints</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>Standard 30-Day Month</td><td>30 days</td><td>4 weeks + 2 days</td><td>4.286 weeks</td><td>2.14 sprints</td></tr>
+        <tr><td>Standard 31-Day Month</td><td>31 days</td><td>4 weeks + 3 days</td><td>4.429 weeks</td><td>2.21 sprints</td></tr>
+        <tr><td>Calendar Quarter (Q1-Q4)</td><td>91 days</td><td>13 weeks exactly</td><td>13.000 weeks</td><td>6.50 sprints</td></tr>
+        <tr><td>Common Year (365 Days)</td><td>365 days</td><td>52 weeks + 1 day</td><td>52.143 weeks</td><td>26.07 sprints</td></tr>
+        <tr><td>Leap Year (366 Days)</td><td>366 days</td><td>52 weeks + 2 days</td><td>52.286 weeks</td><td>26.14 sprints</td></tr>
+        <tr><td>Full Gestation Term</td><td>280 days</td><td>40 weeks exactly</td><td>40.000 weeks</td><td>20.00 sprints</td></tr>
+    </tbody>
+</table>
+
+<h2>Agile Scrum Sprint Capacity and Release Cadence</h2>
+<p>In modern software engineering, Scrum teams execute work in standardized time-boxed iterations designated as <strong>sprints</strong>, typically lasting two weeks ($14 	ext{ calendar days}$ or $10 	ext{ business days}$). Calculating the exact number of weeks between project milestones enables release managers to establish velocity targets:</p>
+
+$$	ext{Sprint Count} = \left\lfloor rac{W_{	ext{decimal}}}{2} 
+ight
+floor$$
+$$	ext{Sprint Velocity Capacity} = 	ext{Sprint Count} 	imes ar{v}_{	ext{team}}$$
+
+<div class="worked-example-card">
+    <h3>Worked Clinical &amp; Project Management Case Study: Clinical Trial Gestation Horizon</h3>
+    <p><strong>Scenario:</strong> A clinical pharmaceutical research study tracks neonate developmental outcomes for mothers enrolled on <strong>January 12, 2026</strong> through study conclusion on <strong>September 28, 2026</strong>. Calculate: (1) total elapsed days, (2) whole weeks and residual days, (3) decimal weeks, and (4) how many 2-week clinical audit check-ins occur during this interval.</p>
+    
+    <div class="step-solution">
+        <h4>Step 1: Compute Total Elapsed Days</h4>
+        <p>From Jan 12 to Sept 28 in 2026 (common year):</p>
+        <p>Jan: 19 days, Feb: 28 days, Mar: 31 days, Apr: 30 days, May: 31 days, Jun: 30 days, Jul: 31 days, Aug: 31 days, Sept: 28 days.</p>
+        $$\Delta D = 19 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 28 = 259 	ext{ days}$$
+
+        <h4>Step 2: Partition into Whole Weeks and Residual Days</h4>
+        $$W_{	ext{whole}} = \lfloor 259 / 7 
+floor = 37 	ext{ weeks}$$
+        $$D_{	ext{residual}} = 259 mod 7 = 0 	ext{ residual days}$$
+        <p><strong>Result:</strong> Exactly 37 weeks and 0 days!</p>
+
+        <h4>Step 3: Evaluate Decimal Weeks</h4>
+        $$W_{	ext{decimal}} = rac{259}{7} = 37.000 	ext{ decimal weeks}$$
+
+        <h4>Step 4: Clinical Bi-Weekly Audit Count</h4>
+        $$	ext{Audits} = \lfloor 37 / 2 
+floor = 18 	ext{ complete bi-weekly audits (with 1 remaining week)}$$
+    </div>
+</div>
+
+<h2>Common Implementation Pitfalls in Week Calculations</h2>
+<ol>
+    <li><strong>Confusing Elapsed Weeks with Calendar Week Numbers:</strong> Computing elapsed weeks ($\Delta D / 7$) measures duration. In contrast, ISO 8601 week numbers ($W01$ to $W53$) represent calendar positions anchored to January 4th.</li>
+    <li><strong>Leap Year Day Shifts:</strong> A leap year introduces February 29th, shifting all post-February week offsets by exactly $+1/7 	ext{ weeks}$ ($+0.143	ext{ weeks}$).</li>
+    <li><strong>Inclusive vs. Exclusive Date Bounds:</strong> If both start and end days are inclusive (e.g., counting both Monday and Friday as active days), add 1 to the raw day difference before dividing by 7.</li>
+</ol>
+
+
+<h2>Academic Semester Planning and Accreditation Credit Hour Standards</h2>
+<p>Higher education institutions accredited in the United States operate under Department of Education Title IV regulations (34 CFR § 600.2) defining the statutory <strong>credit hour</strong>. A standard academic semester spans exactly 15 to 16 calendar weeks, comprising 14 weeks of formal direct instruction and 1 week of final examinations. One semester credit hour legally mandates a minimum of 1 hour (50 minutes) of classroom instruction plus 2 hours of out-of-class student work per week across the 15-week term:</p>
+
+$$	ext{Direct Instruction Time} = 15 	ext{ weeks} 	imes 50 	ext{ minutes} = 750 	ext{ minutes} = 12.5 	ext{ hours per credit}$$
+
+<p>University registrars and curriculum committees compute weeks between term start and graduation dates to certify that accelerated summer terms (typically 6, 8, or 10 weeks) deliver identical cumulative contact hours by proportionally increasing weekly lecture durations.</p>
+
+<h2>Commercial Agriculture and Phenological Crop Maturation Horizons</h2>
+<p>In commercial agronomy, crop production cycles from seed germination to harvest are quantified in standardized calendar week horizons. For instance, greenhouse floriculture schedules poinsettia planting precisely 14 to 16 weeks prior to the Thanksgiving holiday. In poultry farming and livestock management, broiler chicken production operates on an exact 6- to 8-week growth cycle, while bovine gestation spans an average of 40.5 weeks (283 days). Measuring elapsed weeks allows automated feeding and climate control systems to transition through calibrated nutritional growth phases.</p>
+<section class="faq-section">
+    <h2>Frequently Asked Questions About Weeks Between Dates</h2>
+    <div class="faq-item">
+        <h3>How do you calculate weeks and days between two dates?</h3>
+        <p>Find the total number of days between the two dates, divide by 7 to get whole completed weeks, and the remainder gives the residual leftover days.</p>
+    </div>
+    <div class="faq-item">
+        <h3>How many weeks are in a standard calendar year?</h3>
+        <p>A common year has 365 days, which equals 52 weeks and 1 day (52.143 weeks). A leap year has 366 days, which equals 52 weeks and 2 days (52.286 weeks).</p>
+    </div>
+    <div class="faq-item">
+        <h3>How do obstetricians calculate pregnancy gestation weeks?</h3>
+        <p>Obstetricians measure gestational age from the first day of the last menstrual period (LMP) in completed weeks and days (e.g. 24 weeks and 3 days), with full term defined at 40 weeks.</p>
+    </div>
+    <div class="faq-item">
+        <h3>How many two-week Agile sprints fit in a calendar quarter?</h3>
+        <p>A standard quarter has 13 weeks (91 days), which comfortably accommodates 6 two-week development sprints (12 weeks) plus 1 buffer/hardening week.</p>
+    </div>
+</section>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">📅</span>
+            <h3 class="widget-title">Related Date & Time Utility</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="date-difference-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Date Difference & Business Days</a></li>
+            <li><a href="hours-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Work Hours Calculator</a></li>
+            <li><a href="week-number-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> ISO Week Number</a></li>
+            <li><a href="add-days-to-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Add Days to Date</a></li>
+            <li><a href="add-time-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Add Time Calculator</a></li>
+            <li><a href="business-days-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Business Days Calculator</a></li>
+            <li><a href="countdown-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Countdown Calculator</a></li>
+            <li><a href="date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calendar Date Calculator</a></li>
+            <li><a href="day-of-week-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Day of the Week Calculator</a></li>
+            <li><a href="day-of-year-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Day of the Year Calculator</a></li>
+            <li><a href="decimal-time-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Decimal Time Calculator</a></li>
+            <li><a href="leap-year-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Leap Year Calculator</a></li>
+            <li><a href="months-between-dates-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Months Between Dates</a></li>
+            <li><a href="quarter-of-year-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Quarter of Year Calculator</a></li>
+            <li><a href="time-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Time Calculator (Sexagesimal)</a></li>
+            <li><a href="time-duration-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Time Duration Calculator</a></li>
+            <li><a href="weeks-between-dates-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Weeks Between Dates</a></li>
+            <li><a href="age-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exact Age Calculator</a></li>
+            <li><a href="salary-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Salary & Paycheck Calculator</a></li>
+            <li><a href="unit-converter.html" class="sidebar-link-item"><span class="link-bullet">›</span> Universal Multi-Unit Converter</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="datetime.html" class="sidebar-category-link">View All Date & Time Utility Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers peer-reviewed chronometric computing algorithms, professional engineering suites, and enterprise financial calendar engines compliant with ISO 8601, NCEES, and FLSA reporting standards.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Professional Suites</h4>
+                    <ul>
+                        <li><a href="datetime.html">Date &amp; Time Utilities</a></li>
+                        <li><a href="engineering.html">Engineering Tools</a></li>
+                        <li><a href="finance.html">Financial Planning</a></li>
+                        <li><a href="math.html">Mathematics &amp; Statistics</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Core Calculators</h4>
+                    <ul>
+                        <li><a href="time-card-calculator.html">Time Card Calculator</a></li>
+                        <li><a href="time-duration-calculator.html">Time Duration Calculator</a></li>
+                        <li><a href="weeks-between-dates-calculator.html">Weeks Between Dates</a></li>
+                        <li><a href="best-engineering-calculator.html">Best Engineering Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="converter.html">Metric Converters</a></li>
+                        <li><a href="cable-sizing-guide.html">Cable Sizing Guide</a></li>
+                        <li><a href="engineering-formulas.html">Engineering Formulas</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precision engineering, chronometry, and mathematical computational systems.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

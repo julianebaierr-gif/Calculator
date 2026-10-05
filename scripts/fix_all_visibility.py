@@ -81,6 +81,7 @@ CAT_MAP = {
             ("smoking-cost-calculator.html", "Smoking Cost & Opportunity", "🚬", "Cash outlays, S&P 500 compound loss & 11-min life loss", "FV = PMT·[((1+r)ⁿ - 1)/r] | 11 mins lost/cigarette"),
             ("retirement-calculator.html", "Retirement & FIRE Planner", "🏖️", "Trinity study 4% rule, nest egg sizing & inflation", "Nest Egg = (Spend - Pension)/SWR | FIRE = 25×Expenses"),
             ("overtime-calculator.html", "Overtime Pay Calculator", "💼", "FLSA time-and-a-half, regular rate & CA double time", "W_ot = 1.5·R_reg | CA Daily 2.0x Double Time"),
+            ("time-card-calculator.html", "Time Card & Weekly Timesheet", "💼", "7-day timesheet, daily & weekly overtime & gross pay", "W_gross = (H_reg · R) + (H_ot · 1.5R) | FLSA 785.48"),
         ]
     },
     "math.html": {
@@ -205,6 +206,9 @@ CAT_MAP = {
             ("motor-starter-sizing-calculator.html", "Motor Starter Sizing (NEC 430)", "⚙️", "NEMA sizes, IEC AC-3 contactors, overloads & breaker OCPD", "FLA table 430.250 | 125% ampacity | Inverse breaker 250%"),
             ("nec-load-calculation-calculator.html", "NEC Load Calculation (Residential)", "🏡", "Dwelling service sizing, panel amps & SE cable per NEC 220", "Optional 220.82: 10kVA @ 100%, 40% rem + HVAC @ 100%"),
             ("neutral-conductor-sizing-calculator.html", "Neutral Conductor Sizing", "⚡", "3-Phase unbalance, triplen harmonics & NEC 220.61 reduction", "In_fund = √(Ia²+...+Ic² - IaIb...) | Triplen In_3rd = 3·Ih3"),
+            ("best-engineering-calculator.html", "Best Engineering Calculator Guide", "🖩", "NCEES FE/PE exam legal models, Casio vs TI vs HP", "NCEES FE/PE Approved | TI-36X Pro & Casio ClassWiz"),
+            ("cable-sizing-guide.html", "Cable Sizing Guide & Selection", "🔌", "IEC 60364-5-52, BS 7671, NEC 310 ampacity & drop", "Iz = Ib / (Ca·Cg·Ci) | k²S² ≥ I²t | 3% Drop"),
+            ("engineering-formulas.html", "Engineering Formulas Compendium", "📐", "Master multi-discipline formulas & live equation solver", "σ = My/I | hf = f(L/D)(v²/2g) | P = √3·VI·cosφ"),
         ]
     },
     "solar-energy.html": {
@@ -399,6 +403,8 @@ CAT_MAP = {
             ("months-between-dates-calculator.html", "Months Between Dates", "📅", "Calendar month diff, fractional months & 30/360 basis", "ΔM = (Y2-Y1)·12 + (M2-M1) | 30/360 & Actual"),
             ("quarter-of-year-calculator.html", "Quarter of Year Calculator", "📊", "Q1-Q4 calendar, fiscal government & retail 4-4-5", "Q = ⌈M/3⌉ | US Federal & NRF 4-4-5"),
             ("time-calculator.html", "Time Calculator (Sexagesimal)", "⏰", "Add, subtract, multiply, divide durations & takt time", "T_sec = H·3600 + M·60 + S | Takt = T_avail/D"),
+            ("time-duration-calculator.html", "Time Duration Calculator", "⏱️", "Exact elapsed duration, decimal hours & ISO 8601", "Δt = t_end - t_start | P[n]DT[n]H[n]M[n]S"),
+            ("weeks-between-dates-calculator.html", "Weeks Between Dates", "📅", "Full weeks, days, decimal weeks & gestation age", "W = ⌊ΔD / 7⌋ | D_rem = ΔD mod 7 | 40w Gestation"),
         ]
     },
     "converter.html": {
