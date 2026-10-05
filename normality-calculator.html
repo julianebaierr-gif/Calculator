@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Normality Calculator - Chemical Equivalent Concentration (N = M * n)</title>
+  <meta name="description" content="Calculate normality (N = M * n_eq), equivalent weight (EW = M/n), acid-base titration dilution (N1V1 = N2V2), and redox equivalents in analytical chemistry.">
+  <link rel="canonical" href="https://calchub.org/normality-calculator.html">
+  <meta property="og:title" content="Normality Calculator - Equivalent Concentration &amp; Titration Solver">
+  <meta property="og:description" content="Free chemistry normality calculator. Compute normality N = M * n, equivalent mass, acid-base neutralization N1V1 = N2V2, and redox equivalents with step-by-step proofs.">
+  <meta property="og:url" content="https://calchub.org/normality-calculator.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Normality Calculator - Analytical Chemistry Tool">
+  <meta name="twitter:description" content="Solve normality, equivalents per liter, and volumetric titrations across acids, bases, and redox reagents with worked case studies.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Normality Calculator",
+    "url": "https://calchub.org/normality-calculator.html",
+    "description": "Calculates solution normality (N = equivalents / Liter), equivalent weights, and volumetric titration neutralizations.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the relationship between normality and molarity?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Normality (N) equals molarity (M) multiplied by the equivalence factor (n_eq): N = M * n_eq. For monoprotic acids like HCl (n = 1), 1 M = 1 N. For diprotic acids like H2SO4 (n = 2), 1 M = 2 N. For triprotic acids like H3PO4 (n = 3), 1 M = 3 N."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is equivalent weight (EW) calculated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Equivalent weight is calculated by dividing the compound's molar mass (M) by its valence or equivalence factor (n_eq): EW = Molar Mass / n_eq. For sulfuric acid (H2SO4, M = 98.08 g/mol, n = 2), EW = 98.08 / 2 = 49.04 g/equivalent."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the titration neutralization formula using normality?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "At the equivalence point of any volumetric titration, the number of equivalents of acid exactly equals the number of equivalents of base: N1 * V1 = N2 * V2, where N1 and V1 are the normality and volume of solution 1, and N2 and V2 are the normality and volume of solution 2."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the equivalence factor for redox reactions?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "In oxidation-reduction (redox) reactions, the equivalence factor (n) is the number of moles of electrons gained or lost per mole of reactant in the balanced half-reaction. For example, in acidic permanganate titrations (MnO4- + 5e- -> Mn2+), n = 5; thus a 1 M KMnO4 solution is 5 N."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">CalcHub</a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="math.html">Math &amp; Statistics</a>
+        <a href="converter.html">Converters</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="chemical.html">Chemical &amp; Water</a> &rsaquo;
+      <span>Normality Calculator</span>
+    </nav>
+
+    <div class="page-header">
+      <h1 class="page-title">Normality Calculator</h1>
+      <p class="page-desc">Calculate chemical normality ($N = M \times n_{\text{eq}}$), gram equivalent weights, and volumetric titration neutralizations ($N_1 V_1 = N_2 V_2$).</p>
+    </div>
+
+    <div class="calc-grid">
+      <!-- Calculator Column -->
+      <div class="calc-card">
+        <div class="calc-header">
+          <h2>Normality &amp; Equivalents Solver</h2>
+        </div>
+
+        <!-- Mode Selection -->
+        <div class="form-group">
+          <label for="norm-mode">Calculation Mode:</label>
+          <select id="norm-mode" class="form-control">
+            <option value="molarity-to-norm" selected>From Molarity ($M$) &amp; Equivalence Factor ($n_{\text{eq}}$) &rarr; Normality ($N$)</option>
+            <option value="mass-to-norm">From Solute Mass ($m$), Molar Mass ($M$) &amp; Volume ($V$) &rarr; Normality</option>
+            <option value="titration">Titration Neutralization ($N_1 V_1 = N_2 V_2$)</option>
+          </select>
+        </div>
+
+        <!-- Chemical Preset -->
+        <div class="form-group" id="norm-preset-group">
+          <label for="norm-preset">Common Chemical Reagent Preset:</label>
+          <select id="norm-preset" class="form-control">
+            <option value="custom">-- Custom Chemical Formula --</option>
+            <option value="hcl" selected>Hydrochloric Acid (HCl: M = 36.46 g/mol, n = 1 eq/mol)</option>
+            <option value="h2so4">Sulfuric Acid (H2SO4: M = 98.08 g/mol, n = 2 eq/mol)</option>
+            <option value="h3po4">Phosphoric Acid (H3PO4: M = 98.00 g/mol, n = 3 eq/mol)</option>
+            <option value="naoh">Sodium Hydroxide (NaOH: M = 40.00 g/mol, n = 1 eq/mol)</option>
+            <option value="caoh2">Calcium Hydroxide (Ca(OH)2: M = 74.09 g/mol, n = 2 eq/mol)</option>
+            <option value="kmno4-acid">Potassium Permanganate (KMnO4 acidic: M = 158.03, n = 5 e-)</option>
+            <option value="k2cr2o7">Potassium Dichromate (K2Cr2O7 acidic: M = 294.18, n = 6 e-)</option>
+            <option value="na2co3">Sodium Carbonate (Na2CO3: M = 105.99 g/mol, n = 2 eq/mol)</option>
+            <option value="oxalic">Oxalic Acid Dihydrate (H2C2O4·2H2O: M = 126.07, n = 2)</option>
+          </select>
+        </div>
+
+        <!-- Inputs Container -->
+        <div id="norm-molarity-panel">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="norm-molarity-val">Molar Concentration ($M$ in mol/L):</label>
+              <input type="number" id="norm-molarity-val" class="form-control" value="1.0" step="any" min="0.0001">
+            </div>
+            <div class="form-group">
+              <label for="norm-neq-val">Equivalence Factor ($n_{\text{eq}}$):</label>
+              <input type="number" id="norm-neq-val" class="form-control" value="1" step="1" min="1" max="10">
+            </div>
+          </div>
+        </div>
+
+        <div id="norm-mass-panel" style="display: none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="norm-solute-mass">Solute Mass ($m$ in grams):</label>
+              <input type="number" id="norm-solute-mass" class="form-control" value="49.04" step="any" min="0.0001">
+            </div>
+            <div class="form-group">
+              <label for="norm-mw-val">Molar Mass ($M$ in g/mol):</label>
+              <input type="number" id="norm-mw-val" class="form-control" value="98.079" step="any" min="0.01">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="norm-neq-mass">Equivalence Factor ($n_{\text{eq}}$):</label>
+              <input type="number" id="norm-neq-mass" class="form-control" value="2" step="1" min="1" max="10">
+            </div>
+            <div class="form-group">
+              <label for="norm-vol-val">Total Volume ($V$ in Liters):</label>
+              <input type="number" id="norm-vol-val" class="form-control" value="1.0" step="any" min="0.0001">
+            </div>
+          </div>
+        </div>
+
+        <div id="norm-titration-panel" style="display: none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="titr-n1">Reagent 1 Normality ($N_1$):</label>
+              <input type="number" id="titr-n1" class="form-control" value="0.100" step="any" min="0.0001">
+            </div>
+            <div class="form-group">
+              <label for="titr-v1">Reagent 1 Volume ($V_1$ in mL):</label>
+              <input type="number" id="titr-v1" class="form-control" value="25.0" step="any" min="0.0001">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="titr-solve-for">Solve For:</label>
+              <select id="titr-solve-for" class="form-control">
+                <option value="n2" selected>Reagent 2 Normality (N2)</option>
+                <option value="v2">Reagent 2 Volume (V2 in mL)</option>
+              </select>
+            </div>
+            <div class="form-group" id="titr-v2-group">
+              <label for="titr-v2">Reagent 2 Titrated Volume ($V_2$ in mL):</label>
+              <input type="number" id="titr-v2" class="form-control" value="20.0" step="any" min="0.0001">
+            </div>
+            <div class="form-group" id="titr-n2-group" style="display: none;">
+              <label for="titr-n2">Reagent 2 Known Normality ($N_2$):</label>
+              <input type="number" id="titr-n2" class="form-control" value="0.125" step="any" min="0.0001">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="norm-calc-btn" class="btn btn-primary">Calculate Normality</button>
+          <button type="button" id="norm-reset-btn" class="btn btn-secondary">Reset to Default</button>
+        </div>
+
+        <!-- Output Hero and Cards -->
+        <div id="norm-results" class="results-container" style="margin-top: 1.5rem;">
+          <div class="result-hero-card">
+            <div class="result-label" style="font-size: 0.875rem; color: var(--text-muted, #64748b); text-transform: uppercase; font-weight: 600;">Solution Normality ($N$)</div>
+            <div id="norm-primary-out" style="font-size: 2.25rem; font-weight: 800; color: var(--primary, #2563eb); margin: 0.25rem 0;">1.000 N</div>
+            <div id="norm-status-out" style="font-size: 1rem; color: var(--text-secondary, #475569); font-weight: 600;">1.000 equivalents per liter</div>
+          </div>
+
+          <div class="summary-metrics-grid">
+            <div class="metric-card">
+              <div style="font-size: 0.75rem; color: var(--text-muted, #64748b);">Molarity ($M$)</div>
+              <div id="norm-molarity-out" style="font-size: 1.15rem; font-weight: 700;">1.000 M</div>
+            </div>
+            <div class="metric-card">
+              <div style="font-size: 0.75rem; color: var(--text-muted, #64748b);">Equivalent Weight ($EW$)</div>
+              <div id="norm-ew-out" style="font-size: 1.15rem; font-weight: 700;">36.46 g/eq</div>
+            </div>
+            <div class="metric-card">
+              <div style="font-size: 0.75rem; color: var(--text-muted, #64748b);">Equivalents Factor ($n_{\text{eq}}$)</div>
+              <div id="norm-neq-out" style="font-size: 1.15rem; font-weight: 700;">1 eq/mol</div>
+            </div>
+            <div class="metric-card">
+              <div style="font-size: 0.75rem; color: var(--text-muted, #64748b);">Mass per Liter (g/L)</div>
+              <div id="norm-gpl-out" style="font-size: 1.15rem; font-weight: 700;">36.46 g/L</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Reference Sidebar -->
+      <aside class="sidebar-card">
+        <h3>Common Equivalence Factors ($n_{\text{eq}}$)</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary, #475569);">Valence factor based on reaction mechanism:</p>
+        <ul style="font-size: 0.875rem; line-height: 1.6; margin-left: 1.25rem;">
+          <li><strong>Hydrochloric Acid (HCl):</strong> \(n = 1\)</li>
+          <li><strong>Nitric Acid (HNO₃):</strong> \(n = 1\)</li>
+          <li><strong>Sulfuric Acid (H₂SO₄):</strong> \(n = 2\)</li>
+          <li><strong>Phosphoric Acid (H₃PO₄):</strong> \(n = 3\)</li>
+          <li><strong>Sodium Hydroxide (NaOH):</strong> \(n = 1\)</li>
+          <li><strong>Calcium Hydroxide (Ca(OH)₂):</strong> \(n = 2\)</li>
+          <li><strong>KMnO₄ (Acidic Medium):</strong> \(n = 5\) (redox)</li>
+          <li><strong>K₂Cr₂O₇ (Acidic Medium):</strong> \(n = 6\) (redox)</li>
+        </ul>
+
+        <h3 style="margin-top: 1.25rem;">Normality Formulas</h3>
+        <ul style="font-size: 0.875rem; line-height: 1.6; margin-left: 1.25rem;">
+          <li>\(N = M \times n_{\text{eq}}\)</li>
+          <li>\(EW = \frac{M_{\text{molar}}}{n_{\text{eq}}}\)</li>
+          <li>\(N = \frac{m / EW}{V_{\text{liters}}}\)</li>
+          <li>\(N_1 V_1 = N_2 V_2\)</li>
+        </ul>
+      </aside>
+    </div>
+
+    <!-- Long-Form Informational Engineering Article (1,400+ Words) -->
+    <article class="article-body">
+      <h2>1. The Definition and Theoretical Role of Normality in Chemistry</h2>
+      <p>Normality (designated by the capital letter \(N\)), also termed **equivalent concentration**, is a measure of concentration in analytical chemistry defined as the number of gram equivalents (equivalents, \(\text{eq}\)) of a reactive solute contained in one liter of finished solution. Formally:</p>
+      $$\text{Normality } (N) = \frac{\text{Equivalents of Solute}}{\text{Volume of Solution in Liters}} = \frac{n_{\text{eq, total}}}{V_{\text{solution (L)}}}$$
+      <p>While molarity (\(M = \text{mol/L}\)) counts the total chemical molecules or formula units in solution regardless of their functional reactivity, normality specifically counts the reactive capacity of the solute based on the specific type of chemical transformation taking place. Consequently, a single chemical substance can possess multiple different normalities depending on the target reaction medium.</p>
+      <p>The universal mathematical bridge linking normality directly to molarity is:</p>
+      $$N = M \times n_{\text{eq}}$$
+      <p>Where \(M\) is the molar concentration (\(\text{mol/L}\)), and \(n_{\text{eq}}\) is the dimensionless **equivalence factor** (valence factor or stoichiometric reactive capacity, in equivalents per mole, \(\text{eq/mol}\)).</p>
+
+      <h2>2. Determining the Equivalence Factor (\(n_{\text{eq}}\)) Across Reaction Types</h2>
+      <p>The value of \(n_{\text{eq}}\) depends fundamentally on the reaction category:</p>
+
+      <h3>A. Acid-Base Reactions (Proton Exchange)</h3>
+      <p>For acids, \(n_{\text{eq}}\) equals the number of ionizable, dissociable hydronium protons (\(\text{H}^+\)) that one molecule of the acid can donate to a base. For bases, \(n_{\text{eq}}\) equals the number of hydroxide ions (\(\text{OH}^-\)) it can supply, or the number of protons it can accept:</p>
+      <ul>
+        <li><strong>Monoprotic Acids (\(n = 1\)):</strong> Hydrochloric acid (\(\text{HCl}\)), nitric acid (\(\text{HNO}_3\)), and acetic acid (\(\text{CH}_3\text{COOH}\)) each donate exactly 1 proton:
+        $$\text{HCl} \to \text{H}^+ + \text{Cl}^- \implies 1.0\text{ M HCl} = 1.0\text{ N HCl}$$</li>
+        <li><strong>Diprotic Acids (\(n = 2\)):</strong> Sulfuric acid (\(\text{H}_2\text{SO}_4\)) and oxalic acid (\(\text{H}_2\text{C}_2\text{O}_4\)) donate 2 protons:
+        $$\text{H}_2\text{SO}_4 \to 2\text{H}^+ + \text{SO}_4^{2-} \implies 1.0\text{ M H}_2\text{SO}_4 = 2.0\text{ N H}_2\text{SO}_4$$</li>
+        <li><strong>Triprotic Acids (\(n = 3\)):</strong> Phosphoric acid (\(\text{H}_3\text{PO}_4\)) donates up to 3 protons:
+        $$\text{H}_3\text{PO}_4 \to 3\text{H}^+ + \text{PO}_4^{3-} \implies 1.0\text{ M H}_3\text{PO}_4 = 3.0\text{ N H}_3\text{PO}_4$$</li>
+        <li><strong>Hydroxide Bases:</strong> Sodium hydroxide (\(\text{NaOH}\), \(n=1\)) produces 1 eq/mol, whereas calcium hydroxide (\(\text{Ca(OH)}_2\), \(n=2\)) produces 2 eq/mol. Therefore, a \(0.5\text{ M Ca(OH)}_2\) solution is \(1.0\text{ N}\).</li>
+      </ul>
+
+      <h3>B. Oxidation-Reduction (Redox) Reactions (Electron Exchange)</h3>
+      <p>In redox chemistry, \(n_{\text{eq}}\) equals the number of moles of electrons transferred (gained or lost) per mole of reagent according to the balanced half-reaction:</p>
+      <ul>
+        <li><strong>Potassium Permanganate in Acidic Medium (\(n = 5\)):</strong>
+        $$\text{MnO}_4^- + 8\text{H}^+ + 5e^- \longrightarrow \text{Mn}^{2+} + 4\text{H}_2\text{O} \implies n = 5 \implies 1.0\text{ M KMnO}_4 = 5.0\text{ N}$$</li>
+        <li><strong>Potassium Permanganate in Strongly Alkaline Medium (\(n = 1\)):</strong>
+        $$\text{MnO}_4^- + e^- \longrightarrow \text{MnO}_4^{2-} \implies n = 1 \implies 1.0\text{ M KMnO}_4 = 1.0\text{ N}$$</li>
+        <li><strong>Potassium Dichromate in Acidic Medium (\(n = 6\)):</strong>
+        $$\text{Cr}_2\text{O}_7^{2-} + 14\text{H}^+ + 6e^- \longrightarrow 2\text{Cr}^{3+} + 7\text{H}_2\text{O} \implies n = 6 \implies 1.0\text{ M K}_2\text{Cr}_2\text{O}_7 = 6.0\text{ N}$$</li>
+      </ul>
+
+      <h3>C. Precipitation and Complexation Reactions (Ionic Charge)</h3>
+      <p>For neutral salts involved in double-displacement or precipitation titrations, \(n_{\text{eq}}\) equals the total positive electrical charge (valence) of the cation present in the formula unit:</p>
+      <ul>
+        <li>Sodium chloride (\(\text{NaCl}\)): \(\text{Na}^+ \implies n = 1\).</li>
+        <li>Calcium chloride (\(\text{CaCl}_2\)): \(\text{Ca}^{2+} \implies n = 2\).</li>
+        <li>Aluminum sulfate (\(\text{Al}_2(\text{SO}_4)_3\)): Two \(\text{Al}^{3+}\) ions \(\implies n = 2 \times 3 = 6\). A \(1.0\text{ M Al}_2(\text{SO}_4)_3\) solution is \(6.0\text{ N}\).</li>
+      </ul>
+
+      <h2>3. Equivalent Weight (\(EW\)) and Mass Compounding</h2>
+      <p>The equivalent weight (\(EW\), historically called gram equivalent) is the mass of a substance that will supply, consume, or react with exactly one mole of hydrogen ions (\(1.008\text{ g H}^+\)), one mole of electrons (\(6.022 \times 10^{23}\text{ electrons}\)), or one equivalent of any other reactant:</p>
+      $$EW = \frac{\text{Molar Mass } (M)}{n_{\text{eq}}}$$
+      <p>To compound \(V\) liters of an \(N\)-normal solution from pure dry solid reagent of known equivalent weight:</p>
+      $$\text{Required Solute Mass } (m) = N \times V \times EW = N \times V \times \left(\frac{M}{n_{\text{eq}}}\right)$$
+
+      <h2>4. The Universal Titration Equivalence Law (\(N_1 V_1 = N_2 V_2\))</h2>
+      <p>The primary advantage of normality over molarity is the simplification of volumetric titration calculations. When using molarity, stoichiometric coefficients (\(a\text{A} + b\text{B} \to \text{Products}\)) require cross-multiplying mole ratios (\(M_1 V_1 / a = M_2 V_2 / b\)). In contrast, by definition, one equivalent of any acid reacts completely with exactly one equivalent of any base (or one equivalent of oxidizer with one equivalent of reducer). Therefore, at the titration stoichiometric endpoint:</p>
+      $$\text{Equivalents of Analyte} = \text{Equivalents of Titrant}$$
+      $$N_1 \times V_1 = N_2 \times V_2$$
+      <p>Where \(N_1\) and \(V_1\) are the normality and volume of the first reagent, and \(N_2\) and \(V_2\) are the normality and volume of the second reagent. This linear relation holds universally regardless of whether the acid is monoprotic, diprotic, or triprotic, eliminating balancing errors during routine laboratory assays.</p>
+
+      <h2>5. Comprehensive Reagent Normality Reference Table</h2>
+      <p>The following analytical chemistry benchmark table details molar masses, equivalence factors, and resulting equivalent weights for standardized volumetric reagents:</p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Reagent Name</th>
+              <th>Formula</th>
+              <th>Molar Mass (\(M\))</th>
+              <th>Equivalence Factor (\(n_{\text{eq}}\))</th>
+              <th>Equivalent Weight (\(EW\))</th>
+              <th>Mass to Prepare 1.0 L of 1.0 N Solution</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Hydrochloric Acid</td>
+              <td>HCl</td>
+              <td>36.46 g/mol</td>
+              <td>1 eq/mol (acid)</td>
+              <td>36.46 g/eq</td>
+              <td>36.46 g</td>
+            </tr>
+            <tr>
+              <td>Nitric Acid</td>
+              <td>HNO₃</td>
+              <td>63.01 g/mol</td>
+              <td>1 eq/mol (acid)</td>
+              <td>63.01 g/eq</td>
+              <td>63.01 g</td>
+            </tr>
+            <tr>
+              <td>Sulfuric Acid</td>
+              <td>H₂SO₄</td>
+              <td>98.08 g/mol</td>
+              <td>2 eq/mol (acid)</td>
+              <td>49.04 g/eq</td>
+              <td>49.04 g</td>
+            </tr>
+            <tr>
+              <td>Phosphoric Acid</td>
+              <td>H₃PO₄</td>
+              <td>98.00 g/mol</td>
+              <td>3 eq/mol (acid)</td>
+              <td>32.67 g/eq</td>
+              <td>32.67 g</td>
+            </tr>
+            <tr>
+              <td>Sodium Hydroxide</td>
+              <td>NaOH</td>
+              <td>40.00 g/mol</td>
+              <td>1 eq/mol (base)</td>
+              <td>40.00 g/eq</td>
+              <td>40.00 g</td>
+            </tr>
+            <tr>
+              <td>Potassium Hydroxide</td>
+              <td>KOH</td>
+              <td>56.11 g/mol</td>
+              <td>1 eq/mol (base)</td>
+              <td>56.11 g/eq</td>
+              <td>56.11 g</td>
+            </tr>
+            <tr>
+              <td>Calcium Hydroxide</td>
+              <td>Ca(OH)₂</td>
+              <td>74.09 g/mol</td>
+              <td>2 eq/mol (base)</td>
+              <td>37.05 g/eq</td>
+              <td>37.05 g</td>
+            </tr>
+            <tr>
+              <td>Oxalic Acid Dihydrate</td>
+              <td>H₂C₂O₄·2H₂O</td>
+              <td>126.07 g/mol</td>
+              <td>2 eq/mol (acid)</td>
+              <td>63.03 g/eq</td>
+              <td>63.03 g</td>
+            </tr>
+            <tr>
+              <td>Potassium Permanganate</td>
+              <td>KMnO₄ (acidic)</td>
+              <td>158.03 g/mol</td>
+              <td>5 e⁻ (redox)</td>
+              <td>31.61 g/eq</td>
+              <td>31.61 g</td>
+            </tr>
+            <tr>
+              <td>Potassium Dichromate</td>
+              <td>K₂Cr₂O₇ (acidic)</td>
+              <td>294.18 g/mol</td>
+              <td>6 e⁻ (redox)</td>
+              <td>49.03 g/eq</td>
+              <td>49.03 g</td>
+            </tr>
+            <tr>
+              <td>Sodium Thiosulfate Pentahydrate</td>
+              <td>Na₂S₂O₃·5H₂O</td>
+              <td>248.18 g/mol</td>
+              <td>1 e⁻ (iodometry)</td>
+              <td>248.18 g/eq</td>
+              <td>248.18 g</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>6. Step-by-Step Worked Analytical Case Studies</h2>
+
+      <div class="worked-example-card">
+        <h3>Case Study 1: Standardizing Industrial Hydrochloric Acid via NaOH Titration</h3>
+        <p><strong>Scenario:</strong> An environmental water quality technician titrates an unknown wastewater stream containing hydrochloric acid (\(\text{HCl}\)). A \(25.0\text{ mL}\) sample of the acid requires exactly \(31.25\text{ mL}\) of standardized \(0.1040\text{ N}\) sodium hydroxide (\(\text{NaOH}\)) to reach the phenolphthalein end point. Calculate the exact normality and molarity of the acid sample.</p>
+        
+        <div class="step-solution">
+          <p><strong>Step 1: Identify titration parameters:</strong></p>
+          <ul>
+            <li>Volume of acid sample \(V_1 = 25.0\text{ mL}\)</li>
+            <li>Normality of titrant base \(N_2 = 0.1040\text{ N}\)</li>
+            <li>Titrated volume of base \(V_2 = 31.25\text{ mL}\)</li>
+          </ul>
+
+          <p><strong>Step 2: Apply the universal titration equation (\(N_1 V_1 = N_2 V_2\)):</strong></p>
+          $$N_1 \times 25.0\text{ mL} = 0.1040\text{ N} \times 31.25\text{ mL}$$
+          $$N_1 = \frac{0.1040 \times 31.25}{25.0} = \frac{3.250}{25.0} = 0.1300\text{ N}$$
+
+          <p><strong>Step 3: Convert normality to molarity:</strong></p>
+          <p>Since \(\text{HCl}\) is monoprotic (\(n_{\text{eq}} = 1\)):</p>
+          $$M = \frac{N}{n_{\text{eq}}} = \frac{0.1300\text{ N}}{1} = 0.1300\text{ M}$$
+
+          <p><strong>Step 4: Compute concentration in grams per liter:</strong></p>
+          $$C = M \times M_{\text{HCl}} = 0.1300\text{ mol/L} \times 36.46\text{ g/mol} = 4.740\text{ g/L}$$
+          <p><strong>Conclusion:</strong> The wastewater acid concentration is \(0.1300\text{ N}\) (\(0.1300\text{ M}\)), containing \(4.74\text{ g/L}\) of dissolved \(\text{HCl}\).</p>
+        </div>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 2: Preparing Standard 0.0500 N Potassium Permanganate Redox Solution</h3>
+        <p><strong>Scenario:</strong> A laboratory chemist needs to prepare \(2.00\text{ Liters}\) of standard \(0.0500\text{ N}\) potassium permanganate (\(\text{KMnO}_4\)) solution for iron ore titrations in dilute sulfuric acid. The molar mass of \(\text{KMnO}_4\) is \(158.034\text{ g/mol}\). Compute the required mass of pure analytical-grade \(\text{KMnO}_4\) crystals.</p>
+        
+        <div class="step-solution">
+          <p><strong>Step 1: Determine the redox equivalence factor (\(n_{\text{eq}}\)):</strong></p>
+          <p>In acidic iron assays, permanganate is reduced to manganese(II):</p>
+          $$\text{MnO}_4^- + 8\text{H}^+ + 5e^- \longrightarrow \text{Mn}^{2+} + 4\text{H}_2\text{O} \implies n_{\text{eq}} = 5\text{ eq/mol}$$
+
+          <p><strong>Step 2: Calculate equivalent weight (\(EW\)):</strong></p>
+          $$EW = \frac{M}{n_{\text{eq}}} = \frac{158.034\text{ g/mol}}{5} = 31.6068\text{ g/equivalent}$$
+
+          <p><strong>Step 3: Calculate required mass of reagent:</strong></p>
+          $$m = N \times V \times EW = 0.0500\text{ eq/L} \times 2.00\text{ L} \times 31.6068\text{ g/eq}$$
+          $$m = 0.1000\text{ eq} \times 31.6068\text{ g/eq} = 3.1607\text{ grams}$$
+
+          <p><strong>Step 4: Verify solution molarity:</strong></p>
+          $$M = \frac{N}{n_{\text{eq}}} = \frac{0.0500\text{ N}}{5} = 0.0100\text{ M (mol/L)}$$
+          <p><strong>Preparation Protocol:</strong> Dissolve exactly \(3.161\text{ grams}\) of pure \(\text{KMnO}_4\) crystals into deionized water and dilute to the calibration mark in a \(2.00\text{-L}\) volumetric flask.</p>
+        </div>
+      </div>
+
+      <h2>7. Frequently Asked Questions (Analytical Titrations &amp; Standards)</h2>
+      <div class="faq-accordion">
+        <details class="faq-item">
+          <summary>Why is normality declining in modern IUPAC publications?</summary>
+          <div class="faq-answer">
+            <p>IUPAC and modern physical chemistry textbooks increasingly discourage the standalone use of normality because it is ambiguous without specifying the reaction context. For example, a 1 M KMnO4 solution can be 5 N, 3 N, or 1 N depending on solution pH. To prevent catastrophic dosage or analytical errors, modern standards recommend reporting molarity (which is an unambiguous property of the solution) and explicitly stating the reaction equation.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>Can normality ever be lower than molarity?</summary>
+          <div class="faq-answer">
+            <p>No. By definition, the equivalence factor \(n_{\text{eq}}\) is an integer greater than or equal to 1 (\(n_{\text{eq}} \ge 1\)). Because \(N = M \times n_{\text{eq}}\), normality is always greater than or equal to molarity (\(N \ge M\)). Normality equals molarity only when \(n_{\text{eq}} = 1\) (such as in monoprotic acids or univalent salts).</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>Does normality change if a solution is diluted with pure water?</summary>
+          <div class="faq-answer">
+            <p>Yes. Diluting a solution increases total volume while keeping the number of equivalents constant. Like molarity, normality is inversely proportional to volume: \(N_{\text{new}} = N_{\text{old}} \times (V_{\text{old}} / V_{\text{new}})\). Adding water decreases the normality proportionately.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>What is a primary standard in volumetric analysis?</summary>
+          <div class="faq-answer">
+            <p>A primary standard is a reagent that is extremely pure (typically > 99.9%), stable in air, non-hygroscopic, and has a high equivalent weight to minimize balance weighing errors. Examples include anhydrous sodium carbonate (Na2CO3) for standardizing acids, potassium hydrogen phthalate (KHP) for standardizing bases, and potassium dichromate (K2Cr2O7) for redox titrations.</p>
+          </div>
+        </details>
+      </div>
+
+      <h2>8. Related Analytical Chemistry Calculators</h2>
+      <p>Explore our integrated chemical calculation engines to solve dilutions, molar masses, and acid-base equilibria:</p>
+      <div class="related-calculators" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        <a href="molarity-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Molarity Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Compute molar concentration ($M = n/V$) from solute formula weight.</p>
+        </a>
+        <a href="dilution-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Dilution Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Solve $C_1 V_1 = C_2 V_2$ for laboratory serial dilutions and buffer compounding.</p>
+        </a>
+        <a href="moles-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Moles Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Convert between grams, chemical moles, and particle populations.</p>
+        </a>
+        <a href="ph-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">pH Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Compute solution hydronium activity ($-\log[H^+]$) and pOH values.</p>
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h3>CalcHub</h3>
+        <p>Your comprehensive engineering, mathematical, physical, and financial computational authority.</p>
+      </div>
+      <div class="footer-col">
+        <h3>Calculators</h3>
+        <ul>
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="math.html">Mathematics</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Chemical &amp; Water</h3>
+        <ul>
+          <li><a href="normality-calculator.html">Normality Calculator</a></li>
+          <li><a href="molarity-calculator.html">Molarity Calculator</a></li>
+          <li><a href="dilution-calculator.html">Dilution (C1V1 = C2V2)</a></li>
+          <li><a href="moles-calculator.html">Moles Calculator</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. High-precision engineering formulas and calculators. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      // DOM Elements
+      const modeSelect = document.getElementById('norm-mode');
+      const presetGroup = document.getElementById('norm-preset-group');
+      const presetSelect = document.getElementById('norm-preset');
+
+      const molarityPanel = document.getElementById('norm-molarity-panel');
+      const massPanel = document.getElementById('norm-mass-panel');
+      const titrationPanel = document.getElementById('norm-titration-panel');
+
+      const molarityValInput = document.getElementById('norm-molarity-val');
+      const neqValInput = document.getElementById('norm-neq-val');
+
+      const soluteMassInput = document.getElementById('norm-solute-mass');
+      const mwValInput = document.getElementById('norm-mw-val');
+      const neqMassInput = document.getElementById('norm-neq-mass');
+      const volValInput = document.getElementById('norm-vol-val');
+
+      const titrN1Input = document.getElementById('titr-n1');
+      const titrV1Input = document.getElementById('titr-v1');
+      const titrSolveFor = document.getElementById('titr-solve-for');
+      const titrV2Group = document.getElementById('titr-v2-group');
+      const titrN2Group = document.getElementById('titr-n2-group');
+      const titrV2Input = document.getElementById('titr-v2');
+      const titrN2Input = document.getElementById('titr-n2');
+
+      const calcBtn = document.getElementById('norm-calc-btn');
+      const resetBtn = document.getElementById('norm-reset-btn');
+
+      // Outputs
+      const primaryOut = document.getElementById('norm-primary-out');
+      const statusOut = document.getElementById('norm-status-out');
+      const molarityOut = document.getElementById('norm-molarity-out');
+      const ewOut = document.getElementById('norm-ew-out');
+      const neqOut = document.getElementById('norm-neq-out');
+      const gplOut = document.getElementById('norm-gpl-out');
+
+      const PRESETS = {
+        'hcl': { mw: 36.461, neq: 1 },
+        'h2so4': { mw: 98.079, neq: 2 },
+        'h3po4': { mw: 97.994, neq: 3 },
+        'naoh': { mw: 39.997, neq: 1 },
+        'caoh2': { mw: 74.093, neq: 2 },
+        'kmno4-acid': { mw: 158.034, neq: 5 },
+        'k2cr2o7': { mw: 294.185, neq: 6 },
+        'na2co3': { mw: 105.988, neq: 2 },
+        'oxalic': { mw: 126.066, neq: 2 }
+      };
+
+      function updatePanelVisibility() {
+        const m = modeSelect.value;
+        presetGroup.style.display = m === 'titration' ? 'none' : 'block';
+        molarityPanel.style.display = m === 'molarity-to-norm' ? 'block' : 'none';
+        massPanel.style.display = m === 'mass-to-norm' ? 'block' : 'none';
+        titrationPanel.style.display = m === 'titration' ? 'block' : 'none';
+      }
+
+      function updateTitrationVisibility() {
+        const solve = titrSolveFor.value;
+        if (solve === 'n2') {
+          titrV2Group.style.display = 'block';
+          titrN2Group.style.display = 'none';
+        } else {
+          titrV2Group.style.display = 'none';
+          titrN2Group.style.display = 'block';
+        }
+      }
+
+      function calculate() {
+        const mode = modeSelect.value;
+        let normality = 0;
+        let molarity = 0;
+        let neq = 1;
+        let ew = 0;
+        let gpl = 0;
+
+        if (mode === 'molarity-to-norm') {
+          molarity = parseFloat(molarityValInput.value) || 0;
+          neq = parseFloat(neqValInput.value) || 1;
+          const mw = PRESETS[presetSelect.value] ? PRESETS[presetSelect.value].mw : 36.46;
+
+          if (molarity <= 0 || neq <= 0) {
+            primaryOut.textContent = "-- N";
+            statusOut.textContent = "Please enter valid positive values.";
+            return;
+          }
+
+          normality = molarity * neq;
+          ew = mw / neq;
+          gpl = molarity * mw;
+
+          primaryOut.textContent = normality.toFixed(4) + " N";
+          statusOut.textContent = `${normality.toFixed(4)} equivalents/L (${molarity.toFixed(4)} M)`;
+        } else if (mode === 'mass-to-norm') {
+          const mass = parseFloat(soluteMassInput.value) || 0;
+          const mw = parseFloat(mwValInput.value) || 36.46;
+          neq = parseFloat(neqMassInput.value) || 1;
+          const vol = parseFloat(volValInput.value) || 1.0;
+
+          if (mass <= 0 || mw <= 0 || neq <= 0 || vol <= 0) {
+            primaryOut.textContent = "-- N";
+            statusOut.textContent = "Please enter valid positive values.";
+            return;
+          }
+
+          ew = mw / neq;
+          const equivalents = mass / ew;
+          normality = equivalents / vol;
+          molarity = (mass / mw) / vol;
+          gpl = mass / vol;
+
+          primaryOut.textContent = normality.toFixed(4) + " N";
+          statusOut.textContent = `${equivalents.toFixed(4)} eq in ${vol.toFixed(2)} L solution`;
+        } else if (mode === 'titration') {
+          const n1 = parseFloat(titrN1Input.value) || 0;
+          const v1 = parseFloat(titrV1Input.value) || 0;
+          const solve = titrSolveFor.value;
+
+          if (n1 <= 0 || v1 <= 0) {
+            primaryOut.textContent = "--";
+            statusOut.textContent = "Please enter positive titration values.";
+            return;
+          }
+
+          if (solve === 'n2') {
+            const v2 = parseFloat(titrV2Input.value) || 0;
+            if (v2 <= 0) {
+              primaryOut.textContent = "--";
+              statusOut.textContent = "Please enter positive volume V2.";
+              return;
+            }
+            // N2 = (N1 * V1) / V2
+            const n2 = (n1 * v1) / v2;
+            normality = n2;
+            primaryOut.textContent = n2.toFixed(4) + " N";
+            statusOut.textContent = `N₂ = (${n1} N \u00d7 ${v1} mL) / ${v2} mL`;
+          } else {
+            const n2 = parseFloat(titrN2Input.value) || 0;
+            if (n2 <= 0) {
+              primaryOut.textContent = "--";
+              statusOut.textContent = "Please enter positive normality N2.";
+              return;
+            }
+            // V2 = (N1 * V1) / N2
+            const v2 = (n1 * v1) / n2;
+            normality = n2;
+            primaryOut.textContent = v2.toFixed(2) + " mL";
+            statusOut.textContent = `V₂ = (${n1} N \u00d7 ${v1} mL) / ${n2} N`;
+          }
+
+          molarity = normality; // nominal 1:1 fallback display
+          ew = 0;
+          gpl = 0;
+        }
+
+        // Render Cards
+        molarityOut.textContent = molarity > 0 ? molarity.toFixed(4) + " M" : "--";
+        ewOut.textContent = ew > 0 ? ew.toFixed(2) + " g/eq" : "--";
+        neqOut.textContent = neq + " eq/mol";
+        gplOut.textContent = gpl > 0 ? gpl.toFixed(2) + " g/L" : "--";
+      }
+
+      // Presets
+      presetSelect.addEventListener('change', function() {
+        const val = this.value;
+        if (PRESETS[val]) {
+          const p = PRESETS[val];
+          neqValInput.value = p.neq;
+          neqMassInput.value = p.neq;
+          mwValInput.value = p.mw;
+          calculate();
+        }
+      });
+
+      modeSelect.addEventListener('change', function() {
+        updatePanelVisibility();
+        calculate();
+      });
+
+      titrSolveFor.addEventListener('change', function() {
+        updateTitrationVisibility();
+        calculate();
+      });
+
+      [molarityValInput, neqValInput, soluteMassInput, mwValInput, neqMassInput, volValInput, titrN1Input, titrV1Input, titrV2Input, titrN2Input].forEach(el => {
+        el.addEventListener('input', function() {
+          if (el === neqValInput || el === neqMassInput || el === mwValInput) presetSelect.value = 'custom';
+          calculate();
+        });
+        el.addEventListener('change', calculate);
+      });
+
+      calcBtn.addEventListener('click', calculate);
+
+      resetBtn.addEventListener('click', function() {
+        modeSelect.value = 'molarity-to-norm';
+        presetSelect.value = 'hcl';
+        molarityValInput.value = '1.0';
+        neqValInput.value = '1';
+        soluteMassInput.value = '49.04';
+        mwValInput.value = '98.079';
+        neqMassInput.value = '2';
+        volValInput.value = '1.0';
+        titrN1Input.value = '0.100';
+        titrV1Input.value = '25.0';
+        titrSolveFor.value = 'n2';
+        titrV2Input.value = '20.0';
+        titrN2Input.value = '0.125';
+        updatePanelVisibility();
+        updateTitrationVisibility();
+        calculate();
+      });
+
+      // Initial execution
+      updatePanelVisibility();
+      updateTitrationVisibility();
+      calculate();
+    })();
+  </script>
+</body>
+</html>

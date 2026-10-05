@@ -299,6 +299,14 @@ CATEGORIES = {
             ("ro-antiscalant-dosing-calculator.html", "RO Antiscalant (Membrane Scaling)", "🌊", "Concentration factor CF=1/(1-Y), LSI & neat pump LPH"),
             ("sulphuric-acid-dosing-calculator.html", "Sulfuric Acid (H₂SO₄) Dosing", "🧪", "93% & 98% H₂SO₄ feed, alkalinity reduction & cooling tower"),
             ("titration-calculator.html", "Acid-Base Titration (C₁V₁ = C₂V₂)", "🔬", "Equivalence point, analyte molarity & polyprotic curves"),
+            ("mass-percent-calculator.html", "Mass Percent (% w/w)", "⚗️", "Weight percent concentration & solutions"),
+            ("molality-calculator.html", "Molality & Cryoscopy", "❄️", "Molal concentration & freezing depression"),
+            ("moles-calculator.html", "Moles & Avogadro Converter", "⚛️", "Grams to moles & 6.022e23 particle count"),
+            ("normality-calculator.html", "Normality & Equivalents", "🧪", "Equivalents per liter & titration N1V1=N2V2"),
+            ("percent-composition-calculator.html", "Percent Composition", "🔬", "Elemental mass % & empirical formula"),
+            ("percent-yield-calculator.html", "Percent Yield & Efficiency", "⚖️", "Actual vs theoretical reaction yield"),
+            ("theoretical-yield-calculator.html", "Theoretical Yield & Limiting Reagent", "🎯", "Stoichiometric maximum & excess leftover"),
+            ("ppm-calculator.html", "PPM & PPB Concentration", "💧", "Parts per million & mg/L in water"),
         ]
     },
     "physics": {
@@ -423,7 +431,7 @@ def determine_tool_cat(filename):
         return "mechanical"
     if any(k in f for k in ["beam", "retaining", "concrete", "rebar", "brick", "asphalt", "rainwater-downpipe", "block", "drywall", "excavation", "flooring", "footing", "gravel", "paint", "roof-pitch", "slab", "slope", "soil", "tile"]):
         return "civil"
-    if any(k in f for k in ["chemical", "chlorine", "alum", "boyle", "calcium-hypochlorite", "caustic", "charles", "chlorine-dioxide", "coagulant", "combined-gas", "dilution", "gay-lussac", "half-life", "henderson", "hydrazine", "ideal-gas", "lime-dosing", "molar-mass", "molarity", "ph-calculator", "ph-poh", "phosphate", "polymer", "ro-antiscalant", "sulphuric", "titration"]):
+    if any(k in f for k in ["chemical", "chlorine", "alum", "boyle", "calcium-hypochlorite", "caustic", "charles", "chlorine-dioxide", "coagulant", "combined-gas", "dilution", "gay-lussac", "half-life", "henderson", "hydrazine", "ideal-gas", "lime-dosing", "molar-mass", "molarity", "ph-calculator", "ph-poh", "phosphate", "polymer", "ro-antiscalant", "sulphuric", "titration", "mass-percent", "molality", "moles-calculator", "normality", "percent-composition", "percent-yield", "theoretical-yield", "ppm-calculator"]):
         return "chemical"
     if any(k in f for k in ["acceleration", "angular-velocity", "centripetal-force", "doppler-effect", "escape-velocity", "free-fall", "friction", "gravitational-force", "hookes-law", "kinetic-energy", "photon-energy", "simple-pendulum", "snells-law", "specific-heat", "density-calculator", "pressure-calculator", "speed-calculator", "force-calculator", "momentum-calculator", "impulse-calculator", "potential-energy", "work-power", "stress-strain", "terminal-velocity", "specific-gravity"]):
         return "physics"

@@ -287,6 +287,14 @@ CAT_MAP = {
             ("ro-antiscalant-dosing-calculator.html", "RO Antiscalant (Membrane Scaling)", "🌊", "Concentration factor CF=1/(1-Y), LSI & neat pump LPH", "CF = 1/(1-Y) | Prevents CaCO₃, CaSO₄, BaSO₄ & SiO₂"),
             ("sulphuric-acid-dosing-calculator.html", "Sulfuric Acid (H₂SO₄) Dosing", "🧪", "93% & 98% H₂SO₄ feed, alkalinity reduction & cooling tower", "98.08 g H₂SO₄ per 100.09 g CaCO₃ | 0.980 mass ratio"),
             ("titration-calculator.html", "Acid-Base Titration (C₁V₁ = C₂V₂)", "🔬", "Equivalence point, analyte molarity & polyprotic curves", "C_A · V_A · n_A = C_B · V_B · n_B | Buffer inflection"),
+            ("mass-percent-calculator.html", "Mass Percent (% w/w Concentration)", "⚗️", "Weight percentage, solute/solvent mass & alloy recipes", "% w/w = (m_solute / m_solution) × 100% | ppm = % × 10000"),
+            ("molality-calculator.html", "Molality & Colligative Cryoscopy", "❄️", "Molal concentration m = mol/kg & ΔT_f freezing depression", "m = n / m_solvent(kg) | ΔT_f = i·K_f·m | ΔT_b = i·K_b·m"),
+            ("moles-calculator.html", "Moles & Avogadro Particle Converter", "⚛️", "Grams to moles, 6.022e23 particle count & ideal gas STP", "n = m / M | N = n · N_A | V_STP = n · 22.414 L"),
+            ("normality-calculator.html", "Normality & Titration Equivalents", "🧪", "Equivalents per liter N = M · n_eq & N1V1 = N2V2", "N = M · n_eq | EW = M / n_eq | N_1·V_1 = N_2·V_2"),
+            ("percent-composition-calculator.html", "Percent Composition (Elemental Mass %)", "🔬", "Formula weight, elemental mass % & empirical formulas", "% E = (n·M_E / M_compound) × 100% | CHN microanalysis"),
+            ("percent-yield-calculator.html", "Percent Yield & Reaction Efficiency", "⚖️", "Actual vs theoretical yield & organic synthesis loss", "% Yield = (Actual / Theoretical) × 100% | % Error"),
+            ("theoretical-yield-calculator.html", "Theoretical Yield & Limiting Reactant", "🎯", "Limiting reagent identification & excess reactant leftover", "n_prod = (n_lim / ν_lim) · ν_prod | m_theor = n · M"),
+            ("ppm-calculator.html", "PPM & PPB Concentration Converter", "💧", "Parts per million, mg/L in water, ppb & atmospheric gas", "ppm = (m_solute / m_sol) × 10⁶ | 1 ppm = 1 mg/L = 1000 ppb"),
         ]
     },
     "physics.html": {

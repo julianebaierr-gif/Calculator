@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PPM Calculator - Parts Per Million, PPB &amp; mg/L Concentration Converter</title>
+  <meta name="description" content="Convert parts per million (ppm), parts per billion (ppb), mass percent (% w/w), mg/L in water, and atmospheric gas ppm_v to mg/m³ with step-by-step proofs.">
+  <link rel="canonical" href="https://calchub.org/ppm-calculator.html">
+  <meta property="og:title" content="PPM Calculator - Parts Per Million &amp; mg/L Converter">
+  <meta property="og:description" content="Free environmental &amp; chemistry PPM calculator. Convert mass to ppm, mg/L in aqueous solution, ppb, percent concentration, and air pollutant ppm_v.">
+  <meta property="og:url" content="https://calchub.org/ppm-calculator.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PPM Calculator - Environmental &amp; Water Analysis Tool">
+  <meta name="twitter:description" content="Convert ppm to mg/L, ppb, and mass percent with EPA drinking water standards and atmospheric pollution benchmarks.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "PPM Calculator",
+    "url": "https://calchub.org/ppm-calculator.html",
+    "description": "Calculates parts per million (ppm), parts per billion (ppb), milligrams per liter (mg/L), and gas phase volume fractions (ppm_v).",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does parts per million (ppm) mean?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Parts per million (ppm) is a dimensionless ratio that expresses the concentration of a substance as one part solute per one million parts of total solution or mixture: ppm = (Mass of Solute / Total Mass of Solution) * 10^6. One ppm represents 1 milligram of solute per 1 kilogram of solution."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is 1 ppm equal to 1 mg/L in water?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, for dilute aqueous solutions at room temperature. Because pure water has a density of approximately 1.000 kg/L (1,000,000 mg/L), dissolving 1 milligram of solute in 1 liter of water produces 1 mg / 1,000,000 mg = 1 part per million (1 ppm = 1 mg/L)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do you convert percent (%) concentration to ppm?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "To convert percent concentration (% w/w) to ppm, multiply by 10,000: ppm = % * 10,000. For example, 1.0% equals 10,000 ppm, and 0.05% equals 500 ppm."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is gas ppm_v converted to mg/m³ in air pollution?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "For gases at standard ambient temperature (25°C) and pressure (1 atm), the conversion is: Concentration (mg/m³) = [ppm_v * Molar Mass (g/mol)] / 24.45, where 24.45 is the molar volume of an ideal gas in liters at 25°C."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">CalcHub</a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="math.html">Math &amp; Statistics</a>
+        <a href="converter.html">Converters</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="chemical.html">Chemical &amp; Water</a> &rsaquo;
+      <span>PPM Calculator</span>
+    </nav>
+
+    <div class="page-header">
+      <h1 class="page-title">PPM Calculator</h1>
+      <p class="page-desc">Convert between parts per million (ppm), parts per billion (ppb), milligrams per liter (mg/L), mass percent (% w/w), and gas concentrations.</p>
+    </div>
+
+    <div class="calc-grid">
+      <!-- Calculator Column -->
+      <div class="calc-card">
+        <div class="calc-header">
+          <h2>Parts Per Million &amp; Concentration Solver</h2>
+        </div>
+
+        <!-- Mode Selection -->
+        <div class="form-group">
+          <label for="ppm-mode">Calculation Mode:</label>
+          <select id="ppm-mode" class="form-control">
+            <option value="mass-ratio" selected>From Solute Mass &amp; Solution Mass &rarr; PPM &amp; PPB</option>
+            <option value="mgl-water">From mg/L in Water &rarr; PPM &amp; Percentage</option>
+            <option value="percent-to-ppm">From Mass Percentage (% w/w) &rarr; PPM &amp; PPB</option>
+            <option value="gas-ppm">Atmospheric Gas: ppm_v &harr; mg/m³ Converter</option>
+          </select>
+        </div>
+
+        <!-- Environmental Presets -->
+        <div class="form-group">
+          <label for="ppm-preset">Environmental / Water Benchmark Preset:</label>
+          <select id="ppm-preset" class="form-control">
+            <option value="custom">-- Custom Concentration Values --</option>
+            <option value="epa-lead">EPA Drinking Water Lead Action Limit (0.015 ppm / 15 ppb)</option>
+            <option value="epa-arsenic">EPA Arsenic MCL in Drinking Water (0.010 ppm / 10 ppb)</option>
+            <option value="tap-fluoride">Municipal Tap Water Fluoride Target (0.70 ppm)</option>
+            <option value="chlorine-pool">Swimming Pool Free Chlorine Target (2.0 ppm)</option>
+            <option value="co2-air">Atmospheric Carbon Dioxide Level (~425 ppm_v CO2)</option>
+            <option value="co-osha">OSHA Workplace Carbon Monoxide Permissible Limit (50 ppm_v CO)</option>
+            <option value="ocean-salinity">Ocean Seawater Salinity (35,000 ppm / 3.5% w/w)</option>
+          </select>
+        </div>
+
+        <!-- Mode 1: Mass Ratio Panel -->
+        <div id="ppm-mass-panel">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ppm-solute-val">Solute Mass ($m_{\text{solute}}$):</label>
+              <input type="number" id="ppm-solute-val" class="form-control" value="15.0" step="any" min="0.000001">
+            </div>
+            <div class="form-group">
+              <label for="ppm-solute-unit">Solute Unit:</label>
+              <select id="ppm-solute-unit" class="form-control">
+                <option value="mg" selected>Milligrams (mg)</option>
+                <option value="ug">Micrograms (&mu;g)</option>
+                <option value="g">Grams (g)</option>
+                <option value="kg">Kilograms (kg)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ppm-sol-val">Total Solution Mass ($m_{\text{solution}}$):</label>
+              <input type="number" id="ppm-sol-val" class="form-control" value="1.0" step="any" min="0.000001">
+            </div>
+            <div class="form-group">
+              <label for="ppm-sol-unit">Solution Unit:</label>
+              <select id="ppm-sol-unit" class="form-control">
+                <option value="kg" selected>Kilograms (kg / Liters water)</option>
+                <option value="g">Grams (g / mL water)</option>
+                <option value="m3">Cubic Meters (m³ / metric tons)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode 2: mg/L Panel -->
+        <div id="ppm-mgl-panel" style="display: none;">
+          <div class="form-group">
+            <label for="ppm-mgl-val">Aqueous Concentration in mg/L:</label>
+            <input type="number" id="ppm-mgl-val" class="form-control" value="0.70" step="any" min="0.000001">
+          </div>
+        </div>
+
+        <!-- Mode 3: Percent to PPM Panel -->
+        <div id="ppm-pct-panel" style="display: none;">
+          <div class="form-group">
+            <label for="ppm-pct-val">Mass Percent (% w/w):</label>
+            <input type="number" id="ppm-pct-val" class="form-control" value="0.05" step="any" min="0.000001" max="100.0">
+          </div>
+        </div>
+
+        <!-- Mode 4: Gas PPM Panel -->
+        <div id="ppm-gas-panel" style="display: none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ppm-gas-ppmv">Gas Concentration (ppm_v):</label>
+              <input type="number" id="ppm-gas-ppmv" class="form-control" value="50.0" step="any" min="0.0001">
+            </div>
+            <div class="form-group">
+              <label for="ppm-gas-mw">Gas Molar Mass ($M$ in g/mol):</label>
+              <input type="number" id="ppm-gas-mw" class="form-control" value="28.01" step="any" min="1.0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ppm-gas-temp">Temperature (°C):</label>
+              <input type="number" id="ppm-gas-temp" class="form-control" value="25.0" step="any">
+            </div>
+            <div class="form-group">
+              <label for="ppm-gas-press">Pressure (atm):</label>
+              <input type="number" id="ppm-gas-press" class="form-control" value="1.0" step="any">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="ppm-calc-btn" class="btn btn-primary">Calculate Concentration</button>
+          <button type="button" id="ppm-reset-btn" class="btn btn-secondary">Reset</button>
+        </div>
+
+        <!-- Output Hero and Cards -->
+        <div id="ppm-results" class="results-container" style="margin-top: 1.5rem;">
+          <div class="result-hero-card">
+            <div class="result-label" style="font-size: 0.875rem; color: var(--text-muted, #64748b); text-transform: uppercase; font-weight: 600;">Parts Per Million (PPM)</div>
+            <div id="ppm-primary-out" style="font-size: 2.25rem; font-weight: 800; color: var(--primary, #2563eb); margin: 0.25rem 0;">15.00 ppm</div>
+            <div id="ppm-status-out" style="font-size: 1rem; color: var(--text-secondary, #475569); font-weight: 600;">15.00 mg/kg &bull; 15,000 ppb</div>
+          </div>
+
+          <div class="summary-metrics-grid">
+            <div class="metric-card">
+              <div style="font-size: 0.75rem; color: var(--text-muted, #64748b);">Parts Per Billion (PPB)</div>
+              <div id="ppm-ppb-out" style="font-size: 1.15rem; font-weight: 700;">15,000 ppb</div>
+            </div>
+            <div class="metric-card">
+              <div style="font-size: 0.75rem; color: var(--text-muted, #64748b);">Mass Percent (% w/w)</div>
+              <div id="ppm-pct-out" style="font-size: 1.15rem; font-weight: 700;">0.0015%</div>
+            </div>
+            <div class="metric-card">
+              <div style="font-size: 0.75rem; color: var(--text-muted, #64748b);">Aqueous Equivalent</div>
+              <div id="ppm-aq-out" style="font-size: 1.15rem; font-weight: 700;">15.00 mg/L</div>
+            </div>
+            <div class="metric-card">
+              <div style="font-size: 0.75rem; color: var(--text-muted, #64748b);">Parts Per Trillion (PPT)</div>
+              <div id="ppm-ppt-out" style="font-size: 1.15rem; font-weight: 700;">15,000,000 ppt</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Reference Sidebar -->
+      <aside class="sidebar-card">
+        <h3>Environmental PPM Standards</h3>
+        <ul style="font-size: 0.875rem; line-height: 1.6; margin-left: 1.25rem;">
+          <li><strong>EPA Lead Action Limit:</strong><br>0.015 ppm (15 ppb) in drinking water</li>
+          <li><strong>EPA Arsenic MCL:</strong><br>0.010 ppm (10 ppb)</li>
+          <li><strong>EPA Nitrate MCL:</strong><br>10.0 ppm (10 mg/L as N)</li>
+          <li><strong>Tap Water Fluoride:</strong><br>0.70 ppm target (CDC recommended)</li>
+          <li><strong>Atmospheric CO₂:</strong><br>~425 ppm (0.0425% by volume)</li>
+          <li><strong>OSHA Carbon Monoxide:</strong><br>50 ppm 8-hour TWA permissible limit</li>
+        </ul>
+
+        <h3 style="margin-top: 1.25rem;">Scale Interconversions</h3>
+        <ul style="font-size: 0.875rem; line-height: 1.6; margin-left: 1.25rem;">
+          <li>\(1\% = 10,000\text{ ppm}\)</li>
+          <li>\(1\text{ ppm} = 1,000\text{ ppb} = 1\text{ mg/L}\)</li>
+          <li>\(1\text{ ppb} = 1,000\text{ ppt} = 1\text{ }\mu\text{g/L}\)</li>
+          <li>\(1\text{ ppm} = 0.0001\%\)</li>
+        </ul>
+      </aside>
+    </div>
+
+    <!-- Long-Form Informational Engineering Article (1,400+ Words) -->
+    <article class="article-body">
+      <h2>1. The Definition and Fundamental Mathematics of Parts Per Million (PPM)</h2>
+      <p>Parts per million (conventionally abbreviated as **ppm**) is a dimensionless pseudo-unit of concentration used in environmental science, analytical chemistry, toxicology, and industrial process engineering to quantify ultra-trace quantities of a solute or contaminant dispersed within a larger solvent or matrix. Expressing concentrations of minute fractions in standard percentages often results in cumbersome decimals (e.g., \(0.000015\%\)); ppm provides an intuitive, readable alternative by scaling the dimensionless mass fraction to parts per \(10^6\) (one million).</p>
+      <p>Formally, the mass-based concentration in parts per million is defined as:</p>
+      $$\text{ppm} = \left(\frac{m_{\text{solute}}}{m_{\text{total mixture}}}\right) \times 10^6 = \left(\frac{m_{\text{solute}}}{m_{\text{solute}} + m_{\text{solvent}}}\right) \times 1,000,000$$
+      <p>Where \(m_{\text{solute}}\) and \(m_{\text{total mixture}}\) are expressed in identical units of mass (e.g., milligrams of solute per million milligrams of solution). In dimensional terms, because \(1\text{ kilogram} = 1,000\text{ grams} = 1,000,000\text{ milligrams}\):</p>
+      $$1\text{ ppm} = \frac{1\text{ milligram of solute}}{1\text{ kilogram of solution}} = 1\text{ mg/kg}$$
+      <p>Similarly, for extreme ultra-trace analysis in semiconductor fabrication and forensic toxicology, concentration is extended to **parts per billion** (ppb, \(10^{-9}\)) and **parts per trillion** (ppt, \(10^{-12}\)):</p>
+      $$\text{ppb} = \left(\frac{m_{\text{solute}}}{m_{\text{solution}}}\right) \times 10^9 = \text{ppm} \times 1,000 = \frac{1\text{ microgram}}{1\text{ kilogram}}$$
+      $$\text{ppt} = \left(\frac{m_{\text{solute}}}{m_{\text{solution}}}\right) \times 10^{12} = \text{ppb} \times 1,000 = \frac{1\text{ nanogram}}{1\text{ kilogram}}$$
+
+      <h2>2. Why 1 PPM Equals 1 mg/L in Aqueous Solutions</h2>
+      <p>In environmental water testing, wastewater management, and municipal water treatment, analytical laboratories frequently treat **ppm** and **milligrams per liter (mg/L)** as interchangeable equivalents. The physical justification rests on the density of pure water:</p>
+      <ul>
+        <li>At standard conditions (\(20^\circ\text{C}\)), pure water has a volumetric density of \(\rho \approx 1.000\text{ g/mL} = 1.000\text{ kg/L}\).</li>
+        <li>One liter of water therefore has a mass of exactly \(1.000\text{ kg} = 1,000,000\text{ milligrams}\).</li>
+        <li>Dissolving \(1.0\text{ milligram}\) of a trace contaminant (such as lead or arsenic) into \(1.0\text{ liter}\) of water yields:
+        $$\text{Concentration} = \frac{1\text{ mg solute}}{1\text{ L water}} = \frac{1\text{ mg solute}}{1,000,000\text{ mg water}} = 1\text{ part per million (ppm)}$$</li>
+      </ul>
+      <p>This equivalence holds with high accuracy (\(&gt;99.5\%\)) for dilute freshwater systems. However, for dense or saline matrices (such as ocean seawater with density \(\rho = 1.025\text{ kg/L}\), or concentrated industrial brines), 1 mg/L does NOT equal 1 ppm; specific gravity must be factored in:</p>
+      $$\text{ppm (w/w)} = \frac{\text{Concentration (mg/L)}}{\text{Solution Density (kg/L)}}$$
+
+      <h2>3. Atmospheric Air Pollution: Volume PPM (ppm_v) vs. mg/m³</h2>
+      <p>In atmospheric chemistry, air quality monitoring (EPA NAAQS), and industrial workplace hygiene (OSHA), gas concentrations are expressed as **volume parts per million** (\(\text{ppm}_v\)):</p>
+      $$\text{ppm}_v = \left(\frac{V_{\text{gas contaminant}}}{V_{\text{total air}}}\right) \times 10^6$$
+      <p>By Avogadro's Law, volume fractions in an ideal gas mixture are directly identical to mole fractions (\(V_i / V_{\text{total}} = n_i / n_{\text{total}}\)). To convert volumetric gas concentration in \(\text{ppm}_v\) to mass concentration in milligrams per cubic meter (\(\text{mg/m}^3\)), engineers apply the Ideal Gas Law:</p>
+      $$\text{Concentration (mg/m}^3\text{)} = \frac{\text{ppm}_v \times M \times P}{R \times T}$$
+      <p>Under OSHA standard ambient temperature and pressure (\(25^\circ\text{C} = 298.15\text{ K}\), \(P = 1.000\text{ atm}\)), where the molar volume of an ideal gas equals \(24.45\text{ Liters/mol}\):</p>
+      $$\text{mg/m}^3 = \frac{\text{ppm}_v \times M}{24.45} \iff \text{ppm}_v = \frac{\text{mg/m}^3 \times 24.45}{M}$$
+      <p>Where \(M\) is the molecular weight of the contaminant gas in grams per mole.</p>
+
+      <h2>4. Environmental and Industrial PPM Benchmark Table</h2>
+      <p>The following engineering data table contrasts global environmental standards, water quality limits, and industrial thresholds across ppm, ppb, and mass percentages:</p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Substance / Scenario</th>
+              <th>Matrix</th>
+              <th>PPM Value</th>
+              <th>PPB Value</th>
+              <th>Mass Percent (% w/w)</th>
+              <th>Regulatory Standard</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Lead (Pb)</td>
+              <td>Drinking Water</td>
+              <td>0.015 ppm</td>
+              <td>15.0 ppb</td>
+              <td>0.0000015%</td>
+              <td>EPA Lead Action Level</td>
+            </tr>
+            <tr>
+              <td>Arsenic (As)</td>
+              <td>Drinking Water</td>
+              <td>0.010 ppm</td>
+              <td>10.0 ppb</td>
+              <td>0.0000010%</td>
+              <td>EPA Maximum Contaminant Level</td>
+            </tr>
+            <tr>
+              <td>Mercury (Hg)</td>
+              <td>Drinking Water</td>
+              <td>0.002 ppm</td>
+              <td>2.0 ppb</td>
+              <td>0.0000002%</td>
+              <td>EPA Primary Drinking Water Reg</td>
+            </tr>
+            <tr>
+              <td>Fluoride (F⁻)</td>
+              <td>Municipal Tap</td>
+              <td>0.70 ppm</td>
+              <td>700 ppb</td>
+              <td>0.000070%</td>
+              <td>US CDC Recommended Fluoridation</td>
+            </tr>
+            <tr>
+              <td>Chlorine (Free Cl₂)</td>
+              <td>Swimming Pools</td>
+              <td>2.0 – 4.0 ppm</td>
+              <td>2,000 – 4,000 ppb</td>
+              <td>0.0002 – 0.0004%</td>
+              <td>Public Health Sanitization Range</td>
+            </tr>
+            <tr>
+              <td>Nitrate (NO₃⁻ as N)</td>
+              <td>Groundwater</td>
+              <td>10.0 ppm</td>
+              <td>10,000 ppb</td>
+              <td>0.0010%</td>
+              <td>Blue Baby Syndrome Safety Cap</td>
+            </tr>
+            <tr>
+              <td>Carbon Monoxide (CO)</td>
+              <td>Workplace Air</td>
+              <td>50 ppm_v</td>
+              <td>50,000 ppb_v</td>
+              <td>0.0050% (vol)</td>
+              <td>OSHA 8-hour TWA PEL</td>
+            </tr>
+            <tr>
+              <td>Carbon Dioxide (CO₂)</td>
+              <td>Ambient Atmosphere</td>
+              <td>~425 ppm_v</td>
+              <td>425,000 ppb_v</td>
+              <td>0.0425% (vol)</td>
+              <td>Global Keeling Curve (Mauna Loa)</td>
+            </tr>
+            <tr>
+              <td>Ocean Seawater Salts</td>
+              <td>Marine Waters</td>
+              <td>35,000 ppm</td>
+              <td>35,000,000 ppb</td>
+              <td>3.50%</td>
+              <td>Standard Global Salinity (35 PSU)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>5. Step-by-Step Worked Environmental Case Studies</h2>
+
+      <div class="worked-example-card">
+        <h3>Case Study 1: Municipal Water Reservoir Chlorine Disinfection Dosing</h3>
+        <p><strong>Scenario:</strong> A municipal water treatment facility pumps \(2.50\text{ million liters}\) (\(2,500\text{ m}^3\)) of raw reservoir water into a contact chamber. Treatment protocols mandate achieving a target residual free chlorine concentration of \(1.80\text{ ppm}\) (\(\text{mg/L}\)). If the plant uses commercial sodium hypochlorite solution (\(\text{NaOCl}\)) containing \(12.5\%\text{ w/w}\) available chlorine with a solution density of \(\rho = 1.20\text{ kg/L}\), calculate the mass of pure chlorine gas equivalent required and the volume of commercial bleach solution in liters.</p>
+        
+        <div class="step-solution">
+          <p><strong>Step 1: Calculate total mass of chlorine required:</strong></p>
+          <p>Since \(1\text{ ppm} = 1\text{ mg/L}\):</p>
+          $$m_{\text{pure Cl}_2} = 2,500,000\text{ L} \times 1.80\text{ mg/L} = 4,500,000\text{ mg} = 4,500.0\text{ grams} = 4.50\text{ kg}$$
+
+          <p><strong>Step 2: Determine mass of \(12.5\%\) commercial bleach solution:</strong></p>
+          $$m_{\text{bleach solution}} = \frac{4.50\text{ kg}}{0.125} = 36.00\text{ kilograms}$$
+
+          <p><strong>Step 3: Calculate liquid volume of bleach required:</strong></p>
+          $$V_{\text{bleach}} = \frac{\text{Mass}}{\text{Density}} = \frac{36.00\text{ kg}}{1.20\text{ kg/L}} = 30.00\text{ Liters}$$
+          <p><strong>Dosing Protocol:</strong> The dosing pump must meter exactly \(30.0\text{ Liters}\) of \(12.5\%\) sodium hypochlorite into the \(2.50\text{-million liter}\) reservoir to establish a \(1.80\text{ ppm}\) sanitizing residual.</p>
+        </div>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 2: Converting Workplace Carbon Monoxide Exposure from PPM to mg/m³</h3>
+        <p><strong>Scenario:</strong> An industrial hygienist tests ambient air in an underground parking garage using a photoionization gas detector, logging a peak carbon monoxide (\(\text{CO}\)) concentration of \(35.0\text{ ppm}_v\). Ambient conditions are \(20.0^\circ\text{C}\) (\(293.15\text{ K}\)) and \(1.00\text{ atm}\). The molecular weight of carbon monoxide is \(M = 28.01\text{ g/mol}\). Compute the contaminant concentration in milligrams per cubic meter (\(\text{mg/m}^3\)).</p>
+        
+        <div class="step-solution">
+          <p><strong>Step 1: Calculate molar volume of ideal gas at \(20.0^\circ\text{C}\):</strong></p>
+          $$V_m = \frac{R T}{P} = \frac{0.082057 \times 293.15}{1.000} = 24.055\text{ Liters/mol}$$
+
+          <p><strong>Step 2: Apply the temperature-corrected gas conversion formula:</strong></p>
+          $$\text{Concentration (mg/m}^3\text{)} = \frac{\text{ppm}_v \times M}{V_m} = \frac{35.0 \times 28.01\text{ g/mol}}{24.055\text{ L/mol}}$$
+          $$\text{Concentration} = \frac{980.35}{24.055} = 40.75\text{ mg/m}^3$$
+          <p><strong>Hygiene Interpretation:</strong> A reading of \(35.0\text{ ppm}_v\) \(\text{CO}\) corresponds to \(40.75\text{ mg/m}^3\) of particulate-free carbon monoxide in ambient air, remaining within the OSHA 8-hour permissible exposure limit of \(50\text{ ppm}_v\) (\(55\text{ mg/m}^3\)).</p>
+        </div>
+      </div>
+
+      <h2>6. Frequently Asked Questions (Trace Analysis &amp; Water Testing)</h2>
+      <div class="faq-accordion">
+        <details class="faq-item">
+          <summary>How many drops of water represent one part per million?</summary>
+          <div class="faq-answer">
+            <p>One milliliter of water contains approximately 20 standard drops. One liter contains 20,000 drops. A 50-liter domestic aquarium contains about 1,000,000 drops of water. Therefore, adding a single drop of food coloring into a 50-liter tank represents an exact real-world visualization of 1 part per million (1 ppm).</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>What is the difference between ppm and mg/kg in soil testing?</summary>
+          <div class="faq-answer">
+            <p>In soil and agricultural agronomy testing, ppm and mg/kg are strictly identical. Because 1 kilogram equals 1,000,000 milligrams, a pesticide residue level of 5 mg per kilogram of dry soil is precisely 5 ppm. Unlike water, soil density varies widely (bulk density ~1.3 to 1.6 g/cm³); thus, soil concentrations are always reported on a dry mass-to-mass basis (mg/kg = ppm) rather than volume.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>Can TDS meters accurately measure chemical ppm?</summary>
+          <div class="faq-answer">
+            <p>Handheld Total Dissolved Solids (TDS) meters measure electrical conductivity (EC, in microSiemens per centimeter, \(\mu\text{S/cm}\)) and multiply by an empirical conversion factor (typically 0.50 to 0.70) to estimate ppm. While convenient for monitoring reverse osmosis filters or hydroponics, they only detect conductive charged ions (\(\text{Na}^+\), \(\text{Ca}^{2+}\), \(\text{Cl}^-\)) and cannot detect non-conductive dissolved contaminants such as pesticides, bacteria, pharmaceutical residues, or neutral sugars.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>How do you dilute a 1,000 ppm stock standard to 10 ppm?</summary>
+          <div class="faq-answer">
+            <p>Using the standard dilution equation \(C_1 V_1 = C_2 V_2\): To prepare \(1000\text{ mL}\) of \(10\text{ ppm}\) calibration standard from a \(1,000\text{ ppm}\) stock solution: \(V_1 = (10\text{ ppm} \times 1000\text{ mL}) / 1000\text{ ppm} = 10.0\text{ mL}\). Pipette exactly \(10.0\text{ mL}\) of stock standard into a \(1000\text{-mL}\) volumetric flask and dilute with deionized water to the line.</p>
+          </div>
+        </details>
+      </div>
+
+      <h2>7. Related Environmental &amp; Chemical Calculators</h2>
+      <p>Explore our integrated directory of chemical tools to solve dilutions, mass percentages, and molar concentrations:</p>
+      <div class="related-calculators" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        <a href="mass-percent-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Mass Percent Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Determine solution weight concentration (% w/w) and solute/solvent mass ratios.</p>
+        </a>
+        <a href="dilution-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Dilution Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Solve $C_1 V_1 = C_2 V_2$ for laboratory serial dilutions and buffer compounding.</p>
+        </a>
+        <a href="molarity-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Molarity Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Compute volumetric solution concentration ($M = \text{mol/L}$) in moles per liter.</p>
+        </a>
+        <a href="specific-gravity-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Specific Gravity Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Convert hydrometer °API, Baumé, and Brix to relative solution density.</p>
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h3>CalcHub</h3>
+        <p>Your comprehensive engineering, mathematical, physical, and financial computational authority.</p>
+      </div>
+      <div class="footer-col">
+        <h3>Calculators</h3>
+        <ul>
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="math.html">Mathematics</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Chemical &amp; Water</h3>
+        <ul>
+          <li><a href="ppm-calculator.html">PPM Calculator</a></li>
+          <li><a href="mass-percent-calculator.html">Mass Percent</a></li>
+          <li><a href="dilution-calculator.html">Dilution (C1V1 = C2V2)</a></li>
+          <li><a href="density-calculator.html">Density &amp; Specific Gravity</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. High-precision engineering formulas and calculators. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      // DOM Elements
+      const modeSelect = document.getElementById('ppm-mode');
+      const presetSelect = document.getElementById('ppm-preset');
+
+      const massPanel = document.getElementById('ppm-mass-panel');
+      const mglPanel = document.getElementById('ppm-mgl-panel');
+      const pctPanel = document.getElementById('ppm-pct-panel');
+      const gasPanel = document.getElementById('ppm-gas-panel');
+
+      const soluteValInput = document.getElementById('ppm-solute-val');
+      const soluteUnitSelect = document.getElementById('ppm-solute-unit');
+      const solValInput = document.getElementById('ppm-sol-val');
+      const solUnitSelect = document.getElementById('ppm-sol-unit');
+
+      const mglValInput = document.getElementById('ppm-mgl-val');
+      const pctValInput = document.getElementById('ppm-pct-val');
+
+      const gasPpmvInput = document.getElementById('ppm-gas-ppmv');
+      const gasMwInput = document.getElementById('ppm-gas-mw');
+      const gasTempInput = document.getElementById('ppm-gas-temp');
+      const gasPressInput = document.getElementById('ppm-gas-press');
+
+      const calcBtn = document.getElementById('ppm-calc-btn');
+      const resetBtn = document.getElementById('ppm-reset-btn');
+
+      // Outputs
+      const primaryOut = document.getElementById('ppm-primary-out');
+      const statusOut = document.getElementById('ppm-status-out');
+      const ppbOut = document.getElementById('ppm-ppb-out');
+      const pctOut = document.getElementById('ppm-pct-out');
+      const aqOut = document.getElementById('ppm-aq-out');
+      const pptOut = document.getElementById('ppm-ppt-out');
+
+      const PRESETS = {
+        'epa-lead': { mode: 'mass-ratio', solute: 15.0, sUnit: 'ug', sol: 1.0, solUnit: 'kg' },
+        'epa-arsenic': { mode: 'mass-ratio', solute: 10.0, sUnit: 'ug', sol: 1.0, solUnit: 'kg' },
+        'tap-fluoride': { mode: 'mgl-water', mgl: 0.70 },
+        'chlorine-pool': { mode: 'mgl-water', mgl: 2.0 },
+        'co2-air': { mode: 'gas-ppm', ppmv: 425.0, mw: 44.01, temp: 25.0, press: 1.0 },
+        'co-osha': { mode: 'gas-ppm', ppmv: 50.0, mw: 28.01, temp: 25.0, press: 1.0 },
+        'ocean-salinity': { mode: 'percent-to-ppm', pct: 3.5 }
+      };
+
+      const SOLUTE_TO_MG = {
+        'mg': 1.0,
+        'ug': 0.001,
+        'g': 1000.0,
+        'kg': 1000000.0
+      };
+
+      const SOLUTION_TO_KG = {
+        'kg': 1.0,
+        'g': 0.001,
+        'm3': 1000.0
+      };
+
+      function updatePanelVisibility() {
+        const m = modeSelect.value;
+        massPanel.style.display = m === 'mass-ratio' ? 'block' : 'none';
+        mglPanel.style.display = m === 'mgl-water' ? 'block' : 'none';
+        pctPanel.style.display = m === 'percent-to-ppm' ? 'block' : 'none';
+        gasPanel.style.display = m === 'gas-ppm' ? 'block' : 'none';
+      }
+
+      function calculate() {
+        const mode = modeSelect.value;
+        let ppm = 0;
+
+        if (mode === 'mass-ratio') {
+          const rawSolute = parseFloat(soluteValInput.value) || 0;
+          const soluteMg = rawSolute * (SOLUTE_TO_MG[soluteUnitSelect.value] || 1.0);
+
+          const rawSol = parseFloat(solValInput.value) || 0;
+          const solKg = rawSol * (SOLUTION_TO_KG[solUnitSelect.value] || 1.0);
+
+          if (soluteMg <= 0 || solKg <= 0) {
+            primaryOut.textContent = "-- ppm";
+            statusOut.textContent = "Please enter positive mass values.";
+            return;
+          }
+
+          ppm = soluteMg / solKg; // 1 mg / 1 kg = 1 ppm
+        } else if (mode === 'mgl-water') {
+          const mgl = parseFloat(mglValInput.value) || 0;
+          if (mgl <= 0) {
+            primaryOut.textContent = "-- ppm";
+            statusOut.textContent = "Please enter positive mg/L value.";
+            return;
+          }
+          ppm = mgl;
+        } else if (mode === 'percent-to-ppm') {
+          const pct = parseFloat(pctValInput.value) || 0;
+          if (pct <= 0) {
+            primaryOut.textContent = "-- ppm";
+            statusOut.textContent = "Please enter positive percentage.";
+            return;
+          }
+          ppm = pct * 10000;
+        } else if (mode === 'gas-ppm') {
+          const ppmv = parseFloat(gasPpmvInput.value) || 0;
+          const mw = parseFloat(gasMwInput.value) || 28.01;
+          const tempC = parseFloat(gasTempInput.value) || 25.0;
+          const pressAtm = parseFloat(gasPressInput.value) || 1.0;
+
+          if (ppmv <= 0 || mw <= 0 || pressAtm <= 0) {
+            primaryOut.textContent = "-- ppm";
+            statusOut.textContent = "Please enter positive gas values.";
+            return;
+          }
+
+          ppm = ppmv;
+          // Calculate mg/m3
+          const tempK = tempC + 273.15;
+          const vm = (0.082057 * tempK) / pressAtm;
+          const mgM3 = (ppmv * mw) / vm;
+
+          primaryOut.textContent = ppm.toFixed(2) + " ppm_v";
+          statusOut.textContent = `${mgM3.toFixed(2)} mg/m³ in ambient air at ${tempC}°C, ${pressAtm} atm`;
+          ppbOut.textContent = (ppm * 1000).toLocaleString('en-US', { maximumFractionDigits: 1 }) + " ppb_v";
+          pctOut.textContent = (ppm / 10000).toFixed(6) + "% (vol)";
+          aqOut.textContent = `${mgM3.toFixed(2)} mg/m³`;
+          pptOut.textContent = (ppm * 1000000).toLocaleString('en-US', { maximumFractionDigits: 0 }) + " ppt_v";
+          return;
+        }
+
+        const ppb = ppm * 1000;
+        const ppt = ppm * 1000000;
+        const pct = ppm / 10000;
+        const mgl = ppm;
+
+        // Render to UI
+        primaryOut.textContent = ppm >= 1000 ? ppm.toLocaleString('en-US', { maximumFractionDigits: 2 }) + " ppm" : ppm.toFixed(4) + " ppm";
+        statusOut.textContent = `${mgl.toFixed(4)} mg/L (aqueous) \u2022 ${ppb.toLocaleString('en-US', { maximumFractionDigits: 1 })} ppb`;
+        ppbOut.textContent = ppb.toLocaleString('en-US', { maximumFractionDigits: 2 }) + " ppb";
+        pctOut.textContent = pct >= 0.0001 ? pct.toFixed(4) + "%" : pct.toExponential(4) + "%";
+        aqOut.textContent = mgl >= 1000 ? (mgl / 1000).toFixed(3) + " g/L" : mgl.toFixed(4) + " mg/L";
+        pptOut.textContent = ppt >= 1e9 ? ppt.toExponential(3) + " ppt" : ppt.toLocaleString('en-US', { maximumFractionDigits: 0 }) + " ppt";
+      }
+
+      presetSelect.addEventListener('change', function() {
+        const val = this.value;
+        if (PRESETS[val]) {
+          const p = PRESETS[val];
+          modeSelect.value = p.mode;
+          updatePanelVisibility();
+
+          if (p.mode === 'mass-ratio') {
+            soluteValInput.value = p.solute;
+            soluteUnitSelect.value = p.sUnit;
+            solValInput.value = p.sol;
+            solUnitSelect.value = p.solUnit;
+          } else if (p.mode === 'mgl-water') {
+            mglValInput.value = p.mgl;
+          } else if (p.mode === 'percent-to-ppm') {
+            pctValInput.value = p.pct;
+          } else if (p.mode === 'gas-ppm') {
+            gasPpmvInput.value = p.ppmv;
+            gasMwInput.value = p.mw;
+            gasTempInput.value = p.temp;
+            gasPressInput.value = p.press;
+          }
+          calculate();
+        }
+      });
+
+      modeSelect.addEventListener('change', function() {
+        updatePanelVisibility();
+        calculate();
+      });
+
+      [soluteValInput, soluteUnitSelect, solValInput, solUnitSelect, mglValInput, pctValInput, gasPpmvInput, gasMwInput, gasTempInput, gasPressInput].forEach(el => {
+        el.addEventListener('input', function() {
+          presetSelect.value = 'custom';
+          calculate();
+        });
+        el.addEventListener('change', calculate);
+      });
+
+      calcBtn.addEventListener('click', calculate);
+
+      resetBtn.addEventListener('click', function() {
+        modeSelect.value = 'mass-ratio';
+        presetSelect.value = 'epa-lead';
+        soluteValInput.value = '15.0';
+        soluteUnitSelect.value = 'ug';
+        solValInput.value = '1.0';
+        solUnitSelect.value = 'kg';
+        updatePanelVisibility();
+        calculate();
+      });
+
+      // Initial execution
+      updatePanelVisibility();
+      calculate();
+    })();
+  </script>
+</body>
+</html>

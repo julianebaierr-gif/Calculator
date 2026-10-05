@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Percent Yield Calculator - Chemical Reaction Efficiency &amp; Actual Yield</title>
+  <meta name="description" content="Calculate reaction percent yield (% Yield = Actual / Theoretical * 100%), percent error, stoichiometric limits, and chemical synthesis efficiency.">
+  <link rel="canonical" href="https://calchub.org/percent-yield-calculator.html">
+  <meta property="og:title" content="Percent Yield Calculator - Reaction Efficiency Solver">
+  <meta property="og:description" content="Free chemistry percent yield calculator. Compute percentage yield (% Yield = Actual / Theoretical * 100%), required theoretical mass, and percent error.">
+  <meta property="og:url" content="https://calchub.org/percent-yield-calculator.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Percent Yield Calculator - Chemistry Synthesis Tool">
+  <meta name="twitter:description" content="Determine organic synthesis yield percentages, purification losses, and chemical reaction efficiency with worked proofs.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Percent Yield Calculator",
+    "url": "https://calchub.org/percent-yield-calculator.html",
+    "description": "Calculates chemical reaction percent yield, percent error, and required theoretical reactant amounts for chemical syntheses.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the formula for percent yield in chemistry?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Percent yield is calculated by dividing the experimental actual yield by the stoichiometric theoretical yield and multiplying by 100%: Percent Yield = (Actual Yield / Theoretical Yield) * 100%."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between actual yield and theoretical yield?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Theoretical yield is the maximum possible quantity of product predicted by stoichiometry from the limiting reactant, assuming 100% complete conversion with zero loss. Actual yield is the real mass of pure product measured on an analytical balance after reaction, isolation, and purification in the laboratory."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can a reaction percent yield exceed 100%?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A genuine chemical reaction can never exceed 100% yield due to the Law of Conservation of Mass. However, an apparent yield >100% commonly occurs in laboratory experiments due to experimental errors, such as incomplete drying (residual solvent/water in the sample), presence of unreacted starting materials, or co-crystallized impurities."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What causes reaction percent yields to be less than 100%?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Common factors reducing percent yield include: (1) Reversible thermodynamic equilibrium preventing 100% completion; (2) Competing side reactions forming undesired byproducts; (3) Mechanical losses during filtration, transfer, washing, and recrystallization; (4) Impure starting reactants."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">CalcHub</a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="math.html">Math &amp; Statistics</a>
+        <a href="converter.html">Converters</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="chemical.html">Chemical &amp; Water</a> &rsaquo;
+      <span>Percent Yield Calculator</span>
+    </nav>
+
+    <div class="page-header">
+      <h1 class="page-title">Percent Yield Calculator</h1>
+      <p class="page-desc">Compute reaction percentage yield, actual experimental yields, theoretical maximums, and stoichiometric synthesis efficiency.</p>
+    </div>
+
+    <div class="calc-grid">
+      <!-- Calculator Column -->
+      <div class="calc-card">
+        <div class="calc-header">
+          <h2>Reaction Efficiency &amp; Percent Yield Solver</h2>
+        </div>
+
+        <!-- Mode Selection -->
+        <div class="form-group">
+          <label for="py-mode">Calculation Mode:</label>
+          <select id="py-mode" class="form-control">
+            <option value="find-percent" selected>Calculate Percent Yield (from Actual &amp; Theoretical Yield)</option>
+            <option value="find-actual">Calculate Actual Yield (from Target % &amp; Theoretical Yield)</option>
+            <option value="find-theoretical">Calculate Required Theoretical Yield (from Actual Yield &amp; %)</option>
+          </select>
+        </div>
+
+        <!-- Reaction Presets -->
+        <div class="form-group">
+          <label for="py-preset">Common Reaction Synthesis Preset:</label>
+          <select id="py-preset" class="form-control">
+            <option value="custom">-- Custom Laboratory Synthesis --</option>
+            <option value="aspirin" selected>Aspirin Synthesis (Theor: 15.0 g, Actual: 12.3 g &rarr; 82.0%)</option>
+            <option value="ester">Esterification / Ethyl Acetate (Theor: 50.0 g, Actual: 42.5 g &rarr; 85.0%)</option>
+            <option value="precip">BaSO4 Precipitation (Theor: 2.33 g, Actual: 2.21 g &rarr; 94.8%)</option>
+            <option value="haber">Haber Ammonia Pilot (Theor: 100.0 kg, Actual: 18.0 kg &rarr; 18.0% single-pass)</option>
+            <option value="copper">Copper Displacement (Theor: 6.35 g, Actual: 5.85 g &rarr; 92.1%)</option>
+          </select>
+        </div>
+
+        <!-- Inputs Container -->
+        <div id="py-inputs-container">
+          <!-- Actual Yield Row -->
+          <div class="form-row" id="py-actual-row">
+            <div class="form-group">
+              <label for="py-actual-val">Actual Experimental Yield ($Y_{\text{actual}}$):</label>
+              <input type="number" id="py-actual-val" class="form-control" value="12.3" step="any" min="0.0001">
+            </div>
+            <div class="form-group">
+              <label for="py-actual-unit">Unit:</label>
+              <select id="py-actual-unit" class="form-control">
+                <option value="g" selected>Grams (g)</option>
+                <option value="mg">Milligrams (mg)</option>
+                <option value="kg">Kilograms (kg)</option>
+                <option value="mol">Moles (mol)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Theoretical Yield Row -->
+          <div class="form-row" id="py-theor-row">
+            <div class="form-group">
+              <label for="py-theor-val">Theoretical Stoichiometric Yield ($Y_{\text{theor}}$):</label>
+              <input type="number" id="py-theor-val" class="form-control" value="15.0" step="any" min="0.0001">
+            </div>
+            <div class="form-group">
+              <label for="py-theor-unit">Unit:</label>
+              <select id="py-theor-unit" class="form-control">
+                <option value="g" selected>Grams (g)</option>
+                <option value="mg">Milligrams (mg)</option>
+                <option value="kg">Kilograms (kg)</option>
+                <option value="mol">Moles (mol)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Target Percent Row -->
+          <div class="form-row" id="py-target-row" style="display: none;">
+            <div class="form-group">
+              <label for="py-target-pct">Target Percent Yield (%):</label>
+              <input type="number" id="py-target-pct" class="form-control" value="82.0" step="any" min="0.01" max="100.0">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="py-calc-btn" class="btn btn-primary">Calculate Percent Yield</button>
+          <button type="button" id="py-reset-btn" class="btn btn-secondary">Reset</button>
+        </div>
+
+        <!-- Output Cards -->
+        <div id="py-results" class="results-container" style="margin-top: 1.5rem;">
+          <div class="result-hero-card">
+            <div class="result-label" style="font-size: 0.875rem; color: var(--text-muted, #64748b); text-transform: uppercase; font-weight: 600;">Reaction Percent Yield</div>
+            <div id="py-primary-out" style="font-size: 2.25rem; font-weight: 800; color: var(--primary, #2563eb); margin: 0.25rem 0;">82.00%</div>
+            <div id="py-status-out" style="font-size: 1rem; color: var(--text-secondary, #475569); font-weight: 600;">Good Synthetic Yield (Typical Laboratory Isolation)</div>
+          </div>
+
+          <div class="summary-metrics-grid">
+            <div class="metric-card">
+              <div style="font-size: 0.75rem; color: var(--text-muted, #64748b);">Actual Yield</div>
+              <div id="py-act-out" style="font-size: 1.15rem; font-weight: 700;">12.30 g</div>
+            </div>
+            <div class="metric-card">
+              <div style="font-size: 0.75rem; color: var(--text-muted, #64748b);">Theoretical Yield</div>
+              <div id="py-theor-out" style="font-size: 1.15rem; font-weight: 700;">15.00 g</div>
+            </div>
+            <div class="metric-card">
+              <div style="font-size: 0.75rem; color: var(--text-muted, #64748b);">Mass Loss / Discrepancy</div>
+              <div id="py-loss-out" style="font-size: 1.15rem; font-weight: 700; color: #dc2626;">2.70 g (18.00%)</div>
+            </div>
+            <div class="metric-card">
+              <div style="font-size: 0.75rem; color: var(--text-muted, #64748b);">Percent Error</div>
+              <div id="py-error-out" style="font-size: 1.15rem; font-weight: 700;">18.00%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Reference Sidebar -->
+      <aside class="sidebar-card">
+        <h3>Percent Yield Benchmark Scale</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary, #475569);">General rating of chemical synthesis efficiency:</p>
+        <ul style="font-size: 0.875rem; line-height: 1.6; margin-left: 1.25rem;">
+          <li><strong>&gt; 90%:</strong> Excellent yield (high purity, minimal side products)</li>
+          <li><strong>75% – 90%:</strong> Good synthetic yield (standard academic organic lab)</li>
+          <li><strong>50% – 75%:</strong> Moderate yield (multi-step loss or equilibrium limit)</li>
+          <li><strong>&lt; 50%:</strong> Poor yield (competing pathways or difficult isolation)</li>
+          <li><strong>&gt; 100%:</strong> Incomplete drying (residual solvent) or contaminated</li>
+        </ul>
+
+        <h3 style="margin-top: 1.25rem;">Fundamental Equations</h3>
+        <ul style="font-size: 0.875rem; line-height: 1.6; margin-left: 1.25rem;">
+          <li>\(\% \text{Yield} = \frac{\text{Actual}}{\text{Theoretical}} \times 100\%\)</li>
+          <li>\(\% \text{Error} = \frac{|\text{Theor} - \text{Actual}|}{\text{Theor}} \times 100\%\)</li>
+          <li>\(\text{Loss} = \text{Theor} - \text{Actual}\)</li>
+        </ul>
+      </aside>
+    </div>
+
+    <!-- Long-Form Informational Engineering Article (1,400+ Words) -->
+    <article class="article-body">
+      <h2>1. The Chemical Definition and Practical Purpose of Percent Yield</h2>
+      <p>In synthetic chemistry, chemical manufacturing, and process engineering, percent yield quantifies the efficiency of a chemical reaction by comparing the actual quantity of pure product isolated from a laboratory experiment with the theoretical maximum quantity predicted by stoichiometric laws. Formally:</p>
+      $$\text{Percent Yield } (\% Y) = \left(\frac{\text{Actual Yield}}{\text{Theoretical Yield}}\right) \times 100\%$$
+      <p>Where:</p>
+      <ul>
+        <li><strong>Actual Yield:</strong> The real, experimentally measured mass or molar quantity of purified product obtained after reaction completion, filtration, solvent evaporation, and crystallization.</li>
+        <li><strong>Theoretical Yield:</strong> The maximum calculated quantity of product that could form if 100% of the limiting reactant were converted into the desired product with zero physical loss, zero competing side reactions, and complete stoichiometric conversion.</li>
+      </ul>
+      <p>Percent yield serves as the primary benchmark metric for chemical process optimization, economic feasibility assessment in pharmaceutical manufacturing, and the evaluation of green chemistry atom economies.</p>
+
+      <h2>2. Understanding Theoretical Yield and Limiting Reactants</h2>
+      <p>Theoretical yield is calculated through rigorous stoichiometric dimensional analysis based on the **limiting reactant** (the reactant that is consumed first and stops the reaction). Consider a generalized chemical reaction:</p>
+      $$a\text{ A} + b\text{ B} \longrightarrow c\text{ C}$$
+      <p>To determine the theoretical yield of product \(\text{C}\):</p>
+      <ol>
+        <li>Calculate the starting moles of all reactants: \(n_{\text{A}} = m_{\text{A}} / M_{\text{A}}\) and \(n_{\text{B}} = m_{\text{B}} / M_{\text{B}}\).</li>
+        <li>Normalize by their balanced stoichiometric coefficients to identify the limiting reactant:
+        $$\text{If } \frac{n_{\text{A}}}{a} &lt; \frac{n_{\text{B}}}{b}, \quad \text{then A is the limiting reactant.}$$</li>
+        <li>Calculate the theoretical maximum moles of product \(\text{C}\) based strictly on limiting reactant \(\text{A}\):
+        $$n_{\text{C, theoretical}} = n_{\text{A}} \times \left(\frac{c}{a}\right)$$</li>
+        <li>Convert moles of \(\text{C}\) into mass:
+        $$m_{\text{theoretical}} = n_{\text{C, theoretical}} \times M_{\text{C}}$$</li>
+      </ol>
+
+      <h2>3. Why Chemical Yields Rarely Reach 100%</h2>
+      <p>In real-world laboratories and chemical production plants, reactions rarely achieve a 100% yield. The discrepancy between theoretical predictions and experimental realities stems from several physical, chemical, and operational mechanisms:</p>
+
+      <h3>A. Reversible Chemical Equilibria</h3>
+      <p>Many chemical reactions are thermodynamically reversible. Rather than proceeding to complete \(100\%\) consumption of reactants, the system reaches dynamic chemical equilibrium governed by an equilibrium constant (\(K_{\text{eq}}\)):</p>
+      $$K_{\text{eq}} = \frac{[\text{Products}]^c}{[\text{Reactants}]^a}$$
+      <p>Unless products are continuously removed (e.g., Le Chatelier's principle applied by boiling off a volatile ester or precipitating an insoluble salt), the reaction reaches a steady-state ceiling where reactants and products coexist.</p>
+
+      <h3>B. Competing Side Reactions and Parallel Pathways</h3>
+      <p>Organic molecules frequently react through multiple competing thermodynamic or kinetic pathways. For example, during nucleophilic substitution (\(\text{S}_N2\)), competing elimination (\(\text{E}2\)) reactions often occur simultaneously, diverting a portion of the limiting reactant into unwanted alkene byproducts.</p>
+
+      <h3>C. Physical Separation and Purification Losses</h3>
+      <p>The steps required to isolate pure product invariably cause mechanical losses:</p>
+      <ul>
+        <li><strong>Liquid-Liquid Extraction:</strong> Incomplete partition coefficient distribution between aqueous and organic phases leaves traces of product in the discarded aqueous layer.</li>
+        <li><strong>Recrystallization:</strong> In accordance with solubility curves, a fraction of the desired compound remains dissolved in the cold mother liquor.</li>
+        <li><strong>Adsorption:</strong> Products adhere to filter paper, rotary evaporator glassware, and chromatographic silica gel columns.</li>
+      </ul>
+
+      <h2>4. Diagnosing Yields Exceeding 100%</h2>
+      <p>Because matter can neither be created nor destroyed (Law of Conservation of Mass), an experimental percent yield greater than \(100.0\%\) is physically impossible for a pure product. When an analytical balance reports an apparent yield \(&gt; 100\%\), it signals experimental contamination or weighing error:</p>
+      <ul>
+        <li><strong>Residual Solvent / Moisture:</strong> The most common laboratory cause. If a filtered precipitate is weighed before reaching constant mass in a desiccator or vacuum oven, trapped water or organic solvent inflates the mass reading.</li>
+        <li><strong>Unreacted Starting Material:</strong> Incomplete separation leaves unconsumed reactants co-crystallized with the product.</li>
+        <li><strong>Precipitated Salts:</strong> Byproduct inorganic salts (such as \(\text{NaCl}\) or \(\text{MgSO}_4\) drying agent) may have co-precipitated into the final product flask.</li>
+        <li><strong>Analytical Taring Error:</strong> Failure to properly tare the collection vessel on the laboratory balance.</li>
+      </ul>
+
+      <h2>5. Green Chemistry: Atom Economy vs. Percent Yield</h2>
+      <p>While percent yield measures how efficiently a given chemical procedure executes, it does not assess whether the reaction itself is environmentally sustainable. In modern green chemistry, percent yield is evaluated alongside **Atom Economy** and the **Environmental Factor (\(E\)-Factor\)):</p>
+      $$\text{Atom Economy } (\%) = \left(\frac{\text{Molecular Weight of Desired Product}}{\sum \text{Molecular Weights of All Reactants}}\right) \times 100\%$$
+      <p>A reaction can have a \(95\%\) percent yield but still generate vast quantities of toxic waste if its atom economy is only \(25\%\) (e.g., classical Wittig reactions producing massive triphenylphosphine oxide waste). Modern pharmaceutical green synthesis strives to maximize both percent yield (\(&gt; 85\%\)) and atom economy (\(&gt; 70\%\)).</p>
+
+      <h2>6. Step-by-Step Worked Chemical Case Studies</h2>
+
+      <div class="worked-example-card">
+        <h3>Case Study 1: Laboratory Synthesis of Aspirin (Acetylsalicylic Acid)</h3>
+        <p><strong>Scenario:</strong> An undergraduate chemistry student synthesizes aspirin by reacting \(10.00\text{ grams}\) of salicylic acid (\(\text{C}_7\text{H}_6\text{O}_3\), \(M = 138.12\text{ g/mol}\)) with excess acetic anhydride (\(\text{C}_4\text{H}_6\text{O}_3\)) according to: \(\text{C}_7\text{H}_6\text{O}_3 + \text{C}_4\text{H}_6\text{O}_3 \to \text{C}_9\text{H}_8\text{O}_4 + \text{C}_2\text{H}_4\text{O}_2\). After crystallization and vacuum drying, the student isolates \(10.92\text{ grams}\) of pure dry aspirin (\(\text{C}_9\text{H}_8\text{O}_4\), \(M = 180.16\text{ g/mol}\)). Calculate the theoretical yield and the reaction percent yield.</p>
+        
+        <div class="step-solution">
+          <p><strong>Step 1: Calculate moles of limiting reactant (salicylic acid):</strong></p>
+          $$n_{\text{salicylic}} = \frac{10.00\text{ g}}{138.12\text{ g/mol}} = 0.07240\text{ moles}$$
+
+          <p><strong>Step 2: Determine theoretical moles of aspirin produced:</strong></p>
+          <p>From the \(1:1\) stoichiometric molar ratio:</p>
+          $$n_{\text{aspirin, theoretical}} = 0.07240\text{ moles}$$
+
+          <p><strong>Step 3: Calculate theoretical yield mass:</strong></p>
+          $$m_{\text{theoretical}} = 0.07240\text{ mol} \times 180.16\text{ g/mol} = 13.044\text{ grams}$$
+
+          <p><strong>Step 4: Calculate percent yield from actual isolated mass (\(10.92\text{ g}\)):</strong></p>
+          $$\% \text{Yield} = \left(\frac{10.92\text{ g}}{13.044\text{ g}}\right) \times 100\% = 83.72\%$$
+
+          <p><strong>Step 5: Compute percent error and lost mass:</strong></p>
+          $$\text{Mass Lost in Purification} = 13.044\text{ g} - 10.920\text{ g} = 2.124\text{ grams}$$
+          $$\% \text{Error} = 100.0\% - 83.72\% = 16.28\%$$
+          <p><strong>Conclusion:</strong> The aspirin synthesis achieved an \(83.72\%\) yield, representing a high-efficiency academic organic preparation.</p>
+        </div>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 2: Sizing Reactant Mass for Pilot Scale Production Target</h3>
+        <p><strong>Scenario:</strong> A pilot pharmaceutical plant needs to produce exactly \(25.0\text{ kilograms}\) of an active pharmaceutical ingredient (API). Historical manufacturing telemetry demonstrates that this specific chemical coupling reaction operates at an average percent yield of \(78.5\%\). If the theoretical stoichiometric mass ratio is \(1.20\text{ kg}\) of limiting starting material per \(1.00\text{ kg}\) of theoretical API, calculate the required theoretical yield and the mass of starting reactant needed.</p>
+        
+        <div class="step-solution">
+          <p><strong>Step 1: Calculate required theoretical yield from target actual yield:</strong></p>
+          $$\% \text{Yield} = \frac{\text{Actual}}{\text{Theoretical}} \times 100\% \implies \text{Theoretical} = \frac{\text{Actual}}{\% \text{Yield} / 100}$$
+          $$\text{Theoretical Yield Required} = \frac{25.0\text{ kg}}{0.785} = 31.847\text{ kilograms}$$
+
+          <p><strong>Step 2: Calculate required starting material mass:</strong></p>
+          $$m_{\text{starting material}} = 31.847\text{ kg theoretical API} \times 1.20\text{ kg reactant/kg API} = 38.22\text{ kg}$$
+          <p><strong>Engineering Result:</strong> The chemical plant must charge \(38.22\text{ kg}\) of limiting reactant into the reactor to guarantee obtaining \(25.0\text{ kg}\) of finished isolated API under \(78.5\%\) operating yield conditions.</p>
+        </div>
+      </div>
+
+      <h2>7. Frequently Asked Questions (Synthetic Organic Chemistry)</h2>
+      <div class="faq-accordion">
+        <details class="faq-item">
+          <summary>What is an isolated yield versus an assay yield?</summary>
+          <div class="faq-answer">
+            <p>An isolated yield is the mass of pure, dry product collected in a vial after all purification steps (recrystallization, chromatography). An assay yield (or in-situ NMR/HPLC yield) measures the percentage of product present in the crude reaction mixture before any workup or isolation. The difference between assay yield and isolated yield reveals how much product is lost specifically during mechanical purification.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>How does multi-step synthesis affect overall cumulative yield?</summary>
+          <div class="faq-answer">
+            <p>In multi-step chemical syntheses (such as total synthesis of natural products), overall cumulative yield is the mathematical product of the individual step yields: \(\% Y_{\text{overall}} = Y_1 \times Y_2 \times \dots \times Y_n\). If an 8-step sequence has an impressive 85% yield at each step, the overall yield is: \(0.85^8 \approx 0.272\) or only 27.2%. This compounding decay demonstrates why process chemists seek convergent rather than linear synthetic routes.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>Does temperature influence percent yield?</summary>
+          <div class="faq-answer">
+            <p>Significantly. For exothermic reversible reactions, Le Chatelier's principle dictates that raising temperature shifts equilibrium toward reactants, reducing theoretical equilibrium yield. Conversely, running a reaction at too low a temperature may reduce kinetic reaction rates to near zero, resulting in incomplete conversion within practical reaction times. Finding the optimal temperature window balances reaction velocity against equilibrium yield and byproduct formation.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>What is the difference between percent yield and percent purity?</summary>
+          <div class="faq-answer">
+            <p>Percent yield measures quantity (how much of the theoretical maximum product was made), whereas percent purity measures quality (what percentage of the isolated solid is actually the target molecule versus impurities). A chemist might isolate a 95% yield of crude product that is only 70% pure; after recrystallization, they might obtain an 80% yield that is 99.5% pure.</p>
+          </div>
+        </details>
+      </div>
+
+      <h2>8. Related Chemical Stoichiometry Calculators</h2>
+      <p>Explore our integrated chemistry computation suite to solve theoretical yields, moles, and solution concentrations:</p>
+      <div class="related-calculators" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        <a href="moles-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Moles Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Convert between sample grams, chemical moles, and Avogadro particle counts.</p>
+        </a>
+        <a href="percent-composition-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Percent Composition Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Determine elemental mass percentages (% w/w) in chemical formulas.</p>
+        </a>
+        <a href="molar-mass-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Molar Mass Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Calculate molecular weights and elemental proportions from chemical formulas.</p>
+        </a>
+        <a href="mass-percent-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Mass Percent Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Determine solution weight concentration (% w/w) and solute/solvent mass ratios.</p>
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h3>CalcHub</h3>
+        <p>Your comprehensive engineering, mathematical, physical, and financial computational authority.</p>
+      </div>
+      <div class="footer-col">
+        <h3>Calculators</h3>
+        <ul>
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="math.html">Mathematics</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Chemical &amp; Water</h3>
+        <ul>
+          <li><a href="percent-yield-calculator.html">Percent Yield</a></li>
+          <li><a href="percent-composition-calculator.html">Percent Composition</a></li>
+          <li><a href="moles-calculator.html">Moles Calculator</a></li>
+          <li><a href="mass-percent-calculator.html">Mass Percent</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. High-precision engineering formulas and calculators. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      // DOM Elements
+      const modeSelect = document.getElementById('py-mode');
+      const presetSelect = document.getElementById('py-preset');
+
+      const actualRow = document.getElementById('py-actual-row');
+      const actualValInput = document.getElementById('py-actual-val');
+      const actualUnitSelect = document.getElementById('py-actual-unit');
+
+      const theorRow = document.getElementById('py-theor-row');
+      const theorValInput = document.getElementById('py-theor-val');
+      const theorUnitSelect = document.getElementById('py-theor-unit');
+
+      const targetRow = document.getElementById('py-target-row');
+      const targetPctInput = document.getElementById('py-target-pct');
+
+      const calcBtn = document.getElementById('py-calc-btn');
+      const resetBtn = document.getElementById('py-reset-btn');
+
+      // Outputs
+      const primaryOut = document.getElementById('py-primary-out');
+      const statusOut = document.getElementById('py-status-out');
+      const actOut = document.getElementById('py-act-out');
+      const theorOut = document.getElementById('py-theor-out');
+      const lossOut = document.getElementById('py-loss-out');
+      const errorOut = document.getElementById('py-error-out');
+
+      const UNIT_TO_GRAMS = {
+        'g': 1.0,
+        'mg': 0.001,
+        'kg': 1000.0,
+        'mol': 1.0 // nominal equivalent
+      };
+
+      const PRESETS = {
+        'aspirin': { act: 12.3, theor: 15.0, unit: 'g' },
+        'ester': { act: 42.5, theor: 50.0, unit: 'g' },
+        'precip': { act: 2.21, theor: 2.33, unit: 'g' },
+        'haber': { act: 18.0, theor: 100.0, unit: 'kg' },
+        'copper': { act: 5.85, theor: 6.35, unit: 'g' }
+      };
+
+      function updatePanelVisibility() {
+        const m = modeSelect.value;
+        if (m === 'find-percent') {
+          actualRow.style.display = 'flex';
+          theorRow.style.display = 'flex';
+          targetRow.style.display = 'none';
+        } else if (m === 'find-actual') {
+          actualRow.style.display = 'none';
+          theorRow.style.display = 'flex';
+          targetRow.style.display = 'flex';
+        } else if (m === 'find-theoretical') {
+          actualRow.style.display = 'flex';
+          theorRow.style.display = 'none';
+          targetRow.style.display = 'flex';
+        }
+      }
+
+      function calculate() {
+        const mode = modeSelect.value;
+        let actual = 0;
+        let theoretical = 0;
+        let pctYield = 0;
+        const unit = actualUnitSelect.value;
+
+        if (mode === 'find-percent') {
+          actual = parseFloat(actualValInput.value) || 0;
+          theoretical = parseFloat(theorValInput.value) || 0;
+
+          if (actual <= 0 || theoretical <= 0) {
+            primaryOut.textContent = "-- %";
+            statusOut.textContent = "Please enter positive yield values.";
+            return;
+          }
+
+          pctYield = (actual / theoretical) * 100;
+        } else if (mode === 'find-actual') {
+          theoretical = parseFloat(theorValInput.value) || 0;
+          const targetPct = parseFloat(targetPctInput.value) || 0;
+
+          if (theoretical <= 0 || targetPct <= 0) {
+            primaryOut.textContent = "-- %";
+            statusOut.textContent = "Please enter positive target % and theoretical yield.";
+            return;
+          }
+
+          pctYield = targetPct;
+          actual = theoretical * (targetPct / 100);
+        } else if (mode === 'find-theoretical') {
+          actual = parseFloat(actualValInput.value) || 0;
+          const targetPct = parseFloat(targetPctInput.value) || 0;
+
+          if (actual <= 0 || targetPct <= 0) {
+            primaryOut.textContent = "-- %";
+            statusOut.textContent = "Please enter positive actual yield and target %.";
+            return;
+          }
+
+          pctYield = targetPct;
+          theoretical = actual / (targetPct / 100);
+        }
+
+        const massLoss = theoretical - actual;
+        const pctError = Math.abs(theoretical - actual) / theoretical * 100;
+
+        // Status Message
+        let statusMsg = "";
+        if (pctYield > 100) {
+          statusMsg = "Warning: Yield > 100% indicates solvent contamination or drying error.";
+        } else if (pctYield >= 90) {
+          statusMsg = "Excellent Yield (>90% synthetic efficiency)";
+        } else if (pctYield >= 70) {
+          statusMsg = "Good Synthetic Yield (standard laboratory reaction)";
+        } else if (pctYield >= 50) {
+          statusMsg = "Moderate Yield (equilibrium or purification limits)";
+        } else {
+          statusMsg = "Low Yield (<50% - significant side reactions or loss)";
+        }
+
+        // Render to UI
+        primaryOut.textContent = pctYield.toFixed(2) + "%";
+        statusOut.textContent = statusMsg;
+        actOut.textContent = actual.toFixed(2) + " " + unit;
+        theorOut.textContent = theoretical.toFixed(2) + " " + unit;
+        lossOut.textContent = massLoss >= 0 ? `${massLoss.toFixed(2)} ${unit} (${(100 - pctYield).toFixed(2)}%)` : `+${Math.abs(massLoss).toFixed(2)} ${unit} excess`;
+        errorOut.textContent = pctError.toFixed(2) + "%";
+      }
+
+      presetSelect.addEventListener('change', function() {
+        const val = this.value;
+        if (PRESETS[val]) {
+          const p = PRESETS[val];
+          modeSelect.value = 'find-percent';
+          updatePanelVisibility();
+          actualValInput.value = p.act;
+          theorValInput.value = p.theor;
+          actualUnitSelect.value = p.unit;
+          theorUnitSelect.value = p.unit;
+          calculate();
+        }
+      });
+
+      modeSelect.addEventListener('change', function() {
+        updatePanelVisibility();
+        calculate();
+      });
+
+      [actualValInput, actualUnitSelect, theorValInput, theorUnitSelect, targetPctInput].forEach(el => {
+        el.addEventListener('input', function() {
+          presetSelect.value = 'custom';
+          calculate();
+        });
+        el.addEventListener('change', calculate);
+      });
+
+      calcBtn.addEventListener('click', calculate);
+
+      resetBtn.addEventListener('click', function() {
+        modeSelect.value = 'find-percent';
+        presetSelect.value = 'aspirin';
+        actualValInput.value = '12.3';
+        theorValInput.value = '15.0';
+        actualUnitSelect.value = 'g';
+        theorUnitSelect.value = 'g';
+        targetPctInput.value = '82.0';
+        updatePanelVisibility();
+        calculate();
+      });
+
+      // Initial execution
+      updatePanelVisibility();
+      calculate();
+    })();
+  </script>
+</body>
+</html>

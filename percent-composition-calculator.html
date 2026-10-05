@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Percent Composition Calculator - Elemental Mass Percentage in Compounds</title>
+  <meta name="description" content="Calculate elemental percent composition by mass, molecular formula weights, empirical formulas, and combustion analysis with step-by-step chemistry proofs.">
+  <link rel="canonical" href="https://calchub.org/percent-composition-calculator.html">
+  <meta property="og:title" content="Percent Composition Calculator - Elemental Mass % Solver">
+  <meta property="og:description" content="Free chemistry percent composition calculator. Compute elemental mass percentages (% E = n * M_E / M_total * 100%), empirical formulas, and molecular weights.">
+  <meta property="og:url" content="https://calchub.org/percent-composition-calculator.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Percent Composition Calculator - Chemical Formula Analysis">
+  <meta name="twitter:description" content="Determine mass percentages of elements in chemical formulas with empirical and molecular analysis case studies.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Percent Composition Calculator",
+    "url": "https://calchub.org/percent-composition-calculator.html",
+    "description": "Calculates the mass percent composition of elements in chemical compounds, total formula weights, and empirical formula proportions.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the formula for percent composition by mass?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The percent composition of an element in a chemical compound is calculated as: % Composition = (n * Molar Mass of Element / Total Molar Mass of Compound) * 100%, where n is the number of atoms of that element in one formula unit or molecule."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do you find the empirical formula from percent composition?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "To determine an empirical formula: (1) Assume a 100-gram sample, converting each element's percentage directly into grams; (2) Convert grams to moles by dividing by each element's atomic mass; (3) Divide all molar amounts by the smallest calculated mole value to obtain relative molar ratios; (4) If non-integers result, multiply by the smallest common factor to obtain the simplest whole-number ratio."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between an empirical formula and a molecular formula?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "An empirical formula represents the simplest whole-number ratio of atoms in a compound (e.g., CH2O for glucose), whereas a molecular formula gives the exact actual number of atoms of each element in a single discrete molecule (e.g., C6H12O6 for glucose). The molecular formula is always an integer multiple (n) of the empirical formula."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why must the sum of all percent compositions equal 100%?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "By the Law of Conservation of Mass and the Law of Definite Proportions (Proust's Law), the total mass of any chemical compound is precisely the sum of the masses of its constituent elements. Therefore, the sum of all individual elemental mass percentages in a pure compound must equal exactly 100% (within minor rounding discrepancies)."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">CalcHub</a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="math.html">Math &amp; Statistics</a>
+        <a href="converter.html">Converters</a>
+        <a href="engineering.html" class="active">Engineering</a>
+        <a href="finance.html">Finance</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <nav class="breadcrumb-nav">
+      <a href="index.html">Home</a> &rsaquo;
+      <a href="chemical.html">Chemical &amp; Water</a> &rsaquo;
+      <span>Percent Composition Calculator</span>
+    </nav>
+
+    <div class="page-header">
+      <h1 class="page-title">Percent Composition Calculator</h1>
+      <p class="page-desc">Determine elemental mass percentages (% w/w) in chemical formulas, molecular weights, and empirical formula ratios with step-by-step breakdowns.</p>
+    </div>
+
+    <div class="calc-grid">
+      <!-- Calculator Column -->
+      <div class="calc-card">
+        <div class="calc-header">
+          <h2>Elemental Mass Percentage Solver</h2>
+        </div>
+
+        <!-- Compound Presets -->
+        <div class="form-group">
+          <label for="pc-preset">Common Chemical Compound Preset:</label>
+          <select id="pc-preset" class="form-control">
+            <option value="custom">-- Custom Chemical Compound --</option>
+            <option value="water" selected>Water (H2O: H = 11.19%, O = 88.81%)</option>
+            <option value="glucose">Glucose (C6H12O6: C = 40.00%, H = 6.71%, O = 53.29%)</option>
+            <option value="co2">Carbon Dioxide (CO2: C = 27.29%, O = 72.71%)</option>
+            <option value="ethanol">Ethanol (C2H6O: C = 52.14%, H = 13.13%, O = 34.73%)</option>
+            <option value="caffeine">Caffeine (C8H10N4O2: C = 49.48%, H = 5.19%, N = 28.85%, O = 16.48%)</option>
+            <option value="paracetamol">Acetaminophen / Paracetamol (C8H9NO2)</option>
+            <option value="caco3">Calcium Carbonate (CaCO3: Ca = 40.04%, C = 12.00%, O = 47.96%)</option>
+            <option value="h2so4">Sulfuric Acid (H2SO4: H = 2.06%, S = 32.69%, O = 65.25%)</option>
+            <option value="aspirin">Aspirin / Acetylsalicylic Acid (C9H8O4)</option>
+          </select>
+        </div>
+
+        <!-- Dynamic Element Rows Container -->
+        <div id="pc-elements-container">
+          <div style="font-size: 0.875rem; font-weight: 600; color: var(--text-muted, #64748b); margin-bottom: 0.5rem; text-transform: uppercase;">Elements in Compound:</div>
+          <!-- Rows will be populated via JS -->
+        </div>
+
+        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
+          <button type="button" id="pc-add-element-btn" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">+ Add Element</button>
+        </div>
+
+        <div class="form-actions" style="margin-top: 1.25rem;">
+          <button type="button" id="pc-calc-btn" class="btn btn-primary">Calculate Percent Composition</button>
+          <button type="button" id="pc-reset-btn" class="btn btn-secondary">Reset</button>
+        </div>
+
+        <!-- Output Cards -->
+        <div id="pc-results" class="results-container" style="margin-top: 1.5rem;">
+          <div class="result-hero-card">
+            <div class="result-label" style="font-size: 0.875rem; color: var(--text-muted, #64748b); text-transform: uppercase; font-weight: 600;">Total Molecular Weight</div>
+            <div id="pc-mw-out" style="font-size: 2.25rem; font-weight: 800; color: var(--primary, #2563eb); margin: 0.25rem 0;">18.015 g/mol</div>
+            <div id="pc-summary-out" style="font-size: 1rem; color: var(--text-secondary, #475569); font-weight: 600;">2 Elements &bull; 3 Total Atoms</div>
+          </div>
+
+          <!-- Breakdown Table -->
+          <div class="table-responsive" style="margin-top: 1rem;">
+            <table class="data-table" id="pc-breakdown-table" style="font-size: 0.9rem;">
+              <thead>
+                <tr>
+                  <th>Element</th>
+                  <th>Subscript (\(n\))</th>
+                  <th>Atomic Mass (\(\text{g/mol}\))</th>
+                  <th>Total Mass (\(\text{g/mol}\))</th>
+                  <th>Percent by Mass</th>
+                </tr>
+              </thead>
+              <tbody id="pc-breakdown-body">
+                <!-- Dynamically generated rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Reference Sidebar -->
+      <aside class="sidebar-card">
+        <h3>Standard Atomic Weights (IUPAC)</h3>
+        <ul style="font-size: 0.875rem; line-height: 1.6; margin-left: 1.25rem;">
+          <li><strong>Hydrogen (H):</strong> 1.008 g/mol</li>
+          <li><strong>Carbon (C):</strong> 12.011 g/mol</li>
+          <li><strong>Nitrogen (N):</strong> 14.007 g/mol</li>
+          <li><strong>Oxygen (O):</strong> 15.999 g/mol</li>
+          <li><strong>Sodium (Na):</strong> 22.990 g/mol</li>
+          <li><strong>Magnesium (Mg):</strong> 24.305 g/mol</li>
+          <li><strong>Phosphorus (P):</strong> 30.974 g/mol</li>
+          <li><strong>Sulfur (S):</strong> 32.065 g/mol</li>
+          <li><strong>Chlorine (Cl):</strong> 35.453 g/mol</li>
+          <li><strong>Potassium (K):</strong> 39.098 g/mol</li>
+          <li><strong>Calcium (Ca):</strong> 40.078 g/mol</li>
+          <li><strong>Iron (Fe):</strong> 55.845 g/mol</li>
+        </ul>
+
+        <h3 style="margin-top: 1.25rem;">Key Formula</h3>
+        <ul style="font-size: 0.875rem; line-height: 1.6; margin-left: 1.25rem;">
+          <li>\(\% E = \frac{n \times M_E}{M_{\text{compound}}} \times 100\%\)</li>
+          <li>\(\sum \% E_i = 100.0\%\)</li>
+        </ul>
+      </aside>
+    </div>
+
+    <!-- Long-Form Informational Engineering Article (1,400+ Words) -->
+    <article class="article-body">
+      <h2>1. The Fundamental Chemical Principles of Percent Composition</h2>
+      <p>The percent composition by mass of a chemical compound defines the relative proportion of each constituent chemical element present within the substance, expressed as a percentage of the compound's total molecular weight or formula mass. In analytical chemistry, materials science, and synthetic organic synthesis, determining elemental percent composition is the foundational step for verifying compound purity, establishing empirical formulas, and characterizing novel synthesized pharmaceuticals.</p>
+      <p>The mathematical equation for the mass percentage of any chemical element \(E\) in a pure compound is:</p>
+      $$\% E = \left(\frac{n_E \times M_E}{M_{\text{compound}}}\right) \times 100\%$$
+      <p>Where:</p>
+      <ul>
+        <li><strong>\(n_E\):</strong> The stoichiometric subscript representing the number of atoms of element \(E\) contained in one discrete molecular formula unit.</li>
+        <li><strong>\(M_E\):</strong> The standard atomic weight (molar mass) of element \(E\) in grams per mole (\(\text{g/mol}\)), grounded in IUPAC standard atomic weights.</li>
+        <li><strong>\(M_{\text{compound}}\):</strong> The aggregate molar mass (molecular weight) of the chemical compound, computed by summing the atomic weights of all constituent atoms:
+        $$M_{\text{compound}} = \sum_{i=1}^k (n_i \times M_i)$$</li>
+      </ul>
+      <p>By the Law of Conservation of Mass and the Law of Definite Proportions (formulated by French chemist Joseph Proust in 1799), every pure chemical compound always contains its constituent elements in strictly fixed, invariant mass ratios, regardless of the method of synthesis or geographical origin. Consequently, the sum of the individual elemental mass percentages must sum precisely to unity (100%):</p>
+      $$\sum_{i=1}^k \% E_i = 100.00\%$$
+
+      <h2>2. Empirical Formulas vs. Molecular Formulas</h2>
+      <p>A crucial distinction in chemical analysis exists between empirical and molecular formulas:</p>
+      <ul>
+        <li><strong>Empirical Formula:</strong> The simplest integer ratio of elements present in a compound. For instance, the empirical formula of both acetylene (\(\text{C}_2\text{H}_2\)) and benzene (\(\text{C}_6\text{H}_6\)) is \(\text{CH}\), because both contain carbon and hydrogen in a \(1:1\) atomic ratio, corresponding to \(92.26\%\text{ C}\) and \(7.74\%\text{ H}\) by mass.</li>
+        <li><strong>Molecular Formula:</strong> The exact actual number of atoms of each element present in a single discrete molecule. The molecular formula of benzene is \(\text{C}_6\text{H}_6\), while for glucose it is \(\text{C}_6\text{H}_{12}\text{O}_6\) (whose empirical formula is \(\text{CH}_2\text{O}\)).</li>
+      </ul>
+      <p>The integer scaling factor \(n_{\text{factor}}\) between the empirical formula and molecular formula is determined by dividing the experimentally measured molecular molar mass (e.g., via mass spectrometry) by the empirical formula weight:</p>
+      $$n_{\text{factor}} = \frac{M_{\text{molecular (measured)}}}{M_{\text{empirical}}} \implies \text{Molecular Formula} = (\text{Empirical Formula})_{n_{\text{factor}}}$$
+
+      <h2>3. Combustion Analysis: From Experimental Combustion to Percent Composition</h2>
+      <p>For organic compounds composed primarily of carbon, hydrogen, nitrogen, and oxygen, analytical laboratories determine elemental percentages using instrumental **combustion elemental analysis** (CHN analysis). In this method, a precisely weighed sample (\(m_{\text{sample}}\)) is combusted in pure oxygen at temperatures exceeding \(1,000^\circ\text{C}\):</p>
+      $$\text{C}_x\text{H}_y\text{O}_z\text{N}_w + \text{excess O}_2 \longrightarrow x\text{ CO}_2 + \frac{y}{2}\text{ H}_2\text{O} + \frac{w}{2}\text{ N}_2$$
+      <p>The combustion products are captured and weighed selectively:</p>
+      <ol>
+        <li><strong>Carbon Determination:</strong> All carbon in the sample is converted into carbon dioxide (\(\text{CO}_2\), \(M = 44.01\text{ g/mol}\)). The mass of carbon in the original sample is:
+        $$m_{\text{C}} = m_{\text{CO}_2} \times \left(\frac{12.011}{44.010}\right) \implies \% \text{C} = \left(\frac{m_{\text{C}}}{m_{\text{sample}}}\right) \times 100\%$$</li>
+        <li><strong>Hydrogen Determination:</strong> All hydrogen is trapped as water vapor (\(\text{H}_2\text{O}\), \(M = 18.015\text{ g/mol}\)):
+        $$m_{\text{H}} = m_{\text{H}_2\text{O}} \times \left(\frac{2 \times 1.008}{18.015}\right) \implies \% \text{H} = \left(\frac{m_{\text{H}}}{m_{\text{sample}}}\right) \times 100\%$$</li>
+        <li><strong>Oxygen Determination (by Difference):</strong> Because oxygen cannot be measured directly due to the combustion gas atmosphere, its mass percentage is determined by subtracting all other quantified elements from 100%:
+        $$\% \text{O} = 100.00\% - (\% \text{C} + \% \text{H} + \% \text{N})$$</li>
+      </ol>
+
+      <h2>4. Elemental Percent Composition Benchmark Table</h2>
+      <p>The following engineering reference table details molecular formulas, molecular weights, and individual elemental mass percentages across common industrial compounds, fuels, and biological molecules:</p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Compound Name</th>
+              <th>Molecular Formula</th>
+              <th>Molar Mass (\(M\))</th>
+              <th>Primary Element %</th>
+              <th>Secondary Element %</th>
+              <th>Other Elements %</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Water</td>
+              <td>H₂O</td>
+              <td>18.015 g/mol</td>
+              <td>O: 88.79%</td>
+              <td>H: 11.21%</td>
+              <td>&mdash;</td>
+            </tr>
+            <tr>
+              <td>Methane</td>
+              <td>CH₄</td>
+              <td>16.043 g/mol</td>
+              <td>C: 74.87%</td>
+              <td>H: 25.13%</td>
+              <td>&mdash;</td>
+            </tr>
+            <tr>
+              <td>Carbon Dioxide</td>
+              <td>CO₂</td>
+              <td>44.010 g/mol</td>
+              <td>O: 72.71%</td>
+              <td>C: 27.29%</td>
+              <td>&mdash;</td>
+            </tr>
+            <tr>
+              <td>Ethanol</td>
+              <td>C₂H₆O</td>
+              <td>46.068 g/mol</td>
+              <td>C: 52.14%</td>
+              <td>O: 34.73%</td>
+              <td>H: 13.13%</td>
+            </tr>
+            <tr>
+              <td>Glucose (Dextrose)</td>
+              <td>C₆H₁₂O₆</td>
+              <td>180.156 g/mol</td>
+              <td>O: 53.29%</td>
+              <td>C: 40.00%</td>
+              <td>H: 6.71%</td>
+            </tr>
+            <tr>
+              <td>Caffeine</td>
+              <td>C₈H₁₀N₄O₂</td>
+              <td>194.191 g/mol</td>
+              <td>C: 49.48%</td>
+              <td>N: 28.85%</td>
+              <td>O: 16.48%, H: 5.19%</td>
+            </tr>
+            <tr>
+              <td>Aspirin</td>
+              <td>C₉H₈O₄</td>
+              <td>180.157 g/mol</td>
+              <td>C: 60.00%</td>
+              <td>O: 35.52%</td>
+              <td>H: 4.48%</td>
+            </tr>
+            <tr>
+              <td>Acetaminophen</td>
+              <td>C₈H₉NO₂</td>
+              <td>151.163 g/mol</td>
+              <td>C: 63.56%</td>
+              <td>O: 21.17%</td>
+              <td>N: 9.27%, H: 6.00%</td>
+            </tr>
+            <tr>
+              <td>Sulfuric Acid</td>
+              <td>H₂SO₄</td>
+              <td>98.079 g/mol</td>
+              <td>O: 65.25%</td>
+              <td>S: 32.69%</td>
+              <td>H: 2.06%</td>
+            </tr>
+            <tr>
+              <td>Calcium Carbonate</td>
+              <td>CaCO₃</td>
+              <td>100.087 g/mol</td>
+              <td>O: 47.96%</td>
+              <td>Ca: 40.04%</td>
+              <td>C: 12.00%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>5. Step-by-Step Worked Chemical Case Studies</h2>
+
+      <div class="worked-example-card">
+        <h3>Case Study 1: Calculating Elemental Percent Composition of Caffeine (C₈H₁₀N₄O₂)</h3>
+        <p><strong>Scenario:</strong> Analytical chemists quality-testing synthetic caffeine (\(\text{C}_8\text{H}_{10}\text{N}_4\text{O}_2\)) need to establish theoretical elemental mass percentages to benchmark combustion CHN microanalysis. Calculate the molecular formula weight and the exact mass percentage of Carbon, Hydrogen, Nitrogen, and Oxygen.</p>
+        
+        <div class="step-solution">
+          <p><strong>Step 1: Identify standard atomic weights:</strong></p>
+          <ul>
+            <li>Carbon (C): \(12.011\text{ g/mol}\), subscript \(n = 8\)</li>
+            <li>Hydrogen (H): \(1.008\text{ g/mol}\), subscript \(n = 10\)</li>
+            <li>Nitrogen (N): \(14.007\text{ g/mol}\), subscript \(n = 4\)</li>
+            <li>Oxygen (O): \(15.999\text{ g/mol}\), subscript \(n = 2\)</li>
+          </ul>
+
+          <p><strong>Step 2: Calculate total mass contributed by each element:</strong></p>
+          $$m_{\text{C}} = 8 \times 12.011 = 96.088\text{ g/mol}$$
+          $$m_{\text{H}} = 10 \times 1.008 = 10.080\text{ g/mol}$$
+          $$m_{\text{N}} = 4 \times 14.007 = 56.028\text{ g/mol}$$
+          $$m_{\text{O}} = 2 \times 15.999 = 31.998\text{ g/mol}$$
+
+          <p><strong>Step 3: Calculate total molecular weight:</strong></p>
+          $$M_{\text{caffeine}} = 96.088 + 10.080 + 56.028 + 31.998 = 194.194\text{ g/mol}$$
+
+          <p><strong>Step 4: Compute individual percent compositions:</strong></p>
+          $$\% \text{C} = \left(\frac{96.088}{194.194}\right) \times 100\% = 49.480\%$$
+          $$\% \text{H} = \left(\frac{10.080}{194.194}\right) \times 100\% = 5.191\%$$
+          $$\% \text{N} = \left(\frac{56.028}{194.194}\right) \times 100\% = 28.852\%$$
+          $$\% \text{O} = \left(\frac{31.998}{194.194}\right) \times 100\% = 16.477\%$$
+
+          <p><strong>Step 5: Verify summation:</strong></p>
+          $$\sum \% = 49.480 + 5.191 + 28.852 + 16.477 = 100.00\%$$
+          <p><strong>Result:</strong> Pure caffeine contains \(49.48\%\text{ C}\), \(5.19\%\text{ H}\), \(28.85\%\text{ N}\), and \(16.48\%\text{ O}\) by mass.</p>
+        </div>
+      </div>
+
+      <div class="worked-example-card">
+        <h3>Case Study 2: Deriving Empirical and Molecular Formula of Vitamin C (Ascorbic Acid)</h3>
+        <p><strong>Scenario:</strong> Elemental microanalysis of a \(10.00\text{-gram}\) sample of purified Vitamin C yields \(40.92\%\) Carbon, \(4.58\%\) Hydrogen, and \(54.50\%\) Oxygen by mass. Mass spectrometry indicates a molecular molar mass of approximately \(176.12\text{ g/mol}\). Determine the empirical formula and the true molecular formula.</p>
+        
+        <div class="step-solution">
+          <p><strong>Step 1: Convert percentages to grams (assuming 100 g sample):</strong></p>
+          $$m_{\text{C}} = 40.92\text{ g}, \quad m_{\text{H}} = 4.58\text{ g}, \quad m_{\text{O}} = 54.50\text{ g}$$
+
+          <p><strong>Step 2: Convert grams to moles of each element:</strong></p>
+          $$n_{\text{C}} = \frac{40.92\text{ g}}{12.011\text{ g/mol}} = 3.4069\text{ mol}$$
+          $$n_{\text{H}} = \frac{4.58\text{ g}}{1.008\text{ g/mol}} = 4.5436\text{ mol}$$
+          $$n_{\text{O}} = \frac{54.50\text{ g}}{15.999\text{ g/mol}} = 3.4065\text{ mol}$$
+
+          <p><strong>Step 3: Divide by smallest mole value (\(3.4065\text{ mol}\)):</strong></p>
+          $$\text{C}: \frac{3.4069}{3.4065} = 1.00, \quad \text{H}: \frac{4.5436}{3.4065} = 1.334 \approx 1\frac{1}{3}, \quad \text{O}: \frac{3.4065}{3.4065} = 1.00$$
+
+          <p><strong>Step 4: Multiply by 3 to clear the fraction (\(4/3\)):</strong></p>
+          $$\text{C}: 1 \times 3 = 3, \quad \text{H}: 1.333 \times 3 = 4, \quad \text{O}: 1 \times 3 = 3$$
+          $$\textbf{Empirical Formula: } \text{C}_3\text{H}_4\text{O}_3$$
+
+          <p><strong>Step 5: Compute empirical formula mass and scaling factor:</strong></p>
+          $$M_{\text{empirical}} = (3 \times 12.011) + (4 \times 1.008) + (3 \times 15.999) = 36.033 + 4.032 + 47.997 = 88.062\text{ g/mol}$$
+          $$n_{\text{factor}} = \frac{M_{\text{molecular}}}{M_{\text{empirical}}} = \frac{176.12}{88.062} \approx 2.00$$
+          $$\textbf{Molecular Formula: } (\text{C}_3\text{H}_4\text{O}_3)_2 = \text{C}_6\text{H}_8\text{O}_6$$
+          <p><strong>Conclusion:</strong> The empirical formula is \(\text{C}_3\text{H}_4\text{O}_3\) and the true molecular formula of Vitamin C is \(\text{C}_6\text{H}_8\text{O}_6\).</p>
+        </div>
+      </div>
+
+      <h2>6. Frequently Asked Questions (Applied Chemistry &amp; Assay)</h2>
+      <div class="faq-accordion">
+        <details class="faq-item">
+          <summary>Can two different compounds have identical percent compositions?</summary>
+          <div class="faq-answer">
+            <p>Yes. Chemical isomers (compounds with identical molecular formulas but different structural connectivity, such as ethanol and dimethyl ether, both C2H6O) have completely identical percent compositions. Furthermore, any two compounds that share the same empirical formula (such as formaldehyde CH2O, acetic acid C2H4O2, and glucose C6H12O6) possess exactly identical mass percentages (40.0% C, 6.71% H, 53.29% O) despite having vastly different physical, chemical, and biological properties.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>How does isotopic abundance affect percent composition calculations?</summary>
+          <div class="faq-answer">
+            <p>Standard periodic table atomic weights represent the weighted average of all naturally occurring stable isotopes on Earth. For example, carbon is 98.93% Carbon-12 and 1.07% Carbon-13, yielding an average atomic mass of 12.011 g/mol. In specialty applications like nuclear reactor engineering or NMR isotopic labeling, isotopically enriched compounds (such as deuterated water D2O, where deuterium has mass 2.014 g/mol) have dramatically altered percent compositions (D2O is 20.1% Hydrogen/Deuterium by mass, compared to 11.2% for normal H2O).</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>What is water of crystallization and how is it included in percent composition?</summary>
+          <div class="faq-answer">
+            <p>Many inorganic salts incorporate water molecules into their solid crystal matrix (hydrates), such as copper(II) sulfate pentahydrate: CuSO4·5H2O. When calculating percent composition, the mass of the 5 bound water molecules (5 * 18.015 = 90.075 g/mol) must be included in the total formula mass (249.68 g/mol). Water of crystallization itself can be treated as an individual component: % H2O = (90.075 / 249.68) * 100% = 36.08%.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>How do mineralogists use percent composition?</summary>
+          <div class="faq-answer">
+            <p>Mining engineers and geochemists use percent composition to determine theoretical ore grade and metal recovery potential. For example, in copper mining, chalcopyrite (CuFeS2, formula mass 183.52 g/mol) has a theoretical copper content of % Cu = (63.546 / 183.52) * 100% = 34.63%. Knowing this theoretical ceiling allows metallurgists to evaluate extraction efficiency from crushed raw ore.</p>
+          </div>
+        </details>
+      </div>
+
+      <h2>7. Related Stoichiometry &amp; Chemical Calculators</h2>
+      <p>Explore our integrated directory of chemical tools to solve empirical formulas, reaction yields, and solution preparations:</p>
+      <div class="related-calculators" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        <a href="molar-mass-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Molar Mass Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Compute formula weights and molecular weights from chemical symbols.</p>
+        </a>
+        <a href="moles-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Moles Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Convert between grams, moles ($n = m/M$), and Avogadro particle counts.</p>
+        </a>
+        <a href="mass-percent-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Mass Percent Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Determine solution weight concentration (% w/w) and solute/solvent mass ratios.</p>
+        </a>
+        <a href="percent-yield-calculator.html" class="calc-card" style="padding: 1rem; text-decoration: none; color: inherit;">
+          <h4 style="margin: 0 0 0.5rem 0; color: var(--primary, #2563eb);">Percent Yield Calculator</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary, #475569);">Calculate reaction efficiency from actual and theoretical yield limits.</p>
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h3>CalcHub</h3>
+        <p>Your comprehensive engineering, mathematical, physical, and financial computational authority.</p>
+      </div>
+      <div class="footer-col">
+        <h3>Calculators</h3>
+        <ul>
+          <li><a href="index.html">All Calculators</a></li>
+          <li><a href="math.html">Mathematics</a></li>
+          <li><a href="converter.html">Unit Converters</a></li>
+          <li><a href="engineering.html">Electrical &amp; Engineering</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Chemical &amp; Water</h3>
+        <ul>
+          <li><a href="percent-composition-calculator.html">Percent Composition</a></li>
+          <li><a href="molar-mass-calculator.html">Molar Mass Calculator</a></li>
+          <li><a href="moles-calculator.html">Moles Calculator</a></li>
+          <li><a href="mass-percent-calculator.html">Mass Percent</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CalcHub. High-precision engineering formulas and calculators. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      // DOM Elements
+      const presetSelect = document.getElementById('pc-preset');
+      const elementsContainer = document.getElementById('pc-elements-container');
+      const addElementBtn = document.getElementById('pc-add-element-btn');
+      const calcBtn = document.getElementById('pc-calc-btn');
+      const resetBtn = document.getElementById('pc-reset-btn');
+
+      const mwOut = document.getElementById('pc-mw-out');
+      const summaryOut = document.getElementById('pc-summary-out');
+      const breakdownBody = document.getElementById('pc-breakdown-body');
+
+      const COMMON_ELEMENTS = {
+        'H': 1.008, 'He': 4.003, 'Li': 6.941, 'Be': 9.012, 'B': 10.811,
+        'C': 12.011, 'N': 14.007, 'O': 15.999, 'F': 18.998, 'Ne': 20.180,
+        'Na': 22.990, 'Mg': 24.305, 'Al': 26.982, 'Si': 28.085, 'P': 30.974,
+        'S': 32.065, 'Cl': 35.453, 'K': 39.098, 'Ca': 40.078, 'Fe': 55.845,
+        'Cu': 63.546, 'Zn': 65.380, 'Br': 79.904, 'Ag': 107.868, 'I': 126.904
+      };
+
+      const PRESETS = {
+        'water': [
+          { symbol: 'H', count: 2, mw: 1.008 },
+          { symbol: 'O', count: 1, mw: 15.999 }
+        ],
+        'glucose': [
+          { symbol: 'C', count: 6, mw: 12.011 },
+          { symbol: 'H', count: 12, mw: 1.008 },
+          { symbol: 'O', count: 6, mw: 15.999 }
+        ],
+        'co2': [
+          { symbol: 'C', count: 1, mw: 12.011 },
+          { symbol: 'O', count: 2, mw: 15.999 }
+        ],
+        'ethanol': [
+          { symbol: 'C', count: 2, mw: 12.011 },
+          { symbol: 'H', count: 6, mw: 1.008 },
+          { symbol: 'O', count: 1, mw: 15.999 }
+        ],
+        'caffeine': [
+          { symbol: 'C', count: 8, mw: 12.011 },
+          { symbol: 'H', count: 10, mw: 1.008 },
+          { symbol: 'N', count: 4, mw: 14.007 },
+          { symbol: 'O', count: 2, mw: 15.999 }
+        ],
+        'paracetamol': [
+          { symbol: 'C', count: 8, mw: 12.011 },
+          { symbol: 'H', count: 9, mw: 1.008 },
+          { symbol: 'N', count: 1, mw: 14.007 },
+          { symbol: 'O', count: 2, mw: 15.999 }
+        ],
+        'caco3': [
+          { symbol: 'Ca', count: 1, mw: 40.078 },
+          { symbol: 'C', count: 1, mw: 12.011 },
+          { symbol: 'O', count: 3, mw: 15.999 }
+        ],
+        'h2so4': [
+          { symbol: 'H', count: 2, mw: 1.008 },
+          { symbol: 'S', count: 1, mw: 32.065 },
+          { symbol: 'O', count: 4, mw: 15.999 }
+        ],
+        'aspirin': [
+          { symbol: 'C', count: 9, mw: 12.011 },
+          { symbol: 'H', count: 8, mw: 1.008 },
+          { symbol: 'O', count: 4, mw: 15.999 }
+        ]
+      };
+
+      function createRow(symbol = 'H', count = 1, mw = 1.008) {
+        const row = document.createElement('div');
+        row.className = 'form-row pc-element-row';
+        row.style.marginBottom = '0.5rem';
+        row.style.alignItems = 'flex-end';
+
+        row.innerHTML = `
+          <div class="form-group" style="flex: 1; min-width: 80px;">
+            <label style="font-size: 0.75rem;">Element</label>
+            <input type="text" class="form-control pc-el-symbol" value="${symbol}" placeholder="e.g. C">
+          </div>
+          <div class="form-group" style="flex: 1; min-width: 80px;">
+            <label style="font-size: 0.75rem;">Subscript (n)</label>
+            <input type="number" class="form-control pc-el-count" value="${count}" min="1" step="1">
+          </div>
+          <div class="form-group" style="flex: 1.5; min-width: 110px;">
+            <label style="font-size: 0.75rem;">Atomic Wt (g/mol)</label>
+            <input type="number" class="form-control pc-el-mw" value="${mw}" step="any" min="0.001">
+          </div>
+          <button type="button" class="btn btn-secondary pc-remove-btn" style="padding: 0.5rem 0.75rem; margin-bottom: 1rem; color: #dc2626;">&times;</button>
+        `;
+
+        const symInput = row.querySelector('.pc-el-symbol');
+        const countInput = row.querySelector('.pc-el-count');
+        const mwInput = row.querySelector('.pc-el-mw');
+        const removeBtn = row.querySelector('.pc-remove-btn');
+
+        symInput.addEventListener('input', function() {
+          const sym = this.value.trim();
+          if (COMMON_ELEMENTS[sym]) {
+            mwInput.value = COMMON_ELEMENTS[sym];
+          }
+          presetSelect.value = 'custom';
+          calculate();
+        });
+
+        countInput.addEventListener('input', function() {
+          presetSelect.value = 'custom';
+          calculate();
+        });
+
+        mwInput.addEventListener('input', function() {
+          presetSelect.value = 'custom';
+          calculate();
+        });
+
+        removeBtn.addEventListener('click', function() {
+          if (elementsContainer.querySelectorAll('.pc-element-row').length > 1) {
+            row.remove();
+            presetSelect.value = 'custom';
+            calculate();
+          }
+        });
+
+        return row;
+      }
+
+      function loadPreset(key) {
+        elementsContainer.innerHTML = '';
+        const list = PRESETS[key] || PRESETS['water'];
+        list.forEach(item => {
+          elementsContainer.appendChild(createRow(item.symbol, item.count, item.mw));
+        });
+        calculate();
+      }
+
+      function calculate() {
+        const rows = elementsContainer.querySelectorAll('.pc-element-row');
+        let totalMW = 0;
+        let totalAtoms = 0;
+        const elementsData = [];
+
+        rows.forEach(r => {
+          const sym = r.querySelector('.pc-el-symbol').value.trim() || 'X';
+          const n = parseInt(r.querySelector('.pc-el-count').value, 10) || 1;
+          const mw = parseFloat(r.querySelector('.pc-el-mw').value) || 1.0;
+
+          const mass = n * mw;
+          totalMW += mass;
+          totalAtoms += n;
+
+          elementsData.push({
+            symbol: sym,
+            count: n,
+            atomicMass: mw,
+            totalMass: mass
+          });
+        });
+
+        if (totalMW <= 0) {
+          mwOut.textContent = "-- g/mol";
+          summaryOut.textContent = "Please enter valid elements.";
+          breakdownBody.innerHTML = '';
+          return;
+        }
+
+        mwOut.textContent = totalMW.toFixed(3) + " g/mol";
+        summaryOut.textContent = `${elementsData.length} Elements \u2022 ${totalAtoms} Total Atoms`;
+
+        // Render Breakdown Table
+        breakdownBody.innerHTML = '';
+        elementsData.forEach(el => {
+          const pct = (el.totalMass / totalMW) * 100;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong>${el.symbol}</strong></td>
+            <td>${el.count}</td>
+            <td>${el.atomicMass.toFixed(3)}</td>
+            <td>${el.totalMass.toFixed(3)}</td>
+            <td><strong style="color: var(--primary, #2563eb);">${pct.toFixed(2)}%</strong></td>
+          `;
+          breakdownBody.appendChild(tr);
+        });
+      }
+
+      presetSelect.addEventListener('change', function() {
+        if (this.value !== 'custom') {
+          loadPreset(this.value);
+        }
+      });
+
+      addElementBtn.addEventListener('click', function() {
+        elementsContainer.appendChild(createRow('C', 1, 12.011));
+        presetSelect.value = 'custom';
+        calculate();
+      });
+
+      calcBtn.addEventListener('click', calculate);
+
+      resetBtn.addEventListener('click', function() {
+        presetSelect.value = 'water';
+        loadPreset('water');
+      });
+
+      // Initial execution
+      loadPreset('water');
+    })();
+  </script>
+</body>
+</html>
