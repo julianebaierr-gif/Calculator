@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jumping Jacks Calories Burned Calculator | Reps, Tempo & MET Formula</title>
+    <meta name="description" content="Calculate calories burned doing jumping jacks by repetition count, cadence tempo, workout duration, and body weight using biomechanical work and MET formulas.">
+    <link rel="canonical" href="https://calchub.com/jumping-jacks-calories-burned-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Jumping Jacks Calories Burned Calculator",
+      "url": "https://calchub.com/jumping-jacks-calories-burned-calculator.html",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
+      "description": "Calculates calories burned during jumping jacks calisthenics using repetition count, workout duration, jumping tempo, and body weight."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How many calories do jumping jacks burn per minute?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "At a standard moderate cadence of 45 to 55 repetitions per minute (MET 8.0), a 150-lb (68 kg) individual burns approximately 9.0 to 10.0 calories per minute (540 to 600 kcal/hour). Vigorous ballistic intervals exceeding 65 reps per minute can elevate energy expenditure to 12.0 to 14.0 calories per minute."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many calories are burned per 100 jumping jacks?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Performing 100 jumping jacks typically requires between 1.5 and 2.0 minutes at a standard rhythm. For a 150-lb individual, 100 jumping jacks burns approximately 15 to 20 calories. For a 200-lb individual, 100 jumping jacks burns approximately 20 to 26 calories."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What muscles are recruited during jumping jacks?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Jumping jacks are a full-body ballistic movement engaging the gastrocnemius, soleus, quadriceps, gluteus medius, and hip adductors for takeoff and landing, while the lateral deltoids, supraspinatus, trapezius, and core abdominal stabilizers control arm abduction and trunk stability."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the MET value for jumping jacks in the Compendium of Physical Activities?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In the Compendium of Physical Activities, jumping jacks fall under calisthenics code 02054 (calisthenics, vigorous effort, jumping jacks), which is assigned a standardized metabolic equivalent of 8.0 METs. Moderate continuous calisthenic rhythmic jumping is rated at 5.0 to 6.0 METs."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="health.html">Health &amp; Fitness</a>
+                <a href="datetime.html">Date &amp; Time</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="health.html">Health &amp; Fitness</a> &gt; <span>Jumping Jacks Calories Burned Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Jumping Jacks Calories Burned Calculator</h1>
+                        <p class="calc-desc">Calculate caloric energy expenditure, gravitational potential work, and ballistic cadence metrics for jumping jacks using Compendium MET standards and Newtonian physics.</p>
+                    </div>
+                                        <div class="calc-body">
+                        <div class="calc-form">
+                            <div class="unit-toggle-group">
+                                <span class="unit-toggle-label">Unit System:</span>
+                                <div class="toggle-buttons">
+                                    <button type="button" class="unit-btn active" id="jj-unit-imp" onclick="setJJUnit('imperial')">Imperial (lbs)</button>
+                                    <button type="button" class="unit-btn" id="jj-unit-met" onclick="setJJUnit('metric')">Metric (kg)</button>
+                                </div>
+                            </div>
+
+                            <div class="input-grid">
+                                <div class="form-group">
+                                    <label for="jj-weight" id="jj-weight-lbl">Body Weight (lbs):</label>
+                                    <input type="number" id="jj-weight" class="calc-input" value="165" min="50" max="450" step="1">
+                                    <span class="input-hint">Your body mass</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="jj-mode">Calculation Mode:</label>
+                                    <select id="jj-mode" class="calc-input" onchange="toggleJJMode()">
+                                        <option value="duration" selected>Workout Duration (Minutes)</option>
+                                        <option value="reps">Total Repetition Count</option>
+                                    </select>
+                                    <span class="input-hint">Input method</span>
+                                </div>
+
+                                <div class="form-group" id="group-jj-duration">
+                                    <label for="jj-duration">Workout Duration (minutes):</label>
+                                    <input type="number" id="jj-duration" class="calc-input" value="15" min="1" max="120" step="1">
+                                    <span class="input-hint">Total time performing jacks</span>
+                                </div>
+
+                                <div class="form-group" id="group-jj-reps" style="display:none;">
+                                    <label for="jj-reps">Total Completed Repetitions:</label>
+                                    <input type="number" id="jj-reps" class="calc-input" value="500" min="10" max="5000" step="10">
+                                    <span class="input-hint">Count of individual jumping jacks</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="jj-cadence">Cadence &amp; Ballistic Intensity:</label>
+                                    <select id="jj-cadence" class="calc-input">
+                                        <option value="40">Slow / Low-Impact (35-40 reps/min, ~5.5 METs)</option>
+                                        <option value="50" selected>Moderate Rhythm (45-55 reps/min, ~8.0 METs)</option>
+                                        <option value="65">Vigorous / Fast Pace (60-70 reps/min, ~9.5 METs)</option>
+                                        <option value="80">HIIT Max Ballistic (75+ reps/min, ~11.0 METs)</option>
+                                    </select>
+                                    <span class="input-hint">Cadence speed and effort</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="jj-vest">Weighted Vest / Extra Load (lbs/kg):</label>
+                                    <input type="number" id="jj-vest" class="calc-input" value="0" min="0" max="60" step="1">
+                                    <span class="input-hint">Additional external load (0 for bodyweight only)</span>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn-primary" onclick="calculateJumpingJacks()">Calculate Jumping Jack Calories</button>
+                        </div>
+
+                        <div class="calc-results" id="jj-results">
+                            <h2>Session Expenditure Breakdown</h2>
+                            <div class="result-highlight-card">
+                                <span class="highlight-label">Total Caloric Expenditure</span>
+                                <span class="highlight-val" id="res-jj-total-kcal">157 kcal</span>
+                                <span class="highlight-sub" id="res-jj-rate">10.5 kcal / minute (629 kcal/hour)</span>
+                            </div>
+
+                            <div class="results-stats-grid">
+                                <div class="stat-card">
+                                    <span class="stat-title">Estimated Total Repetitions</span>
+                                    <span class="stat-value" id="res-jj-total-reps">750 reps</span>
+                                    <span class="stat-desc">Cumulative completed jumps</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-title">Metabolic Equivalent</span>
+                                    <span class="stat-value" id="res-jj-mets">8.0 METs</span>
+                                    <span class="stat-desc">Compendium code 02054</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-title">Gravitational Work (W)</span>
+                                    <span class="stat-value" id="res-jj-work">44.1 kJ</span>
+                                    <span class="stat-desc">Mechanical energy hoisting center of mass</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-title">Running Equivalence</span>
+                                    <span class="stat-value" id="res-jj-run-equiv">1.35 miles</span>
+                                    <span class="stat-desc">Equivalent aerobic jog distance</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        let jjUnit = 'imperial';
+
+                        function setJJUnit(unit) {
+                            jjUnit = unit;
+                            document.getElementById('jj-unit-imp').classList.toggle('active', unit === 'imperial');
+                            document.getElementById('jj-unit-met').classList.toggle('active', unit === 'metric');
+
+                            const wInput = document.getElementById('jj-weight');
+                            const wLbl = document.getElementById('jj-weight-lbl');
+                            if (unit === 'metric') {
+                                wLbl.textContent = 'Body Weight (kg):';
+                                wInput.value = (parseFloat(wInput.value) * 0.453592).toFixed(1);
+                            } else {
+                                wLbl.textContent = 'Body Weight (lbs):';
+                                wInput.value = (parseFloat(wInput.value) / 0.453592).toFixed(1);
+                            }
+                            calculateJumpingJacks();
+                        }
+
+                        function toggleJJMode() {
+                            const mode = document.getElementById('jj-mode').value;
+                            document.getElementById('group-jj-duration').style.display = (mode === 'duration') ? 'block' : 'none';
+                            document.getElementById('group-jj-reps').style.display = (mode === 'reps') ? 'block' : 'none';
+                            calculateJumpingJacks();
+                        }
+
+                        function calculateJumpingJacks() {
+                            let rawWeight = parseFloat(document.getElementById('jj-weight').value) || 165;
+                            let mode = document.getElementById('jj-mode').value;
+                            let vestLoad = parseFloat(document.getElementById('jj-vest').value) || 0;
+                            let cadence = parseFloat(document.getElementById('jj-cadence').value) || 50;
+
+                            let weightKg = (jjUnit === 'imperial') ? rawWeight * 0.453592 : rawWeight;
+                            let vestKg = (jjUnit === 'imperial') ? vestLoad * 0.453592 : vestLoad;
+                            let totalMassKg = weightKg + vestKg;
+
+                            let durationMin = 15;
+                            let totalReps = 750;
+
+                            if (mode === 'duration') {
+                                durationMin = parseFloat(document.getElementById('jj-duration').value) || 15;
+                                totalReps = Math.round(durationMin * cadence);
+                            } else {
+                                totalReps = parseFloat(document.getElementById('jj-reps').value) || 500;
+                                durationMin = totalReps / cadence;
+                            }
+
+                            let mets = 8.0;
+                            if (cadence <= 40) mets = 5.5;
+                            else if (cadence <= 50) mets = 8.0;
+                            else if (cadence <= 65) mets = 9.5;
+                            else mets = 11.0;
+
+                            // Scale METs if carrying weighted vest
+                            if (vestKg > 0) {
+                                mets *= (1.0 + (vestKg / weightKg) * 0.7);
+                            }
+
+                            let totalKcal = durationMin * (mets * 3.5 * totalMassKg) / 200;
+                            let kcalRate = (durationMin > 0) ? totalKcal / durationMin : 0;
+                            let kcalPerHour = kcalRate * 60;
+
+                            // Biomechanical Gravitational Work: W = m * g * delta_h * reps
+                            // Average vertical displacement of center of mass ~ 8 cm (0.08 m) per jump
+                            let deltaH = 0.08;
+                            let workJoules = totalMassKg * 9.80665 * deltaH * totalReps;
+                            let workKJ = workJoules / 1000;
+
+                            // Running equivalence: ~100 kcal per mile for 150 lb person
+                            let runMiles = totalKcal / (weightKg * 1.60934 * 0.95);
+
+                            document.getElementById('res-jj-total-kcal').textContent = Math.round(totalKcal) + ' kcal';
+                            document.getElementById('res-jj-rate').textContent = kcalRate.toFixed(1) + ' kcal / min (' + Math.round(kcalPerHour) + ' kcal/hr)';
+                            document.getElementById('res-jj-total-reps').textContent = Math.round(totalReps) + ' reps';
+                            document.getElementById('res-jj-mets').textContent = mets.toFixed(1) + ' METs';
+                            document.getElementById('res-jj-work').textContent = workKJ.toFixed(1) + ' kJ';
+                            document.getElementById('res-jj-run-equiv').textContent = runMiles.toFixed(2) + ' miles (' + (runMiles * 1.60934).toFixed(2) + ' km)';
+                        }
+
+                        window.addEventListener('DOMContentLoaded', calculateJumpingJacks);
+                    </script>
+                </div>
+                <article class="article-body">
+                    <h2>Biomechanical &amp; Neuromuscular Anatomy of the Jumping Jack</h2>
+<p>The jumping jack—known historically in British physical education as the "star jump"—is one of the most widely performed calisthenic exercises in human physical conditioning. Despite its simplicity, the exercise engages a complex sequence of ballistic plyometrics, rapid eccentric-concentric stretch-shortening cycles, and multi-joint kinetic chain coordination.</p>
+
+<p>Every repetition of a jumping jack consists of two distinct biomechanical phases:</p>
+
+<ol>
+    <li><strong>The Abduction / Aerial Phase:</strong> The gastrocnemius, soleus, quadriceps, and gluteus medius generate explosive triple extension at the hips, knees, and ankles, propelling the total body mass vertically off the floor. Simultaneously, the middle deltoids, supraspinatus, and trapezius fire concentrically to abduct both arms through a $180^\circ$ coronal arc until the hands meet overhead, while the hip abductors spread the lower extremities outward past shoulder width.</li>
+    <li><strong>The Adduction / Impact Absorption Phase:</strong> As gravitational acceleration pulls the body back to the deck, the feet strike in wide dorsiflexion. The hip adductors (adductor magnus, longus, brevis) and pectineus contract violently to bring the thighs back to the anatomical midline, while the latissimus dorsi, pectoralis major, and teres major depress and adduct the arms back against the lateral torso.</li>
+</ol>
+
+<h2>Caloric Expenditure Physics: Gravitational Work ($W = mgh$) &amp; Elastic Recovery</h2>
+<p>To understand the energetic cost of jumping jacks from first principles of Newtonian mechanics, we evaluate the external mechanical work performed against Earth's gravitational acceleration ($g = 9.80665 \, \text{m/s}^2$). In each jump, the human center of mass (located approximately near the second sacral vertebra, $S_2$) is elevated vertically by height displacement $\Delta h$ (typically averaging between $0.06 \, \text{and } 0.10 \, \text{meters}$, or $2.5 \, \text{to } 4.0 \, \text{inches}$ depending on cadence and jumping vigor):</p>
+
+$$W_{\text{single jump}} = m \cdot g \cdot \Delta h$$
+
+<p>For an individual with body mass $m = 75 \, \text{kg}$ ($165 \, \text{lbs}$) performing a jump with $\Delta h = 0.08 \, \text{meters}$:</p>
+
+$$W_{\text{single jump}} = 75 \, \text{kg} \times 9.80665 \, \text{m/s}^2 \times 0.08 \, \text{m} = 58.84 \, \text{Joules}$$
+
+<p>Across $500 \, \text{repetitions}$, the total cumulative external vertical work performed is:</p>
+
+$$W_{\text{total}} = 500 \times 58.84 \, \text{J} = 29,420 \, \text{Joules} = 29.42 \, \text{kJ}$$
+
+<p>However, total metabolic caloric consumption is vastly higher than pure vertical work due to three major physiological mechanisms:</p>
+<ul>
+    <li><strong>Upper Extremity Kinetic Acceleration:</strong> The human upper extremities constitute roughly $10\%$ of total body mass. Accelerating both arms from rest through a $180^\circ$ overhead trajectory at $50$ to $60$ repetitions per minute requires massive repetitive muscular work by the shoulder girdle.</li>
+    <li><strong>Internal Muscle Work and Co-contraction:</strong> Antagonist muscles must fire continuously to decelerate the limbs at the extremes of range of motion, consuming chemical ATP without contributing to positive external work.</li>
+    <li><strong>Thermodynamic Inefficiency:</strong> Human skeletal muscle converts metabolic energy into mechanical work at an efficiency of only $20\% - 25\%$, while $75\% - 80\%$ is released as thermal heat.</li>
+</ul>
+
+<h2>Compendium of Physical Activities MET Classifications</h2>
+<p>In clinical exercise epidemiology, energy expenditure for calisthenics is standardized using the <strong>Compendium of Physical Activities</strong>. Jumping jacks are categorized under code <strong>02054</strong>:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Cadence &amp; Intensity Category</th>
+            <th>Repetition Tempo (RPM)</th>
+            <th>Compendium MET Rating</th>
+            <th>Burn Rate (140 lb / 63.5 kg)</th>
+            <th>Burn Rate (180 lb / 81.6 kg)</th>
+            <th>Cardiovascular Training Zone</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Low-Impact / Step Jacks</strong></td>
+            <td>$30 - 40 \, \text{reps/min}$</td>
+            <td>$5.0 \, \text{METs}$</td>
+            <td>$5.5 \, \text{kcal/min}$</td>
+            <td>$7.1 \, \text{kcal/min}$</td>
+            <td>Zone 1 - 2 Aerobic Base</td>
+        </tr>
+        <tr>
+            <td><strong>Moderate Rhythmic Jacks</strong></td>
+            <td>$45 - 55 \, \text{reps/min}$</td>
+            <td>$8.0 \, \text{METs}$</td>
+            <td>$8.9 \, \text{kcal/min}$</td>
+            <td>$11.4 \, \text{kcal/min}$</td>
+            <td>Zone 3 Aerobic Steady-State</td>
+        </tr>
+        <tr>
+            <td><strong>Vigorous Ballistic Jacks</strong></td>
+            <td>$60 - 70 \, \text{reps/min}$</td>
+            <td>$9.5 \, \text{METs}$</td>
+            <td>$10.6 \, \text{kcal/min}$</td>
+            <td>$13.6 \, \text{kcal/min}$</td>
+            <td>Zone 4 Lactate Threshold</td>
+        </tr>
+        <tr>
+            <td><strong>HIIT Max Tabata Intervals</strong></td>
+            <td>$75+ \, \text{reps/min}$</td>
+            <td>$11.5 \, \text{METs}$</td>
+            <td>$12.8 \, \text{kcal/min}$</td>
+            <td>$16.4 \, \text{kcal/min}$</td>
+            <td>Zone 5 Anaerobic Capacity</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>How Many Calories Are Burned per 100, 500, and 1,000 Jumping Jacks?</h2>
+<p>The exact caloric cost of a specific repetition benchmark depends heavily on the athlete's body mass and cadenced speed. Because heavier bodies require greater force to accelerate vertically, caloric expenditure scales in direct linear proportion to body weight:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Repetition Benchmark</th>
+            <th>Approximate Duration (at 50 RPM)</th>
+            <th>130 lb (59 kg) Person</th>
+            <th>160 lb (72.6 kg) Person</th>
+            <th>200 lb (90.7 kg) Person</th>
+            <th>240 lb (108.9 kg) Person</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>100 Jumping Jacks</strong></td>
+            <td>2.0 minutes</td>
+            <td>$16.5 \, \text{kcal}$</td>
+            <td>$20.3 \, \text{kcal}$</td>
+            <td>$25.4 \, \text{kcal}$</td>
+            <td>$30.5 \, \text{kcal}$</td>
+        </tr>
+        <tr>
+            <td><strong>250 Jumping Jacks</strong></td>
+            <td>5.0 minutes</td>
+            <td>$41.3 \, \text{kcal}$</td>
+            <td>$50.8 \, \text{kcal}$</td>
+            <td>$63.5 \, \text{kcal}$</td>
+            <td>$76.2 \, \text{kcal}$</td>
+        </tr>
+        <tr>
+            <td><strong>500 Jumping Jacks</strong></td>
+            <td>10.0 minutes</td>
+            <td>$82.6 \, \text{kcal}$</td>
+            <td>$101.6 \, \text{kcal}$</td>
+            <td>$127.0 \, \text{kcal}$</td>
+            <td>$152.4 \, \text{kcal}$</td>
+        </tr>
+        <tr>
+            <td><strong>1,000 Jumping Jacks</strong></td>
+            <td>20.0 minutes</td>
+            <td>$165.2 \, \text{kcal}$</td>
+            <td>$203.2 \, \text{kcal}$</td>
+            <td>$254.0 \, \text{kcal}$</td>
+            <td>$304.8 \, \text{kcal}$</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Worked Biomechanical Case Study: 15-Minute Calisthenic Session</h2>
+<div class="worked-example-card">
+    <h3>HIIT Calisthenic Protocol: 15 Minutes at 60 RPM Cadence</h3>
+    <p><strong>Subject Profile:</strong> A 32-year-old fitness enthusiast weighing $175 \, \text{lbs}$ ($79.38 \, \text{kg}$) executes a continuous 15-minute jumping jack workout maintaining a brisk tempo of $60 \, \text{reps/min}$ (totaling $900 \, \text{reps}$).</p>
+
+    <div class="step-solution">
+        <h4>Step 1: Determine Metabolic Intensity (METs)</h4>
+        <p>A cadence of $60 \, \text{reps/min}$ falls into the vigorous ballistic category, corresponding to an empirical MET value of $9.5 \, \text{METs}$.</p>
+
+        <h4>Step 2: Calculate Gross Rate of Oxygen Consumption (VO2)</h4>
+        $$\text{VO}_2 = 9.5 \times 3.5 = 33.25 \, \text{mL}\cdot\text{kg}^{-1}\cdot\text{min}^{-1}$$
+
+        <h4>Step 3: Compute Caloric Burn Rate and Total Expenditure</h4>
+        $$\text{Kcal/min} = \frac{33.25 \times 79.38}{200} = \frac{2,639.4}{200} = 13.20 \, \text{kcal/min}$$
+        $$\text{Total Energy Expended (15 min)} = 13.20 \times 15 = 198.0 \, \text{kcal}$$
+
+        <h4>Step 4: Compute External Mechanical Gravitational Work</h4>
+        $$\Delta h = 0.08 \, \text{meters per jump}$$
+        $$W = 79.38 \, \text{kg} \times 9.80665 \, \text{m/s}^2 \times 0.08 \, \text{m} \times 900 \, \text{reps}$$
+        $$W = 56,048 \, \text{Joules} = 56.05 \, \text{kJ}$$
+
+        <h4>Step 5: Compare Against Equivalent Jogging Distance</h4>
+        $$\text{Running Economy} \approx 1.0 \, \text{kcal/kg/km} \implies 79.38 \, \text{kcal per km}$$
+        $$\text{Equivalent Distance} = \frac{198.0 \, \text{kcal}}{79.38 \, \text{kcal/km}} = 2.49 \, \text{km} \, (1.55 \, \text{miles})$$
+
+        <h4>Clinical Assessment</h4>
+        <p>In 15 minutes, the participant completed 900 ground impacts, lifted their center of mass through a cumulative vertical displacement of $72 \, \text{meters}$ ($236 \, \text{feet}$), and burned $198 \, \text{kcal}$—achieving the precise metabolic conditioning of a 1.55-mile outdoor run.</p>
+    </div>
+</div>
+
+<h2>Frequently Asked Questions About Jumping Jacks Calorie Burn</h2>
+<h3>How many calories do jumping jacks burn per minute?</h3>
+<p>At a standard cadence of 45 to 55 repetitions per minute (MET 8.0), a 150-lb (68 kg) individual burns approximately 9.0 to 10.0 calories per minute (540 to 600 kcal/hour). High-intensity intervals exceeding 65 reps per minute can elevate energy expenditure to 12.0 to 14.0 calories per minute.</p>
+
+<h3>How many calories are burned per 100 jumping jacks?</h3>
+<p>Performing 100 jumping jacks takes approximately 1.5 to 2.0 minutes. A 150-lb individual burns roughly 18 to 22 calories per 100 jacks, while a 200-lb individual burns 24 to 28 calories.</p>
+
+<h3>What muscles are recruited during jumping jacks?</h3>
+<p>Jumping jacks recruit the gastrocnemius, soleus, quadriceps, gluteus medius, and hip adductors for the vertical jump, while the middle deltoids, supraspinatus, upper trapezius, and core abdominal musculature coordinate arm abduction and torso stabilization.</p>
+
+<h3>What is the MET value for jumping jacks in the Compendium of Physical Activities?</h3>
+<p>Under the Compendium of Physical Activities, jumping jacks are coded as 02054 with an official value of 8.0 METs for vigorous effort. Low-impact or modified step jacks fall between 5.0 and 6.0 METs.</p>
+
+<h3>Do jumping jacks improve bone mineral density?</h3>
+<p>Yes. The repetitive ground reaction forces ($1.5\times$ to $2.0\times$ body weight) generate piezoelectric mechanical strain across the calcaneus, tibia, and femoral neck, stimulating osteoblast activity and helping prevent osteopenia and osteoporosis in both adolescents and aging adults.</p>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚖️</span>
+            <h3 class="widget-title">Related Health & Fitness</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bmr-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMR Calculator</a></li>
+            <li><a href="macro-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Macro Split Calculator</a></li>
+            <li><a href="calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Calculator (TDEE)</a></li>
+            <li><a href="bmi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Daily Water Intake</a></li>
+            <li><a href="a1c-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> HbA1c to eAG Glucose Sizer</a></li>
+            <li><a href="bac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Blood Alcohol (BAC) Clearance</a></li>
+            <li><a href="body-surface-area-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Surface Area (Mosteller)</a></li>
+            <li><a href="bsa-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Oncology BSA & Calvert Dosing</a></li>
+            <li><a href="calorie-deficit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Deficit & Fat Loss Planner</a></li>
+            <li><a href="calories-burned-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exercise Calories Burned (METs)</a></li>
+            <li><a href="carbohydrate-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Carbohydrate Intake & Glycogen</a></li>
+            <li><a href="cholesterol-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cholesterol Ratio & Castelli Risk</a></li>
+            <li><a href="due-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Due Date & Gestation</a></li>
+            <li><a href="fat-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Dietary Fat Intake (Grams/Day)</a></li>
+            <li><a href="heart-rate-zone-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heart Rate Zone (Karvonen HRR)</a></li>
+            <li><a href="lean-body-mass-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lean Body Mass (Boer & James)</a></li>
+            <li><a href="max-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Max Heart Rate (Tanaka & Gulati)</a></li>
+            <li><a href="met-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> METs & Activity Caloric Burn</a></li>
+            <li><a href="ovulation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ovulation & Fertile Window</a></li>
+            <li><a href="pregnancy-weight-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Weight Gain (IOM/ACOG)</a></li>
+            <li><a href="protein-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Protein Intake (ISSN/DRI Optimum)</a></li>
+            <li><a href="sleep-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sleep Cycle (90-Min REM Ultradian)</a></li>
+            <li><a href="sodium-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sodium to Salt & AHA Dietary Cap</a></li>
+            <li><a href="target-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Target Heart Rate (Karvonen HRR)</a></li>
+            <li><a href="tdee-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> TDEE & Calorie Burn (Total Daily)</a></li>
+            <li><a href="waist-to-height-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio (WHtR)</a></li>
+            <li><a href="waist-to-height-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio Sizer</a></li>
+            <li><a href="waist-to-hip-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Hip Ratio (WHR Risk)</a></li>
+            <li><a href="one-rep-max-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> One Rep Max (1RM)</a></li>
+            <li><a href="vo2-max-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> VO2 Max Calculator</a></li>
+            <li><a href="pace-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Running Pace & Race Splits</a></li>
+            <li><a href="treadmill-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Treadmill Calorie Calculator</a></li>
+            <li><a href="stairmaster-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> StairMaster Calorie Calculator</a></li>
+            <li><a href="cycling-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cycling Calorie Calculator</a></li>
+            <li><a href="pushup-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pushup Calorie Calculator</a></li>
+            <li><a href="bench-press-calories-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Bench Press Calories Calculator</a></li>
+            <li><a href="swimming-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Swimming Calorie Calculator</a></li>
+            <li><a href="stationary-bike-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Stationary Bike Calorie Calculator</a></li>
+            <li><a href="incline-treadmill-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Incline Treadmill Calorie Calculator</a></li>
+            <li><a href="rucking-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rucking Calorie Calculator</a></li>
+            <li><a href="jack-daniels-running-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Jack Daniels Running Calculator</a></li>
+            <li><a href="jumping-jacks-calories-burned-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Jumping Jacks Calories Burned</a></li>
+            <li><a href="squat-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Squat Calorie Calculator</a></li>
+            <li><a href="sit-up-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sit Up Calorie Calculator</a></li>
+            <li><a href="leg-press-to-squat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Leg Press to Squat Calculator</a></li>
+            <li><a href="cycling-watt-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cycling Watt Calorie Calculator</a></li>
+            <li><a href="running-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Running Calorie Calculator</a></li>
+            <li><a href="rowing-machine-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rowing Machine Calorie Calculator</a></li>
+            <li><a href="peloton-calorie-burn-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Peloton Calorie Burn Calculator</a></li>
+            <li><a href="elliptical-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Elliptical Calorie Calculator</a></li>
+            <li><a href="ftp-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> FTP Calculator (Cycling)</a></li>
+            <li><a href="elliptical-to-running-conversion-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Elliptical to Running Conversion</a></li>
+            <li><a href="army-body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Army Body Fat Calculator</a></li>
+            <li><a href="starbucks-calories-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Starbucks Calories Calculator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="health.html" class="sidebar-category-link">View All Health & Fitness Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers peer-reviewed exercise physiology computing algorithms, biomechanical energy expenditure models, and clinical metabolic engines compliant with ACSM, NSCA, and USARIEM research standards.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Cardio &amp; Metabolic</h4>
+                    <ul>
+                        <li><a href="stationary-bike-calorie-calculator.html">Stationary Bike Calories</a></li>
+                        <li><a href="incline-treadmill-calorie-calculator.html">Incline Treadmill Calories</a></li>
+                        <li><a href="rucking-calorie-calculator.html">Rucking Calorie Calculator</a></li>
+                        <li><a href="treadmill-calorie-calculator.html">Treadmill Calorie Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Athletic Performance</h4>
+                    <ul>
+                        <li><a href="jack-daniels-running-calculator.html">Jack Daniels VDOT Calculator</a></li>
+                        <li><a href="jumping-jacks-calories-burned-calculator.html">Jumping Jacks Calories</a></li>
+                        <li><a href="squat-calorie-calculator.html">Squat Calorie Calculator</a></li>
+                        <li><a href="vo2-max-calculator.html">VO2 Max Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>General Health</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="calorie-calculator.html">TDEE Calorie Calculator</a></li>
+                        <li><a href="bmi-calculator.html">BMI Calculator</a></li>
+                        <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed exercise physiology and biomechanical calculation engines.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

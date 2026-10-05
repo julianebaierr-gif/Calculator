@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Running Calorie Calculator | Margaria Energetics & ACSM Formula</title>
+    <meta name="description" content="Calculate calories burned running by distance, pace, body weight, and incline using Rodolfo Margaria's cost of transport (1.0 kcal/kg/km) and ACSM equations.">
+    <link rel="canonical" href="https://calchub.com/running-calorie-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Running Calorie Calculator",
+      "url": "https://calchub.com/running-calorie-calculator.html",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
+      "description": "Calculates running calories burned, net vs gross expenditure, oxygen cost, and fuel substrate oxidation using Margaria running energetics and ACSM metabolic equations."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is Margaria's rule of thumb for running caloric expenditure?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Renowned Italian exercise physiologist Rodolfo Margaria established that the net metabolic cost of running on flat terrain is approximately 1.0 kilocalorie per kilogram of body weight per kilometer (or ~0.73 kcal per pound per mile), regardless of running speed. While running faster burns more calories per minute, the caloric cost per mile remains largely constant."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many calories does running one mile burn?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For an average individual weighing 150 lbs (68 kg), running one mile burns approximately 100 to 115 gross calories (or roughly 90 to 100 net calories). A 200-lb (91 kg) runner burns approximately 135 to 150 gross calories per mile."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does running faster burn more calories over the same distance?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Running faster increases aerodynamic air resistance and vertical oscillation slightly, increasing energy expenditure by 3% to 6% per mile at elite speeds. However, the primary difference is time: running 6 miles in 45 minutes burns calories much faster per minute than running 6 miles in 60 minutes, while total distance caloric cost remains nearly identical."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between gross and net running calories?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Gross calories include both the energy of running and the baseline resting calories your body would burn sitting quietly. Net calories subtract your resting metabolic rate, isolating the exact surplus caloric expenditure created solely by the exercise."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="health.html">Health &amp; Fitness</a>
+                <a href="datetime.html">Date &amp; Time</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="health.html">Health &amp; Fitness</a> &gt; <span>Running Calorie Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Running Calorie Calculator</h1>
+                        <p class="calc-desc">Precision running exercise physiology engine calculating net and gross caloric expenditure, Margaria cost of transport, and METs across road, track, and trail surfaces.</p>
+                    </div>
+                                        <div class="calc-body">
+                        <div class="calc-form">
+                            <div class="unit-toggle-group">
+                                <span class="unit-toggle-label">Unit System:</span>
+                                <div class="toggle-buttons">
+                                    <button type="button" class="unit-btn active" id="run-unit-imp" onclick="setRunUnit('imperial')">Imperial (lbs, miles, min/mi)</button>
+                                    <button type="button" class="unit-btn" id="run-unit-met" onclick="setRunUnit('metric')">Metric (kg, km, min/km)</button>
+                                </div>
+                            </div>
+
+                            <div class="input-grid">
+                                <div class="form-group">
+                                    <label for="run-weight" id="run-bw-lbl">Runner Body Weight (lbs):</label>
+                                    <input type="number" id="run-weight" class="calc-input" value="160" min="50" max="450" step="1">
+                                    <span class="input-hint">Your body mass</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="run-mode">Workout Input Mode:</label>
+                                    <select id="run-mode" class="calc-input" onchange="toggleRunMode()">
+                                        <option value="dist-time" selected>Distance &amp; Time</option>
+                                        <option value="dist-pace">Distance &amp; Pace</option>
+                                        <option value="time-pace">Time &amp; Pace</option>
+                                    </select>
+                                    <span class="input-hint">Input parameters</span>
+                                </div>
+
+                                <div class="form-group" id="group-run-dist">
+                                    <label for="run-dist" id="run-dist-lbl">Run Distance (miles):</label>
+                                    <input type="number" id="run-dist" class="calc-input" value="5.0" min="0.1" max="100" step="0.1">
+                                    <span class="input-hint">Completed mileage</span>
+                                </div>
+
+                                <div class="form-group" id="group-run-time">
+                                    <label>Elapsed Time:</label>
+                                    <div style="display:flex; gap:8px;">
+                                        <input type="number" id="run-time-h" class="calc-input" placeholder="Hrs" value="0" min="0" max="24" style="flex:1;">
+                                        <input type="number" id="run-time-m" class="calc-input" placeholder="Min" value="45" min="0" max="59" style="flex:1;">
+                                        <input type="number" id="run-time-s" class="calc-input" placeholder="Sec" value="0" min="0" max="59" style="flex:1;">
+                                    </div>
+                                    <span class="input-hint">Hours : Minutes : Seconds</span>
+                                </div>
+
+                                <div class="form-group" id="group-run-pace" style="display:none;">
+                                    <label id="run-pace-lbl">Pace (min:sec / mile):</label>
+                                    <div style="display:flex; gap:8px;">
+                                        <input type="number" id="run-pace-m" class="calc-input" placeholder="Min" value="9" min="3" max="25" style="flex:1;">
+                                        <input type="number" id="run-pace-s" class="calc-input" placeholder="Sec" value="0" min="0" max="59" style="flex:1;">
+                                    </div>
+                                    <span class="input-hint">Average split pace</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="run-grade">Incline / Grade (%):</label>
+                                    <input type="number" id="run-grade" class="calc-input" value="0" min="-10" max="25" step="0.5">
+                                    <span class="input-hint">0% = flat road / track</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="run-surface">Running Surface:</label>
+                                    <select id="run-surface" class="calc-input" onchange="calculateRunning()">
+                                        <option value="1.0" selected>Paved Road / Concrete (Standard)</option>
+                                        <option value="0.97">Treadmill Belt (Reduced wind resistance)</option>
+                                        <option value="1.05">All-Weather Tartan Track (Slightly softer)</option>
+                                        <option value="1.10">Dirt Trail / Cross-Country (Uneven ground)</option>
+                                        <option value="1.25">Soft Sand / Beach Running (High compliance)</option>
+                                    </select>
+                                    <span class="input-hint">Surface biomechanical multiplier</span>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn-primary" onclick="calculateRunning()">Calculate Running Caloric Burn</button>
+                        </div>
+
+                        <div class="calc-results" id="run-results">
+                            <h2>Running Energetics Diagnostics</h2>
+                            <div class="result-highlight-card">
+                                <span class="highlight-label">Total Gross Caloric Expenditure</span>
+                                <span class="highlight-val" id="res-run-total-kcal">574 kcal</span>
+                                <span class="highlight-sub" id="res-run-rate">115 kcal / mile (12.8 kcal/minute)</span>
+                            </div>
+
+                            <div class="results-stats-grid">
+                                <div class="stat-card">
+                                    <span class="stat-title">Net Exercise Burn</span>
+                                    <span class="stat-value" id="res-run-net-kcal">511 kcal</span>
+                                    <span class="stat-desc">Calories above resting baseline</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-title">Average Running Pace</span>
+                                    <span class="stat-value" id="res-run-pace">9:00 /mi</span>
+                                    <span class="stat-desc">Speed: 6.67 mph (10.7 km/h)</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-title">Metabolic Equivalent</span>
+                                    <span class="stat-value" id="res-run-mets">10.5 METs</span>
+                                    <span class="stat-desc">Compendium code 12050 (running)</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-title">Margaria Cost of Transport</span>
+                                    <span class="stat-value" id="res-run-cot">1.02 kcal/kg/km</span>
+                                    <span class="stat-desc">Biomechanical efficiency metric</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        let runUnit = 'imperial';
+
+                        function setRunUnit(unit) {
+                            runUnit = unit;
+                            document.getElementById('run-unit-imp').classList.toggle('active', unit === 'imperial');
+                            document.getElementById('run-unit-met').classList.toggle('active', unit === 'metric');
+
+                            const wInput = document.getElementById('run-weight');
+                            const dInput = document.getElementById('run-dist');
+                            const wLbl = document.getElementById('run-bw-lbl');
+                            const dLbl = document.getElementById('run-dist-lbl');
+                            const pLbl = document.getElementById('run-pace-lbl');
+
+                            if (unit === 'metric') {
+                                wLbl.textContent = 'Runner Body Weight (kg):';
+                                dLbl.textContent = 'Run Distance (km):';
+                                pLbl.textContent = 'Pace (min:sec / km):';
+                                wInput.value = (parseFloat(wInput.value) * 0.453592).toFixed(1);
+                                dInput.value = (parseFloat(dInput.value) * 1.60934).toFixed(2);
+                            } else {
+                                wLbl.textContent = 'Runner Body Weight (lbs):';
+                                dLbl.textContent = 'Run Distance (miles):';
+                                pLbl.textContent = 'Pace (min:sec / mile):';
+                                wInput.value = (parseFloat(wInput.value) / 0.453592).toFixed(1);
+                                dInput.value = (parseFloat(dInput.value) / 1.60934).toFixed(2);
+                            }
+                            calculateRunning();
+                        }
+
+                        function toggleRunMode() {
+                            const mode = document.getElementById('run-mode').value;
+                            document.getElementById('group-run-dist').style.display = (mode === 'time-pace') ? 'none' : 'block';
+                            document.getElementById('group-run-time').style.display = (mode === 'dist-pace') ? 'none' : 'block';
+                            document.getElementById('group-run-pace').style.display = (mode === 'dist-time') ? 'none' : 'block';
+                            calculateRunning();
+                        }
+
+                        function calculateRunning() {
+                            let rawBw = parseFloat(document.getElementById('run-weight').value) || 160;
+                            let mode = document.getElementById('run-mode').value;
+                            let gradePercent = parseFloat(document.getElementById('run-grade').value) || 0;
+                            let surfaceMult = parseFloat(document.getElementById('run-surface').value) || 1.0;
+
+                            let bwKg = (runUnit === 'imperial') ? rawBw * 0.453592 : rawBw;
+                            let totalDistMiles = 5.0;
+                            let totalTimeSec = 2700;
+
+                            if (mode === 'dist-time') {
+                                let rawDist = parseFloat(document.getElementById('run-dist').value) || 5.0;
+                                totalDistMiles = (runUnit === 'imperial') ? rawDist : rawDist / 1.60934;
+                                let h = parseFloat(document.getElementById('run-time-h').value) || 0;
+                                let m = parseFloat(document.getElementById('run-time-m').value) || 0;
+                                let s = parseFloat(document.getElementById('run-time-s').value) || 0;
+                                totalTimeSec = (h * 3600) + (m * 60) + s;
+                                if (totalTimeSec <= 0) totalTimeSec = 2700;
+                            } else if (mode === 'dist-pace') {
+                                let rawDist = parseFloat(document.getElementById('run-dist').value) || 5.0;
+                                totalDistMiles = (runUnit === 'imperial') ? rawDist : rawDist / 1.60934;
+                                let pm = parseFloat(document.getElementById('run-pace-m').value) || 9;
+                                let ps = parseFloat(document.getElementById('run-pace-s').value) || 0;
+                                let paceSec = (pm * 60) + ps;
+                                if (runUnit === 'metric') paceSec = paceSec * 1.60934;
+                                totalTimeSec = totalDistMiles * paceSec;
+                            } else {
+                                let h = parseFloat(document.getElementById('run-time-h').value) || 0;
+                                let m = parseFloat(document.getElementById('run-time-m').value) || 0;
+                                let s = parseFloat(document.getElementById('run-time-s').value) || 0;
+                                totalTimeSec = (h * 3600) + (m * 60) + s;
+                                if (totalTimeSec <= 0) totalTimeSec = 2700;
+                                let pm = parseFloat(document.getElementById('run-pace-m').value) || 9;
+                                let ps = parseFloat(document.getElementById('run-pace-s').value) || 0;
+                                let paceSec = (pm * 60) + ps;
+                                if (runUnit === 'metric') paceSec = paceSec * 1.60934;
+                                totalDistMiles = (paceSec > 0) ? totalTimeSec / paceSec : 5.0;
+                            }
+
+                            let totalHours = totalTimeSec / 3600;
+                            let speedMph = (totalHours > 0) ? totalDistMiles / totalHours : 6.0;
+                            let speedMpm = speedMph * 26.8224; // meters per minute
+                            let gradeFrac = gradePercent / 100.0;
+
+                            // ACSM Running Equation: VO2 = 3.5 + 0.2*S + 0.9*S*G
+                            let vo2 = 3.5 + (0.2 * speedMpm) + (0.9 * speedMpm * gradeFrac);
+                            vo2 *= surfaceMult;
+
+                            let mets = vo2 / 3.5;
+                            let durationMin = totalTimeSec / 60;
+                            let totalGrossKcal = durationMin * (mets * 3.5 * bwKg) / 200;
+
+                            let restingKcal = durationMin * (1.0 * 3.5 * bwKg) / 200;
+                            let netKcal = Math.max(0, totalGrossKcal - restingKcal);
+
+                            let distKm = totalDistMiles * 1.60934;
+                            let cot = (distKm > 0 && bwKg > 0) ? (totalGrossKcal / (bwKg * distKm)) : 1.0;
+                            let kcalPerDist = (runUnit === 'imperial') ? totalGrossKcal / totalDistMiles : totalGrossKcal / distKm;
+                            let distSuffix = (runUnit === 'imperial') ? ' / mile' : ' / km';
+
+                            // Format pace
+                            let secPerUnit = (runUnit === 'imperial') ? (totalTimeSec / totalDistMiles) : (totalTimeSec / distKm);
+                            let pMins = Math.floor(secPerUnit / 60);
+                            let pSecs = Math.round(secPerUnit % 60);
+                            if (pSecs === 60) { pMins++; pSecs = 0; }
+                            let paceStr = pMins + ':' + (pSecs < 10 ? '0' : '') + pSecs + (runUnit === 'imperial' ? ' /mi' : ' /km');
+                            let speedStr = 'Speed: ' + speedMph.toFixed(2) + ' mph (' + (speedMph * 1.60934).toFixed(2) + ' km/h)';
+
+                            document.getElementById('res-run-total-kcal').textContent = Math.round(totalGrossKcal) + ' kcal';
+                            document.getElementById('res-run-rate').textContent = Math.round(kcalPerDist) + ' kcal' + distSuffix + ' (' + (totalGrossKcal / durationMin).toFixed(1) + ' kcal/min)';
+                            document.getElementById('res-run-net-kcal').textContent = Math.round(netKcal) + ' kcal';
+                            document.getElementById('res-run-pace').textContent = paceStr;
+                            document.getElementById('res-run-mets').textContent = mets.toFixed(1) + ' METs';
+                            document.getElementById('res-run-cot').textContent = cot.toFixed(2) + ' kcal/kg/km';
+                        }
+
+                        window.addEventListener('DOMContentLoaded', calculateRunning);
+                    </script>
+                </div>
+                <article class="article-body">
+                    <h2>The Foundations of Running Energetics: Margaria's Law</h2>
+<p>Human distance running represents one of the most thoroughly investigated locomotion patterns in evolutionary biology and exercise physiology. From an energetic perspective, running is characterized by a bouncing gait governed by a <strong>spring-mass model</strong>. With each foot strike, kinetic and gravitational potential energy are temporarily stored as elastic strain energy within the Achilles tendon, plantar fascia, and patellar tendon, before being rebounded during toe-off.</p>
+
+<p>In 1963, legendary Italian physiologist <strong>Rodolfo Margaria</strong> and his collaborators published groundbreaking research demonstrating that on level ground, <strong>the net metabolic cost of running per unit distance is remarkably invariant to running speed</strong>. Known as <em>Margaria's Law</em> or the <strong>Cost of Transport (CoT)</strong>, this fundamental principle states:</p>
+
+$$\text{Net Cost of Running} \approx 1.0 \, \text{kcal} \cdot \text{kg}^{-1} \cdot \text{km}^{-1} \approx 0.73 \, \text{kcal} \cdot \text{lb}^{-1} \cdot \text{mile}^{-1}$$
+
+<p>This means whether a 70-kg (154 lb) runner covers a 10-kilometer distance at an easy 10:00/mile jog or at an aggressive 6:00/mile race pace, the net energy required to transport their bodily mass across that distance is almost identical:</p>
+
+$$\text{Net Expenditure} = 70.0 \, \text{kg} \times 10.0 \, \text{km} \times 1.0 \, \frac{\text{kcal}}{\text{kg}\cdot\text{km}} = 700 \, \text{kcal}$$
+
+<p>While running faster dramatically increases the <em>rate</em> of energy expenditure per minute, the shorter duration spent running balances the thermodynamic equation.</p>
+
+<h2>ACSM Metabolic Equations for Motorized &amp; Outdoor Running</h2>
+<p>To compute gross oxygen consumption ($\text{VO}_2$, in $\text{mL}\cdot\text{kg}^{-1}\cdot\text{min}^{-1}$) across variable velocities and terrain gradients, the <strong>American College of Sports Medicine (ACSM)</strong> developed the definitive metabolic running formula:</p>
+
+$$\text{VO}_2 = 3.5 + (0.2 \times S) + (0.9 \times S \times G)$$
+
+<p>Where:</p>
+<ul>
+    <li>$3.5$: Resting metabolic baseline ($1 \, \text{MET}$, in $\text{mL}\cdot\text{kg}^{-1}\cdot\text{min}^{-1}$).</li>
+    <li>$S$: Running speed in <strong>meters per minute</strong> ($1 \, \text{mph} = 26.8224 \, \text{m/min}$).</li>
+    <li>$G$: Incline grade expressed as a decimal fraction (e.g., $2\% = 0.02$).</li>
+    <li>$0.2$: Horizontal oxygen cost factor per meter of forward progression.</li>
+    <li>$0.9$: Vertical gravitational work factor for uphill running.</li>
+</ul>
+
+<p>Caloric energy expenditure is derived from gross $\text{VO}_2$ using the universal conversion factor for mixed carbohydrate and lipid oxidation:</p>
+
+$$\text{Burn Rate (kcal/min)} = \frac{\text{VO}_2 \times \text{Body Weight (kg)}}{200}$$
+
+<h2>Gross vs. Net Running Calories: Why It Matters for Weight Loss</h2>
+<p>A frequent error among runners seeking fat loss is conflating gross calories with net calories:</p>
+
+<ul>
+    <li><strong>Gross Caloric Burn:</strong> The total energy burned during the run, including the baseline cellular maintenance calories your body would have expended sitting on the sofa.</li>
+    <li><strong>Net Caloric Burn:</strong> The surplus calories expended strictly due to the mechanical and cardiovascular act of running ($\text{Net} = \text{Gross} - \text{Resting Baseline}$).</li>
+</ul>
+
+<p>For a 180-lb (81.6 kg) runner who completes a 60-minute 6-mile run, gross calorie burn is roughly $780 \, \text{kcal}$. However, their resting metabolic rate would have burned approximately $86 \, \text{kcal}$ during that hour regardless. Therefore, the actual net energy deficit created by the workout is $694 \, \text{kcal}$. Counting gross calories while neglecting baseline dietary maintenance needs frequently leads to weight loss plateaus.</p>
+
+<h2>Surface Compliance &amp; Aerodynamic Drag Factors</h2>
+<p>While Margaria's law holds well on flat asphalt, environmental and biomechanical factors modulate the cost of transport:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Running Surface</th>
+            <th>Surface Factor</th>
+            <th>Biomechanical Mechanism</th>
+            <th>Relative Caloric Difference</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Paved Asphalt / Concrete Road</strong></td>
+            <td>1.00</td>
+            <td>Rigid surface, maximum elastic tendon energy return</td>
+            <td>Baseline ($1.00\times$)</td>
+        </tr>
+        <tr>
+            <td><strong>Motorized Treadmill Belt</strong></td>
+            <td>0.97</td>
+            <td>Absence of air resistance; belt assists leg turnover slightly</td>
+            <td>$-3\%$ to $-5\%$ lower (unless set to 1% grade)</td>
+        </tr>
+        <tr>
+            <td><strong>Synthetic Tartan Track</strong></td>
+            <td>1.03</td>
+            <td>High compliance rubber dampens impact; slight energy absorption</td>
+            <td>$+3\%$ higher</td>
+        </tr>
+        <tr>
+            <td><strong>Dirt Trail / Forest Path</strong></td>
+            <td>1.10</td>
+            <td>Uneven footing, lateral ankle stabilization, variable stride cadence</td>
+            <td>$+10\%$ higher</td>
+        </tr>
+        <tr>
+            <td><strong>Soft Beach Sand</strong></td>
+            <td>1.25 - 1.40</td>
+            <td>Severe ground compliance; zero elastic tendon recoil</td>
+            <td>$+25\%$ to $+40\%$ higher</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>To simulate outdoor road running on an indoor treadmill, exercise physiologists universally recommend setting the treadmill deck to a <strong>$1.0\%$ incline grade</strong>. At speeds exceeding 7.0 mph (11.3 km/h), the $1\%$ grade perfectly offsets the missing aerodynamic wind resistance of outdoor locomotion.</p>
+
+<h2>Substrate Utilization: Fat vs. Carbohydrate Oxidation Across Paces</h2>
+<p>The speed at which you run dictates the biochemical fuel substrate oxidized by your muscle mitochondria:</p>
+<ul>
+    <li><strong>Low-Intensity Aerobic Base (Zone 2, &lt; 70% HRmax):</strong> At conversational paces, the body derives $60\% \text{ to } 75\%$ of its ATP from intramuscular and adipose <strong>free fatty acids</strong>, sparing glycogen stores.</li>
+    <li><strong>Lactate Threshold (Zone 4, 80-88% HRmax):</strong> At threshold tempo pace, fuel utilization shifts aggressively toward <strong>muscle glycogen and blood glucose</strong> ($80\%+$ carbohydrate), as lipid oxidation is too slow to meet rapid ATP demands.</li>
+    <li><strong>VO2 Max &amp; Sprint Intervals (Zone 5, &gt; 90% HRmax):</strong> Anaerobic glycolysis and phosphagen pathways supply nearly $100\%$ of energy, producing rapid lactate and hydrogen ion accumulation.</li>
+</ul>
+
+<h2>Worked Clinical Case Study: 10K Road Race Caloric Expenditure</h2>
+<div class="worked-example-card">
+    <h3>Race Analysis: 10K (6.21 Miles) at 8:00 / Mile Pace</h3>
+    <p><strong>Subject Profile:</strong> A 31-year-old female runner weighing $140 \, \text{lbs}$ ($63.50 \, \text{kg}$) completes a certified 10-kilometer ($6.2137 \, \text{miles}$) road race in $49 \text{ minutes and } 42 \text{ seconds}$ ($49.70 \, \text{minutes}$ at an average speed of $7.50 \, \text{mph} = 201.17 \, \text{m/min}$).</p>
+
+    <div class="step-solution">
+        <h4>Step 1: Calculate Gross VO2 via ACSM Running Equation</h4>
+        $$S = 7.50 \, \text{mph} \times 26.8224 = 201.17 \, \text{m/min}$$
+        $$\text{VO}_2 = 3.5 + (0.2 \times 201.17) = 3.5 + 40.234 = 43.734 \, \text{mL}\cdot\text{kg}^{-1}\cdot\text{min}^{-1}$$
+
+        <h4>Step 2: Convert VO2 to METs</h4>
+        $$\text{METs} = \frac{43.734}{3.5} = 12.50 \, \text{METs}$$
+
+        <h4>Step 3: Compute Caloric Burn Rate &amp; Total Expenditure</h4>
+        $$\text{Burn Rate} = \frac{12.50 \times 3.5 \times 63.50}{200} = \frac{2,778.1}{200} = 13.89 \, \text{kcal/min}$$
+        $$\text{Total Gross Caloric Burn} = 13.89 \, \text{kcal/min} \times 49.70 \, \text{min} = 690.3 \, \text{kcal}$$
+
+        <h4>Step 4: Compute Margaria Cost of Transport Verification</h4>
+        $$\text{Net Kcal} = 690.3 - \left(\frac{1.0 \times 3.5 \times 63.50}{200} \times 49.70\right) = 690.3 - 55.2 = 635.1 \, \text{kcal}$$
+        $$\text{Cost of Transport} = \frac{635.1 \, \text{kcal}}{63.50 \, \text{kg} \times 10.0 \, \text{km}} = 1.000 \, \text{kcal/kg/km}$$
+
+        <h4>Clinical Assessment</h4>
+        <p>The runner expended $690 \, \text{gross kcal}$ ($111 \, \text{kcal/mile}$), operating at an elite aerobic intensity of $12.5 \, \text{METs}$. Her net cost of transport matched Margaria's theoretical baseline of exactly $1.00 \, \text{kcal/kg/km}$.</p>
+    </div>
+</div>
+
+<h2>Running Caloric Burn Reference Table Across Body Weights &amp; Distances</h2>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Distance Benchmark</th>
+            <th>130 lb (59 kg) Runner</th>
+            <th>160 lb (72.6 kg) Runner</th>
+            <th>190 lb (86.2 kg) Runner</th>
+            <th>220 lb (99.8 kg) Runner</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>1 Mile (1.61 km)</strong></td>
+            <td>$91 \, \text{kcal}$</td>
+            <td>$112 \, \text{kcal}$</td>
+            <td>$133 \, \text{kcal}$</td>
+            <td>$154 \, \text{kcal}$</td>
+        </tr>
+        <tr>
+            <td><strong>5 Kilometers (3.11 mi)</strong></td>
+            <td>$283 \, \text{kcal}$</td>
+            <td>$348 \, \text{kcal}$</td>
+            <td>$414 \, \text{kcal}$</td>
+            <td>$479 \, \text{kcal}$</td>
+        </tr>
+        <tr>
+            <td><strong>5 Miles (8.05 km)</strong></td>
+            <td>$455 \, \text{kcal}$</td>
+            <td>$560 \, \text{kcal}$</td>
+            <td>$665 \, \text{kcal}$</td>
+            <td>$770 \, \text{kcal}$</td>
+        </tr>
+        <tr>
+            <td><strong>10 Kilometers (6.21 mi)</strong></td>
+            <td>$565 \, \text{kcal}$</td>
+            <td>$696 \, \text{kcal}$</td>
+            <td>$827 \, \text{kcal}$</td>
+            <td>$957 \, \text{kcal}$</td>
+        </tr>
+        <tr>
+            <td><strong>Half Marathon (13.11 mi)</strong></td>
+            <td>$1,193 \, \text{kcal}$</td>
+            <td>$1,468 \, \text{kcal}$</td>
+            <td>$1,744 \, \text{kcal}$</td>
+            <td>$2,019 \, \text{kcal}$</td>
+        </tr>
+        <tr>
+            <td><strong>Marathon (26.22 mi)</strong></td>
+            <td>$2,386 \, \text{kcal}$</td>
+            <td>$2,937 \, \text{kcal}$</td>
+            <td>$3,487 \, \text{kcal}$</td>
+            <td>$4,038 \, \text{kcal}$</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Frequently Asked Questions About Running Caloric Expenditure</h2>
+<h3>What is Margaria's rule of thumb for running caloric expenditure?</h3>
+<p>Rodolfo Margaria established that the net energy cost of running on flat terrain is roughly 1.0 kilocalorie per kilogram of body weight per kilometer (~0.73 kcal per pound per mile). Because the cost of transport per unit distance is largely independent of velocity, running one mile burns roughly the same calories regardless of pace.</p>
+
+<h3>How many calories does running one mile burn?</h3>
+<p>An average 160-lb individual burns roughly 110 to 115 gross calories per mile (or about 100 net calories). Heavier runners burn more calories because greater muscular force is required to accelerate and elevate their body mass.</p>
+
+<h3>Does running faster burn more calories over the same distance?</h3>
+<p>Running faster increases aerodynamic drag and vertical bounce slightly, raising caloric burn by 3% to 6% per mile at faster speeds. However, the primary effect of faster running is a dramatically higher burn rate per minute, completing the workout in fewer total minutes.</p>
+
+<h3>Why does running on a treadmill burn slightly fewer calories than road running?</h3>
+<p>On a stationary treadmill, there is no ambient air resistance to overcome, and the motorized belt assists with foot pullback. Setting the treadmill incline to 1.0% perfectly compensates for the lack of aerodynamic wind resistance, matching the energy cost of outdoor road running.</p>
+
+<h3>How much does running on a trail or sand increase calorie burn?</h3>
+<p>Running on soft dirt trails increases caloric expenditure by roughly 10% due to uneven footing and stabilizing muscle activation. Running on soft beach sand increases expenditure by 25% to 40% because energy is absorbed by the shifting sand rather than returned elastically through tendons.</p>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚖️</span>
+            <h3 class="widget-title">Related Health & Fitness</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bmr-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMR Calculator</a></li>
+            <li><a href="macro-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Macro Split Calculator</a></li>
+            <li><a href="calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Calculator (TDEE)</a></li>
+            <li><a href="bmi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Daily Water Intake</a></li>
+            <li><a href="a1c-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> HbA1c to eAG Glucose Sizer</a></li>
+            <li><a href="bac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Blood Alcohol (BAC) Clearance</a></li>
+            <li><a href="body-surface-area-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Surface Area (Mosteller)</a></li>
+            <li><a href="bsa-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Oncology BSA & Calvert Dosing</a></li>
+            <li><a href="calorie-deficit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Deficit & Fat Loss Planner</a></li>
+            <li><a href="calories-burned-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exercise Calories Burned (METs)</a></li>
+            <li><a href="carbohydrate-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Carbohydrate Intake & Glycogen</a></li>
+            <li><a href="cholesterol-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cholesterol Ratio & Castelli Risk</a></li>
+            <li><a href="due-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Due Date & Gestation</a></li>
+            <li><a href="fat-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Dietary Fat Intake (Grams/Day)</a></li>
+            <li><a href="heart-rate-zone-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heart Rate Zone (Karvonen HRR)</a></li>
+            <li><a href="lean-body-mass-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lean Body Mass (Boer & James)</a></li>
+            <li><a href="max-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Max Heart Rate (Tanaka & Gulati)</a></li>
+            <li><a href="met-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> METs & Activity Caloric Burn</a></li>
+            <li><a href="ovulation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ovulation & Fertile Window</a></li>
+            <li><a href="pregnancy-weight-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Weight Gain (IOM/ACOG)</a></li>
+            <li><a href="protein-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Protein Intake (ISSN/DRI Optimum)</a></li>
+            <li><a href="sleep-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sleep Cycle (90-Min REM Ultradian)</a></li>
+            <li><a href="sodium-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sodium to Salt & AHA Dietary Cap</a></li>
+            <li><a href="target-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Target Heart Rate (Karvonen HRR)</a></li>
+            <li><a href="tdee-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> TDEE & Calorie Burn (Total Daily)</a></li>
+            <li><a href="waist-to-height-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio (WHtR)</a></li>
+            <li><a href="waist-to-height-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio Sizer</a></li>
+            <li><a href="waist-to-hip-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Hip Ratio (WHR Risk)</a></li>
+            <li><a href="one-rep-max-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> One Rep Max (1RM)</a></li>
+            <li><a href="vo2-max-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> VO2 Max Calculator</a></li>
+            <li><a href="pace-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Running Pace & Race Splits</a></li>
+            <li><a href="treadmill-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Treadmill Calorie Calculator</a></li>
+            <li><a href="stairmaster-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> StairMaster Calorie Calculator</a></li>
+            <li><a href="cycling-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cycling Calorie Calculator</a></li>
+            <li><a href="pushup-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pushup Calorie Calculator</a></li>
+            <li><a href="bench-press-calories-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Bench Press Calories Calculator</a></li>
+            <li><a href="swimming-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Swimming Calorie Calculator</a></li>
+            <li><a href="stationary-bike-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Stationary Bike Calorie Calculator</a></li>
+            <li><a href="incline-treadmill-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Incline Treadmill Calorie Calculator</a></li>
+            <li><a href="rucking-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rucking Calorie Calculator</a></li>
+            <li><a href="jack-daniels-running-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Jack Daniels Running Calculator</a></li>
+            <li><a href="jumping-jacks-calories-burned-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Jumping Jacks Calories Burned</a></li>
+            <li><a href="squat-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Squat Calorie Calculator</a></li>
+            <li><a href="sit-up-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sit Up Calorie Calculator</a></li>
+            <li><a href="leg-press-to-squat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Leg Press to Squat Calculator</a></li>
+            <li><a href="cycling-watt-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cycling Watt Calorie Calculator</a></li>
+            <li><a href="running-calorie-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Running Calorie Calculator</a></li>
+            <li><a href="rowing-machine-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rowing Machine Calorie Calculator</a></li>
+            <li><a href="peloton-calorie-burn-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Peloton Calorie Burn Calculator</a></li>
+            <li><a href="elliptical-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Elliptical Calorie Calculator</a></li>
+            <li><a href="ftp-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> FTP Calculator (Cycling)</a></li>
+            <li><a href="elliptical-to-running-conversion-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Elliptical to Running Conversion</a></li>
+            <li><a href="army-body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Army Body Fat Calculator</a></li>
+            <li><a href="starbucks-calories-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Starbucks Calories Calculator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="health.html" class="sidebar-category-link">View All Health & Fitness Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers peer-reviewed exercise physiology computing algorithms, biomechanical energy expenditure models, and resistance training physics engines compliant with ACSM, NSCA, and Concept2 research standards.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Cardio &amp; Ergometry</h4>
+                    <ul>
+                        <li><a href="cycling-watt-calorie-calculator.html">Cycling Watt Calorie Calculator</a></li>
+                        <li><a href="running-calorie-calculator.html">Running Calorie Calculator</a></li>
+                        <li><a href="rowing-machine-calorie-calculator.html">Rowing Machine Calories</a></li>
+                        <li><a href="peloton-calorie-burn-calculator.html">Peloton Calorie Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Strength &amp; Biomechanics</h4>
+                    <ul>
+                        <li><a href="sit-up-calorie-calculator.html">Sit Up Calorie Calculator</a></li>
+                        <li><a href="leg-press-to-squat-calculator.html">Leg Press to Squat Calculator</a></li>
+                        <li><a href="squat-calorie-calculator.html">Squat Calorie Calculator</a></li>
+                        <li><a href="bench-press-calories-calculator.html">Bench Press Calories</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="calorie-calculator.html">TDEE Calorie Calculator</a></li>
+                        <li><a href="bmi-calculator.html">BMI Calculator</a></li>
+                        <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precision exercise physiology and sports biomechanics computing suites.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

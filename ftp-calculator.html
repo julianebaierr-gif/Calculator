@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTP Calculator | Functional Threshold Power & Coggan 7 Power Zones</title>
+    <meta name="description" content="Calculate your Functional Threshold Power (FTP) in Watts, Watts/kg, and Coggan 7 training power zones from 20-minute, 8-minute, or ramp test power meter data.">
+    <link rel="canonical" href="https://calchub.com/ftp-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "FTP Calculator",
+      "url": "https://calchub.com/ftp-calculator.html",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
+      "description": "Calculates Functional Threshold Power (FTP) in Watts and Watts per kilogram (W/kg), and prescribes Andrew Coggan's 7 power training zones from cycling power meter test results."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is Functional Threshold Power (FTP) in cycling?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Functional Threshold Power (FTP) is the highest average mechanical power (measured in Watts) that a cyclist can sustain in a quasi-steady state for approximately one hour. Formulated by Dr. Andrew Coggan and Hunter Allen, FTP serves as the baseline benchmark for defining individualized training zones and tracking aerobic fitness."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is 20-minute average power multiplied by 0.95 to calculate FTP?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A standard 20-minute maximum-effort time trial draws approximately 5% of its total energy from anaerobic glycolytic capacity (W'). Multiplying 20-minute average power by 0.95 (a 5% deduction) strips away the anaerobic contribution, isolating the athlete's true sustainable aerobic lactate threshold power for a 60-minute duration."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a good Watts per kilogram (W/kg) FTP for a cyclist?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For untrained recreational cyclists, FTP typically falls between 1.5 and 2.2 W/kg. Moderate club riders achieve 2.5 to 3.2 W/kg, competitive amateurs (Cat 3/4) reach 3.5 to 4.2 W/kg, elite national racers (Cat 1/2) reach 4.5 to 5.2 W/kg, and WorldTour professionals sustain 5.8 to 6.5+ W/kg."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are Andrew Coggan's 7 Classic Power Training Zones?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Coggan power zones are: Zone 1 Active Recovery (<55% FTP), Zone 2 Endurance (56-75%), Zone 3 Tempo (76-90%), Zone 4 Lactate Threshold (91-105%), Zone 5 VO2 Max (106-120%), Zone 6 Anaerobic Capacity (121-150%), and Zone 7 Neuromuscular Power (>150% FTP)."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="health.html">Health &amp; Fitness</a>
+                <a href="datetime.html">Date &amp; Time</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="health.html">Health &amp; Fitness</a> &gt; <span>FTP Calculator (Functional Threshold Power)</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>FTP Calculator (Functional Threshold Power)</h1>
+                        <p class="calc-desc">Compute your cycling Functional Threshold Power (FTP), specific power-to-weight ratio (W/kg), and Coggan 7 Classic Training Zones using standardized physiological testing protocols.</p>
+                    </div>
+                                        <div class="calc-body">
+                        <div class="calc-form">
+                            <div class="input-grid">
+                                <div class="form-group">
+                                    <label for="ftp-test-type">Testing Protocol Method:</label>
+                                    <select id="ftp-test-type" class="calc-input" onchange="toggleFTPProtocol()">
+                                        <option value="20min" selected>Standard 20-Minute Test (FTP = 95% of Avg Watts)</option>
+                                        <option value="8min">8-Minute Test (FTP = 90% of Avg Watts)</option>
+                                        <option value="ramp">Ramp / Step Test (FTP = 75% of Final Minute Power)</option>
+                                        <option value="60min">60-Minute Hour Record / TT (FTP = 100% of Avg Watts)</option>
+                                        <option value="direct">Direct FTP Input (Known Watts)</option>
+                                    </select>
+                                    <span class="input-hint">Protocol used during testing</span>
+                                </div>
+
+                                <div class="form-group" id="group-ftp-watts">
+                                    <label for="ftp-power" id="ftp-power-lbl">20-Minute Test Average Power (Watts):</label>
+                                    <input type="number" id="ftp-power" class="calc-input" value="260" min="50" max="700" step="1">
+                                    <span class="input-hint" id="ftp-power-hint">Average power across the 20-min work bout</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="ftp-weight">Cyclist Body Weight:</label>
+                                    <div style="display:flex; gap:8px;">
+                                        <input type="number" id="ftp-weight" class="calc-input" value="165" min="40" max="350" step="1" style="flex:2;">
+                                        <select id="ftp-weight-unit" class="calc-input" style="flex:1;" onchange="calculateFTP()">
+                                            <option value="lbs" selected>lbs</option>
+                                            <option value="kg">kg</option>
+                                        </select>
+                                    </div>
+                                    <span class="input-hint">Used for Watts per kilogram (W/kg) calculation</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="ftp-gender">Biological Category:</label>
+                                    <select id="ftp-gender" class="calc-input" onchange="calculateFTP()">
+                                        <option value="male" selected>Male Cyclist</option>
+                                        <option value="female">Female Cyclist</option>
+                                    </select>
+                                    <span class="input-hint">Used for performance classification tier</span>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn-primary" onclick="calculateFTP()">Calculate FTP &amp; Coggan Power Zones</button>
+                        </div>
+
+                        <div class="calc-results" id="ftp-results">
+                            <h2>Functional Threshold Power Diagnostics</h2>
+                            <div class="result-highlight-card">
+                                <span class="highlight-label">Calculated Functional Threshold Power</span>
+                                <span class="highlight-val" id="res-ftp-val">247 Watts</span>
+                                <span class="highlight-sub" id="res-ftp-wkg">3.30 W/kg (Cat 3-4 Competitive Amateur)</span>
+                            </div>
+
+                            <div class="results-stats-grid">
+                                <div class="stat-card">
+                                    <span class="stat-title">Zone 1: Active Recovery</span>
+                                    <span class="stat-value" id="res-ftp-z1">&lt; 136 Watts</span>
+                                    <span class="stat-desc">&lt; 55% FTP (recovery spins)</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-title">Zone 2: Endurance Base</span>
+                                    <span class="stat-value" id="res-ftp-z2">138 - 185 Watts</span>
+                                    <span class="stat-desc">56% - 75% FTP (aerobic foundation)</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-title">Zone 3: Tempo</span>
+                                    <span class="stat-value" id="res-ftp-z3">188 - 222 Watts</span>
+                                    <span class="stat-desc">76% - 90% FTP (rhythmic endurance)</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-title">Zone 4: Lactate Threshold</span>
+                                    <span class="stat-value" id="res-ftp-z4">225 - 259 Watts</span>
+                                    <span class="stat-desc">91% - 105% FTP (FTP intervals)</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-title">Zone 5: VO2 Max</span>
+                                    <span class="stat-value" id="res-ftp-z5">262 - 296 Watts</span>
+                                    <span class="stat-desc">106% - 120% FTP (3-5 min intervals)</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-title">Zone 6: Anaerobic Capacity</span>
+                                    <span class="stat-value" id="res-ftp-z6">299 - 371 Watts</span>
+                                    <span class="stat-desc">121% - 150% FTP (30-90 sec repeats)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        function toggleFTPProtocol() {
+                            const method = document.getElementById('ftp-test-type').value;
+                            const lbl = document.getElementById('ftp-power-lbl');
+                            const hint = document.getElementById('ftp-power-hint');
+
+                            if (method === '20min') {
+                                lbl.textContent = '20-Minute Test Average Power (Watts):';
+                                hint.textContent = 'Average power across the 20-min work bout';
+                            } else if (method === '8min') {
+                                lbl.textContent = '8-Minute Test Average Power (Watts):';
+                                hint.textContent = 'Average power across the 8-min work bout';
+                            } else if (method === 'ramp') {
+                                lbl.textContent = 'Final Step Minute Power (Watts):';
+                                hint.textContent = 'Highest 1-minute step completed in ramp test';
+                            } else if (method === '60min') {
+                                lbl.textContent = '60-Minute Hour Record Power (Watts):';
+                                hint.textContent = 'Exact 1-hour sustained maximum average power';
+                            } else {
+                                lbl.textContent = 'Direct FTP Benchmark (Watts):';
+                                hint.textContent = 'Enter known FTP';
+                            }
+                            calculateFTP();
+                        }
+
+                        function calculateFTP() {
+                            let method = document.getElementById('ftp-test-type').value;
+                            let rawPower = parseFloat(document.getElementById('ftp-power').value) || 260;
+                            let rawWeight = parseFloat(document.getElementById('ftp-weight').value) || 165;
+                            let weightUnit = document.getElementById('ftp-weight-unit').value;
+                            let gender = document.getElementById('ftp-gender').value;
+
+                            let weightKg = (weightUnit === 'lbs') ? rawWeight * 0.453592 : rawWeight;
+
+                            let ftp = 247;
+                            if (method === '20min') ftp = rawPower * 0.95;
+                            else if (method === '8min') ftp = rawPower * 0.90;
+                            else if (method === 'ramp') ftp = rawPower * 0.75;
+                            else if (method === '60min') ftp = rawPower * 1.00;
+                            else ftp = rawPower;
+
+                            let wkg = (weightKg > 0) ? ftp / weightKg : 0;
+
+                            // Classification tier
+                            let tier = "Recreational";
+                            if (gender === 'male') {
+                                if (wkg < 2.2) tier = "Recreational / Untrained";
+                                else if (wkg < 3.0) tier = "Category 5 / Novice Club";
+                                else if (wkg < 3.8) tier = "Category 4 / Trained Amateur";
+                                else if (wkg < 4.5) tier = "Category 3 / Competitive Racer";
+                                else if (wkg < 5.2) tier = "Category 1-2 / Elite National";
+                                else tier = "Semi-Pro / WorldTour Elite";
+                            } else {
+                                if (wkg < 1.8) tier = "Recreational / Untrained";
+                                else if (wkg < 2.5) tier = "Category 4-5 / Novice Club";
+                                else if (wkg < 3.2) tier = "Category 3 / Trained Amateur";
+                                else if (wkg < 3.9) tier = "Category 2 / Competitive Racer";
+                                else if (wkg < 4.6) tier = "Category 1 / Elite National";
+                                else tier = "Pro / WorldTour Elite";
+                            }
+
+                            // Coggan 7 Classic Power Zones
+                            let z1_max = Math.round(ftp * 0.55);
+                            let z2_min = Math.round(ftp * 0.56);
+                            let z2_max = Math.round(ftp * 0.75);
+                            let z3_min = Math.round(ftp * 0.76);
+                            let z3_max = Math.round(ftp * 0.90);
+                            let z4_min = Math.round(ftp * 0.91);
+                            let z4_max = Math.round(ftp * 1.05);
+                            let z5_min = Math.round(ftp * 1.06);
+                            let z5_max = Math.round(ftp * 1.20);
+                            let z6_min = Math.round(ftp * 1.21);
+                            let z6_max = Math.round(ftp * 1.50);
+
+                            document.getElementById('res-ftp-val').textContent = Math.round(ftp) + ' Watts';
+                            document.getElementById('res-ftp-wkg').textContent = wkg.toFixed(2) + ' W/kg (' + tier + ')';
+
+                            document.getElementById('res-ftp-z1').textContent = '< ' + z1_max + ' W';
+                            document.getElementById('res-ftp-z2').textContent = z2_min + ' - ' + z2_max + ' W';
+                            document.getElementById('res-ftp-z3').textContent = z3_min + ' - ' + z3_max + ' W';
+                            document.getElementById('res-ftp-z4').textContent = z4_min + ' - ' + z4_max + ' W';
+                            document.getElementById('res-ftp-z5').textContent = z5_min + ' - ' + z5_max + ' W';
+                            document.getElementById('res-ftp-z6').textContent = z6_min + ' - ' + z6_max + ' W';
+                        }
+
+                        window.addEventListener('DOMContentLoaded', calculateFTP);
+                    </script>
+                </div>
+                <article class="article-body">
+                    <h2>The Physiology of Functional Threshold Power (FTP)</h2>
+<p>In modern competitive cycling, <strong>Functional Threshold Power (FTP)</strong> represents the gold standard physiological anchor for endurance training, workout prescription, and race pacing. Formulated in the early 2000s by renowned exercise physiologist <strong>Dr. Andrew Coggan</strong> and cycling coach <strong>Hunter Allen</strong>, FTP bridged the gap between complex laboratory metabolic gas carts and mobile strain-gauge bicycle power meters.</p>
+
+<p>Physiologically, FTP is defined as <strong>the highest mechanical power (measured in Watts) that a cyclist can sustain in a quasi-steady state for approximately 60 minutes</strong>. It corresponds closely to the athlete's <em>Maximal Lactate Steady State (MLSS)</em>—the inflection point at which systemic blood lactate production exactly matches the physiological rate of blood lactate clearance and buffering (typically occurring at blood lactate concentrations between $3.5 \, \text{and } 4.5 \, \text{mmol/L}$).</p>
+
+<p>Riding even slightly below FTP permits sustainable aerobic energy production primarily via oxidative phosphorylation. Exceeding FTP, however, accelerates anaerobic glycolysis, triggering rapid hydrogen ion ($H^+$) accumulation, intracellular acidosis, and exponential depletion of the finite anaerobic work capacity ($W'$), terminating the effort within minutes.</p>
+
+<h2>Standardized Testing Protocols: Why Multiply 20-Minute Power by 0.95?</h2>
+<p>While an actual 60-minute maximum-effort individual time trial represents the purest test of FTP, sustaining maximal suffering for a full hour presents severe psychological and pacing challenges. Consequently, coaches developed shorter, highly validated testing protocols:</p>
+
+<h3>1. The Hunter Allen &amp; Andrew Coggan 20-Minute Protocol (0.95 Multiplier)</h3>
+<p>The 20-minute test is the most widely validated FTP protocol in sports science. Following a thorough warm-up that includes a clearing 5-minute maximum blowout effort to blunt anaerobic capacity, the cyclist executes an all-out 20-minute time trial:</p>
+
+$$\text{FTP} = \text{Average Power}_{\text{20-min}} \times 0.95$$
+
+<p>The mathematical necessity of the $0.95$ factor ($5\%$ deduction) is rooted in human bioenergetics. During a 20-minute maximum effort, approximately <strong>$5\%$ of total mechanical energy is derived from anaerobic glycolytic stores ($W'$)</strong>. Subtracting $5\%$ mathematically eliminates this non-sustainable anaerobic contribution, accurately projecting what the aerobic oxidative system can sustain for 60 continuous minutes.</p>
+
+<h3>2. The 8-Minute Test (0.90 Multiplier)</h3>
+<p>Popularized by Carmichael Training Systems (CTS), this protocol requires two all-out 8-minute intervals separated by 10 minutes of active recovery. The average power of the two intervals is multiplied by $0.90$ (a $10\%$ deduction to account for greater anaerobic reserve utilization during the shorter duration):</p>
+
+$$\text{FTP} = \text{Average Power}_{\text{8-min}} \times 0.90$$
+
+<h3>3. The Progressive Ramp Test (0.75 Multiplier)</h3>
+<p>Common on smart trainers and platforms like Zwift and TrainerRoad, the ramp test increases target resistance by $20$ to $25 \, \text{Watts}$ every minute until complete muscular failure. FTP is calculated from the highest 1-minute step power completed ($P_{\text{max}}$):</p>
+
+$$\text{FTP} = P_{\text{max}} \times 0.75$$
+
+<h2>Power-to-Weight Ratio: Watts per Kilogram (W/kg)</h2>
+<p>While absolute FTP in Watts dictates performance on flat roads and in time trials where aerodynamic drag ($C_d A$) is the primary resistor, <strong>Watts per kilogram (W/kg)</strong> is the absolute arbiter of cycling performance on uphill gradients where gravitational potential energy dominates:</p>
+
+$$\text{Specific Power} = \frac{\text{FTP (Watts)}}{\text{Body Mass (kg)}}$$
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Competitive Racing Category</th>
+            <th>Male FTP (W/kg)</th>
+            <th>Female FTP (W/kg)</th>
+            <th>Typical 60-Min Power (70 kg Rider)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Untrained / Novice</strong></td>
+            <td>$&lt; 2.20 \, \text{W/kg}$</td>
+            <td>$&lt; 1.80 \, \text{W/kg}$</td>
+            <td>$&lt; 150 \, \text{Watts}$</td>
+        </tr>
+        <tr>
+            <td><strong>Category 5 (Entry Racer)</strong></td>
+            <td>$2.20 - 3.00 \, \text{W/kg}$</td>
+            <td>$1.80 - 2.50 \, \text{W/kg}$</td>
+            <td>$150 - 210 \, \text{Watts}$</td>
+        </tr>
+        <tr>
+            <td><strong>Category 4 (Trained Club)</strong></td>
+            <td>$3.00 - 3.80 \, \text{W/kg}$</td>
+            <td>$2.50 - 3.20 \, \text{W/kg}$</td>
+            <td>$210 - 265 \, \text{Watts}$</td>
+        </tr>
+        <tr>
+            <td><strong>Category 3 (Competitive)</strong></td>
+            <td>$3.80 - 4.50 \, \text{W/kg}$</td>
+            <td>$3.20 - 3.90 \, \text{W/kg}$</td>
+            <td>$265 - 315 \, \text{Watts}$</td>
+        </tr>
+        <tr>
+            <td><strong>Category 1-2 (Elite Amateur)</strong></td>
+            <td>$4.50 - 5.20 \, \text{W/kg}$</td>
+            <td>$3.90 - 4.60 \, \text{W/kg}$</td>
+            <td>$315 - 365 \, \text{Watts}$</td>
+        </tr>
+        <tr>
+            <td><strong>UCI WorldTour Professional</strong></td>
+            <td>$5.80 - 6.50+ \, \text{W/kg}$</td>
+            <td>$5.00 - 5.80+ \, \text{W/kg}$</td>
+            <td>$400 - 455+ \, \text{Watts}$</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Andrew Coggan's 7 Classic Power Training Zones</h2>
+<p>Once FTP is determined, it unlocks Dr. Coggan's Seven Power Training Zones. Each zone targets a specific physiological pathway and cellular adaptation:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Zone Designation</th>
+            <th>Intensity (% of FTP)</th>
+            <th>Target Physiological Adaptation</th>
+            <th>Sustainable Duration</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Zone 1: Active Recovery</strong></td>
+            <td>$&lt; 55\%$</td>
+            <td>Enhances muscular blood flow, lactate clearance, low cardiac strain</td>
+            <td>Unlimited (&gt; 3 hours)</td>
+        </tr>
+        <tr>
+            <td><strong>Zone 2: Endurance Base</strong></td>
+            <td>$56\% - 75\%$</td>
+            <td>Mitochondrial biogenesis, capillary proliferation, fatty acid oxidation</td>
+            <td>$2 - 6$ hours</td>
+        </tr>
+        <tr>
+            <td><strong>Zone 3: Tempo</strong></td>
+            <td>$76\% - 90\%$</td>
+            <td>Aerobic endurance, glycogen storage, muscular stamina</td>
+            <td>$1 - 3$ hours</td>
+        </tr>
+        <tr>
+            <td><strong>Zone 4: Lactate Threshold</strong></td>
+            <td>$91\% - 105\%$</td>
+            <td>Maximizes MLSS, improves blood buffering capacity, mental pacing</td>
+            <td>$30 - 60$ minutes</td>
+        </tr>
+        <tr>
+            <td><strong>Zone 5: VO2 Max</strong></td>
+            <td>$106\% - 120\%$</td>
+            <td>Increases maximal cardiac stroke volume, expands aerobic ceiling</td>
+            <td>$3 - 8$ minutes</td>
+        </tr>
+        <tr>
+            <td><strong>Zone 6: Anaerobic Capacity</strong></td>
+            <td>$121\% - 150\%$</td>
+            <td>High-energy phosphate and fast-glycolytic enzyme development</td>
+            <td>$30 - 120$ seconds</td>
+        </tr>
+        <tr>
+            <td><strong>Zone 7: Neuromuscular Power</strong></td>
+            <td>$&gt; 150\%$</td>
+            <td>Type IIx motor unit recruitment, peak sprint force production</td>
+            <td>$5 - 15$ seconds</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Worked Clinical Case Study: 20-Minute FTP Protocol Analysis</h2>
+<div class="worked-example-card">
+    <h3>Laboratory Power Assessment Scenario</h3>
+    <p><strong>Subject Profile:</strong> A 30-year-old road cyclist weighing $160 \, \text{lbs}$ ($72.57 \, \text{kg}$) executes a formal Coggan 20-minute field test on a calibrated direct-drive smart trainer. Over the 20-minute time trial, his power meter records an average power output of $280 \, \text{Watts}$ with an average heart rate of $174 \, \text{BPM}$.</p>
+
+    <div class="step-solution">
+        <h4>Step 1: Calculate Functional Threshold Power (FTP)</h4>
+        $$\text{FTP} = \text{Power}_{\text{20-min}} \times 0.95 = 280 \, \text{W} \times 0.95 = 266.0 \, \text{Watts}$$
+
+        <h4>Step 2: Calculate Specific Power-to-Weight Ratio</h4>
+        $$\text{W/kg} = \frac{266.0 \, \text{Watts}}{72.57 \, \text{kg}} = 3.67 \, \text{W/kg}$$
+        <p>This places the athlete squarely in the <strong>Category 4 competitive club racer</strong> bracket.</p>
+
+        <h4>Step 3: Prescribe Individualized Coggan Power Zones</h4>
+        <ul>
+            <li><strong>Zone 1 Recovery (&lt; 55%):</strong> $&lt; 146 \, \text{Watts}$</li>
+            <li><strong>Zone 2 Endurance (56% - 75%):</strong> $149 - 200 \, \text{Watts}$ (Target for long Sunday group rides)</li>
+            <li><strong>Zone 3 Tempo (76% - 90%):</strong> $202 - 239 \, \text{Watts}$</li>
+            <li><strong>Zone 4 Threshold (91% - 105%):</strong> $242 - 279 \, \text{Watts}$ (Target for $2 \times 20\text{-min}$ sweet spot workouts)</li>
+            <li><strong>Zone 5 VO2 Max (106% - 120%):</strong> $282 - 319 \, \text{Watts}$ (Target for $5 \times 4\text{-min}$ intervals)</li>
+            <li><strong>Zone 6 Anaerobic (121% - 150%):</strong> $322 - 399 \, \text{Watts}$</li>
+        </ul>
+
+        <h4>Clinical Assessment</h4>
+        <p>The cyclist possesses a baseline aerobic threshold of $266 \, \text{Watts}$. Structuring his training around these zones eliminates junk miles and optimizes mitochondrial adaptations.</p>
+    </div>
+</div>
+
+<h2>Frequently Asked Questions About Functional Threshold Power (FTP)</h2>
+<h3>What is Functional Threshold Power (FTP) in cycling?</h3>
+<p>FTP is the highest average power in Watts that a cyclist can sustain for approximately one hour in a quasi-steady state. Developed by Dr. Andrew Coggan and Hunter Allen, it represents the primary metric for prescribing individualized training zones and assessing aerobic fitness.</p>
+
+<h3>Why is 20-minute average power multiplied by 0.95 to calculate FTP?</h3>
+<p>In a 20-minute maximum effort, approximately 5% of energy is supplied by non-sustainable anaerobic capacity. Multiplying average power by 0.95 removes this anaerobic contribution, isolating the athlete's sustainable aerobic 60-minute threshold.</p>
+
+<h3>What is a good Watts per kilogram (W/kg) FTP for a cyclist?</h3>
+<p>Recreational cyclists typically sit between 1.5 and 2.2 W/kg. Moderate club riders achieve 2.5 to 3.2 W/kg, competitive amateur racers reach 3.5 to 4.2 W/kg, and elite professional cyclists exceed 5.8 to 6.5 W/kg.</p>
+
+<h3>How often should you re-test your FTP?</h3>
+<p>FTP should be re-tested every 6 to 8 weeks, typically at the end of a targeted training block. Testing too frequently causes unnecessary training disruption, while waiting longer than 10 weeks risks training in obsolete zones that no longer match your improved fitness.</p>
+
+<h3>What is the difference between FTP and VO2 Max?</h3>
+<p>VO2 Max is the absolute ceiling of aerobic oxygen consumption, sustainable for only 5 to 8 minutes (Zone 5, ~106-120% FTP). FTP is the submaximal aerobic threshold that can be sustained continuously for an hour (~75-85% of VO2 Max power).</p>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚖️</span>
+            <h3 class="widget-title">Related Health & Fitness</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bmr-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMR Calculator</a></li>
+            <li><a href="macro-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Macro Split Calculator</a></li>
+            <li><a href="calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Calculator (TDEE)</a></li>
+            <li><a href="bmi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Daily Water Intake</a></li>
+            <li><a href="a1c-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> HbA1c to eAG Glucose Sizer</a></li>
+            <li><a href="bac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Blood Alcohol (BAC) Clearance</a></li>
+            <li><a href="body-surface-area-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Surface Area (Mosteller)</a></li>
+            <li><a href="bsa-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Oncology BSA & Calvert Dosing</a></li>
+            <li><a href="calorie-deficit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Deficit & Fat Loss Planner</a></li>
+            <li><a href="calories-burned-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exercise Calories Burned (METs)</a></li>
+            <li><a href="carbohydrate-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Carbohydrate Intake & Glycogen</a></li>
+            <li><a href="cholesterol-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cholesterol Ratio & Castelli Risk</a></li>
+            <li><a href="due-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Due Date & Gestation</a></li>
+            <li><a href="fat-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Dietary Fat Intake (Grams/Day)</a></li>
+            <li><a href="heart-rate-zone-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heart Rate Zone (Karvonen HRR)</a></li>
+            <li><a href="lean-body-mass-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lean Body Mass (Boer & James)</a></li>
+            <li><a href="max-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Max Heart Rate (Tanaka & Gulati)</a></li>
+            <li><a href="met-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> METs & Activity Caloric Burn</a></li>
+            <li><a href="ovulation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ovulation & Fertile Window</a></li>
+            <li><a href="pregnancy-weight-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Weight Gain (IOM/ACOG)</a></li>
+            <li><a href="protein-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Protein Intake (ISSN/DRI Optimum)</a></li>
+            <li><a href="sleep-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sleep Cycle (90-Min REM Ultradian)</a></li>
+            <li><a href="sodium-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sodium to Salt & AHA Dietary Cap</a></li>
+            <li><a href="target-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Target Heart Rate (Karvonen HRR)</a></li>
+            <li><a href="tdee-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> TDEE & Calorie Burn (Total Daily)</a></li>
+            <li><a href="waist-to-height-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio (WHtR)</a></li>
+            <li><a href="waist-to-height-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio Sizer</a></li>
+            <li><a href="waist-to-hip-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Hip Ratio (WHR Risk)</a></li>
+            <li><a href="one-rep-max-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> One Rep Max (1RM)</a></li>
+            <li><a href="vo2-max-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> VO2 Max Calculator</a></li>
+            <li><a href="pace-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Running Pace & Race Splits</a></li>
+            <li><a href="treadmill-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Treadmill Calorie Calculator</a></li>
+            <li><a href="stairmaster-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> StairMaster Calorie Calculator</a></li>
+            <li><a href="cycling-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cycling Calorie Calculator</a></li>
+            <li><a href="pushup-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pushup Calorie Calculator</a></li>
+            <li><a href="bench-press-calories-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Bench Press Calories Calculator</a></li>
+            <li><a href="swimming-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Swimming Calorie Calculator</a></li>
+            <li><a href="stationary-bike-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Stationary Bike Calorie Calculator</a></li>
+            <li><a href="incline-treadmill-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Incline Treadmill Calorie Calculator</a></li>
+            <li><a href="rucking-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rucking Calorie Calculator</a></li>
+            <li><a href="jack-daniels-running-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Jack Daniels Running Calculator</a></li>
+            <li><a href="jumping-jacks-calories-burned-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Jumping Jacks Calories Burned</a></li>
+            <li><a href="squat-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Squat Calorie Calculator</a></li>
+            <li><a href="sit-up-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sit Up Calorie Calculator</a></li>
+            <li><a href="leg-press-to-squat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Leg Press to Squat Calculator</a></li>
+            <li><a href="cycling-watt-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cycling Watt Calorie Calculator</a></li>
+            <li><a href="running-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Running Calorie Calculator</a></li>
+            <li><a href="rowing-machine-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rowing Machine Calorie Calculator</a></li>
+            <li><a href="peloton-calorie-burn-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Peloton Calorie Burn Calculator</a></li>
+            <li><a href="elliptical-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Elliptical Calorie Calculator</a></li>
+            <li><a href="ftp-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> FTP Calculator (Cycling)</a></li>
+            <li><a href="elliptical-to-running-conversion-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Elliptical to Running Conversion</a></li>
+            <li><a href="army-body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Army Body Fat Calculator</a></li>
+            <li><a href="starbucks-calories-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Starbucks Calories Calculator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="health.html" class="sidebar-category-link">View All Health & Fitness Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers peer-reviewed exercise physiology computing algorithms, military body composition standards, and dietary nutritional engines compliant with ACSM, DoD AR 600-9, and clinical nutrition research.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Cardio &amp; Endurance</h4>
+                    <ul>
+                        <li><a href="elliptical-calorie-calculator.html">Elliptical Calorie Calculator</a></li>
+                        <li><a href="ftp-calculator.html">FTP Cycling Calculator</a></li>
+                        <li><a href="elliptical-to-running-conversion-calculator.html">Elliptical to Running</a></li>
+                        <li><a href="treadmill-calorie-calculator.html">Treadmill Calorie Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Body Composition &amp; Nutrition</h4>
+                    <ul>
+                        <li><a href="army-body-fat-calculator.html">Army Body Fat Calculator</a></li>
+                        <li><a href="starbucks-calories-calculator.html">Starbucks Calorie Calculator</a></li>
+                        <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
+                        <li><a href="bmr-calculator.html">BMR Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="calorie-calculator.html">TDEE Calorie Calculator</a></li>
+                        <li><a href="bmi-calculator.html">BMI Calculator</a></li>
+                        <li><a href="health.html">Health Suite</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed metabolic and physiological calculation suites.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

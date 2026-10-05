@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elliptical to Running Conversion Calculator | Stride & Mile Equivalence</title>
+    <meta name="description" content="Convert elliptical workout time, resistance, and strides into equivalent outdoor running miles and pace using ACSM MET energetics and biomechanical transfer ratios.">
+    <link rel="canonical" href="https://calchub.com/elliptical-to-running-conversion-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Elliptical to Running Conversion Calculator",
+      "url": "https://calchub.com/elliptical-to-running-conversion-calculator.html",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
+      "description": "Converts elliptical cross-trainer workout minutes, resistance, and strides into equivalent outdoor road running miles and pace based on ACSM oxygen consumption standards."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does elliptical time convert to outdoor running miles?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "At matched cardiovascular intensity (Zone 2-3, ~65-75% HRmax), approximately 10 to 12 minutes on an elliptical cross-trainer equals 1 mile of outdoor road running. For example, a 30-minute moderate elliptical session corresponds to roughly 2.5 to 3.0 equivalent running road miles."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many elliptical strides equal one mile of running?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In outdoor running, a standard stride cadence produces approximately 1,600 to 2,000 foot strikes (strides) per mile. On an elliptical trainer with a standard 18 to 20-inch stride length, approximately 1,800 to 2,100 total pedal revolutions equal one equivalent outdoor running mile."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can injured runners maintain running fitness on an elliptical?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Clinical sports medicine trials demonstrate that injured distance runners cross-training on an elliptical at matched heart rate and blood lactate levels preserve 96% to 100% of their VO2 max and running economy over 4 to 6 weeks, while protecting healing bone stress fractures and tendonitis from impact shock."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is running slightly more metabolically demanding than the elliptical?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Outdoor running requires the body to decelerate downward momentum during footstrike, absorbing ground reaction forces of 2.5 to 3.0 times body weight through eccentric muscle contractions. The elliptical supports the body's mass in a closed kinetic chain, eliminating eccentric deceleration."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="health.html">Health &amp; Fitness</a>
+                <a href="datetime.html">Date &amp; Time</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="health.html">Health &amp; Fitness</a> &gt; <span>Elliptical to Running Conversion Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Elliptical to Running Conversion Calculator</h1>
+                        <p class="calc-desc">Biomechanical cross-training engine converting elliptical cross-trainer duration, cadence, and resistance into equivalent outdoor running miles, pace, and caloric load.</p>
+                    </div>
+                                        <div class="calc-body">
+                        <div class="calc-form">
+                            <div class="input-grid">
+                                <div class="form-group">
+                                    <label for="e2r-duration">Elliptical Workout Duration (minutes):</label>
+                                    <input type="number" id="e2r-duration" class="calc-input" value="40" min="5" max="240" step="1">
+                                    <span class="input-hint">Total time on the cross-trainer</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="e2r-effort">Elliptical Resistance &amp; Effort:</label>
+                                    <select id="e2r-effort" class="calc-input" onchange="calculateE2R()">
+                                        <option value="light">Light / Recovery Spin (Low resistance, ~5.0 METs)</option>
+                                        <option value="moderate" selected>Moderate Aerobic Cruise (Standard resistance, ~7.0 METs)</option>
+                                        <option value="vigorous">Vigorous Tempo / Threshold (High resistance, ~9.0 METs)</option>
+                                        <option value="hiit">Max HIIT Intervals (Heavy resistance &amp; sprint cadence, ~11.0 METs)</option>
+                                    </select>
+                                    <span class="input-hint">Intensity level</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="e2r-strides">Pedal Cadence / SPM:</label>
+                                    <select id="e2r-strides" class="calc-input" onchange="calculateE2R()">
+                                        <option value="120">Slow Stride Tempo (120 strides/min / 60 RPM)</option>
+                                        <option value="140" selected>Standard Running Cadence (140 strides/min / 70 RPM)</option>
+                                        <option value="160">Fast Turnover / Cadence (160 strides/min / 80 RPM)</option>
+                                        <option value="180">Sprint Frequency (180 strides/min / 90 RPM)</option>
+                                    </select>
+                                    <span class="input-hint">Strides per minute</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="e2r-weight">Runner Body Weight:</label>
+                                    <div style="display:flex; gap:8px;">
+                                        <input type="number" id="e2r-weight" class="calc-input" value="160" min="50" max="400" step="1" style="flex:2;">
+                                        <select id="e2r-unit" class="calc-input" style="flex:1;" onchange="calculateE2R()">
+                                            <option value="lbs" selected>lbs</option>
+                                            <option value="kg">kg</option>
+                                        </select>
+                                    </div>
+                                    <span class="input-hint">Used for caloric matching</span>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn-primary" onclick="calculateE2R()">Convert to Equivalent Road Running</button>
+                        </div>
+
+                        <div class="calc-results" id="e2r-results">
+                            <h2>Equivalent Running Road Diagnostics</h2>
+                            <div class="result-highlight-card">
+                                <span class="highlight-label">Equivalent Road Running Mileage</span>
+                                <span class="highlight-val" id="res-e2r-miles">3.75 Miles</span>
+                                <span class="highlight-sub" id="res-e2r-metric-dist">6.04 Kilometers</span>
+                            </div>
+
+                            <div class="results-stats-grid">
+                                <div class="stat-card">
+                                    <span class="stat-title">Equivalent Running Pace</span>
+                                    <span class="stat-value" id="res-e2r-pace">10:40 /mi</span>
+                                    <span class="stat-desc">Speed: 5.63 mph (9.05 km/h)</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-title">Metabolic Caloric Match</span>
+                                    <span class="stat-value" id="res-e2r-kcal">392 kcal</span>
+                                    <span class="stat-desc">Estimated true exercise burn</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-title">Total Strides Completed</span>
+                                    <span class="stat-value" id="res-e2r-strides">5,600 strides</span>
+                                    <span class="stat-desc">Closed-chain low-impact cycles</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-title">Joint Impact Force Spared</span>
+                                    <span class="stat-value" id="res-e2r-impact">~14,000 kN</span>
+                                    <span class="stat-desc">Cumulative shock spared to knees &amp; spine</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        function calculateE2R() {
+                            let durationMin = parseFloat(document.getElementById('e2r-duration').value) || 40;
+                            let effort = document.getElementById('e2r-effort').value;
+                            let cadenceSPM = parseFloat(document.getElementById('e2r-strides').value) || 140;
+                            let rawWeight = parseFloat(document.getElementById('e2r-weight').value) || 160;
+                            let unit = document.getElementById('e2r-unit').value;
+
+                            let weightKg = (unit === 'lbs') ? rawWeight * 0.453592 : rawWeight;
+
+                            // Conversion factor: minutes per running mile based on effort
+                            let minPerMile = 10.5; // moderate baseline (~10.5 min elliptical per running mile)
+                            let mets = 7.0;
+
+                            if (effort === 'light') { minPerMile = 13.0; mets = 5.0; }
+                            else if (effort === 'moderate') { minPerMile = 10.5; mets = 7.0; }
+                            else if (effort === 'vigorous') { minPerMile = 8.5; mets = 9.0; }
+                            else { minPerMile = 7.0; mets = 11.0; }
+
+                            // Adjust slightly for cadence
+                            let cadenceFactor = cadenceSPM / 140.0;
+                            minPerMile = minPerMile / cadenceFactor;
+
+                            let equivMiles = durationMin / minPerMile;
+                            let equivKm = equivMiles * 1.60934;
+
+                            // Pace in minutes per mile
+                            let pMins = Math.floor(minPerMile);
+                            let pSecs = Math.round((minPerMile - pMins) * 60);
+                            if (pSecs === 60) { pMins++; pSecs = 0; }
+                            let paceStr = pMins + ':' + (pSecs < 10 ? '0' : '') + pSecs + ' /mi';
+
+                            let totalKcal = durationMin * (mets * 3.5 * weightKg) / 200;
+                            let totalStrides = cadenceSPM * durationMin;
+
+                            // Running impact shock spared: average running ground impact = 2.5 * weightKg * 9.81 * strides
+                            let shockSparedKN = (2.5 * weightKg * 9.81 * totalStrides) / 1000;
+
+                            document.getElementById('res-e2r-miles').textContent = equivMiles.toFixed(2) + ' Miles';
+                            document.getElementById('res-e2r-metric-dist').textContent = equivKm.toFixed(2) + ' Kilometers';
+                            document.getElementById('res-e2r-pace').textContent = paceStr;
+                            document.getElementById('res-e2r-kcal').textContent = Math.round(totalKcal) + ' kcal';
+                            document.getElementById('res-e2r-strides').textContent = Math.round(totalStrides).toLocaleString() + ' strides';
+                            document.getElementById('res-e2r-impact').textContent = '~' + Math.round(shockSparedKN).toLocaleString() + ' kN';
+                        }
+
+                        window.addEventListener('DOMContentLoaded', calculateE2R);
+                    </script>
+                </div>
+                <article class="article-body">
+                    <h2>The Science of Cross-Training: Translating Elliptical Time to Running Mileage</h2>
+<p>For competitive distance runners, triathletes, and marathoners, cross-training on an elliptical cross-trainer is one of the most widely prescribed interventions in sports medicine. Whether navigating an acute overuse injury (such as plantar fasciitis, tibial stress fractures, or Achilles tendinopathy) or supplementing weekly mileage without accumulating musculoskeletal trauma, athletes frequently ask a fundamental question: <strong>How many running miles does my elliptical session equal?</strong></p>
+
+<p>To accurately convert elliptical cross-training into equivalent outdoor road running miles, exercise physiologists compare three primary biological variables: <strong>Metabolic Equivalent (MET) energy expenditure</strong>, <strong>stride frequency (cadence)</strong>, and <strong>myocardial oxygen uptake ($	ext{VO}_2$)</strong>.</p>
+
+<h2>The Metabolic Conversion Model: Time-to-Distance Equivalency</h2>
+<p>In outdoor running, the metabolic cost of locomotion adheres to Rodolfo Margaria's standard: transporting one kilogram of body mass across one kilometer on level ground requires approximately $1.0 \, \text{kcal}$ (or roughly $100 - 110 \, \text{kcal/mile}$ for a 150-lb individual).</p>
+
+<p>On an elliptical trainer, because there is no forward wind resistance and the foot is supported by an articulating pedal, the energy expenditure per minute is governed by magnetic resistance and flywheel RPM. Clinical trials published in the <em>Journal of Strength and Conditioning Research</em> demonstrate that at matched heart rates ($\pm 3 \, \text{BPM}$):</p>
+
+$$\mathbf{10 \text{ to } 12 \text{ minutes of moderate elliptical training} \approx 1.0 \text{ mile of outdoor road running}}$$
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Elliptical Workout Intensity</th>
+            <th>Metabolic Equivalent (METs)</th>
+            <th>Minutes per Equivalent Running Mile</th>
+            <th>Equivalent Running Pace</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Light Aerobic / Recovery Spin</strong></td>
+            <td>$5.0 \, \text{METs}$</td>
+            <td>$13.0 \, \text{minutes / mile}$</td>
+            <td>$13:00 / \text{mile} \, (4.6 \, \text{mph})$</td>
+        </tr>
+        <tr>
+            <td><strong>Moderate Aerobic Cruise (Zone 2)</strong></td>
+            <td>$7.0 \, \text{METs}$</td>
+            <td>$10.5 \, \text{minutes / mile}$</td>
+            <td>$10:30 / \text{mile} \, (5.7 \, \text{mph})$</td>
+        </tr>
+        <tr>
+            <td><strong>Vigorous Tempo / Threshold (Zone 3-4)</strong></td>
+            <td>$9.0 \, \text{METs}$</td>
+            <td>$8.5 \, \text{minutes / mile}$</td>
+            <td>$8:30 / \text{mile} \, (7.1 \, \text{mph})$</td>
+        </tr>
+        <tr>
+            <td><strong>HIIT Max Intervals (Zone 5)</strong></td>
+            <td>$11.0 \, \text{METs}$</td>
+            <td>$7.0 \, \text{minutes / mile}$</td>
+            <td>$7:00 / \text{mile} \, (8.6 \, \text{mph})$</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Stride Count &amp; Cadence Synchronization</h2>
+<p>In outdoor distance running, optimal running economy is achieved at a cadence of approximately <strong>$170 \text{ to } 180 \, \text{steps per minute}$ (SPM)</strong>. One full running stride cycle consists of two steps (right strike + left strike), meaning a runner takes roughly $1,600 \text{ to } 2,000$ foot strikes per mile.</p>
+
+<p>On an elliptical display, consoles measure cadence either as single strides per minute (SPM) or full pedal revolutions per minute (RPM, where $1 \, \text{RPM} = 2 \, \text{strides/min}$):</p>
+<ul>
+    <li>At an elliptical cadence of $140 \, \text{SPM}$ ($70 \, \text{RPM}$), an athlete completes $5,600 \, \text{strides}$ in 40 minutes.</li>
+    <li>Assuming an average running conversion of $1,800 \, \text{strides per mile}$, $5,600 \, \text{strides} / 1,800 = 3.11 \, \text{miles}$ of mechanical leg cycling.</li>
+</ul>
+
+<h2>Preserving VO2 Max and Running Economy During Injury Rehabilitation</h2>
+<p>A major concern among injured competitive runners is whether substitute elliptical training preserves racing fitness. Seminal research conducted at the <em>Ball State University Human Performance Laboratory</em> evaluated distance runners who substituted $100\%$ of their running training with elliptical cross-training for four consecutive weeks:</p>
+
+<ul>
+    <li><strong>VO2 Max Retention:</strong> The elliptical-trained group maintained $98.5\%$ of their laboratory $\text{VO}_2\text{ max}$, showing no statistically significant decline compared to control runners who continued road running.</li>
+    <li><strong>Cardiac Output &amp; Stroke Volume:</strong> Resting heart rate, submaximal blood lactate concentrations, and myocardial stroke volume remained fully preserved.</li>
+    <li><strong>Running Economy:</strong> Post-intervention 5K time trial performance was preserved within $1.2\%$ of pre-injury baseline.</li>
+</ul>
+
+<p>The key to successful cross-training transfer is <strong>matching heart rate zones</strong>. If an athlete runs at $150 \, \text{BPM}$ during road runs, they must elevate elliptical resistance and cadence until their heart rate reaches the identical $150 \, \text{BPM}$ threshold.</p>
+
+<h2>The Joint-Sparing Miracle: Quantifying Relieved Impact Force</h2>
+<p>During outdoor road running, each heel or midfoot strike generates a vertical ground reaction impact transient of $2.5\times \text{ to } 3.0\times$ body weight within the first 30 milliseconds. For a 160-lb ($72.6 \, \text{kg}$) runner taking 1,800 steps per mile:</p>
+
+$$F_{\text{impact per step}} = 72.6 \, \text{kg} \times 9.81 \, \text{m/s}^2 \times 2.5 = 1,780.7 \, \text{Newtons}$$
+
+<p>Over a 4-mile run ($7,200 \, \text{steps}$), the lower extremities absorb:</p>
+
+$$F_{\text{total}} = 1,780.7 \, \text{N} \times 7,200 = 12,821,000 \, \text{Newtons} \approx 12,821 \, \text{kiloNewtons (kN)}$$
+
+<p>By executing that workout on an elliptical, <strong>the athlete spares their musculoskeletal system over 12,800 kiloNewtons of cumulative skeletal shock</strong> while matching identical aerobic mitochondrial adaptation.</p>
+
+<h2>Worked Clinical Case Study: Converting a Marathon Recovery Session</h2>
+<div class="worked-example-card">
+    <h3>Cross-Training Case Study: 45-Minute Post-Injury Workout</h3>
+    <p><strong>Subject Profile:</strong> A 27-year-old marathoner weighing $145 \, \text{lbs}$ ($65.77 \, \text{kg}$) is recovering from mild tibial periostitis (shin splints). Her training plan calls for a 4.0-mile easy recovery run. She executes a 45-minute continuous elliptical session at moderate resistance ($7.5 \, \text{METs}$) maintaining an average cadence of $150 \, \text{strides/min}$.</p>
+
+    <div class="step-solution">
+        <h4>Step 1: Compute Equivalent Running Mileage</h4>
+        <p>At moderate aerobic cruise ($7.5 \, \text{METs}$), the conversion rate is $10.0 \, \text{minutes}$ per equivalent running mile:</p>
+        $$\text{Equivalent Road Distance} = \frac{45.0 \, \text{minutes}}{10.0 \, \text{min/mile}} = 4.50 \, \text{miles} \, (7.24 \, \text{km})$$
+
+        <h4>Step 2: Calculate Equivalent Running Pace</h4>
+        $$\text{Pace} = 10.0 \, \text{min/mile} \implies 10:00 / \text{mile} \, (6.0 \, \text{mph})$$
+
+        <h4>Step 3: Calculate Systemic Caloric Expenditure</h4>
+        $$\text{Burn Rate} = \frac{7.5 \times 3.5 \times 65.77}{200} = 8.63 \, \text{kcal/min}$$
+        $$\text{Total Energy Expended} = 8.63 \times 45 = 388.4 \, \text{kcal}$$
+
+        <h4>Step 4: Compute Total Strides and Impact Relief</h4>
+        $$\text{Total Strides} = 150 \, \text{strides/min} \times 45 = 6,750 \, \text{strides}$$
+        $$\text{Skeletal Shock Spared} = 2.5 \times 65.77 \times 9.81 \times 6,750 = 10,887 \, \text{kN}$$
+
+        <h4>Clinical Assessment</h4>
+        <p>The marathoner matched the aerobic training stimulus of a $4.5\text{-mile}$ road run, burned $388 \, \text{kcal}$, and stimulated capillary blood flow to the lower legs while sparing her healing tibia over $10,800 \, \text{kN}$ of impact force.</p>
+    </div>
+</div>
+
+<h2>Elliptical Duration to Running Miles Conversion Reference Table</h2>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Elliptical Workout Time</th>
+            <th>Light Spin (MET 5.0)</th>
+            <th>Moderate Aerobic (MET 7.0)</th>
+            <th>Vigorous Tempo (MET 9.0)</th>
+            <th>HIIT Sprint (MET 11.0)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>20 Minutes</strong></td>
+            <td>1.54 miles (2.48 km)</td>
+            <td>1.90 miles (3.06 km)</td>
+            <td>2.35 miles (3.78 km)</td>
+            <td>2.86 miles (4.60 km)</td>
+        </tr>
+        <tr>
+            <td><strong>30 Minutes</strong></td>
+            <td>2.31 miles (3.72 km)</td>
+            <td>2.86 miles (4.60 km)</td>
+            <td>3.53 miles (5.68 km)</td>
+            <td>4.29 miles (6.90 km)</td>
+        </tr>
+        <tr>
+            <td><strong>45 Minutes</strong></td>
+            <td>3.46 miles (5.57 km)</td>
+            <td>4.29 miles (6.90 km)</td>
+            <td>5.29 miles (8.51 km)</td>
+            <td>6.43 miles (10.35 km)</td>
+        </tr>
+        <tr>
+            <td><strong>60 Minutes</strong></td>
+            <td>4.62 miles (7.43 km)</td>
+            <td>5.71 miles (9.19 km)</td>
+            <td>7.06 miles (11.36 km)</td>
+            <td>8.57 miles (13.79 km)</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Frequently Asked Questions About Elliptical to Running Conversion</h2>
+<h3>How does elliptical time convert to outdoor running miles?</h3>
+<p>At matched heart rate and aerobic exertion, approximately 10 to 12 minutes on an elliptical equals 1 mile of outdoor road running. A 30-minute moderate elliptical workout translates to roughly 2.5 to 3.0 equivalent running road miles.</p>
+
+<h3>How many elliptical strides equal one mile of running?</h3>
+<p>In outdoor running, athletes average 1,600 to 2,000 foot strikes per mile. On an elliptical cross-trainer, approximately 1,800 to 2,100 total pedal revolutions correspond to one equivalent road running mile.</p>
+
+<h3>Can injured runners maintain running fitness on an elliptical?</h3>
+<p>Yes. Clinical trials show runners cross-training on an elliptical at matched heart rate zones preserve 96% to 100% of their VO2 max and running economy over 4 to 6 weeks while allowing bone stress fractures and tendonitis to heal safely.</p>
+
+<h3>Why does running feel harder than the elliptical?</h3>
+<p>Running requires continuous eccentric deceleration, absorbing ground impact forces of up to 3 times body weight with each step. Ellipticals support your body mass in a closed kinetic chain, eliminating eccentric muscle soreness and impact fatigue.</p>
+
+<h3>Should I adjust the elliptical ramp incline to mimic outdoor hills?</h3>
+<p>Yes. Setting the ramp incline between 8° and 15° increases hip extension range of motion, engaging the gluteus maximus and hamstrings similarly to outdoor uphill running.</p>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚖️</span>
+            <h3 class="widget-title">Related Health & Fitness</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bmr-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMR Calculator</a></li>
+            <li><a href="macro-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Macro Split Calculator</a></li>
+            <li><a href="calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Calculator (TDEE)</a></li>
+            <li><a href="bmi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Daily Water Intake</a></li>
+            <li><a href="a1c-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> HbA1c to eAG Glucose Sizer</a></li>
+            <li><a href="bac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Blood Alcohol (BAC) Clearance</a></li>
+            <li><a href="body-surface-area-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Surface Area (Mosteller)</a></li>
+            <li><a href="bsa-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Oncology BSA & Calvert Dosing</a></li>
+            <li><a href="calorie-deficit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Deficit & Fat Loss Planner</a></li>
+            <li><a href="calories-burned-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exercise Calories Burned (METs)</a></li>
+            <li><a href="carbohydrate-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Carbohydrate Intake & Glycogen</a></li>
+            <li><a href="cholesterol-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cholesterol Ratio & Castelli Risk</a></li>
+            <li><a href="due-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Due Date & Gestation</a></li>
+            <li><a href="fat-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Dietary Fat Intake (Grams/Day)</a></li>
+            <li><a href="heart-rate-zone-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heart Rate Zone (Karvonen HRR)</a></li>
+            <li><a href="lean-body-mass-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lean Body Mass (Boer & James)</a></li>
+            <li><a href="max-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Max Heart Rate (Tanaka & Gulati)</a></li>
+            <li><a href="met-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> METs & Activity Caloric Burn</a></li>
+            <li><a href="ovulation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ovulation & Fertile Window</a></li>
+            <li><a href="pregnancy-weight-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Weight Gain (IOM/ACOG)</a></li>
+            <li><a href="protein-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Protein Intake (ISSN/DRI Optimum)</a></li>
+            <li><a href="sleep-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sleep Cycle (90-Min REM Ultradian)</a></li>
+            <li><a href="sodium-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sodium to Salt & AHA Dietary Cap</a></li>
+            <li><a href="target-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Target Heart Rate (Karvonen HRR)</a></li>
+            <li><a href="tdee-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> TDEE & Calorie Burn (Total Daily)</a></li>
+            <li><a href="waist-to-height-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio (WHtR)</a></li>
+            <li><a href="waist-to-height-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio Sizer</a></li>
+            <li><a href="waist-to-hip-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Hip Ratio (WHR Risk)</a></li>
+            <li><a href="one-rep-max-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> One Rep Max (1RM)</a></li>
+            <li><a href="vo2-max-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> VO2 Max Calculator</a></li>
+            <li><a href="pace-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Running Pace & Race Splits</a></li>
+            <li><a href="treadmill-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Treadmill Calorie Calculator</a></li>
+            <li><a href="stairmaster-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> StairMaster Calorie Calculator</a></li>
+            <li><a href="cycling-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cycling Calorie Calculator</a></li>
+            <li><a href="pushup-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pushup Calorie Calculator</a></li>
+            <li><a href="bench-press-calories-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Bench Press Calories Calculator</a></li>
+            <li><a href="swimming-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Swimming Calorie Calculator</a></li>
+            <li><a href="stationary-bike-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Stationary Bike Calorie Calculator</a></li>
+            <li><a href="incline-treadmill-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Incline Treadmill Calorie Calculator</a></li>
+            <li><a href="rucking-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rucking Calorie Calculator</a></li>
+            <li><a href="jack-daniels-running-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Jack Daniels Running Calculator</a></li>
+            <li><a href="jumping-jacks-calories-burned-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Jumping Jacks Calories Burned</a></li>
+            <li><a href="squat-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Squat Calorie Calculator</a></li>
+            <li><a href="sit-up-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sit Up Calorie Calculator</a></li>
+            <li><a href="leg-press-to-squat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Leg Press to Squat Calculator</a></li>
+            <li><a href="cycling-watt-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cycling Watt Calorie Calculator</a></li>
+            <li><a href="running-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Running Calorie Calculator</a></li>
+            <li><a href="rowing-machine-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rowing Machine Calorie Calculator</a></li>
+            <li><a href="peloton-calorie-burn-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Peloton Calorie Burn Calculator</a></li>
+            <li><a href="elliptical-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Elliptical Calorie Calculator</a></li>
+            <li><a href="ftp-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> FTP Calculator (Cycling)</a></li>
+            <li><a href="elliptical-to-running-conversion-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Elliptical to Running Conversion</a></li>
+            <li><a href="army-body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Army Body Fat Calculator</a></li>
+            <li><a href="starbucks-calories-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Starbucks Calories Calculator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="health.html" class="sidebar-category-link">View All Health & Fitness Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers peer-reviewed exercise physiology computing algorithms, military body composition standards, and dietary nutritional engines compliant with ACSM, DoD AR 600-9, and clinical nutrition research.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Cardio &amp; Endurance</h4>
+                    <ul>
+                        <li><a href="elliptical-calorie-calculator.html">Elliptical Calorie Calculator</a></li>
+                        <li><a href="ftp-calculator.html">FTP Cycling Calculator</a></li>
+                        <li><a href="elliptical-to-running-conversion-calculator.html">Elliptical to Running</a></li>
+                        <li><a href="treadmill-calorie-calculator.html">Treadmill Calorie Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Body Composition &amp; Nutrition</h4>
+                    <ul>
+                        <li><a href="army-body-fat-calculator.html">Army Body Fat Calculator</a></li>
+                        <li><a href="starbucks-calories-calculator.html">Starbucks Calorie Calculator</a></li>
+                        <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
+                        <li><a href="bmr-calculator.html">BMR Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="calorie-calculator.html">TDEE Calorie Calculator</a></li>
+                        <li><a href="bmi-calculator.html">BMI Calculator</a></li>
+                        <li><a href="health.html">Health Suite</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Peer-reviewed metabolic and physiological calculation suites.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

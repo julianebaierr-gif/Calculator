@@ -44,6 +44,29 @@ CATEGORIES = {
             ("one-rep-max-calculator.html", "One Rep Max (1RM)", "🏋️", "Brzycki, Epley & Lombardi 1RM strength formulas"),
             ("vo2-max-calculator.html", "VO2 Max Calculator", "🫀", "Cooper 12-min, Rockport walk & HR ratio aerobic capacity"),
             ("pace-calculator.html", "Running Pace & Race Splits", "⏱️", "min/mi, min/km, 400m track laps & Riegel race predictor"),
+            ("treadmill-calorie-calculator.html", "Treadmill Calorie Calculator", "🏃", "ACSM walking & running equations with incline grade"),
+            ("stairmaster-calorie-calculator.html", "StairMaster Calorie Calculator", "🪜", "Vertical mechanical work & stepping cadence"),
+            ("cycling-calorie-calculator.html", "Cycling Calorie Calculator", "🚴", "Aerodynamic drag, rolling resistance & hill climbing"),
+            ("pushup-calorie-calculator.html", "Pushup Calorie Calculator", "💪", "64% bodyweight mechanical stroke & tempo work"),
+            ("bench-press-calories-calculator.html", "Bench Press Calories Calculator", "🏋️", "Barbell tonnage work, stroke displacement & EPOC"),
+            ("swimming-calorie-calculator.html", "Swimming Calorie Calculator", "🏊", "Freestyle, breaststroke, butterfly & backstroke hydrodynamics"),
+            ("stationary-bike-calorie-calculator.html", "Stationary Bike Calorie Calculator", "🚲", "ACSM leg ergometry formulas, mechanical watts & cadence"),
+            ("incline-treadmill-calorie-calculator.html", "Incline Treadmill Calorie Calculator", "⛰️", "Steep grade walking, 12-3-30 workout & gravitational work"),
+            ("rucking-calorie-calculator.html", "Rucking Calorie Calculator", "🎒", "US Army USARIEM Pandolf load carriage equation"),
+            ("jack-daniels-running-calculator.html", "Jack Daniels Running Calculator", "⏱️", "Dr. Jack Daniels VDOT score & training paces (E, M, T, I, R)"),
+            ("jumping-jacks-calories-burned-calculator.html", "Jumping Jacks Calories Burned", "⭐", "Ballistic cadence, gravitational displacement & Compendium METs"),
+            ("squat-calorie-calculator.html", "Squat Calorie Calculator", "🏋️", "Barbell & bodyweight squat biomechanics, stroke & EPOC"),
+            ("sit-up-calorie-calculator.html", "Sit Up Calorie Calculator", "🧘", "Trunk flexion 48% bodyweight displacement & MET standards"),
+            ("leg-press-to-squat-calculator.html", "Leg Press to Squat Calculator", "🦵", "45° sled incline vector physics (W·sin 45°) & 1RM conversion"),
+            ("cycling-watt-calorie-calculator.html", "Cycling Watt Calorie Calculator", "⚡", "Direct power meter kJ to kilocalories & 21.5% gross efficiency"),
+            ("running-calorie-calculator.html", "Running Calorie Calculator", "🏃", "Margaria cost of transport (1.0 kcal/kg/km) & ACSM running"),
+            ("rowing-machine-calorie-calculator.html", "Rowing Machine Calorie Calculator", "🚣", "Concept2 PM5 physics, 500m split pace & Watts formula"),
+            ("peloton-calorie-burn-calculator.html", "Peloton Calorie Burn Calculator", "🚴", "Peloton Total Output (kJ), resistance/cadence & HR correction"),
+            ("elliptical-calorie-calculator.html", "Elliptical Calorie Calculator", "🏃", "Closed-chain stride, dual-action arm poles & console correction"),
+            ("ftp-calculator.html", "FTP Calculator (Cycling)", "⚡", "Functional Threshold Power, 20-min 0.95 factor & 7 Coggan zones"),
+            ("elliptical-to-running-conversion-calculator.html", "Elliptical to Running Conversion", "🔄", "Cross-training cardio conversion, cadence & miles equivalence"),
+            ("army-body-fat-calculator.html", "Army Body Fat Calculator", "🪖", "Official US Army AR 600-9 circumference tape test formula"),
+            ("starbucks-calories-calculator.html", "Starbucks Calories Calculator", "☕", "Nutritional builder, cup sizes, milk choices & syrup pumps"),
         ]
     },
     "finance": {
@@ -473,7 +496,7 @@ CATEGORIES = {
 
 def determine_tool_cat(filename):
     f = filename.lower()
-    if any(k in f for k in ["bmi", "calorie", "body-fat", "ideal-weight", "water-intake", "bmr", "macro", "a1c", "bac", "body-surface-area", "bsa", "calorie-deficit", "calories-burned", "carbohydrate", "cholesterol", "due-date", "fat-intake", "heart-rate-zone", "lean-body-mass", "max-heart-rate", "met-calculator", "ovulation", "pregnancy-weight-gain", "protein-intake", "sleep-calculator", "sodium-intake", "target-heart-rate", "tdee", "waist-to-height", "waist-to-hip", "one-rep-max", "vo2-max", "pace"]):
+    if any(k in f for k in ["bmi", "calorie", "body-fat", "ideal-weight", "water-intake", "bmr", "macro", "a1c", "bac", "body-surface-area", "bsa", "calorie-deficit", "calories-burned", "carbohydrate", "cholesterol", "due-date", "fat-intake", "heart-rate-zone", "lean-body-mass", "max-heart-rate", "met-calculator", "ovulation", "pregnancy-weight-gain", "protein-intake", "sleep-calculator", "sodium-intake", "target-heart-rate", "tdee", "waist-to-height", "waist-to-hip", "one-rep-max", "vo2-max", "pace", "jack-daniels", "ftp", "elliptical", "stairmaster", "rucking", "starbucks", "swimming", "pushup", "squat", "sit-up", "bench-press", "cycling", "rowing", "peloton", "leg-press", "jumping-jacks"]):
         return "health"
     if any(k in f for k in ["mortgage", "tip", "loan", "compound", "simple-interest", "discount", "salary", "roi", "rule-of-72", "amortization", "apr-apy", "break-even", "capital-gains", "cd-calculator", "credit-card", "debt-to-income", "down-payment", "emergency-fund", "inflation", "net-salary", "net-worth", "sales-tax", "savings", "markup", "smoking-cost", "retirement", "overtime", "time-card"]):
         return "finance"

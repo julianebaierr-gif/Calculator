@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sit Up Calorie Calculator | Abdominal Biomechanics & Reps Formula</title>
+    <meta name="description" content="Calculate calories burned doing sit-ups and crunches using torso trunk displacement (48% body weight), repetition counts, incline angles, and MET standards.">
+    <link rel="canonical" href="https://calchub.com/sit-up-calorie-calculator.html">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Sit Up Calorie Calculator",
+      "url": "https://calchub.com/sit-up-calorie-calculator.html",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
+      "description": "Calculates calories burned performing sit-ups and abdominal crunches using trunk segment mass (48% of body weight), repetition tempo, incline angles, and Compendium METs."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How many calories does one sit-up burn?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A single standard sit-up burns approximately 0.15 to 0.25 calories depending on body weight, arm position, and execution tempo. For a 160-lb (72.6 kg) individual, performing 100 sit-ups burns approximately 18 to 25 kilocalories."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What percentage of body weight is lifted during a sit-up?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In human anthropometry, the torso, head, and arms represent approximately 48% to 50% of total body weight. During a full sit-up, this entire upper segment is rotated through an angular arc of 70 to 80 degrees against gravity, whereas a crunch lifts only the head and upper thoracic spine (~20% of body weight)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do sit-ups burn belly fat directly through spot reduction?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Spot reduction is a physiological myth. Subcutaneous adipose tissue is mobilized systemically via catecholamine-stimulated lipolysis throughout the body. While sit-ups strengthen and hypertrophy the rectus abdominis, visible abdominal definition requires a systemic caloric deficit."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does an incline decline sit-up bench increase caloric expenditure?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Positioning the body on a decline bench increases the gravitational moment arm and vertical stroke height. A 30-degree decline bench forces the abdominal and hip flexor musculature to overcome a greater angular resistance, increasing mechanical work by 40% to 65% per repetition."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CalcHub</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="health.html">Health &amp; Fitness</a>
+                <a href="datetime.html">Date &amp; Time</a>
+                <a href="math.html">Math &amp; Stats</a>
+                <a href="finance.html">Finance</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrapper">
+            <main class="content-area">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="health.html">Health &amp; Fitness</a> &gt; <span>Sit Up Calorie Calculator</span>
+                </nav>
+                <div class="calculator-card">
+                    <div class="calc-header">
+                        <h1>Sit Up Calorie Calculator</h1>
+                        <p class="calc-desc">Biomechanical calisthenic engine calculating gravitational torso work ($W = m_{\text{trunk}} \cdot g \cdot \Delta h$), abdominal flexion energy, and MET caloric burn for sit-ups and crunches.</p>
+                    </div>
+                                        <div class="calc-body">
+                        <div class="calc-form">
+                            <div class="unit-toggle-group">
+                                <span class="unit-toggle-label">Unit System:</span>
+                                <div class="toggle-buttons">
+                                    <button type="button" class="unit-btn active" id="su-unit-imp" onclick="setSUUnit('imperial')">Imperial (lbs)</button>
+                                    <button type="button" class="unit-btn" id="su-unit-met" onclick="setSUUnit('metric')">Metric (kg)</button>
+                                </div>
+                            </div>
+
+                            <div class="input-grid">
+                                <div class="form-group">
+                                    <label for="su-weight" id="su-bw-lbl">Body Weight (lbs):</label>
+                                    <input type="number" id="su-weight" class="calc-input" value="165" min="50" max="450" step="1">
+                                    <span class="input-hint">Your body weight</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="su-mode">Tracking Mode:</label>
+                                    <select id="su-mode" class="calc-input" onchange="toggleSUMode()">
+                                        <option value="reps" selected>Total Repetition Count</option>
+                                        <option value="duration">Workout Duration (Minutes)</option>
+                                    </select>
+                                    <span class="input-hint">Reps or duration based</span>
+                                </div>
+
+                                <div class="form-group" id="group-su-reps">
+                                    <label for="su-reps">Completed Repetitions:</label>
+                                    <input type="number" id="su-reps" class="calc-input" value="100" min="5" max="3000" step="5">
+                                    <span class="input-hint">Total sit-up reps</span>
+                                </div>
+
+                                <div class="form-group" id="group-su-duration" style="display:none;">
+                                    <label for="su-duration">Workout Duration (minutes):</label>
+                                    <input type="number" id="su-duration" class="calc-input" value="10" min="1" max="90" step="1">
+                                    <span class="input-hint">Active exercise time</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="su-type">Sit-Up / Crunch Variation:</label>
+                                    <select id="su-type" class="calc-input" onchange="calculateSitUps()">
+                                        <option value="standard" selected>Standard Full Sit-Up (Hands across chest ~48% mass)</option>
+                                        <option value="head">Standard Sit-Up (Hands behind head / long lever)</option>
+                                        <option value="crunch">Abdominal Crunch (Upper thoracic lift only ~20% mass)</option>
+                                        <option value="incline">Decline Bench Sit-Up (-30° decline angle)</option>
+                                        <option value="weighted">Weighted Sit-Up (Plate held on chest)</option>
+                                    </select>
+                                    <span class="input-hint">Biomechanical lever and range</span>
+                                </div>
+
+                                <div class="form-group" id="group-su-weight-extra" style="display:none;">
+                                    <label for="su-extra-load">Weighted Plate (lbs/kg):</label>
+                                    <input type="number" id="su-extra-load" class="calc-input" value="10" min="0" max="100" step="2.5">
+                                    <span class="input-hint">External plate mass on chest</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="su-intensity">Repetition Tempo / Pacing:</label>
+                                    <select id="su-intensity" class="calc-input" onchange="calculateSitUps()">
+                                        <option value="slow">Controlled / Strict Tempo (15-20 reps/min, ~3.8 METs)</option>
+                                        <option value="moderate" selected>Moderate Continuous Pace (25-30 reps/min, ~5.0 METs)</option>
+                                        <option value="vigorous">Vigorous / Military PT Standard (35-45 reps/min, ~7.5 METs)</option>
+                                    </select>
+                                    <span class="input-hint">Execution speed</span>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn-primary" onclick="calculateSitUps()">Calculate Abdominal Caloric Burn</button>
+                        </div>
+
+                        <div class="calc-results" id="su-results">
+                            <h2>Abdominal Work &amp; Caloric Output</h2>
+                            <div class="result-highlight-card">
+                                <span class="highlight-label">Total Caloric Expenditure</span>
+                                <span class="highlight-val" id="res-su-total-kcal">22 kcal</span>
+                                <span class="highlight-sub" id="res-su-per-rep">0.22 kcal per repetition (100 reps completed)</span>
+                            </div>
+
+                            <div class="results-stats-grid">
+                                <div class="stat-card">
+                                    <span class="stat-title">Gravitational Work (W)</span>
+                                    <span class="stat-value" id="res-su-work">8.8 kJ</span>
+                                    <span class="stat-desc">Mechanical energy hoisting torso against gravity</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-title">Metabolic Equivalent</span>
+                                    <span class="stat-value" id="res-su-mets">5.0 METs</span>
+                                    <span class="stat-desc">Compendium code 02050 (calisthenics)</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-title">Estimated Time</span>
+                                    <span class="stat-value" id="res-su-time">3.6 min</span>
+                                    <span class="stat-desc">Calculated workout duration</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-title">Burn Rate</span>
+                                    <span class="stat-value" id="res-su-rate">6.2 kcal/min</span>
+                                    <span class="stat-desc">Hourly projection: 372 kcal/hr</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        let suUnit = 'imperial';
+
+                        function setSUUnit(unit) {
+                            suUnit = unit;
+                            document.getElementById('su-unit-imp').classList.toggle('active', unit === 'imperial');
+                            document.getElementById('su-unit-met').classList.toggle('active', unit === 'metric');
+
+                            const wInput = document.getElementById('su-weight');
+                            const wLbl = document.getElementById('su-bw-lbl');
+                            if (unit === 'metric') {
+                                wLbl.textContent = 'Body Weight (kg):';
+                                wInput.value = (parseFloat(wInput.value) * 0.453592).toFixed(1);
+                            } else {
+                                wLbl.textContent = 'Body Weight (lbs):';
+                                wInput.value = (parseFloat(wInput.value) / 0.453592).toFixed(1);
+                            }
+                            calculateSitUps();
+                        }
+
+                        function toggleSUMode() {
+                            const mode = document.getElementById('su-mode').value;
+                            document.getElementById('group-su-reps').style.display = (mode === 'reps') ? 'block' : 'none';
+                            document.getElementById('group-su-duration').style.display = (mode === 'duration') ? 'block' : 'none';
+                            calculateSitUps();
+                        }
+
+                        function calculateSitUps() {
+                            const suType = document.getElementById('su-type').value;
+                            document.getElementById('group-su-weight-extra').style.display = (suType === 'weighted') ? 'block' : 'none';
+
+                            let rawBw = parseFloat(document.getElementById('su-weight').value) || 165;
+                            let mode = document.getElementById('su-mode').value;
+                            let intensity = document.getElementById('su-intensity').value;
+                            let extraLoad = (suType === 'weighted') ? (parseFloat(document.getElementById('su-extra-load').value) || 10) : 0;
+
+                            let bwKg = (suUnit === 'imperial') ? rawBw * 0.453592 : rawBw;
+                            let extraKg = (suUnit === 'imperial') ? extraLoad * 0.453592 : extraLoad;
+
+                            let repsPerMin = 28;
+                            let mets = 5.0;
+                            if (intensity === 'slow') { repsPerMin = 18; mets = 3.8; }
+                            else if (intensity === 'vigorous') { repsPerMin = 40; mets = 7.5; }
+
+                            let totalReps = 100;
+                            let durationMin = 3.6;
+
+                            if (mode === 'reps') {
+                                totalReps = parseFloat(document.getElementById('su-reps').value) || 100;
+                                durationMin = totalReps / repsPerMin;
+                            } else {
+                                durationMin = parseFloat(document.getElementById('su-duration').value) || 10;
+                                totalReps = Math.round(durationMin * repsPerMin);
+                            }
+
+                            // Biomechanical lifted mass fraction
+                            let massFraction = 0.48; // standard torso, head, arms ~48% BW
+                            let deltaH = 0.24; // center of mass vertical lift in meters ~ 9.5 inches
+
+                            if (suType === 'head') {
+                                massFraction = 0.48;
+                                deltaH = 0.26; // longer moment arm
+                            } else if (suType === 'crunch') {
+                                massFraction = 0.20; // thoracic spine only
+                                deltaH = 0.10;
+                                mets *= 0.70;
+                            } else if (suType === 'incline') {
+                                massFraction = 0.48;
+                                deltaH = 0.35; // decline bench adds vertical displacement
+                                mets *= 1.30;
+                            } else if (suType === 'weighted') {
+                                mets *= (1.0 + (extraKg / (bwKg * massFraction)) * 0.8);
+                            }
+
+                            let effectiveMassKg = (bwKg * massFraction) + extraKg;
+                            let workJoules = effectiveMassKg * 9.80665 * deltaH * totalReps;
+                            let workKJ = workJoules / 1000;
+
+                            // Caloric calculation from METs
+                            let totalKcal = durationMin * (mets * 3.5 * bwKg) / 200;
+                            let kcalPerRep = (totalReps > 0) ? (totalKcal / totalReps) : 0;
+                            let kcalRate = (durationMin > 0) ? (totalKcal / durationMin) : 0;
+
+                            document.getElementById('res-su-total-kcal').textContent = Math.round(totalKcal) + ' kcal';
+                            document.getElementById('res-su-per-rep').textContent = kcalPerRep.toFixed(2) + ' kcal per repetition (' + totalReps + ' reps completed)';
+                            document.getElementById('res-su-work').textContent = workKJ.toFixed(1) + ' kJ';
+                            document.getElementById('res-su-mets').textContent = mets.toFixed(1) + ' METs';
+                            document.getElementById('res-su-time').textContent = durationMin.toFixed(1) + ' min';
+                            document.getElementById('res-su-rate').textContent = kcalRate.toFixed(1) + ' kcal/min';
+                        }
+
+                        window.addEventListener('DOMContentLoaded', calculateSitUps);
+                    </script>
+                </div>
+                <article class="article-body">
+                    <h2>Biomechanical &amp; Anatomical Analysis of the Sit-Up</h2>
+<p>The sit-up is a classical core calisthenic exercise that evaluates dynamic muscular endurance of the anterior abdominal wall and hip flexor complex. Biomechanically, the sit-up involves two distinct anatomical phases occurring along the sagittal plane:</p>
+
+<ol>
+    <li><strong>The Lumbar Flexion Phase (Initial $0^\circ$ to $30^\circ$):</strong> The rectus abdominis, internal obliques, and external obliques contract concentrically to curl the thoracic spine off the floor, flattening the lumbar lordosis. This initial range of motion isolates the abdominal wall with minimal hip flexor activation (anatomically identical to a standard crunch).</li>
+    <li><strong>The Pelvic / Hip Flexion Phase ($30^\circ$ to $70^\circ+$):</strong> Once the scapulae and upper thoracic spine are elevated, the abdominal muscles contract isometrically to stabilize the spinal column. The primary kinetic drivers of the remaining vertical arc are the deep hip flexors: the <em>iliopsoas</em> (psoas major and iliacus), the <em>rectus femoris</em>, the <em>tensor fasciae latae</em>, and the <em>sartorius</em>, which pull the rigid pelvis and torso toward the fixed femurs.</li>
+</ol>
+
+<h2>The Physics of Sit-Up Energy: Gravitational Work ($W = F \cdot d$)</h2>
+<p>To establish the true mechanical workload of a sit-up, exercise biomechanists analyze segmental body mass distribution using the Hanavan or Dempster human anthropometric models. In an adult human, segmental masses are allocated as follows:</p>
+
+<ul>
+    <li>Head and Neck: $\sim 8.1\%$ of total body weight</li>
+    <li>Torso (Thorax, Abdomen, Pelvis): $\sim 49.7\%$ of total body weight</li>
+    <li>Upper Extremities (Arms, Forearms, Hands): $\sim 10.0\%$ of total body weight</li>
+    <li>Lower Extremities (Thighs, Shanks, Feet): $\sim 32.2\%$ of total body weight</li>
+</ul>
+
+<p>Because the lower extremities remain anchored to the floor throughout the movement, the mass elevated against gravity represents approximately <strong>$48\%$ to $50\%$ of total body weight</strong> ($m_{\text{trunk}}$). In each repetition, the torso's center of mass is hoisted vertically through an elevation displacement $\Delta h$ averaging approximately $0.24 \, \text{meters}$ ($9.5 \, \text{inches}$):</p>
+
+$$W_{\text{concentric}} = m_{\text{trunk}} \cdot g \cdot \Delta h = (0.48 \times m_{\text{body}}) \cdot 9.80665 \cdot 0.24$$
+
+<p>For an individual weighing $75 \, \text{kg}$ ($165 \, \text{lbs}$):</p>
+
+$$m_{\text{trunk}} = 0.48 \times 75 = 36.0 \, \text{kg}$$
+$$W_{\text{single rep}} = 36.0 \, \text{kg} \times 9.80665 \, \text{m/s}^2 \times 0.24 \, \text{m} = 84.73 \, \text{Joules}$$
+
+<p>Performing $100 \, \text{repetitions}$ delivers $8,473 \, \text{Joules} = 8.47 \, \text{kJ}$ of external mechanical work against gravity.</p>
+
+<h2>Converting Mechanical Abdominal Work to Metabolic Kilocalories</h2>
+<p>Human skeletal muscle converts chemical adenosine triphosphate (ATP) into mechanical tension at a gross efficiency of roughly $20\%$. Concentric abdominal flexion combined with eccentric descent and continuous isometric core stabilization consumes approximately five times more chemical energy than the external mechanical work:</p>
+
+$$\text{Metabolic Work (kcal)} = \frac{W_{\text{Joules}}}{4,184 \times 0.20} \times 1.33$$
+
+<p>For $100 \, \text{sit-ups}$ at $75 \, \text{kg}$, pure mechanical movement consumes approximately $13.5 \, \text{metabolic kilocalories}$. When combined with systemic resting baseline metabolism, cardiovascular respiration, and stabilizing muscular tension over a 4-minute period, the total energy expended reaches approximately <strong>$20 \text{ to } 25 \, \text{kcal}$</strong> ($0.20 - 0.25 \, \text{kcal/rep}$).</p>
+
+<h2>Compendium of Physical Activities MET Ratings for Calisthenic Core Exercises</h2>
+<p>Epidemiological research quantifies abdominal exercise using <strong>Metabolic Equivalents (METs)</strong>:</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Exercise &amp; Cadence</th>
+            <th>Compendium Code</th>
+            <th>MET Rating</th>
+            <th>Burn Rate (150 lb / 68 kg)</th>
+            <th>Burn Rate (190 lb / 86 kg)</th>
+            <th>Primary Limiting Musculature</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Abdominal Crunches (Controlled)</strong></td>
+            <td>02050</td>
+            <td>3.5 METs</td>
+            <td>$4.0 \, \text{kcal/min}$</td>
+            <td>$5.0 \, \text{kcal/min}$</td>
+            <td>Rectus abdominis, obliques</td>
+        </tr>
+        <tr>
+            <td><strong>Moderate Sit-Ups (25-30 reps/min)</strong></td>
+            <td>02050</td>
+            <td>5.0 METs</td>
+            <td>$5.7 \, \text{kcal/min}$</td>
+            <td>$7.2 \, \text{kcal/min}$</td>
+            <td>Iliopsoas, rectus abdominis</td>
+        </tr>
+        <tr>
+            <td><strong>Vigorous Military PT (35-45 reps/min)</strong></td>
+            <td>02052</td>
+            <td>7.5 METs</td>
+            <td>$8.5 \, \text{kcal/min}$</td>
+            <td>$10.8 \, \text{kcal/min}$</td>
+            <td>Hip flexors, rectus femoris</td>
+        </tr>
+        <tr>
+            <td><strong>Decline Bench Sit-Ups (-30°)</strong></td>
+            <td>02052 (Modified)</td>
+            <td>8.0 METs</td>
+            <td>$9.1 \, \text{kcal/min}$</td>
+            <td>$11.5 \, \text{kcal/min}$</td>
+            <td>Psoas major, anterior chain</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Dispelling the Myth: Sit-Ups and Spot Reduction of Abdominal Fat</h2>
+<p>A widespread misconception in fitness culture is the belief that performing hundreds of daily sit-ups will burn fat directly from the waistline. Decades of exercise biochemistry have decisively disproven <strong>spot reduction</strong>.</p>
+
+<p>Adipose tissue (body fat) is stored intracellularly in adipocytes as triglycerides. When skeletal muscles contract during exercise, they do not draw fatty acids directly from adjacent subcutaneous adipose tissue. Instead, exercise triggers systemic neuroendocrine signals (epinephrine and norepinephrine secretion) into the bloodstream. These hormones bind to $\beta$-adrenergic receptors on adipocytes throughout the entire body, releasing free fatty acids into systemic circulation to be oxidized by the liver and active musculature. Consequently, whether you perform sit-ups, sprint, or cycle, fat loss occurs uniformly across genetic adipose depots.</p>
+
+<h2>Worked Biomechanical Case Study: 100 Sit-Ups Energy Computation</h2>
+<div class="worked-example-card">
+    <h3>Laboratory Exercise Scenario: 100 Standard Sit-Ups</h3>
+    <p><strong>Subject Profile:</strong> A 29-year-old male weighing $175 \, \text{lbs}$ ($79.38 \, \text{kg}$) performs 100 standard military-style sit-ups with hands across chest in 3 minutes and 20 seconds ($3.33 \, \text{minutes}$ at a cadence of $30 \, \text{reps/min}$).</p>
+
+    <div class="step-solution">
+        <h4>Step 1: Calculate Effective Elevated Trunk Mass</h4>
+        $$m_{\text{trunk}} = 0.48 \times 79.38 \, \text{kg} = 38.10 \, \text{kg}$$
+
+        <h4>Step 2: Compute Mechanical Gravitational Work</h4>
+        $$\Delta h = 0.24 \, \text{meters}$$
+        $$W_{\text{single}} = 38.10 \, \text{kg} \times 9.80665 \, \text{m/s}^2 \times 0.24 \, \text{m} = 89.67 \, \text{Joules}$$
+        $$W_{\text{100 reps}} = 89.67 \times 100 = 8,967 \, \text{Joules} = 8.97 \, \text{kJ}$$
+
+        <h4>Step 3: Calculate Systemic Caloric Expenditure via METs</h4>
+        <p>A cadence of 30 reps/min falls under moderate-to-vigorous calisthenics ($5.0 \, \text{METs}$):</p>
+        $$\text{Burn Rate} = \frac{5.0 \times 3.5 \times 79.38}{200} = 6.95 \, \text{kcal/min}$$
+        $$\text{Total Energy Expended} = 6.95 \, \text{kcal/min} \times 3.33 \, \text{minutes} = 23.14 \, \text{kcal}$$
+        $$\text{Cost Per Sit-Up} = \frac{23.14 \, \text{kcal}}{100 \, \text{reps}} = 0.231 \, \text{kcal/rep}$$
+
+        <h4>Clinical Assessment</h4>
+        <p>The subject performed $8.97 \, \text{kJ}$ of mechanical work in $3.33 \, \text{minutes}$, expending $23.1 \, \text{kcal}$. While the caloric burn is modest compared to 20 minutes of treadmill running, the exercise generated high peak tension across the iliopsoas and rectus abdominis, enhancing core kinetic chain transfer.</p>
+    </div>
+</div>
+
+<h2>Frequently Asked Questions About Sit-Up Caloric Burn</h2>
+<h3>How many calories does one sit-up burn?</h3>
+<p>A single standard sit-up burns approximately 0.15 to 0.25 calories depending on body weight, cadence tempo, and arm lever positioning. For an average 160-lb individual, 100 completed sit-ups burns approximately 20 to 25 calories.</p>
+
+<h3>What percentage of body weight is lifted during a sit-up?</h3>
+<p>In human anthropometry, the torso, arms, and head constitute approximately 48% to 50% of total body weight. During a full sit-up, this upper segment rotates through a 70-degree arc against gravity. By contrast, a crunch lifts only the head and upper thoracic spine, moving approximately 20% of body mass.</p>
+
+<h3>Do sit-ups burn belly fat directly?</h3>
+<p>No. Spot reduction is biologically impossible. Fat mobilization is governed by systemic hormone signaling that extracts free fatty acids from adipose stores across the entire body. Sit-ups strengthen and hypertrophy the abdominal muscles, but subcutaneous belly fat can only be reduced through a sustained systemic caloric deficit.</p>
+
+<h3>How does a decline bench increase the difficulty and calorie burn of sit-ups?</h3>
+<p>Performing sit-ups on a 30-degree decline bench increases the gravitational lever arm and extends vertical displacement ($\Delta h$) from 0.24 meters to roughly 0.35 meters. This increases mechanical work and muscular recruitment by 40% to 65% per repetition.</p>
+
+<h3>Can sit-ups cause lower back pain?</h3>
+<p>Yes. Full sit-ups with anchored feet generate high compressive shear forces on the lumbar spine (often exceeding 3,000 Newtons) due to the intense contraction of the psoas major pulling directly on the lumbar vertebrae ($L1-L5$). Individuals with lumbar disc pathology are generally advised to perform McGill curl-ups or planks instead.</p>
+                </article>
+            </main>
+                  <!-- Related Category Sidebar -->
+      <aside class="post-sidebar">
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-header">
+            <span class="widget-icon">⚖️</span>
+            <h3 class="widget-title">Related Health & Fitness</h3>
+          </div>
+          <p class="sidebar-widget-subtitle">Specialized calculation tools in this discipline:</p>
+          <ul class="sidebar-links-list">
+            <li><a href="bmr-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMR Calculator</a></li>
+            <li><a href="macro-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Macro Split Calculator</a></li>
+            <li><a href="calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Calculator (TDEE)</a></li>
+            <li><a href="bmi-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> BMI Calculator</a></li>
+            <li><a href="body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Fat Calculator</a></li>
+            <li><a href="ideal-weight-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ideal Body Weight</a></li>
+            <li><a href="water-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Daily Water Intake</a></li>
+            <li><a href="a1c-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> HbA1c to eAG Glucose Sizer</a></li>
+            <li><a href="bac-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Blood Alcohol (BAC) Clearance</a></li>
+            <li><a href="body-surface-area-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Body Surface Area (Mosteller)</a></li>
+            <li><a href="bsa-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Oncology BSA & Calvert Dosing</a></li>
+            <li><a href="calorie-deficit-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Calorie Deficit & Fat Loss Planner</a></li>
+            <li><a href="calories-burned-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Exercise Calories Burned (METs)</a></li>
+            <li><a href="carbohydrate-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Carbohydrate Intake & Glycogen</a></li>
+            <li><a href="cholesterol-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cholesterol Ratio & Castelli Risk</a></li>
+            <li><a href="due-date-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Due Date & Gestation</a></li>
+            <li><a href="fat-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Dietary Fat Intake (Grams/Day)</a></li>
+            <li><a href="heart-rate-zone-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Heart Rate Zone (Karvonen HRR)</a></li>
+            <li><a href="lean-body-mass-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Lean Body Mass (Boer & James)</a></li>
+            <li><a href="max-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Max Heart Rate (Tanaka & Gulati)</a></li>
+            <li><a href="met-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> METs & Activity Caloric Burn</a></li>
+            <li><a href="ovulation-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Ovulation & Fertile Window</a></li>
+            <li><a href="pregnancy-weight-gain-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pregnancy Weight Gain (IOM/ACOG)</a></li>
+            <li><a href="protein-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Protein Intake (ISSN/DRI Optimum)</a></li>
+            <li><a href="sleep-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sleep Cycle (90-Min REM Ultradian)</a></li>
+            <li><a href="sodium-intake-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Sodium to Salt & AHA Dietary Cap</a></li>
+            <li><a href="target-heart-rate-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Target Heart Rate (Karvonen HRR)</a></li>
+            <li><a href="tdee-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> TDEE & Calorie Burn (Total Daily)</a></li>
+            <li><a href="waist-to-height-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio (WHtR)</a></li>
+            <li><a href="waist-to-height-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Height Ratio Sizer</a></li>
+            <li><a href="waist-to-hip-ratio-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Waist-to-Hip Ratio (WHR Risk)</a></li>
+            <li><a href="one-rep-max-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> One Rep Max (1RM)</a></li>
+            <li><a href="vo2-max-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> VO2 Max Calculator</a></li>
+            <li><a href="pace-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Running Pace & Race Splits</a></li>
+            <li><a href="treadmill-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Treadmill Calorie Calculator</a></li>
+            <li><a href="stairmaster-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> StairMaster Calorie Calculator</a></li>
+            <li><a href="cycling-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cycling Calorie Calculator</a></li>
+            <li><a href="pushup-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Pushup Calorie Calculator</a></li>
+            <li><a href="bench-press-calories-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Bench Press Calories Calculator</a></li>
+            <li><a href="swimming-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Swimming Calorie Calculator</a></li>
+            <li><a href="stationary-bike-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Stationary Bike Calorie Calculator</a></li>
+            <li><a href="incline-treadmill-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Incline Treadmill Calorie Calculator</a></li>
+            <li><a href="rucking-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rucking Calorie Calculator</a></li>
+            <li><a href="jack-daniels-running-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Jack Daniels Running Calculator</a></li>
+            <li><a href="jumping-jacks-calories-burned-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Jumping Jacks Calories Burned</a></li>
+            <li><a href="squat-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Squat Calorie Calculator</a></li>
+            <li><a href="sit-up-calorie-calculator.html" class="sidebar-link-item active"><span class="link-bullet">›</span> Sit Up Calorie Calculator</a></li>
+            <li><a href="leg-press-to-squat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Leg Press to Squat Calculator</a></li>
+            <li><a href="cycling-watt-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Cycling Watt Calorie Calculator</a></li>
+            <li><a href="running-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Running Calorie Calculator</a></li>
+            <li><a href="rowing-machine-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Rowing Machine Calorie Calculator</a></li>
+            <li><a href="peloton-calorie-burn-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Peloton Calorie Burn Calculator</a></li>
+            <li><a href="elliptical-calorie-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Elliptical Calorie Calculator</a></li>
+            <li><a href="ftp-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> FTP Calculator (Cycling)</a></li>
+            <li><a href="elliptical-to-running-conversion-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Elliptical to Running Conversion</a></li>
+            <li><a href="army-body-fat-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Army Body Fat Calculator</a></li>
+            <li><a href="starbucks-calories-calculator.html" class="sidebar-link-item"><span class="link-bullet">›</span> Starbucks Calories Calculator</a></li>
+          </ul>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+            <a href="health.html" class="sidebar-category-link">View All Health & Fitness Calculators &rarr;</a>
+          </div>
+        </div>
+      </aside>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About CalcHub</h4>
+                    <p>CalcHub delivers peer-reviewed exercise physiology computing algorithms, biomechanical energy expenditure models, and resistance training physics engines compliant with ACSM, NSCA, and Concept2 research standards.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Cardio &amp; Ergometry</h4>
+                    <ul>
+                        <li><a href="cycling-watt-calorie-calculator.html">Cycling Watt Calorie Calculator</a></li>
+                        <li><a href="running-calorie-calculator.html">Running Calorie Calculator</a></li>
+                        <li><a href="rowing-machine-calorie-calculator.html">Rowing Machine Calories</a></li>
+                        <li><a href="peloton-calorie-burn-calculator.html">Peloton Calorie Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Strength &amp; Biomechanics</h4>
+                    <ul>
+                        <li><a href="sit-up-calorie-calculator.html">Sit Up Calorie Calculator</a></li>
+                        <li><a href="leg-press-to-squat-calculator.html">Leg Press to Squat Calculator</a></li>
+                        <li><a href="squat-calorie-calculator.html">Squat Calorie Calculator</a></li>
+                        <li><a href="bench-press-calories-calculator.html">Bench Press Calories</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">All Calculators</a></li>
+                        <li><a href="calorie-calculator.html">TDEE Calorie Calculator</a></li>
+                        <li><a href="bmi-calculator.html">BMI Calculator</a></li>
+                        <li><a href="body-fat-calculator.html">Body Fat Calculator</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CalcHub. All rights reserved. Precision exercise physiology and sports biomechanics computing suites.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
