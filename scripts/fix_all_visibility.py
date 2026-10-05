@@ -310,6 +310,14 @@ CAT_MAP = {
             ("density-calculator.html", "Density & Specific Gravity (ρ = m/V)", "⚖️", "Volumetric mass density, buoyant force & API gravity", "ρ = m/V | SG = ρ/1000 | F_b = ρ_fluid·V_sub·g"),
             ("pressure-calculator.html", "Pressure Calculator (Fluid & Mechanical)", "⚙️", "Mechanical contact stress P=F/A & hydrostatic head P=ρgh", "P = F/A | P = ρgh | P_abs = P_atm + P_gauge"),
             ("speed-calculator.html", "Speed & Velocity Kinematics (v = d/t)", "⏱️", "Scalar velocity, running pace min/km & kinematic acceleration", "v = d/t | Pace = 1/v | v_f² = v_0² + 2ad"),
+            ("force-calculator.html", "Force Calculator (Newton's Second Law)", "⚡", "Force F=ma, gravitational weight & SI/imperial conversion", "F = m·a | W = m·g | F = G·(m₁m₂)/r²"),
+            ("momentum-calculator.html", "Linear Momentum & Collisions (p = mv)", "🎱", "Translational momentum, 1D collisions & coefficient of restitution", "p = m·v | E_k = p²/(2m) | m₁u₁ + m₂u₂ = m₁v₁ + m₂v₂"),
+            ("impulse-calculator.html", "Impulse & Impact Force Attenuation", "💥", "Impulse J = FΔt = Δp, crash attenuation & rocket specific impulse", "J = F·Δt = Δp = m·Δv | I_sp = J / (m·g₀)"),
+            ("potential-energy-calculator.html", "Potential Energy (Gravitational & Elastic)", "🏔️", "Gravitational U = mgh, spring U = ½kx² & free-fall velocity", "U_g = m·g·h | U_s = ½·k·x² | v = √(2gh)"),
+            ("work-power-calculator.html", "Work and Power (W = Fd, P = W/t)", "⚙️", "Mechanical work, linear power, shaft torque & horsepower", "W = F·d·cos(θ) | P = W/t = F·v | P = 2πNτ/60"),
+            ("stress-strain-calculator.html", "Stress and Strain (Hooke's Elasticity)", "🏗️", "Tensile stress σ = F/A, strain ε = ΔL/L & Young's modulus E", "σ = F/A | ε = ΔL/L₀ | E = σ/ε | SF = σ_yield / σ_allow"),
+            ("terminal-velocity-calculator.html", "Terminal Velocity (Aerodynamic Drag)", "🪂", "Free-fall terminal velocity, drag force & high-altitude dynamics", "v_t = √((2mg)/(ρ·A·C_d)) | F_d = ½ρ·v²·C_d·A"),
+            ("specific-gravity-calculator.html", "Specific Gravity & Relative Density", "⚖️", "Specific gravity SG = ρ/ρ_ref, °API, Baumé, Brix & buoyancy", "SG = ρ/ρ_ref | °API = 141.5/SG - 131.5 | f_sub = SG_obj/SG_fl"),
         ]
     },
     "fire-safety.html": {

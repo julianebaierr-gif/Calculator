@@ -324,6 +324,14 @@ CATEGORIES = {
             ("density-calculator.html", "Density & Specific Gravity (ρ = m/V)", "⚖️", "Volumetric mass density, buoyant force & API gravity"),
             ("pressure-calculator.html", "Pressure Calculator (Fluid & Mechanical)", "⚙️", "Mechanical contact stress P=F/A & hydrostatic head P=ρgh"),
             ("speed-calculator.html", "Speed & Velocity Kinematics (v = d/t)", "⏱️", "Scalar velocity, running pace min/km & kinematic acceleration"),
+            ("force-calculator.html", "Force Calculator (F = ma)", "⚡", "Force, gravitational weight & Newton II"),
+            ("momentum-calculator.html", "Momentum & Collisions (p = mv)", "🎱", "Linear momentum, elastic/inelastic collisions"),
+            ("impulse-calculator.html", "Impulse & Impact Force", "💥", "Impulse J = FΔt, crash attenuation & Isp"),
+            ("potential-energy-calculator.html", "Potential Energy (mgh & ½kx²)", "🏔️", "Gravitational & spring potential energy"),
+            ("work-power-calculator.html", "Work & Power (W = Fd, P = W/t)", "⚙️", "Mechanical work, linear/shaft power & HP"),
+            ("stress-strain-calculator.html", "Stress & Strain (Hooke's Law)", "🏗️", "Normal stress, strain, modulus E & safety factor"),
+            ("terminal-velocity-calculator.html", "Terminal Velocity", "🪂", "Aerodynamic drag & steady-state falling speed"),
+            ("specific-gravity-calculator.html", "Specific Gravity & Hydrometer", "⚖️", "Relative density, API gravity, Baumé & Brix"),
         ]
     },
     "fire": {
@@ -417,7 +425,7 @@ def determine_tool_cat(filename):
         return "civil"
     if any(k in f for k in ["chemical", "chlorine", "alum", "boyle", "calcium-hypochlorite", "caustic", "charles", "chlorine-dioxide", "coagulant", "combined-gas", "dilution", "gay-lussac", "half-life", "henderson", "hydrazine", "ideal-gas", "lime-dosing", "molar-mass", "molarity", "ph-calculator", "ph-poh", "phosphate", "polymer", "ro-antiscalant", "sulphuric", "titration"]):
         return "chemical"
-    if any(k in f for k in ["acceleration", "angular-velocity", "centripetal-force", "doppler-effect", "escape-velocity", "free-fall", "friction", "gravitational-force", "hookes-law", "kinetic-energy", "photon-energy", "simple-pendulum", "snells-law", "specific-heat", "density-calculator", "pressure-calculator", "speed-calculator"]):
+    if any(k in f for k in ["acceleration", "angular-velocity", "centripetal-force", "doppler-effect", "escape-velocity", "free-fall", "friction", "gravitational-force", "hookes-law", "kinetic-energy", "photon-energy", "simple-pendulum", "snells-law", "specific-heat", "density-calculator", "pressure-calculator", "speed-calculator", "force-calculator", "momentum-calculator", "impulse-calculator", "potential-energy", "work-power", "stress-strain", "terminal-velocity", "specific-gravity"]):
         return "physics"
     if any(k in f for k in ["sprinkler", "smoke", "fire-alarm", "hydrant", "fire-pump", "nac", "strobe"]):
         return "fire"
