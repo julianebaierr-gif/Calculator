@@ -98,133 +98,120 @@
     </div>
   </header>
 
-  <main class="container">
-    <nav class="breadcrumb-nav">
-      <a href="index.html">Home</a> &rsaquo; 
-      <a href="engineering.html">Engineering</a> &rsaquo; 
-      <a href="mechanical.html">Mechanical</a> &rsaquo; 
-      <span>Spring Rate Calculator</span>
-    </nav>
+    <main class="container">
+    <div class="calculator-workspace-full" style="max-width:1200px;margin:0 auto 2.5rem;padding:0 1.25rem;">
+      <nav class="breadcrumb">
+        <a href="index.html">Home</a> &gt; 
+        <a href="engineering.html">Engineering</a> &gt; 
+        <a href="mechanical.html">Mechanical</a> &gt; 
+        <span>Spring Rate Calculator</span>
+      </nav>
 
-    <header class="calc-header">
-      <div class="calc-badge">Spring Mechanics &amp; Machine Design</div>
-      <h1 class="calc-title">Spring Rate Calculator</h1>
-      <p class="calc-tagline">Calculate helical compression spring constant ($k$), spring index ($C$), Wahl stress factor, solid deflection height, and peak torsional shear stress.</p>
-    </header>
+      <div class="calculator-card">
+        <div class="calc-header">
+          <h1>Spring Rate Calculator</h1>
+          <p class="calc-desc">Calculate helical compression spring constant (k), spring index (C), Wahl stress factor, solid deflection height, and peak torsional shear stress per ASTM and SMI standards.</p>
+        </div>
 
-    <div class="tool-top-section" style="max-width:1200px;margin:0 auto 2.5rem;padding:0 1.25rem;">
-        <div class="tool-card">
-          <form id="springForm">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="wireMaterial">Spring Material Specification ($G$ Modulus)</label>
-                <select id="wireMaterial" class="form-control">
-                  <option value="79300" selected>Music Wire ASTM A228 (High Carbon Steel, G = 79.3 GPa)</option>
-                  <option value="78600">Oil-Tempered Wire ASTM A229 (G = 78.6 GPa)</option>
-                  <option value="79300_cr">Chrome Silicon ASTM A401 (High Fatigue, G = 79.3 GPa)</option>
-                  <option value="69000">Stainless Steel 302/304 ASTM A313 (Corrosion, G = 69.0 GPa)</option>
-                  <option value="71000">Stainless Steel 17-7 PH (Precipitation Hardened, G = 71.0 GPa)</option>
-                  <option value="41400">Phosphor Bronze ASTM B159 (Non-Magnetic, G = 41.4 GPa)</option>
-                  <option value="custom">Custom Shear Modulus ($G$)</option>
-                </select>
+        <div class="calc-grid">
+          <div class="calc-inputs">
+            <div class="input-group">
+              <label for="wireMaterial">Spring Material Specification (G Modulus)</label>
+              <select id="wireMaterial" class="input-field">
+                <option value="79300" selected>Music Wire ASTM A228 (High Carbon Steel, G = 79.3 GPa)</option>
+                <option value="78600">Oil-Tempered Wire ASTM A229 (G = 78.6 GPa)</option>
+                <option value="79300_cr">Chrome Silicon ASTM A401 (High Fatigue, G = 79.3 GPa)</option>
+                <option value="69000">Stainless Steel 302/304 ASTM A313 (Corrosion, G = 69.0 GPa)</option>
+                <option value="71000">Stainless Steel 17-7 PH (Precipitation Hardened, G = 71.0 GPa)</option>
+                <option value="41400">Phosphor Bronze ASTM B159 (Non-Magnetic, G = 41.4 GPa)</option>
+                <option value="custom">Custom Shear Modulus (G)</option>
+              </select>
+              <span class="input-hint">Material torsional shear modulus</span>
+            </div>
+
+            <div class="input-group" id="gModulusGroup">
+              <label for="gModulus">Torsional Shear Modulus (G in MPa)</label>
+              <input type="number" id="gModulus" class="input-field" value="79300" min="1000" step="100">
+              <span class="input-hint">1 GPa = 1,000 MPa = 1,000 N/mm²</span>
+            </div>
+
+            <div class="input-group">
+              <label for="wireDia">Wire Diameter (d in mm)</label>
+              <input type="number" id="wireDia" class="input-field" value="3.5" min="0.1" step="0.1">
+              <span class="input-hint">Gauge / cross-sectional diameter of the wire</span>
+            </div>
+
+            <div class="input-group">
+              <label for="outerDia">Outer Coil Diameter (D_outer in mm)</label>
+              <input type="number" id="outerDia" class="input-field" value="28.0" min="0.5" step="0.5">
+              <span class="input-hint">Mean diameter D = Outer Diameter - d</span>
+            </div>
+
+            <div class="input-group">
+              <label for="totalCoils">Total Number of Coils (n_t)</label>
+              <input type="number" id="totalCoils" class="input-field" value="9.5" min="1" step="0.25">
+              <span class="input-hint">Total coils counted tip-to-tip</span>
+            </div>
+
+            <div class="input-group">
+              <label for="endType">Spring End Coil Geometry</label>
+              <select id="endType" class="input-field">
+                <option value="sq_ground" selected>Squared &amp; Ground Ends (na = nt - 2)</option>
+                <option value="squared">Squared / Closed Unground (na = nt - 2)</option>
+                <option value="plain_ground">Plain &amp; Ground Ends (na = nt - 1)</option>
+                <option value="plain">Plain Open Ends (na = nt)</option>
+              </select>
+              <span class="input-hint">End seating condition defines active coils</span>
+            </div>
+
+            <div class="input-group">
+              <label for="freeLength">Free Length (L_free in mm)</label>
+              <input type="number" id="freeLength" class="input-field" value="65.0" min="1" step="1">
+              <span class="input-hint">Unloaded overall spring length</span>
+            </div>
+
+            <div class="input-group">
+              <label for="appliedLoad">Design Working Load (F in Newtons)</label>
+              <input type="number" id="appliedLoad" class="input-field" value="350" min="0" step="10">
+              <span class="input-hint">Applied compressive operating force</span>
+            </div>
+          </div>
+
+          <div class="calc-results">
+            <div class="result-card primary-result">
+              <div class="result-label">Spring Constant / Rate (k)</div>
+              <div class="result-value" id="resSpringRate" style="font-size:2rem;">-- N/mm</div>
+              <div class="result-sub" id="resRateImperial">-- lbf/in</div>
+            </div>
+
+            <div class="result-grid-mini" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem;">
+              <div class="result-card">
+                <div class="result-label">Spring Index (C = D/d)</div>
+                <div class="result-value-sm" id="resSpringIndex">--</div>
               </div>
-              <div class="form-group">
-                <label for="gModulus">Torsional Shear Modulus ($G$ in MPa)</label>
-                <input type="number" id="gModulus" class="form-control" value="79300" min="1000" step="100" required>
-                <span class="hint">1 GPa = 1,000 MPa = 1,000 N/mm²</span>
+              <div class="result-card">
+                <div class="result-label">Wahl Stress Factor (Kw)</div>
+                <div class="result-value-sm" id="resWahlFactor">--</div>
+              </div>
+              <div class="result-card">
+                <div class="result-label">Solid Height (Hs)</div>
+                <div class="result-value-sm" id="resSolidHeight">-- mm</div>
+              </div>
+              <div class="result-card">
+                <div class="result-label">Max Deflection (delta_s)</div>
+                <div class="result-value-sm" id="resMaxDeflection">-- mm</div>
               </div>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label for="wireDia">Wire Diameter ($d$ in mm)</label>
-                <input type="number" id="wireDia" class="form-control" value="3.5" min="0.1" step="any" required>
-                <span class="hint">Gauge / cross-sectional diameter of the wire</span>
-              </div>
-              <div class="form-group">
-                <label for="outerDia">Outer Coil Diameter ($D_{outer}$ in mm)</label>
-                <input type="number" id="outerDia" class="form-control" value="28.0" min="0.5" step="any" required>
-                <span class="hint">Mean diameter $D = D_{outer} - d$</span>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="totalCoils">Total Number of Coils ($n_t$)</label>
-                <input type="number" id="totalCoils" class="form-control" value="9.5" min="1" step="0.25" required>
-                <span class="hint">Total coils counted tip-to-tip</span>
-              </div>
-              <div class="form-group">
-                <label for="endType">Spring End Coil Geometry</label>
-                <select id="endType" class="form-control">
-                  <option value="sq_ground" selected>Squared &amp; Ground Ends ($n_a = n_t - 2$)</option>
-                  <option value="squared">Squared / Closed Unground ($n_a = n_t - 2$)</option>
-                  <option value="plain_ground">Plain &amp; Ground Ends ($n_a = n_t - 1$)</option>
-                  <option value="plain">Plain Open Ends ($n_a = n_t$)</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="freeLength">Free Length ($L_{free}$ in mm)</label>
-                <input type="number" id="freeLength" class="form-control" value="65.0" min="1" step="any" required>
-                <span class="hint">Unloaded overall spring length</span>
-              </div>
-              <div class="form-group">
-                <label for="appliedLoad">Design Working Load ($F$ in Newtons)</label>
-                <input type="number" id="appliedLoad" class="form-control" value="350" min="0" step="any">
-                <span class="hint">Applied compressive operating force</span>
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button type="button" class="btn btn-primary" id="calcSpringBtn">Calculate Spring Mechanics</button>
-              <button type="reset" class="btn btn-secondary" id="resetSpringBtn">Reset</button>
-            </div>
-          </form>
-
-          <div id="springResultBox" class="results-container" style="display: none; margin-top: 1.5rem;">
-            <h3>Calculated Helical Spring Characteristics</h3>
-            <div class="results-grid">
-              <div class="result-tile highlight">
-                <span class="result-label">Spring Constant / Rate ($k$)</span>
-                <span class="result-value" id="resSpringRate">-- N/mm</span>
-              </div>
-              <div class="result-tile">
-                <span class="result-label">Spring Rate in Imperial</span>
-                <span class="result-value" id="resRateImperial">-- lbf/in</span>
-              </div>
-              <div class="result-tile">
-                <span class="result-label">Spring Index ($C = D / d$)</span>
-                <span class="result-value" id="resSpringIndex">--</span>
-              </div>
-              <div class="result-tile">
-                <span class="result-label">Wahl Stress Factor ($K_w$)</span>
-                <span class="result-value" id="resWahlFactor">--</span>
-              </div>
-              <div class="result-tile">
-                <span class="result-label">Solid Height ($H_s$)</span>
-                <span class="result-value" id="resSolidHeight">-- mm</span>
-              </div>
-              <div class="result-tile">
-                <span class="result-label">Max Deflection to Solid ($\delta_s$)</span>
-                <span class="result-value" id="resMaxDeflection">-- mm</span>
-              </div>
-              <div class="result-tile">
-                <span class="result-label">Operating Deflection under Load</span>
-                <span class="result-value" id="resWorkDeflection">-- mm</span>
-              </div>
-              <div class="result-tile">
-                <span class="result-label">Wahl Corrected Shear Stress ($\tau_{max}$)</span>
-                <span class="result-value" id="resShearStress">-- MPa</span>
-              </div>
+            <div class="result-card" style="margin-top:1rem;background:var(--bg-accent, #eff6ff);border-left:4px solid var(--brand-primary, #2563eb);">
+              <div class="result-label">Operating Stress &amp; Deflection</div>
+              <div class="result-value" id="resShearStress" style="color:var(--brand-primary, #2563eb);font-size:1.15rem;">-- MPa</div>
+              <div class="result-sub" id="resWorkDeflection">-- mm deflection under load</div>
             </div>
           </div>
         </div>
-
-        </div>
-
+      </div>
+    </div>
   <div class="post-layout-grid" style="max-width:1200px;margin:0 auto 3rem;padding:0 1.25rem;">
     <div class="post-main-content">
       <article class="article-body">
@@ -542,10 +529,6 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const calcBtn = document.getElementById('calcSpringBtn');
-      const resetBtn = document.getElementById('resetSpringBtn');
-      const resultBox = document.getElementById('springResultBox');
-
       const wireMaterial = document.getElementById('wireMaterial');
       const gModulus = document.getElementById('gModulus');
       const wireDia = document.getElementById('wireDia');
@@ -555,24 +538,24 @@
       const freeLength = document.getElementById('freeLength');
       const appliedLoad = document.getElementById('appliedLoad');
 
-      wireMaterial.addEventListener('change', function() {
-        if (this.value !== 'custom') {
-          const val = this.value.split('_')[0];
+      function syncModulus() {
+        if (wireMaterial.value !== 'custom') {
+          const val = wireMaterial.value.split('_')[0];
           gModulus.value = val;
         }
-      });
+        calculateSpring();
+      }
 
       function calculateSpring() {
-        const G = parseFloat(gModulus.value);
-        const d = parseFloat(wireDia.value);
-        const D_out = parseFloat(outerDia.value);
-        const nt = parseFloat(totalCoils.value);
+        const G = parseFloat(gModulus.value) || 79300;
+        const d = parseFloat(wireDia.value) || 3.5;
+        const D_out = parseFloat(outerDia.value) || 28.0;
+        const nt = parseFloat(totalCoils.value) || 9.5;
         const ends = endType.value;
-        const L_free = parseFloat(freeLength.value);
+        const L_free = parseFloat(freeLength.value) || 65.0;
         const F = parseFloat(appliedLoad.value) || 0;
 
-        if (isNaN(G) || G <= 0 || isNaN(d) || d <= 0 || isNaN(D_out) || D_out <= d || isNaN(nt) || nt <= 0) {
-          alert('Please enter valid positive spring dimensions (D_out must be greater than wire diameter d).');
+        if (d <= 0 || D_out <= d || nt <= 0) {
           return;
         }
 
@@ -602,19 +585,18 @@
         const d4 = Math.pow(d, 4);
         const D3 = Math.pow(D, 3);
         const k_N_mm = (G * d4) / (8.0 * D3 * na);
-        // Convert to lbf/in: 1 N/mm = 5.710147 lbf/in
         const k_lbf_in = k_N_mm * 5.710147;
 
-        // Wahl factor Kw = (4C - 1) / (4C - 4) + 0.615 / C
+        // Wahl factor Kw
         const Kw = ((4.0 * C - 1.0) / (4.0 * C - 4.0)) + (0.615 / C);
 
-        // Solid deflection delta_s
+        // Solid deflection
         const delta_s = Math.max(0, L_free - Hs);
 
         // Operating deflection under load F
         const workDeflection = F > 0 ? (F / k_N_mm) : 0;
 
-        // Shear stress tau = Kw * (8 * F * D) / (pi * d^3)
+        // Shear stress
         let tau_MPa = 0;
         if (F > 0) {
           tau_MPa = Kw * ((8.0 * F * D) / (Math.PI * Math.pow(d, 3)));
@@ -623,20 +605,18 @@
         // Render outputs
         document.getElementById('resSpringRate').textContent = k_N_mm.toFixed(3) + ' N/mm';
         document.getElementById('resRateImperial').textContent = k_lbf_in.toFixed(2) + ' lbf/in';
-        document.getElementById('resSpringIndex').textContent = C.toFixed(2) + (C < 4 ? ' (Too tight, high stress)' : (C > 12 ? ' (Prone to tangle/buckle)' : ' (Optimal 4–12 range)'));
+        document.getElementById('resSpringIndex').textContent = C.toFixed(2) + (C < 4 ? ' (High stress)' : (C > 12 ? ' (Prone to buckle)' : ' (Optimal)'));
         document.getElementById('resWahlFactor').textContent = Kw.toFixed(3);
         document.getElementById('resSolidHeight').textContent = Hs.toFixed(2) + ' mm';
         document.getElementById('resMaxDeflection').textContent = delta_s.toFixed(2) + ' mm';
-        document.getElementById('resWorkDeflection').textContent = workDeflection > 0 ? (workDeflection.toFixed(2) + ' mm (' + ((workDeflection / delta_s) * 100).toFixed(1) + '% to solid)') : '0 mm (Unloaded)';
+        document.getElementById('resWorkDeflection').textContent = workDeflection > 0 ? (workDeflection.toFixed(2) + ' mm (' + ((workDeflection / Math.max(0.01, delta_s)) * 100).toFixed(1) + '% to solid)') : '0 mm (Unloaded)';
         document.getElementById('resShearStress').textContent = tau_MPa > 0 ? (tau_MPa.toFixed(1) + ' MPa') : '0 MPa';
-
-        resultBox.style.display = 'block';
-        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
 
-      calcBtn.addEventListener('click', calculateSpring);
-      resetBtn.addEventListener('click', function() {
-        resultBox.style.display = 'none';
+      wireMaterial.addEventListener('change', syncModulus);
+      [gModulus, wireDia, outerDia, totalCoils, endType, freeLength, appliedLoad].forEach(el => {
+        el.addEventListener('input', calculateSpring);
+        el.addEventListener('change', calculateSpring);
       });
 
       calculateSpring();
