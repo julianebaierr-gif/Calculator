@@ -265,25 +265,17 @@ $$\Delta t_{\text{ms}} = T_{\text{target}} - T_{\text{now}}$$
 
 <p>When $\Delta t_{\text{ms}} > 0$, the event lies in the future. The total discrete duration in integer seconds is obtained via floor division:</p>
 
-$$\Delta t_{\text{sec}} = \left\lfloor \frac{\Delta t_{\text{ms}}}{1000} 
-ight
-floor$$
+$$\Delta t_{\text{sec}} = \left\lfloor \frac{\Delta t_{\text{ms}}}{1000} \right\rfloor$$
 
 <p>To map this scalar into user-readable sexagesimal positional components—days ($D$), hours ($H$), minutes ($M$), and seconds ($S$)—the algorithm applies nested modulo and floor operations:</p>
 
-$$D = \left\lfloor \frac{\Delta t_{\text{sec}}}{86400} 
-ight
-floor$$
+$$D = \left\lfloor \frac{\Delta t_{\text{sec}}}{86400} \right\rfloor$$
 
-$$H = \left\lfloor \frac{\Delta t_{\text{sec}} mod 86400}{3600} 
-ight
-floor$$
+$$H = \left\lfloor \frac{\Delta t_{\text{sec}} \bmod 86400}{3600} \right\rfloor$$
 
-$$M = \left\lfloor \frac{\Delta t_{\text{sec}} mod 3600}{60} 
-ight
-floor$$
+$$M = \left\lfloor \frac{\Delta t_{\text{sec}} \bmod 3600}{60} \right\rfloor$$
 
-$$S = \Delta t_{\text{sec}} mod 60$$
+$$S = \Delta t_{\text{sec}} \bmod 60$$
 
 <p>Where $86400 = 24 \times 3600$ represents the total number of SI seconds in a civil solar day, and $3600$ represents the seconds in a single hour.</p>
 
@@ -302,16 +294,16 @@ $$T_{\text{epoch}} = (\text{YearDays} + \text{LeapDays}) \times 86400 + (H \time
 
 <p>To achieve high-frequency jitter-free rendering (such as sub-frame 60 FPS / 120 FPS animations), modern web applications combine wall-clock target resolution with the <strong>Monotonic Clock</strong> provided by the W3C High Resolution Time API (<code>window.performance.now()</code>):</p>
 
-$$\Delta t_{\text{monotonic}} = \text{TargetEpoch}_{\text{UTC}} - ig( T_{\text{origin}} + \text{performance.now()} ig)$$
+$$\Delta t_{\text{monotonic}} = \text{TargetEpoch}_{\text{UTC}} - \big( T_{\text{origin}} + \text{performance.now()} \big)$$
 
 <p>Because monotonic clocks never decrease and are independent of system clock modifications, countdown animations maintain sub-millisecond smoothness without displaying visual stutter.</p>
 
 <h2>Nanosecond Synchronizations and IEEE 1588 PTP Protocols</h2>
 <p>In high-frequency algorithmic financial trading (HFT), power grid phasor measurement units (PMUs), and distributed particle accelerators (such as CERN), countdown synchronization operates beyond seconds into nanosecond regimes ($10^{-9} \text{ s}$). Under standard NTP over commercial wide-area networks, timing uncertainty hovers between $1$ and $50$ milliseconds. To synchronize distributed nodes with sub-microsecond precision, enterprise engineering deploys the <strong>IEEE 1588 Precision Time Protocol (PTP)</strong>.</p>
 
-<p>IEEE 1588 utilizes hardware packet timestamping at the physical network interface layer (PHY), measuring mean round-trip path delays ($\delta$) and clock offsets ($	heta$) via bidirectional message exchange:</p>
+<p>IEEE 1588 utilizes hardware packet timestamping at the physical network interface layer (PHY), measuring mean round-trip path delays ($\delta$) and clock offsets ($\theta$) via bidirectional message exchange:</p>
 
-$$\delta = \frac{(t_2 - t_1) + (t_4 - t_3)}{2}, \quad 	heta = \frac{(t_2 - t_1) - (t_4 - t_3)}{2}$$
+$$\delta = \frac{(t_2 - t_1) + (t_4 - t_3)}{2}, \quad \theta = \frac{(t_2 - t_1) - (t_4 - t_3)}{2}$$
 
 <p>This protocol enables distributed clusters to coordinate simultaneous market orders or launch triggers with synchronization variances bounded within under $100 \text{ nanoseconds}$.</p>
 
@@ -355,13 +347,13 @@ $$\delta = \frac{(t_2 - t_1) + (t_4 - t_3)}{2}, \quad 	heta = \frac{(t_2 - t_1) 
         <h4>Step 3: Decompose into Standard Countdown Form</h4>
         $$D = \lfloor 281,670 / 86400 
 floor = 3 \text{ days}$$
-        $$\text{Remainder} = 281,670 mod 86400 = 22,470 \text{ seconds}$$
+        $$\text{Remainder} = 281,670 \bmod 86400 = 22,470 \text{ seconds}$$
         $$H = \lfloor 22,470 / 3600 
 floor = 6 \text{ hours}$$
-        $$\text{Remainder} = 22,470 mod 3600 = 870 \text{ seconds}$$
+        $$\text{Remainder} = 22,470 \bmod 3600 = 870 \text{ seconds}$$
         $$M = \lfloor 870 / 60 
 floor = 14 \text{ minutes}$$
-        $$S = 870 mod 60 = 30 \text{ seconds}$$
+        $$S = 870 \bmod 60 = 30 \text{ seconds}$$
         <p><strong>Countdown Display:</strong> <code>L-03d 06h 14m 30s</code>.</p>
 
         <h4>Step 4: Compute Total Equivalent Minutes</h4>
@@ -376,7 +368,27 @@ floor = 14 \text{ minutes}$$
     <li><strong>Failure to Transition to Negative (Elapsed) Time:</strong> Without proper conditional branching, timers that cross T-zero may wrap around to display nonsensical negative numbers (e.g., <code>-1d -2h</code>) instead of cleanly entering an elapsed timeline format.</li>
 </ol>
                 
-      <!-- Contextual Internal Linking: Connected Workflow Solvers -->
+      <h2>Frequently Asked Questions</h2>
+<div class="faq-accordion">
+  <div class="faq-item">
+    <h3>How is the countdown between current time and target date calculated?</h3>
+    <p>The calculation takes the target timestamp in UTC milliseconds, subtracts the current system time, and decomposes the remaining milliseconds into discrete integer units: days (86,400,000 ms), hours (3,600,000 ms), minutes (60,000 ms), and seconds (1,000 ms).</p>
+  </div>
+  <div class="faq-item">
+    <h3>How does the countdown handle Daylight Saving Time (DST) changes?</h3>
+    <p>Because the countdown operates on absolute UTC epoch timestamps, transitions across Daylight Saving Time boundaries are naturally integrated. A 23-hour 'spring-forward' or 25-hour 'fall-back' day correctly counts down the exact physical elapsed hours.</p>
+  </div>
+  <div class="faq-item">
+    <h3>Can you count down to a specific time of day as well as a date?</h3>
+    <p>Yes. The calculator accepts both a calendar date and a specific time of day (HH:MM), enabling second-by-second precision for product launches, exam start times, sporting events, and scheduled travel departures.</p>
+  </div>
+  <div class="faq-item">
+    <h3>What happens when the target countdown date has passed?</h3>
+    <p>When the target timestamp occurs in the past, the engine automatically switches into 'Elapsed Since' mode, displaying the exact time that has elapsed since the milestone occurred.</p>
+  </div>
+</div>
+
+<!-- Contextual Internal Linking: Connected Workflow Solvers -->
       <section class="related-tools-section" style="margin-top: 2.75rem; padding-top: 1.75rem; border-top: 1px solid var(--border-light, #e2e8f0);">
         <h2 style="margin-bottom: 0.75rem;">Connected Computational Solvers &amp; Cross-Disciplinary Workflows</h2>
         <p style="color: var(--text-secondary, #475569); margin-bottom: 1.25rem;">Explore precision analytical companion models and dedicated verification solvers from our <a href="datetime.html">Date & Time Utilities</a> directory for countdown analysis:</p>

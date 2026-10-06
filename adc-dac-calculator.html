@@ -243,7 +243,7 @@
 
           <div class="formula-box">
             <div class="formula-title">4. Theoretical Signal-to-Quantization-Noise Ratio (SQNR)</div>
-            <div class="formula-math">$$\text{SQNR}_{ideal} = 20 \log_{10}\left(\sqrt{1.5} \cdot 2^N\right) = 6.02 \times N + 1.76 \text{ dB}$$</div>
+            <div class="formula-math">$$\text{SQNR}_{ideal} = 20 \log_{10}\left(\sqrt{1.5} \cdot 2^N \right) = 6.02 \times N + 1.76 \text{ dB}$$</div>
             <p>For a full-scale sinusoidal input spanning the entire converter range, the RMS signal voltage is $V_{sig(rms)} = \frac{V_{FS}}{2\sqrt{2}} = \frac{2^N \cdot V_{LSB}}{2\sqrt{2}}$. Taking the ratio of RMS signal power to RMS quantization noise power in decibels produces the celebrated $6.02N + 1.76$ dB relationship.</p>
           </div>
 
@@ -426,7 +426,7 @@
           </p>
           <div class="formula-box">
             <div class="formula-title">Oversampling SNR Processing Gain Formula</div>
-            <div class="formula-math">$$\Delta\text{SNR} = 10 \log_{10}\left(\frac{f_s}{2 f_{BW}}\right) = 10 \log_{10}(\text{OSR})$$</div>
+            <div class="formula-math">$$\Delta\text{SNR} = 10 \log_{10}\left(\frac{f_s}{2 f_{BW}} \right) = 10 \log_{10}(\text{OSR})$$</div>
             <p>Where $\text{OSR} = \frac{f_s}{2 f_{BW}}$ is the oversampling ratio. Because quantization noise power is uniformly distributed across the entire Nyquist bandwidth from $0$ to $f_s/2$, filtering out out-of-band noise down to signal bandwidth $f_{BW}$ reduces in-band noise floor. For every quadruple ($4\times$) increase in oversampling ratio, dynamic range increases by $6.02\text{ dB}$, effectively recovering one extra bit of measurement resolution.</p>
           </div>
 
@@ -438,7 +438,27 @@
             <li><strong>Thermal Johnson Noise:</strong> For ultra-high resolution converters ($N \ge 24\text{ bits}$), physical thermodynamic resistor noise $\sqrt{4kTRB}$ often exceeds theoretical quantization noise, creating the fundamental analog physical noise ceiling.</li>
           </ul>
         
-      <!-- Contextual Internal Linking: Connected Workflow Solvers -->
+      <h2>Frequently Asked Questions</h2>
+<div class="faq-accordion">
+  <div class="faq-item">
+    <h3>What is the formula for ADC step size (LSB voltage resolution)?</h3>
+    <p>The step size or Least Significant Bit (LSB) voltage represents the smallest detectable change in analog voltage that alters the digital output by one count. It is calculated by dividing the full-scale analog reference voltage range by the total number of discrete quantization levels: V_LSB = V_ref / (2^N), where N is the converter resolution in bits. For example, a 12-bit ADC operating with a 3.30 V reference has an LSB of 3.30 V / 4096 = 0.80566 mV.</p>
+  </div>
+  <div class="faq-item">
+    <h3>How is the theoretical Signal-to-Quantization-Noise Ratio (SQNR) derived?</h3>
+    <p>Theoretical SQNR is derived assuming an ideal full-scale sinusoidal input and uniform quantization error distributed uniformly between -LSB/2 and +LSB/2 with a probability density of 1/LSB. The RMS signal voltage of a peak-to-peak full-scale sine wave is V_FS / (2 * sqrt(2)), while the RMS quantization noise voltage is V_LSB / sqrt(12). Taking the ratio in decibels yields SNR_ideal = 20 * log10(sqrt(1.5) * 2^N) = 6.02 * N + 1.76 dB. Every additional bit of resolution boosts theoretical dynamic range by approximately 6.02 dB.</p>
+  </div>
+  <div class="faq-item">
+    <h3>What is the difference between converter resolution and accuracy?</h3>
+    <p>Resolution specifies the number of discrete steps into which the converter divides the analog span (determined purely by bit count 2^N), indicating potential precision. Accuracy, however, measures how closely the actual converted output conforms to the true theoretical analog value across operating temperature and aging. Accuracy is degraded by analog hardware non-idealities including integral non-linearity (INL), differential non-linearity (DNL), offset voltage error, gain error, and reference drift.</p>
+  </div>
+  <div class="faq-item">
+    <h3>What is Effective Number of Bits (ENOB) and why does it differ from nominal bits?</h3>
+    <p>Nominal resolution is the design bit width of the digital register (such as 16 or 24 bits). Real-world analog converters suffer from internal thermal noise (Johnson-Nyquist noise), clock jitter, and harmonic distortion. Signal-to-Noise and Distortion ratio (SINAD) combines all noise and spurs. ENOB computes the equivalent ideal resolution that would produce the observed SINAD: ENOB = (SINAD - 1.76) / 6.02. A physical 16-bit SAR ADC may achieve an ENOB of 14.2 bits under high-frequency dynamic testing.</p>
+  </div>
+</div>
+
+<!-- Contextual Internal Linking: Connected Workflow Solvers -->
       <section class="related-tools-section" style="margin-top: 2.75rem; padding-top: 1.75rem; border-top: 1px solid var(--border-light, #e2e8f0);">
         <h2 style="margin-bottom: 0.75rem;">Connected Computational Solvers &amp; Cross-Disciplinary Workflows</h2>
         <p style="color: var(--text-secondary, #475569); margin-bottom: 1.25rem;">Explore precision analytical companion models and dedicated verification solvers from our <a href="engineering.html">Electrical & Power Systems</a> directory for adc dac analysis:</p>

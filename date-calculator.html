@@ -361,13 +361,11 @@ $$\Delta M = \Delta M + 12, \quad \Delta Y = \Delta Y - 1$$
 <h2>The End-of-Month Clamping Phenomenon in Temporal Projection</h2>
 <p>When adding or subtracting calendar intervals from an anchor date—for example, adding exactly one month to January 31st—algebraic computation encounters an impossibility: the date <em>February 31st</em> does not exist in any solar calendar. In software systems and legal contracts, this is resolved via the <strong>End-of-Month Clamping Convention</strong> (standardized by ANSI SQL, Java <code>java.time</code>, and Python <code>dateutil.relativedelta</code>):</p>
 
-$$M_{\text{new}} = (M_0 + \Delta M) mod 12$$
+$$M_{\text{new}} = (M_0 + \Delta M) \bmod 12$$
 
-$$Y_{\text{new}} = Y_0 + \left\lfloor \frac{M_0 + \Delta M}{12} 
-ight
-floor$$
+$$Y_{\text{new}} = Y_0 + \left\lfloor \frac{M_0 + \Delta M}{12} \right\rfloor$$
 
-$$d_{\text{clamped}} = \minig(d_0, \text{DaysInMonth}(Y_{\text{new}}, M_{\text{new}})ig)$$
+$$d_{\text{clamped}} = \min\big(d_0, \text{DaysInMonth}(Y_{\text{new}}, M_{\text{new}})\big)$$
 
 <p>Under this formal convention, adding one month to January 31, 2026 clamps cleanly to <strong>February 28, 2026</strong>. In a leap year (such as 2028), adding one month to January 31st clamps cleanly to <strong>February 29, 2028</strong>.</p>
 
@@ -447,7 +445,27 @@ $$\text{MJD} = \text{JDN} - 2400000.5$$
     <li><strong>Proleptic Gregorian Calendar Distortion:</strong> Projecting dates prior to October 15, 1582 requires specifying whether calculations utilize the proleptic Gregorian calendar or the historical Julian calendar (which drifted by 10 days at the time of the Gregorian reform).</li>
 </ol>
                 
-      <!-- Contextual Internal Linking: Connected Workflow Solvers -->
+      <h2>Frequently Asked Questions</h2>
+<div class="faq-accordion">
+  <div class="faq-item">
+    <h3>How does the date calculator borrow days across months of different lengths?</h3>
+    <p>When the day of the end date is less than the day of the start date, the algorithm borrows days from the preceding month. The number of borrowed days exactly matches the actual length of that specific preceding month (28 or 29 for February, 30, or 31 days).</p>
+  </div>
+  <div class="faq-item">
+    <h3>What is the end-of-month clamping rule when adding months?</h3>
+    <p>When adding one month to January 31, the mathematical target February 31 does not exist. The algorithm applies standard clamping, adjusting the resulting date to the final valid day of the target month (February 28, or February 29 during a leap year).</p>
+  </div>
+  <div class="faq-item">
+    <h3>Does the calculator include both the start date and end date?</h3>
+    <p>By default, duration calculations measure the exact elapsed time between dates (excluding the start date). However, an option is provided to include both boundary dates for legal, leasing, and contractual compliance.</p>
+  </div>
+  <div class="faq-item">
+    <h3>How are leap years factored into date difference calculations?</h3>
+    <p>The calculation engine uses exact astronomical Gregorian calendrical rules. Any leap year crossed in the date span automatically accounts for the intercalary February 29th, ensuring 100% precision.</p>
+  </div>
+</div>
+
+<!-- Contextual Internal Linking: Connected Workflow Solvers -->
       <section class="related-tools-section" style="margin-top: 2.75rem; padding-top: 1.75rem; border-top: 1px solid var(--border-light, #e2e8f0);">
         <h2 style="margin-bottom: 0.75rem;">Connected Computational Solvers &amp; Cross-Disciplinary Workflows</h2>
         <p style="color: var(--text-secondary, #475569); margin-bottom: 1.25rem;">Explore precision analytical companion models and dedicated verification solvers from our <a href="datetime.html">Date & Time Utilities</a> directory for date analysis:</p>

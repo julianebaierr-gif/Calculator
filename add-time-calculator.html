@@ -284,17 +284,11 @@ window.addEventListener('DOMContentLoaded', updateTimeCalc);
 
 <p>Performing addition or subtraction on chronometric vectors $(H_1, M_1, S_1)$ and $(H_2, M_2, S_2)$ requires rigorous carry-over and borrowing algorithms. The mathematical carry-over sequence for addition is formalized as follows:</p>
 
-$$S_{\text{raw}} = S_1 + S_2, \quad S_{\text{net}} = S_{\text{raw}} mod 60, \quad C_M = \left\lfloor \frac{S_{\text{raw}}}{60} 
-ight
-floor$$
+$$S_{\text{raw}} = S_1 + S_2, \quad S_{\text{net}} = S_{\text{raw}} \bmod 60, \quad C_M = \left\lfloor \frac{S_{\text{raw}}}{60} \right\rfloor$$
 
-$$M_{\text{raw}} = M_1 + M_2 + C_M, \quad M_{\text{net}} = M_{\text{raw}} mod 60, \quad C_H = \left\lfloor \frac{M_{\text{raw}}}{60} 
-ight
-floor$$
+$$M_{\text{raw}} = M_1 + M_2 + C_M, \quad M_{\text{net}} = M_{\text{raw}} \bmod 60, \quad C_H = \left\lfloor \frac{M_{\text{raw}}}{60} \right\rfloor$$
 
-$$H_{\text{raw}} = H_1 + H_2 + C_H, \quad H_{\text{net}} = H_{\text{raw}} mod 24, \quad D_{\text{overflow}} = \left\lfloor \frac{H_{\text{raw}}}{24} 
-ight
-floor$$
+$$H_{\text{raw}} = H_1 + H_2 + C_H, \quad H_{\text{net}} = H_{\text{raw}} \bmod 24, \quad D_{\text{overflow}} = \left\lfloor \frac{H_{\text{raw}}}{24} \right\rfloor$$
 
 <p>Where $C_M$ and $C_H$ represent the integer carry-over quotients, and $D_{\text{overflow}}$ represents the count of 24-hour diurnal boundaries crossed. In subtraction, whenever $S_1 < S_2$, a borrow of 60 seconds is decremented from $M_1$. If $M_1 < M_2$, a borrow of 60 minutes is decremented from $H_1$.</p>
 
@@ -306,7 +300,7 @@ floor$$
     $$T_{\text{target}} = (T_0 + \Delta t) \pmod{86400 \text{ seconds}}$$
     </li>
     <li><strong>Duration Aggregation (Elapsed Interval):</strong> Accumulating multiple work periods, flight legs, machinery runtimes, or audio/video tracks. In duration summation, time is an unbounded linear scalar:
-    $$T_{\text{total}} = \sum_{i=1}^n ig(H_i \cdot 3600 + M_i \cdot 60 + S_iig)$$
+    $$T_{\text{total}} = \sum_{i=1}^n \big(H_i \cdot 3600 + M_i \cdot 60 + S_i\big)$$
     </li>
 </ol>
 
@@ -334,12 +328,10 @@ $$S_{\text{total}} = (H \times 3600) + (M \times 60) + S$$
 
 <ul>
     <li><strong>Special Relativity (Kinematic Dilation):</strong> The satellite's high velocity causes atomic clocks to run slower by approximately $-7 \ \mu\text{s/day}$ relative to Earth ground observers:
-    $$\Delta t_v = t_0 \left( \sqrt{1 - \frac{v^2}{c^2}} - 1 
-ight) pprox -\frac{1}{2}\frac{v^2}{c^2} t_0$$
+    $$\Delta t_v = t_0 \left( \sqrt{1 - \frac{v^2}{c^2}} - 1 \right) \approx -\frac{1}{2}\frac{v^2}{c^2} t_0$$
     </li>
     <li><strong>General Relativity (Gravitational Dilation):</strong> The weaker gravitational potential at $20,200 \text{ km}$ causes satellite atomic clocks to run faster by $+45 \ \mu\text{s/day}$:
-    $$\Delta t_g = t_0 \left( \frac{\Delta \Phi}{c^2} 
-ight)$$
+    $$\Delta t_g = t_0 \left( \frac{\Delta \Phi}{c^2} \right)$$
     </li>
 </ul>
 
@@ -376,13 +368,13 @@ ight)$$
     <div class="step-solution">
         <h4>Step 1: Sum the Raw Seconds</h4>
         $$S_{\text{raw}} = 25 + 50 + 15 = 90 \text{ seconds}$$
-        $$S_{\text{net}} = 90 mod 60 = 30 \text{ seconds}$$
+        $$S_{\text{net}} = 90 \bmod 60 = 30 \text{ seconds}$$
         $$C_M = \lfloor 90 / 60 
 floor = 1 \text{ carried minute}$$
 
         <h4>Step 2: Sum the Raw Minutes with Carry</h4>
         $$M_{\text{raw}} = 48 + 34 + 52 + 1 = 135 \text{ minutes}$$
-        $$M_{\text{net}} = 135 mod 60 = 15 \text{ minutes}$$
+        $$M_{\text{net}} = 135 \bmod 60 = 15 \text{ minutes}$$
         $$C_H = \lfloor 135 / 60 
 floor = 2 \text{ carried hours}$$
 
@@ -405,7 +397,27 @@ floor = 2 \text{ carried hours}$$
     <li><strong>Leap Second Misunderstandings:</strong> While the International Earth Rotation and Reference Systems Service (IERS) periodically inserts atomic leap seconds (UTC), civil time software ignores leap seconds for standard interval addition to prevent variable-rate clock distortion.</li>
 </ol>
                 
-      <!-- Contextual Internal Linking: Connected Workflow Solvers -->
+      <h2>Frequently Asked Questions</h2>
+<div class="faq-accordion">
+  <div class="faq-item">
+    <h3>How does base-60 carry-over work when adding time?</h3>
+    <p>Time addition operates on base-60 (sexagesimal) arithmetic. When seconds exceed 59, they are divided by 60; the remainder represents the net seconds, and the quotient is carried over as added minutes. Similarly, when minutes exceed 59, the quotient carries over as additional hours.</p>
+  </div>
+  <div class="faq-item">
+    <h3>How does the calculator handle time crossing past midnight (24 hours)?</h3>
+    <p>When adding durations to clock timestamps, any accumulated hours exceeding 24 are divided by 24. The quotient is recorded as an integer day overflow count (+1 day, +2 days, etc.), while the modulo remainder yields the new 24-hour clock time.</p>
+  </div>
+  <div class="faq-item">
+    <h3>Can you subtract time intervals with this calculator?</h3>
+    <p>Yes. Switching to subtraction mode allows subtracting durations from a base time. If a term has fewer seconds or minutes than the subtracted term, the algorithm borrows 60 units from the adjacent higher unit (borrowing 60 seconds from 1 minute, or 60 minutes from 1 hour).</p>
+  </div>
+  <div class="faq-item">
+    <h3>How are summed hours and minutes converted to decimal hours?</h3>
+    <p>Total decimal hours are computed via the formula: Decimal Hours = Hours + (Minutes / 60) + (Seconds / 3600). For example, 5 hours, 36 minutes, and 18 seconds equals 5 + 0.60 + 0.005 = 5.605 decimal hours.</p>
+  </div>
+</div>
+
+<!-- Contextual Internal Linking: Connected Workflow Solvers -->
       <section class="related-tools-section" style="margin-top: 2.75rem; padding-top: 1.75rem; border-top: 1px solid var(--border-light, #e2e8f0);">
         <h2 style="margin-bottom: 0.75rem;">Connected Computational Solvers &amp; Cross-Disciplinary Workflows</h2>
         <p style="color: var(--text-secondary, #475569); margin-bottom: 1.25rem;">Explore precision analytical companion models and dedicated verification solvers from our <a href="datetime.html">Date & Time Utilities</a> directory for add time analysis:</p>

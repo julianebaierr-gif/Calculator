@@ -242,13 +242,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
 <p>For any Gregorian calendar date consisting of year $Y$, month $M \in \{1,\dots,12\}$, and day $D \in \{1,\dots,31\}$, the closed-form algebraic equation for the ordinal day of the year is given by:</p>
 
-$$\text{DoY} = \left\lfloor \frac{275 \cdot M}{9} 
-ight
-floor - \left\lfloor \frac{M + 9}{12} 
-ight
-floor \cdot ig(1 + \mathbb{I}_{\text{leap}}(Y)ig) + D - 30$$
+$$\text{DoY} = \left\lfloor \frac{275 \cdot M}{9} \right\rfloor - \left\lfloor \frac{M + 9}{12} \right\rfloor \cdot \big(1 + \mathbb{I}_{\text{leap}}(Y)\big) + D - 30$$
 
-<p>Where $\mathbb{I}_{\text{leap}}(Y)$ is the binary indicator function returning 1 if $Y$ is a leap year and 0 otherwise. This integer formula eliminates table lookups by exploiting the linear slope approximation of monthly accumulations ($275/9 pprox 30.555$), with the step term $\lfloor (M+9)/12 
+<p>Where $\mathbb{I}_{\text{leap}}(Y)$ is the binary indicator function returning 1 if $Y$ is a leap year and 0 otherwise. This integer formula eliminates table lookups by exploiting the linear slope approximation of monthly accumulations ($275/9 \approx 30.555$), with the step term $\lfloor (M+9)/12 
 floor$ acting as an activation switch that suppresses February's anomaly for January and February ($M \le 2$), while subtracting 1 or 2 days for all subsequent months ($M \ge 3$).</p>
 
 <h2>Solar Declination Angle and Radiation Modeling</h2>
@@ -256,16 +252,15 @@ floor$ acting as an activation switch that suppresses February's anomaly for Jan
 
 <p>Cooper's fundamental astronomical approximation models solar declination $\delta$ as a sinusoidal function of the day of the year $N$:</p>
 
-$$\delta = 23.45^\circ \times \sin\left( \frac{360^\circ}{365} \times (N + 284) 
-ight)$$
+$$\delta = 23.45^\circ \times \sin\left( \frac{360^\circ}{365} \times (N + 284) \right)$$
 
-<p>Where the phase shift of $+284$ days aligns the sinusoidal zero-crossing with the vernal equinox ($N pprox 80$, March 21st, where $\delta = 0^\circ$). The extreme boundaries occur at the solstices:</p>
+<p>Where the phase shift of $+284$ days aligns the sinusoidal zero-crossing with the vernal equinox ($N \approx 80$, March 21st, where $\delta = 0^\circ$). The extreme boundaries occur at the solstices:</p>
 <ul>
-    <li><strong>Summer Solstice ($N pprox 172$, June 21):</strong> $\delta = +23.45^\circ$ (Sun zenith at Tropic of Cancer).</li>
-    <li><strong>Winter Solstice ($N pprox 355$, December 21):</strong> $\delta = -23.45^\circ$ (Sun zenith at Tropic of Capricorn).</li>
+    <li><strong>Summer Solstice ($N \approx 172$, June 21):</strong> $\delta = +23.45^\circ$ (Sun zenith at Tropic of Cancer).</li>
+    <li><strong>Winter Solstice ($N \approx 355$, December 21):</strong> $\delta = -23.45^\circ$ (Sun zenith at Tropic of Capricorn).</li>
 </ul>
 
-<p>Solar photovoltaic engineers directly feed $\delta$ into equations calculating the local solar zenith angle $	heta_z$, optimal photovoltaic array tilt angles ($eta pprox \phi - \delta$), and atmospheric optical air mass ($AM$).</p>
+<p>Solar photovoltaic engineers directly feed $\delta$ into equations calculating the local solar zenith angle $\theta_z$, optimal photovoltaic array tilt angles ($\beta \approx \phi - \delta$), and atmospheric optical air mass ($AM$).</p>
 
 <h3>Ordinal Day Reference Matrix for Month Start Boundaries</h3>
 <table class="data-table">
@@ -300,7 +295,7 @@ ight)$$
     
     <div class="step-solution">
         <h4>Step 1: Verify Leap Year Status</h4>
-        <p>Year 2026: $2026 mod 4 = 2 \neq 0$. Common year (365 days).</p>
+        <p>Year 2026: $2026 \bmod 4 = 2 \neq 0$. Common year (365 days).</p>
 
         <h4>Step 2: Calculate Ordinal Day ($N$)</h4>
         <p>From the reference matrix, October 1st in a common year is Day 274.</p>
@@ -308,13 +303,13 @@ ight)$$
         <p><strong>Ordinal Date:</strong> <code>2026-278</code>.</p>
 
         <h4>Step 3: Calculate Annual Percentage Elapsed</h4>
-        $$\text{Percentage} = \frac{278}{365} \times 100\% pprox 76.1644\%$$
+        $$\text{Percentage} = \frac{278}{365} \times 100\% \approx 76.1644\%$$
 
         <h4>Step 4: Compute Solar Declination Angle ($\delta$)</h4>
-        $$	heta_{\text{arg}} = \frac{360^\circ}{365} \times (278 + 284) = \frac{360^\circ}{365} \times 562 = 554.3014^\circ$$
-        $$	heta_{\text{normalized}} = 554.3014^\circ - 360^\circ = 194.3014^\circ$$
-        $$\sin(194.3014^\circ) pprox -0.2470$$
-        $$\delta = 23.45^\circ \times (-0.2470) pprox -5.79^\circ$$
+        $$\theta_{\text{arg}} = \frac{360^\circ}{365} \times (278 + 284) = \frac{360^\circ}{365} \times 562 = 554.3014^\circ$$
+        $$\theta_{\text{normalized}} = 554.3014^\circ - 360^\circ = 194.3014^\circ$$
+        $$\sin(194.3014^\circ) \approx -0.2470$$
+        $$\delta = 23.45^\circ \times (-0.2470) \approx -5.79^\circ$$
         <p><strong>Result:</strong> The Sun's subsolar point lies at approximately $5.79^\circ$ South latitude, indicating the Northern Hemisphere autumn solar descent.</p>
     </div>
 </div>
@@ -327,8 +322,7 @@ ight)$$
 </ol>
 <h2>Agricultural Growing Degree Days and Phenological Modeling</h2>
 <p>Agronomists, horticulturists, and climate scientists rely on continuous day-of-the-year numbering to track Growing Degree Days (GDD) and biological life cycle milestones (phenology). Standard calendar months introduce uneven day intervals (28 to 31 days) that distort thermal accumulation integrals. By utilizing continuous ordinal days $N$, daily mean temperatures $T_{\text{mean}}$ above a base physiological threshold $T_{\text{base}}$ are integrated seamlessly:
-$$\text{GDD}_{\text{cumulative}} = \sum_{N = N_{\text{bio}}}^{N_{\text{harvest}}} \max\left(0, \frac{T_{\text{max}}(N) + T_{\text{min}}(N)}{2} - T_{\text{base}}
-ight)$$
+$$\text{GDD}_{\text{cumulative}} = \sum_{N = N_{\text{bio}}}^{N_{\text{harvest}}} \max\left(0, \frac{T_{\text{max}}(N) + T_{\text{min}}(N)}{2} - T_{\text{base}} \right)$$
 This enables predictive harvesting models for commercial corn, wheat, viticulture, and orchard pest emergence regardless of leap year discrepancies.</p>
 
 <h2>Satellite Orbital Telemetry and TLE Epoch Formats</h2>
