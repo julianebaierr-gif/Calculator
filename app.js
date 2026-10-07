@@ -1,5 +1,5 @@
 /**
- * CALCHUB GLOBAL CORE APPLICATION JAVASCRIPT
+ * FITCALCHUB GLOBAL CORE APPLICATION JAVASCRIPT
  * Handles Instant Header Search, Copy to Clipboard, PDF Export & Interactive UI
  */
 
@@ -186,8 +186,8 @@ function initMathRendering() {
 window.copyToClipboard = function(text, successMsg = "Result copied to clipboard!") {
   let textToCopy = text;
   const currentUrl = window.location.href.split('#')[0].split('?')[0];
-  if (!textToCopy.includes("CalcHub")) {
-    textToCopy = `${textToCopy}\n\n— Verified & Computed via CalcHub: ${currentUrl}`;
+  if (!textToCopy.includes("FitCalcHub")) {
+    textToCopy = `${textToCopy}\n\n— Verified & Computed via FitCalcHub: ${currentUrl}`;
   } else if (!textToCopy.includes("http")) {
     textToCopy = `${textToCopy}\nSource: ${currentUrl}`;
   }

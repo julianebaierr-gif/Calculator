@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 ==============================================================================
-CALCHUB INSTANT INDEXING PROTOCOL (2026 TECHNICAL EDGE SEO)
+FITCALCHUB INSTANT INDEXING PROTOCOL (2026 TECHNICAL EDGE SEO)
 Automated Submission via Bing IndexNow API & Google/Bing Sitemap Notification
 Submits 100% of Clean URLs from sitemap.xml
 ==============================================================================
@@ -13,8 +13,8 @@ import urllib.parse
 import re
 import os
 
-SITE_HOST = "calchub.org"
-INDEXNOW_KEY = "calchub2026indexnowkey"
+SITE_HOST = "www.fitcalchub.co.uk"
+INDEXNOW_KEY = "fitcalchub2026indexnowkey"
 SITEMAP_URL = f"https://{SITE_HOST}/sitemap.xml"
 
 def get_all_sitemap_urls():
@@ -54,7 +54,7 @@ def submit_indexnow(urls):
 
 if __name__ == "__main__":
     print("=" * 60)
-    print(" CalcHub Automated Instant Indexing Engine (2026 Edge SEO)")
+    print(" FitCalcHub Automated Instant Indexing Engine (2026 Edge SEO)")
     print("=" * 60)
     urls = get_all_sitemap_urls()
     print(f"[+] Extracted {len(urls)} live canonical URLs from sitemap.xml")
