@@ -253,7 +253,20 @@ window.addEventListener('DOMContentLoaded', () => {
     <div class="post-layout-grid" style="max-width:1200px;margin:0 auto 3rem;padding:0 1.25rem;">
       <div class="post-main-content">
         <article class="article-body">
-                    <h2>Mathematical Mechanics of the Ordinal Day of the Year</h2>
+                    
+    <nav class="toc-container" aria-label="Table of Contents">
+      <div class="toc-title">📑 Table of Contents</div>
+      <ul class="toc-list">
+        <li><a href="#mathematical-mechanics-of-the-ordinal-day-of-the-y">Mathematical Mechanics of the Ordinal Day of the Year</a></li>
+        <li><a href="#solar-declination-angle-and-radiation-modeling">Solar Declination Angle and Radiation Modeling</a></li>
+        <li><a href="#common-implementation-pitfalls-with-day-of-the-yea">Common Implementation Pitfalls with Day of the Year</a></li>
+        <li><a href="#agricultural-growing-degree-days-and-phenological">Agricultural Growing Degree Days and Phenological Modeling</a></li>
+        <li><a href="#satellite-orbital-telemetry-and-tle-epoch-formats">Satellite Orbital Telemetry and TLE Epoch Formats</a></li>
+        <li><a href="#frequently-asked-questions-about-day-of-the-year">Frequently Asked Questions About Day of the Year</a></li>
+      </ul>
+    </nav>
+
+      <h2 id="mathematical-mechanics-of-the-ordinal-day-of-the-y">Mathematical Mechanics of the Ordinal Day of the Year</h2>
 <p>In astronomical modeling, geospatial data processing, solar radiation forecasting, and aerospace orbital mechanics, civil calendar representations based on variable month names and days are inherently unwieldy. Instead, engineering systems represent chronological progression as a continuous one-dimensional scalar known as the <strong>Day of the Year (DoY)</strong>, or <strong>ordinal date</strong>. Under international standard <strong>ISO 8601</strong>, an ordinal date is formally encoded as <code>YYYY-DDD</code>, where <code>DDD</code> spans monotonically from <code>001</code> to <code>365</code> (or <code>366</code> in an astronomical leap year).</p>
 
 <p>For any Gregorian calendar date consisting of year $Y$, month $M \in \{1,\dots,12\}$, and day $D \in \{1,\dots,31\}$, the closed-form algebraic equation for the ordinal day of the year is given by:</p>
@@ -263,7 +276,7 @@ $$\text{DoY} = \left\lfloor \frac{275 \cdot M}{9} \right\rfloor - \left\lfloor \
 <p>Where $\mathbb{I}_{\text{leap}}(Y)$ is the binary indicator function returning 1 if $Y$ is a leap year and 0 otherwise. This integer formula eliminates table lookups by exploiting the linear slope approximation of monthly accumulations ($275/9 \approx 30.555$), with the step term $\lfloor (M+9)/12 
 floor$ acting as an activation switch that suppresses February's anomaly for January and February ($M \le 2$), while subtracting 1 or 2 days for all subsequent months ($M \ge 3$).</p>
 
-<h2>Solar Declination Angle and Radiation Modeling</h2>
+<h2 id="solar-declination-angle-and-radiation-modeling">Solar Declination Angle and Radiation Modeling</h2>
 <p>The primary scientific application of the Day of the Year ($N = \text{DoY}$) occurs in solar photovoltaic engineering and atmospheric meteorology. Because the Earth's rotational axis is tilted by an obliquity of approximately $23.45^\circ$ relative to the ecliptic plane, the apparent latitude where the Sun is directly overhead at solar noon (the <strong>Solar Declination Angle</strong> $\delta$) oscillates continuously throughout the annual cycle.</p>
 
 <p>Cooper's fundamental astronomical approximation models solar declination $\delta$ as a sinusoidal function of the day of the year $N$:</p>
@@ -330,18 +343,18 @@ $$\delta = 23.45^\circ \times \sin\left( \frac{360^\circ}{365} \times (N + 284) 
     </div>
 </div>
 
-<h2>Common Implementation Pitfalls with Day of the Year</h2>
+<h2 id="common-implementation-pitfalls-with-day-of-the-yea">Common Implementation Pitfalls with Day of the Year</h2>
 <ol>
     <li><strong>Confusing Ordinal Day with Julian Day Number (JDN):</strong> In computer science documentation and legacy codebases, the ordinal Day of the Year (1 to 365) is frequently mislabeled as a "Julian date" (e.g., calling <code>2026-278</code> a Julian date). In strict astronomy, Julian Date represents the continuous count of days since 4713 BCE (e.g., $\text{JD } 2,461,319.5$). Conflating the two creates catastrophic database synchronization errors.</li>
     <li><strong>Zero-Based vs. One-Based Indexing Discrepancies:</strong> In C <code>struct tm</code> (POSIX), the member <code>tm_yday</code> is zero-based ($0 \le \text{tm\_yday} \le 365$, where January 1 is Day 0). In ISO 8601, ordinal dates are strictly one-based ($001 \le \text{DDD} \le 366$). Converting between POSIX systems and ISO displays requires careful $+1$ offset handling.</li>
     <li><strong>The Leap Day Boundary Shift:</strong> Omitting the quadrennial check shifts all dates after February 28th backward by exactly one day in leap years, throwing off agricultural growing degree day (GDD) calculations and satellite ground-track predictions.</li>
 </ol>
-<h2>Agricultural Growing Degree Days and Phenological Modeling</h2>
+<h2 id="agricultural-growing-degree-days-and-phenological">Agricultural Growing Degree Days and Phenological Modeling</h2>
 <p>Agronomists, horticulturists, and climate scientists rely on continuous day-of-the-year numbering to track Growing Degree Days (GDD) and biological life cycle milestones (phenology). Standard calendar months introduce uneven day intervals (28 to 31 days) that distort thermal accumulation integrals. By utilizing continuous ordinal days $N$, daily mean temperatures $T_{\text{mean}}$ above a base physiological threshold $T_{\text{base}}$ are integrated seamlessly:
 $$\text{GDD}_{\text{cumulative}} = \sum_{N = N_{\text{bio}}}^{N_{\text{harvest}}} \max\left(0, \frac{T_{\text{max}}(N) + T_{\text{min}}(N)}{2} - T_{\text{base}} \right)$$
 This enables predictive harvesting models for commercial corn, wheat, viticulture, and orchard pest emergence regardless of leap year discrepancies.</p>
 
-<h2>Satellite Orbital Telemetry and TLE Epoch Formats</h2>
+<h2 id="satellite-orbital-telemetry-and-tle-epoch-formats">Satellite Orbital Telemetry and TLE Epoch Formats</h2>
 <p>In aerospace geodesy and space situational awareness, North American Aerospace Defense Command (NORAD) and NASA publish Two-Line Element sets (TLE) using fractional day-of-the-year notation. For example, epoch <code>26278.41666667</code> denotes the year 2026, day 278, at precisely 10:00:00 UTC. Using ordinal days avoids sexagesimal time conversions and eliminates ambiguity across planetary coordinate reference frames.</p>
 
 <section class="faq-section">
@@ -375,7 +388,7 @@ This enables predictive harvesting models for commercial corn, wheat, viticultur
       </section>
 
 
-      <h2>Frequently Asked Questions About Day of the Year</h2>
+      <h2 id="frequently-asked-questions-about-day-of-the-year">Frequently Asked Questions About Day of the Year</h2>
     <div class="faq-item">
         <h3>What is an ISO 8601 Ordinal Date?</h3>
         <p>An ISO 8601 ordinal date consists of a 4-digit calendar year followed by a 3-digit continuous day count, formatted as <code>YYYY-DDD</code> (e.g., <code>2026-001</code> for January 1st, or <code>2026-365</code> for December 31st). It eliminates monthly boundaries for logistics, packaging expiry tracking, and manufacturing lot codes.</p>

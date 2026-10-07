@@ -355,7 +355,20 @@ window.addEventListener('DOMContentLoaded', () => {
     <div class="post-layout-grid" style="max-width:1200px;margin:0 auto 3rem;padding:0 1.25rem;">
       <div class="post-main-content">
         <article class="article-body">
-                    <h2>Mathematical Foundations of Gregorian Date Calculus</h2>
+                    
+    <nav class="toc-container" aria-label="Table of Contents">
+      <div class="toc-title">📑 Table of Contents</div>
+      <ul class="toc-list">
+        <li><a href="#mathematical-foundations-of-gregorian-date-calculu">Mathematical Foundations of Gregorian Date Calculus</a></li>
+        <li><a href="#the-end-of-month-clamping-phenomenon-in-temporal-p">The End-of-Month Clamping Phenomenon in Temporal Projection</a></li>
+        <li><a href="#continuous-astronomical-time-julian-day-numbers-jd">Continuous Astronomical Time: Julian Day Numbers (JDN) and MJD</a></li>
+        <li><a href="#the-year-2038-problem-y2k38-in-computer-systems">The Year 2038 Problem (Y2K38) in Computer Systems</a></li>
+        <li><a href="#common-methodological-errors-in-date-calculations">Common Methodological Errors in Date Calculations</a></li>
+        <li><a href="#frequently-asked-questions">Frequently Asked Questions</a></li>
+      </ul>
+    </nav>
+
+      <h2 id="mathematical-foundations-of-gregorian-date-calculu">Mathematical Foundations of Gregorian Date Calculus</h2>
 <p>Calculating temporal spans between arbitrary dates or projecting calendar dates across multi-scale units (years, months, weeks, days) constitutes a core operational necessity in biomedical clinical trials, jurisprudence, actuarial life tables, and corporate debt issuance. The primary difficulty in date mathematics arises from the fact that the civil calendar is non-metric and non-uniform: solar years alternate between 365 and 366 days, while individual months vary cyclically between 28, 29, 30, and 31 days.</p>
 
 <p>When computing the discrete decomposition $(\Delta Y, \Delta M, \Delta D)$ between two dates $D_1 = (Y_1, M_1, d_1)$ and $D_2 = (Y_2, M_2, d_2)$ where $D_2 \ge D_1$, arithmetic operates through positional borrowing:</p>
@@ -374,7 +387,7 @@ $$\Delta D = \Delta D + \text{DaysInMonth}(Y_2, M_2 - 1), \quad \Delta M = \Delt
 
 $$\Delta M = \Delta M + 12, \quad \Delta Y = \Delta Y - 1$$
 
-<h2>The End-of-Month Clamping Phenomenon in Temporal Projection</h2>
+<h2 id="the-end-of-month-clamping-phenomenon-in-temporal-p">The End-of-Month Clamping Phenomenon in Temporal Projection</h2>
 <p>When adding or subtracting calendar intervals from an anchor date—for example, adding exactly one month to January 31st—algebraic computation encounters an impossibility: the date <em>February 31st</em> does not exist in any solar calendar. In software systems and legal contracts, this is resolved via the <strong>End-of-Month Clamping Convention</strong> (standardized by ANSI SQL, Java <code>java.time</code>, and Python <code>dateutil.relativedelta</code>):</p>
 
 $$M_{\text{new}} = (M_0 + \Delta M) \bmod 12$$
@@ -413,7 +426,7 @@ $$d_{\text{clamped}} = \min\big(d_0, \text{DaysInMonth}(Y_{\text{new}}, M_{\text
     </tbody>
 </table>
 
-<h2>Continuous Astronomical Time: Julian Day Numbers (JDN) and MJD</h2>
+<h2 id="continuous-astronomical-time-julian-day-numbers-jd">Continuous Astronomical Time: Julian Day Numbers (JDN) and MJD</h2>
 <p>To eliminate month length variations and century leap-year complexities in computational astrophysics and satellite orbit ephemerides, astronomers bypass calendar dates entirely in favor of continuous scalar numbers. The primary celestial timescale is the <strong>Julian Day Number (JDN)</strong>, defined as the continuous count of days elapsed since Greenwich mean noon on January 1, 4713 BCE (proleptic Julian calendar).</p>
 
 <p>For modern aerospace tracking and satellite flight dynamics, NASA and the International Astronomical Union (IAU) commonly employ the <strong>Modified Julian Date (MJD)</strong>:</p>
@@ -422,7 +435,7 @@ $$\text{MJD} = \text{JDN} - 2400000.5$$
 
 <p>The offset of $0.5$ shifts the start of the astronomical day from noon to midnight UTC, ensuring seamless synchronization with civil solar dates. The duration between any two historical or future events $(t_1, t_2)$ is obtained through exact scalar subtraction: $\Delta t = \text{MJD}_2 - \text{MJD}_1$, completely circumventing calendar irregularities.</p>
 
-<h2>The Year 2038 Problem (Y2K38) in Computer Systems</h2>
+<h2 id="the-year-2038-problem-y2k38-in-computer-systems">The Year 2038 Problem (Y2K38) in Computer Systems</h2>
 <p>In software engineering and Unix-like operating systems (including Linux, Android, iOS, and macOS), calendar dates are traditionally stored as the number of elapsed seconds since the Unix Epoch (January 1, 1970 00:00:00 UTC). Systems utilizing legacy <strong>32-bit signed integers</strong> (<code>time_t</code>) possess a maximum positive representable value of $2^{31} - 1 = 2,147,483,647$ seconds.</p>
 
 <p>This limitation triggers the famous <strong>Year 2038 Problem (Y2K38)</strong>:</p>
@@ -454,14 +467,14 @@ $$\text{MJD} = \text{JDN} - 2400000.5$$
     </div>
 </div>
 
-<h2>Common Methodological Errors in Date Calculations</h2>
+<h2 id="common-methodological-errors-in-date-calculations">Common Methodological Errors in Date Calculations</h2>
 <ol>
     <li><strong>Naive Thirty-Day Month Multipliers:</strong> Multiplying months by 30 (e.g., assuming 6 months = 180 days) introduces systematic discrepancies. The interval from March 1 to September 1 contains 184 days, whereas the interval from September 1 to March 1 contains only 181 days (or 182 in a leap year). True date math must traverse actual calendar months.</li>
     <li><strong>Asymmetry in Temporal Reversal:</strong> Adding a month and then subtracting a month does not necessarily return to the original date due to clamping. For example, $\text{Jan 31} + 1 \text{ month} = \text{Feb 28}$; subsequent subtraction $\text{Feb 28} - 1 \text{ month} = \text{Jan 28}$, resulting in an irreversible 3-day loss.</li>
     <li><strong>Proleptic Gregorian Calendar Distortion:</strong> Projecting dates prior to October 15, 1582 requires specifying whether calculations utilize the proleptic Gregorian calendar or the historical Julian calendar (which drifted by 10 days at the time of the Gregorian reform).</li>
 </ol>
                 
-      <h2>Frequently Asked Questions</h2>
+      <h2 id="frequently-asked-questions">Frequently Asked Questions</h2>
 <div class="faq-accordion">
   <div class="faq-item">
     <h3>How does the date calculator borrow days across months of different lengths?</h3>

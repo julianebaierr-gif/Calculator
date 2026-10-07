@@ -233,7 +233,21 @@ window.addEventListener('DOMContentLoaded', () => {
 <div class="post-layout-grid" style="max-width:1200px;margin:0 auto 3rem;padding:0 1.25rem;">
 <div class="post-main-content">
 <article class="article-body">
-<h2>Mathematical Principles of Continuous Time Duration</h2>
+
+    <nav class="toc-container" aria-label="Table of Contents">
+      <div class="toc-title">📑 Table of Contents</div>
+      <ul class="toc-list">
+        <li><a href="#mathematical-principles-of-continuous-time-duratio">Mathematical Principles of Continuous Time Duration</a></li>
+        <li><a href="#the-iso-8601-duration-standard-representation">The ISO 8601 Duration Standard Representation</a></li>
+        <li><a href="#network-telemetry-and-distributed-systems-clock-sy">Network Telemetry and Distributed Systems Clock Synchronization</a></li>
+        <li><a href="#common-implementation-pitfalls-with-duration-calcu">Common Implementation Pitfalls with Duration Calculations</a></li>
+        <li><a href="#specialized-applications-athletic-chronometry-and">Specialized Applications: Athletic Chronometry and High-Precision Lap Splits</a></li>
+        <li><a href="#relational-databases-and-sql-temporal-duration-mod">Relational Databases and SQL Temporal Duration Modeling</a></li>
+        <li><a href="#frequently-asked-questions-about-time-duration">Frequently Asked Questions About Time Duration</a></li>
+      </ul>
+    </nav>
+
+      <h2 id="mathematical-principles-of-continuous-time-duratio">Mathematical Principles of Continuous Time Duration</h2>
 <p>In physical kinematics, chronobiology, space geodesy, and computer networking, measuring the exact <strong>duration</strong> elapsed between two chronological events requires continuous interval arithmetic. While discrete dates follow discontinuous calendar partitions (varying month lengths, leap years), duration is an invariant physical scalar measured in the SI base unit of seconds ($s$).</p>
 <p>Given an initial timestamp $t_{\text{start}}$ and a terminal timestamp $t_{\text{end}}$, the fundamental elapsed duration $\Delta t$ is evaluated from their UNIX epoch representations (milliseconds elapsed since January 1, 1970 00:00:00 UTC):</p>
 
@@ -246,7 +260,7 @@ $$H = \left\lfloor \frac{\Delta t_{\text{sec}} \bmod 86400}{3600} \right\rfloor$
 $$M = \left\lfloor \frac{\Delta t_{\text{sec}} \bmod 3600}{60} \right\rfloor$$
 $$S = \Delta t_{\text{sec}} \bmod 60$$
 
-<h2>The ISO 8601 Duration Standard Representation</h2>
+<h2 id="the-iso-8601-duration-standard-representation">The ISO 8601 Duration Standard Representation</h2>
 <p>International standard <strong>ISO 8601-1:2019</strong> specifies an unambiguous syntax for exchanging duration metadata across enterprise computer software, distributed APIs, and database schemas. An ISO 8601 duration string follows the canonical format:</p>
 
 $$\text{P}[n]\text{Y}[n]\text{M}[n]\text{D}\text{T}[n]\text{H}[n]\text{M}[n]\text{S}$$
@@ -280,7 +294,7 @@ $$\text{P}[n]\text{Y}[n]\text{M}[n]\text{D}\text{T}[n]\text{H}[n]\text{M}[n]\tex
 <tr><td>1 Julian Year ($a$)</td><td>$31,557,600 \text{ s}$</td><td>$525,960 \text{ min}$</td><td>$8,766.0 \text{ hr}$</td><td>$365.25 \text{ d}$</td></tr>
 </tbody>
 </table>
-<h2>Network Telemetry and Distributed Systems Clock Synchronization</h2>
+<h2 id="network-telemetry-and-distributed-systems-clock-sy">Network Telemetry and Distributed Systems Clock Synchronization</h2>
 <p>In cloud computing, high-frequency financial trading, and distributed database consensus (such as Google Spanner's TrueTime API), duration measurements face relativistic and network latency challenges. Network Time Protocol (NTP) and Precision Time Protocol (IEEE 1588 PTP) synchronize atomic clocks across global data centers.</p>
 <p>When measuring durations across servers, engineers utilize <strong>monotonic clock timers</strong> (e.g., <code>clock_gettime(CLOCK_MONOTONIC)</code> in Linux) rather than wall-clock real time (<code>CLOCK_REALTIME</code>). Monotonic clocks never jump backward due to NTP slew adjustments or leap second insertions, guaranteeing mathematically positive duration evaluations.</p>
 <div class="worked-example-card">
@@ -304,19 +318,19 @@ floor = 14 \text{ minutes}$$
         $$\text{Total Gigabytes} = \frac{7.2675 \times 10^{11}}{8 \times 10^9} \approx 90.84 \text{ GB}$$
     </div>
 </div>
-<h2>Common Implementation Pitfalls with Duration Calculations</h2>
+<h2 id="common-implementation-pitfalls-with-duration-calcu">Common Implementation Pitfalls with Duration Calculations</h2>
 <ol>
 <li><strong>Daylight Saving Time (DST) Jumps:</strong> Calculating duration between local wall-clock times across the spring transition (e.g., 01:30 to 03:30) appears to span 2 hours, but physically only 1 hour elapsed because clocks jumped forward at 02:00. Always compute durations using UTC epoch timestamps.</li>
 <li><strong>Leap Second Distortions:</strong> While civil time occasionally inserts a 61st second (23:59:60 UTC) to match Earth's slowing rotation, POSIX standards ignore leap seconds, causing a 1-second discrepancy against International Atomic Time (TAI).</li>
 <li><strong>Floating Point Inaccuracies in Millisecond Conversions:</strong> Dividing large epoch millisecond timestamps directly in 32-bit floating point induces truncation errors. Systems must retain 64-bit double precision integers.</li>
 </ol>
-<h2>Specialized Applications: Athletic Chronometry and High-Precision Lap Splits</h2>
+<h2 id="specialized-applications-athletic-chronometry-and">Specialized Applications: Athletic Chronometry and High-Precision Lap Splits</h2>
 <p>In Olympic track and field, motorsport telemetry (Formula 1, NASCAR), and competitive swimming, time duration calculations require sub-second millisecond resolution governed by international governing bodies (World Athletics, FIA, World Aquatics). At velocities exceeding 300 km/h in Formula 1 racing, an interval of just 0.001 seconds (1 millisecond) represents approximately 8.33 centimeters of physical track displacement. Chronometric timing systems employ transponder loops embedded in the circuit asphalt that generate differential time splits:</p>
 
 $$\Delta t_{\text{split}} = t_{\text{sector, } k} - t_{\text{sector, } k-1}$$
 
 <p>Accumulating lap sectors into total race duration requires high-precision sexagesimal floating-point addition that prevents IEEE 754 binary floating-point roundoff drift over multi-hour endurance events like the 24 Hours of Le Mans.</p>
-<h2>Relational Databases and SQL Temporal Duration Modeling</h2>
+<h2 id="relational-databases-and-sql-temporal-duration-mod">Relational Databases and SQL Temporal Duration Modeling</h2>
 <p>In enterprise software architecture and data warehousing (PostgreSQL, Oracle, Snowflake, MySQL), durations are stored using specialized temporal data types such as SQL standard <code>INTERVAL DAY TO SECOND</code>. Evaluating differences between timestamps utilizes statutory SQL functions:</p>
 <pre><code>-- PostgreSQL exact duration extraction
 SELECT AGE(end_timestamp, start_timestamp) AS calendar_span,
@@ -351,7 +365,7 @@ SELECT AGE(end_timestamp, start_timestamp) AS calendar_span,
 </a>
 </div>
 </section>
-<h2>Frequently Asked Questions About Time Duration</h2>
+<h2 id="frequently-asked-questions-about-time-duration">Frequently Asked Questions About Time Duration</h2>
 <div class="faq-item">
 <h3>How is time duration calculated across days?</h3>
 <p>The start and end date-times are converted to millisecond epoch timestamps, the difference is calculated, and then decomposed into integer days, hours, minutes, and seconds.</p>

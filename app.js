@@ -184,11 +184,19 @@ function initMathRendering() {
 }
 
 window.copyToClipboard = function(text, successMsg = "Result copied to clipboard!") {
+  let textToCopy = text;
+  const currentUrl = window.location.href.split('#')[0].split('?')[0];
+  if (!textToCopy.includes("CalcHub")) {
+    textToCopy = `${textToCopy}\n\n— Verified & Computed via CalcHub: ${currentUrl}`;
+  } else if (!textToCopy.includes("http")) {
+    textToCopy = `${textToCopy}\nSource: ${currentUrl}`;
+  }
+
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(text).then(() => showToast(successMsg));
+    navigator.clipboard.writeText(textToCopy).then(() => showToast(successMsg));
   } else {
     const input = document.createElement("textarea");
-    input.value = text;
+    input.value = textToCopy;
     document.body.appendChild(input);
     input.select();
     document.execCommand("copy");

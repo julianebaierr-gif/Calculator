@@ -272,7 +272,20 @@ window.addEventListener('DOMContentLoaded', () => {
     <div class="post-layout-grid" style="max-width:1200px;margin:0 auto 3rem;padding:0 1.25rem;">
       <div class="post-main-content">
         <article class="article-body">
-                    <h2>Mathematical Formulation of Real-Time Countdown Systems</h2>
+                    
+    <nav class="toc-container" aria-label="Table of Contents">
+      <div class="toc-title">📑 Table of Contents</div>
+      <ul class="toc-list">
+        <li><a href="#mathematical-formulation-of-real-time-countdown-sy">Mathematical Formulation of Real-Time Countdown Systems</a></li>
+        <li><a href="#timezone-normalization-and-epoch-alignment">Timezone Normalization and Epoch Alignment</a></li>
+        <li><a href="#high-frequency-precision-time-monotonic-clocks-vs">High-Frequency Precision Time: Monotonic Clocks vs. Wall-Clock Time</a></li>
+        <li><a href="#nanosecond-synchronizations-and-ieee-1588-ptp-prot">Nanosecond Synchronizations and IEEE 1588 PTP Protocols</a></li>
+        <li><a href="#common-implementation-bugs-in-countdown-applicatio">Common Implementation Bugs in Countdown Applications</a></li>
+        <li><a href="#frequently-asked-questions">Frequently Asked Questions</a></li>
+      </ul>
+    </nav>
+
+      <h2 id="mathematical-formulation-of-real-time-countdown-sy">Mathematical Formulation of Real-Time Countdown Systems</h2>
 <p>In computational chronometry, a countdown timer calculates the exact vector difference between a continuous dynamic current timestamp $T_{\text{now}}$ and an invariant future target epoch $T_{\text{target}}$. Although frequently presented as a simplistic visual interface, accurate countdown engines must navigate non-trivial challenges associated with client-server clock desynchronization, Coordinated Universal Time (UTC) epoch transformations, and multi-scale dimensional unit decomposition.</p>
 
 <p>The total physical temporal interval $\Delta t$ between $T_{\text{now}}$ and $T_{\text{target}}$ is initially quantified as an absolute scalar in milliseconds:</p>
@@ -295,7 +308,7 @@ $$S = \Delta t_{\text{sec}} \bmod 60$$
 
 <p>Where $86400 = 24 \times 3600$ represents the total number of SI seconds in a civil solar day, and $3600$ represents the seconds in a single hour.</p>
 
-<h2>Timezone Normalization and Epoch Alignment</h2>
+<h2 id="timezone-normalization-and-epoch-alignment">Timezone Normalization and Epoch Alignment</h2>
 <p>A frequent error in countdown implementations stems from local timezone ambiguities. If a global software release is scheduled for <code>2027-01-01 00:00:00 UTC</code>, a client browser operating in New York (Eastern Standard Time, UTC-5) must not evaluate the target as midnight local time. The countdown engine must normalize both timestamps to absolute Unix Epoch time (milliseconds elapsed since January 1, 1970 00:00:00 UTC):</p>
 
 $$T_{\text{epoch}} = (\text{YearDays} + \text{LeapDays}) \times 86400 + (H \times 3600) + (M \times 60) + S - \text{TZ}_{\text{offset}}$$
@@ -305,7 +318,7 @@ $$T_{\text{epoch}} = (\text{YearDays} + \text{LeapDays}) \times 86400 + (H \time
 <h3>Daylight Saving Time (DST) Invariance</h3>
 <p>When a countdown spans across a Daylight Saving Time boundary—such as the March "spring-forward" transition where a civil day contains only 23 hours, or the November "fall-back" transition where a civil day contains 25 hours—naive countdown algorithms that assume every day contains 24.0 civil hours introduce a 1-hour jump in remaining time. By anchoring calculations in absolute UTC epoch milliseconds, the true physical countdown progresses without disruption.</p>
 
-<h2>High-Frequency Precision Time: Monotonic Clocks vs. Wall-Clock Time</h2>
+<h2 id="high-frequency-precision-time-monotonic-clocks-vs">High-Frequency Precision Time: Monotonic Clocks vs. Wall-Clock Time</h2>
 <p>In real-time software engineering, JavaScript web applications, and embedded digital displays, computing countdown increments using standard wall-clock interfaces (such as <code>new Date()</code>) exposes the system to non-linear clock jumps. Wall-clock time is subject to Network Time Protocol (NTP) slewing, manual operating system time adjustments, and leap second insertions. When an NTP daemon adjusts the local system clock backward by several milliseconds, wall-clock countdown timers can register frozen or backward intervals.</p>
 
 <p>To achieve high-frequency jitter-free rendering (such as sub-frame 60 FPS / 120 FPS animations), modern web applications combine wall-clock target resolution with the <strong>Monotonic Clock</strong> provided by the W3C High Resolution Time API (<code>window.performance.now()</code>):</p>
@@ -314,7 +327,7 @@ $$\Delta t_{\text{monotonic}} = \text{TargetEpoch}_{\text{UTC}} - \big( T_{\text
 
 <p>Because monotonic clocks never decrease and are independent of system clock modifications, countdown animations maintain sub-millisecond smoothness without displaying visual stutter.</p>
 
-<h2>Nanosecond Synchronizations and IEEE 1588 PTP Protocols</h2>
+<h2 id="nanosecond-synchronizations-and-ieee-1588-ptp-prot">Nanosecond Synchronizations and IEEE 1588 PTP Protocols</h2>
 <p>In high-frequency algorithmic financial trading (HFT), power grid phasor measurement units (PMUs), and distributed particle accelerators (such as CERN), countdown synchronization operates beyond seconds into nanosecond regimes ($10^{-9} \text{ s}$). Under standard NTP over commercial wide-area networks, timing uncertainty hovers between $1$ and $50$ milliseconds. To synchronize distributed nodes with sub-microsecond precision, enterprise engineering deploys the <strong>IEEE 1588 Precision Time Protocol (PTP)</strong>.</p>
 
 <p>IEEE 1588 utilizes hardware packet timestamping at the physical network interface layer (PHY), measuring mean round-trip path delays ($\delta$) and clock offsets ($\theta$) via bidirectional message exchange:</p>
@@ -377,14 +390,14 @@ floor = 14 \text{ minutes}$$
     </div>
 </div>
 
-<h2>Common Implementation Bugs in Countdown Applications</h2>
+<h2 id="common-implementation-bugs-in-countdown-applicatio">Common Implementation Bugs in Countdown Applications</h2>
 <ol>
     <li><strong>Client System Clock Drift:</strong> Browsers evaluate <code>new Date()</code> using the local operating system clock. If the user's computer clock is manually altered or drifts by 5 minutes, client-side countdowns exhibit an identical 5-minute offset. High-reliability countdowns synchronize periodically with Network Time Protocol (NTP) servers via WebSocket or HTTP HEAD headers.</li>
     <li><strong>Timer Drift and Browser Tab Throttling:</strong> JavaScript <code>setInterval()</code> calls are heavily throttled by modern web browsers when a browser tab is placed in the background (slowing from 1,000 ms to 10,000 ms or more to conserve mobile battery). Resilient countdown engines re-query real clock time on every tick rather than simply decrementing an internal counter variable.</li>
     <li><strong>Failure to Transition to Negative (Elapsed) Time:</strong> Without proper conditional branching, timers that cross T-zero may wrap around to display nonsensical negative numbers (e.g., <code>-1d -2h</code>) instead of cleanly entering an elapsed timeline format.</li>
 </ol>
                 
-      <h2>Frequently Asked Questions</h2>
+      <h2 id="frequently-asked-questions">Frequently Asked Questions</h2>
 <div class="faq-accordion">
   <div class="faq-item">
     <h3>How is the countdown between current time and target date calculated?</h3>
