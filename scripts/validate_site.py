@@ -32,7 +32,8 @@ def main():
                 continue
             
             clean_target = h.strip('/')
-            if clean_target == '' or clean_target == 'sitemap.xml' or clean_target == 'styles.css' or clean_target == 'favicon.ico' or clean_target == 'favicon.svg' or clean_target == 'apple-touch-icon.png':
+            known_assets = {'sitemap.xml', 'styles.css', 'favicon.ico', 'favicon.svg', 'apple-touch-icon.png', 'site.webmanifest', 'logo.png', 'og-image.png'}
+            if clean_target == '' or clean_target in known_assets:
                 continue
             
             target_file = clean_target if clean_target.endswith('.html') else f"{clean_target}.html"
