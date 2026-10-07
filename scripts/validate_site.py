@@ -7,6 +7,9 @@ def main():
     print(f"Validating {len(html_files)} HTML files...")
     errors = 0
 
+    all_slugs = {f.replace('.html', '') for f in html_files}
+    all_slugs.add('')  # root '/'
+
     for f in html_files:
         with open(f, 'r', encoding='utf-8') as fh:
             c = fh.read()
@@ -16,15 +19,29 @@ def main():
         if '</html>' not in c:
             print(f"Error: {f} missing closing html tag")
             errors += 1
-        # Check internal html links
-        links = re.findall(r'href=[\'"]([a-zA-Z0-9_\-\.]+\.html)[\'"]', c)
-        for link in links:
-            if not os.path.exists(link):
-                print(f"Broken link in {f}: {link}")
+
+        # Strip <script>...</script> before checking HTML href links
+        html_only = re.sub(r'<script\b[^>]*>.*?</script>', '', c, flags=re.S)
+
+        # Check internal links
+        hrefs = re.findall(r'href=[\'"]([^\'":#\s]+)(?:#[^\'"]*)?[\'"]', html_only)
+        for h in hrefs:
+            if h.startswith('http') or h.startswith('mailto:') or h.startswith('tel:') or h.startswith('#') or h.startswith('javascript:'):
+                continue
+            if '${' in h:
+                continue
+            
+            clean_target = h.strip('/')
+            if clean_target == '' or clean_target == 'sitemap.xml' or clean_target == 'styles.css' or clean_target == 'favicon.ico' or clean_target == 'favicon.svg' or clean_target == 'apple-touch-icon.png':
+                continue
+            
+            target_file = clean_target if clean_target.endswith('.html') else f"{clean_target}.html"
+            if not os.path.exists(target_file):
+                print(f"Broken link in {f}: {h} (Target not found: {target_file})")
                 errors += 1
 
     if errors == 0:
-        print(f"SUCCESS: All {len(html_files)} HTML files and internal links are 100% valid with zero broken links!")
+        print(f"SUCCESS: All {len(html_files)} HTML files and internal links are 100% valid with ZERO broken links!")
     else:
         print(f"Found {errors} errors.")
 

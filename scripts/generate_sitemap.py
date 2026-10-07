@@ -1,5 +1,6 @@
 """
-Generates sitemap.xml for all HTML pages in CalcHub.
+Generates sitemap.xml for all HTML pages in CalcHub using clean URLs.
+Complies with Vercel's cleanUrls: true setting.
 """
 
 import os
@@ -9,16 +10,20 @@ from datetime import date
 def main():
     today = date.today().isoformat()
     html_files = glob.glob("*.html")
+    # Exclude 404 error page
     html_files = [f for f in html_files if f != "404.html"]
 
-    # Sort files logically: index first, category hubs, then tools
     categories = [
         "health.html", "finance.html", "math.html", "engineering.html",
         "solar-energy.html", "mechanical.html", "civil.html", "chemical.html",
         "fire-safety.html", "programmer.html", "datetime.html", "converter.html"
     ]
 
-    tools = [f for f in html_files if f != "index.html" and f not in categories]
+    legal_pages = [
+        "about.html", "privacy-policy.html", "terms.html", "disclaimer.html", "contact.html"
+    ]
+
+    tools = [f for f in html_files if f != "index.html" and f not in categories and f not in legal_pages]
 
     urls = []
     # 1. Homepage
@@ -32,8 +37,9 @@ def main():
     # 2. Category Hubs
     for cat in sorted(categories):
         if os.path.exists(cat):
+            clean_name = cat.replace(".html", "")
             urls.append(f"""  <url>
-    <loc>https://calchub.org/{cat}</loc>
+    <loc>https://calchub.org/{clean_name}</loc>
     <lastmod>{today}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
@@ -41,11 +47,23 @@ def main():
 
     # 3. Calculators
     for tool in sorted(tools):
+        clean_name = tool.replace(".html", "")
         urls.append(f"""  <url>
-    <loc>https://calchub.org/{tool}</loc>
+    <loc>https://calchub.org/{clean_name}</loc>
     <lastmod>{today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
+  </url>""")
+
+    # 4. Legal & EEAT Pages
+    for lp in sorted(legal_pages):
+        if os.path.exists(lp):
+            clean_name = lp.replace(".html", "")
+            urls.append(f"""  <url>
+    <loc>https://calchub.org/{clean_name}</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
   </url>""")
 
     sitemap_content = f"""<?xml version="1.0" encoding="UTF-8"?>
@@ -62,7 +80,7 @@ def main():
     with open("sitemap.xml", "w", encoding="utf-8") as f:
         f.write(sitemap_content)
 
-    print(f"Generated sitemap.xml with {len(urls)} URLs.")
+    print(f"Generated clean sitemap.xml with {len(urls)} URLs.")
 
 if __name__ == "__main__":
     main()
