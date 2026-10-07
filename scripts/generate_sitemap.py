@@ -10,8 +10,15 @@ from datetime import date
 def main():
     today = date.today().isoformat()
     html_files = glob.glob("*.html")
-    # Exclude 404 error page
-    html_files = [f for f in html_files if f != "404.html"]
+    # Exclude 404 error page and canonical redirects
+    aliases = {
+        "3-phase-power-calculator.html",
+        "waist-to-height-ratio-calculator.html",
+        "fire-sprinkler-calculator.html",
+        "privacy.html",
+        "legal.html"
+    }
+    html_files = [f for f in html_files if f != "404.html" and f not in aliases]
 
     categories = [
         "health.html", "finance.html", "math.html", "engineering.html",

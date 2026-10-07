@@ -82,6 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initTOC();
   initQuickCalc();
   initCategoryFilter();
+  initMathRendering();
   if (typeof window.rotateSidebarTools === "function") {
     window.rotateSidebarTools();
   }
@@ -148,11 +149,39 @@ function initToast() {
 window.showToast = function(msg = "Copied to clipboard!") {
   const toast = document.getElementById("toast-notice");
   const msgEl = document.getElementById("toast-msg");
-  if (!toast || !msgEl) return;
-  msgEl.textContent = msg;
-  toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 2500);
+  if (!toast || !msgEl) {
+    initToast();
+  }
+  const t = document.getElementById("toast-notice");
+  const m = document.getElementById("toast-msg");
+  if (!t || !m) return;
+  m.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2500);
 };
+
+// Global non-blocking Toast fallback for mobile alert() UX
+window.alert = function(msg) {
+  window.showToast(msg);
+};
+
+// Universal KaTeX Auto-Render Initializer
+function initMathRendering() {
+  const renderMath = () => {
+    if (typeof renderMathInElement === "function") {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false }
+        ],
+        throwOnError: false
+      });
+    }
+  };
+  renderMath();
+  setTimeout(renderMath, 250);
+}
 
 window.copyToClipboard = function(text, successMsg = "Result copied to clipboard!") {
   if (navigator.clipboard && window.isSecureContext) {

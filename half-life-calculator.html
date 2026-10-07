@@ -71,7 +71,14 @@
 <!-- KaTeX Math Rendering Support -->
 <link href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" rel="stylesheet"/>
 <script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script defer="" onload="renderMathInElement(document.body);" src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\[', right: '\\]', display: true}, {left: '\\(', right: '\\)', display: false}], throwOnError: false});"></script>
+  <!-- Open Graph & Social Sharing Previews -->
+  <meta property="og:image" content="https://calchub.org/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="CalcHub — Precision Standards-Compliant Calculators">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://calchub.org/og-image.png">
 </head>
 <body data-category="chemical">
 <!-- Sticky Header -->
@@ -652,21 +659,21 @@
       let resAlt = "";
 
       if (target === "nt") {
-        if (n0 <= 0 || thalf_s <= 0) { alert("N0 and Half-Life must be positive non-zero"); return; }
+        if (n0 <= 0 || thalf_s <= 0) { window.showToast("N0 and Half-Life must be positive non-zero"); return; }
         const cycles = t_s / thalf_s;
         nt = n0 * Math.pow(0.5, cycles);
         resLabel = "Remaining Quantity N(t)";
         resVal = nt >= 0.001 ? nt.toFixed(4) : nt.toExponential(4);
         resAlt = ((nt / n0) * 100).toFixed(2) + "% of initial quantity remaining";
       } else if (target === "n0") {
-        if (nt <= 0 || thalf_s <= 0) { alert("N(t) and Half-Life must be positive non-zero"); return; }
+        if (nt <= 0 || thalf_s <= 0) { window.showToast("N(t) and Half-Life must be positive non-zero"); return; }
         const cycles = t_s / thalf_s;
         n0 = nt * Math.pow(2.0, cycles);
         resLabel = "Initial Quantity (N₀)";
         resVal = n0 >= 0.001 ? n0.toFixed(4) : n0.toExponential(4);
         resAlt = "Decayed to " + nt + " over " + cycles.toFixed(2) + " half-lives";
       } else if (target === "t") {
-        if (n0 <= 0 || nt <= 0 || nt >= n0 || thalf_s <= 0) { alert("For decay time: N0 > N(t) > 0 and t½ > 0 required"); return; }
+        if (n0 <= 0 || nt <= 0 || nt >= n0 || thalf_s <= 0) { window.showToast("For decay time: N0 > N(t) > 0 and t½ > 0 required"); return; }
         t_s = thalf_s * (Math.log(n0 / nt) / Math.LN2);
         const outUnit = document.getElementById("elapsedTimeUnit").value;
         const t_disp = fromSeconds(t_s, outUnit);
@@ -674,7 +681,7 @@
         resVal = t_disp.toFixed(3) + " " + outUnit;
         resAlt = (t_s / 86400).toFixed(1) + " days (" + (t_s / (365.25 * 86400)).toFixed(2) + " years)";
       } else if (target === "thalf") {
-        if (n0 <= 0 || nt <= 0 || nt >= n0 || t_s <= 0) { alert("For half-life: N0 > N(t) > 0 and t > 0 required"); return; }
+        if (n0 <= 0 || nt <= 0 || nt >= n0 || t_s <= 0) { window.showToast("For half-life: N0 > N(t) > 0 and t > 0 required"); return; }
         thalf_s = (t_s * Math.LN2) / Math.log(n0 / nt);
         const outUnit = document.getElementById("thalfUnit").value;
         const thalf_disp = fromSeconds(thalf_s, outUnit);
